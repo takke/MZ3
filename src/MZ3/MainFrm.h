@@ -1,0 +1,76 @@
+// MainFrm.h : CMainFrame クラスのインターフェイス
+//
+
+
+#pragma once
+
+
+
+class CMainFrame : public CFrameWnd
+{
+protected: // シリアル化からのみ作成します。
+	CMainFrame();
+	DECLARE_DYNCREATE(CMainFrame)
+
+public:
+
+// 操作
+public:
+
+// オーバーライド
+public:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+
+// 実装
+public:
+	virtual ~CMainFrame();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#endif
+
+public:  // コントロール バー用メンバ
+	CCommandBar m_wndCommandBar;
+
+	// 生成された、メッセージ割り当て関数
+protected:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+
+	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg void OnBackButton();
+	afx_msg void OnForwardButton();
+	inline afx_msg void OnStopButton() {
+		::SendMessage(GetActiveView()->m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+	};
+	afx_msg void OnSettingLogin();
+	void OnUpdateBackButton(CCmdUI*);
+	void OnUpdateForwardButton(CCmdUI*);
+	void OnUpdateStopButton(CCmdUI*);
+	void OnUpdateImageButton(CCmdUI*);
+	void OnUpdateWriteButton(CCmdUI*);
+	void OnUpdateBrowserButton(CCmdUI*);
+
+	afx_msg void OnSettingGeneral();
+	afx_msg void OnMenuClose();
+	afx_msg void OnUpdateGetpageAll(CCmdUI *pCmdUI);
+	afx_msg void OnGetpageAll();
+	afx_msg void OnGetpageLatest10();
+	afx_msg void OnUpdateGetpageLatest10(CCmdUI *pCmdUI);
+	afx_msg void OnChangeFontBig();
+	afx_msg void OnChangeFontMedium();
+	afx_msg void OnChangeFontSmall();
+	bool ChangeAllViewFont(int fontHeight);
+	afx_msg void OnChangeFontNormal();
+	afx_msg void OnUpdateMenuBack(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateMenuNext(CCmdUI *pCmdUI);
+	afx_msg void OnMenuBack();
+	afx_msg void OnMenuNext();
+	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+	afx_msg void OnCheckNew();
+	afx_msg void OnHelpMenu();
+	afx_msg void OnHistoryMenu();
+	afx_msg void OnStartCruise();
+};
+
+

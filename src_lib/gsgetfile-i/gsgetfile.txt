@@ -1,0 +1,247 @@
+------------------------------------------------------------------------------
+	gsgetfile.dll version 0.05β
+	Copyright(C) 2002-2003 Y.Nagamidori
+	開発者向けマニュアル
+------------------------------------------------------------------------------
+●　概要
+PocketPC標準の"ファイルを開く"ダイアログや"名前を付けて保存"のファイル選択ダイアログは
+My Documents等の一部の限られたフォルダにのみアクセスできず不便です。
+また、HPC標準のものもPC用Windowsのものより機能が限られており不満が残ります。
+gsgetfile.dllはPocketPCでHPC同等以上のファイル選択ダイアログの提供と、HPCで標準の
+ファイル選択ダイアログ以上の機能のダイアログを提供するDLL（ダイナミックリンクライブラリ)です。
+
+PocketPC / HPC / ポポペ (HPCの横幅320pixel版) / Palm-sizePC(HPCの横幅240pixel版)によってダイアログが切り替わります。
+
+
+●　動作環境、および必要なDLL
+WindowsCE2.11日本語版以上のもの
+プラットホームに依存しません。
+ソースからビルドした場合はWindowsCE 2.0でも使用できると思います。
+
+
+●　必要開発環境
+embedded Visual C++ 3.0
+
+
+●　動作確認
+jornada720 / GENIOe550X / E-65で動作確認を行っています。
+
+
+●　使用方法
+includeフォルダのgsgetfile.hをインクルードし、
+libフォルダのgsgetfile.libをリンクして使用してください。
+またLoadLibrary関数でdllをロードする場合は不要です。
+対応するCPUのlibやdllが場合はソースから自分でビルドしてください。
+
+libフォルダのgsgetlib.libはgsgetfile.dllが存在したらgsgetfile.dllを使用し、
+存在しない場合は、OS標準のものを呼び出す関数を実装したスタティックライブラリです。
+includeフォルダのgsgetlib.hをインクルードしてお好みにより使用してください。
+
+
+●　リファレンス
+gsgetfile.dllにはOS標準のコモンダイアログと同等の関数が実装されています。
+基本的にコモンダイアログのGetOpenFileNameとGetSaveFileNameと使用方法は同じです。
+----------------------------------------------------------------------
+BOOL gsGetOpenFileName(OPENFILENAME* pofn)
+----------------------------------------------------------------------
+機能:	ファイル選択ダイアログ(開くダイアログ)を表示しファイル名を取得する。
+引数:	OPENFILENAME* pofn:	情報構造体へのポインタ
+戻り値:	TRUE: 成功 / FALSE: 失敗
+詳細:	コモンダイアログのGetOpenFileName()と同等の動作をします。
+
+----------------------------------------------------------------------
+BOOL gsGetSaveFileName(OPENFILENAME* pofn)
+----------------------------------------------------------------------
+機能:	ファイル選択ダイアログ(保存ダイアログ)を表示しファイル名を取得する。
+引数:	OPENFILENAME* pofn:	情報構造体へのポインタ
+戻り値:	TRUE: 成功 / FALSE: 失敗
+詳細:	コモンダイアログのGetSaveFileName()と同等の動作をします。
+
+----------------------------------------------------------------------
+情報構造体 OPENFILENAME
+----------------------------------------------------------------------
+情報構造体 OPENFILENAMEは次のように定義されています。
+右側は各値の注意事項です。
+特に注意点のないものはサポートされているフィールドです。
+
+typedef struct tagOFN {
+   DWORD        lStructSize; // 構造体のサイズ: 必ずsizeof(OPENFILENAME)をセットしてください。
+   HWND         hwndOwner;
+   HINSTANCE    hInstance;   // 未サポート
+   LPCTSTR      lpstrFilter; // 複数の拡張子のサポート(※注1)
+   LPTSTR       lpstrCustomFilter; // 未サポート
+   DWORD        nMaxCustFilter; // 未サポート
+   DWORD        nFilterIndex;
+   LPTSTR       lpstrFile;
+   DWORD        nMaxFile;
+   LPTSTR       lpstrFileTitle; // (※注2)
+   DWORD        nMaxFileTitle;
+   LPCTSTR      lpstrInitialDir;
+   LPCTSTR      lpstrTitle;
+   DWORD        Flags; // 下記のOPENFILENAMEの値Flagsのサポート状況を参照
+   WORD         nFileOffset; // 未サポート
+   WORD         nFileExtension; // 未サポート
+   LPCTSTR      lpstrDefExt;
+   LPARAM       lCustData; // 未サポート
+   LPOFNHOOKPROC lpfnHook; // 未サポート
+   LPCTSTR      lpTemplateName; // 未サポート
+} OPENFILENAME, *LPOPENFILENAME;
+
+※注1: HPCでは"*.mp3;*mp2;*.mpa"のように拡張子をカンマ区切りで複数指定することができませんが
+gsgetfile.dllではこのカンマ区切りでの指定をサポートしています。(この機能が一番欲しかった。)
+
+※注2: OFN_ALLOWMULTISELECTフラグでファイル名複数選択時は値が格納されません。
+PC用Windowsのダイアログと同等です。
+
+各フィールドの詳しい情報はMSDNライブラリなどを参照してください。
+
+----------------------------------------------------------------------
+OPENFILENAMEのFlagsのサポート状況
+----------------------------------------------------------------------
+○以下のフラグはサポートされています。
+OFN_ALLOWMULTISELECT
+OFN_CREATEPROMPT
+OFN_OVERWRITEPROMPT
+OFN_PATHMUSTEXIST
+OFN_FILEMUSTEXIST
+
+○以下のフラグは未サポートです。
+OFN_ENABLEHOOK
+OFN_ENABLESIZING
+OFN_ENABLETEMPLATE
+OFN_ENABLETEMPLATEHANDLE
+OFN_EXPLORER
+OFN_HIDEREADONLY
+OFN_LONGNAMES
+OFN_NOCHANGEDIR
+OFN_NODEREFERENCELINKS
+OFN_NOLONGNAMES
+OFN_NONETWORKBUTTON
+OFN_NOREADONLYRETURN
+OFN_NOTESTFILECREATE
+OFN_NOVALIDATE
+OFN_PROJECT
+OFN_PROPERTY
+OFN_READONLY
+OFN_SHAREAWARE
+OFN_SHOWHELP
+
+○以下のフラグは現状では未サポートですが必要ならば将来的にサポートするかもしれません。
+OFN_EXTENSIONDIFFERENT
+
+各フラグの詳しい情報はMSDNライブラリなどを参照してください。
+
+
+●　制限事項
+○OFN_ALLOWMULTISELECTについて
+複数ファイルの選択です。サポートされています。GetOpenFileNameでのみ有効です。
+単一のファイル選択時はOPENFILENAME構造体のlpstrFileにフルパス名が格納されますが、
+複数選択時には
+  <パス>NULL<ファイル名1>NULL<ファイル名2>NULL<ファイル名3>...
+のように格納されます。
+PC用WindowsのGetOpenFileNameと同等の動作です。
+
+○HPCでの動作制限
+HPCにはデスクトップが存在しOS標準のものではデスクトップにアクセス可能ですが
+gsgetfile.dllではアクセスできません。
+
+○動作確認を行っていないデバイスでの動作
+フォルダのアイコンなどがただしく表示されない場合があります。
+表示されないデバイスがありましたら作者に報告してください。サポートを行うかもしれません。
+
+○エラー情報の取得
+GetOpenFileName()/GetSaveFileName()が失敗した場合、CommDlgExtendedError()でエラー情報が
+取得できますが、gsgetfile.dllでは取得できません。
+
+
+●　dll本体の使用条件
+gsgetfile.dllはフリーソフトです。dll本体の再配布/転載など自由に行ってください。制限はありません。
+
+
+●　ソースコードの使用条件
+ソースに関しては使用条件があります。
+それは
+・致命的なバグがあったら作者に報告すること
+・動作確認のないデバイスでの動作確認情報を作者に提供すること（特にl'agendaとぽぽぺ）
+です。
+あとはどのように利用されてもかまいません。
+商用利用、改変版の配布、ソフトへの組み込みなどなどお好きなように使用してください。
+この程度のもので儲けようとも思いませんし。
+
+とはいえ、名前を変えてソースにちょっとだけ改良加えた奴を別の名前つけてシェアウェアにする
+といった情けない行為はあまりしない方がいいと思いますけど（xx mascot騒動もあったし）
+
+
+●　サンプルコード
+○gsgetfile.dllが存在する場合はgsgetfile.dllを使用し
+存在しない場合はOS標準のよびを呼び出す関数のこーど (gsgetlib.libから抜粋)
+BOOL GetOpenFileNameEx(OPENFILENAME* pofn)
+{
+	HINSTANCE hInst = LoadLibrary(_T("gsgetfile.dll"));
+	if (hInst) {
+		BOOL (*gsGetOpenFileName)(OPENFILENAME* pofn);
+		(FARPROC&)gsGetOpenFileName = GetProcAddress(hInst, _T("gsGetOpenFileName"));
+		if (gsGetOpenFileName) {
+			BOOL ret = gsGetOpenFileName(pofn);
+			FreeLibrary(hInst);
+			return ret;
+		}
+		FreeLibrary(hInst);
+	}
+	return GetOpenFileName(pofn);
+}
+
+○通常の"ファイルを開く"ダイアログを表示するコード
+void OnFileOpen()
+{
+	WCHAR szFile[MAX_PATH] = L"\0";
+	OPENFILENAME ofn;
+
+	memset(&(ofn), 0, sizeof(ofn));
+	ofn.lStructSize	= sizeof(ofn);
+	ofn.hwndOwner   = m_hWnd;
+	ofn.lpstrFile   = szFile;
+	ofn.nMaxFile    = MAX_PATH;	
+	ofn.lpstrTitle  = L"MP3ﾌｧｲﾙを開く...";
+	ofn.lpstrFilter = L"使用可能なファイル\0*.mp3;*.rmp;*.mp2;*.mpa\0MP3ﾌｧｲﾙ (*.MP3)\0*.mp3\0RMPﾌｧｲﾙ (*.RMP)\0*.rmp\0Layer-2 (*.mp2)\0*.mp2\0Layer-1 (*.mpa)\0*.mpa\0すべてのﾌｧｲﾙ (*.*)\0*.*\0\0";
+	ofn.Flags       = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT;
+	ofn.lpstrInitialDir = m_szInitDir;
+	if (GetOpenFileName(&ofn) == IDOK)
+	{
+		// 成功した場合の処理
+	}
+}
+
+
+
+
+●　参考資料
+○HPC標準のファイル選択ダイアログとの違い
+・ファイルの複数選択が可能
+・デスクトップにアクセスできない
+・新規フォルダ作成ボタンがない
+・カンマ区切り複数拡張子指定が可能
+
+○PocketPC標準のファイル選択ダイアログとの違い
+・My Documents以外のフォルダのファイルのアクセスが可能
+・ファイルの複数選択が可能
+・PocketPC標準のものは妙に遅い
+
+●　更新履歴
+0.00β	初版作成
+0.01β	ファイルの単一選択時に拡張子がある場合、正しく動作しなかったため修正
+	PocketPCで複数選択時の動作変更
+0.02β	横幅320pixel対応
+	テキストボックスにフィルタを打ち込んだときの動作修正
+	フォルダのショートカットが2重に表示されるバグFix
+0.03β	ファイルをリストから選択しない場合、拡張子がつかないバグをFix
+	フォルダが2つ表示される場合があったため修正
+	拡張子をつけない場合メモリ破壊していたため修正
+0.04β	複数選択可能時すべて選択ボタン追加(PocketPC)
+	キーボードショートカット(Ctrl+A)対応(HPC)
+0.04β	複数選択時のテキストボックスへの文字列追加削除処理の変更
+	CEF版の削除
+
+
+●　開発者向け連絡先メールアドレス
+y_nagamidori@mail.goo.ne.jp

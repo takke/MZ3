@@ -1,0 +1,131 @@
+@charset "Shift_JIS";
+
+/* 共通スタイル */
+/*
+*
+{
+	font-size		: 1.0em;
+	line-height		: 1.0em;
+	text-align		: left;
+	text-decoration	: none;
+	text-autospace	: ideograph-alpha ideograph-numeric ideograph-space;
+	font-style		: normal;
+	font-weight		: normal;
+}*/
+
+html
+{
+	direction	: ltr;
+	margin		: 0px;
+	padding		: 0px;
+	border		: 0px;
+	color		: #553311;
+}
+
+head
+{
+	display		: none;
+}
+
+/* 一般HTMLスタイル */
+/*font,center,b,i,*/s,strike,u,hr
+{
+	display		: none;
+}
+
+em,strong,dfn,code,samp,kbd,var,cite,abbr,acronym,
+a,h1,h2,h3,h4,h5,h6,pre,ins,del
+{
+/*	font-size		: 1.0em;*/
+/*	font-style		: normal;*/
+/*	font-weight		: normal;*/
+	text-decoration	: none;
+}
+
+a
+{
+	color	: #4080FF;
+}
+
+a:link
+{
+	color	: #4080FF;
+}
+
+a:active
+{
+	color	: #888888;
+}
+
+a:visited
+{
+	color	: #204088;
+}
+
+h1
+{
+	font-size	: 2.0em;
+	font-weight	: bold;
+}
+
+h2
+{
+	font-size	: 1.4em;
+	font-weight	: bold;
+}
+
+h3
+{
+	font-size	: 1.2em;
+	font-weight	: bold;
+}
+
+h4
+{
+	font-size		: 1.0em;
+	font-weight		: bold;
+	margin-left		: 1.0em;
+	margin-bottom	: 0.5em;
+}
+
+/* 各フレーズ要素スタイル */
+em
+{
+	color			: #004477;
+	font-weight		: bold;
+	font-style		: normal;
+}
+
+strong
+{
+	color			: #FF4400;
+	text-decoration	: underline;
+}
+
+dfn
+{
+	color			: #774422;
+	text-decoration	: underline;
+}
+
+ins
+{
+	color			: #663311;
+	font-style		: italic;
+}
+
+del
+{
+	color			: #663311;
+	text-decoration	: line-through;
+}
+
+kbd
+{
+	font-style		: italic;
+}
+
+code
+{
+	font-style		: italic;
+}

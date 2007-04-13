@@ -1,0 +1,198 @@
+.JRegex API
+JRegexの各関数の説明
+
+..正規表現コンパイル
+正規表現のコンパイルを行います
+検索/置き換えを実行するときこの関数の戻り値が必須となります
+
+  jreg* jreg_comp(t_code *regstr, jreg_opt opt)
+
+    regstr [in] 正規表現パターン
+    opt    [in] コンパイルオプション
+
+     Option
+     以下の値の組み合わせを指定します
+      JREG_NONE            オプション指定なし
+      JREG_STARTLINE       改行直後を先頭として扱う
+      JREG_ENDLINE         改行直前を終端として扱う
+      JREG_MULTILINE       複数行を扱う (改行前後を先頭/終端として扱う)
+      JREG_BINARYMODE      バイナリモードで実行
+      JREG_DFA             DFAコンパイルを行う
+
+     戻り値
+     コンパイルされた正規表現情報が返されます
+     コンパイルエラー時は null(0) が返されます
+
+  * JRegexでは大文字小文字無視のオプションは実行時オプションとなります
+  * 正規表現パターンは m/.../ などとくくる必要はありません
+
+  * JREG_DFA とするとアルゴリズムの制限によって以下の制約を受けます
+  *  後方参照、最短一致、限定一致のいずれかが使用された場合
+  *  自動的に JREG_DFA は無効になります
+  * 拡張正規表現は部分的なNFAとして扱われます
+
+..正規表現マッチング
+与えられたパターンとマッチングを行います
+
+  bool jreg_exec(jreg *reg, PATTERN_STR Pattern, u_int start,
+                 u_int len, jreg_opt opt)
+
+    reg     [in/out] 正規表現情報
+    Pattern [in]     検索対象
+    start   [in]     検索開始位置
+    len     [in]     検索領域サイズ
+    opt     [in]     実行オプション
+
+     Pattern
+     配列、または関数ポインタを渡せます
+     関数ポインタを渡す場合実行オプションに JREG_STRINGFUNC を指定します
+     JREG_STRINGFUNC を指定すれば参照するインデックスと
+     ユーザ定義値(jreg.usrval)を元に関数がコールされます
+      PATTERN_TCODE        配列の先頭ポインタを渡します
+      PATTERN_FUNC         関数ポインタを渡します
+
+     opt
+     以下の値の組み合わせを指定します
+      JREG_NONE            オプション指定なし
+      JREG_ICASE           大文字小文字無視
+      JREG_SINGLESTEP      複数位置での検索/置き換えをしない
+      JREG_STRINGFUNC      文字列をコールバック関数から取得
+      JREG_NORMAL          デフォルトのオプションを指定
+
+     戻り値
+     検索対象にマッチすれば true が返されます
+     それ以外は false が返されます
+     全体マッチ位置/幅は jreg.backref[0] に格納されます
+     マッチ幅が 0 であればマッチしていません
+     マッチ幅を -1 すればマッチ文字数が分かります
+     マッチ幅が 1(-1して0) であれば0文字幅マッチしています
+
+  * JRegexでは大文字小文字無視を実行時に解決するため実行時オプションとなります
+  * 使用できる正規表現についてはJRegex.txtを参照してください
+
+..正規表現置き換え
+与えられたパターンとマッチングし置き換え後文字列を作成します
+
+  bool jreg_replace(jreg *reg, jreg_rep *rep, PATTERN_STR Pattern,
+                    u_int start, u_int len, jreg_opt opt)
+
+    reg     [in/out] 正規表現情報
+    rep     [in/out] 置き換え情報
+    Pattern [in]     検索対象
+    start   [in]     検索開始位置
+    len     [in]     検索領域サイズ
+    opt     [in]     実行オプション
+
+     rep
+     置き換え後情報を指定します
+     repbuf に null を指定することで先に bufsize の値を取得できます
+      repstr  [in]     置き換え後文字列パターン
+      repbuf  [in/out] 置き換え後文字列
+      bufsize [out]    置き換え後文字列のサイズ
+      start   [out]    置き換え開始位置
+      match   [out]    置き換え幅
+
+     Pattern
+     配列、または関数ポインタを渡せます
+     関数ポインタを渡す場合実行オプションに JREG_STRINGFUNC を指定します
+     JREG_STRINGFUNC を指定すれば参照するインデックスと
+     ユーザ定義値(jreg.usrval)を元に関数がコールされます
+      PATTERN_TCODE        配列の先頭ポインタを渡します
+      PATTERN_FUNC         関数ポインタを渡します
+
+     opt
+     以下の値の組み合わせを指定します
+      JREG_NONE            オプション指定なし
+      JREG_ICASE           大文字小文字無視
+      JREG_SINGLESTEP      複数位置での検索/置き換えをしない
+      JREG_STRINGFUNC      文字列をコールバック関数から取得
+      JREG_USELASTRET      前回の検索結果を利用
+      JREG_NORMAL          デフォルトのオプションを指定
+
+
+     戻り値
+     検索対象にマッチすれば true が返されます
+     それ以外は false が返されます
+     マッチ位置/幅は jreg.backref[0] に格納されます
+
+  * 使用できる置き換え後文字列パターンについてはJRegex.txtを参照してください
+
+..正規表現解放
+jreg_comp で作成した正規表現情報を解放します
+
+  void jreg_free(jreg *reg)
+
+    reg [in] 正規表現情報
+
+     戻り値
+     戻り値はありません
+
+.サンプル
+ソースは以下のようなものになります
+
+010 #include "JRegex.h"
+020 #include <locale.h>
+030 #include <stdio.h>
+040 
+050 int _tmain(int argc, TCHAR *args[])
+060 {
+070 	jreg *reg = jreg_comp(_T("ab+c[xyz]"), JREG_NORMAL);
+080 	PATTERN_STR pat;
+090 	
+100 	if(!reg) {return(-1);}
+110 	pat.PATTERN_TCODE = _T("abbbbcy");
+120 	
+130 	_tsetlocale(LC_ALL, _T("Japanese"));
+140 	if(jreg_exec(reg, pat, 0, _tcslen(pat.PATTERN_TCODE), JREG_NORMAL))
+150 	{
+160 		_tprintf("match!");
+170 	}
+180 	
+190 	jreg_free(reg);
+200 	return(0);
+210 }
+
+cl(MS-VC)でコンパイルする場合
+$ cl xxx.c JRegex.c JChar.c jectlib.c
+
+GCC(MinGW)でもコンパイルできるはずです
+SJISパッチを当ててワーニングを無視すればそのままいけるかも、です
+
+..エラーが出る場合 (共通)
+正規表現文字列を渡す場合などにキャストエラーが出る場合があります
+JRegex内部では文字列を t_code型 と言った独自型で扱います
+SJIS版では unsigned char型、UNICODE版では unsigned short型になります
+適切にキャストしてください
+
+MS-VCを使っている場合は TCHAR型 を使うと思いますが
+t_code型 はこれを符号なし整数にしたものです
+
+..エラーが出る場合 (MS-VC)
+JRegexはワーニングレベル /W3 でワーニングが出ないことを確認しています
+ただし最高のワーニングレベル /W4 では大量の警告が出ます
+これはコーディングスタイルにかかわるものも多い為無視しています
+実用上問題ありません
+
+..エラーが出る場合 (GCC MinGW)
+内部でWindowsSDK用のヘッダである tchar.h を必要とします
+また、内部でSJISマルチバイト文字列を利用しているため警告が出ます
+GCCにパッチを当てるか、警告の個所をコメントアウトしておいてください
+
+UNICODE版でコンパイルするとコンパイルは通っても実行時におかしな動作をします
+これはGCCでのワイドキャラクタの扱い方がMS-VCと違う為です
+GCCのパッチを作るかUNICODE版でのコンパイルをあきらめてください
+
+JRegexをコンパイルすると大量にでるエラー/警告は次のように修正できます
+
+例えば
+  _limitu      このマクロは `left shift count >= width of type' と言う警告がでます
+               limit.h をインクルードしてそちらを使うよう修正してください
+  /* /*/ //*/  このコメントの書き方は `warning: "/*" within comment' と言う警告がでます
+               #if #else #endif で書き直してください
+  'ぁ' など    日本語版cl(MS-VC)では通用します (他国語版では調べていません)
+               `multi-character character constant' と言う警告がでます
+               \x829f などと書き直してください、SJIS版とUNICODE版で分ける必要があります
+
+.注意点
+複数のスレッドから同一のコンパイル済み正規表現情報を使用することは出来ません
+スレッド毎に正規表現をコンパイルして使用してください

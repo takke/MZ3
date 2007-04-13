@@ -1,0 +1,734 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resourceppc.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resourceppc.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)\r\n"
+    "LANGUAGE 17, 1\r\n"
+    "#pragma code_page(932)\r\n"
+    "#include ""res\\MZ3ppc.rc2""  // Microsoft Visual C++ 以外で編集されたリソース\r\n"
+    "#include ""afxres.rc""     // 標準コンポーネント\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\MZ3.ico"
+IDR_MZ3TYPE             ICON                    "res\\MZ3Doc.ico"
+IDI_NO_PHOTO_ICON       ICON                    "res\\NoPhotoIcon.ico"
+IDI_PHOTO_ICON          ICON                    "res\\photo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "メニュー"
+    BEGIN
+        POPUP "画面"
+        BEGIN
+            MENUITEM "前の画面へ",                       ID_MENU_BACK
+            MENUITEM "次の画面へ",                       ID_MENU_NEXT
+        END
+        POPUP "設定"
+        BEGIN
+            MENUITEM "一般...",                       ID_SETTING_GENERAL
+            POPUP "記事取得"
+            BEGIN
+                MENUITEM "全件取得",                        IDM_GETPAGE_ALL
+                MENUITEM "最新１０件取得",                     IDM_GETPAGE_LATEST10
+            END
+            POPUP "文字サイズ"
+            BEGIN
+                MENUITEM "大",                           ID_CHANGE_FONT_BIG
+                MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
+                MENUITEM "小",                           ID_CHANGE_FONT_SMALL
+            END
+        END
+        POPUP "編集"
+        BEGIN
+            MENUITEM "切り取り",                        ID_EDIT_CUT
+            MENUITEM "コピー",                         ID_EDIT_COPY
+            MENUITEM "貼り付け",                        ID_EDIT_PASTE
+            MENUITEM "全て選択",                        ID_SELECT_ALL
+        END
+        POPUP "ブックマーク"
+        BEGIN
+            MENUITEM "ブックマークに追加",                   ID_ADD_BOOKMARK
+            MENUITEM "ブックマークから削除",                  ID_DEL_BOOKMARK
+        END
+        POPUP "その他"
+        BEGIN
+            MENUITEM "新着チェック",                      IDM_CHECK_NEW
+            MENUITEM "巡回",                          IDM_START_CRUISE
+            MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
+        END
+        POPUP "ヘルプ"
+        BEGIN
+            MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
+            MENUITEM "改版履歴",                        ID_HISTORY_MENU
+            MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "終了",                          ID_MENU_CLOSE
+    END
+    POPUP "削除済メニュー"
+    BEGIN
+        POPUP "設定"
+        BEGIN
+            MENUITEM "ログイン...",                     ID_SETTING_LOGIN
+        END
+    END
+END
+
+IDR_BODY_MENU MENU 
+BEGIN
+    POPUP "一般メニュー"
+    BEGIN
+        MENUITEM "ログを開く",                       ID_VIEW_LOG
+        MENUITEM "全部読む",                        ID_GET_ALL
+        MENUITEM "最新の１０件を読む",                   ID_GET_LAST10
+        MENUITEM SEPARATOR
+        MENUITEM "未読にする",                       IDM_SET_NO_READ
+    END
+    POPUP "コミュニティ用メニュー"
+    BEGIN
+        MENUITEM "トピック一覧",                      IDM_VIEW_BBS_LIST
+        MENUITEM "トピック一覧（ログ）",                  IDM_VIEW_BBS_LIST_LOG
+        MENUITEM SEPARATOR
+        MENUITEM "ブラウザで開く",                     ID_OPEN_BROWSER
+    END
+END
+
+IDR_REPORT_MENU MENU 
+BEGIN
+    POPUP "レポート"
+    BEGIN
+        MENUITEM "戻る",                          ID_BACK_MENU
+        MENUITEM "進む",                          ID_NEXT_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "コメントを書く...",                  ID_WRITE_COMMENT
+        POPUP "ページ"
+        BEGIN
+            MENUITEM "再読込",                         IDM_RELOAD_PAGE
+        END
+        POPUP "ブックマーク"
+        BEGIN
+            MENUITEM "ブックマークに追加",                   ID_ADD_BOOKMARK
+            MENUITEM "ブックマークから削除",                  ID_DEL_BOOKMARK
+        END
+        MENUITEM "ブラウザで開く（このページ）...",           ID_OPEN_BROWSER
+        MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
+    END
+END
+
+IDR_IMAGE_MENU MENU 
+BEGIN
+    POPUP "画像"
+    BEGIN
+        MENUITEM "画像",                          ID_32800
+    END
+END
+
+IDR_WRITE_MENU MENU 
+BEGIN
+    POPUP "編集"
+    BEGIN
+        POPUP "編集"
+        BEGIN
+            MENUITEM "コピー",                         ID_EDIT_COPY
+            MENUITEM "切り取り",                        ID_EDIT_CUT
+            MENUITEM "貼り付け",                        ID_EDIT_PASTE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "写真を添付する",                     ID_ATTACH_PHOTO
+        MENUITEM "書き込み",                        ID_WRITE_SEND_MENU
+        MENUITEM "中止",                          ID_WRITE_CANCEL_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "前の画面へ",                       ID_WRITE_BACK_MENU
+    END
+END
+
+IDR_DIARY_MENU MENU 
+BEGIN
+    POPUP "日記メニュー"
+    BEGIN
+        MENUITEM "日記を書く",                       ID_WRITE_DIARY
+    END
+END
+
+IDR_PROFILE_ITEM_MENU MENU 
+BEGIN
+    POPUP "プロフィール項目"
+    BEGIN
+        MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
+        MENUITEM "自己紹介を簡易表示...",                ID_OPEN_SELFINTRO
+        MENUITEM "紹介文を簡易表示...",                 ID_OPEN_INTRO
+        MENUITEM "メッセージを送る",                    ID_SEND_NEW_MESSAGE
+    END
+END
+
+IDR_CATEGORY_MENU MENU 
+BEGIN
+    POPUP "カテゴリメニュー"
+    BEGIN
+        MENUITEM "巡回",                          IDM_CRUISE
+        MENUITEM "巡回予約",                        IDM_CHECK_CRUISE
+        MENUITEM "日記を書く",                       ID_WRITE_DIARY
+    END
+END
+
+IDR_ATTACH_IMAGE_MENU MENU 
+BEGIN
+    POPUP "書き込み画面用画像添付メニュー"
+    BEGIN
+        POPUP "写真１"
+        BEGIN
+            MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO1
+            MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO1
+        END
+        POPUP "写真２"
+        BEGIN
+            MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO2
+            MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO2
+        END
+        POPUP "写真３"
+        BEGIN
+            MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO3
+            MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO3
+        END
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_SELECT_ALL,          VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG  0, 0, 147, 179
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "バージョン情報 MZ3"
+FONT 9, "MS UI Gothic"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC_1,7,7,18,21,SS_REALSIZEIMAGE
+    LTEXT           "MZ3 Version 0.0.0.0",IDC_STATIC_2,27,7,101,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006-2007",IDC_STATIC_5,27,18,102,8
+    LTEXT           "Takke, Icchu and many contributors...",IDC_STATIC_7,30,29,108,8
+    LTEXT           "(GNU General Public License)",IDC_STATIC_8,30,40,88,8
+    LTEXT           "based on :",IDC_STATIC_11,27,52,31,8
+    LTEXT           "MZ3 Version 0.3.3.1",IDC_STATIC_4,30,63,70,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006 Mako",IDC_STATIC_3,30,74,86,8
+    LTEXT           "includes :",IDC_STATIC_9,27,86,28,8
+    LTEXT           "JRegex lib.",IDC_STATIC_10,30,97,34,8
+    LTEXT           "Copyright (C) 2003 (全略)",IDC_STATIC_6,30,108,77,8
+    LTEXT           "FDQ Library",IDC_STATIC_12,30,120,36,8
+    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_13,30,131,69,8
+    LTEXT           "total received bytes here.",IDC_TOTAL_BYTES_STATIC,27,147,112,8
+    PUSHBUTTON      "reset",IDC_RESET_TOTAL_RECV_BYTES_BUTTON,30,159,24,13
+END
+
+IDD_ABOUTBOX_WIDE DIALOG  0, 0, 187, 128
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "バージョン情報 MZ3"
+FONT 9, "MS UI Gothic"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC_1,7,7,18,21,SS_REALSIZEIMAGE
+    LTEXT           "MZ3 Version 0.0.0.0",IDC_STATIC_2,30,7,101,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006 Mako",IDC_STATIC_3,63,63,86,8
+    LTEXT           "MZ3 Version 0.3.3.1",IDC_STATIC_4,63,52,70,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006-2007",IDC_STATIC_5,30,18,112,8
+    LTEXT           "(GNU General Public License)",IDC_STATIC_8,33,40,88,8
+    LTEXT           "includes :",IDC_STATIC_9,30,75,28,8
+    LTEXT           "Copyright (C) 2003 (全略)",IDC_STATIC_6,103,75,77,8
+    LTEXT           "JRegex lib.",IDC_STATIC_10,63,75,34,8
+    LTEXT           "Takke, Icchu and many contributors...",IDC_STATIC_7,33,29,108,8
+    LTEXT           "based on :",IDC_STATIC_11,30,52,31,8
+    LTEXT           "FDQ Library",IDC_STATIC_12,63,86,36,8
+    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_13,103,86,69,8
+    LTEXT           "total received bytes here.",IDC_TOTAL_BYTES_STATIC,30,101,117,8
+    PUSHBUTTON      "reset",IDC_RESET_TOTAL_RECV_BYTES_BUTTON,152,99,24,13
+END
+
+IDD_MZ3_FORM DIALOG  0, 0, 87, 104
+STYLE DS_SETFONT | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    EDITTEXT        IDC_INFO_EDIT,0,90,40,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    CONTROL         "",IDC_HEADER_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,42,60,12
+    CONTROL         "",IDC_BODY_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,59,60,30
+    CONTROL         "",IDC_GROUP_TAB,"SysTabControl32",0x0,7,7,50,14
+    CONTROL         "",IDC_PROGRESS_BAR,"msctls_progress32",WS_BORDER | 0x1,7,28,66,14
+END
+
+IDD_REPORTVIEW DIALOG  0, 0, 87, 98
+STYLE DS_SETFONT | WS_CHILD | WS_SYSMENU
+FONT 9, "MS UI Gothic"
+BEGIN
+    EDITTEXT        IDC_INFO_EDIT,0,68,64,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE
+    CONTROL         "",IDC_REPORT_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,12,79,30
+    EDITTEXT        IDC_REPORT_EDIT,0,44,76,14,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_TITLE_EDIT,0,0,69,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "",IDC_PROGRESS_BAR,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER | 0x1,0,84,80,14
+END
+
+IDD_OPTIONTAB_PROXY DIALOG  0, 0, 139, 130
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "PROXY"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "Server",IDC_STATIC,7,26,48,8
+    CONTROL         "PROXYを使用する",IDC_PROXY_USE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,69,10
+    LTEXT           "Port",IDC_STATIC,7,52,36,8
+    EDITTEXT        IDC_PROXY_SERVER_EDIT,7,35,102,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PROXY_PORT_EDIT,7,61,42,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "User",IDC_STATIC,7,78,42,8
+    EDITTEXT        IDC_PROXY_USER_EDIT,7,88,45,14,ES_AUTOHSCROLL
+    LTEXT           "Password",IDC_STATIC,59,78,66,8
+    EDITTEXT        IDC_PROXY_PASSWPRD_EDIT,58,88,46,14,ES_AUTOHSCROLL
+END
+
+IDD_OPTIONTAB_GETPAGE DIALOG  0, 0, 139, 116
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "取得"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "全データ取得",IDC_PAGE_GETALL_RADIO,"Button",BS_AUTORADIOBUTTON,14,20,55,10
+    CONTROL         "最新１０件取得",IDC_PAGE_GETLATEST_RADIO,"Button",BS_AUTORADIOBUTTON,69,20,59,10
+    GROUPBOX        "記事取得",IDC_STATIC,7,7,125,28
+    LTEXT           "受信バッファ",IDC_STATIC,14,54,38,8
+    COMBOBOX        IDC_RECV_BUF_COMBO,69,52,52,48,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "受信",IDC_STATIC,7,41,125,28
+    CONTROL         "保存する",IDC_SAVE_LOG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,89,42,10
+    PUSHBUTTON      "保存先を変更する",IDC_CHANGE_LOG_FOLDER_BUTTON,59,87,65,14
+    GROUPBOX        "ログ",IDC_STATIC,7,75,125,34
+END
+
+IDD_WRITEVIEW DIALOG  0, 0, 81, 98
+STYLE DS_SETFONT | WS_CHILD
+FONT 9, "MS UI Gothic"
+BEGIN
+    EDITTEXT        IDC_WRITE_TITLE_EDIT,6,6,40,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_WRITE_BODY_EDIT,6,30,40,14,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_WRITE_INFO_EDIT,7,53,40,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "書き込み",IDC_WRITE_SEND_BUTTON,0,84,30,14
+    PUSHBUTTON      "中止",IDC_WRITE_CANCEL_BUTTON,31,83,29,14
+END
+
+IDD_OPTIONTAB_USER DIALOG  0, 0, 139, 130
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "ログイン"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "メールアドレス",IDC_STATIC,6,6,84,8
+    LTEXT           "パスワード",IDC_STATIC,6,42,84,8
+    EDITTEXT        IDC_LOGIN_MAIL_EDIT,6,18,84,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_LOGIN_PASSWORD_EDIT,6,54,84,14,ES_PASSWORD | ES_AUTOHSCROLL
+END
+
+IDD_OPTIONTAB_GENERAL DIALOG  0, 0, 139, 148
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "一般"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "新着メッセージ、コメントチェック",IDC_BOOT_MNC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,22,108,10
+    GROUPBOX        "起動時",IDC_STATIC,7,7,125,35
+    CONTROL         "背景に画像を表示する",IDC_USE_BGIMAGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,60,82,10
+    PUSHBUTTON      "フォント",IDC_SELECT_FONT_BUTTON,12,86,35,14
+    LTEXT           "大",IDC_STATIC,62,76,10,8
+    EDITTEXT        IDC_FONT_BIG_EDIT,56,86,20,14,ES_AUTOHSCROLL
+    LTEXT           "中",IDC_STATIC,86,76,10,8
+    EDITTEXT        IDC_FONT_MEDIUM_EDIT,80,86,20,14,ES_AUTOHSCROLL
+    LTEXT           "小",IDC_STATIC,110,76,10,8
+    EDITTEXT        IDC_FONT_SMALL_EDIT,104,86,20,14,ES_AUTOHSCROLL
+    GROUPBOX        "UI",IDC_STATIC,7,47,125,57
+    PUSHBUTTON      "タブの初期化",IDC_RESET_TAB_BUTTON,7,111,50,14
+END
+
+IDD_DEBUG_DIALOG DIALOG  0, 0, 119, 51
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Debug Info."
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_DEBUG_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,84,32
+END
+
+IDD_QUOTE_DIALOG DIALOG  0, 0, 119, 118
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quote Type"
+FONT 9, "MS UI Gothic"
+BEGIN
+    LISTBOX         IDC_TYPE_LIST,7,73,105,38,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SAMPLE_EDIT,7,26,105,40,ES_MULTILINE | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_MESSAGE_EDIT,7,7,105,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+END
+
+IDD_CHOOSE_FONT_DIALOG DIALOG  0, 0, 119, 51
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "フォント選択"
+FONT 9, "MS UI Gothic"
+BEGIN
+    CONTROL         "",IDC_FONT_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,105,26
+END
+
+IDD_DEBUG2_DIALOG DIALOG  0, 0, 186, 90
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Debug"
+FONT 8, "MS Shell Dlg"
+BEGIN
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,3,4,0
+ PRODUCTVERSION 0,3,4,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041103a4"
+        BEGIN
+            VALUE "FileDescription", "WILLCOM W-ZERO3シリーズ用mixiブラウザ"
+            VALUE "FileVersion", "0.3.4.0"
+            VALUE "InternalName", "MZ3.exe"
+            VALUE "LegalCopyright", "mako, icchu, takke  All rights reserved."
+            VALUE "OriginalFilename", "MZ3.exe"
+            VALUE "ProductName", "MZ3"
+            VALUE "ProductVersion", "0.3.4.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 932
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 139
+        VERTGUIDE, 27
+        VERTGUIDE, 30
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 172
+    END
+
+    IDD_ABOUTBOX_WIDE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        VERTGUIDE, 30
+        VERTGUIDE, 33
+        VERTGUIDE, 63
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 121
+    END
+
+    IDD_MZ3_FORM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 80
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 97
+    END
+
+    IDD_OPTIONTAB_PROXY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 123
+    END
+
+    IDD_OPTIONTAB_GETPAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        VERTGUIDE, 14
+        VERTGUIDE, 69
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 109
+        HORZGUIDE, 25
+        HORZGUIDE, 58
+        HORZGUIDE, 94
+    END
+
+    IDD_WRITEVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 74
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
+    END
+
+    IDD_OPTIONTAB_USER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 123
+    END
+
+    IDD_OPTIONTAB_GENERAL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 80
+        HORZGUIDE, 93
+        HORZGUIDE, 118
+    END
+
+    IDD_DEBUG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 44
+    END
+
+    IDD_QUOTE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 111
+    END
+
+    IDD_CHOOSE_FONT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 44
+    END
+
+    IDD_DEBUG2_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR TOOLBAR  32, 32
+BEGIN
+    BUTTON      ID_BACK_BUTTON
+    BUTTON      ID_FORWARD_BUTTON
+    BUTTON      ID_STOP_BUTTON
+    BUTTON      ID_WRITE_BUTTON
+    BUTTON      ID_IMAGE_BUTTON
+    BUTTON      ID_OPEN_BROWSER
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+IDR_TOOLBAR_QVGA TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_BACK_BUTTON
+    BUTTON      ID_FORWARD_BUTTON
+    BUTTON      ID_STOP_BUTTON
+    BUTTON      ID_WRITE_BUTTON
+    BUTTON      ID_IMAGE_BUTTON
+    BUTTON      ID_OPEN_BROWSER
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
+IDR_TOOLBAR_QVGA        BITMAP                  "res\\toolbarQVGA.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "MZ3\n\nMZ3\n\n\nMZ3.Document\nMZ3.Document"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "MZ3"
+    AFX_IDS_IDLEMESSAGE     "レディ"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_SAVE            "作業中のファイルを上書きして保存\n保存"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_COPY            "選択範囲をコピーしてクリップボードに保存\n保存"
+    ID_EDIT_CUT             "選択範囲を切り取ってクリップボードに保存\n切り取り"
+    ID_EDIT_PASTE           "クリップボードの内容を貼り付け\n貼り付け"
+    ID_EDIT_UNDO            "直前に行った動作を元に戻す\n元に戻す"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "新規作成"
+    IDS_MENU                "メニュー"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCCLOSE         "作業中のウィンドウを閉じ、変更したファイルの保存を指示"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCTASKLIST      "タスク一覧をアクティブにする"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WRITE_DIARY          "日記を書く"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE 17, 1
+#pragma code_page(932)
+#include "res\MZ3ppc.rc2"  // Microsoft Visual C++ 以外で編集されたリソース
+#include "afxres.rc"     // 標準コンポーネント
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

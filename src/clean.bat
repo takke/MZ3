@@ -1,0 +1,2 @@
+@perl clean.pl
+@pause
