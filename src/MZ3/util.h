@@ -426,6 +426,9 @@ inline CString MakeLogfilePath( const CMixiData& data )
 
 	// ログインページ
 	case ACCESS_LOGIN:				return theApp.m_filepath.logFolder + L"\\login.html";
+
+	// トップページ
+	case ACCESS_MAIN:				return theApp.m_filepath.logFolder + L"\\home.html";
 	
 	// リスト系
 	case ACCESS_LIST_DIARY:			return theApp.m_filepath.logFolder + L"\\new_friend_diary.html";
