@@ -4,7 +4,7 @@
 #pragma once
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.7.0.0"
+#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.0.0 Beta1 $Rev$"
 
 // Window メッセージ
 
