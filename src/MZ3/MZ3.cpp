@@ -67,6 +67,9 @@ BOOL CMZ3App::InitInstance()
 			currentDisplayMode = SR_QVGA;
 		}else if( (horizontal == 480 && vertical == 640) || (horizontal == 640 && vertical == 480) ) {
 			currentDisplayMode = SR_VGA;
+		}else if( (horizontal == 480 && vertical == 800) || (horizontal == 800 && vertical == 480) ) {
+			//EM¥ONE‘Î‰ž
+			currentDisplayMode = SR_VGA;
 		}else if( (horizontal == 240 && vertical == 240) ) {
 			currentDisplayMode = SR_SQUARE240;
 		}else{
