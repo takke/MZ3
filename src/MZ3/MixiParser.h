@@ -1905,7 +1905,7 @@ public:
 		/**
 		 * 方針：
 		 * - 下記のロジックで項目開始行を取得する。
-		 *   - "<table ... BGCOLOR=#EED6B5>" の行を探す。
+		 *   - "<table ... BGCOLOR="#EED6B5">" の行を探す。
 		 *   - "</td></tr></table>" が現れるまで読み飛ばす。
 		 *   - 次の行以降が項目。
 		 *
@@ -1922,7 +1922,7 @@ public:
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			if( util::LineHasStringsNoCase( line, L"<table", L"BGCOLOR=#EED6B5>" ) ) 
+			if( util::LineHasStringsNoCase( line, L"<table", L"#EED6B5" ) ) 
 			{
 				// 項目開始行発見。
 				bInItems = true;
@@ -1951,7 +1951,7 @@ public:
 			// "<table ... BGCOLOR=#EED6B5>" が現れたらナビゲーション行。
 			// 「次」、「前」のリンクを含む。
 			// 解析を終了する。
-			if( util::LineHasStringsNoCase( line, L"<td", L"BGCOLOR=#EED6B5>" ) ) 
+			if( util::LineHasStringsNoCase( line, L"<td", L"#EED6B5" ) ) 
 			{
 				// 「次を表示」、「前を表示」のリンクを抽出する
 				parseNextBackLink( nextLink, backLink, line );
@@ -1961,16 +1961,16 @@ public:
 			}
 
 			// 項目？
-			//   <td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#FFD8B0>0X月XX日<br>XX:XX</td>
-			//   <td bgcolor=#FFF4E0>&nbsp;<a href="view_bbs.pl?id=xxx&comm_id=xxx">内容</a></td></tr>
-			if( util::LineHasStringsNoCase( line, L"<td", L"#FFD8B0>" ) ) {
+			//   <td align="center" rowspan="3" nowrap="nowrap" bgcolor="#FFD8B0">0X月XX日<br />XX:XX</td>
+			//   <td bgcolor="#FFF4E0">&nbsp;<a href="view_bbs.pl?id=xxx&comm_id=xxx">【報告】動作しました</a></td></tr>
+			if( util::LineHasStringsNoCase( line, L"<td", L"#FFD8B0" ) ) {
 				// 解析
 				CMixiData mixi;
 
 				// 日付
 				CString date, time;
-				util::GetBetweenSubString( line, L">", L"<br>", date );
-				util::GetBetweenSubString( line, L"<br>", L"<", time );
+				util::GetBetweenSubString( line, L">", L"<br />", date );
+				util::GetBetweenSubString( line, L"<br />", L"<", time );
 				ParserUtil::ChangeDate( date, time, &mixi );
 
 				// 次の行を取得し、見出しとリンクを抽出する
@@ -2010,7 +2010,7 @@ public:
 				// コメント数解析
 				{
 					// 下記の行を取得して解析する。
-					// <td ALIGN=right bgcolor=#FFFFFF><a href=view_bbs.pl?id=xxx&comm_id=xxx>書き込み(19)</a>
+					// <td ALIGN=right bgcolor="#FFFFFF"><a href=view_bbs.pl?id=xxx&comm_id=xxx>書き込み(19)</a>
 					int commentCount = -1;
 					for( iLine++; iLine<count; iLine++ ) {
 						const CString& line = html_.GetAt(iLine);
