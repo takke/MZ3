@@ -7,7 +7,7 @@
 #define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.0.0 Beta1"
 
 /// リビジョン番号
-#define MZ3_SVN_REVISION			L"$Rev$"
+#define MZ3_SVN_REVISION			L"$Rev$" 
 
 // Window メッセージ
 
