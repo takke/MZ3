@@ -12,13 +12,17 @@ $Id$
 
 * MZ3.i by Takke
 
+** MZ3.i Ver.0.8.0.0 Beta2	(2007.04.22)
+- オプション画面の構成を変更
+- その他
+
+http://www.mz3.jp/bin/MZ3.0.8.0.0b2.CAB
+
 ** MZ3.i Ver.0.8.0.0 Beta1	(2007.04.18)
 - home.pl の進捗表示に対応。
 - EM ONE 対応（Thanks いっちゅうさん！）
 - トピック一覧が取得できない不具合を修正
 - その他
-
-http://www.mz3.jp/bin/MZ3.0.8.0.0b1.CAB
 
 ** MZ3.i Ver.0.7.0.0 正式版	(2007.04.14)
 - ドキュメント更新

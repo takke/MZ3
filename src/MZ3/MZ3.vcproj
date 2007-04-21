@@ -1332,6 +1332,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\ChangeLog.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\ReadMe.txt"
 			>
 		</File>
