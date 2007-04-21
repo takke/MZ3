@@ -33,7 +33,9 @@
 #define IDC_STATIC_2                    202
 #define IDD_CHOOSE_FONT_DIALOG          202
 #define IDC_STATIC_3                    203
+#define IDD_OPTIONTAB_UI                203
 #define IDC_STATIC_4                    204
+#define IDD_OPTIONTAB_LOG               204
 #define IDC_STATIC_5                    205
 #define IDC_STATIC_6                    206
 #define IDC_STATIC_7                    207
@@ -69,6 +71,8 @@
 #define IDC_EDIT1                       1027
 #define IDC_FONT_BIG_EDIT               1027
 #define IDC_SAMPLE_EDIT                 1027
+#define IDC_LOGFILE_EDIT                1027
+#define IDC_LOGFOLDER_EDIT              1027
 #define IDC_WRITE_BODY_EDIT             1028
 #define IDC_FONT_MEDIUM_EDIT            1028
 #define IDC_MESSAGE_EDIT                1028

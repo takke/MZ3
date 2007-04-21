@@ -1,4 +1,4 @@
-// GetPageTab.cpp : 実装ファイル
+// OptionTabGetPage.cpp : 実装ファイル
 //
 
 #include "stdafx.h"
@@ -29,7 +29,6 @@ void COptionTabGetPage::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(COptionTabGetPage, CPropertyPage)
-	ON_BN_CLICKED(IDC_CHANGE_LOG_FOLDER_BUTTON, &COptionTabGetPage::OnBnClickedChangeLogFolderButton)
 END_MESSAGE_MAP()
 
 
@@ -101,10 +100,6 @@ void COptionTabGetPage::Load()
 
 		mc_RecvBufCombo.SetCurSel( idx );
 	}
-
-	// ログの保存
-	CheckDlgButton( IDC_SAVE_LOG_CHECK, theApp.m_optionMng.m_bSaveLog ? BST_CHECKED : BST_UNCHECKED );
-
 }
 
 /**
@@ -124,32 +119,4 @@ void COptionTabGetPage::Save()
 
 	// 受信バッファサイズ
 	theApp.m_optionMng.SetRecvBufSize( mc_RecvBufCombo.GetItemData( mc_RecvBufCombo.GetCurSel() ) );
-
-	// ログの保存
-	theApp.m_optionMng.m_bSaveLog = (IsDlgButtonChecked( IDC_SAVE_LOG_CHECK ) == BST_CHECKED);
-}
-
-/**
- * ログフォルダの変更
- */
-void COptionTabGetPage::OnBnClickedChangeLogFolderButton()
-{
-	CString strFolderPath = theApp.m_filepath.logFolder;
-	if( util::GetOpenFolderPath( m_hWnd, L"ログフォルダの変更", strFolderPath ) ) {
-		CString msg;
-		msg.Format( 
-			L"ログファイルの出力先を\n"
-			L" %s\n"
-			L"に変更します。よろしいですか？",
-			strFolderPath );
-
-		if( MessageBox( msg, 0, MB_YESNO ) == IDYES ) {
-			// オプションに保存
-			theApp.m_optionMng.SetLogFolder( strFolderPath );
-
-			// 各種パスの再生成
-			theApp.m_filepath.init_logpath();
-		}
-	}
-
 }

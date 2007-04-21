@@ -23,9 +23,9 @@ public:
 	virtual void OnOK();
 	virtual BOOL OnInitDialog();
 
+private:
 	void Load();
 	void Save();
 
-	afx_msg void OnBnClickedChangeLogFolderButton();
 	CComboBox mc_RecvBufCombo;
 };

@@ -1042,11 +1042,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabLog.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabMInfo.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\OptionTabProxy.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabUI.cpp"
 					>
 				</File>
 				<File
@@ -1236,11 +1244,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabLog.h"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabMInfo.h"
 					>
 				</File>
 				<File
 					RelativePath=".\OptionTabProxy.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabUI.h"
 					>
 				</File>
 				<File

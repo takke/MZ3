@@ -5,23 +5,21 @@
 
 class COptionTabMInfo : public CPropertyPage
 {
-  DECLARE_DYNAMIC(COptionTabMInfo)
+	DECLARE_DYNAMIC(COptionTabMInfo)
 
 public:
-  COptionTabMInfo();
-  virtual ~COptionTabMInfo();
+	COptionTabMInfo();
+	virtual ~COptionTabMInfo();
 
-// ダイアログ データ
-  enum { IDD = IDD_OPTIONTAB_GENERAL };
+	// ダイアログ データ
+	enum { IDD = IDD_OPTIONTAB_GENERAL };
 
 protected:
-  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
 
-  DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP()
 
 public:
-  virtual BOOL OnInitDialog();
-  virtual void OnOK();
-  afx_msg void OnBnClickedResetTabButton();
-  afx_msg void OnBnClickedSelectFontButton();
+	virtual BOOL OnInitDialog();
+	virtual void OnOK();
 };

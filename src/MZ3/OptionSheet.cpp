@@ -34,8 +34,10 @@ END_MESSAGE_MAP()
 
 void COptionSheet::SetPage()
 {
-	AddPage( &m_userTab );			// メアド、パスワード
-	AddPage( &m_infoTab );
-	AddPage( &m_proxyTab );			// プロキシ
-	AddPage( &m_pageTab );			// データ取得
+	AddPage( &m_userTab );			// ログインタブ
+	AddPage( &m_infoTab );			// 一般タブ
+	AddPage( &m_uiTab );			// UIタブ
+	AddPage( &m_proxyTab );			// プロキシタブ
+	AddPage( &m_pageTab );			// 取得タブ
+	AddPage( &m_logTab );			// ログタブ
 }
