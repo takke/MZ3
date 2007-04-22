@@ -107,6 +107,21 @@ void Option::Load()
 		}else{
 			m_bUseLeftSoftKey = (s == "1");
 		}
+
+		// 引用符号
+		s = inifile.GetValue( "QuoteMark", "UI" );
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_quoteMark = s.c_str();
+			// 先頭と末尾の "/" を削除する
+			if( m_quoteMark.Left(1) == L"/" ) {
+				m_quoteMark.Delete( 0 );
+			}
+			if( m_quoteMark.Right(1) == L"/" ) {
+				m_quoteMark.Delete( m_quoteMark.GetLength()-1 );
+			}
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -165,6 +180,11 @@ void Option::Save()
 	inifile.SetValue( L"FontFace", m_fontFace, "UI");
 	// 左ソフトキー有効？
 	inifile.SetValue( "UseLeftSoftKey", m_bUseLeftSoftKey ? "1" : "0", "UI" );
+
+	// 引用符号
+	// 末尾の半角スペースを保存するため、
+	// "/" で囲む形で保存する
+	inifile.SetValue( L"QuoteMark", L"/" + m_quoteMark + L"/", "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

@@ -20,6 +20,8 @@ private:
 	GETPAGE_TYPE	m_GetPageType;		///< ページ取得種別
 
 	BOOL			m_bBootCheckMnC;	///< 起動時のメッセージ確認
+	CString			m_quoteMark;		///< 引用符号
+
 	BOOL			m_bUseBgImage;		///< 背景に画像を表示するかどうか
 	int				m_totalRecvBytes;	///< 総データ受信量
 
@@ -52,6 +54,7 @@ public:
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
+		, m_quoteMark( L"> " )
 	{
 	}
 
@@ -83,8 +86,11 @@ public:
 	BOOL IsBootCheckMnC()			{ return m_bBootCheckMnC; }			///< 起動時のチェック
 	void SetBootCheckMnC(BOOL flag) { m_bBootCheckMnC = flag; }			///< 起動時のチェックの設定
 
-	BOOL IsUseBgImage()				{ return m_bUseBgImage; }			///< 背景画像を使う？
-	void SetUseBgImage(BOOL flag)	{ m_bUseBgImage = flag; }			///< 背景画像を使うかどうかの設定
+	LPCTSTR GetQuoteMark()				{ return m_quoteMark; }			///< 引用符号の取得
+	void SetQuoteMark( LPCTSTR mark )	{ m_quoteMark = mark; }			///< 引用符号の設定
+
+	BOOL IsUseBgImage()					{ return m_bUseBgImage; }		///< 背景画像を使う？
+	void SetUseBgImage(BOOL flag)		{ m_bUseBgImage = flag; }		///< 背景画像を使うかどうかの設定
 
 	int  GetFontHeight()				{ return m_fontHeight; }		///< フォントサイズの取得
 	void SetFontHeight( int fontHeight ){ m_fontHeight = fontHeight; }	///< フォントサイズの設定

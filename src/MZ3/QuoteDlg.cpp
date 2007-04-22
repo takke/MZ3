@@ -58,22 +58,24 @@ BOOL CQuoteDlg::OnInitDialog()
 	int idx = 0;
 	int default_idx = 0;
 
+	CString quoteMark = theApp.m_optionMng.GetQuoteMark();
+
 	m_typeList.InsertString( idx, L"引用なし" );
 	m_typeList.SetItemData( idx, quote::QUOTETYPE_NONE );
 	idx ++;
 
 	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, L"> [番号]" );
+		m_typeList.InsertString( idx, quoteMark + L"[番号]" );
 		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM );
 		idx ++;
 	}
 
-	m_typeList.InsertString( idx, L"> [名前]" );
+	m_typeList.InsertString( idx, quoteMark + L"[名前]" );
 	m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME );
 	idx ++;
 
 	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, L"> [番号] [名前]" );
+		m_typeList.InsertString( idx, quoteMark + L"[番号] [名前]" );
 		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME );
 		idx ++;
 	}
@@ -83,18 +85,18 @@ BOOL CQuoteDlg::OnInitDialog()
 	idx ++;
 
 	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, L"> [番号] ＋本文" );
+		m_typeList.InsertString( idx, quoteMark + L"[番号] ＋本文" );
 		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_BODY );
 		idx ++;
 	}
 
-	m_typeList.InsertString( idx, L"> [名前] ＋本文" );
+	m_typeList.InsertString( idx, quoteMark + L"[名前] ＋本文" );
 	m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME_BODY );
 	default_idx = idx;
 	idx ++;
 
 	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, L"> [番号] [名前] ＋本文" );
+		m_typeList.InsertString( idx, quoteMark + L"[番号] [名前] ＋本文" );
 		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME_BODY );
 		default_idx = idx;
 		idx ++;

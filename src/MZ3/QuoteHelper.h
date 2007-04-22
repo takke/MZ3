@@ -20,7 +20,7 @@ enum QuoteType {
  */
 inline CString MakeQuoteString( const CMixiData& mixi, QuoteType quoteType )
 {
-#define QUOTE_HEAD_STR	L"> "
+	CString quoteMark = theApp.m_optionMng.GetQuoteMark();
 
 	CString strQuote;
 	switch( quoteType ) {
@@ -31,32 +31,32 @@ inline CString MakeQuoteString( const CMixiData& mixi, QuoteType quoteType )
 		break;
 	case QUOTETYPE_NUM:
 		if( mixi.GetCommentIndex() > 0 ) {
-			strQuote.Format( L"%s%d\r\n", QUOTE_HEAD_STR, mixi.GetCommentIndex() );
+			strQuote.Format( L"%s%d\r\n", quoteMark, mixi.GetCommentIndex() );
 		}else{
-			strQuote.Format( L"%s\r\n", QUOTE_HEAD_STR );
+			strQuote.Format( L"%s\r\n", quoteMark );
 		}
 		return strQuote;
 	case QUOTETYPE_NAME:
-		strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetAuthor() );
+		strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", quoteMark, mixi.GetAuthor() );
 		return strQuote;
 	case QUOTETYPE_NUM_NAME:
 		if( mixi.GetCommentIndex() > 0 ) {
-			strQuote.Format( L"%s%d %sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetCommentIndex(), mixi.GetAuthor() );
+			strQuote.Format( L"%s%d %sÇ≥ÇÒ\r\n", quoteMark, mixi.GetCommentIndex(), mixi.GetAuthor() );
 		}else{
-			strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetAuthor() );
+			strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", quoteMark, mixi.GetAuthor() );
 		}
 		return strQuote;
 	case QUOTETYPE_NUM_BODY:
-		strQuote.Format( L"%s%d\r\n", QUOTE_HEAD_STR, mixi.GetCommentIndex() );
+		strQuote.Format( L"%s%d\r\n", quoteMark, mixi.GetCommentIndex() );
 		break;
 	case QUOTETYPE_NAME_BODY:
-		strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetAuthor() );
+		strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", quoteMark, mixi.GetAuthor() );
 		break;
 	case QUOTETYPE_NUM_NAME_BODY:
 		if( mixi.GetCommentIndex() > 0 ) {
-			strQuote.Format( L"%s%d %sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetCommentIndex(), mixi.GetAuthor() );
+			strQuote.Format( L"%s%d %sÇ≥ÇÒ\r\n", quoteMark, mixi.GetCommentIndex(), mixi.GetAuthor() );
 		}else{
-			strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", QUOTE_HEAD_STR, mixi.GetAuthor() );
+			strQuote.Format( L"%s%sÇ≥ÇÒ\r\n", quoteMark, mixi.GetAuthor() );
 		}
 		break;
 	default:
@@ -73,7 +73,7 @@ inline CString MakeQuoteString( const CMixiData& mixi, QuoteType quoteType )
 				// \r\n ÇÃç∂ë§Çë}ì¸
 				CString left = line.Left(idx);
 				if( !left.IsEmpty() ) {
-					strQuote += QUOTE_HEAD_STR;
+					strQuote += quoteMark;
 					strQuote += left;
 					strQuote += L"\r\n";
 				}
@@ -82,7 +82,7 @@ inline CString MakeQuoteString( const CMixiData& mixi, QuoteType quoteType )
 				line = line.Mid( idx+2 );
 			}
 			if( !line.IsEmpty() ) {
-				strQuote += QUOTE_HEAD_STR;
+				strQuote += quoteMark;
 				strQuote += line;
 				strQuote += L"\r\n";
 			}

@@ -71,8 +71,8 @@
 #define IDC_EDIT1                       1027
 #define IDC_FONT_BIG_EDIT               1027
 #define IDC_SAMPLE_EDIT                 1027
-#define IDC_LOGFILE_EDIT                1027
 #define IDC_LOGFOLDER_EDIT              1027
+#define IDC_QUOTE_MARK_EDIT             1027
 #define IDC_WRITE_BODY_EDIT             1028
 #define IDC_FONT_MEDIUM_EDIT            1028
 #define IDC_MESSAGE_EDIT                1028
@@ -98,6 +98,7 @@
 #define IDC_RESET_TAB_BUTTON            1046
 #define IDC_SELECT_FONT_BUTTON          1047
 #define IDC_FONT_LIST                   1047
+#define IDC_COMBO1                      1048
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -262,7 +263,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        151
 #define _APS_NEXT_COMMAND_VALUE         32932
-#define _APS_NEXT_CONTROL_VALUE         1048
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif
