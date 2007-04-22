@@ -1046,7 +1046,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\OptionTabMInfo.cpp"
+					RelativePath=".\OptionTabGeneral.cpp"
 					>
 				</File>
 				<File
@@ -1240,15 +1240,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabGeneral.h"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabGetPage.h"
 					>
 				</File>
 				<File
 					RelativePath=".\OptionTabLog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\OptionTabMInfo.h"
 					>
 				</File>
 				<File

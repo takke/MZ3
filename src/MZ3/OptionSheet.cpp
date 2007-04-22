@@ -34,10 +34,10 @@ END_MESSAGE_MAP()
 
 void COptionSheet::SetPage()
 {
-	AddPage( &m_userTab );			// ログインタブ
-	AddPage( &m_infoTab );			// 一般タブ
-	AddPage( &m_uiTab );			// UIタブ
-	AddPage( &m_proxyTab );			// プロキシタブ
-	AddPage( &m_pageTab );			// 取得タブ
-	AddPage( &m_logTab );			// ログタブ
+	AddPage( &m_tabUser );		// ログインタブ
+	AddPage( &m_tabGeneral );	// 一般タブ
+	AddPage( &m_tabUi );		// UIタブ
+	AddPage( &m_tabProxy );		// プロキシタブ
+	AddPage( &m_tabGet );		// 取得タブ
+	AddPage( &m_tabLog );		// ログタブ
 }

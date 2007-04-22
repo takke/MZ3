@@ -3,35 +3,35 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
-#include "OptionTabMInfo.h"
+#include "OptionTabGeneral.h"
 #include "ReportView.h"
 #include "ChooseFontDlg.h"
 #include "util.h"
 
-// COptionTabMInfo ダイアログ
+// COptionTabGeneral ダイアログ
 
-IMPLEMENT_DYNAMIC(COptionTabMInfo, CPropertyPage)
+IMPLEMENT_DYNAMIC(COptionTabGeneral, CPropertyPage)
 
-COptionTabMInfo::COptionTabMInfo()
-	: CPropertyPage(COptionTabMInfo::IDD)
+COptionTabGeneral::COptionTabGeneral()
+	: CPropertyPage(COptionTabGeneral::IDD)
 {
 
 }
 
-COptionTabMInfo::~COptionTabMInfo()
+COptionTabGeneral::~COptionTabGeneral()
 {
 }
 
-void COptionTabMInfo::DoDataExchange(CDataExchange* pDX)
+void COptionTabGeneral::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(COptionTabMInfo, CPropertyPage)
+BEGIN_MESSAGE_MAP(COptionTabGeneral, CPropertyPage)
 END_MESSAGE_MAP()
 
-// COptionTabMInfo メッセージ ハンドラ
-BOOL COptionTabMInfo::OnInitDialog()
+// COptionTabGeneral メッセージ ハンドラ
+BOOL COptionTabGeneral::OnInitDialog()
 {
 	CPropertyPage::OnInitDialog();
 
@@ -42,7 +42,7 @@ BOOL COptionTabMInfo::OnInitDialog()
 	return TRUE;
 }
 
-void COptionTabMInfo::OnOK()
+void COptionTabGeneral::OnOK()
 {
 	// 起動時の新着チェック
 	theApp.m_optionMng.SetBootCheckMnC(

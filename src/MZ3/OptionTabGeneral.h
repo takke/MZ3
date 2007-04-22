@@ -1,15 +1,15 @@
 #pragma once
 
 
-// COptionTabMInfo ダイアログ
+// COptionTabGeneral ダイアログ
 
-class COptionTabMInfo : public CPropertyPage
+class COptionTabGeneral : public CPropertyPage
 {
-	DECLARE_DYNAMIC(COptionTabMInfo)
+	DECLARE_DYNAMIC(COptionTabGeneral)
 
 public:
-	COptionTabMInfo();
-	virtual ~COptionTabMInfo();
+	COptionTabGeneral();
+	virtual ~COptionTabGeneral();
 
 	// ダイアログ データ
 	enum { IDD = IDD_OPTIONTAB_GENERAL };

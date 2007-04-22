@@ -3,7 +3,7 @@
 #include "OptionTabUser.h"
 #include "OptionTabProxy.h"
 #include "OptionTabGetPage.h"
-#include "OptionTabMInfo.h"
+#include "OptionTabGeneral.h"
 #include "OptionTabUI.h"
 #include "OptionTabLog.h"
 
@@ -24,12 +24,12 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	COptionTabUser		m_userTab;		///< ログインタブ
-	COptionTabMInfo		m_infoTab;		///< 一般タブ
-	COptionTabUI		m_uiTab;		///< UIタブ
-	COptionTabProxy		m_proxyTab;		///< PROXYタブ
-	COptionTabGetPage	m_pageTab;		///< 取得タブ
-	COptionTabLog		m_logTab;		///< ログタブ
+	COptionTabUser		m_tabUser;		///< ログインタブ
+	COptionTabGeneral	m_tabGeneral;	///< 一般タブ
+	COptionTabUI		m_tabUi;		///< UIタブ
+	COptionTabProxy		m_tabProxy;		///< PROXYタブ
+	COptionTabGetPage	m_tabGet;		///< 取得タブ
+	COptionTabLog		m_tabLog;		///< ログタブ
 };
 
 
