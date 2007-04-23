@@ -220,7 +220,9 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	GetDlgItem(IDC_PROGRESS_BAR)->MoveWindow( 0, y, cx, hProgress );
 
 	// リストカラム幅の変更
-	ResetColumnWidth( *m_data );
+	if( m_data != NULL ) {
+		ResetColumnWidth( *m_data );
+	}
 }
 
 HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
@@ -1414,6 +1416,9 @@ LRESULT CReportView::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
  */
 void CReportView::ResetColumnWidth(const CMixiData& mixi)
 {
+	if( m_list.m_hWnd == NULL )
+		return;
+
 	// 要素種別が「ヘルプ」なら日時を表示しない。
 
 	// 幅の定義
