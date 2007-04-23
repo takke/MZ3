@@ -40,8 +40,7 @@ BOOL COptionTabUI::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	// 背景On/Off
-	((CButton*)GetDlgItem(IDC_USE_BGIMAGE_CHECK))->SetCheck(
-		theApp.m_optionMng.IsUseBgImage() ? BST_CHECKED : BST_UNCHECKED );
+	CheckDlgButton( IDC_USE_BGIMAGE_CHECK, theApp.m_optionMng.IsUseBgImage() ? BST_CHECKED : BST_UNCHECKED );
 
 	// フォント（大）
 	SetDlgItemText( IDC_FONT_BIG_EDIT, util::int2str(theApp.m_optionMng.m_fontHeightBig) );
@@ -50,19 +49,17 @@ BOOL COptionTabUI::OnInitDialog()
 	// フォント（小）
 	SetDlgItemText( IDC_FONT_SMALL_EDIT, util::int2str(theApp.m_optionMng.m_fontHeightSmall) );
 
+	// 左ソフトキーの有効・無効
+	CheckDlgButton( IDC_USE_LEFTSOFTKEY_CHECK, theApp.m_optionMng.m_bUseLeftSoftKey ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;
 }
 
 void COptionTabUI::OnOK()
 {
-	// 起動時の新着チェック
-	theApp.m_optionMng.SetBootCheckMnC(
-		((CButton*)GetDlgItem(IDC_BOOT_MNC_CHECK))->GetCheck() == BST_CHECKED ? TRUE : FALSE );
-
 	// 背景On/Off
 	theApp.m_optionMng.SetUseBgImage(
 		((CButton*)GetDlgItem(IDC_USE_BGIMAGE_CHECK))->GetCheck() == BST_CHECKED ? TRUE : FALSE );
-
 
 	// フォント（大）
 	{
@@ -91,6 +88,9 @@ void COptionTabUI::OnOK()
 		if( n > 50 ) n = 50;
 		theApp.m_optionMng.m_fontHeightSmall = n;
 	}
+
+	// 左ソフトキーの有効・無効
+	theApp.m_optionMng.m_bUseLeftSoftKey = IsDlgButtonChecked( IDC_USE_LEFTSOFTKEY_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }
