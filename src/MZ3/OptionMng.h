@@ -38,6 +38,11 @@ public:
 
 	bool			m_bUseLeftSoftKey;	///< 左ソフトキーによるメニュー表示を利用する？
 
+	int				m_nMainViewCategoryListHeightRatio;	///< メイン画面のカテゴリリストの高さ（比率）[1,100]
+	int				m_nMainViewBodyListHeightRatio;		///< メイン画面のボディリストの高さ（比率）[1,100]
+	int				m_nReportViewListHeightRatio;		///< レポート画面のリストの高さ（比率）[1,100]
+	int				m_nReportViewBodyHeightRatio;		///< レポート画面のボディの高さ（比率）[1,100]
+
 private:
 	int				m_recvBufSize;		///< 受信バッファサイズ
 
@@ -55,6 +60,10 @@ public:
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
 		, m_quoteMark( L"> " )
+		, m_nMainViewCategoryListHeightRatio( 30 )	// カテゴリリストは 30%
+		, m_nMainViewBodyListHeightRatio( 70 )		// ボディリストは 70%
+		, m_nReportViewListHeightRatio( 40 )		// リストは 40%
+		, m_nReportViewBodyHeightRatio( 60 )		// ボディは 60%
 	{
 	}
 

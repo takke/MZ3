@@ -187,8 +187,11 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	if( theApp.GetDisplayMode() == SR_QVGA ){
 		hTitle  = fontHeight - 4;
 	}
-	int hList   = (cy * 4 / 10)-hTitle;		// (全体の4割-タイトル領域) をリスト領域とする
-	int hReport = (cy * 6 / 10);			// 全体の6割をレポート領域とする
+
+	const int h1 = theApp.m_optionMng.m_nReportViewListHeightRatio;
+	const int h2 = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
+	int hList   = (cy * h1 / (h1+h2))-hTitle;	// (全体のN%-タイトル領域) をリスト領域とする
+	int hReport = (cy * h2 / (h1+h2));			// 全体のN%をレポート領域とする
 
 	// 情報領域は必要に応じて表示されるため、上記とは関係ない。
 	int hInfo   = fontHeight+6*2;			// 情報領域もフォントサイズ依存
@@ -215,6 +218,9 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	int hProgress = hInfo * 2 / 3;
 	int y = cy - hInfo - hProgress;
 	GetDlgItem(IDC_PROGRESS_BAR)->MoveWindow( 0, y, cx, hProgress );
+
+	// リストカラム幅の変更
+	ResetColumnWidth( *m_data );
 }
 
 HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
@@ -1410,21 +1416,24 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
 {
 	// 要素種別が「ヘルプ」なら日時を表示しない。
 
-	// 全体のピクセル数を設定する
-	int w = 450;
+	// 幅の定義
+	CRect rect;
+	GetWindowRect( &rect );
+	int w = rect.Width();
+	// ピクセル数の微調整（スクリーン幅より少し小さくする）
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
-		w = 450;
+		w -= 30;
 		break;
 	case SR_QVGA:
 	default:
-		w = 450/2;
+		w -= 30/2;
 		break;
 	}
 
 	// ヘルプなら、7:(17+21):0 の比率で分割する
 	// ヘルプ以外なら、7:17:21 の比率で分割する
-	const int W_COL1 = 7;
+	const int W_COL1 =  7;
 	const int W_COL2 = 17;
 	const int W_COL3 = 21;
 	if( mixi.GetAccessType() == ACCESS_HELP ) {

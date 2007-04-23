@@ -279,6 +279,7 @@ void CMZ3View::OnInitialUpdate()
 		ListView_SetExtendedListViewStyle((HWND)m_categoryList.m_hWnd, LVS_EX_FULLROWSELECT);
 
 		// カラム作成
+		// いずれも初期化時に再設定するので仮の幅を指定しておく。
 		switch( theApp.GetDisplayMode() ) {
 		case SR_VGA:
 			m_categoryList.InsertColumn(0, _T(""), LVCFMT_LEFT, 250, -1);
@@ -315,6 +316,7 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// カラム作成
+		// いずれも初期化時に再設定するので仮の幅を指定しておく。
 		if( theApp.GetDisplayMode() == SR_VGA ){
 			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 240, -1);
 			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 210, -1);
@@ -323,6 +325,9 @@ void CMZ3View::OnInitialUpdate()
 			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 105, -1);
 		}
 	}
+
+	// リストカラム幅の変更
+	ResetColumnWidth();
 
 	// インフォメーションエディットの設定
 	{
@@ -463,8 +468,11 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 
 	// カテゴリ、ボディリストの領域を % で指定
 	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
-	int hCategory = (cy * 30 / 100) - (hGroup - 1);
-	int hBody     = (cy * 70 / 100) - (hInfo - 1);
+	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+	int hCategory = (cy * h1 / (h1+h2)) - (hGroup - 1);
+	int hBody     = (cy * h2 / (h1+h2)) - (hInfo - 1);
 
 	int y = 0;
 	GetDlgItem(IDC_GROUP_TAB)  ->MoveWindow( 0, y, cx, hGroup    );
@@ -480,6 +488,9 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	int hProgress = hInfo * 2 / 3;
 	y = cy - hInfo - hProgress;
 	GetDlgItem(IDC_PROGRESS_BAR)->MoveWindow( 0, y, cx, hProgress );
+
+	// リストカラム幅の変更
+	ResetColumnWidth();
 }
 
 /**
@@ -2629,4 +2640,43 @@ void CMZ3View::OnSendNewMessage()
 	mixi = GetSelectedBodyItem();
 
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &mixi );
+}
+
+/**
+ * カラムサイズ（幅）を再設定する。
+ */
+void CMZ3View::ResetColumnWidth()
+{
+	// 要素種別が「ヘルプ」なら日時を表示しない。
+
+	// 幅の定義
+	CRect rect;
+	GetWindowRect( &rect );
+	int w = rect.Width();
+	// ピクセル数の微調整（スクリーン幅より少し小さくする）
+	switch( theApp.GetDisplayMode() ) {
+	case SR_VGA:
+		w -= 35;
+		break;
+	case SR_QVGA:
+	default:
+		w -= 35/2;
+		break;
+	}
+
+	// カテゴリリストは 25:20 の比率で分割する
+	{
+		const int W_COL1 = 25;
+		const int W_COL2 = 20;
+		m_categoryList.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2) );
+		m_categoryList.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2) );
+	}
+
+	// ボディリストは 24:21 の比率で分割する
+	{
+		const int W_COL1 = 24;
+		const int W_COL2 = 21;
+		m_bodyList.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2) );
+		m_bodyList.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2) );
+	}
 }

@@ -14,6 +14,17 @@ namespace option {
 
 // Option メンバ関数
 
+inline int normalizeRange( int value, int minv, int maxv ) 
+{
+	// 下限値調整
+	value = max( value, minv );
+
+	// 上限値調整
+	value = min( value, maxv );
+
+	return value;
+}
+
 void Option::Load()
 {
 	const CString& fileName = theApp.m_filepath.inifile;
@@ -122,6 +133,24 @@ void Option::Load()
 				m_quoteMark.Delete( m_quoteMark.GetLength()-1 );
 			}
 		}
+
+		// リストの高さ（比率）
+		s = inifile.GetValue( "MainViewCategoryListHeightRatio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewCategoryListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+		}
+		s = inifile.GetValue( "MainViewBodyListHeightRatio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewBodyListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+		}
+		s = inifile.GetValue( "ReportViewListHeightRatio", "UI" );
+		if(! s.empty() ) {
+			m_nReportViewListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+		}
+		s = inifile.GetValue( "ReportViewBodyHeightRatio", "UI" );
+		if(! s.empty() ) {
+			m_nReportViewBodyHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -185,6 +214,12 @@ void Option::Save()
 	// 末尾の半角スペースを保存するため、
 	// "/" で囲む形で保存する
 	inifile.SetValue( L"QuoteMark", L"/" + m_quoteMark + L"/", "UI" );
+
+	// リストの高さ（比率）
+	inifile.SetValue( "MainViewCategoryListHeightRatio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListHeightRatio), "UI" );
+	inifile.SetValue( "MainViewBodyListHeightRatio",     (LPCSTR)util::int2str_a(m_nMainViewBodyListHeightRatio), "UI" );
+	inifile.SetValue( "ReportViewListHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewListHeightRatio), "UI" );
+	inifile.SetValue( "ReportViewBodyHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewBodyHeightRatio), "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

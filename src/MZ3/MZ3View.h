@@ -254,6 +254,7 @@ public:
 	bool CruiseToNextCategory(void);
 	bool MoveToNextCruiseCategory(void);
 	afx_msg void OnSendNewMessage();
+	void ResetColumnWidth();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
