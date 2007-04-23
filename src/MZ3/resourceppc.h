@@ -87,6 +87,8 @@
 #define IDC_USE_BGIMAGE_CHECK           1035
 #define IDC_USE_LOG_CHECK               1035
 #define IDC_SAVE_LOG_CHECK              1035
+#define IDC_USE_BGIMAGE_CHECK2          1036
+#define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
 #define IDC_TYPE_LIST                   1038
@@ -98,7 +100,6 @@
 #define IDC_RESET_TAB_BUTTON            1046
 #define IDC_SELECT_FONT_BUTTON          1047
 #define IDC_FONT_LIST                   1047
-#define IDC_COMBO1                      1048
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
