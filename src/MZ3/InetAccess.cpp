@@ -660,8 +660,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			if( dwOneRecvSize < 128 ) {
 				dwOneRecvSize = 128;
 			}
-			if( dwOneRecvSize > 1024*10 ) {
-				dwOneRecvSize = 1024*10;
+			if( dwOneRecvSize > 1024*100 ) {
+				dwOneRecvSize = 1024*100;
 			}
 		}
 		// éÛêMèàóù
@@ -678,7 +678,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			}
 
 			// éÛêM
-			static std::vector<char> pData( 1024*10+1 );
+			static std::vector<char> pData( 1024*100+1 );
 			DWORD dwBytesRead = 0;
 			if( InternetReadFile(m_hRequest, &pData[0], dwRequestSize, &dwBytesRead) == FALSE ) {
 				break;

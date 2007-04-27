@@ -47,7 +47,7 @@ BOOL COptionTabGetPage::OnInitDialog()
 
 	// コンボボックスの初期化
 	{
-		int list[] = { 256, 512, 1024, 2048, 4096, 8192, -1 };
+		int list[] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, -1 };
 
 		mc_RecvBufCombo.ResetContent();
 

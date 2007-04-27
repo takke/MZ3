@@ -121,7 +121,7 @@ public:
 		if( bufSize < RECVBUFSIZE_MIN ) {
 			return RECVBUFSIZE_MIN;
 		}
-		const int RECVBUFSIZE_MAX = 8192;
+		const int RECVBUFSIZE_MAX = 32768;
 		if( bufSize > RECVBUFSIZE_MAX ) {
 			return RECVBUFSIZE_MAX;
 		}
