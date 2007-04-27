@@ -85,6 +85,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_MENU_BACK, &CReportView::OnMenuBack)
 	ON_COMMAND(ID_BACK_MENU, &CReportView::OnBackMenu)
 	ON_COMMAND(ID_NEXT_MENU, &CReportView::OnNextMenu)
+	ON_NOTIFY(HDN_ENDTRACK, 0, &CReportView::OnHdnEndtrackReportList)
 END_MESSAGE_MAP()
 
 
@@ -1411,17 +1412,8 @@ LRESULT CReportView::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
 	return TRUE;
 }
 
-/**
- * 表示する要素に応じて、カラムサイズ（幅）を再設定する。
- */
-void CReportView::ResetColumnWidth(const CMixiData& mixi)
+int CReportView::GetListWidth(void)
 {
-	if( m_list.m_hWnd == NULL )
-		return;
-
-	// 要素種別が「ヘルプ」なら日時を表示しない。
-
-	// 幅の定義
 	CRect rect;
 	GetWindowRect( &rect );
 	int w = rect.Width();
@@ -1435,6 +1427,21 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
 		w -= 30/2;
 		break;
 	}
+	return w;
+}
+
+/**
+ * 表示する要素に応じて、カラムサイズ（幅）を再設定する。
+ */
+void CReportView::ResetColumnWidth(const CMixiData& mixi)
+{
+	if( m_list.m_hWnd == NULL )
+		return;
+
+	// 要素種別が「ヘルプ」なら日時を表示しない。
+
+	// 幅の定義
+	int w = GetListWidth();
 
 	// ヘルプなら、W_COL1:(W_COL2+W_COL3):0 の比率で分割する
 	// ヘルプ以外なら、W_COL1:W_COL2:W_COL3 の比率で分割する
@@ -1452,4 +1459,39 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
 		m_list.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2+W_COL3) );
 		m_list.SetColumnWidth(2, w * W_COL3/(W_COL1+W_COL2+W_COL3) );
 	}
+}
+
+/**
+ * ヘッダのドラッグ終了
+ *
+ * カラム幅の再構築を行う。
+ */
+void CReportView::OnHdnEndtrackReportList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+
+	CRect rect;
+	CHeaderCtrl* pHeader = NULL;
+
+	// リストの取得
+	if( (pHeader = m_list.GetHeaderCtrl()) == NULL ) {
+		return;
+	}
+
+	// カラム１
+	if(! pHeader->GetItemRect( 0, rect ) ) return;
+	theApp.m_optionMng.m_nReportViewListCol1Ratio = rect.Width();
+
+	// カラム２
+	if(! pHeader->GetItemRect( 1, rect ) ) return;
+	theApp.m_optionMng.m_nReportViewListCol2Ratio = rect.Width();
+
+	// カラム３
+	// 最終カラムなので、リスト幅-他のカラムサイズとする。
+	theApp.m_optionMng.m_nReportViewListCol3Ratio
+		= GetListWidth() 
+			- theApp.m_optionMng.m_nReportViewListCol1Ratio
+			- theApp.m_optionMng.m_nReportViewListCol2Ratio;
+
+	*pResult = 0;
 }

@@ -112,6 +112,8 @@ public:
 	afx_msg void OnBackMenu();
 	afx_msg void OnNextMenu();
 	void ResetColumnWidth(const CMixiData& mixi);
+	afx_msg void OnHdnEndtrackReportList(NMHDR *pNMHDR, LRESULT *pResult);
+	int GetListWidth(void);
 };
 
 

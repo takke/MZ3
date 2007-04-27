@@ -255,6 +255,8 @@ public:
 	bool MoveToNextCruiseCategory(void);
 	afx_msg void OnSendNewMessage();
 	void ResetColumnWidth();
+	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
+	int GetListWidth(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

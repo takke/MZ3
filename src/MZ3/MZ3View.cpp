@@ -184,6 +184,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CRUISE, &CMZ3View::OnCruise)
 	ON_COMMAND(IDM_CHECK_CRUISE, &CMZ3View::OnCheckCruise)
 	ON_COMMAND(ID_SEND_NEW_MESSAGE, &CMZ3View::OnSendNewMessage)
+	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -2642,14 +2643,8 @@ void CMZ3View::OnSendNewMessage()
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &mixi );
 }
 
-/**
- * カラムサイズ（幅）を再設定する。
- */
-void CMZ3View::ResetColumnWidth()
+int CMZ3View::GetListWidth(void)
 {
-	// 要素種別が「ヘルプ」なら日時を表示しない。
-
-	// 幅の定義
 	CRect rect;
 	GetWindowRect( &rect );
 	int w = rect.Width();
@@ -2663,6 +2658,18 @@ void CMZ3View::ResetColumnWidth()
 		w -= 35/2;
 		break;
 	}
+	return w;
+}
+
+/**
+ * カラムサイズ（幅）を再設定する。
+ */
+void CMZ3View::ResetColumnWidth()
+{
+	// 要素種別が「ヘルプ」なら日時を表示しない。
+
+	// 幅の定義
+	int w = GetListWidth();
 
 	// カテゴリリストは 25:20 の比率で分割する
 	if( m_categoryList.m_hWnd != NULL ) {
@@ -2679,4 +2686,50 @@ void CMZ3View::ResetColumnWidth()
 		m_bodyList.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2) );
 		m_bodyList.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2) );
 	}
+}
+
+/**
+ * ヘッダのドラッグ終了
+ *
+ * カラム幅の再構築を行う。
+ */
+void CMZ3View::OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+
+	CRect rect;
+	CHeaderCtrl* pHeader = NULL;
+
+	// カテゴリリスト
+
+	// カテゴリリストの幅はドラッグで変更できないので、保存しない。
+/*	if( (pHeader = m_categoryList.GetHeaderCtrl()) == NULL ) {
+		return;
+	}
+
+	// カラム１
+	if(! pHeader->GetItemRect( 0, rect ) ) return;
+	theApp.m_optionMng.m_nMainViewCategoryListCol1Ratio = rect.Width();
+
+	// カラム２
+	// 最終カラムなので、リスト幅-他のカラムサイズとする。
+	theApp.m_optionMng.m_nMainViewCategoryListCol2Ratio
+		= GetListWidth() - theApp.m_optionMng.m_nMainViewCategoryListCol1Ratio;
+*/
+
+	// ボディリスト
+	if( (pHeader = m_bodyList.GetHeaderCtrl()) == NULL ) {
+		return;
+	}
+
+	// カラム１
+	if(! pHeader->GetItemRect( 0, rect ) ) return;
+	theApp.m_optionMng.m_nMainViewBodyListCol1Ratio = rect.Width();
+
+	// カラム２
+	// 最終カラムなので、リスト幅-他のカラムサイズとする。
+	theApp.m_optionMng.m_nMainViewBodyListCol2Ratio
+		= GetListWidth() - theApp.m_optionMng.m_nMainViewBodyListCol1Ratio;
+
+	*pResult = 0;
 }
