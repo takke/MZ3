@@ -104,6 +104,9 @@ public:
 
 	void StartConfirmPost( CString msg );
 	void StartEntryPost();
+	afx_msg void OnPreviewAttachedPhoto1();
+	afx_msg void OnPreviewAttachedPhoto2();
+	afx_msg void OnPreviewAttachedPhoto3();
 };
 
 

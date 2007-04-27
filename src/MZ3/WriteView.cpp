@@ -74,6 +74,9 @@ BEGIN_MESSAGE_MAP(CWriteView, CFormView)
 	ON_COMMAND(ID_CANCEL_ATTACH_PHOTO2, &CWriteView::OnCancelAttachPhoto2)
 	ON_COMMAND(ID_CANCEL_ATTACH_PHOTO3, &CWriteView::OnCancelAttachPhoto3)
 	ON_COMMAND(ID_ATTACH_PHOTO, &CWriteView::OnAttachPhoto)
+	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO1, &CWriteView::OnPreviewAttachedPhoto1)
+	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO2, &CWriteView::OnPreviewAttachedPhoto2)
+	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO3, &CWriteView::OnPreviewAttachedPhoto3)
 END_MESSAGE_MAP()
 
 
@@ -180,6 +183,24 @@ void CWriteView::OnBnClickedWriteSendButton()
 		case WRITEVIEW_TYPE_NEWMESSAGE:
 			s = L"メッセージを送信します\nよろしいですか？";
 			break;
+		}
+
+		// 添付画像があればファイル名を追加。
+		if( !m_photo1_filepath.IsEmpty() ||
+			!m_photo2_filepath.IsEmpty() ||
+			!m_photo3_filepath.IsEmpty() ) 
+		{
+			s.Append( L"\n\n" );
+			s.Append( L"添付画像：\n" );
+			if( !m_photo1_filepath.IsEmpty() ) {
+				s.Append( m_photo1_filepath + L"\n" );
+			}
+			if( !m_photo2_filepath.IsEmpty() ) {
+				s.Append( m_photo2_filepath + L"\n" );
+			}
+			if( !m_photo3_filepath.IsEmpty() ) {
+				s.Append( m_photo3_filepath + L"\n" );
+			}
 		}
 
 		int ret = ::MessageBox(m_hWnd, s, L"MZ3", MB_ICONQUESTION | MB_OKCANCEL);
@@ -575,7 +596,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				CMenu* pcThisMenu = menu.GetSubMenu(0);
 
 				// 写真添付ができない画面では「写真を添付する」メニューを消す
-				pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
+				if( !IsEnableAttachImageMode() ) {
+					pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
+				}
 
 				pcThisMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 					pt.x,
@@ -760,10 +783,12 @@ void CWriteView::OnImageButton()
 
 		int id_attach = ID_ATTACH_PHOTO1+i;
 		int id_cancel = ID_CANCEL_ATTACH_PHOTO1+i;
+		int id_preview = ID_PREVIEW_ATTACHED_PHOTO1+i;
 		if( wcslen(photo_files[i])==0 ) {
 			// 未添付
 			pSubMenu->ModifyMenu( id_attach, MF_BYCOMMAND, id_attach, _T("ファイルを選択する") );
 			pSubMenu->RemoveMenu( id_cancel, MF_BYCOMMAND );
+			pSubMenu->RemoveMenu( id_preview, MF_BYCOMMAND );
 		}else{
 			// 添付済み
 			pSubMenu->ModifyMenu( id_attach, MF_BYCOMMAND, id_attach, _T("ファイルを変更する") );
@@ -887,6 +912,30 @@ void CWriteView::OnCancelAttachPhoto2() { m_photo2_filepath = L""; }
 
 /// 写真３｜添付をやめる
 void CWriteView::OnCancelAttachPhoto3() { m_photo3_filepath = L""; }
+
+/// 写真１｜プレビュー
+void CWriteView::OnPreviewAttachedPhoto1()
+{
+	if( !m_photo1_filepath.IsEmpty() ) { 
+		util::OpenByShellExecute( m_photo1_filepath );
+	}
+}
+
+/// 写真２｜プレビュー
+void CWriteView::OnPreviewAttachedPhoto2()
+{
+	if( !m_photo2_filepath.IsEmpty() ) { 
+		util::OpenByShellExecute( m_photo2_filepath );
+	}
+}
+
+/// 写真３｜プレビュー
+void CWriteView::OnPreviewAttachedPhoto3()
+{
+	if( !m_photo3_filepath.IsEmpty() ) { 
+		util::OpenByShellExecute( m_photo3_filepath );
+	}
+}
 
 /// 右ソフトキーメニュー｜写真を添付する
 void CWriteView::OnAttachPhoto()

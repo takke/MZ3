@@ -239,16 +239,19 @@ BEGIN
         BEGIN
             MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO1
             MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO1
+            MENUITEM "プレビュー",                       ID_PREVIEW_ATTACHED_PHOTO1
         END
         POPUP "写真２"
         BEGIN
             MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO2
             MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO2
+            MENUITEM "プレビュー",                       ID_PREVIEW_ATTACHED_PHOTO2
         END
         POPUP "写真３"
         BEGIN
             MENUITEM "添付ファイルを選択する",                 ID_ATTACH_PHOTO3
             MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO3
+            MENUITEM "プレビュー",                       ID_PREVIEW_ATTACHED_PHOTO3
         END
     END
 END

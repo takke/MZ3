@@ -847,19 +847,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 					break;
 				case IDNO:
 					// ダウンロード済みファイルを開く
-					{
-						// ファイルを開く
-						SHELLEXECUTEINFO sei;
-						sei.cbSize       = sizeof(sei);
-						sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
-						sei.hwnd         = 0;
-						sei.lpVerb       = _T("open");
-						sei.lpFile       = strFilepath;
-						sei.lpParameters = NULL;
-						sei.lpDirectory  = NULL;
-						sei.nShow        = SW_NORMAL;
-						ShellExecuteEx(&sei);
-					}
+					util::OpenByShellExecute( strFilepath );
 					break;
 				default:
 					break;

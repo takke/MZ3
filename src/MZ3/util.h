@@ -8,6 +8,24 @@ namespace util
 {
 
 /**
+ * ファイルを開く
+ */
+inline bool OpenByShellExecute( LPCTSTR target )
+{
+	// ファイルを開く
+	SHELLEXECUTEINFO sei;
+	sei.cbSize       = sizeof(sei);
+	sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
+	sei.hwnd         = 0;
+	sei.lpVerb       = _T("open");
+	sei.lpFile       = target;
+	sei.lpParameters = NULL;
+	sei.lpDirectory  = NULL;
+	sei.nShow        = SW_NORMAL;
+	return ShellExecuteEx( &sei ) == TRUE;
+}
+
+/**
  * ファイルの存在チェック
  *
  * ファイルが存在すれば true、存在しなければ false を返す
