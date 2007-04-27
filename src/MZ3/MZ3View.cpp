@@ -2666,16 +2666,16 @@ void CMZ3View::ResetColumnWidth()
 
 	// カテゴリリストは 25:20 の比率で分割する
 	if( m_categoryList.m_hWnd != NULL ) {
-		const int W_COL1 = 25;
-		const int W_COL2 = 20;
+		const int W_COL1 = theApp.m_optionMng.m_nMainViewCategoryListCol1Ratio;
+		const int W_COL2 = theApp.m_optionMng.m_nMainViewCategoryListCol2Ratio;
 		m_categoryList.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2) );
 		m_categoryList.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2) );
 	}
 
 	// ボディリストは 24:21 の比率で分割する
 	if( m_bodyList.m_hWnd != NULL ) {
-		const int W_COL1 = 24;
-		const int W_COL2 = 21;
+		const int W_COL1 = theApp.m_optionMng.m_nMainViewBodyListCol1Ratio;
+		const int W_COL2 = theApp.m_optionMng.m_nMainViewBodyListCol2Ratio;
 		m_bodyList.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2) );
 		m_bodyList.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2) );
 	}

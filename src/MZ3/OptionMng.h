@@ -38,10 +38,19 @@ public:
 
 	bool			m_bUseLeftSoftKey;	///< 左ソフトキーによるメニュー表示を利用する？
 
-	int				m_nMainViewCategoryListHeightRatio;	///< メイン画面のカテゴリリストの高さ（比率）[1,100]
-	int				m_nMainViewBodyListHeightRatio;		///< メイン画面のボディリストの高さ（比率）[1,100]
-	int				m_nReportViewListHeightRatio;		///< レポート画面のリストの高さ（比率）[1,100]
-	int				m_nReportViewBodyHeightRatio;		///< レポート画面のボディの高さ（比率）[1,100]
+	int				m_nMainViewCategoryListHeightRatio;	///< メイン画面のカテゴリリストの高さ（比率）[1,1000]
+	int				m_nMainViewBodyListHeightRatio;		///< メイン画面のボディリストの高さ（比率）[1,1000]
+	int				m_nReportViewListHeightRatio;		///< レポート画面のリストの高さ（比率）[1,1000]
+	int				m_nReportViewBodyHeightRatio;		///< レポート画面のボディの高さ（比率）[1,1000]
+
+	int				m_nMainViewCategoryListCol1Ratio;	///< メイン画面のカテゴリリストのカラム１の幅（比率）[1,1000]
+	int				m_nMainViewCategoryListCol2Ratio;	///< メイン画面のカテゴリリストのカラム２の幅（比率）[1,1000]
+	int				m_nMainViewBodyListCol1Ratio;		///< メイン画面のボディリストのカラム１の幅（比率）[1,1000]
+	int				m_nMainViewBodyListCol2Ratio;		///< メイン画面のボディリストのカラム２の幅（比率）[1,1000]
+
+	int				m_nReportViewListCol1Ratio;			///< レポート画面のリストのカラム１の幅（比率）[1,1000]
+	int				m_nReportViewListCol2Ratio;			///< レポート画面のリストのカラム２の幅（比率）[1,1000]
+	int				m_nReportViewListCol3Ratio;			///< レポート画面のリストのカラム３の幅（比率）[1,1000]
 
 private:
 	int				m_recvBufSize;		///< 受信バッファサイズ
@@ -64,6 +73,14 @@ public:
 		, m_nMainViewBodyListHeightRatio( 70 )		// ボディリストは 70%
 		, m_nReportViewListHeightRatio( 40 )		// リストは 40%
 		, m_nReportViewBodyHeightRatio( 60 )		// ボディは 60%
+		, m_nReportViewListCol1Ratio( 7 )			// カラム１は 7/N
+		, m_nReportViewListCol2Ratio( 17 )			// カラム２は 17/N
+		, m_nReportViewListCol3Ratio( 21 )			// カラム３は 21/N
+		, m_nMainViewCategoryListCol1Ratio( 25 )	// カテゴリリスト、カラム１は 25/N
+		, m_nMainViewCategoryListCol2Ratio( 20 )	// カテゴリリスト、カラム２は 20/N
+		, m_nMainViewBodyListCol1Ratio( 24 )		// ボディリスト、カラム１は 24/N
+		, m_nMainViewBodyListCol2Ratio( 21 )		// ボディリスト、カラム２は 21/N
+
 	{
 	}
 

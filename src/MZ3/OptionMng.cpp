@@ -135,21 +135,52 @@ void Option::Load()
 		}
 
 		// リストの高さ（比率）
+		const int RATIO_MAX = 1000;
 		s = inifile.GetValue( "MainViewCategoryListHeightRatio", "UI" );
 		if(! s.empty() ) {
-			m_nMainViewCategoryListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+			m_nMainViewCategoryListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
 		}
 		s = inifile.GetValue( "MainViewBodyListHeightRatio", "UI" );
 		if(! s.empty() ) {
-			m_nMainViewBodyListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+			m_nMainViewBodyListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
 		}
 		s = inifile.GetValue( "ReportViewListHeightRatio", "UI" );
 		if(! s.empty() ) {
-			m_nReportViewListHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+			m_nReportViewListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
 		}
 		s = inifile.GetValue( "ReportViewBodyHeightRatio", "UI" );
 		if(! s.empty() ) {
-			m_nReportViewBodyHeightRatio = normalizeRange( atoi(s.c_str()), 1, 100 );
+			m_nReportViewBodyHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+
+		// リストのカラム幅（比率）
+		s = inifile.GetValue( "MainViewBodyListCol1Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewBodyListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "MainViewBodyListCol2Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewBodyListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "MainViewCategoryListCol1Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewCategoryListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "MainViewCategoryListCol2Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nMainViewCategoryListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "ReportViewListCol1Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nReportViewListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "ReportViewListCol2Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nReportViewListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
+		}
+		s = inifile.GetValue( "ReportViewListCol3Ratio", "UI" );
+		if(! s.empty() ) {
+			m_nReportViewListCol3Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
 		}
 	}
 
@@ -220,6 +251,16 @@ void Option::Save()
 	inifile.SetValue( "MainViewBodyListHeightRatio",     (LPCSTR)util::int2str_a(m_nMainViewBodyListHeightRatio), "UI" );
 	inifile.SetValue( "ReportViewListHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewListHeightRatio), "UI" );
 	inifile.SetValue( "ReportViewBodyHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewBodyHeightRatio), "UI" );
+
+	// リストのカラム幅（比率）
+	inifile.SetValue( "MainViewBodyListCol1Ratio", (LPCSTR)util::int2str_a(m_nMainViewBodyListCol1Ratio), "UI" );
+	inifile.SetValue( "MainViewBodyListCol2Ratio", (LPCSTR)util::int2str_a(m_nMainViewBodyListCol2Ratio), "UI" );
+	inifile.SetValue( "MainViewCategoryListCol1Ratio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListCol1Ratio), "UI" );
+	inifile.SetValue( "MainViewCategoryListCol2Ratio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListCol2Ratio), "UI" );
+
+	inifile.SetValue( "ReportViewListCol1Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol1Ratio), "UI" );
+	inifile.SetValue( "ReportViewListCol2Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol2Ratio), "UI" );
+	inifile.SetValue( "ReportViewListCol3Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol3Ratio), "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

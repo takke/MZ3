@@ -1436,11 +1436,11 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
 		break;
 	}
 
-	// ヘルプなら、7:(17+21):0 の比率で分割する
-	// ヘルプ以外なら、7:17:21 の比率で分割する
-	const int W_COL1 =  7;
-	const int W_COL2 = 17;
-	const int W_COL3 = 21;
+	// ヘルプなら、W_COL1:(W_COL2+W_COL3):0 の比率で分割する
+	// ヘルプ以外なら、W_COL1:W_COL2:W_COL3 の比率で分割する
+	const int W_COL1 = theApp.m_optionMng.m_nReportViewListCol1Ratio;
+	const int W_COL2 = theApp.m_optionMng.m_nReportViewListCol2Ratio;
+	const int W_COL3 = theApp.m_optionMng.m_nReportViewListCol3Ratio;
 	if( mixi.GetAccessType() == ACCESS_HELP ) {
 		// ヘルプ
 		m_list.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2+W_COL3) );
