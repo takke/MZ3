@@ -397,10 +397,6 @@ void CReportView::SetData(CMixiData* data)
 	m_list.SetItemState( focusItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 
 	m_list.EnsureVisible( focusItem, FALSE );
-
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary());
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
-
 }
 
 /**
@@ -1178,6 +1174,10 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 	RECT rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 	OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
+
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary());
+	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
+
 	return LRESULT();
 }
 
