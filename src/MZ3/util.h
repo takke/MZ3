@@ -774,8 +774,8 @@ inline bool LineHasStringsNoCase(
 inline CString ConvertUrlForMixiMobile( LPCTSTR url )
 {
 	CString path;
-	if( util::GetAfterSubString( url, L"mixi.jp/", path ) >= 0 ) {
-		// mixi.jp/ が含まれているので mixi の URL とみなす。
+	if( util::GetAfterSubString( url, L"//mixi.jp/", path ) >= 0 ) {
+		// //mixi.jp/ が含まれているので mixi の URL とみなす。
 		// mixi モバイル用URLに変換したURLを返す。
 		return theApp.MakeLoginUrlForMixiMobile( path );
 	}
