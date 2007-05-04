@@ -159,6 +159,7 @@ public:
 			FILE* fp = fopen( &filename_mbs[0], "w" );
 			fclose( fp );
 		}
+
 		return true;
 	}
 

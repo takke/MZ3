@@ -33,7 +33,6 @@ END_MESSAGE_MAP()
 CMZ3App::CMZ3App()
 	: CWinApp()
 {
-//	m_hInternet = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -87,6 +86,23 @@ BOOL CMZ3App::InitInstance()
 	// ファイルパス群を初期化
 	m_filepath.init();
 
+	// MZ3 ロガーの初期化
+	m_logger.init( m_filepath.mz3logfile );
+
+	// ログレベルの設定
+#ifdef	MZ3_DEBUG
+	// Release_MZ3 なので debug 有効
+	m_logger.setLogLevel( CSimpleLogger::CATEGORY_DEBUG );
+#else
+#ifdef	_DEBUG
+	// Debug 以外なので debug 有効
+	m_logger.setLogLevel( CSimpleLogger::CATEGORY_DEBUG );
+#else
+	// リリースなので info まで有効
+	m_logger.setLogLevel( CSimpleLogger::CATEGORY_INFO );
+#endif
+#endif
+
 	// オプション読み込み
 	m_optionMng.Load();
 
@@ -97,7 +113,9 @@ BOOL CMZ3App::InitInstance()
 	m_loginMng.Read();
 
 	// ログ用INIファイルの読み込み
+	MZ3LOGGER_DEBUG( L"ini ファイル読み込み開始" );
 	m_logfile.Load( m_filepath.logfile );
+	MZ3LOGGER_DEBUG( L"ini ファイル読み込み完了" );
 
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
@@ -126,6 +144,7 @@ BOOL CMZ3App::InitInstance()
 					L"「いいえ」：MZ3を終了します。",
 					L"MZ3", MB_YESNO ) != IDYES ) 
 			{
+				MZ3LOGGER_INFO( L"ユーザによるキャンセルのため終了" );
 				return FALSE;
 			}
 		}
@@ -195,6 +214,8 @@ int CMZ3App::ExitInstance()
 //	msg.Format( L"ログファイルを\n%s\nに保存します", logfile );
 //	MessageBox( NULL, msg, 0, MB_OK );
 
+	MZ3LOGGER_DEBUG( L"MZ3 終了処理開始" );
+
 	// ログファイルの保存
 	if( m_logfile.Save( m_filepath.logfile ) == false ) {
 		MessageBox( NULL, L"ログファイル保存失敗", m_filepath.logfile, MB_OK );
@@ -205,6 +226,8 @@ int CMZ3App::ExitInstance()
 
 	// グループ定義ファイルの保存
 	Mz3GroupDataWriter::save( m_root, m_filepath.groupfile );
+
+	MZ3LOGGER_DEBUG( L"MZ3 終了処理完了" );
 
 	return CWinApp::ExitInstance();
 }
@@ -329,6 +352,9 @@ void CMZ3App::FilePath::init()
 {
 	TCHAR temppath[256];
 	::GetTempPath(256, temppath);
+
+	// MZ3 本体のログファイル
+	mz3logfile.Format( L"%s\\mz3log.txt", theApp.GetAppDirPath() );
 
 	// HTML 用一時ファイル(SJIS)
 	temphtml.Format( _T("%s\\mz3s.dat"), temppath );

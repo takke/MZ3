@@ -711,6 +711,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SimpleLogger.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -1038,15 +1042,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabGeneral.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabGetPage.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\OptionTabLog.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OptionTabGeneral.cpp"
 					>
 				</File>
 				<File
@@ -1126,6 +1130,10 @@
 			</File>
 			<File
 				RelativePath=".\Resourceppc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SimpleLogger.h"
 				>
 			</File>
 			<File

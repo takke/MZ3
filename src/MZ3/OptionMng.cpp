@@ -27,6 +27,8 @@ inline int normalizeRange( int value, int minv, int maxv )
 
 void Option::Load()
 {
+	MZ3LOGGER_DEBUG( L"オプション設定読み込み開始" );
+
 	const CString& fileName = theApp.m_filepath.inifile;
 
 	inifile::IniFile inifile;
@@ -206,10 +208,14 @@ void Option::Load()
 		// 総データ受信量
 		m_totalRecvBytes = atoi( inifile.GetValue("TotalRecvBytes", "Net").c_str() );
 	}
+
+	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
 }
 
 void Option::Save()
 {
+	MZ3LOGGER_DEBUG( L"オプション設定保存開始" );
+
 	inifile::IniFile inifile;
 
 	inifile.SetValue("Use", (LPCSTR)util::int2str_a(m_proxyUse), "Proxy");
@@ -277,6 +283,8 @@ void Option::Save()
 
 	// Save
 	inifile.Save( theApp.m_filepath.inifile, false );
+
+	MZ3LOGGER_DEBUG( L"オプション設定保存完了" );
 }
 
 }// namespace option

@@ -15,6 +15,14 @@
 #include "GroupItem.h"
 #include "Mz3GroupData.h"
 #include "CategoryItem.h"
+#include "SimpleLogger.h"
+
+// ログ出力用マクロ
+#define MZ3LOGGER_FATAL(msg)	SIMPLELOGGER_FATAL(theApp.m_logger,msg)
+#define MZ3LOGGER_ERROR(msg)	SIMPLELOGGER_ERROR(theApp.m_logger,msg)
+#define MZ3LOGGER_INFO(msg)		SIMPLELOGGER_INFO (theApp.m_logger,msg)
+#define MZ3LOGGER_DEBUG(msg)	SIMPLELOGGER_DEBUG(theApp.m_logger,msg)
+#define MZ3LOGGER_TRACE(msg)	SIMPLELOGGER_TRACE(theApp.m_logger,msg)
 
 #define TOOLBAR_HEIGHT 24
 
@@ -39,6 +47,7 @@ public:
 	/// MZ3 で利用しているファイルのパス
 	class FilePath {
 	public:
+		CString		mz3logfile;		///< MZ3 のログファイル
 		CString		temphtml;		///< HTML 用一時ファイル(SJIS)のパス
 		CString		logfile;		///< ログファイル（INIファイル）のパス
 		CString		inifile;		///< オプション用INIファイルのパス
@@ -86,6 +95,10 @@ public:
 private:
 	ScreenResolution	currentDisplayMode;
 public:
+
+	//--- ロガー
+	CSimpleLogger		m_logger;				///< ログ出力オブジェクト
+
 	//--- UI
 	CFont				m_font;					///< 共通フォント
 	CMZ3View*			m_pMainView;			///< メインビュー
