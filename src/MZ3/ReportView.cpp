@@ -1456,22 +1456,34 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
  */
 void CReportView::OnHdnEndtrackReportList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	MZ3LOGGER_DEBUG( L"OnHdnEndtrackReportList" );
+
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+
+	// カラム幅の反映
+	m_bodyList.SetColumnWidth( phdr->iItem, phdr->pitem->cxy );
 
 	CRect rect;
 	CHeaderCtrl* pHeader = NULL;
 
 	// リストの取得
 	if( (pHeader = m_list.GetHeaderCtrl()) == NULL ) {
+		MZ3LOGGER_ERROR( L"リストのヘッダを取得できないので終了" );
 		return;
 	}
 
 	// カラム１
-	if(! pHeader->GetItemRect( 0, rect ) ) return;
+	if(! pHeader->GetItemRect( 0, rect ) ) {
+		MZ3LOGGER_ERROR( L"リストのヘッダ、第1カラムの幅を取得できないので終了" );
+		return;
+	}
 	theApp.m_optionMng.m_nReportViewListCol1Ratio = rect.Width();
 
 	// カラム２
-	if(! pHeader->GetItemRect( 1, rect ) ) return;
+	if(! pHeader->GetItemRect( 1, rect ) ) {
+		MZ3LOGGER_ERROR( L"リストのヘッダ、第2カラムの幅を取得できないので終了" );
+		return;
+	}
 	theApp.m_optionMng.m_nReportViewListCol2Ratio = rect.Width();
 
 	// カラム３

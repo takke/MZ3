@@ -2695,15 +2695,39 @@ void CMZ3View::ResetColumnWidth()
  */
 void CMZ3View::OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	MZ3LOGGER_DEBUG( L"OnHdnEndtrackHeaderList" );
+
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+
+	// カラム幅の反映
+	m_bodyList.SetColumnWidth( phdr->iItem, phdr->pitem->cxy );
 
 	CRect rect;
 	CHeaderCtrl* pHeader = NULL;
+
+	// ボディリストヘッダの取得
+	if( (pHeader = m_bodyList.GetHeaderCtrl()) == NULL ) {
+		MZ3LOGGER_ERROR( L"ボディリストのヘッダを取得できないので終了" );
+		return;
+	}
+
+	// カラム１
+	if(! pHeader->GetItemRect( 0, rect ) ) {
+		MZ3LOGGER_ERROR( L"ボディリストのヘッダ、第1カラムの幅を取得できないので終了" );
+		return;
+	}
+	theApp.m_optionMng.m_nMainViewBodyListCol1Ratio = rect.Width();
+
+	// カラム２
+	// 最終カラムなので、リスト幅-他のカラムサイズとする。
+	theApp.m_optionMng.m_nMainViewBodyListCol2Ratio
+		= GetListWidth() - theApp.m_optionMng.m_nMainViewBodyListCol1Ratio;
 
 	// カテゴリリスト
 
 	// カテゴリリストの幅はドラッグで変更できないので、保存しない。
 /*	if( (pHeader = m_categoryList.GetHeaderCtrl()) == NULL ) {
+		MZ3LOGGER_ERROR( L"カテゴリリストのヘッダ が NULL なので終了" );
 		return;
 	}
 
@@ -2716,20 +2740,6 @@ void CMZ3View::OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 	theApp.m_optionMng.m_nMainViewCategoryListCol2Ratio
 		= GetListWidth() - theApp.m_optionMng.m_nMainViewCategoryListCol1Ratio;
 */
-
-	// ボディリスト
-	if( (pHeader = m_bodyList.GetHeaderCtrl()) == NULL ) {
-		return;
-	}
-
-	// カラム１
-	if(! pHeader->GetItemRect( 0, rect ) ) return;
-	theApp.m_optionMng.m_nMainViewBodyListCol1Ratio = rect.Width();
-
-	// カラム２
-	// 最終カラムなので、リスト幅-他のカラムサイズとする。
-	theApp.m_optionMng.m_nMainViewBodyListCol2Ratio
-		= GetListWidth() - theApp.m_optionMng.m_nMainViewBodyListCol1Ratio;
 
 	*pResult = 0;
 }
