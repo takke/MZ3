@@ -51,6 +51,11 @@ void Option::Load()
 		m_bBootCheckMnC = (BOOL)atoi(inifile.GetValue("CheckMnC", "Boot").c_str());
 	}
 
+	if (inifile.SectionExists("General") != FALSE) {
+		m_bConvertUrlForMixiMobile
+			= (atoi(inifile.GetValue("ConvertUrlForMixiMobile", "General").c_str()) != 0) ? true : false;
+	}
+
 	if (inifile.SectionExists("UI") != FALSE) {
 		// UI セクション
 
@@ -228,6 +233,13 @@ void Option::Save()
 
 	inifile::IniFile inifile;
 
+	//--- 全般
+	inifile.SetValue( 
+		"ConvertUrlForMixiMobile", 
+		(LPCSTR)util::int2str_a( m_bConvertUrlForMixiMobile ? 1 : 0 ),
+		"General" );
+
+	//--- Proxy
 	inifile.SetValue("Use", (LPCSTR)util::int2str_a(m_proxyUse), "Proxy");
 	inifile.SetValue(L"Server", m_proxyServer, "Proxy");
 	inifile.SetValue("Port", (LPCSTR)util::int2str_a(m_proxyPort), "Proxy");

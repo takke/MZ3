@@ -114,6 +114,7 @@ BEGIN
         BEGIN
             MENUITEM "新着チェック",                      IDM_CHECK_NEW
             MENUITEM "巡回",                          IDM_START_CRUISE
+            MENUITEM "mixiモバイルを開く",                 IDM_OPEN_MIXI_MOBILE_BY_BROWSER
             MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
         END
         POPUP "ヘルプ"
@@ -402,11 +403,14 @@ STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 CAPTION "一般"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
-    CONTROL         "新着メッセージ、コメントチェック",IDC_BOOT_MNC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,22,108,10
-    GROUPBOX        "起動時",IDC_STATIC,7,7,125,35
-    LTEXT           "引用符号",IDC_STATIC,12,66,38,8
-    EDITTEXT        IDC_QUOTE_MARK_EDIT,57,63,65,14,ES_AUTOHSCROLL
-    GROUPBOX        "返信",IDC_STATIC,7,51,125,31
+    CONTROL         "新着メッセージ、コメントチェック",IDC_BOOT_MNC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,20,108,10
+    GROUPBOX        "起動時",IDC_STATIC,7,7,125,29
+    LTEXT           "引用符号",IDC_STATIC,12,55,38,8
+    EDITTEXT        IDC_QUOTE_MARK_EDIT,57,52,65,14,ES_AUTOHSCROLL
+    GROUPBOX        "返信",IDC_STATIC,7,42,125,27
+    CONTROL         "mixiモバイルのURLに変換する",IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,106,10
+    GROUPBOX        "ブラウザ連携",IDC_STATIC,7,75,125,30
 END
 
 IDD_DEBUG_DIALOG DIALOG  0, 0, 119, 51
@@ -602,7 +606,7 @@ BEGIN
         VERTGUIDE, 12
         TOPMARGIN, 7
         BOTTOMMARGIN, 141
-        HORZGUIDE, 70
+        HORZGUIDE, 59
     END
 
     IDD_DEBUG_DIALOG, DIALOG

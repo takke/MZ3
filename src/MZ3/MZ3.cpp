@@ -284,19 +284,42 @@ CString CMZ3App::GetAppDirPath()
 /**
  * ユーザ設定（E-Mailアドレス、パスワード）を用いて、ログインページの実行後のURLを生成する
  */
-CString CMZ3App::GetLoginUri()
+CString CMZ3App::MakeLoginUrl( LPCTSTR nextUrl )
 {
-	// アドレス、パスワードは EUC エンコードする
-	CString mail = URLEncoder::encode_euc( m_loginMng.GetEmail() );
-	CString pass = URLEncoder::encode_euc( m_loginMng.GetPassword() );
+	// アドレス、パスワード、next_url を EUC エンコードする
+	CString mail = URLEncoder::encode_euc( theApp.m_loginMng.GetEmail() );
+	CString pass = URLEncoder::encode_euc( theApp.m_loginMng.GetPassword() );
+	CString encodedNextUrl = URLEncoder::encode_euc( nextUrl );
 
 	CString uri;
-	uri.Format(_T("http://mixi.jp/login.pl?email=%s&password=%s&next_url=/home.pl"),
+	uri.Format(_T("http://mixi.jp/login.pl?email=%s&password=%s&next_url=%s"),
 		mail,
-		pass);
+		pass,
+		encodedNextUrl
+		);
 
 //	MessageBox( NULL, uri, L"MZ3", MB_OK );
 	return uri;
+}
+
+/**
+ * ユーザ設定（E-Mailアドレス、パスワード）を用いて、自動ログインURLを生成する
+ */
+CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
+{
+	// アドレス、パスワード、next_url を EUC エンコードする
+	CString mail = URLEncoder::encode_euc( theApp.m_loginMng.GetEmail() );
+	CString pass = URLEncoder::encode_euc( theApp.m_loginMng.GetPassword() );
+	CString encodedNextUrl = URLEncoder::encode_euc( nextUrl );
+
+	CString url;
+	url.Format( 
+		L"http://m.mixi.jp/login.pl?submit=main&type=full&mode=password&key=&next_url=%s&email=%s&password=%s",
+		encodedNextUrl,
+		mail,
+		pass);
+
+	return url;
 }
 
 /// コマンドバーのボタンの有効・無効制御

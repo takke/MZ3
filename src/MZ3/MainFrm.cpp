@@ -12,6 +12,8 @@
 #include "ReportView.h"
 #include "WriteView.h"
 #include "MZ3View.h"
+#include "util.h"
+#include "url_encoder.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -53,6 +55,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_HELP_MENU, &CMainFrame::OnHelpMenu)
 	ON_COMMAND(ID_HISTORY_MENU, &CMainFrame::OnHistoryMenu)
 	ON_COMMAND(IDM_START_CRUISE, &CMainFrame::OnStartCruise)
+	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 END_MESSAGE_MAP()
 
 
@@ -518,4 +521,13 @@ void CMainFrame::OnHistoryMenu()
 void CMainFrame::OnStartCruise()
 {
 	theApp.m_pMainView->StartCruise();
+}
+
+/**
+ * ‚»‚Ì‘¼bmixiƒ‚ƒoƒCƒ‹‚ğŠJ‚­
+ */
+void CMainFrame::OnOpenMixiMobileByBrowser()
+{
+	CString url = theApp.MakeLoginUrlForMixiMobile( L"home.pl" );
+	util::OpenUrlByBrowser( url );
 }

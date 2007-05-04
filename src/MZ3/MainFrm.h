@@ -71,6 +71,7 @@ public:
 	afx_msg void OnHelpMenu();
 	afx_msg void OnHistoryMenu();
 	afx_msg void OnStartCruise();
+	afx_msg void OnOpenMixiMobileByBrowser();
 };
 
 

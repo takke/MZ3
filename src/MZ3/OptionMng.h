@@ -37,6 +37,9 @@ private:
 	int				m_totalRecvBytes;	///< 総データ受信量
 
 public:
+
+	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
+
 	int				m_fontHeight;		///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;			///< フォント名（"" の場合は設定しない）
 
@@ -100,6 +103,7 @@ public:
 		, m_nMainViewBodyListCol2Ratio( 21 )		// ボディリスト、カラム２は 21/N
 		, m_reportScrollType( REPORT_SCROLL_TYPE_PAGE )
 		, m_reportScrollLine( 7 )
+		, m_bConvertUrlForMixiMobile( true )
 	{
 	}
 

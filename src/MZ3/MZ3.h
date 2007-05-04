@@ -137,7 +137,8 @@ public:
 	void SetReConnect(BOOL value) { m_reConnect = value; };
 	BOOL IsReConnect() { return m_reConnect; }
 
-	CString GetLoginUri();
+	CString MakeLoginUrl( LPCTSTR nextUrl=L"/home.pl" );
+	CString MakeLoginUrlForMixiMobile( LPCTSTR nextUrl );
 
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:

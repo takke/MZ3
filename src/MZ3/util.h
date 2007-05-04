@@ -74,27 +74,6 @@ inline void OpenUrlByBrowser( LPCTSTR url )
 }
 
 /**
- * 指定されたURLをブラウザで開く（確認画面付き）
- */
-inline void OpenBrowserForUrl( LPCTSTR url )
-{
-	// 確認画面
-	CString msg;
-	msg.Format( 
-		L"下記のURLをブラウザで開きます。\n\n"
-		L"%s\n\n"
-		L"よろしいですか？", url );
-	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
-	{
-		// YES ボタン以外なので終了
-		return;
-	}
-
-	// ブラウザで開く
-	util::OpenUrlByBrowser( url );
-}
-
-/**
  * gsgetfile.dll を用いてファイル選択画面を表示する
  *
  * 成功時は IDOK が返る
@@ -151,27 +130,6 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath
 	}else{
 		return false;
 	}
-}
-
-/**
- * 指定されたユーザのプロフィールページをブラウザで開く（確認画面付き）
- */
-inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
-{
-	// 確認画面
-	CString msg;
-	msg.Format( 
-		L"%s さんのプロフィールページをブラウザで開きます。\n\n"
-		L"%s\n\n"
-		L"よろしいですか？", szUserName, url );
-	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
-	{
-		// YES ボタン以外なので終了
-		return;
-	}
-
-	// ブラウザで開く
-	util::OpenUrlByBrowser( url );
 }
 
 /// アクセス種別を文字列に変換する
@@ -807,6 +765,77 @@ inline bool LineHasStringsNoCase(
 	}
 
 	return true;
+}
+
+/**
+ * 指定されたURLが mixi の URL であれば、
+ * mixi モバイル用URLに変換する
+ */
+inline CString ConvertUrlForMixiMobile( LPCTSTR url )
+{
+	CString path;
+	if( util::GetAfterSubString( url, L"mixi.jp/", path ) >= 0 ) {
+		// mixi.jp/ が含まれているので mixi の URL とみなす。
+		// mixi モバイル用URLに変換したURLを返す。
+		return theApp.MakeLoginUrlForMixiMobile( path );
+	}
+
+	// mixi 用URLではないため、変換せずに返す。
+	return url;
+}
+
+/**
+ * 指定されたURLをブラウザで開く（確認画面付き）
+ */
+inline void OpenBrowserForUrl( LPCTSTR url )
+{
+	// 確認画面
+	CString msg;
+	msg.Format( 
+		L"下記のURLをブラウザで開きます。\n\n"
+		L"%s\n\n"
+		L"よろしいですか？", url );
+	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
+	{
+		// YES ボタン以外なので終了
+		return;
+	}
+
+	// mixi モバイル用URL変換
+	CString requestUrl = url;
+	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
+		requestUrl = ConvertUrlForMixiMobile( url );
+	}
+
+	// ブラウザで開く
+	util::OpenUrlByBrowser( requestUrl );
+}
+
+/**
+ * 指定されたユーザのプロフィールページをブラウザで開く（確認画面付き）
+ */
+inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
+{
+	// 確認画面
+	CString msg;
+	msg.Format( 
+		L"%s さんのプロフィールページをブラウザで開きます。\n\n"
+		L"%s\n\n"
+		L"よろしいですか？", szUserName, url );
+	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
+	{
+		// YES ボタン以外なので終了
+		return;
+	}
+
+	// mixi モバイル用URL変換
+	CString requestUrl = url;
+	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
+		requestUrl = ConvertUrlForMixiMobile( url );
+	}
+
+	// ブラウザで開く
+	util::OpenUrlByBrowser( requestUrl );
 }
 
 }

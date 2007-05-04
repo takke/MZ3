@@ -623,7 +623,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// mixi データを保存（待避）
 			theApp.m_mixiBeforeRelogin = *data;
-			data->SetURL( theApp.GetLoginUri() );
+			data->SetURL( theApp.MakeLoginUrl() );
 
 			// ログイン実行
 			data->SetAccessType( ACCESS_LOGIN );

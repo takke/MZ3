@@ -41,6 +41,10 @@ BOOL COptionTabGeneral::OnInitDialog()
 	// 引用符号
 	SetDlgItemText( IDC_QUOTE_MARK_EDIT, theApp.m_optionMng.GetQuoteMark() );
 
+	// mixi モバイル対応
+	CheckDlgButton( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK, 
+		theApp.m_optionMng.m_bConvertUrlForMixiMobile ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;
 }
 
@@ -55,6 +59,9 @@ void COptionTabGeneral::OnOK()
 	GetDlgItemText( IDC_QUOTE_MARK_EDIT, mark );
 	theApp.m_optionMng.SetQuoteMark( mark );
 
+	// mixi モバイル対応
+	theApp.m_optionMng.m_bConvertUrlForMixiMobile = 
+		IsDlgButtonChecked( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK ) == BST_CHECKED ? true : false;
+
 	CPropertyPage::OnOK();
 }
-

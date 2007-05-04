@@ -221,7 +221,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
 		theApp.m_accessType = ACCESS_LOGIN;
 		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.GetLoginUri(), L"", CInetAccess::FILE_HTML );
+		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), L"", CInetAccess::FILE_HTML );
 		return;
 	}
 
@@ -284,7 +284,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 
 		theApp.m_accessType = ACCESS_LOGIN;
 		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.GetLoginUri(), NULL, CInetAccess::FILE_HTML );
+		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
 
 		return LRESULT();
 	}
