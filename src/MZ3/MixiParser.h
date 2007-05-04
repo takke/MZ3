@@ -1153,13 +1153,7 @@ private:
 		}
 
 		// URL に応じてアクセス種別を設定する
-		if( url.Find( L"view_community.pl" ) != -1 ) {
-			mixi.SetAccessType( ACCESS_COMMUNITY );
-		}else if( url.Find( L"show_friend.pl" ) != -1 ) {
-			mixi.SetAccessType( ACCESS_PROFILE );
-		}else{
-			mixi.SetAccessType( ACCESS_INVALID );
-		}
+		mixi.SetAccessType( util::EstimateAccessTypeByUrl( url ) );
 
 		return true;
 	}
@@ -1397,7 +1391,6 @@ line2 : <a href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/membe
 				name.Replace( L"\n", L"" );
 
 				mixi.SetName( name );
-
 				mixi.SetAccessType( ACCESS_PROFILE );
 
 				// mixi_list に追加する。
@@ -1994,15 +1987,7 @@ public:
 				mixi.SetURL( url );
 
 				// URL に応じてアクセス種別を設定
-				if (url.Find(_T("view_enquete.pl")) != -1) {
-					mixi.SetAccessType(ACCESS_ENQUETE);
-				}
-				else if (url.Find(_T("view_event.pl")) != -1) {
-					mixi.SetAccessType(ACCESS_EVENT);
-				}
-				else if (url.Find(_T("view_bbs.pl")) != -1 ) {
-					mixi.SetAccessType(ACCESS_BBS);
-				}
+				mixi.SetAccessType( util::EstimateAccessTypeByUrl(url) );
 
 				// IDの抽出、設定
 				mixi.SetID( MixiUrlParser::GetID(url) );
@@ -2591,15 +2576,7 @@ public:
 					MixiUrlParser::GetCommentCount( buf ) );
 
 				// URL に応じてアクセス種別を設定
-				if (buf.Find(_T("view_enquete.pl")) != -1) {
-					data.SetAccessType(ACCESS_ENQUETE);
-				}
-				else if (buf.Find(_T("view_event.pl")) != -1) {
-					data.SetAccessType(ACCESS_EVENT);
-				}
-				else if( buf.Find(_T("view_bbs.pl")) != -1 ) {
-					data.SetAccessType(ACCESS_BBS);
-				}
+				data.SetAccessType( util::EstimateAccessTypeByUrl(buf) );
 
 				// ＩＤを設定
 				buf = buf.Mid(buf.Find(_T("id=")) + wcslen(_T("id=")));
