@@ -14,17 +14,6 @@ namespace option {
 
 // Option メンバ関数
 
-inline int normalizeRange( int value, int minv, int maxv ) 
-{
-	// 下限値調整
-	value = max( value, minv );
-
-	// 上限値調整
-	value = min( value, maxv );
-
-	return value;
-}
-
 void Option::Load()
 {
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み開始" );
@@ -184,6 +173,27 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_nReportViewListCol3Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
 		}
+
+		// レポート画面のスクロールタイプ
+		s = inifile.GetValue( "ReportScrollType", "UI" );
+		if(! s.empty() ) {
+			int type = atoi(s.c_str());
+			switch( type ) {
+			case option::Option::REPORT_SCROLL_TYPE_LINE:
+			case option::Option::REPORT_SCROLL_TYPE_PAGE:
+				m_reportScrollType = (option::Option::REPORT_SCROLL_TYPE) type;
+				break;
+			default:
+				MZ3LOGGER_ERROR( L"ReportScrollType が規定値以外です" );
+				break;
+			}
+		}
+
+		// レポート画面のスクロール行数
+		s = inifile.GetValue( "ReportScrollLine", "UI" );
+		if(! s.empty() ) {
+			m_reportScrollLine = normalizeRange( atoi(s.c_str()), 1, 100 );
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -267,6 +277,12 @@ void Option::Save()
 	inifile.SetValue( "ReportViewListCol1Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol1Ratio), "UI" );
 	inifile.SetValue( "ReportViewListCol2Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol2Ratio), "UI" );
 	inifile.SetValue( "ReportViewListCol3Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol3Ratio), "UI" );
+
+	// レポート画面のスクロールタイプ
+	inifile.SetValue( "ReportScrollType", (LPCSTR)util::int2str_a(m_reportScrollType), "UI" );
+
+	// レポート画面のスクロール行数
+	inifile.SetValue( "ReportScrollLine", (LPCSTR)util::int2str_a(m_reportScrollLine), "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

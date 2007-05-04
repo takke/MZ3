@@ -1058,6 +1058,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabReport.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabUI.cpp"
 					>
 				</File>
@@ -1261,6 +1265,10 @@
 				</File>
 				<File
 					RelativePath=".\OptionTabProxy.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabReport.h"
 					>
 				</File>
 				<File

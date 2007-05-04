@@ -169,7 +169,9 @@ void CReportView::OnInitialUpdate()
 	}
 
 	m_nochange = FALSE;
-	m_scrollLine = 7;
+
+	// スクロール量の初期値設定
+	m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
 }
 
 /**
@@ -205,8 +207,13 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	GetDlgItem(IDC_REPORT_EDIT)->MoveWindow( 0, hTitle+hList, cx, hReport );
 	GetDlgItem(IDC_INFO_EDIT)  ->MoveWindow( 0, cy - hInfo,   cx, hInfo   );
 
-	m_scrollLine = (hReport / fontHeight) - 2;
-	TRACE(_T("Scrol Line = %d\n"), m_scrollLine);
+	// スクロールタイプが「ページ単位」なら再計算
+	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
+		m_scrollLine = (hReport / fontHeight) - 2;
+		TRACE(_T("Scrol Line = %d\n"), m_scrollLine);
+	}else{
+		m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
+	}
 
 	// 選択中の行が表示されるようにする
 	if( m_list.m_hWnd != NULL ) {

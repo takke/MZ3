@@ -37,6 +37,7 @@
 #define IDC_STATIC_4                    204
 #define IDD_OPTIONTAB_LOG               204
 #define IDC_STATIC_5                    205
+#define IDD_OPTIONTAB_REPORT            205
 #define IDC_STATIC_6                    206
 #define IDC_STATIC_7                    207
 #define IDC_STATIC_8                    208
@@ -73,6 +74,7 @@
 #define IDC_SAMPLE_EDIT                 1027
 #define IDC_LOGFOLDER_EDIT              1027
 #define IDC_QUOTE_MARK_EDIT             1027
+#define IDC_SCROLL_LINE_EDIT            1027
 #define IDC_WRITE_BODY_EDIT             1028
 #define IDC_FONT_MEDIUM_EDIT            1028
 #define IDC_MESSAGE_EDIT                1028
@@ -99,6 +101,8 @@
 #define IDC_RESET_TAB_BUTTON            1046
 #define IDC_SELECT_FONT_BUTTON          1047
 #define IDC_FONT_LIST                   1047
+#define IDC_SCROLL_LINE_RADIO           1049
+#define IDC_SCROLL_PAGE_RADIO           1050
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -253,9 +257,9 @@
 #define ID_32929                        32929
 #define ID_NEW_MESSAGE                  32930
 #define ID_SEND_NEW_MESSAGE             32931
-#define ID_PREVIEW_ATTACHED_PHOTO3      32934
-#define ID_PREVIEW_ATTACHED_PHOTO2      32933
 #define ID_PREVIEW_ATTACHED_PHOTO1      32932
+#define ID_PREVIEW_ATTACHED_PHOTO2      32933
+#define ID_PREVIEW_ATTACHED_PHOTO3      32934
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -266,7 +270,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        151
 #define _APS_NEXT_COMMAND_VALUE         32942
-#define _APS_NEXT_CONTROL_VALUE         1049
+#define _APS_NEXT_CONTROL_VALUE         1050
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

@@ -5,6 +5,7 @@
 #include "OptionTabGetPage.h"
 #include "OptionTabGeneral.h"
 #include "OptionTabUI.h"
+#include "OptionTabReport.h"
 #include "OptionTabLog.h"
 
 // COptionSheet
@@ -27,9 +28,10 @@ private:
 	COptionTabUser		m_tabUser;		///< ログインタブ
 	COptionTabGeneral	m_tabGeneral;	///< 一般タブ
 	COptionTabUI		m_tabUi;		///< UIタブ
-	COptionTabProxy		m_tabProxy;		///< PROXYタブ
+	COptionTabReport	m_tabReport;	///< レポート画面タブ
 	COptionTabGetPage	m_tabGet;		///< 取得タブ
 	COptionTabLog		m_tabLog;		///< ログタブ
+	COptionTabProxy		m_tabProxy;		///< PROXYタブ
 };
 
 

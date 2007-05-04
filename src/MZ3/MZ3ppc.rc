@@ -471,6 +471,18 @@ BEGIN
     GROUPBOX        "保存先",IDC_STATIC,7,28,125,35
 END
 
+IDD_OPTIONTAB_REPORT DIALOG  0, 0, 139, 148
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "レポート画面"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "行単位：",IDC_SCROLL_LINE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,21,40,10
+    CONTROL         "ページ",IDC_SCROLL_PAGE_RADIO,"Button",BS_AUTORADIOBUTTON,14,37,35,10
+    EDITTEXT        IDC_SCROLL_LINE_EDIT,56,19,21,14,ES_AUTOHSCROLL
+    LTEXT           "行",IDC_STATIC,81,22,10,8
+    GROUPBOX        "スクロール",IDC_STATIC,7,7,125,46
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -643,6 +655,16 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 109
         HORZGUIDE, 48
+    END
+
+    IDD_OPTIONTAB_REPORT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        VERTGUIDE, 14
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+        HORZGUIDE, 26
     END
 END
 #endif    // APSTUDIO_INVOKED

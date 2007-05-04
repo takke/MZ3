@@ -229,6 +229,8 @@ int CMZ3App::ExitInstance()
 
 	MZ3LOGGER_DEBUG( L"MZ3 I—¹ˆ—Š®—¹" );
 
+	MZ3LOGGER_INFO( L"MZ3 I—¹" );
+
 	return CWinApp::ExitInstance();
 }
 

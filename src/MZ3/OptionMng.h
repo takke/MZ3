@@ -5,6 +5,17 @@
 /// オプションデータ
 namespace option {
 
+inline int normalizeRange( int value, int minv, int maxv ) 
+{
+	// 下限値調整
+	value = max( value, minv );
+
+	// 上限値調整
+	value = min( value, maxv );
+
+	return value;
+}
+
 /**
  * オプションデータ管理クラス
  */
@@ -52,6 +63,13 @@ public:
 	int				m_nReportViewListCol2Ratio;			///< レポート画面のリストのカラム２の幅（比率）[1,1000]
 	int				m_nReportViewListCol3Ratio;			///< レポート画面のリストのカラム３の幅（比率）[1,1000]
 
+	enum REPORT_SCROLL_TYPE {
+		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
+		REPORT_SCROLL_TYPE_PAGE = 1,	///< ページ単位
+	};
+	REPORT_SCROLL_TYPE	m_reportScrollType;	///< レポート画面のスクロールタイプ
+	int				m_reportScrollLine;	///< レポート画面のスクロール行数
+
 private:
 	int				m_recvBufSize;		///< 受信バッファサイズ
 
@@ -80,7 +98,8 @@ public:
 		, m_nMainViewCategoryListCol2Ratio( 20 )	// カテゴリリスト、カラム２は 20/N
 		, m_nMainViewBodyListCol1Ratio( 24 )		// ボディリスト、カラム１は 24/N
 		, m_nMainViewBodyListCol2Ratio( 21 )		// ボディリスト、カラム２は 21/N
-
+		, m_reportScrollType( REPORT_SCROLL_TYPE_PAGE )
+		, m_reportScrollLine( 7 )
 	{
 	}
 
