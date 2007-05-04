@@ -1461,7 +1461,7 @@ void CReportView::OnHdnEndtrackReportList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
 
 	// ƒJƒ‰ƒ€•‚Ì”½‰f
-	m_bodyList.SetColumnWidth( phdr->iItem, phdr->pitem->cxy );
+	m_list.SetColumnWidth( phdr->iItem, phdr->pitem->cxy );
 
 	CRect rect;
 	CHeaderCtrl* pHeader = NULL;
