@@ -727,7 +727,7 @@ inline CString CreateMixiUrl(LPCTSTR str)
 {
 	if( wcsstr( str, L"mixi.jp" ) == NULL ) {
 		CString uri;
-		uri.Format(_T("http://mixi.jp/%s\n"), str);
+		uri.Format(_T("http://mixi.jp/%s"), str);
 		return uri;
 	}else{
 		return str;
