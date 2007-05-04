@@ -89,6 +89,8 @@
 #define IDC_USE_BGIMAGE_CHECK           1035
 #define IDC_USE_LOG_CHECK               1035
 #define IDC_SAVE_LOG_CHECK              1035
+#define IDC_USE_MIXI_MOBILE_CHECK       1035
+#define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
@@ -260,6 +262,8 @@
 #define ID_PREVIEW_ATTACHED_PHOTO1      32932
 #define ID_PREVIEW_ATTACHED_PHOTO2      32933
 #define ID_PREVIEW_ATTACHED_PHOTO3      32934
+#define ID_32942                        32942
+#define IDM_OPEN_MIXI_MOBILE_BY_BROWSER 32943
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -269,7 +273,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        151
-#define _APS_NEXT_COMMAND_VALUE         32942
+#define _APS_NEXT_COMMAND_VALUE         32944
 #define _APS_NEXT_CONTROL_VALUE         1050
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
