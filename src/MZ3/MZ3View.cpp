@@ -1513,7 +1513,9 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 			}
 			// インターネットにアクセス
 			m_hotList = &m_bodyList;
-			AccessProc( &m_selGroup->getFocusedCategory()->m_mixi, util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
+			AccessProc( 
+				&m_selGroup->getFocusedCategory()->m_mixi, 
+				util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
 		}
 		else {
 			// 非選択項目なので、取得時刻とボディの変更。
