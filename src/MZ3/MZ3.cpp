@@ -103,6 +103,8 @@ BOOL CMZ3App::InitInstance()
 #endif
 #endif
 
+	MZ3LOGGER_INFO( L"MZ3 起動開始" );
+
 	// オプション読み込み
 	m_optionMng.Load();
 
@@ -132,8 +134,12 @@ BOOL CMZ3App::InitInstance()
 	ParseCommandLine(cmdInfo);
 
 	// トップページ用の初期化
+	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
 	bool bExistGroupFile = util::ExistFile( theApp.m_filepath.groupfile );
-	if( Mz3GroupDataReader::load( m_root, theApp.m_filepath.groupfile ) == false ) {
+	if( Mz3GroupDataReader::load( m_root, theApp.m_filepath.groupfile ) ) {
+		MZ3LOGGER_INFO( L"タブ設定ファイル読み込み成功" );
+	}else{
+		MZ3LOGGER_INFO( L"タブ設定ファイル読み込み失敗" );
 		// ロード失敗
 		// ファイルが存在するのにロード失敗なら初期化確認。
 		// ファイルが存在しないなら初期状態なので確認なしで初期化。
@@ -148,7 +154,9 @@ BOOL CMZ3App::InitInstance()
 				return FALSE;
 			}
 		}
+
 		// 初期化
+		MZ3LOGGER_INFO( L"タブ初期化" );
 		m_root.initForTopPage();
 	}
 
@@ -204,6 +212,8 @@ BOOL CMZ3App::InitInstance()
 		// ユーザ設定画面を表示する
 		((CMainFrame*)m_pMainWnd)->OnSettingLogin();
 	}
+
+	MZ3LOGGER_INFO( L"MZ3 初期化完了" );
 
 	return TRUE;
 }
