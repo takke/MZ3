@@ -769,15 +769,32 @@ inline bool LineHasStringsNoCase(
 
 /**
  * 指定されたURLが mixi の URL であれば、
- * mixi モバイル用URLに変換する
+ * mixi モバイルの自動ログイン用URLに変換する
  */
-inline CString ConvertUrlForMixiMobile( LPCTSTR url )
+inline CString ConvertToMixiMobileAutoLoginUrl( LPCTSTR url )
 {
 	CString path;
 	if( util::GetAfterSubString( url, L"//mixi.jp/", path ) >= 0 ) {
 		// //mixi.jp/ が含まれているので mixi の URL とみなす。
 		// mixi モバイル用URLに変換したURLを返す。
 		return theApp.MakeLoginUrlForMixiMobile( path );
+	}
+
+	// mixi 用URLではないため、変換せずに返す。
+	return url;
+}
+
+/**
+ * 指定されたURLが mixi の URL であれば、
+ * mixi の自動ログイン用URLに変換する
+ */
+inline CString ConvertToMixiAutoLoginUrl( LPCTSTR url )
+{
+	CString path;
+	if( util::GetAfterSubString( url, L"//mixi.jp/", path ) >= 0 ) {
+		// //mixi.jp/ が含まれているので mixi の URL とみなす。
+		// mixi の自動ログイン用URLに変換したURLを返す。
+		return theApp.MakeLoginUrl( path );
 	}
 
 	// mixi 用URLではないため、変換せずに返す。
@@ -801,10 +818,14 @@ inline void OpenBrowserForUrl( LPCTSTR url )
 		return;
 	}
 
-	// mixi モバイル用URL変換
+	// 自動ログイン変換
 	CString requestUrl = url;
 	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
-		requestUrl = ConvertUrlForMixiMobile( url );
+		// mixi モバイル用自動ログインURL変換
+		requestUrl = ConvertToMixiMobileAutoLoginUrl( url );
+	} else {
+		// mixi 用自動ログインURL変換
+		requestUrl = ConvertToMixiAutoLoginUrl( url );
 	}
 
 	// ブラウザで開く
@@ -828,10 +849,14 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 		return;
 	}
 
-	// mixi モバイル用URL変換
+	// 自動ログイン変換
 	CString requestUrl = url;
 	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
-		requestUrl = ConvertUrlForMixiMobile( url );
+		// mixi モバイル用自動ログインURL変換
+		requestUrl = ConvertToMixiMobileAutoLoginUrl( url );
+	} else {
+		// mixi 用自動ログインURL変換
+		requestUrl = ConvertToMixiAutoLoginUrl( url );
 	}
 
 	// ブラウザで開く

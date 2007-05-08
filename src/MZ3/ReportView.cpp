@@ -763,7 +763,20 @@ void CReportView::OnLoadUrl(UINT nID)
 	switch( r ) {
 	case IDYES:
 		// ブラウザで開く
-		util::OpenUrlByBrowser( url );
+		{
+			// 自動ログイン変換
+			CString requestUrl = url;
+			if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
+				// mixi モバイル用自動ログインURL変換
+				requestUrl = util::ConvertToMixiMobileAutoLoginUrl( url );
+			} else {
+				// mixi 用自動ログインURL変換
+				requestUrl = util::ConvertToMixiAutoLoginUrl( url );
+			}
+
+			// ブラウザで開く
+			util::OpenUrlByBrowser( requestUrl );
+		}
 		break;
 	case IDNO:
 		// MZ3でダウンロード
