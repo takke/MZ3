@@ -10,10 +10,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	wprintf( L"---start---\n" );
 
 	std::wstring target 
-		= L"aaa";
+		= L"<img src=\"http://img.mixi.jp/img/emoji/85.gif\" alt=\"‹i‰Œ\" width=\"16\" height=\"16\" class=\"emoji\" border=\"0\">";
 
 	std::wstring pattern
-		= L"<a href=list_community.pl([?][^>]+)>([^<]+)</a>";
+		= L"<img src=\"([^\"]+)\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\".*>";
 
 	wprintf( L"target [%s]\n", target.c_str() );
 	wprintf( L"pattern[%s]\n", pattern.c_str() );

@@ -67,6 +67,9 @@ public:
 		CString target;
 		if( util::GetAfterSubString( str, L"show_friend.pl", target ) == -1 ) {
 			// not found.
+			CString msg;
+			msg.Format( L"引数が show_friend.pl を含みません str[%s]", str );
+			MZ3LOGGER_ERROR(msg);
 			return false;
 		}
 
@@ -74,6 +77,9 @@ public:
 		CString id;
 		if( util::GetBetweenSubString( target, L"id=", L"\">", id ) == -1 ) {
 			// not found.
+			CString msg;
+			msg.Format( L"引数が 'id=' を含みません str[%s]", str );
+			MZ3LOGGER_ERROR(msg);
 			return false;
 		}
 		data->SetAuthorID( id );
@@ -81,9 +87,13 @@ public:
 		// 名前抽出
 		CString name;
 		if( util::GetBetweenSubString( target, L">", L"<", name ) == -1 ) {
+			CString msg;
+			msg.Format( L"引数が '>', '<' を含みません str[%s]", str );
+			MZ3LOGGER_ERROR(msg);
 			return false;
 		}
 		data->SetAuthor( name );
+
 		return true;
 	}
 
@@ -235,36 +245,6 @@ public:
 	}
 
 	/**
-	 * リンク変換。
-	 */
-	static void ExtractReplaceLink(CString& str, CMixiData* data)
-	{
-		// いずれの処理も、
-		// すぐに ExtractXxx を実行してもいいが、
-		// ExtractXxx はコストが高いので、事前に Find で最低限の探索を行っている
-
-		// 画像の抽出
-		if( str.Find( L"show_album_picture.pl" ) != -1 ) {
-			// アルバム画像の抽出
-			ExtractAlbumImage( str, *data );
-		}
-		else if( str.Find( L"<img src" ) != -1 ) {
-			// 画像
-			ExtractDiaryImage( str, *data );
-		}
-
-		// リンクの抽出
-		if (str.Find( L"href" ) != -1) {
-			ExtractURI( str, *data );
-		}
-
-		// 2ch 形式のリンク抽出
-		if( str.Find( L"ttp://" ) != -1 ) {
-			Extract2chURL( str, *data );
-		}
-	}
-
-	/**
 	 * HTML 要素の置換。実体参照。
 	 */
 	static void UnEscapeHtmlElement(CString& str)
@@ -325,7 +305,104 @@ public:
 		}
 	}
 
+	/**
+	 * リンク変換。
+	 */
+	static void ExtractReplaceLink(CString& str, CMixiData* data)
+	{
+		// いずれの処理も、
+		// すぐに ExtractXxx を実行してもいいが、
+		// ExtractXxx はコストが高いので、事前に Find で最低限の探索を行っている
+
+#define LINE_HAS_DIARY_IMAGE(str) util::LineHasStringsNoCase( str, L"<a", L"MM_openBrWindow('", L"'", L"</a>" )
+
+		// 画像の抽出
+		// アルバム画像、日記・トピック・アンケート画像の抽出
+
+		if( str.Find( L"show_album_picture.pl" ) != -1 ) {
+			// アルバム画像の抽出
+			ExtractAlbumImage( str, *data );
+		}else if( LINE_HAS_DIARY_IMAGE(str) ) {
+			// 日記・トピック・アンケート画像の抽出
+			ExtractDiaryImage( str, *data );
+		}
+
+		// 絵文字画像リンクの変換
+		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
+#define LINE_HAS_EMOJI_LINK(str)	util::LineHasStringsNoCase( str, L"<img", L"alt=", L"class=\"emoji\"", L">" )
+		if( LINE_HAS_EMOJI_LINK(str) ) {
+			ReplaceEmojiImageToText( str );
+		}
+
+		// リンクの抽出
+		if (str.Find( L"href" ) != -1) {
+			ExtractURI( str, *data );
+		}
+
+		// 2ch 形式のリンク抽出
+		if( str.Find( L"ttp://" ) != -1 ) {
+			Extract2chURL( str, *data );
+		}
+	}
+
 private:
+
+	/**
+	 * 絵文字画像リンクの変換。
+	 *
+	 * とりあえず alt 文字列に置換する。
+	 */
+	static void ReplaceEmojiImageToText( CString& line )
+	{
+		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
+		// のようなリンクを
+		// "((喫煙))" に変換する
+
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !reg.isCompiled() ) {
+			LPCTSTR szPattern = L"<img src=\"([^\"]+)\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>";
+			if(! reg.compile( szPattern ) ) {
+				// コンパイル失敗なのでそのまま終了。
+				// つーかコンパイル失敗はNGだorz
+				return;
+			}
+		}
+
+		CString target = line;
+		line = L"";
+		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+			if( reg.exec(target) == false || 
+				reg.results.size() != 3 )
+			{
+				// 未発見。
+				// 残りの文字列を追加して終了。
+				line += target;
+				break;
+			}
+
+			// 発見。
+
+			// マッチ文字列全体の左側を出力
+			line += target.Left( reg.results[0].start );
+
+			// url
+			// 例："http://img.mixi.jp/img/emoji/85.gif"
+			const std::wstring& url = reg.results[1].str;
+
+			// 代替文字列
+			// 例："喫煙"
+			const std::wstring& alt = reg.results[2].str;
+
+			// 代替文字列を追加する。
+			line.AppendFormat( L"((%s))", alt.c_str() );
+
+			// ターゲットを更新。
+			target = target.Mid( reg.results[0].end );
+		}
+
+	}
+
 	/**
 	 * アルバム画像変換
 	 *
@@ -402,7 +479,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
 	 * また、str から該当する画像リンクを削除する。
 	 */
-	static void ExtractDiaryImage(CString& str, CMixiData& data_)
+	static void ExtractDiaryImage(CString& line, CMixiData& data_)
 	{
 /* 想定文字列（改行なし。Zは英数字）
 <td><table><tr><td width="130" height="140" align="center" valign="middle">
@@ -411,29 +488,45 @@ owner_id=ZZZZZ&id=ZZZZZ&number=ZZZZZ','pict','width=680,height=660,toolbar=
 no,scrollbars=yes,left=5,top=5')"><img src="http://ic29.mixi.jp/p/ZZZZZZZ/
 ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 */
-		LPCTSTR tag_MMBegin		= _T("MM_openBrWindow('");
-		LPCTSTR tag_MMEnd		= _T("'");
-		LPCTSTR tag_ImageEnd	= _T("</a></td>");
 		LPCTSTR url_mixi		= _T("http://mixi.jp/");
 
-		CString target = str;
-		str = L"";
+		// 入出力文字列を解析対象とする。
+		CString target = line;
+
+		// とりあえず入出力文字列を空にする。
+		line = L"";
+
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			CString url_right;
-			if( util::GetBetweenSubString( target, tag_MMBegin, tag_MMEnd, url_right ) == -1 ) {
+			if( LINE_HAS_DIARY_IMAGE(target) ) {
+				CString url_right;
+				if( util::GetBetweenSubString( target, L"MM_openBrWindow('", L"'", url_right ) == -1 ) {
+					// not found
+					// LineHasStringsNoCase でチェックしているのでここに来たら内部エラー。
+					MZ3LOGGER_FATAL( L"画像リンク解析でエラーが発生しました。 line[" + target + L"]" );
+					break;
+				}
+
+				TRACE(_T("%s\n"), url_right);
+				CString url_image = url_mixi + url_right;
+				data_.AddImage( url_image );
+
+				// 画像リンクを置換する
+				line.AppendFormat( L"<<画像%02d>><br>", data_.GetImageCount() );
+
+				// 次のサーチのために str を更新する
+				if( util::GetAfterSubString( target, L"</a>", target ) < 0 ) {
+					// 更新OK
+				}else{
+					// 終了タグがなかった。タグ仕様変更？
+					MZ3LOGGER_ERROR( L"画像の終了タグが見つかりません。 line[" + target + L"]" );
+					break;
+				}
+			}else{
 				// not found
+				// 見つからなかったので、解析対象文字列を入出力文字列に追加する
+				line += target;
 				break;
 			}
-
-			TRACE(_T("%s\n"), url_right);
-			CString url_image = url_mixi + url_right;
-			data_.AddImage( url_image );
-
-			str.AppendFormat( L"<<画像%02d>><br>", data_.GetImageCount() );
-
-			// 次のサーチのためにbufを変更する
-			int index = target.Find( tag_ImageEnd );
-			target = target.Mid(index + wcslen(tag_ImageEnd));
 		}
 	}
 
@@ -2976,11 +3069,11 @@ public:
 class ViewBbsParser : public MixiContentParser
 {
 public:
-	static bool parse( CMixiData& data_, const CHtmlArray& html_ ) 
+	static bool parse( CMixiData& mixi, const CHtmlArray& html_ ) 
 	{
-		data_.ClearAllList();
+		mixi.ClearAllList();
 
-		INT_PTR count = html_.GetCount();
+		INT_PTR lastLine = html_.GetCount();
 
 		if (html_.GetAt(2).Find(_T("302 Moved")) != -1) {
 			// 現在は見れない
@@ -2989,175 +3082,190 @@ public:
 		}
 
 		BOOL findFlag = FALSE;
-		BOOL endFlag = FALSE;
+		BOOL bFound2ndTableEndTag = FALSE;
 
-		const CString& tagTableEnd = _T("</table>");
 		const CString& tagBR  = _T("<br>");
-		int index;
 
-		for (int i=180; i<count; i++) {
+		for (int i=180; i<lastLine; i++) {
 			CString str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
 				// フラグを発見するまで廻す
-				if ((index = str.Find(_T("show_friend.pl"))) != -1) {
-					// 投稿ユーザ名
-					findFlag = FALSE;
-					CString buf = str.Mid(index);
-					MixiUrlParser::GetAuthor(buf, &data_);
+				// フラグ：class="h120"
 
-					// 日付を取得
-					for (int j=i; j>0; j--) {
-						str = html_.GetAt(j);
-						if (str.Find(_T("日")) != -1) {
-							ParserUtil::ChangeDate(
-								util::XmlParser::GetElement(str, 2) + _T(" ") + util::XmlParser::GetElement(str, 4),
-								&data_);
-							break;
-						}
-					}
+				// "show_friend.pl" つまりトピ作成者のプロフィールリンクがあれば、
+				// トピ作成者のユーザ名と投稿日時を取得する。
+				if ( util::LineHasStringsNoCase( str, L"show_friend.pl" ) ) {
 
+					parseTopicAuthorAndCreateDate( i, html_, mixi );
+
+					// この行にはないので次の行へ。
 					continue;
 				}
-				else if (str.Find(_T("class=\"h120\"")) != -1) {
+
+				if (util::LineHasStringsNoCase( str, L"class=\"h120\"" ) ) {
 					// </table>を探す
 					findFlag = TRUE;
-					if (str.Find(_T("img src")) == -1) {
-						// 画像なし。
 
-						// 解析対象(str) のパターンは下記の２通り。
-						// パターン1：（1行）
-						// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
-						// <table><tr></tr></table>内容
-						// パターン2：（1行）
-						// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
-						// <table><tr></tr></table>内容</td></tr></table>
+					// とりあえず改行
+					mixi.AddBody(_T("\r\n"));
 
-						// とりあえず改行
-						data_.AddBody(_T("\r\n"));
+					// 解析対象(str) のパターンは下記の２通り。
+					// ●画像なしパターン1：（1行）
+					// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
+					// <table><tr></tr></table>内容
+					// ●画像なしパターン2：（1行）
+					// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
+					// <table><tr></tr></table>内容</td></tr></table>
+					// ●画像ありパターン1：（2行）
+					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
+					//        <tr><td width="130" height="140" align="center" valign="middle">
+					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
+					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
+					//        <img src="http://ic52.mixi.jp/p/xxx.jpg" border="0"></a></td>
+					// line2: </tr></table>写真付きトピック</td></tr></table>
+					// ●画像ありパターン2：（2行）
+					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
+					//        <tr><td width="130" height="140" align="center" valign="middle">
+					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
+					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
+					//        <img src="http://ic39.mixi.jp/p/xxx.jpg" border="0"></a></td>
+					// line2: </tr></table>本文がちょっと長い
+					// ●画像ありパターン3：（3行）
+					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
+					//        <tr><td width="130" height="140" align="center" valign="middle">
+					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
+					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
+					//        <img src="http://ic57.mixi.jp/p/xxx.jpg" border="0"></a></td>
+					// line2: <td width="130" height="140" align="center" valign="middle">
+					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
+					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
+					//        <img src="http://ic43.mixi.jp/p/xxx.jpg" border="0"></a></td>
+					// line3: </tr></table>本文表示される？
 
-						// 最初の </table> までを削除
-						CString buf;
-						util::GetAfterSubString( str, tagTableEnd, buf );
+					// </table> が現れるまで各行をバッファリング。
+					// これは、画像が複数あるような場合に、</table> が次の行に含まれるため。
 
-						// さらに </table> があるなら、終了フラグを立てておく
-						if( buf.Find(tagTableEnd) >= 0 ) {
-							// さらに </table> があった。(パターン2)
-							endFlag = TRUE;
-						}
+					// 現在の行をバッファリング
+					CString line = str;
 
-						// 解析＆投入
-						ParserUtil::AddBodyWithExtract( data_, buf );
-						continue;
-					}
-					else {
-						// 画像があった場合
+					// </table> がなければ </table> が見つかるまでバッファリング
+					if( !util::LineHasStringsNoCase( line, L"</table>" ) ) {
 
-						// ●パターン1：（2行）
-						// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-						//        <tr><td width="130" height="140" align="center" valign="middle">
-						//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
-						//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-						//        <img src="http://ic52.mixi.jp/p/xxx.jpg" border="0"></a></td>
-						// line2: </tr></table>写真付きトピック</td></tr></table>
-						// ●パターン2：（2行）
-						// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-						//        <tr><td width="130" height="140" align="center" valign="middle">
-						//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
-						//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-						//        <img src="http://ic39.mixi.jp/p/xxx.jpg" border="0"></a></td>
-						// line2: </tr></table>本文がちょっと長い
-						// ●パターン3：（3行）
-						// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-						//        <tr><td width="130" height="140" align="center" valign="middle">
-						//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
-						//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-						//        <img src="http://ic57.mixi.jp/p/xxx.jpg" border="0"></a></td>
-						// line2: <td width="130" height="140" align="center" valign="middle">
-						//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
-						//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-						//        <img src="http://ic43.mixi.jp/p/xxx.jpg" border="0"></a></td>
-						// line3: </tr></table>本文表示される？
-						// ■方針
-						// (1.1) lineN に</table>がなければ（パターン3）、投入。（以降</table>が見つかるまで繰り返す）
-						// (1.2) lineN に</table>があれば、画像抽出完了。
-						// (2.1) lineN に</table>が複数あるなら（パターン1）、本文抽出も完了。
-						// (2.2) lineN に</table>が１つのみなら（パターン2）、本文抽出を継続。
-
-						// とりあえず改行
-						data_.AddBody(_T("\r\n"));
-
-						// </table> が見つかるまで解析、投入。
-						while( i<count ) {
-							// 投入
-							ParserUtil::AddBodyWithExtract( data_, str );
+						while( i<lastLine ) {
 							// 次の行をフェッチ
-							str = html_.GetAt( ++i );
+							const CString& nextLine = html_.GetAt( ++i );
+
+							// バッファリング
+							line += nextLine;
+
 							// </table> があれば終了
-							if( str.Find(tagTableEnd) != -1 ) {
+							if( util::LineHasStringsNoCase( nextLine, L"</table>" ) ) {
 								break;
 							}
 						}
-
-						// </table>が2つあればパターン1、1つならパターン2
-						// まず、最初の </table> までを削除
-						CString buf;
-						util::GetAfterSubString( str, tagTableEnd, buf );
-
-						// さらに </table> があるなら、終了フラグを立てておく
-						if( buf.Find(tagTableEnd) >= 0 ) {
-							// さらに </table> があった。(パターン2)
-							endFlag = TRUE;
-						}
-
-						// 解析＆投入
-						ParserUtil::AddBodyWithExtract( data_, buf );
-						continue;
 					}
+
+					// 最初の </table> までについて、
+					// 画像リンクがあれば、解析し、投入。
+					{
+						CString strBeforeTableEndTag;
+						util::GetBeforeSubString( line, L"</table>", strBeforeTableEndTag );
+						if( LINE_HAS_DIARY_IMAGE(strBeforeTableEndTag) ) {
+							ParserUtil::AddBodyWithExtract( mixi, strBeforeTableEndTag );
+						}
+					}
+
+					// 最初の </table> 以降を取得。
+					CString strAfterTableEndTag;
+					util::GetAfterSubString( line, L"</table>", strAfterTableEndTag );
+
+					// 最初の </table> 以降を解析＆投入
+					ParserUtil::AddBodyWithExtract( mixi, strAfterTableEndTag );
+
+					// さらに </table> がある(パターン2)なら、終了フラグを立てておく
+					if( util::LineHasStringsNoCase( strAfterTableEndTag, L"</table>" ) ) {
+						bFound2ndTableEndTag = TRUE;
+					}
+
+				}else{
+					// フラグがないので読み飛ばす
 				}
 			}
 			else {
+				// フラグ発見済み。
+				// 最初の </table> が見つかる行までは解析済み。
+				// 「既にトピックの終了フラグ（2つ目の</table>タグ）が発見済み」
+				// または
+				// 「</table> を発見」すればコメント取得処理を行う。
 
-				if (str.Find(tagTableEnd) == -1 && endFlag == FALSE) {
-					// フラグを発見したらここで終了タグまでデータ取得
-					ParserUtil::AddBodyWithExtract( data_, str );
-				}
-				else {
+				if( util::LineHasStringsNoCase(str,L"</table>") || bFound2ndTableEndTag ) {
 					if (str.Find(tagBR) != -1) {
 						str.Replace(_T("</td></tr>"), _T(""));
 						str.Replace(_T("</tbody>"), _T(""));
 						str.Replace(_T("</table>"), _T(""));
-						ParserUtil::AddBodyWithExtract( data_, str );
+						ParserUtil::AddBodyWithExtract( mixi, str );
 					}
 
 					// コメントの開始まで探す
-					data_.ClearChildren();
+					mixi.ClearChildren();
 
-					index = i;
-					while( index < count ) {
-						index = parseBBSComment(index, count, &data_, html_);
+					int index = i;
+					while( index < lastLine ) {
+						index = parseBBSComment(index, lastLine, &mixi, html_);
 						if( index == -1 ) {
 							break;
 						}
 					}
-					if (index == -1 || index >= count) {
+					if (index == -1 || index >= lastLine) {
 						break;
 					}
+				}else{
+					// 2つ目の</table>タグ未発見なので、解析＆投入
+					ParserUtil::AddBodyWithExtract( mixi, str );
 				}
-
 			}
 		}
 
 		// ページ移動リンクの抽出
-		parsePageLink( data_, html_ );
+		parsePageLink( mixi, html_ );
 
 		// 「最新のトピック」の抽出
-		parseRecentTopics( data_, html_ );
+		parseRecentTopics( mixi, html_ );
 
 		return true;
 	}
 
 private:
+
+	/**
+	 * i 行目から投稿ユーザ名を取得し、上方向に投稿日時を探索する
+	 */
+	static bool parseTopicAuthorAndCreateDate( int i, const CHtmlArray& html_, CMixiData& mixi )
+	{
+		// 投稿ユーザ名
+		const CString& line = html_.GetAt( i );
+		MixiUrlParser::GetAuthor(line, &mixi);
+
+		// 日付を取得
+		// i 行目⇒2行目まで探索する。
+		// 通常は3行程度前に下記がある。
+		// <td rowspan="3" width="110" bgcolor="#ffd8b0" align="center" valign="top" nowrap>
+		// 2007年05月10日<br>19:57</td>
+		for (int j=i; j>0; j--) {
+			const CString& line = html_.GetAt(j);
+			if( util::LineHasStringsNoCase( line, L"年", L"月", L"日" ) ) {
+				// TODO XmlParser 使わない方が柔軟では？(takke)
+				ParserUtil::ChangeDate(
+					util::XmlParser::GetElement(line, 2) + _T(" ") + util::XmlParser::GetElement(line, 4),
+					&mixi);
+				return true;
+			}
+		}
+
+		// 未発見のため終了
+		return false;
+	}
 
 	/**
 	 * ＢＢＳコメント取得 トピック コメント一覧
@@ -3302,7 +3410,7 @@ public:
 		data_.ClearAllList();
 		data_.ClearChildren();
 
-		INT_PTR count = html_.GetCount();
+		INT_PTR lastLine = html_.GetCount();
 
 		/*
 		 * 解析方針：
@@ -3322,7 +3430,7 @@ public:
 		 */
 		bool bInEnquete = false;
 		int iLine=180;
-		for( ; iLine<count; iLine++ ) {
+		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
 			// ●設問内容解析
@@ -3361,7 +3469,7 @@ public:
 		}
 
 		// コメント解析
-		while( iLine<count ) {
+		while( iLine<lastLine ) {
 			iLine = parseEnqueteComment( iLine, &data_, html_ );
 			if( iLine == -1 ) {
 				break;
