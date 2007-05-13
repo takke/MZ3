@@ -633,19 +633,17 @@ void CReportView::OnLoadImage(UINT nID)
 
 	m_infoEdit.ShowWindow(SW_SHOW);
 
-	TCHAR uri[256];
-	memset(uri, 0x00, sizeof(TCHAR)*256);
-	wcscpy(uri, m_currentData->GetImage(nID - ID_REPORT_IMAGE-1));
+	CString url = m_currentData->GetImage(nID - ID_REPORT_IMAGE-1);
+	MZ3LOGGER_DEBUG( L"画像ダウンロード開始 url[" + url + L"]" );
 
 	m_access = TRUE;
-
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 
-	//イメージURLをCGIから取得
+	// イメージURLをCGIから取得
 	theApp.m_accessType = ACCESS_IMAGE;
-	theApp.m_inet.DoGet(uri, _T(""), CInetAccess::FILE_HTML );
+	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_HTML );
 }
 
 /**
@@ -837,12 +835,22 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// イメージのファイル名を生成
 			CString strFilepath;
 			CString strFilename;
-			{
-				// url からファイル名を抽出する。
-				// url : http://ic32.mixi.jp/p/ZZZ/ZZZ/album/ZZ/ZZ/XXXXX.jpg
-				// url : http://ic46.mixi.jp/p/ZZZ/ZZZ/diary/ZZ/ZZ/XXXXX.jpg
-				// とりあえず / 以降を使う
-				strFilename = url.Mid(url.ReverseFind( '/' )+1);
+
+			// url からファイル名を抽出する。
+			// url : http://ic32.mixi.jp/p/ZZZ/ZZZ/album/ZZ/ZZ/XXXXX.jpg
+			// url : http://ic46.mixi.jp/p/ZZZ/ZZZ/diary/ZZ/ZZ/XXXXX.jpg
+			// とりあえず / 以降を使う
+			int idx = url.ReverseFind( '/' );
+			if( idx == -1 ) {
+				// 見つからなかったのでファイル名不正エラー
+				CString msg;
+				msg.Format( 
+					L"ファイル名が不明のため続行できません\n"
+					L" url : %s", url );
+				MessageBox( msg );
+				return 0;
+			}else{ 
+				strFilename = url.Mid(idx+1);
 				strFilepath.Format(_T("%s\\%s"), 
 					theApp.m_filepath.imageFolder, 
 					strFilename );
