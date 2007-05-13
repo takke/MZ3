@@ -247,61 +247,104 @@ public:
 	/**
 	 * HTML 要素の置換。実体参照。
 	 */
-	static void UnEscapeHtmlElement(CString& str)
+	static void UnEscapeHtmlElement(CString& line)
 	{
-		while( str.Replace(_T("\n"), _T("")) ) ;
-		while( str.Replace(_T("<br>"), _T("\r\n")) ) ;
-		while( str.Replace(_T("</td>"), _T("")) );
-		while( str.Replace(_T("</tr>"), _T("")) );
-		while( str.Replace(_T("</table>"), _T("")) );
+		while( line.Replace(_T("\n"), _T("")) ) ;
+
+		// table タグの除去
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<table[^>]*>" ) ) 
+					return;
+			reg.replaceAll( line, L"" );
+		}
+		while( line.Replace(_T("</table>"), _T("")) );
+
+		// tr タグの除去
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<tr[^>]*>" ) ) 
+					return;
+			reg.replaceAll( line, L"" );
+		}
+		while( line.Replace(_T("</tr>"), _T("")) );
+
+		// td タグの除去
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<td[^>]*>" ) ) 
+					return;
+			reg.replaceAll( line, L"" );
+		}
+		while( line.Replace(_T("</td>"), _T("")) );
+
+		// br タグの置換
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<br[^>]*>" ) ) 
+					return;
+			reg.replaceAll( line, L"\r\n" );
+		}
 
 		// "<p>" → 削除
-		while( str.Replace(_T("<p>"), _T("")) ) ;
+		while( line.Replace(_T("<p>"), _T("")) ) ;
 
 		// </p> → 改行
-		while( str.Replace(_T("</p>"), _T("\r\n\r\n")) ) ;
+		while( line.Replace(_T("</p>"), _T("\r\n\r\n")) ) ;
 
-		while( str.Replace(_T("&quot;"), _T("\"")) ) ;
-		while( str.Replace(_T("&gt;"), _T(">")) ) ;
-		while( str.Replace(_T("&lt;"), _T("<")) ) ;
-		while( str.Replace(_T("&nbsp;"), _T(" ")) ) ;
+		while( line.Replace(_T("&quot;"), _T("\"")) ) ;
+		while( line.Replace(_T("&gt;"), _T(">")) ) ;
+		while( line.Replace(_T("&lt;"), _T("<")) ) ;
+		while( line.Replace(_T("&nbsp;"), _T(" ")) ) ;
 
-		// &#xxxx; の実体参照化
+		// &#xxxx; の実体参照の文字化
 		// 例）&#3642; → char(3642)
-		{
-			// 正規表現のコンパイル（一回のみ）
-			static MyRegex reg;
-			if( !reg.isCompiled() ) {
-				if(! reg.compile( L"&#([0-9]{4,5});" ) ) {
-					// コンパイル失敗なのでそのまま終了。
-					// つーかコンパイル失敗はNGだorz
-					return;
-				}
-			}
-			CString target = str;
-			str = L"";
-			for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-				std::vector<MyRegex::Result>* pResults = NULL;
-				if( reg.exec(target) == false || reg.results.size() != 2 )
-				{
-					// 未発見。
-					// 残りの文字列を代入して終了。
-					str += target;
-					break;
-				}
-				// 発見。
-				// マッチ文字列の左側を出力
-				str += target.Left( reg.results[0].start );
+		ReplaceEntityReferenceToCharacter( line );
+	}
 
-				// 実体化
-				{
-					int d = _wtoi( reg.results[1].str.c_str() );
-					str.AppendFormat( L"%c", d );
-				}
-
-				// ターゲットを更新。
-				target = target.Mid( reg.results[0].end );
+	/**
+	 * &#xxxx; の実体参照の文字化
+	 * 例）&#3642; → char(3642)
+	 */
+	static void ReplaceEntityReferenceToCharacter( CString& str )
+	{
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !reg.isCompiled() ) {
+			if(! reg.compile( L"&#([0-9]{4,5});" ) ) {
+				// コンパイル失敗なのでそのまま終了。
+				// つーかコンパイル失敗はNGだorz
+				return;
 			}
+		}
+
+		CString target = str;
+		str = L"";
+		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+			std::vector<MyRegex::Result>* pResults = NULL;
+			if( reg.exec(target) == false || reg.results.size() != 2 )
+			{
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				str += target;
+				break;
+			}
+			// 発見。
+			// マッチ文字列の左側を出力
+			str += target.Left( reg.results[0].start );
+
+			// 実体化
+			{
+				int d = _wtoi( reg.results[1].str.c_str() );
+				str.AppendFormat( L"%c", d );
+			}
+
+			// ターゲットを更新。
+			target = target.Mid( reg.results[0].end );
 		}
 	}
 
@@ -334,6 +377,11 @@ public:
 			ReplaceEmojiImageToText( str );
 		}
 
+		// その他の画像リンクの変換
+		if( util::LineHasStringsNoCase( str, L"<img", L"src=" ) ) {
+			ExtractGeneralImageLink( str, *data );
+		}
+
 		// リンクの抽出
 		if (str.Find( L"href" ) != -1) {
 			ExtractURI( str, *data );
@@ -361,7 +409,7 @@ private:
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
-			LPCTSTR szPattern = L"<img src=\"([^\"]+)\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>";
+			LPCTSTR szPattern = L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>";
 			if(! reg.compile( szPattern ) ) {
 				// コンパイル失敗なのでそのまま終了。
 				// つーかコンパイル失敗はNGだorz
@@ -369,38 +417,11 @@ private:
 			}
 		}
 
-		CString target = line;
-		line = L"";
-		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			if( reg.exec(target) == false || 
-				reg.results.size() != 3 )
-			{
-				// 未発見。
-				// 残りの文字列を追加して終了。
-				line += target;
-				break;
-			}
+		// ((喫煙)) に変換する
+		reg.replaceAll( line, L"(({2}))" );
 
-			// 発見。
-
-			// マッチ文字列全体の左側を出力
-			line += target.Left( reg.results[0].start );
-
-			// url
-			// 例："http://img.mixi.jp/img/emoji/85.gif"
-			const std::wstring& url = reg.results[1].str;
-
-			// 代替文字列
-			// 例："喫煙"
-			const std::wstring& alt = reg.results[2].str;
-
-			// 代替文字列を追加する。
-			line.AppendFormat( L"((%s))", alt.c_str() );
-
-			// ターゲットを更新。
-			target = target.Mid( reg.results[0].end );
-		}
-
+		// [m:xx] 形式に置換する場合は下記の replaceAll とする。
+//		if( reg.replaceAll( line, L"[m:{1}]" ) ) {
 	}
 
 	/**
@@ -445,6 +466,16 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 
 		CString buf = str.Mid( pos );
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+
+			// タグ開始前までを追加
+			CString left;
+			if( util::GetBeforeSubString( buf, tag_MMBegin, left ) == -1 ) {
+				// not found
+				ret += buf;
+				break;
+			}
+			ret += left;
+
 			CString url_right;
 			if( util::GetBetweenSubString( buf, tag_MMBegin, tag_MMEnd, url_right ) == -1 ) {
 				// not found
@@ -474,7 +505,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 	}
 
 	/**
-	 * 画像変換。
+	 * 日記、トピック等の画像変換。
 	 *
 	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
 	 * また、str から該当する画像リンクを削除する。
@@ -498,6 +529,17 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
 			if( LINE_HAS_DIARY_IMAGE(target) ) {
+
+				// 左側をとりあえず出力
+				CString left;
+				if( util::GetBeforeSubString( target, L"<a", left ) == -1 ) {
+					// not found
+					// LineHasStringsNoCase でチェックしているのでここに来たら内部エラー。
+					MZ3LOGGER_FATAL( L"画像リンク解析でエラーが発生しました。 line[" + target + L"]" );
+					break;
+				}
+				line += left;
+
 				CString url_right;
 				if( util::GetBetweenSubString( target, L"MM_openBrWindow('", L"'", url_right ) == -1 ) {
 					// not found
@@ -528,6 +570,59 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 				break;
 			}
 		}
+	}
+
+	/**
+	 * 画像変換。
+	 *
+	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
+	 * また、str から該当する画像リンクを削除する。
+	 */
+	static void ExtractGeneralImageLink(CString& line, CMixiData& data_)
+	{
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !reg.isCompiled() ) {
+			LPCTSTR szPattern = L"<img[^>]*src=\"([^\"]+)\" [^>]*>";
+			if(! reg.compile( szPattern ) ) {
+				// コンパイル失敗なのでそのまま終了。
+				// つーかコンパイル失敗はNGだorz
+				return;
+			}
+		}
+
+		CString target = line;
+		line = L"";
+		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+			if( !reg.exec(target) || reg.results.size() != 2 ) {
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				line += target;
+				break;
+			}
+
+			// 発見。
+			std::vector<MyRegex::Result>& results = reg.results;
+
+			// マッチ文字列全体の左側を出力
+			line.Append( target, results[0].start );
+
+			CString text = L"<<画像>>";
+
+			// url を追加
+			LPCTSTR url = results[1].str.c_str();
+			data_.m_linkList.push_back( CMixiData::Link(url, text) );
+
+			// 置換
+			line.Append( text );
+
+			// とりあえず改行
+			line += _T("<br>");
+
+			// ターゲットを更新。
+			target.Delete( 0, results[0].end );
+		}
+
 	}
 
 public:
