@@ -69,6 +69,7 @@ public:
 		std::wstring buf = target;
 		if( replaceAll( buf, replace ) ) {
 			target = buf.c_str();
+			return true;
 		}else{
 			return false;
 		}

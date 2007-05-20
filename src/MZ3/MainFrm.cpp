@@ -94,45 +94,35 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	int id_toolbar = 0;
 
-	//dpi値によってツールバーの画像を変更(2007/05/13 icchu追加)
-	HKEY    hKey;
-    long    lErr;
-	DWORD dwDpi;		// "Dpi"のデータを受け取る
-	DWORD dwType;		// 値の種類を受け取る
-	DWORD dwSize;		// データのサイズを受け取る
-
-    //レジストリをオープン
-    lErr = RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_ROOT,0,KEY_READ,&hKey);
-	
-	//エラーなければ値を取得
-	if (lErr == 0) 
-	{ 
-		lErr = RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,NULL,&dwSize);
-		lErr = RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,(LPBYTE)&dwDpi,&dwSize);
-	}
-
-	//RealVGA化していたら(dpi値が96)だったらコマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
-	if (dwDpi <= 96) 
+	//2007/05/13 icchu追加ここから
+	//dpi値によってツールバーの画像を変更
 	{
-		id_toolbar = IDR_TOOLBAR_QVGA;
-	} else {
-		id_toolbar = IDR_TOOLBAR;
+		HKEY  hKey;
+		DWORD dwDpi;		// "Dpi"のデータを受け取る
+		DWORD dwType;		// 値の種類を受け取る
+		DWORD dwSize;		// データのサイズを受け取る
+
+		//レジストリをオープン
+		
+		//エラーなければ値を取得
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_ROOT,0,KEY_READ,&hKey) == 0) 
+		{ 
+			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,NULL,&dwSize);
+			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,(LPBYTE)&dwDpi,&dwSize);
+		}
+
+		//レジストリのクローズ
+		RegCloseKey(hKey);
+
+		//RealVGA化していたら(dpi値が96以下だったら)コマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
+		if (dwDpi <= 96) 
+		{
+			id_toolbar = IDR_TOOLBAR_QVGA;
+		} else {
+			id_toolbar = IDR_TOOLBAR;
+		}
 	}
-	
-	//レジストリのクローズ
-	RegCloseKey(hKey);
-
 	//2007/05/13 icchu追加ここまで
-
-	//switch( theApp.GetDisplayMode() ) {
-	//case SR_VGA:
-	//	id_toolbar = IDR_TOOLBAR;
-	//	break;
-	//case SR_QVGA:
-	//default:
-	//	id_toolbar = IDR_TOOLBAR_QVGA;
-	//	break;
-	//}
 
 	if (!m_wndCommandBar.Create(this) ||
 		!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
@@ -154,8 +144,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	return TRUE;
 }
-
-
 
 // CMainFrame 診断
 
