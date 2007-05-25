@@ -456,15 +456,15 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// 画面下部の情報領域
-	int hInfo     = fontHeight +12;
-	if( theApp.GetDisplayMode() == SR_QVGA ) {
-		hInfo     = fontHeight - 4;
+	int hInfo     = fontHeight - 4;
+	if( theApp.GetDisplayMode() == SR_VGA ) {
+		hInfo     = fontHeight +12;
 	}
 
 	// グループタブ
-	int hGroup    = fontHeight +12;
-	if( theApp.GetDisplayMode() == SR_QVGA ) {
-		hGroup -= 4;
+	int hGroup    = fontHeight + 8;
+	if( theApp.GetDisplayMode() == SR_VGA ) {
+		hGroup    = fontHeight +12;
 	}
 
 	// カテゴリ、ボディリストの領域を % で指定

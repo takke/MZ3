@@ -19,11 +19,6 @@
 #define new DEBUG_NEW
 #endif
 
-//2007/05/13 icchu 追加　
-#define SZ_REG_ROOT TEXT("System\\GWE\\Display")
-#define SZ_REG_DBVOL TEXT("LogicalPixelsY")
-//2007/05/13 icchu追加ここまで
-
 const DWORD dwAdornmentFlags = 0; // [終了] ボタン
 
 // CMainFrame
@@ -92,37 +87,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+
+	// dpi値によってツールバーの画像を変更
 	int id_toolbar = 0;
 
-	//2007/05/13 icchu追加ここから
-	//dpi値によってツールバーの画像を変更
-	{
-		HKEY  hKey;
-		DWORD dwDpi;		// "Dpi"のデータを受け取る
-		DWORD dwType;		// 値の種類を受け取る
-		DWORD dwSize;		// データのサイズを受け取る
-
-		//レジストリをオープン
-		
-		//エラーなければ値を取得
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_ROOT,0,KEY_READ,&hKey) == 0) 
-		{ 
-			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,NULL,&dwSize);
-			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,(LPBYTE)&dwDpi,&dwSize);
-		}
-
-		//レジストリのクローズ
-		RegCloseKey(hKey);
-
-		//RealVGA化していたら(dpi値が96以下だったら)コマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
-		if (dwDpi <= 96) 
-		{
-			id_toolbar = IDR_TOOLBAR_QVGA;
-		} else {
-			id_toolbar = IDR_TOOLBAR;
-		}
+	// RealVGA化していたら(dpi値が96以下だったら)コマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
+	if (theApp.GetDPI() <= 96) {
+		id_toolbar = IDR_TOOLBAR_QVGA;
+	} else {
+		id_toolbar = IDR_TOOLBAR;
 	}
-	//2007/05/13 icchu追加ここまで
 
 	if (!m_wndCommandBar.Create(this) ||
 		!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||

@@ -26,12 +26,15 @@ BEGIN_MESSAGE_MAP(CMZ3App, CWinApp)
 END_MESSAGE_MAP()
 
 
+#define SZ_REG_ROOT		TEXT("System\\GWE\\Display")
+#define SZ_REG_DBVOL	TEXT("LogicalPixelsY")
 
 // -----------------------------------------------------------------------------
 // コンストラクタ
 // -----------------------------------------------------------------------------
 CMZ3App::CMZ3App()
 	: CWinApp()
+	, m_dpi(96)
 {
 }
 
@@ -63,17 +66,40 @@ BOOL CMZ3App::InitInstance()
 		int vertical   = DRA::GetScreenCaps(VERTRES);
 
 		if( (horizontal == 240 && vertical == 320) || (horizontal == 320 && vertical == 240) ) {
-			currentDisplayMode = SR_QVGA;
+			m_currentDisplayMode = SR_QVGA;
 		}else if( (horizontal == 480 && vertical == 640) || (horizontal == 640 && vertical == 480) ) {
-			currentDisplayMode = SR_VGA;
+			m_currentDisplayMode = SR_VGA;
 		}else if( (horizontal == 480 && vertical == 800) || (horizontal == 800 && vertical == 480) ) {
-			//EM･ONE対応
-			currentDisplayMode = SR_VGA;
+			// EM･ONE対応
+			m_currentDisplayMode = SR_VGA;
 		}else if( (horizontal == 240 && vertical == 240) ) {
-			currentDisplayMode = SR_SQUARE240;
+			m_currentDisplayMode = SR_SQUARE240;
 		}else{
 			// デフォルト値
-			currentDisplayMode = SR_QVGA;
+			m_currentDisplayMode = SR_QVGA;
+		}
+	}
+
+	// DPI 値の取得
+	{
+		HKEY  hKey = NULL;
+		DWORD dwDpi = m_dpi;	// "Dpi"のデータを受け取る
+		DWORD dwType;			// 値の種類を受け取る
+		DWORD dwSize;			// データのサイズを受け取る
+
+		// レジストリをオープン
+		
+		// エラーなければ値を取得
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_ROOT,0,KEY_READ,&hKey) == 0) 
+		{ 
+			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,NULL,&dwSize);
+			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,(LPBYTE)&dwDpi,&dwSize);
+
+			// エラーがなければ取得した値を保存。
+			m_dpi = dwDpi;
+
+			//レジストリのクローズ
+			RegCloseKey(hKey);
 		}
 	}
 

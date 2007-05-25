@@ -93,7 +93,8 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	ScreenResolution	currentDisplayMode;
+	DWORD				m_dpi;					///< DPI
+	ScreenResolution	m_currentDisplayMode;	///< ‰ð‘œ“x
 public:
 
 	//--- ƒƒK[
@@ -143,7 +144,8 @@ public:
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:
 	bool MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace );
-	ScreenResolution GetDisplayMode() { return(currentDisplayMode); }
+	ScreenResolution GetDisplayMode() { return m_currentDisplayMode; }
+	DWORD GetDPI() { return m_dpi; }
 	void ShowMixiData( CMixiData* data );
 };
 
