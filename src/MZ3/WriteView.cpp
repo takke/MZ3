@@ -125,17 +125,15 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 {
 	CFormView::OnSize(nType, cx, cy);
 
-	int hEdit = 36;
+	int hEdit = theApp.GetInfoRegionHeight(theApp.m_optionMng.m_fontHeight);
 	int yBtn  = 144;
 
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
-		hEdit = 36;
 		yBtn  = 144;
 		break;
 	case SR_QVGA:
 	default:
-		hEdit = 18;
 		yBtn  = 120;
 		break;
 	}

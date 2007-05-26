@@ -144,9 +144,11 @@ public:
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:
 	bool MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace );
+	void ShowMixiData( CMixiData* data );
+
 	ScreenResolution GetDisplayMode() { return m_currentDisplayMode; }
 	DWORD GetDPI() { return m_dpi; }
-	void ShowMixiData( CMixiData* data );
+	int GetInfoRegionHeight( int fontHeight );
 };
 
 extern CMZ3App theApp;

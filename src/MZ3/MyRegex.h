@@ -65,6 +65,7 @@ public:
 		return reg!=NULL;
 	}
 
+#ifdef __AFX_H__
 	bool replaceAll( CString& target, const std::wstring& replace ) {
 		std::wstring buf = target;
 		if( replaceAll( buf, replace ) ) {
@@ -74,6 +75,7 @@ public:
 			return false;
 		}
 	}
+#endif
 
 	/**
 	 * 正規表現にマッチした部分文字列の置換。

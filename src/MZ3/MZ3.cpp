@@ -496,3 +496,23 @@ void CMZ3App::FilePath::init_logpath()
 
 }
 
+/**
+ * 情報領域などの高さをフォントの高さをベースに計算する
+ */
+int CMZ3App::GetInfoRegionHeight( int fontHeight )
+{
+	switch( theApp.GetDisplayMode() ) {
+	case SR_VGA:
+		if( theApp.GetDPI() > 96 ) {
+			// VGA かつ非RealVGA環境
+			return fontHeight +6*2;
+		}else{
+			// VGA かつRealVGA環境
+			return fontHeight +6;
+		}
+		break;
+	default:
+		// VGA 以外
+		return fontHeight -4;
+	}
+}

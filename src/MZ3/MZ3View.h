@@ -120,9 +120,10 @@ private:
 		int targetGroupIndex;		///< 現在の巡回対象グループアイテムのインデックス
 		int targetCategoryIndex;	///< 現在の巡回対象カテゴリアイテムのインデックス
 		bool autoCruise;			///< 予約巡回モード？
+		bool unreadOnly;			///< 未読のみ巡回モード
 
 		CruiseInfo() : state(CRUISE_STATE_STOP), targetBodyItem(0), targetGroupIndex(0), targetCategoryIndex(0), 
-			autoCruise(false) {}
+			autoCruise(false), unreadOnly(false) {}
 
 		/// 巡回中かどうかを返す
 		bool enable() {
@@ -250,13 +251,14 @@ public:
 	void MyShowHelp(void);
 	void MyShowHistory(void);
 	afx_msg void OnCheckCruise();
-	void StartCruise(void);
+	void StartCruise( bool unreadOnly );
 	bool CruiseToNextCategory(void);
 	bool MoveToNextCruiseCategory(void);
 	afx_msg void OnSendNewMessage();
 	void ResetColumnWidth();
 	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
 	int GetListWidth(void);
+	bool DoNextBodyItemCruise();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -55,6 +55,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_HELP_MENU, &CMainFrame::OnHelpMenu)
 	ON_COMMAND(ID_HISTORY_MENU, &CMainFrame::OnHistoryMenu)
 	ON_COMMAND(IDM_START_CRUISE, &CMainFrame::OnStartCruise)
+	ON_COMMAND(IDM_START_CRUISE_UNREAD_ONLY, &CMainFrame::OnStartCruiseUnreadOnly)
 	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 END_MESSAGE_MAP()
 
@@ -518,11 +519,19 @@ void CMainFrame::OnHistoryMenu()
 }
 
 /**
- * ‚»‚Ì‘¼b„‰ñ
+ * ‚»‚Ì‘¼b‘S‚Ä‚ğ„‰ñ
  */
 void CMainFrame::OnStartCruise()
 {
-	theApp.m_pMainView->StartCruise();
+	theApp.m_pMainView->StartCruise( false );
+}
+
+/**
+ * ‚»‚Ì‘¼b–¢“Ç‚ğ„‰ñ
+ */
+void CMainFrame::OnStartCruiseUnreadOnly()
+{
+	theApp.m_pMainView->StartCruise( true );
 }
 
 /**

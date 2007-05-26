@@ -128,18 +128,8 @@ void CQuoteDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 
-	int hInfo = 36;
+	int hInfo = theApp.GetInfoRegionHeight(theApp.m_optionMng.m_fontHeight);
 	int hList = cy/2 - hInfo;
-
-	switch( theApp.GetDisplayMode() ) {
-	case SR_VGA:
-		hInfo = 36;
-		break;
-	case SR_QVGA:
-	default:
-		hInfo = 18;
-		break;
-	}
 
 	GetDlgItem(IDC_MESSAGE_EDIT)->MoveWindow(   0,        0, cx, hInfo          );
 	GetDlgItem(IDC_SAMPLE_EDIT )->MoveWindow(   0,    hInfo, cx, cy-hList-hInfo );

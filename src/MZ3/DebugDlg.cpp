@@ -155,6 +155,10 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, util::ExistFile(util::MakeLogfilePath(*data)) ? L"true" : L"false" );
 	idx++;
 
+	m_List.InsertItem( idx, L"SM_CYBORDER" );
+	m_List.SetItemText( idx, 1, util::int2str(GetSystemMetrics(SM_CYBORDER)) );
+	idx++;
+
 	m_List.SetItemState( 0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 
 	return TRUE;  // return TRUE unless you set the focus to a control

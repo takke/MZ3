@@ -283,8 +283,8 @@ void CMZ3View::OnInitialUpdate()
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
 		switch( theApp.GetDisplayMode() ) {
 		case SR_VGA:
-			m_categoryList.InsertColumn(0, _T(""), LVCFMT_LEFT, 250, -1);
-			m_categoryList.InsertColumn(1, _T(""), LVCFMT_LEFT, 200, -1);
+			m_categoryList.InsertColumn(0, _T(""), LVCFMT_LEFT, 125*2, -1);
+			m_categoryList.InsertColumn(1, _T(""), LVCFMT_LEFT, 100*2, -1);
 			break;
 		case SR_QVGA:
 		default:
@@ -318,12 +318,16 @@ void CMZ3View::OnInitialUpdate()
 
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
-		if( theApp.GetDisplayMode() == SR_VGA ){
-			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 240, -1);
-			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 210, -1);
-		}else{
+		switch( theApp.GetDisplayMode() ) {
+		case SR_VGA:
+			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 120*2, -1);
+			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 105*2, -1);
+			break;
+		case SR_QVGA:
+		default:
 			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 120, -1);
 			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 105, -1);
+			break;
 		}
 	}
 
@@ -456,15 +460,18 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// 画面下部の情報領域
-	int hInfo     = fontHeight - 4;
-	if( theApp.GetDisplayMode() == SR_VGA ) {
-		hInfo     = fontHeight +12;
-	}
+	int hInfo     = theApp.GetInfoRegionHeight(fontHeight);
 
 	// グループタブ
-	int hGroup    = fontHeight + 8;
+	int hGroup    = fontHeight -2;				// デフォルト値
 	if( theApp.GetDisplayMode() == SR_VGA ) {
-		hGroup    = fontHeight +12;
+		if( theApp.GetDPI() > 96 ) {
+			// VGA かつ非RealVGA環境
+			hGroup    = fontHeight +12;
+		}else{
+			// VGA かつRealVGA環境
+			hGroup    = fontHeight + 8;
+		}
 	}
 
 	// カテゴリ、ボディリストの領域を % で指定
@@ -822,12 +829,14 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				// ボディリストにフォーカスを移動する
 				CommandSetFocusBodyList();
 
-				// 取得する
-				CMixiData& mixi = GetSelectedBodyItem();
-				AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
+				// 選択解除
+				MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
 
-				// 通信継続のためここで return する
-				return TRUE;
+				// 次の巡回項目へ。
+				if( DoNextBodyItemCruise() ) {
+					// 通信継続のためここで return する
+					return TRUE;
+				}
 			}
 
 			util::MySetInformationText( m_hWnd, L"完了" );
@@ -850,32 +859,11 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// 次の巡回対象があれば取得する
 			// なければ終了する
 			m_cruise.targetBodyItem++;
-			CMixiDataList& bodyList = m_selGroup->getSelectedCategory()->GetBodyList();
-			if( m_cruise.targetBodyItem >= (int)bodyList.size() ) {
-				// 巡回終了
-				if( m_cruise.autoCruise ) {
-					// 予約巡回なので次に進む
-					m_cruise.targetCategoryIndex++;
-					CruiseToNextCategory();
-				}else{
-					// 一時巡回なのでここで終了。
-					m_cruise.finish();
-					MessageBox( L"巡回完了" );
-				}
-			}else{
-				// 次の巡回対象を取得する
 
-				// （ボディリスト上の）次の要素に移動する
-				int idxSel  = m_selGroup->getSelectedCategory()->selectedBody;
-				int idxNext = idxSel +1;
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel,  false );
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
-				m_bodyList.EnsureVisible( idxNext, FALSE );
+			// 選択解除
+			MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
 
-				// 取得する
-				CMixiData& mixi = GetSelectedBodyItem();
-				AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
-
+			if( DoNextBodyItemCruise() ) {
 				// 通信継続のためここで return する
 				return TRUE;
 			}
@@ -2452,6 +2440,7 @@ void CMZ3View::OnCruise()
 	// 巡回開始
 	m_cruise.start();
 	m_cruise.autoCruise = false;
+	m_cruise.unreadOnly = false;
 
 	// 「選択中のカテゴリ」を（フォーカスカテゴリで）変更しておく。
 	m_selGroup->selectedCategory = m_selGroup->focusedCategory;
@@ -2548,7 +2537,7 @@ bool CMZ3View::CruiseToNextCategory(void)
 	if( !MoveToNextCruiseCategory() ) {
 		// 巡回完了
 		m_cruise.finish();
-		util::MySetInformationText( m_hWnd, L"巡回完了" );
+		util::MySetInformationText( m_hWnd, L"巡回完了（予約巡回）" );
 
 		// カテゴリリストにフォーカスを移動する
 		CommandSetFocusCategoryList();
@@ -2575,16 +2564,11 @@ bool CMZ3View::CruiseToNextCategory(void)
 
 	// フォーカスを上ペインに。
 
-
 	// 巡回対象カテゴリの解決
 	CCategoryItem& targetCategory = theApp.m_root.groups[ m_cruise.targetGroupIndex ].categories[ m_cruise.targetCategoryIndex ];
 	CMixiData& mixi = targetCategory.m_mixi;
 
-//	CString msg;
-//	msg.Format( L"%s, %d, %d", targetCategory.m_name, m_cruise.targetGroupIndex, m_cruise.targetCategoryIndex );
-//	MessageBox( msg );
-
-	AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()));
+	AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
 
 	return true;
 }
@@ -2592,8 +2576,10 @@ bool CMZ3View::CruiseToNextCategory(void)
 /**
  * 巡回開始
  */
-void CMZ3View::StartCruise(void)
+void CMZ3View::StartCruise( bool unreadOnly )
 {
+	m_cruise.unreadOnly = unreadOnly;
+
 	if( MessageBox( L"巡回を開始します。よろしいですか？", NULL, MB_YESNO ) != IDYES ) {
 		return;
 	}
@@ -2616,9 +2602,6 @@ bool CMZ3View::MoveToNextCruiseCategory(void)
 {
 	std::vector<CGroupItem>& groups = theApp.m_root.groups;
 	for( ; m_cruise.targetGroupIndex<(int)groups.size(); m_cruise.targetGroupIndex++ ) {
-//		CString msg;
-//		msg.Format( L"%d of %d\n", m_cruise.targetGroupIndex, groups.size() );
-//		MessageBox( msg );
 
 		CGroupItem& group = groups[m_cruise.targetGroupIndex];
 		CCategoryItemList& categories = group.categories;
@@ -2744,4 +2727,95 @@ void CMZ3View::OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 */
 
 	*pResult = 0;
+}
+
+/**
+ *
+ * @return 巡回継続の場合は true、巡回終了の場合は false を返す
+ */
+bool CMZ3View::DoNextBodyItemCruise()
+{
+	CMixiDataList& bodyList = m_selGroup->getSelectedCategory()->GetBodyList();
+	if( m_cruise.targetBodyItem >= (int)bodyList.size() ) {
+		// 巡回終了
+		if( m_cruise.autoCruise ) {
+			// 予約巡回なので次に進む
+			m_cruise.targetCategoryIndex++;
+			bool rval = CruiseToNextCategory();
+			if( rval ) {
+				// 通信終了
+
+				// 項目を選択/表示状態にする
+				int idx = m_selGroup->getSelectedCategory()->selectedBody;
+				MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
+				m_bodyList.EnsureVisible( idx, FALSE );
+			}
+			return rval;
+		}else{
+			// 一時巡回なのでここで終了。
+			m_cruise.finish();
+			MessageBox( L"クイック巡回完了" );
+
+			// 通信終了
+			return false;
+		}
+	}else{
+		// 次の巡回対象を取得する
+
+		// 次のボディ要素に移動する
+
+		m_selGroup->getSelectedCategory()->selectedBody = m_cruise.targetBodyItem;
+
+		CMixiData& mixi = GetSelectedBodyItem();
+
+		// 未読巡回モードなら、既読要素をスキップする
+		if( m_cruise.unreadOnly ) {
+
+			// 未読巡回モードなので、次の未読要素を探索する。
+			// 全て既読なら次のカテゴリへ。
+			bool unread = false;	// 未読フラグ
+			switch( mixi.GetAccessType() ) {
+			case ACCESS_BBS:
+			case ACCESS_EVENT:
+			case ACCESS_ENQUETE:
+				// コミュニティ、イベント、アンケートなので、
+				// 該当トピックのコメントを全て既読なら既読と判定する。
+				if (mixi.GetLastIndex() == -1) {
+					// 全くの未読
+					unread = true;
+				} else if (mixi.GetLastIndex() >= mixi.GetCommentCount()) {
+					// 更新なし
+					unread = false;
+				} else {
+					// 未読あり
+					unread = true;
+				}
+				break;
+			default:
+				// コミュニティ以外なので、ログの有無で既読・未読を判定する
+				if(! util::ExistFile(util::MakeLogfilePath(mixi)) ) {
+					unread = true;
+				}
+				break;
+			}
+			if(! unread ) {
+				// 既読なので次のボディ要素へ。
+				m_cruise.targetBodyItem ++;
+
+				// 再帰呼び出しにより、次の巡回項目を探す。
+				return DoNextBodyItemCruise();
+			}
+		}
+
+		// 項目を選択/表示状態にする
+		int idxNext = m_cruise.targetBodyItem;
+		MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
+		m_bodyList.EnsureVisible( idxNext, FALSE );
+
+		// 取得する
+		AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
+
+		// 通信継続
+		return true;
+	}
 }

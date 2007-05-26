@@ -186,21 +186,15 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		fontHeight = 24;
 	}
 
-	int hTitle  = fontHeight+6*2;			// タイトル領域はフォントサイズ依存
-	if( theApp.GetDisplayMode() == SR_QVGA ){
-		hTitle  = fontHeight - 4;
-	}
+	int hTitle  = theApp.GetInfoRegionHeight(fontHeight);	// タイトル領域はフォントサイズ依存
 
 	const int h1 = theApp.m_optionMng.m_nReportViewListHeightRatio;
 	const int h2 = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
 	int hList   = (cy * h1 / (h1+h2))-hTitle;	// (全体のN%-タイトル領域) をリスト領域とする
 	int hReport = (cy * h2 / (h1+h2));			// 全体のN%をレポート領域とする
 
-	// 情報領域は必要に応じて表示されるため、上記とは関係ない。
-	int hInfo   = fontHeight+6*2;			// 情報領域もフォントサイズ依存
-	if( theApp.GetDisplayMode() == SR_QVGA ){
-		hInfo   = fontHeight - 4;
-	}
+	// 情報領域は必要に応じて表示されるため、上記の比率とは関係なくサイズを設定する
+	int hInfo   = theApp.GetInfoRegionHeight(fontHeight);	// 情報領域もフォントサイズ依存
 
 	GetDlgItem(IDC_TITLE_EDIT) ->MoveWindow( 0, 0,            cx, hTitle  );
 	GetDlgItem(IDC_REPORT_LIST)->MoveWindow( 0, hTitle,       cx, hList   );

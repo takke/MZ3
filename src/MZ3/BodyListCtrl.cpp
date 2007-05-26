@@ -22,9 +22,10 @@ CBodyListCtrl::CBodyListCtrl()
 	// 色のデフォルト値を設定
 	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
 	// とりあえず赤に設定
-	m_clrBgSecond = RGB( 255,0,0);
-	m_clrFgFirst = ::GetSysColor(COLOR_WINDOWTEXT);
-	m_clrFgSecond = ::GetSysColor(COLOR_WINDOWTEXT);
+	m_clrBgSecond   = RGB( 255,0,0);
+
+	m_clrFgFirst	= ::GetSysColor(COLOR_WINDOWTEXT);
+	m_clrFgSecond	= ::GetSysColor(COLOR_WINDOWTEXT);
 
 	m_hBitmap = NULL;
 }
@@ -200,7 +201,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					// 全くの未読
 					clrTextFg = RGB(0x00, 0x00, 0xFF);
 				}
-				else if (data->GetLastIndex() == data->GetCommentCount()) {
+				else if (data->GetLastIndex() >= data->GetCommentCount()) {
 					// 更新なし
 					clrTextFg = RGB(0x00, 0x00, 0x00);
 				}
