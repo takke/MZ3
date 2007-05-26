@@ -11,11 +11,16 @@ $Id$
 
 * MZ3.i by Takke
 
+** MZ3.i Ver.0.8.0.0 Beta14	(2007.05.26)
+- 「未読を巡回」機能を追加。
+- 非VGA環境での表示を改善。
+- その他
+
+http://www.mz3.jp/bin/MZ3.0.8.0.0b14.CAB
+
 ** MZ3.i Ver.0.8.0.0 Beta13	(2007.05.25)
 - 解像度判定を改善
 - その他
-
-http://www.mz3.jp/bin/MZ3.0.8.0.0b13.CAB
 
 ** MZ3.i Ver.0.8.0.0 Beta12	(2007.05.20)
 - Real VGA 対応（Thanks いっちゅうさん！）
