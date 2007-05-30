@@ -432,7 +432,7 @@ private:
 	 */
 	static void ExtractAlbumImage(CString& str, CMixiData& data_)
 	{
-/*想定文字列（改行なし）
+/* 想定文字列（改行なし）
 <br>
 <a href="javascript:void(0)" onClick="MM_openBrWindow('show_album_picture.pl?
 album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
@@ -3372,7 +3372,6 @@ private:
 		int retIndex = eIndex;
 		CMixiData cmtData;
 		BOOL findFlag = FALSE;
-		CString buf;
 		CString date;
 		CString comment;
 		int index;
@@ -3381,6 +3380,7 @@ private:
 			str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
+				CString buf;
 
 				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1) {
 					// コメントなし
@@ -3406,7 +3406,7 @@ private:
 				else if ((index = str.Find(_T("show_friend.pl"))) != -1) {
 
 					str = html_.GetAt(i-1);
-					buf = str.Mid(str.Find(_T("<b>"))+3);
+					util::GetAfterSubString( str, L"<b>", buf );
 					buf = util::XmlParser::GetElement(buf, 1);
 					while(buf.Replace(_T("&nbsp;"), _T("")));
 					cmtData.SetCommentIndex(_wtoi(buf));
@@ -3456,28 +3456,30 @@ private:
 			}
 			else {
 
-				if ((index = str.Find(_T("class=\"h120\""))) != -1) {
+				if( util::LineHasStringsNoCase(str, L"class=\"h120\"") ) {
 					// コメント本文取得
 					str = html_.GetAt(i);
-					buf = str.Mid(index + wcslen(_T("class=\"h120\"")) + 1);
 
 					cmtData.AddBody(_T("\r\n"));
-					ParserUtil::AddBodyWithExtract( cmtData, buf );
+					ParserUtil::AddBodyWithExtract( cmtData, str );
 
 					i++;
-					for( ; i<eIndex; i++ ) {
-						str = html_.GetAt(i);
+					for( ; i+1<eIndex; i++ ) {
+						const CString& line  = html_.GetAt(i);
+						const CString& line2 = html_.GetAt(i+1);
 
-						if (str.Find(_T("</tr>")) != -1 && html_.GetAt(i+1).Find(_T("</table>")) != -1) {
+						if (util::LineHasStringsNoCase( line, L"</tr>") && 
+							util::LineHasStringsNoCase( line2,L"</table>") )
+						{
 							// 一番最後の改行を削除
-							ParserUtil::AddBodyWithExtract( cmtData, str );
+							ParserUtil::AddBodyWithExtract( cmtData, line );
 
 							// 終了タグが出てきたのでここで終わり
 							retIndex = i + 5;
 							break;
 						}
 
-						ParserUtil::AddBodyWithExtract( cmtData, str );
+						ParserUtil::AddBodyWithExtract( cmtData, line );
 					}
 					break;
 				}
@@ -3728,7 +3730,6 @@ private:
 		CMixiData cmtData;
 		BOOL findFlag = FALSE;
 		CString buf;
-//		CString date;
 		CString comment;
 		int index;
 
@@ -3786,20 +3787,30 @@ private:
 			}
 			else {
 
-				if ((index = str.Find(_T("class=\"h120\""))) != -1) {
+				if( util::LineHasStringsNoCase( str, L"<tr", L"<td", L"class=\"h120\"") ) {
 					// コメントコメント本文取得
 					str = html_.GetAt(i);
-					if ((unsigned int)str.GetLength() > (unsigned int)(index + wcslen(_T("class=\"h120\">")) + 1)) {
-						// ----------------------------------------
-						// アンケートのパターン
-						// ----------------------------------------
-						cmtData.AddBody(_T("\r\n"));
-					}
-					buf = str.Mid(index + wcslen(_T("class=\"h120\"")) + 1);
 
-					if ((index = buf.Find(_T("</td></tr></table>"))) != -1) {
+					// ----------------------------------------
+					// アンケートのパターン
+					// ----------------------------------------
+					cmtData.AddBody(_T("\r\n"));
+
+					// [    <tr><td class="h120" width="500">０１２３４５６７８９０]
+					// ↓
+					// [<td class="h120" width="500">０１２３４５６７８９０]
+
+					// [    <tr><td class="h120" width="500">テストあげ</td></tr></table>]
+					// ↓
+					// [<td class="h120" width="500">テストあげ</td></tr></table>]
+					util::GetAfterSubString( str, L">", buf );
+
+					if( util::GetBeforeSubString( buf, L"</td></tr></table>", buf ) > 0 ) {
+						// [<td class="h120" width="500">テストあげ</td></tr></table>]
+						// ↓
+						// [<td class="h120" width="500">テストあげ]
+
 						// 終了タグがあった場合
-						buf = buf.Left(index);
 						ParserUtil::AddBodyWithExtract( cmtData, buf );
 						retIndex = i + 5;
 						break;
@@ -3811,27 +3822,30 @@ private:
 
 					while( i<eIndex ) {
 						i++;
-						str = html_.GetAt(i);
-						if (str.Find(_T("</td>")) != -1 &&
-							html_.GetAt(i+1).Find(_T("</tr>")) != -1) 
+
+						const CString& line  = html_.GetAt(i);
+						const CString& line2 = html_.GetAt(i+1);
+						if (util::LineHasStringsNoCase(line, L"</td>") &&
+							util::LineHasStringsNoCase(line2,L"</tr>") ) 
 						{
 							// 一番最後の改行を削除
-							str.Replace(_T("\n"), _T(""));
-							ParserUtil::AddBodyWithExtract( cmtData, str );
+							buf = line;
+							buf.Replace(_T("\n"), _T(""));
+							ParserUtil::AddBodyWithExtract( cmtData, buf );
 
 							// 終了タグが出てきたのでここで終わり
 							retIndex = i + 5;
 							break;
 						}
-						else if ((index = str.Find(_T("</td></tr>"))) != -1) {
+						else if ((index = line.Find(_T("</td></tr>"))) != -1) {
 							// 終了タグ発見
-							buf = str.Left(index);
+							buf = line.Left(index);
 							ParserUtil::AddBodyWithExtract( cmtData, buf );
 							retIndex = i + 5;
 							break;
 						}
 
-						ParserUtil::AddBodyWithExtract( cmtData, str );
+						ParserUtil::AddBodyWithExtract( cmtData, line );
 					}
 					break;
 				}
@@ -3875,14 +3889,22 @@ public:
 			if (findFlag == FALSE) {
 
 				if (str.Find(_T("企画者")) != -1) {
+
+					// 次の行に企画者（Author）があるはず。
+					// <td bgcolor=#FDF9F2>&nbsp;<a href="show_friend.pl?id=xxx">なまえ</a>
 					i++;
 					str = html_.GetAt(i);
 
-					index = str.Find(_T("show_friend"));
+					index = str.Find(_T("show_friend.pl"));
+					if( index < 0 ) {
+						MZ3LOGGER_ERROR( L"show_friend.pl が見つかりません [" + str + L"]" );
+						break;
+					}
 					buf = str.Mid(index);
-					MixiUrlParser::GetAuthor(buf, &data_);
+					MixiUrlParser::GetAuthor( buf, &data_ );
 
-					i+=6;
+					// 開催日時の取得
+					i += 6;
 					str = html_.GetAt(i);
 					ParserUtil::UnEscapeHtmlElement(str);
 					buf = _T("開催日時 ") + str;
@@ -3890,7 +3912,8 @@ public:
 					data_.AddBody(buf);
 					data_.AddBody(_T("\r\n"));
 
-					i+=6;
+					// 開催場所の取得
+					i += 6;
 					str = html_.GetAt(i);
 					ParserUtil::UnEscapeHtmlElement(str);
 					buf = _T("開催場所 ") + str;
@@ -3899,42 +3922,46 @@ public:
 
 					i++;
 					continue;
-
 				}
 
 
 				// フラグを発見するまで廻す
-				if (str.Find(_T("詳細")) != -1) {
+				if (util::LineHasStringsNoCase( str, L"詳細") ) {
 					findFlag = TRUE;
-					// </table>を探す
+
+					// </td></tr>を探す
 					i++;
 					str = html_.GetAt(i);
-					index = str.Find(_T("CLASS=h120>"));
-					buf = str.Mid(index+ wcslen(_T("CLASS=h120>")));
-
-					if ((index = buf.Find(_T("</td></tr>"))) != -1) {
-						buf = buf.Left(index);
-						// ここで終了
-						endFlag = TRUE;
-					}
 
 					data_.AddBody(_T("\r\n"));
-					ParserUtil::AddBodyWithExtract( data_, buf );
+
+					// [<td bgcolor=#ffffff><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120 width="410">テスト用です</td></tr></table></td>]
+
+					if( util::GetBeforeSubString( str, L"</td></tr>", buf ) > 0 ) {
+						// 1行なので終了。
+						// [<td bgcolor=#ffffff><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120 width="410">テスト用です]
+						ParserUtil::AddBodyWithExtract( data_, buf );
+
+						// ここで終了
+						endFlag = TRUE;
+					}else{
+						// 未終了なので行をそのまま投入。
+						ParserUtil::AddBodyWithExtract( data_, str );
+					}
 					continue;
 				}
 			}
 			else {
 
 				if (endFlag == FALSE) {
-					if ((index = str.Find(_T("</td></tr>"))) == -1) {
-						ParserUtil::AddBodyWithExtract( data_, str );
-						continue;
-					}
-					else {
-						buf = str.Left(index);
+					// </td></tr> が現れるまで解析＆追加。
+					if( util::GetBeforeSubString( str, L"</td></tr>", buf) >= 0 ) {
+						// 詳細、終了
 						ParserUtil::AddBodyWithExtract( data_, buf );
-						// 終了タグ
 						endFlag = TRUE;
+					}else{
+						// 未終了なので行をそのまま投入。
+						ParserUtil::AddBodyWithExtract( data_, str );
 					}
 				}
 				else {
@@ -3976,7 +4003,6 @@ public:
 		int retIndex = eIndex;
 		CMixiData cmtData;
 		BOOL findFlag = FALSE;
-		CString buf;
 		CString date;
 		CString comment;
 		int index;
@@ -3986,38 +4012,30 @@ public:
 
 			if (findFlag == FALSE) {
 
-				if (str.Find(_T("<!-- end : Loop -->")) != -1) {
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1) {
-					// コメントなし
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if (str.Find(_T("<!-- COMMENT: end -->")) != -1) {
+				if( util::LineHasStringsNoCase( str, L"<!-- end : Loop -->" ) ||
+					util::LineHasStringsNoCase( str, L"<!-- ADD_COMMENT: start -->" ) ||
+					util::LineHasStringsNoCase( str, L"<!-- COMMENT: end -->" ) ||
+					util::LineHasStringsNoCase( str, L"add_event_comment.pl" ) ) 
+				{
 					// コメント全体の終了タグ発見
 					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
+					return -1;
 				}
-				//コメント終了条件追加(2006/11/19 icchu追加)
-				else if (str.Find(_T("add_event_comment.pl")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if ((index = str.Find(_T("show_friend.pl"))) != -1) {
+				
+				if ((index = str.Find(_T("show_friend.pl"))) != -1) {
 
-					buf = str.Mid(index);
+					CString buf = str.Mid(index);
 					MixiUrlParser::GetAuthor(buf, &cmtData);
 
+					// コメント番号を前の行から取得する
+					// [<font color="#f8a448"><b>&nbsp;25</b>&nbsp;:</font>]
 					str = html_.GetAt(i-1);
-					buf = str.Mid(str.Find(_T("<b>"))+wcslen(_T("<b>")));
-					buf = util::XmlParser::GetElement(buf, 1);
+
+					if( util::GetBetweenSubString( str, L"<b>", L"</b>", buf ) < 0 ) {
+						MZ3LOGGER_ERROR( L"コメント番号が取得できません。mixi 仕様変更？" );
+						return -1;
+					}
+
 					while(buf.Replace(_T("&nbsp;"), _T("")));
 					cmtData.SetCommentIndex(_wtoi(buf));
 
@@ -4035,58 +4053,45 @@ public:
 					}
 
 					findFlag = TRUE;
-
 				}
 			}
 			else {
 
 				// コメントコメント本文取得
 
-				int index2 = 0;
-				if ((index = str.Find(_T("CLASS=h120>"))) != -1 || (index2 = str.Find(_T("class=\"h120\">"))) != -1) {
+				if( util::LineHasStringsNoCase( str, L"<td", L"class=h120" ) ||
+					util::LineHasStringsNoCase( str, L"<td", L"class=\"h120\"" ) )
+				{
+					cmtData.AddBody(_T("\r\n"));
 
-					//パターン分け
-					if (index != -1) {
-						if ((unsigned int)str.GetLength() > (unsigned int)(index + wcslen(_T("CLASS=h120>")) + 1)) {
-							cmtData.AddBody(_T("\r\n"));
-						}
-						buf = str.Mid(index + wcslen(_T("CLASS=h120>")));
+					// [<tr><td class="h120" width="500">てすと</td></tr>]
 
-					}
-					else {
-						if ((unsigned int)str.GetLength() > (unsigned int)(index2 + wcslen(_T("class=\"h120\">")) + 1)) {
-							cmtData.AddBody(_T("\r\n"));
-						}
-						buf = str.Mid(index2 + wcslen(_T("class=\"h120\">")));
-					}
+					ParserUtil::AddBodyWithExtract( cmtData, str );
 
-					CString buf2;
-					buf2 = html_.GetAt(i+1);
-					if ((index = buf.Find(_T("</td></tr>"))) != -1 &&
-						buf2.Find(_T("</table>")) != -1)
+					CString line2 = html_.GetAt(i+1);
+					if( util::LineHasStringsNoCase( str,   L"</td></tr>" ) &&
+						util::LineHasStringsNoCase( line2, L"</table>" ) )
 					{
 						// 終了タグがあった場合
-						buf = buf.Left(index);
-						ParserUtil::AddBodyWithExtract( cmtData, buf );
 						retIndex = i + 5;
 						break;
 					}
 
-					// それ以外の場合
-					ParserUtil::AddBodyWithExtract( cmtData, buf );
-
+					// 終了タグ未発見の場合：
+					// 終了タグが現れるまで解析＆追加。
 					while( i<eIndex ) {
 						i++;
-						str = html_.GetAt(i);
-						if ((index = str.Find(_T("</td></tr>"))) != -1) {
+						const CString& line = html_.GetAt(i);
+
+						CString buf;
+						if ( util::GetBeforeSubString( line, L"</td></tr>", buf ) > 0 ) {
 							// 終了タグ発見
-							buf = str.Left(index);
 							ParserUtil::AddBodyWithExtract( cmtData, buf );
 							retIndex = i + 5;
 							break;
 						}
 
-						ParserUtil::AddBodyWithExtract( cmtData, str );
+						ParserUtil::AddBodyWithExtract( cmtData, line );
 					}
 					break;
 				}
