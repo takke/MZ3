@@ -185,6 +185,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CHECK_CRUISE, &CMZ3View::OnCheckCruise)
 	ON_COMMAND(ID_SEND_NEW_MESSAGE, &CMZ3View::OnSendNewMessage)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
+	ON_WM_SETTINGCHANGE()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -453,6 +454,20 @@ CMZ3Doc* CMZ3View::GetDocument() const // デバッグ以外のバージョンはインラインで
 void CMZ3View::OnSize(UINT nType, int cx, int cy)
 {
 	CFormView::OnSize(nType, cx, cy);
+
+	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );
+	{
+		CRect rect;
+		CString msg;
+
+		GetWindowRect( &rect );
+		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+
+		GetWindowRect( &rect );
+		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+	}
 
 	int fontHeight = theApp.m_optionMng.m_fontHeight;
 	if( fontHeight == 0 ) {
@@ -2818,4 +2833,14 @@ bool CMZ3View::DoNextBodyItemCruise()
 		// 通信継続
 		return true;
 	}
+}
+void CMZ3View::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
+{
+	CFormView::OnSettingChange(uFlags, lpszSection);
+
+/*	MZ3LOGGER_DEBUG( L"OnSettingChange( " + util::int2str(uFlags) + L", " + lpszSection + L" )" );
+
+	if( uFlags & SETTINGCHANGE_RESET ) {
+	}
+*/
 }

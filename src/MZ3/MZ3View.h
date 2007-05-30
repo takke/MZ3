@@ -259,6 +259,7 @@ public:
 	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
 	int GetListWidth(void);
 	bool DoNextBodyItemCruise();
+	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

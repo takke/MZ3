@@ -840,7 +840,8 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				CString msg;
 				msg.Format( 
 					L"ファイル名が不明のため続行できません\n"
-					L" url : %s", url );
+					L" url : [%s]", url );
+				MZ3LOGGER_ERROR( msg );
 				MessageBox( msg );
 				return 0;
 			}else{ 
