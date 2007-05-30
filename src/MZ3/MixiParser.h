@@ -552,16 +552,18 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 				CString url_image = url_mixi + url_right;
 				data_.AddImage( url_image );
 
+				MZ3LOGGER_DEBUG( L"画像URL [" + url_image + L"]" );
+
 				// 画像リンクを置換する
 				line.AppendFormat( L"<<画像%02d>><br>", data_.GetImageCount() );
 
 				// 次のサーチのために str を更新する
 				if( util::GetAfterSubString( target, L"</a>", target ) < 0 ) {
-					// 更新OK
-				}else{
 					// 終了タグがなかった。タグ仕様変更？
 					MZ3LOGGER_ERROR( L"画像の終了タグが見つかりません。 line[" + target + L"]" );
 					break;
+				}else{
+					// 更新OK
 				}
 			}else{
 				// not found
@@ -2404,22 +2406,16 @@ public:
 			}
 		}
 
-
-
-
 		// 日記開始フラグ
-		const CString& strDiaryStartTag1 = _T("class=\"h12\">");
-		const CString& strDiaryStartTag2 = _T("CLASS=h12>");
 
 		for (int i=75; i<count; i++) {
 			str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
 				// 日記開始フラグを発見するまで廻す
-				int idx1 = str.Find(strDiaryStartTag1);
-				int idx2 = str.Find(strDiaryStartTag2);
 
-				if (idx1 != -1 || idx2 != -1 ) 
+				if (util::LineHasStringsNoCase( str, L"<td", L"class=\"h12\"" ) ||
+					util::LineHasStringsNoCase( str, L"<td", L"CLASS=h12" ) )
 				{
 					// 日記開始フラグ発見（日記本文発見）
 					findFlag = TRUE;
@@ -2464,20 +2460,17 @@ public:
 					// 日記の添付画像取得
 					parseImageLink( data_, html_, i );
 
-					// 現在の行に戻る
-					str = html_.GetAt(i);
+					// "<td" 以降に整形
+					str = str.Mid( str.Find(L"<td") );
 
-					if( idx1 != -1 ) {
-						buf = str.Mid( idx1 + wcslen(strDiaryStartTag1) );
-					}else{
-						buf = str.Mid( idx2 + wcslen(strDiaryStartTag2) );
-					}
-					if (buf.Find(_T("</td>")) != -1) {
+					// 現在の行を解析、追加。
+					if( util::GetBeforeSubString( str, L"</td>", buf ) > 0 ) {
 						// この１行で終わり
-						buf = buf.Left(buf.Find(_T("</td>")));
+						ParserUtil::AddBodyWithExtract( data_, buf );
 						endFlag = TRUE;
+					}else{
+						ParserUtil::AddBodyWithExtract( data_, str );
 					}
-					ParserUtil::AddBodyWithExtract( data_, buf );
 				}
 				else if (str.Find(_T("さんは外部ブログを使われています。<br>")) != -1) {
 					// 外部ブログ解析
@@ -2507,6 +2500,7 @@ public:
 					// コメント取得
 					i += 10;
 					data_.ClearChildren();
+
 					int cmtNum = 0;
 
 					index = i;
@@ -2569,11 +2563,18 @@ private:
 			if( iLine_+iBack >= html_.GetCount() ) {
 				break;
 			}
-			CString str = html_.GetAt( iLine_ +iBack );
-			if (str.Find(_T("MM_openBrWindow('")) != -1) {
+			CString line = html_.GetAt( iLine_ +iBack );
+			if (line.Find(_T("MM_openBrWindow('")) != -1) {
 				// 画像発見。
 				// 追加。
-				ParserUtil::AddBodyWithExtract( data_, str );
+
+				// 先頭のタブを削除するために "<" 以前を削除
+				int index = line.Find( L"<" );
+				if( index > 0 ) {
+					line = line.Mid( index );
+				}
+
+				ParserUtil::AddBodyWithExtract( data_, line );
 
 				bImageFound = true;
 			}
@@ -2614,18 +2615,13 @@ private:
 			str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
-				if (str.Find(_T("add_comment.pl")) != -1) {
-					// コメントなし
+				if( util::LineHasStringsNoCase( str, L"add_comment.pl" ) ||	// コメントなし
+					util::LineHasStringsNoCase( str, L"<!-- ///// コメント : end ///// -->" ) ) // コメント全体の終了タグ発見
+				{
 					GetPostAddress(i, eIndex, html_, data_);
-					retIndex = -1;
-					break;
+					return -1;
 				}
-				else if (str.Find(_T("<!-- ///// コメント : end ///// -->")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, data_);
-					retIndex = -1;
-					break;
-				}
+
 				if ((index = str.Find(_T("show_friend.pl"))) != -1) {
 					// コメントヘッダ取得
 
@@ -3923,7 +3919,6 @@ public:
 					i++;
 					continue;
 				}
-
 
 				// フラグを発見するまで廻す
 				if (util::LineHasStringsNoCase( str, L"詳細") ) {
