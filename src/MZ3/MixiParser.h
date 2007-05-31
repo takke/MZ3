@@ -1257,6 +1257,7 @@ private:
 			}
 		}
 		if( iLine >= endLine ) {
+			MZ3LOGGER_ERROR( L"<a href=\"...\"> が現れませんでした。 iLine[" + util::int2str(iLine) + L"]" );
 			return false;
 		}
 
@@ -1267,13 +1268,13 @@ private:
 				const CString line = html.GetAt( iLine );
 
 				CString buf;
-				// <td colspan="2" bgcolor="#FFFFFF"><a href="show_friend.pl?id=xxx">名称</a></td>
+				// <td colspan="2" bgcolor="#FFFFFF"><a href="show_friend.pl?id=xxx">なまえ</a></td>
 				// または
-				// <a href="view_community.pl?id=xxx">名称</a>
+				// <a href="view_community.pl?id=xxx">コミュニティ名</a>
 				// から名称を抽出する
 				if( util::GetBetweenSubString( line, L"<a href=\"", L"</a>", buf ) > 0 ) {
-					// buf : view_community.pl?id=xxx">名称
-					// buf : show_friend.pl?id=xxx">名称
+					// buf : view_community.pl?id=xxx">なまえ
+					// buf : show_friend.pl?id=xxx">コミュニティ名
 					// 名前抽出
 					CString name;
 					if( util::GetAfterSubString( buf, L">", name ) > 0 ) {
@@ -1284,6 +1285,7 @@ private:
 				}
 			}
 			if( iLine >= lastLine ) {
+				MZ3LOGGER_ERROR( L"<a href=\"...\"> が現れませんでした。 iLine[" + util::int2str(iLine) + L"]" );
 				return false;
 			}
 		}
@@ -1300,7 +1302,7 @@ private:
 					CString after;
 					if( util::GetAfterSubString( 
 							line,
-							L"<td colspan=\"2\" bgcolor=\"#FFFFFF\">", after ) < 0 )
+							L"<td colspan=\"2\" bgcolor=\"#FFFFFF\"", after ) < 0 )
 					{
 						continue;
 					}
@@ -1308,12 +1310,13 @@ private:
 					bInIntroduce = true;
 					continue;
 				}
+
 				// 自己紹介終了？
-				int idx = line.Find( L"</td>" );
-				if( idx >= 0 ) {
+				CString left;
+				if( util::GetBeforeSubString( line, L"</td>", left ) >= 0 ) {
 					// 自己紹介終了。
 					// その左側を取得し、本文に追加し、ループ終了
-					CString left = line.Left( idx );
+					ParserUtil::AddBodyWithExtract( mixi, left );
 					break;
 				}else{
 					// 自己紹介継続。
@@ -1329,16 +1332,15 @@ private:
 			for( ; iLine+1<lastLine; iLine++ ) {
 				const CString line = html.GetAt( iLine );
 				
-				if( !util::LineHasStringsNoCase( line, L"<td bgcolor=\"#FFFFFF\" width=\"250\" align=\"left\">" ) ) {
-					continue;
-				}
-				// 次の行が最終ログイン時刻文字列
-				CString date = html.GetAt( iLine+1 );
+				if( util::LineHasStringsNoCase( line, L"<td", L"bgcolor=\"#FFFFFF\"", L"width=\"250\"", L"align=\"left\">" ) ) {
+					// 次の行が最終ログイン時刻文字列
+					CString date = html.GetAt( iLine+1 );
 
-				// 最終ログイン発見。
-				date.Replace(_T("\n"), _T(""));
-				mixi.SetDate( date );
-				break;
+					// 最終ログイン発見。
+					date.Replace(_T("\n"), _T(""));
+					mixi.SetDate( date );
+					break;
+				}
 			}
 		}
 
@@ -4112,54 +4114,49 @@ public:
 	{
 		data_.ClearAllList();
 
-		INT_PTR count;
-		count = html_.GetCount();
+		INT_PTR count = html_.GetCount();
 
-		CString str;
-		CString buf;
-		CString date;
-		int index;
 
 		for (int i=0; i<count; i++) {
-			str = html_.GetAt(i);
-			if (str.Find(_T("<font COLOR=#996600>日　付")) != -1) {
-				buf = str.Mid(str.Find(_T("</font>")) + wcslen(_T("</font>")));
+			CString str = html_.GetAt(i);
+
+			// 日付抽出
+			if( util::LineHasStringsNoCase( str, L"<font", L" COLOR=#996600", L">", L"日　付" ) ) {
+				CString buf = str.Mid(str.Find(_T("</font>")) + wcslen(_T("</font>")));
 				while( buf.Replace(_T("&nbsp;"), _T(" ")) );
 				buf.Replace(_T(":"), _T(""));
 				buf.Replace(_T(" "), _T(""));
 				buf.Replace(_T("時"), _T(":"));
 				ParserUtil::ChangeDate(buf, &data_);
+				continue;
 			}
-			else if (str.Find(_T("差出人")) != -1 &&
-				(index = str.Find(_T("show_friend.pl?id="))) != -1) {
-					buf = str.Mid(index + wcslen(_T("show_friend.pl?id=")));
-					buf.Left(buf.Find(_T("\"")));
-					data_.SetOwnerID(_wtoi(buf));
-			}
-			else if ((index = str.Find(_T("<td CLASS=h120>"))) != -1) {
 
-				buf = str.Mid(index + wcslen(_T("<td CLASS=h120>")));
-				if ((index = buf.Find(_T("</td></tr>"))) != -1) {
-					buf = buf.Left(index);
-					ParserUtil::UnEscapeHtmlElement(buf);
-					data_.AddBody(_T("\r\n"));
-					data_.AddBody(buf);
+			// 差出人ID抽出
+			if( util::LineHasStringsNoCase( str, L"<font", L" COLOR=#996600", L">", L"差出人", L"show_friend.pl?id=" ) ) {
+				CString buf;
+				util::GetBetweenSubString( str, L"show_friend.pl?id=", L"\"", buf );
+				data_.SetOwnerID(_wtoi(buf));
+				continue;
+			}
+
+			// 本文抽出
+			if( util::LineHasStringsNoCase( str, L"<td", L"CLASS=", L"h120" ) ) {
+
+				data_.AddBody(_T("\r\n"));
+				ParserUtil::AddBodyWithExtract( data_, str );
+
+				// 同じ行に </td></tr> が存在すれば終了。
+				if( util::LineHasStringsNoCase( str, L"</td></tr>" ) ) {
 					break;
 				}
-				ParserUtil::UnEscapeHtmlElement(buf);
-				data_.AddBody(_T("\r\n"));
-				data_.AddBody(buf);
+
 				for (int j=i+1; j<count; j++) {
 					str = html_.GetAt(j);
-					if ((index = str.Find(_T("</td></tr>"))) != -1) {
+					ParserUtil::AddBodyWithExtract( data_, str );
+
+					if( util::LineHasStringsNoCase( str, L"</td></tr>" ) ) {
 						// 終了フラグ発見
-						buf = str.Left(index);
-						ParserUtil::UnEscapeHtmlElement(buf);
-						data_.AddBody(buf);
 						break;
-					}
-					else {
-						ParserUtil::AddBodyWithExtract( data_, str );
 					}
 				}
 				break;
