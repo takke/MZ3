@@ -549,6 +549,10 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	m_infoEdit.ShowWindow(SW_HIDE);
 
+	// 中断後に書き込みボタンが押されると何故か強制終了してしまうため、
+	// 本文領域にフォーカスを戻す。
+	m_bodyEdit.SetFocus();
+
 	return LRESULT();
 }
 
