@@ -228,6 +228,9 @@ void CWriteView::OnBnClickedWriteSendButton()
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 
 	StartConfirmPost( msg );
+
+	// キー押下イベントを奪うためにフォーカスを取得する
+	SetFocus();
 }
 
 // -----------------------------------------------------------------------------
@@ -604,11 +607,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 					this);
 			}
 			break;
-		}
 
-	}
-	else if (pMsg->message == WM_KEYDOWN) {
-		switch (MapVirtualKey(pMsg->wParam, 2)) {
 		case VK_BACK:
 			if (m_access != FALSE) {
 				// アクセス中は中断処理
@@ -617,6 +616,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 			}
 			break;
 		}
+
 	}
 
 	return CFormView::PreTranslateMessage(pMsg);
