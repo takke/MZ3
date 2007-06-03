@@ -829,7 +829,7 @@ void CInetAccess::CloseInternetHandles()
 
 	// m_hConnection ‚ª NULL ‚Å‚È‚¯‚ê‚ÎA•Â‚¶‚é
 	if( m_hConnection != NULL ) {
-		InternetCloseHandle(m_hConnection);
+		InternetCloseHandle( m_hConnection );
 		m_hConnection = NULL;
 	}
 }

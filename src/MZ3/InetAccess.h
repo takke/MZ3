@@ -89,14 +89,14 @@ public:
 	{ 
 		m_abort = TRUE;
 		::Sleep(100);
-		InternetCloseHandle( m_hConnection );
-		m_hConnection = NULL;
-		InternetCloseHandle( m_hRequest );
-		m_hRequest = NULL;
+
+		CloseInternetHandles();
 
 		// Abort Žž‚Í Internet ƒnƒ“ƒhƒ‹‚à•Â‚¶‚é
-		InternetCloseHandle( m_hInternet );
-		m_hInternet = NULL;
+		if( m_hInternet != NULL ) {
+			InternetCloseHandle( m_hInternet );
+			m_hInternet = NULL;
+		}
 	};
 
 private:
