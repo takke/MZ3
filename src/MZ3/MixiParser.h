@@ -257,7 +257,8 @@ public:
 			if( !reg.isCompiled() ) 
 				if(! reg.compile( L"<table[^>]*>" ) ) 
 					return;
-			reg.replaceAll( line, L"" );
+			if( line.Find( L"<table" ) != -1 ) 
+				reg.replaceAll( line, L"" );
 		}
 		while( line.Replace(_T("</table>"), _T("")) );
 
@@ -267,7 +268,8 @@ public:
 			if( !reg.isCompiled() ) 
 				if(! reg.compile( L"<tr[^>]*>" ) ) 
 					return;
-			reg.replaceAll( line, L"" );
+			if( line.Find( L"<tr" ) != -1 ) 
+				reg.replaceAll( line, L"" );
 		}
 		while( line.Replace(_T("</tr>"), _T("")) );
 
@@ -277,9 +279,21 @@ public:
 			if( !reg.isCompiled() ) 
 				if(! reg.compile( L"<td[^>]*>" ) ) 
 					return;
-			reg.replaceAll( line, L"" );
+			if( line.Find( L"<td" ) != -1 ) 
+				reg.replaceAll( line, L"" );
 		}
 		while( line.Replace(_T("</td>"), _T("")) );
+
+		// div タグの除去
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<div[^>]*>" ) ) 
+					return;
+			if( line.Find( L"<div" ) != -1 ) 
+				reg.replaceAll( line, L"" );
+		}
+		while( line.Replace(_T("</div>"), _T("")) );
 
 		// br タグの置換
 		{
@@ -287,7 +301,8 @@ public:
 			if( !reg.isCompiled() ) 
 				if(! reg.compile( L"<br[^>]*>" ) ) 
 					return;
-			reg.replaceAll( line, L"\r\n" );
+			if( line.Find( L"<br" ) != -1 ) 
+				reg.replaceAll( line, L"\r\n" );
 		}
 
 		// "<p>" → 削除
@@ -4066,29 +4081,30 @@ public:
 					ParserUtil::AddBodyWithExtract( cmtData, str );
 
 					CString line2 = html_.GetAt(i+1);
-					if( util::LineHasStringsNoCase( str,   L"</td></tr>" ) &&
+					if( util::LineHasStringsNoCase( str,   L"</td>" ) &&
 						util::LineHasStringsNoCase( line2, L"</table>" ) )
 					{
 						// 終了タグがあった場合
 						retIndex = i + 5;
-						break;
-					}
+					}else{
+						// 終了タグ未発見の場合：
+						// 終了タグが現れるまで解析＆追加。
+						while( i<eIndex ) {
+							i++;
+							const CString& line = html_.GetAt(i);
 
-					// 終了タグ未発見の場合：
-					// 終了タグが現れるまで解析＆追加。
-					while( i<eIndex ) {
-						i++;
-						const CString& line = html_.GetAt(i);
+							CString buf;
+							if( util::GetBeforeSubString( line, L"</td>", buf ) >= 0 ||
+								util::GetBeforeSubString( line, L"</table>", buf ) >= 0 ) 
+							{
+								// 終了タグ発見
+								ParserUtil::AddBodyWithExtract( cmtData, buf );
+								retIndex = i + 5;
+								break;
+							}
 
-						CString buf;
-						if ( util::GetBeforeSubString( line, L"</td></tr>", buf ) > 0 ) {
-							// 終了タグ発見
-							ParserUtil::AddBodyWithExtract( cmtData, buf );
-							retIndex = i + 5;
-							break;
+							ParserUtil::AddBodyWithExtract( cmtData, line );
 						}
-
-						ParserUtil::AddBodyWithExtract( cmtData, line );
 					}
 					break;
 				}
