@@ -28,4 +28,6 @@ private:
 	void Save();
 
 	afx_msg void OnBnClickedChangeLogFolderButton();
+public:
+	afx_msg void OnBnClickedCleanLogButton();
 };

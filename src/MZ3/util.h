@@ -863,4 +863,76 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 	util::OpenUrlByBrowser( requestUrl );
 }
 
+/**
+ * code from http://techtips.belution.com/ja/vc/0083/
+ */
+template< class T>
+int FindFileCallback(const TCHAR* szDirectory,
+                    const TCHAR* szFile,
+                    int (*pFindCallback)(const TCHAR* szDirectory,
+                                         const WIN32_FIND_DATA* Data,
+                                         T    pCallbackProbe),
+                    T    pCallbackProbe = NULL,
+                    int  nDepth = -1)
+{
+    int            nResult = TRUE;
+    HANDLE          hFile  = INVALID_HANDLE_VALUE;
+    TCHAR          szPath[ MAX_PATH ];
+    WIN32_FIND_DATA data;
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  探索深度が尽きたら次のディレクトリは探さない．
+    //
+    if( nDepth == 0 || nResult == FALSE) return nResult;
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  ディレクトリ潜航
+    //
+    _stprintf( szPath, _T("%s*.*"), szDirectory);
+    hFile = FindFirstFile( szPath, &data);
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            // ディレクトリでないならやりなおし．
+            if( (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                != FILE_ATTRIBUTE_DIRECTORY ) continue;
+
+            // カレント及び親ディレクトリならやりなおし．
+            if( _tcscmp(data.cFileName, _T(".")) == 0
+                || _tcscmp(data.cFileName, _T("..")) == 0 ) continue;
+
+            // 発見ディレクトリの潜航準備．
+            _stprintf( szPath, _T("%s%s\\"), szDirectory, data.cFileName);
+
+            //再帰呼び出し．ただし Depth -1 で渡す．ブクブク．
+            nResult = FindFileCallback( szPath, szFile, pFindCallback, pCallbackProbe, nDepth -1);
+        }
+        while( FindNextFile( hFile, &data) && nResult);
+
+        FindClose( hFile );
+    }
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  ファイル探索
+    //
+    _stprintf( szPath, _T("%s%s"), szDirectory, szFile);
+    hFile = FindFirstFile( szPath, &data);
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            nResult = (pFindCallback)( szDirectory, &data, pCallbackProbe);
+        }
+        while( FindNextFile( hFile, &data) && nResult);
+
+        FindClose( hFile );
+    }
+
+    return nResult;
+}
+
 }
