@@ -39,6 +39,7 @@ private:
 	HWND				m_hwnd;					///< 終了通知を送るウィンドウのハンドル
 
 
+
 	void*				m_object;				///< 終了メッセージで LPARAM に渡すポインタ
 
 	BOOL				m_abort;				///< 中断フラグ
@@ -51,6 +52,8 @@ private:
 	HINTERNET			m_hInternet;			///< セッション(InternetOpenで取得)
 
 	bool				m_bAccessing;			///< 通信中フラグ
+
+
 
 	FILE_TYPE			m_fileType;				///< 受信ファイル種別
 
@@ -108,6 +111,9 @@ private:
 	int ExecSendRecv( EXEC_SENDRECV_TYPE execType );
 
 	void CloseInternetHandles();
+
+	//2007/06/18 いっちゅう追加
+	HRESULT WINAPI SP_EstablishInetConnProc();
 };
 
 
