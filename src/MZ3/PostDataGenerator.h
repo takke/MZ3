@@ -196,12 +196,17 @@ public:
 		case ACCESS_MYDIARY:
 			post.AppendPostBody( "submit=confirm&comment_body=" );
 			post.AppendPostBody( post.GetComment() );
-			post.AppendPostBody( "&owner_id=" );
-			post.AppendPostBody( util::int2str_a( mixi.GetOwnerID() ) );
+
+      //2007/06/22 いっちゅう mixi仕様変更対応　owner_idが要らなくなったっぽい
+			//post.AppendPostBody( "&owner_id=" );
+			//post.AppendPostBody( util::int2str_a( mixi.GetOwnerID() ) );
+      
 			post.AppendPostBody( "&post_key=" );
 			post.AppendPostBody( post.GetPostKey() );
 			break;
 		}
+
+    //MZ3LOGGER_DEBUG( post.GetPostKey() );
 
 		// Content-Type を設定する
 		// Content-Type: application/x-www-form-urlencoded

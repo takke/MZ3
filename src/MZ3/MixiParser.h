@@ -2721,7 +2721,7 @@ public:
 
 		BOOL dataFind = FALSE;
 
-		for (int i=150; i<count; i++) {
+		for (int i=140; i<count; i++) {
 			const CString& str = html_.GetAt(i);
 
 			// 「次」、「前」のリンク
@@ -4330,7 +4330,8 @@ public:
 
 				// 日付
 				const CString& str = html_.GetAt(i-1);
-				ParserUtil::ChangeDate(util::XmlParser::GetElement(str, 3), util::XmlParser::GetElement(str, 5), &data);
+        //2007/06/20 いっちゅう日記投稿不具合対応
+				ParserUtil::ChangeDate(util::XmlParser::GetElement(str, 5), util::XmlParser::GetElement(str, 7), &data);
 
 				for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);

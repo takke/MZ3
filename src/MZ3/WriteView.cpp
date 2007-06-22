@@ -351,6 +351,8 @@ void CWriteView::StartEntryPost()
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
 				url.Format( L"http://mixi.jp/%s&owner_id=%d", m_data->GetPostAddress(), m_data->GetOwnerID());
+			  //2007/06/21　いっちゅう　リファラー追加
+				refUrl.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
 				break;
 			}
 		}
