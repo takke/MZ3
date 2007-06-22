@@ -11,8 +11,6 @@
 #include "util.h"
 
 #pragma comment(lib, "wininet.lib")
-
-//2007/06/18 いっちゅう追加
 #pragma comment( lib, "cellcore.lib" )
 
 #include <initguid.h>
@@ -263,124 +261,63 @@ inline bool my_append_buf( kfm::kf_buf_type& out_buf, char* pData, DWORD dwSize 
 
 	return true;
 }
-//**
-// *
-// *  FUNCTION: 
-// *    SP_EstablishInetConnProc
-// *
-// *  PURPOSE: 
-// *    Establish Internet Connection
-// * 
-// */
-//DWORD CInetAccess::SP_EstablishInetConnProc( HWND hwnd )
-//{
-//  CONNMGR_CONNECTIONINFO ConnInfo = { 0 };
-//  PROXY_CONFIG pcProxy = {0};
-//  DWORD dwTimeOut = 120000;
-//  DWORD dwIndex = 0;
-//  DWORD dwConStatus;
-//  HRESULT hResult;
-//
-//	do {
-//		memset(&ConnInfo, 0, sizeof(CONNMGR_CONNECTIONINFO));
-//		ConnInfo.cbSize		= sizeof(CONNMGR_CONNECTIONINFO);
-//		ConnInfo.dwParams	= CONNMGR_PARAM_GUIDDESTNET;
-//		ConnInfo.dwFlags    = CONNMGR_FLAG_PROXY_HTTP;
-//		ConnInfo.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE;
-//		ConnInfo.bDisabled  = FALSE;
-//		ConnInfo.bExclusive = FALSE;
-//
-//		hResult = ConnMgrMapURL(L"http://mixi.jp", &ConnInfo.guidDestNet, &dwIndex);
-//		if (hResult != S_OK)
-//			break;
-//
-//		hResult = ConnMgrEstablishConnectionSync(&ConnInfo, &g_hConn, dwTimeOut, &dwConStatus);
-//	} while (dwConStatus != CONNMGR_STATUS_CONNECTED);
-//
-//	if(dwConStatus == CONNMGR_STATUS_CONNECTED){
-//		hResult = ConnMgrProviderMessage(
-//			g_hConn,						// An optional handle to the current connection. 
-//			&IID_ConnPrv_IProxyExtension,	// const GUID * pguidProvider
-//			NULL,							// DWORD * pdwIndex
-//			0,								// DWORD dwMsg1 General parameter 1
-//			0,								// DWORD dwMsg2 General parameter 2
-//			(PBYTE)&pcProxy,				// PBYTE pParam
-//			sizeof(pcProxy));				// ULONG cbParamSize
-//
-//		g_bDirect = TRUE;
-//		g_lpszProxy = NULL;
-//
-//		if (hResult == S_OK) {
-//			g_bDirect = FALSE;
-//			wcscpy(g_szProxy, pcProxy.szProxyServer);
-//			g_lpszProxy = g_szProxy;
-//		}
-//
-//		ConnMgrReleaseConnection(g_hConn, TRUE);
-//
-//		return dwConStatus;
-//	}
-//
-//	return dwConStatus;
-//}
 
 /**
  * コネクションチェック
  *
  * 接続がされていなかったらダイアルアップ処理
- *
- * 
  */
 HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc()
 {
-   CONNMGR_CONNECTIONINFO ci = {0};
-   PROXY_CONFIG pcProxy = {0};
-   DWORD dwStatus = 0;
-   DWORD dwIndex = 0;
-   HRESULT hr = S_OK; 
-   HANDLE hConnection = NULL;
-   HANDLE hOpen = NULL;
-   LPTSTR pszProxy = NULL;
-   DWORD dwAccessType;
-   DWORD dwTimeOut = 120000;  //タイムアウト値
+	CONNMGR_CONNECTIONINFO ci = {0};
+	PROXY_CONFIG pcProxy = {0};
+	DWORD dwStatus = 0;
+	DWORD dwIndex = 0;
+	HRESULT hr = S_OK; 
+	HANDLE hConnection = NULL;
+	HANDLE hOpen = NULL;
+	LPTSTR pszProxy = NULL;
+	DWORD dwAccessType;
+	DWORD dwTimeOut = 120000;  //タイムアウト値
 
-   // コネクションマネージャの初期化
-   ci.cbSize = sizeof(CONNMGR_CONNECTIONINFO); 
-   ci.dwParams = CONNMGR_PARAM_GUIDDESTNET; 
-   ci.dwFlags = CONNMGR_FLAG_PROXY_HTTP; 
-   ci.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE; 
+	// コネクションマネージャの初期化
+	ci.cbSize = sizeof(CONNMGR_CONNECTIONINFO); 
+	ci.dwParams = CONNMGR_PARAM_GUIDDESTNET; 
+	ci.dwFlags = CONNMGR_FLAG_PROXY_HTTP; 
+	ci.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE; 
 
-   // URLチェック
-   hr = ConnMgrMapURL(L"http://mixi.jp", &(ci.guidDestNet), &dwIndex);
+	// URLチェック
+	hr = ConnMgrMapURL(L"http://mixi.jp", &(ci.guidDestNet), &dwIndex);
 
-   //接続チェック
-   hr = ConnMgrEstablishConnectionSync(&ci, &hConnection, dwTimeOut, &dwStatus);
+	// 接続処理
+	hr = ConnMgrEstablishConnectionSync(&ci, &hConnection, dwTimeOut, &dwStatus);
 
-   //接続がされたらコネクションマネージャからプロクシ情報の取得
-   //はするが、プロクシの実装は今後要検討。（グローバルプロクシ使いたくない人も居ると思うので）
-   hr = ConnMgrProviderMessage( hConnection, &IID_ConnPrv_IProxyExtension, NULL, 0, 0, (PBYTE)&pcProxy, sizeof(pcProxy)); 
-   if (S_OK == hr)
-   {
-      dwAccessType = INTERNET_OPEN_TYPE_PROXY;
-      pszProxy = (LPTSTR) LocalAlloc(LPTR, ARRAYSIZE(pcProxy.szProxyServer));
-      hr = StringCchCopyN(pszProxy, ARRAYSIZE(pcProxy.szProxyServer), 
-                          pcProxy.szProxyServer, ARRAYSIZE(pcProxy.szProxyServer));
-   }
-   else if (E_NOINTERFACE == hr)
-   {
-      //プロクシ情報がない場合はダイレクト接続
-      dwAccessType = INTERNET_OPEN_TYPE_DIRECT;
-      pszProxy = NULL;
-      hr = S_OK;
-   }
+	// 接続がされたらコネクションマネージャからプロクシ情報の取得はするが、
+	// プロクシの実装は今後要検討。（グローバルプロクシ使いたくない人も居ると思うので）
+	hr = ConnMgrProviderMessage( hConnection, &IID_ConnPrv_IProxyExtension, NULL, 0, 0, (PBYTE)&pcProxy, sizeof(pcProxy)); 
+	if (S_OK == hr)
+	{
+		dwAccessType = INTERNET_OPEN_TYPE_PROXY;
+//		pszProxy = (LPTSTR) LocalAlloc(LPTR, ARRAYSIZE(pcProxy.szProxyServer));
+//		hr = StringCchCopyN(pszProxy, ARRAYSIZE(pcProxy.szProxyServer), 
+//			pcProxy.szProxyServer, ARRAYSIZE(pcProxy.szProxyServer));
+	}
+	else if (E_NOINTERFACE == hr)
+	{
+		//プロクシ情報がない場合はダイレクト接続
+		dwAccessType = INTERNET_OPEN_TYPE_DIRECT;
+		pszProxy = NULL;
+		hr = S_OK;
+	}
 
-   if (hConnection)
-   {
-       ConnMgrReleaseConnection(hConnection, TRUE);
-   }
+	if (hConnection)
+	{
+		ConnMgrReleaseConnection(hConnection, TRUE);
+	}
 
-    return hr;
+	return hr;
 }
+
 /**
  * 送受信処理を行う。
  *
@@ -390,18 +327,7 @@ HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc()
  */
 int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 {
-	// 接続確認
-/*	if( ::InternetCheckConnection( L"mixi.jp", FLAG_ICC_FORCE_CONNECTION, 0 ) == FALSE ) {
-		if( GetLastError() == ERROR_NOT_CONNECTED ) {
-			// 非接続状態なのでエラー
-			m_strErrorMsg = L"非接続状態";
-			return WM_MZ3_GET_ERROR;
-		}
-	}
-*/
-
-	//2007/06/18 いっちゅう追加
-	//接続確認。接続が無かったらダイアルアップ処理
+	// 接続確認。接続が無かったらダイアルアップ処理
 	SP_EstablishInetConnProc();
 
 	// URL 分解
