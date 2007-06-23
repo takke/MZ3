@@ -78,6 +78,10 @@ void COptionTabGetPage::Load()
 		((CButton*)GetDlgItem(IDC_PAGE_GETLATEST_RADIO))->SetCheck(BST_CHECKED);
 	}
 
+	// 自動接続
+	CheckDlgButton( IDC_USE_AUTOCONNECTION_CHECK, 
+		theApp.m_optionMng.IsUseAutoConnection() ? BST_CHECKED : BST_UNCHECKED );
+
 	// 受信バッファサイズ
 	// リストになければ末尾に追加。
 	const int recvBufSize = theApp.m_optionMng.GetRecvBufSize();
@@ -116,6 +120,10 @@ void COptionTabGetPage::Save()
 		type = GETPAGE_LATEST10;
 	}
 	theApp.m_optionMng.SetPageType(type);
+
+	// 自動接続
+	theApp.m_optionMng.SetUseAutoConnection( 
+		IsDlgButtonChecked( IDC_USE_AUTOCONNECTION_CHECK ) == BST_CHECKED ? true : false );
 
 	// 受信バッファサイズ
 	theApp.m_optionMng.SetRecvBufSize( mc_RecvBufCombo.GetItemData( mc_RecvBufCombo.GetCurSel() ) );

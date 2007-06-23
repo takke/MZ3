@@ -128,15 +128,9 @@ public:
 	CMixiData			m_mixi4recv;			///< 受信時に利用する mixi データ
 	CInetAccess			m_inet;					///< ネット接続オブジェクト
 
-private:
-	BOOL				m_reConnect;			///< 再接続フラグ
-
 public:
 	void ChangeView(CView*);
 	CString GetAppDirPath();
-
-	void SetReConnect(BOOL value) { m_reConnect = value; };
-	BOOL IsReConnect() { return m_reConnect; }
 
 	CString MakeLoginUrl( LPCTSTR nextUrl=L"/home.pl" );
 	CString MakeLoginUrlForMixiMobile( LPCTSTR nextUrl );

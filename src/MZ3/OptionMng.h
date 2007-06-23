@@ -22,19 +22,23 @@ inline int normalizeRange( int value, int minv, int maxv )
 class Option
 {
 private:
-	BOOL			m_proxyUse;			///< プロキシを使う？
-	CString			m_proxyServer;		///< プロキシのサーバ
-	int				m_proxyPort;		///< プロキシのポート
-	CString			m_proxyUser;		///< プロキシのユーザ
-	CString			m_proxyPassword;	///< プロキシのパスワード
+	bool			m_bUseAutoConnection;	///< 自動接続を使う？
+	bool			m_bUseProxy;			///< プロキシを使う？
+	bool			m_bUseGlobalProxy;		///< グローバルプロキシを使う？
+											///< （自動接続ONの場合のみ有効）
 
-	GETPAGE_TYPE	m_GetPageType;		///< ページ取得種別
+	CString			m_proxyServer;			///< プロキシのサーバ
+	int				m_proxyPort;			///< プロキシのポート
+	CString			m_proxyUser;			///< プロキシのユーザ
+	CString			m_proxyPassword;		///< プロキシのパスワード
 
-	BOOL			m_bBootCheckMnC;	///< 起動時のメッセージ確認
-	CString			m_quoteMark;		///< 引用符号
+	GETPAGE_TYPE	m_GetPageType;			///< ページ取得種別
 
-	BOOL			m_bUseBgImage;		///< 背景に画像を表示するかどうか
-	int				m_totalRecvBytes;	///< 総データ受信量
+	BOOL			m_bBootCheckMnC;		///< 起動時のメッセージ確認
+	CString			m_quoteMark;			///< 引用符号
+
+	BOOL			m_bUseBgImage;			///< 背景に画像を表示するかどうか
+	int				m_totalRecvBytes;		///< 総データ受信量
 
 public:
 
@@ -79,6 +83,9 @@ private:
 public:
 	Option()
 		: m_GetPageType( GETPAGE_ALL )
+		, m_bUseAutoConnection( true )
+		, m_bUseProxy( false )
+		, m_bUseGlobalProxy( true )
 		, m_bBootCheckMnC( FALSE )
 		, m_bUseBgImage( TRUE )
 		, m_fontHeight( 24 )
@@ -114,23 +121,29 @@ public:
 	void Load();
 	void Save();
 
-	void SetProxyUse(BOOL value) { m_proxyUse = value; };
-	BOOL IsProxyUse() { return m_proxyUse; };
+	void SetUseProxy(bool value) { m_bUseProxy = value; }
+	bool IsUseProxy() { return m_bUseProxy; }
 	
-	void SetProxyServer(LPCTSTR value) { m_proxyServer = value; };
-	LPCTSTR GetProxyServer() { return m_proxyServer; };
+	void SetUseGlobalProxy(bool value) { m_bUseGlobalProxy = value; }
+	bool IsUseGlobalProxy() { return m_bUseGlobalProxy; }
 	
-	void SetProxyPort(int value) { m_proxyPort = value; };
-	int GetProxyPort() { return m_proxyPort; };
+	void SetUseAutoConnection(bool value) { m_bUseAutoConnection = value; }
+	bool IsUseAutoConnection() { return m_bUseAutoConnection; }
+	
+	void SetProxyServer(LPCTSTR value) { m_proxyServer = value; }
+	LPCTSTR GetProxyServer() { return m_proxyServer; }
+	
+	void SetProxyPort(int value) { m_proxyPort = value; }
+	int GetProxyPort() { return m_proxyPort; }
 
-	void SetProxyUser(LPCTSTR value) { m_proxyUser = value; };
-	LPCTSTR GetProxyUser() { return m_proxyUser; };
+	void SetProxyUser(LPCTSTR value) { m_proxyUser = value; }
+	LPCTSTR GetProxyUser() { return m_proxyUser; }
 
-	void SetProxyPassword(LPCTSTR value) { m_proxyPassword = value; };
-	LPCTSTR GetProxyPassword() { return m_proxyPassword; };
+	void SetProxyPassword(LPCTSTR value) { m_proxyPassword = value; }
+	LPCTSTR GetProxyPassword() { return m_proxyPassword; }
 
-	GETPAGE_TYPE GetPageType() { return m_GetPageType; };
-	void SetPageType(GETPAGE_TYPE value) { m_GetPageType = value; };
+	GETPAGE_TYPE GetPageType() { return m_GetPageType; }
+	void SetPageType(GETPAGE_TYPE value) { m_GetPageType = value; }
 
 	BOOL IsBootCheckMnC()			{ return m_bBootCheckMnC; }			///< 起動時のチェック
 	void SetBootCheckMnC(BOOL flag) { m_bBootCheckMnC = flag; }			///< 起動時のチェックの設定

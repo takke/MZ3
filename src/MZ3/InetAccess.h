@@ -113,7 +113,7 @@ private:
 	void CloseInternetHandles();
 
 	//2007/06/18 ‚¢‚Á‚¿‚ã‚¤’Ç‰Á
-	HRESULT WINAPI SP_EstablishInetConnProc();
+	HRESULT WINAPI SP_EstablishInetConnProc( CString& proxy );
 };
 
 

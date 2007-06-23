@@ -33,7 +33,8 @@ void Option::Load()
 
 	if (inifile.SectionExists("Proxy") != FALSE) {
 		// プロキシセクションがあった場合
-		m_proxyUse = atoi( inifile.GetValue("Use", "Proxy").c_str() );
+		m_bUseProxy       = atoi( inifile.GetValue("Use", "Proxy").c_str() ) ? true : false;
+		m_bUseGlobalProxy = atoi( inifile.GetValue("Use", "GlobalProxy").c_str() ) ? true : false;
 
 		m_proxyServer   = util::my_mbstowcs( inifile.GetValue("Server", "Proxy") ).c_str();
 		m_proxyPort     = atoi( inifile.GetValue("Port", "Proxy").c_str() );
@@ -41,7 +42,6 @@ void Option::Load()
 		m_proxyPassword = util::my_mbstowcs( inifile.GetValue("Password", "Proxy") ).c_str();
 
 	}
-	TRACE(_T("Proxy[%d] %s:%d\n"), m_proxyUse, m_proxyServer, m_proxyPort);
 
 	if (inifile.SectionExists("Page") != FALSE) {
 		m_GetPageType = (GETPAGE_TYPE)atoi( inifile.GetValue("GetType", "Page").c_str() );
@@ -220,6 +220,14 @@ void Option::Load()
 		// 受信バッファサイズ
 		m_recvBufSize = atoi( inifile.GetValue("RecvBufferSize", "Net").c_str() );
 
+		// 自動接続
+		std::string s = inifile.GetValue("AutoConnect", "Net");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bUseAutoConnection = atoi( s.c_str() ) != 0;
+		}
+
 		// 総データ受信量
 		m_totalRecvBytes = atoi( inifile.GetValue("TotalRecvBytes", "Net").c_str() );
 	}
@@ -240,12 +248,14 @@ void Option::Save()
 		"General" );
 
 	//--- Proxy
-	inifile.SetValue("Use", (LPCSTR)util::int2str_a(m_proxyUse), "Proxy");
+	inifile.SetValue("Use", (LPCSTR)util::int2str_a(m_bUseProxy), "Proxy");
+	inifile.SetValue("UseGlobalProxy", (LPCSTR)util::int2str_a(m_bUseGlobalProxy), "Proxy");
+
 	inifile.SetValue(L"Server", m_proxyServer, "Proxy");
 	inifile.SetValue("Port", (LPCSTR)util::int2str_a(m_proxyPort), "Proxy");
-
 	inifile.SetValue(L"User", m_proxyUser, "Proxy");
 	inifile.SetValue(L"Password", m_proxyPassword, "Proxy");
+
 	inifile.SetValue("GetType", (LPCSTR)util::int2str_a(m_GetPageType), "Page");
 	inifile.SetValue("CheckMnC", (LPCSTR)util::int2str_a(m_bBootCheckMnC), "Boot");
 
@@ -305,6 +315,9 @@ void Option::Save()
 
 	// 受信バッファサイズ
 	inifile.SetValue( "RecvBufferSize", (LPCSTR)util::int2str_a(m_recvBufSize), "Net" );
+
+	// 自動接続
+	inifile.SetValue( "AutoConnect", (LPCSTR)util::int2str_a(m_bUseAutoConnection ? 1 : 0), "Net" );
 
 	// 総データ受信量
 	inifile.SetValue( "TotalRecvBytes", (LPCSTR)util::int2str_a(m_totalRecvBytes), "Net" );

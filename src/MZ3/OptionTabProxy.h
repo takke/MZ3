@@ -35,4 +35,9 @@ private:
   CEdit m_userEdit;
   CEdit m_passwordEdit;
 
+public:
+	bool DoUpdateControlViewStatus(void);
+	afx_msg void OnBnClickedProxyUseCheck();
+	afx_msg void OnBnClickedUseGlobalProxyRadio();
+	afx_msg void OnBnClickedUseManualProxyRadio();
 };

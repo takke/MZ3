@@ -90,6 +90,7 @@
 #define IDC_USE_LOG_CHECK               1035
 #define IDC_SAVE_LOG_CHECK              1035
 #define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
+#define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
@@ -104,8 +105,9 @@
 #define IDC_FONT_LIST                   1047
 #define IDC_SCROLL_LINE_RADIO           1049
 #define IDC_SCROLL_PAGE_RADIO           1050
-#define IDC_BUTTON1                     1050
 #define IDC_CLEAN_LOG_BUTTON            1050
+#define IDC_USE_GLOBAL_PROXY_RADIO      1051
+#define IDC_USE_MANUAL_PROXY_RADIO      1052
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -277,7 +279,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        151
 #define _APS_NEXT_COMMAND_VALUE         32946
-#define _APS_NEXT_CONTROL_VALUE         1051
+#define _APS_NEXT_CONTROL_VALUE         1052
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

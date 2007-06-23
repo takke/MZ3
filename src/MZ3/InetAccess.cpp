@@ -116,13 +116,29 @@ CInetAccess::~CInetAccess()
  */
 bool CInetAccess::Open()
 {
+	// プロキシ文字列
 	CString proxy = L"";
 
+	if( theApp.m_optionMng.IsUseAutoConnection() ) {
+		// インターネット自動接続。
+		// 接続が無かったらダイアルアップ処理を行う。
+		// また、グローバルプロキシの接続先を取得する。
+		SP_EstablishInetConnProc( proxy );
+	}
 
-	if (theApp.m_optionMng.IsProxyUse() != FALSE) {
-		proxy.Format(_T("%s:%d"),
-			theApp.m_optionMng.GetProxyServer(),
-			theApp.m_optionMng.GetProxyPort());
+	if (theApp.m_optionMng.IsUseProxy() ) {
+		// プロキシ文字列を生成する
+
+		if( theApp.m_optionMng.IsUseGlobalProxy() ) {
+			// 「端末の設定を使用する」オプションが有効。
+			// SP_EstablishInetConnProc にて取得済みであるため、ここでは何もしない。
+		}else{
+			// 「手動設定」オプションが有効。
+			// ユーザ指定のサーバとポート番号からプロキシ文字列を生成する
+			proxy.Format(_T("%s:%d"),
+				theApp.m_optionMng.GetProxyServer(),
+				theApp.m_optionMng.GetProxyPort());
+		}
 	}
 
 	try {
@@ -263,28 +279,26 @@ inline bool my_append_buf( kfm::kf_buf_type& out_buf, char* pData, DWORD dwSize 
 }
 
 /**
- * コネクションチェック
+ * 自動接続。
  *
- * 接続がされていなかったらダイアルアップ処理
+ * 接続がされていなかったらダイアルアップ処理を行う。
+ * また、コネクションマネージャからプロキシ情報を取得する。
  */
-HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc()
+HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc( CString& proxy )
 {
 	CONNMGR_CONNECTIONINFO ci = {0};
 	PROXY_CONFIG pcProxy = {0};
 	DWORD dwStatus = 0;
 	DWORD dwIndex = 0;
-	HRESULT hr = S_OK; 
+	HRESULT hr = S_OK;
 	HANDLE hConnection = NULL;
-	HANDLE hOpen = NULL;
-	LPTSTR pszProxy = NULL;
-	DWORD dwAccessType;
-	DWORD dwTimeOut = 120000;  //タイムアウト値
+	DWORD dwTimeOut = 120000;	//タイムアウト値
 
 	// コネクションマネージャの初期化
-	ci.cbSize = sizeof(CONNMGR_CONNECTIONINFO); 
-	ci.dwParams = CONNMGR_PARAM_GUIDDESTNET; 
-	ci.dwFlags = CONNMGR_FLAG_PROXY_HTTP; 
-	ci.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE; 
+	ci.cbSize     = sizeof(CONNMGR_CONNECTIONINFO);
+	ci.dwParams   = CONNMGR_PARAM_GUIDDESTNET;
+	ci.dwFlags    = CONNMGR_FLAG_PROXY_HTTP;
+	ci.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE;
 
 	// URLチェック
 	hr = ConnMgrMapURL(L"http://mixi.jp", &(ci.guidDestNet), &dwIndex);
@@ -292,21 +306,18 @@ HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc()
 	// 接続処理
 	hr = ConnMgrEstablishConnectionSync(&ci, &hConnection, dwTimeOut, &dwStatus);
 
-	// 接続がされたらコネクションマネージャからプロクシ情報の取得はするが、
-	// プロクシの実装は今後要検討。（グローバルプロクシ使いたくない人も居ると思うので）
+	// コネクションマネージャからプロクシ情報を取得する
 	hr = ConnMgrProviderMessage( hConnection, &IID_ConnPrv_IProxyExtension, NULL, 0, 0, (PBYTE)&pcProxy, sizeof(pcProxy)); 
 	if (S_OK == hr)
 	{
-		dwAccessType = INTERNET_OPEN_TYPE_PROXY;
-//		pszProxy = (LPTSTR) LocalAlloc(LPTR, ARRAYSIZE(pcProxy.szProxyServer));
-//		hr = StringCchCopyN(pszProxy, ARRAYSIZE(pcProxy.szProxyServer), 
-//			pcProxy.szProxyServer, ARRAYSIZE(pcProxy.szProxyServer));
+		// 取得OK。
+		// proxy にプロキシ情報を設定する
+		proxy = pcProxy.szProxyServer;
 	}
 	else if (E_NOINTERFACE == hr)
 	{
-		//プロクシ情報がない場合はダイレクト接続
-		dwAccessType = INTERNET_OPEN_TYPE_DIRECT;
-		pszProxy = NULL;
+		// プロクシ情報がない場合はダイレクト接続
+		proxy = L"";
 		hr = S_OK;
 	}
 
@@ -327,9 +338,6 @@ HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc()
  */
 int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 {
-	// 接続確認。接続が無かったらダイアルアップ処理
-	SP_EstablishInetConnProc();
-
 	// URL 分解
 	ParseURI();
 
@@ -390,14 +398,14 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 	::InternetSetOption(m_hConnection, INTERNET_OPTION_RECEIVE_TIMEOUT, (LPVOID)timeout, sizeof(timeout));
 
 	// プロクシ設定がONの場合、IDとパスワードをセット
-	if (theApp.m_optionMng.IsProxyUse() == TRUE) {
+	if (theApp.m_optionMng.IsUseProxy() == TRUE) {
 
 		LPTSTR proxy = _T("INTERNET_OPTION_PROXY");
-		LPTSTR id    = const_cast<LPTSTR>(theApp.m_optionMng.GetProxyUser());
+		LPTSTR user  = const_cast<LPTSTR>(theApp.m_optionMng.GetProxyUser());
 		LPTSTR pass  = const_cast<LPTSTR>(theApp.m_optionMng.GetProxyPassword());
 
 		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY, proxy, sizeof(proxy));
-		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_USERNAME, id, sizeof(id));
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_USERNAME, user, sizeof(user));
 		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_PASSWORD, pass, sizeof(pass));
 	}
 
