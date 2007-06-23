@@ -111,6 +111,13 @@ void COptionTabGetPage::Load()
  */
 void COptionTabGetPage::Save()
 {
+	CString buf;
+
+	// 再接続フラグ。
+	// 状態が変化した場合に再接続を行う。
+	bool bReConnect = false;
+
+
 	// 取得種別
 	GETPAGE_TYPE type;
 	if (((CButton*)GetDlgItem(IDC_PAGE_GETALL_RADIO))->GetCheck() == BST_CHECKED) {
@@ -121,10 +128,18 @@ void COptionTabGetPage::Save()
 	}
 	theApp.m_optionMng.SetPageType(type);
 
-	// 自動接続
-	theApp.m_optionMng.SetUseAutoConnection( 
-		IsDlgButtonChecked( IDC_USE_AUTOCONNECTION_CHECK ) == BST_CHECKED ? true : false );
-
 	// 受信バッファサイズ
 	theApp.m_optionMng.SetRecvBufSize( mc_RecvBufCombo.GetItemData( mc_RecvBufCombo.GetCurSel() ) );
+
+	// 自動接続
+	bool bUseAutoConnectionUpdated = IsDlgButtonChecked( IDC_USE_AUTOCONNECTION_CHECK ) == BST_CHECKED ? true : false;
+	if( theApp.m_optionMng.IsUseAutoConnection() != bUseAutoConnectionUpdated ) {
+		bReConnect = true;
+	}
+	theApp.m_optionMng.SetUseAutoConnection( bUseAutoConnectionUpdated );
+
+	if (bReConnect) {
+		// 再接続フラグが ON なのでクローズする（再接続は必要時に行われる）
+		theApp.m_inet.CloseInternetHandles();
+	}
 }

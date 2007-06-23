@@ -108,10 +108,9 @@ void COptionTabProxy::Save()
 	theApp.m_optionMng.SetProxyPassword(buf);
 
 	if (bReConnect) {
-		// 再接続フラグが ON なので再オープン
-		theApp.m_inet.Open();
+		// 再接続フラグが ON なのでクローズする（再接続は必要時に行われる）
+		theApp.m_inet.CloseInternetHandles();
 	}
-
 }
 
 BOOL COptionTabProxy::OnInitDialog()
