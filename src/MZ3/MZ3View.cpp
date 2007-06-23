@@ -242,7 +242,7 @@ void CMZ3View::OnInitialUpdate()
 	OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 
 	// インターネット回線を開く
-	theApp.m_inet.Open();
+//	theApp.m_inet.Open();
 
 	m_login = FALSE;
 	m_access = FALSE;

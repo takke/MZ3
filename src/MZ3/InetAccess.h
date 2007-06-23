@@ -75,6 +75,7 @@ public:
 	virtual ~CInetAccess();
 
 	bool Open();
+	void CloseInternetHandles();
 
 	LPCTSTR	GetURL()			{ return m_uri; }
 
@@ -110,9 +111,6 @@ private:
 
 	int ExecSendRecv( EXEC_SENDRECV_TYPE execType );
 
-	void CloseInternetHandles();
-
-	//2007/06/18 ‚¢‚Á‚¿‚ã‚¤’Ç‰Á
 	HRESULT WINAPI SP_EstablishInetConnProc( CString& proxy );
 };
 
