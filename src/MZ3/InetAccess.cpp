@@ -18,6 +18,9 @@
 #include <connmgr_proxy.h>
 #define ARRAYSIZE( a ) (sizeof( a )/sizeof(a[0]) )
 
+#define SZ_REG_CONNECTION_ROOT TEXT("System\\State\\Connections")
+#define SZ_REG_CONNECTION_DBVOL TEXT("Count") 
+
 // CInetAccess
 
 /**
@@ -350,6 +353,32 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			m_strErrorMsg = L"接続エラー(InternetOpen)";
 			return WM_MZ3_GET_ERROR;
 		}
+  }else{
+    //自動接続がONの場合接続状態をチェック
+	  if( theApp.m_optionMng.IsUseAutoConnection() ) {
+		  HKEY  hKey = NULL;
+		  DWORD dwConnect;	// Connectionのステータス
+		  DWORD dwType;			// 値の種類を受け取る
+		  DWORD dwSize;			// データのサイズを受け取る
+
+		  // レジストリをオープン
+		  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_CONNECTION_ROOT,0,KEY_READ,&hKey) == 0) 
+		  { 
+			  RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,NULL,&dwSize);
+			  RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,(LPBYTE)&dwConnect,&dwSize);
+
+			  // 接続が切断されていればクローズ後、再オープン
+        if (dwConnect == 0)
+        {
+          //クローズ
+			    CloseInternetHandles();
+          //オープン
+          Open();
+        }
+			  //レジストリのクローズ
+			  RegCloseKey(hKey);
+		  }    
+    }
 	}
 
 	try {
