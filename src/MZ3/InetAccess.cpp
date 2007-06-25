@@ -333,6 +333,36 @@ HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc( CString& proxy )
 }
 
 /**
+ * ネットワークの接続状態を確認する。
+ *
+ * @return 接続：true、切断：false
+ */
+bool CInetAccess::IsNetworkConnected()
+{
+	// 切断されていればクローズ後、再オープン
+	HKEY  hKey = NULL;
+	DWORD dwConnect=0;		// Connectionのステータス
+	DWORD dwType;			// 値の種類を受け取る
+	DWORD dwSize;			// データのサイズを受け取る
+
+	// レジストリをオープン
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_CONNECTION_ROOT,0,KEY_READ,&hKey) == 0) 
+	{ 
+		RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,NULL,&dwSize);
+		RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,(LPBYTE)&dwConnect,&dwSize);
+
+		// レジストリのクローズ
+		RegCloseKey(hKey);
+
+		// dwConnect>0 であれば接続状態
+		return (dwConnect > 0) ? true : false;
+	}else{
+		// レジストリエントリがなければ切断状態と判断する
+		return false;
+	}
+}
+
+/**
  * 送受信処理を行う。
  *
  * GET メソッドまたは POST メソッドで通信を行う。
@@ -351,34 +381,25 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		// 接続処理を行う
 		if( !Open() ) {
 			m_strErrorMsg = L"接続エラー(InternetOpen)";
+			MZ3LOGGER_ERROR( m_strErrorMsg );
 			return WM_MZ3_GET_ERROR;
 		}
-  }else{
-    //自動接続がONの場合接続状態をチェック
-	  if( theApp.m_optionMng.IsUseAutoConnection() ) {
-		  HKEY  hKey = NULL;
-		  DWORD dwConnect;	// Connectionのステータス
-		  DWORD dwType;			// 値の種類を受け取る
-		  DWORD dwSize;			// データのサイズを受け取る
-
-		  // レジストリをオープン
-		  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_CONNECTION_ROOT,0,KEY_READ,&hKey) == 0) 
-		  { 
-			  RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,NULL,&dwSize);
-			  RegQueryValueEx(hKey,SZ_REG_CONNECTION_DBVOL,NULL,&dwType,(LPBYTE)&dwConnect,&dwSize);
-
-			  // 接続が切断されていればクローズ後、再オープン
-        if (dwConnect == 0)
-        {
-          //クローズ
-			    CloseInternetHandles();
-          //オープン
-          Open();
-        }
-			  //レジストリのクローズ
-			  RegCloseKey(hKey);
-		  }    
-    }
+	}else{
+		// 自動接続がONの場合、接続状態をチェックする。
+		// 何らかの理由で切断されている場合、再接続を行う。
+		if( theApp.m_optionMng.IsUseAutoConnection() ) {
+			// 切断されていればクローズ後、再オープン
+			if( !IsNetworkConnected() ) {
+				// クローズ
+				CloseInternetHandles();
+				// オープン
+				if( !Open() ) {
+					m_strErrorMsg = L"接続エラー(InternetOpen,2)";
+					MZ3LOGGER_ERROR( m_strErrorMsg );
+					return WM_MZ3_GET_ERROR;
+				}
+			}
+		}
 	}
 
 	try {

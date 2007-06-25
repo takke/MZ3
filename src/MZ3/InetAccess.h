@@ -76,6 +76,7 @@ public:
 
 	bool Open();
 	void CloseInternetHandles();
+	bool IsNetworkConnected();
 
 	LPCTSTR	GetURL()			{ return m_uri; }
 
