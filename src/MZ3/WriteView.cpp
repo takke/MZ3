@@ -453,6 +453,10 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
 	if (html.IsPostSucceeded(m_writeViewType) != FALSE) {
+#ifdef	MZ3_DEBUG
+		// only for Release_MZ3 configuration
+		DumpToTemporaryDraftFile();
+#endif
 		if (m_abort == FALSE) {
 			switch (m_writeViewType ) {
 			case WRITEVIEW_TYPE_REPLYMESSAGE:
@@ -491,7 +495,17 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	else {
-		::MessageBox(m_hWnd, L"投稿に失敗しました", L"MZ3", MB_OK);
+		LPCTSTR msg = L"投稿に失敗しました";
+		util::MySetInformationText( m_hWnd, msg );
+
+		CString s;
+		s.Format( 
+			L"%s\n\n"
+			L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
+		::MessageBox(m_hWnd, s, L"MZ3", MB_ICONERROR);
+
+		// 失敗したのでダンプする
+		DumpToTemporaryDraftFile();
 
 		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
 		m_sendButton.EnableWindow(TRUE);
@@ -503,6 +517,33 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	m_access = FALSE;
 
 	return LRESULT();
+}
+
+/**
+ * 書き込み内容をダンプする
+ */
+bool CWriteView::DumpToTemporaryDraftFile()
+{
+	FILE* fp = _wfopen( theApp.m_filepath.tempdraftfile, L"w" );
+
+	if( fp == NULL ) {
+		MZ3LOGGER_FATAL( L"ダンプファイルオープン失敗" );
+		return false;
+	}
+
+	// 1行目：タイトル
+	CString title;
+	GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
+	fwprintf( fp, L"%s\n", title );
+
+	// 2行目以降：本文
+	CString msg;
+	GetDlgItemText( IDC_WRITE_BODY_EDIT, msg );
+	fwprintf( fp, L"%s\n", msg );
+
+	fclose( fp );
+
+	return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -692,7 +733,15 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 			LPCTSTR msg = L"投稿に失敗しました";
 			util::MySetInformationText( m_hWnd, msg );
-			::MessageBox(m_hWnd, msg, L"MZ3", MB_ICONERROR);
+
+			CString s;
+			s.Format( 
+				L"%s\n\n"
+				L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
+			::MessageBox(m_hWnd, s, L"MZ3", MB_ICONERROR);
+
+			// 失敗したのでダンプする
+			DumpToTemporaryDraftFile();
 
 			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
 			return LRESULT();
