@@ -91,7 +91,10 @@ public:
 
 	/// ’†’f
 	inline void Abort() 
-	{ 
+	{
+		if( m_abort ) 
+			return;
+
 		m_abort = TRUE;
 		::Sleep(100);
 

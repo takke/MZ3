@@ -54,6 +54,7 @@ public:
 		CString		groupfile;		///< グループ定義ファイル（INIファイル）のパス
 		CString		helpfile;		///< Readme.txt のパス
 		CString		historyfile;	///< ChangeLog.txt のパス
+		CString		tempdraftfile;	///< 書き込み失敗時の下書きファイル
 
 		CString		groupBgImage;	///< グループリスト背景画像のパス
 		CString		categoryBgImage;///< カテゴリリスト背景画像のパス
