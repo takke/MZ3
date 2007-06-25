@@ -107,6 +107,9 @@ public:
 	afx_msg void OnPreviewAttachedPhoto1();
 	afx_msg void OnPreviewAttachedPhoto2();
 	afx_msg void OnPreviewAttachedPhoto3();
+
+private:
+	bool DumpToTemporaryDraftFile();
 };
 
 

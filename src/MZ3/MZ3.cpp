@@ -435,6 +435,9 @@ void CMZ3App::FilePath::init()
 	// ChangeLog.txt のパス
 	historyfile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("ChangeLog.txt"));
 
+	// temp_draftfile.txt のパス
+	tempdraftfile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("temp_draftfile.txt"));
+
 	// グループリスト背景画像のパス
 	groupBgImage.Format( L"%s\\skin\\group.jpg", theApp.GetAppDirPath() );
 
