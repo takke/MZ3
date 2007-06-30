@@ -54,12 +54,59 @@ public:
 			return false;
 		}
 
+		// ローテート
+		rotate( strLogfilePath );
+
+		// オープン
 		m_fp = _wfopen( strLogfilePath, L"a+t" );
 		if( m_fp == NULL ) {
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * 日毎のローテートを行う
+	 */
+	void rotate( LPCTSTR strLogfilePath ) {
+		// ファイルの作成日付がシステム日付と異なれば削除する
+
+		// ファイルの情報を取得する
+		HANDLE hFile = CreateFile( strLogfilePath, 
+			GENERIC_READ, 
+			FILE_SHARE_READ, 
+			NULL, 
+			OPEN_EXISTING, 
+			FILE_ATTRIBUTE_NORMAL, NULL );
+		if( hFile == NULL ) {
+			// file not found.
+			return;
+		}
+
+		FILETIME ft;
+		if( GetFileTime( hFile, &ft, NULL, NULL ) == FALSE ) {
+			return;
+		}
+		CloseHandle( hFile );
+
+		// 時刻変換
+		SYSTEMTIME stFile, stSystem;
+		if( FileTimeToSystemTime( &ft, &stFile ) == FALSE ) {
+			return;
+		}
+
+		// システム時刻取得
+		GetLocalTime( &stSystem );
+
+		// 比較
+		if( stFile.wYear  != stSystem.wYear  ||
+			stFile.wMonth != stSystem.wMonth ||
+			stFile.wDay   != stSystem.wDay   )
+		{
+			// 日付が異なるので削除
+			DeleteFile( strLogfilePath );
+		}		
 	}
 
 	/**
