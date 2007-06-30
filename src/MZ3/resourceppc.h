@@ -92,6 +92,8 @@
 #define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
+#define IDC_SAVE_LOG_CHECK2             1036
+#define IDC_DEBUG_MODE_CHECK            1036
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
 #define IDC_TYPE_LIST                   1038

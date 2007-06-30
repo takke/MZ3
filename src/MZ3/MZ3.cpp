@@ -134,6 +134,11 @@ BOOL CMZ3App::InitInstance()
 	// オプション読み込み
 	m_optionMng.Load();
 
+	// デバッグモードならログレベル変更
+	if( m_optionMng.IsDebugMode() ) {
+		m_logger.setLogLevel( CSimpleLogger::CATEGORY_DEBUG );
+	}
+
 	// オプションによってファイルパス群を再生成
 	m_filepath.init_logpath();
 

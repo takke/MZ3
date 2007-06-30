@@ -120,8 +120,10 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath
 
 	// 保存先変更画面の表示
 	TCHAR szFileName[256] = L"";
-	wcsncpy( szFileName, theApp.m_filepath.logFolder, 255 );
-	int rc = FolderTree (hWnd, _T("ログフォルダの変更"), szFileName);
+	wcsncpy( szFileName, szFolderPath, 255 );
+	TCHAR szTitleBuf[256] = L"";
+	wcsncpy( szTitleBuf, szTitle, 255 );
+	int rc = FolderTree (hWnd, szTitleBuf, szFileName);
 	FreeLibrary (hInst);
 
 	if( rc == IDOK && util::ExistFile(szFileName) ) {

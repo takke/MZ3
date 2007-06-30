@@ -214,6 +214,14 @@ void Option::Load()
 
 		// ログフォルダ
 		m_logFolder = inifile.GetValue("LogFolder", "Log").c_str();
+
+		// デバッグモード フラグ
+		s = inifile.GetValue( "DebugMode", "Log" );
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bDebugMode = (s == "1");
+		}
 	}
 
 	if (inifile.SectionExists("Net") != FALSE) {
@@ -312,6 +320,9 @@ void Option::Save()
 
 	// 保存先フォルダ
 	inifile.SetValue( L"LogFolder", m_logFolder, "Log");
+
+	// デバッグモード
+	inifile.SetValue( "DebugMode", m_bDebugMode ? "1" : "0", "Log" );
 
 	// 受信バッファサイズ
 	inifile.SetValue( "RecvBufferSize", (LPCSTR)util::int2str_a(m_recvBufSize), "Net" );

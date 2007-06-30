@@ -70,17 +70,7 @@ public:
 	/// POST のボディ部に ANSI 文字列を追加する。
 	void AppendPostBody( const char* str ) {
 
-		int len = strlen(str);
-		if( len>0 ) {
-			// 元のサイズ
-			size_t n = m_postBody.size();
-
-			// 末尾に追加できるだけのバッファを確保
-			m_postBody.resize( n+len );
-
-			// 末尾にコピー
-			memcpy( &m_postBody[0] +n, str, len );
-		}
+		AppendPostBody( str, strlen(str) );
 	}
 
 	/// POST のボディ部に char 配列を追加する。
@@ -95,6 +85,9 @@ public:
 
 			// 末尾にコピー
 			memcpy( &m_postBody[0] +n, str, len );
+
+			// 末尾に '\0' を付加
+//			m_postBody[n+len] = '\0';
 		}
 	}
 

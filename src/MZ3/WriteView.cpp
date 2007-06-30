@@ -14,6 +14,8 @@
 #include "PostDataGenerator.h"
 #include "MixiParser.h"
 
+#define GENERATE_POSTMSG_FAILED_MESSAGE L"送信データの作成に失敗しました"
+
 // CWriteView
 
 IMPLEMENT_DYNCREATE(CWriteView, CFormView)
@@ -214,7 +216,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 	m_infoEdit.ShowWindow(SW_SHOW);
 
 	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-		// OwnerIDが未取得なので、ログインし、取得する
+		MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する" );
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
 		theApp.m_accessType = ACCESS_LOGIN;
@@ -300,13 +302,14 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 
 	// 確認画面の解析
 	if( html.GetPostConfirmData(m_postData) == false ) {
-		MessageBox( 
+		CString msg = 
 			L"エラーが発生しました\r\n"
 			L"確認画面にエラー内容が表示されていますが、"
 			L"本バージョンのMZ3ではエラー内容を表示できません・・・\r\n"
 			L"お手数ですが、下記ファイルを直接解析してくださいm(_ _)m\r\n"
-			+ strConfirmTempFile
-			);
+			+ strConfirmTempFile;
+		MessageBox( msg );
+		MZ3LOGGER_ERROR( msg );
 		return 0;
 	}
 
@@ -321,6 +324,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
  */
 void CWriteView::StartEntryPost() 
 {
+
 	// 中断確認
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
@@ -336,7 +340,7 @@ void CWriteView::StartEntryPost()
 		{
 			// 電文の生成
 			if( !mixi::EntryCommentGenerator::generate( *m_postData, *m_data ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -366,7 +370,7 @@ void CWriteView::StartEntryPost()
 
 			// 電文の生成
 			if( !mixi::EntryDiaryGenerator::generate( *m_postData, title ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -383,7 +387,7 @@ void CWriteView::StartEntryPost()
 
 			// 電文の生成
 			if( !mixi::EntryReplyMessageGenerator::generate( *m_postData, title ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -401,7 +405,7 @@ void CWriteView::StartEntryPost()
 
 			// 電文の生成
 			if( !mixi::EntryNewMessageGenerator::generate( *m_postData, title ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -495,8 +499,10 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		}
 	}
 	else {
-		LPCTSTR msg = L"投稿に失敗しました";
+		LPCTSTR msg = L"投稿に失敗しました(1)";
 		util::MySetInformationText( m_hWnd, msg );
+
+		MZ3LOGGER_ERROR( msg );
 
 		CString s;
 		s.Format( 
@@ -731,8 +737,10 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		mixi::HomeParser::parse( html );
 
 		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-			LPCTSTR msg = L"投稿に失敗しました";
+			LPCTSTR msg = L"投稿に失敗しました(2)";
 			util::MySetInformationText( m_hWnd, msg );
+
+			MZ3LOGGER_ERROR( msg );
 
 			CString s;
 			s.Format( 
@@ -1040,7 +1048,7 @@ void CWriteView::StartConfirmPost( CString wmsg )
 			if( !mixi::PostCommentGenerator::generate( *m_postData, *m_data, euc_msg, 
 													   m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) ) 
 			{
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -1056,7 +1064,7 @@ void CWriteView::StartConfirmPost( CString wmsg )
 			if( !mixi::PostDiaryGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
 													 m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
 			{
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -1070,7 +1078,7 @@ void CWriteView::StartConfirmPost( CString wmsg )
 		{
 			// 電文生成
 			if( !mixi::PostReplyMessageGenerator::generate( *m_postData, euc_msg ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -1096,7 +1104,7 @@ void CWriteView::StartConfirmPost( CString wmsg )
 		{
 			// 電文生成
 			if( !mixi::PostNewMessageGenerator::generate( *m_postData, euc_msg ) ) {
-				MessageBox( L"送信データの作成に失敗しました" );
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
 
@@ -1150,11 +1158,15 @@ void CWriteView::StartConfirmPost( CString wmsg )
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE );
 
+	// リファラ設定
+//	LPCTSTR refUrl = L"";
+	LPCTSTR refUrl = m_data->GetURL();
+
 	// 通信開始
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 	theApp.m_inet.DoPost(
 		url, 
-		L"", 
+		refUrl, 
 		CInetAccess::FILE_HTML, 
 		m_postData );
 }

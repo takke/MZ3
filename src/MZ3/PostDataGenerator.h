@@ -206,8 +206,6 @@ public:
 			break;
 		}
 
-    //MZ3LOGGER_DEBUG( post.GetPostKey() );
-
 		// Content-Type Çê›íËÇ∑ÇÈ
 		// Content-Type: application/x-www-form-urlencoded
 		post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );

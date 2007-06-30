@@ -22,6 +22,7 @@ inline int normalizeRange( int value, int minv, int maxv )
 class Option
 {
 private:
+	bool			m_bDebugMode;			///< デバッグモード
 	bool			m_bUseAutoConnection;	///< 自動接続を使う？
 	bool			m_bUseProxy;			///< プロキシを使う？
 	bool			m_bUseGlobalProxy;		///< グローバルプロキシを使う？
@@ -111,6 +112,7 @@ public:
 		, m_reportScrollType( REPORT_SCROLL_TYPE_PAGE )
 		, m_reportScrollLine( 7 )
 		, m_bConvertUrlForMixiMobile( true )
+		, m_bDebugMode( false )
 	{
 	}
 
@@ -123,6 +125,9 @@ public:
 
 	void SetUseProxy(bool value) { m_bUseProxy = value; }
 	bool IsUseProxy() { return m_bUseProxy; }
+	
+	void SetDebugMode(bool value) { m_bDebugMode = value; }
+	bool IsDebugMode() { return m_bDebugMode; }
 	
 	void SetUseGlobalProxy(bool value) { m_bUseGlobalProxy = value; }
 	bool IsUseGlobalProxy() { return m_bUseGlobalProxy; }

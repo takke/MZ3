@@ -30,4 +30,5 @@ private:
 	afx_msg void OnBnClickedChangeLogFolderButton();
 public:
 	afx_msg void OnBnClickedCleanLogButton();
+	afx_msg void OnBnClickedDebugModeCheck();
 };

@@ -30,6 +30,7 @@ void COptionTabLog::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(COptionTabLog, CPropertyPage)
 	ON_BN_CLICKED(IDC_CHANGE_LOG_FOLDER_BUTTON, &COptionTabLog::OnBnClickedChangeLogFolderButton)
 	ON_BN_CLICKED(IDC_CLEAN_LOG_BUTTON, &COptionTabLog::OnBnClickedCleanLogButton)
+	ON_BN_CLICKED(IDC_DEBUG_MODE_CHECK, &COptionTabLog::OnBnClickedDebugModeCheck)
 END_MESSAGE_MAP()
 
 
@@ -62,6 +63,9 @@ void COptionTabLog::Load()
 
 	// ログのパス
 	SetDlgItemText( IDC_LOGFOLDER_EDIT, theApp.m_optionMng.GetLogFolder() );
+
+	// デバッグモード
+	CheckDlgButton( IDC_DEBUG_MODE_CHECK, theApp.m_optionMng.IsDebugMode() ? BST_CHECKED : BST_UNCHECKED );
 }
 
 /**
@@ -81,6 +85,9 @@ void COptionTabLog::Save()
 
 	// 各種パスの再生成
 	theApp.m_filepath.init_logpath();
+
+	// デバッグモード
+	theApp.m_optionMng.SetDebugMode( IsDlgButtonChecked( IDC_DEBUG_MODE_CHECK ) == BST_CHECKED );
 }
 
 /**
@@ -181,4 +188,9 @@ void COptionTabLog::OnBnClickedCleanLogButton()
 		L"%d 個のファイルを削除しました。\n"
 		L"（対象ファイル：%d 個）", nDeleted, nFiles );
 	MessageBox( msg );
+}
+
+void COptionTabLog::OnBnClickedDebugModeCheck()
+{
+	MessageBox( L"デバッグモードの変更は再起動後に反映されます" );
 }

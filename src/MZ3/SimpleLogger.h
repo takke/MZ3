@@ -71,6 +71,13 @@ public:
 	}
 
 	/**
+	 * ログレベルの取得
+	 */
+	CATEGORY getLogLevel() {
+		return m_level;
+	}
+
+	/**
 	 * ログ出力終了
 	 */
 	bool finish() {
@@ -123,6 +130,13 @@ public:
 		if( m_level < CATEGORY_TRACE ) 
 			return false;
 		return outputMessage( CATEGORY_TRACE, message, strSourceFilename, line );
+	}
+
+	/**
+	 * DEBUG 有効？
+	 */
+	bool isDebugEnabled() {
+		return m_level >= CATEGORY_DEBUG;
 	}
 
 private:
