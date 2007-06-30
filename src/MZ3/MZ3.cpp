@@ -129,7 +129,7 @@ BOOL CMZ3App::InitInstance()
 #endif
 #endif
 
-	MZ3LOGGER_INFO( L"MZ3 起動開始" );
+	MZ3LOGGER_INFO( L"MZ3 起動開始 " + util::GetSourceRevision() );
 
 	// オプション読み込み
 	m_optionMng.Load();

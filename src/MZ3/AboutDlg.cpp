@@ -45,12 +45,9 @@ void CAboutDlg::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 	// バージョン番号
 	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
 		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
-		CString rev = MZ3_SVN_REVISION;	// $Rev: xx $
-		rev.Replace( L"$Rev: ", L" [" );
-		rev.Replace( L" $", L"]" );
 
 		CString version = MZ3_VERSION_TEXT;
-		version += rev;
+		version += util::GetSourceRevision();
 		item->SetWindowTextW( version );
 	}
 

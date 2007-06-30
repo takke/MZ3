@@ -85,9 +85,6 @@ public:
 
 			// 末尾にコピー
 			memcpy( &m_postBody[0] +n, str, len );
-
-			// 末尾に '\0' を付加
-//			m_postBody[n+len] = '\0';
 		}
 	}
 

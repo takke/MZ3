@@ -622,8 +622,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	if (lParam == NULL) {
 		// データがＮＵＬＬの場合
-		TRACE(_T("アクセス戻りデータＮＵＬＬ\n"));
-		util::MySetInformationText( m_hWnd, L"内部エラーが発生しました(戻り値＝NULL)" );
+		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
+		MZ3LOGGER_ERROR( msg );
+		util::MySetInformationText( m_hWnd, msg );
 		return LRESULT();
 	}
 
@@ -691,15 +692,18 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				return LRESULT();
 			} else {
 				// ログイン失敗
-				::MessageBox(m_hWnd, _T("ログイン出来ませんでした"), _T("MZ3"), MB_ICONSTOP | MB_OK);
+				LPCTSTR emsg = _T("ログイン出来ませんでした");
+				::MessageBox(m_hWnd, emsg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+				MZ3LOGGER_ERROR( emsg );
 
 				// データを待避データに戻す
 				*data = theApp.m_mixiBeforeRelogin;
 
 				m_access = FALSE;
+
 				// プログレスバーを非表示
 				mc_progressBar.ShowWindow( SW_HIDE );
-				util::MySetInformationText( m_hWnd, _T("ログイン出来ませんでした") );
+				util::MySetInformationText( m_hWnd, emsg );
 				return LRESULT();
 			}
 			break;
@@ -930,6 +934,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 		L"%s\n\n"
 		L"原因：%s", smsg, theApp.m_inet.GetErrorMessage() );
 	::MessageBox(m_hWnd, msg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+
+	MZ3LOGGER_ERROR( msg );
 
 	m_access = FALSE;
 

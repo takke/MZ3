@@ -155,13 +155,15 @@ bool CInetAccess::Open()
 		m_hInternet = NULL;
 
 		// エラー発生
-		MessageBox( NULL, L"エラー発生", 0, MB_OK );
+		m_strErrorMsg = L"エラー発生";
+		MessageBox( NULL, m_strErrorMsg, 0, MB_OK );
+		MZ3LOGGER_ERROR( m_strErrorMsg );
 		return false;
 	}
 	if( m_hInternet == NULL ) {
-		CString msg;
-		msg.Format( L"エラー発生 (%d)", GetLastError() );
-		MessageBox( NULL, msg, 0, MB_OK );
+		m_strErrorMsg.Format( L"エラー発生 (%d)", GetLastError() );
+		MessageBox( NULL, m_strErrorMsg, 0, MB_OK );
+		MZ3LOGGER_ERROR( m_strErrorMsg );
 		return false;
 	}
 
@@ -428,6 +430,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		CloseInternetHandles();
 		if (m_abort == FALSE) {
 			m_strErrorMsg = L"例外発生(InternetConnect)";
+			MZ3LOGGER_ERROR( m_strErrorMsg );
 			return WM_MZ3_GET_ERROR;
 		}else{
 			return WM_MZ3_GET_ABORT;
@@ -439,6 +442,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		// m_hRequest, m_hConnection を閉じる。
 		CloseInternetHandles();
 		m_strErrorMsg = L"コネクションなし";
+		MZ3LOGGER_ERROR( m_strErrorMsg );
 		return WM_MZ3_GET_ERROR;
 	}
 
@@ -499,6 +503,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		CloseInternetHandles();
 		if (m_abort == FALSE) {
 			m_strErrorMsg = L"例外発生(HttpOpenRequest)";
+			MZ3LOGGER_ERROR( m_strErrorMsg );
 			return WM_MZ3_GET_ERROR;
 		}
 		else {
@@ -510,6 +515,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		// m_hRequest, m_hConnection を閉じる。
 		CloseInternetHandles();
 		m_strErrorMsg = L"リクエスト失敗（オープン）";
+		MZ3LOGGER_ERROR( m_strErrorMsg );
 		return WM_MZ3_GET_ERROR;
 	}
 
@@ -529,7 +535,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		util::MySetInformationText( m_hwnd, _T("リクエスト送信中") );
 
 		// logging
-		if( theApp.m_logger.getLogLevel() >= CSimpleLogger::CATEGORY_DEBUG ) {
+		if( theApp.m_logger.isDebugEnabled() ) {
 			CString msg;
 			msg.Format( L"url : %s", m_strPath );
 
@@ -563,6 +569,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 				// m_hRequest, m_hConnection を閉じる。
 				CloseInternetHandles();
 				m_strErrorMsg = L"リクエスト送信失敗";
+				MZ3LOGGER_ERROR( m_strErrorMsg );
 				return WM_MZ3_GET_ERROR;
 			}
 		}
@@ -571,6 +578,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			CloseInternetHandles();
 			if (m_abort == FALSE) {
 				m_strErrorMsg = L"例外発生(HttpSendRequest)";
+				MZ3LOGGER_ERROR( m_strErrorMsg );
 				return WM_MZ3_GET_ERROR;
 			}
 			else {
@@ -587,7 +595,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		CPostData::post_array& buf = m_postData->GetPostBody();
 
 		// logging
-		if( theApp.m_logger.getLogLevel() >= CSimpleLogger::CATEGORY_DEBUG ) {
+		if( theApp.m_logger.isDebugEnabled() ) {
 			CString msg;
 			msg.Format( L"url : %s", m_strPath );
 			MZ3LOGGER_DEBUG( msg );
