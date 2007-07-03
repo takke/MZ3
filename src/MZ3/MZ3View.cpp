@@ -19,6 +19,9 @@
 #define new DEBUG_NEW
 #endif
 
+/// 長押し判定時間
+#define LONG_RETURN_RANGE_MSEC	500
+
 /**
  * リストコントロールのフォーカス状態と選択状態を設定する。
  */
@@ -195,6 +198,7 @@ END_MESSAGE_MAP()
  */
 CMZ3View::CMZ3View()
 	: CFormView(CMZ3View::IDD)
+	, m_dwLastReturn( 0 )
 {
 	m_preCategory = 0;
 
@@ -1614,6 +1618,26 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		// アクセス中は再アクセス不可
 		if( m_access ) return TRUE;
 
+		if( m_dwLastReturn != 0 ) {
+			if( GetTickCount() < m_dwLastReturn + LONG_RETURN_RANGE_MSEC ) {
+				// 長押し判定時間内に離されたので、通常押下とみなす。
+
+				// キー押下時刻をクリアしておく。
+				m_dwLastReturn = 0;
+			}else{
+				// 長押し判定時間以上経っているので、ログを開く
+
+				// ログを開く
+				OnViewLog();
+
+				// キー押下時刻をクリアしておく。
+				m_dwLastReturn = 0;
+
+				// ここでは終了。
+				return TRUE;
+			}
+		}
+
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
 			// メニュー表示
@@ -1666,6 +1690,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			break;
 		}
 		return TRUE;
+
 	case VK_BACK:
 		if( m_access ) {
 			// アクセス中は無視
@@ -1673,8 +1698,40 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 		// 非アクセス中は、カテゴリリストに移動する
 		return CommandSetFocusCategoryList();
+
+	case VK_PROCESSKEY:	// 0xE5
+		// W-ZERO3 で RETURN キー押下時に飛んでくるキー。
+		// m_dwLastReturn を更新しておく。
+		m_dwLastReturn = GetTickCount();
+
+		// 長押し判定用スレッドを開始
+		AfxBeginThread( LongReturnKey_Thread, this );
+		break;
 	}
 	return FALSE;
+}
+
+/**
+ * 長押し判定用スレッド
+ */
+unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
+{
+	CMZ3View* pView = (CMZ3View*)This;
+
+	// 長押し判定時間分、Sleep する。
+	Sleep( LONG_RETURN_RANGE_MSEC );
+
+	if( pView->m_dwLastReturn != 0 ) {
+		// まだ VK_RETURN が来ていないので、ログを開く
+		// のはボタンリリース時で、ここではメッセージのみ変更しておく。
+		util::MySetInformationText( pView->GetSafeHwnd(), L"ログを開きます..." );
+
+		// W-ZERO3 の場合は、VK_PROCESSKEY 押下からの経過時間で長押し判定
+	}else{
+		// 既に VK_RETURN が来ているので、何もしない。
+	}
+
+	return 0;
 }
 
 /**
@@ -2004,6 +2061,17 @@ void CMZ3View::OnViewLog()
 {
 	CMixiData& mixi = GetSelectedBodyItem();
 	CString strLogfilePath = util::MakeLogfilePath( mixi );
+
+	// ファイル存在確認
+	if(! util::ExistFile( strLogfilePath ) ) {
+		// FILE NOT FOUND.
+		CString msg = L"ログファイルがありません : " + strLogfilePath;
+		MZ3LOGGER_INFO( msg );
+
+		util::MySetInformationText( m_hWnd, msg );
+		
+		return;
+	}
 
 	MyParseMixiHtml( strLogfilePath, mixi );
 	MyShowReportView( mixi );
@@ -2840,6 +2908,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 		return true;
 	}
 }
+
 void CMZ3View::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 {
 	CFormView::OnSettingChange(uFlags, lpszSection);

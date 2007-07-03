@@ -186,6 +186,9 @@ private:
 
 	CPostData*		m_postData;
 
+	/// RETURN ÉLÅ[Çâüâ∫ÇµÇΩéûçè
+	DWORD			m_dwLastReturn;
+
 	afx_msg void OnEnSetfocusInfoEdit();
 	afx_msg void OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -210,9 +213,10 @@ private:
 private:
 	static unsigned int Initialize_Thread( LPVOID This );
 	static unsigned int ReloadGroupTab_Thread( LPVOID This );
+	static unsigned int LongReturnKey_Thread( LPVOID This );
 
 	bool DoInitialize();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+//	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnViewLog();
 	void MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi);
 	void MyShowReportView(CMixiData& mixi);
