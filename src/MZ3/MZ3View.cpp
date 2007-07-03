@@ -20,7 +20,7 @@
 #endif
 
 /// 長押し判定時間
-#define LONG_RETURN_RANGE_MSEC	500
+#define LONG_RETURN_RANGE_MSEC	400
 
 /**
  * リストコントロールのフォーカス状態と選択状態を設定する。
