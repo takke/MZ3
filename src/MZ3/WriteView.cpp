@@ -355,8 +355,8 @@ void CWriteView::StartEntryPost()
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
 				url.Format( L"http://mixi.jp/%s&owner_id=%d", m_data->GetPostAddress(), m_data->GetOwnerID());
-			  //2007/06/21　いっちゅう　リファラー追加
-				refUrl.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
+        //リファラ設定したら投稿で止まるようになったので保留
+				//refUrl.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
 				break;
 			}
 		}
@@ -1159,8 +1159,9 @@ void CWriteView::StartConfirmPost( CString wmsg )
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE );
 
 	// リファラ設定
-//	LPCTSTR refUrl = L"";
-	LPCTSTR refUrl = m_data->GetURL();
+	LPCTSTR refUrl = L"";
+  //リファラ設定したら投稿で止まるようになったので保留
+	//LPCTSTR refUrl = m_data->GetURL();
 
 	// 通信開始
 	theApp.m_inet.Initialize( m_hWnd, NULL );
