@@ -968,6 +968,8 @@ class ListNewsCategoryParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListNewsCategoryParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -1133,6 +1135,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListNewsCategoryParser.parse() finished." );
 		return true;
 	}
 
@@ -1165,6 +1168,8 @@ class ListBookmarkParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListBookmarkParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -1216,6 +1221,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListBookmarkParser.parse() finished." );
 		return true;
 	}
 
@@ -1381,6 +1387,8 @@ class ListFriendParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListFriendParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -1447,6 +1455,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListFriendParser.parse() finished." );
 		return true;
 	}
 
@@ -1627,6 +1636,8 @@ class ListCommunityParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListCommunityParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -1693,6 +1704,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListCommunityParser.parse() finished." );
 		return true;
 	}
 
@@ -1863,6 +1875,8 @@ class ShowIntroParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ShowIntroParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -1919,6 +1933,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ShowIntroParser.parse() finished." );
 		return true;
 	}
 
@@ -2081,6 +2096,8 @@ class ListBbsParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListBbsParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -2227,6 +2244,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListBbsParser.parse() finished." );
 		return true;
 	}
 
@@ -2256,6 +2274,8 @@ class ViewNewsParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ViewNewsParser.parse() start." );
+
 		data_.ClearAllList();
 
 		INT_PTR count = html_.GetCount();
@@ -2304,6 +2324,8 @@ public:
 
 			ParserUtil::AddBodyWithExtract( data_, str );
 		}
+
+		MZ3LOGGER_DEBUG( L"ViewNewsParser.parse() finished." );
 		return true;
 	}
 
@@ -2317,6 +2339,8 @@ class ViewDiaryParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ViewDiaryParser.parse() start." );
+
 		data_.ClearAllList();
 
 		INT_PTR count = html_.GetCount();
@@ -2519,6 +2543,7 @@ public:
 			}
 		}
 
+		MZ3LOGGER_DEBUG( L"ViewDiaryParser.parse() finished." );
 		return true;
 	}
 
@@ -2697,6 +2722,8 @@ class NewBbsParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"NewBbsParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		// 「次」、「前」のリンク
@@ -2801,6 +2828,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"NewBbsParser.parse() finished." );
 		return true;
 	}
 
@@ -2838,6 +2866,8 @@ class ListMessageParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListMessageParser.parse() start." );
+
 		// 「次」、「前」のリンク
 		CMixiData backLink;
 		CMixiData nextLink;
@@ -2903,6 +2933,8 @@ public:
 				break;
 			}
 		}
+
+		MZ3LOGGER_DEBUG( L"ListMessageParser.parse() finished." );
 		return true;
 	}
 };
@@ -2917,6 +2949,8 @@ class ListNewFriendDiaryParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListNewFriendDiaryParser.parse() start." );
+
 		// 「次」、「前」のリンク
 		CMixiData backLink;
 		CMixiData nextLink;
@@ -3021,6 +3055,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListNewFriendDiaryParser.parse() finished." );
 		return true;
 	}
 
@@ -3058,6 +3093,8 @@ class NewCommentParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"NewCommentParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		CString str;
@@ -3147,6 +3184,8 @@ public:
 
 			}
 		}
+
+		MZ3LOGGER_DEBUG( L"NewCommentParser.parse() finished." );
 		return true;
 	}
 };
@@ -3161,6 +3200,8 @@ class ViewBbsParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& mixi, const CHtmlArray& html_ ) 
 	{
+		MZ3LOGGER_DEBUG( L"ViewBbsParser.parse() start." );
+
 		mixi.ClearAllList();
 
 		INT_PTR lastLine = html_.GetCount();
@@ -3323,6 +3364,7 @@ public:
 		// 「最新のトピック」の抽出
 		parseRecentTopics( mixi, html_ );
 
+		MZ3LOGGER_DEBUG( L"ViewBbsParser.parse() finished." );
 		return true;
 	}
 
@@ -3499,6 +3541,8 @@ class ViewEnqueteParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ViewEnqueteParser.parse() start." );
+
 		data_.ClearAllList();
 		data_.ClearChildren();
 
@@ -3574,6 +3618,7 @@ public:
 		// 「最新のトピック」の抽出
 		parseRecentTopics( data_, html_ );
 
+		MZ3LOGGER_DEBUG( L"ViewEnqueteParser.parse() finished." );
 		return true;
 	}
 
@@ -3866,6 +3911,8 @@ class ViewEventParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ViewEventParser.parse() start." );
+
 		data_.ClearAllList();
 
 		INT_PTR count;
@@ -3984,6 +4031,7 @@ public:
 		// 「最新のトピック」の抽出
 		parseRecentTopics( data_, html_ );
 
+		MZ3LOGGER_DEBUG( L"ViewEventParser.parse() finished." );
 		return true;
 	}
 
@@ -4110,6 +4158,8 @@ class ViewMessageParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ViewMessageParser.parse() start." );
+
 		data_.ClearAllList();
 
 		INT_PTR count = html_.GetCount();
@@ -4161,6 +4211,8 @@ public:
 
 			}
 		}
+
+		MZ3LOGGER_DEBUG( L"ViewMessageParser.parse() finished." );
 		return true;
 	}
 };
@@ -4175,6 +4227,8 @@ class ShowLogParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ShowLogParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		BOOL findFlag = FALSE;
@@ -4242,6 +4296,8 @@ public:
 
 			}
 		}
+
+		MZ3LOGGER_DEBUG( L"ShowLogParser.parse() finished." );
 		return true;
 	}
 };
@@ -4256,6 +4312,8 @@ class ListDiaryParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListDiaryParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		BOOL findFlag = FALSE;
@@ -4346,6 +4404,7 @@ public:
 			out_.push_back( nextLink );
 		}
 
+		MZ3LOGGER_DEBUG( L"ListDiaryParser.parse() finished." );
 		return true;
 	}
 
@@ -4377,6 +4436,8 @@ class ListCommentParser : public MixiListParser
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"ListCommentParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		/**
@@ -4499,6 +4560,8 @@ public:
 				break;
 			}
 		}
+
+		MZ3LOGGER_DEBUG( L"ListCommentParser.parse() finished." );
 		return true;
 	}
 };
@@ -4511,6 +4574,8 @@ class HelpParser : public MixiContentParser
 public:
 	static bool parse( CMixiData& mixi, const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"HelpParser.parse() start." );
+
 		mixi.ClearAllList();
 
 		INT_PTR count = html_.GetCount();
@@ -4620,6 +4685,7 @@ public:
 			}
 		}
 
+		MZ3LOGGER_DEBUG( L"HelpParser.parse() finished." );
 		return true;
 	}
 
@@ -4667,6 +4733,8 @@ public:
 	 */
 	static bool parse( const CHtmlArray& html_ )
 	{
+		MZ3LOGGER_DEBUG( L"HomeParser.parse() start." );
+
 		INT_PTR count = html_.GetCount();
 
 		int index = 0;
@@ -4702,6 +4770,7 @@ public:
 			}
 		}
 
+		MZ3LOGGER_DEBUG( L"HomeParser.parse() finished." );
 		return true;
 	}
 
