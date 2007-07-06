@@ -71,25 +71,16 @@ bool CHtmlArray::GetPostConfirmData(CPostData* data)
 		// から value の値を取得する
 		if (line.Find(_T("post_key")) != -1) {
 
-			if (line.Find(_T("value=\"")) != -1) {
-				// value="" 形式
-				if( util::GetBetweenSubString( line, L"value=\"", L"\"", postKey ) == -1 ) {
-					MZ3LOGGER_DEBUG( L"post_key の解析失敗:" + line );
-					continue;
-				}
-			}else if( line.Find( L"value=" ) != -1 ) {
-				// value= 形式
-				if( util::GetBetweenSubString( line, L"value=", L">", postKey ) == -1 ) {
-					MZ3LOGGER_DEBUG( L"post_key の解析失敗:" + line );
-					continue;
-				}
+			if( util::GetBetweenSubString( line, L"value=\"", L"\"", postKey ) >= 0 ) {
+				// ok.
+			}else if( util::GetBetweenSubString( line, L"value=", L">", postKey ) >= 0 ) {
+				// ok.
 			}else{
-				MZ3LOGGER_DEBUG( L"post_key がありましたが、value 値が見つかりません。:" + line );
+				MZ3LOGGER_ERROR( L"post_key がありましたが、value 値が見つかりません。:" + line );
 				continue;
 			}
 			data->SetPostKey(postKey);
 			MZ3LOGGER_DEBUG( L"postKey : " + postKey );
-
 			return true;
 		}
 
@@ -104,15 +95,26 @@ bool CHtmlArray::GetPostConfirmData(CPostData* data)
 			}
 
 			if( util::GetBetweenSubString( line, L"value=\"", L"\"", packed ) >= 0 ) {
-				data->SetPacked( packed );
+				// ok.
 			}else if( util::GetBetweenSubString( line, L"value=", L">", packed ) >= 0 ) {
-				data->SetPacked( packed );
+				// ok.
+			}else{
+				MZ3LOGGER_ERROR( L"packed がありましたが、value 値が見つかりません。:" + line );
+				continue;
 			}
+			MZ3LOGGER_DEBUG( L"packed : " + packed );
+			data->SetPacked( packed );
 		}
 
 	}
 
 	// NOT FOUND
+	CString msg;
+	msg.Format( L"post_key が見つかりませんでした。post_key[%s], packed[%s]\n", 
+		data->GetPostKey(),
+		data->GetPacked() );
+	MZ3LOGGER_ERROR( msg );
+
 	return false;
 }
 
