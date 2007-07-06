@@ -70,17 +70,26 @@ bool CHtmlArray::GetPostConfirmData(CPostData* data)
 		// <input type="hidden" name="post_key" value="xxxxxxxxxxxxxxxxxxx...xxxx">
 		// から value の値を取得する
 		if (line.Find(_T("post_key")) != -1) {
+
 			if (line.Find(_T("value=\"")) != -1) {
-				postKey = line.Mid(line.Find(_T("value=\"")) + wcslen(_T("value=\"")));
-				postKey = postKey.Left(postKey.Find(_T("\"")));
+				// value="" 形式
+				if( util::GetBetweenSubString( line, L"value=\"", L"\"", postKey ) == -1 ) {
+					MZ3LOGGER_DEBUG( L"post_key の解析失敗:" + line );
+					continue;
+				}
 			}else if( line.Find( L"value=" ) != -1 ) {
-				postKey = line.Mid(line.Find(_T("value=")) + wcslen(_T("value=")));
-				postKey = postKey.Left(postKey.Find(_T(">")));
+				// value= 形式
+				if( util::GetBetweenSubString( line, L"value=", L">", postKey ) == -1 ) {
+					MZ3LOGGER_DEBUG( L"post_key の解析失敗:" + line );
+					continue;
+				}
 			}else{
+				MZ3LOGGER_DEBUG( L"post_key がありましたが、value 値が見つかりません。:" + line );
 				continue;
 			}
 			data->SetPostKey(postKey);
-			TRACE(_T("Key = %s\n"), postKey);
+			MZ3LOGGER_DEBUG( L"postKey : " + postKey );
+
 			return true;
 		}
 
