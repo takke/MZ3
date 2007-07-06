@@ -535,7 +535,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		util::MySetInformationText( m_hwnd, _T("リクエスト送信中") );
 
 		// logging
-		if( theApp.m_logger.isDebugEnabled() ) {
+		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 			CString msg;
 			msg.Format( L"url : %s", m_strPath );
 
@@ -594,7 +594,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		CPostData::post_array& buf = m_postData->GetPostBody();
 
 		// logging
-		if( theApp.m_logger.isDebugEnabled() ) {
+		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 			CString msg;
 			msg.Format( L"url : %s", m_strPath );
 			MZ3LOGGER_DEBUG( msg );
@@ -742,7 +742,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 						m_uri = szLocation;
 						m_nRedirect ++;
 
-						if( theApp.m_logger.isDebugEnabled() ) {
+						if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 							CString msg;
 							msg.Format( L"リダイレクト：[%s]", m_uri );
 							MZ3LOGGER_DEBUG( msg );
