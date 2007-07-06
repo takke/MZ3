@@ -38,27 +38,32 @@ inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, b
 
 inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType )
 {
+	CString item;
+
 	switch( bodyColType ) {
 	case CCategoryItem::BODY_INDICATE_TYPE_DATE:
-		return data->GetDate();
+		item = data->GetDate();
+		break;
 	case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-		return data->GetName();
+		item = data->GetName();
+		break;
 	case CCategoryItem::BODY_INDICATE_TYPE_TITLE:
-		return data->GetTitle();
+		item = data->GetTitle();
+		break;
 	case CCategoryItem::BODY_INDICATE_TYPE_BODY:
-		{
-			// 本文を1行に変換して割り当て。
-			CString body;
-			for( u_int i=0; i<data->GetBodySize(); i++ ) {
-				CString line = data->GetBody(i);
-				while( line.Replace( L"\r\n", L"" ) );
-				body.Append( line );
-			}
-			return body.Left( 30 );
+		// 本文を1行に変換して割り当て。
+		for( u_int i=0; i<data->GetBodySize(); i++ ) {
+			CString line = data->GetBody(i);
+			while( line.Replace( L"\r\n", L"" ) );
+			item.Append( line );
 		}
+		break;
 	default:
 		return L"";
 	}
+
+	// 上限設定
+	return item.Left( 30 );
 }
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
