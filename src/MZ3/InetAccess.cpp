@@ -543,8 +543,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			static MyRegex reg;
 			if( !reg.isCompiled() ) {
 				if(! reg.compile( L"password=[^&]+" ) ) {
-					// コンパイル失敗は無視
-					MZ3LOGGER_DEBUG( L"コンパイル失敗" );
+					MZ3LOGGER_DEBUG( FAILED_TO_COMPILE_REGEX_MSG );
 				}
 			}
 			if( reg.isCompiled() ) {

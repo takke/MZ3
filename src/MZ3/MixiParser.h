@@ -331,8 +331,7 @@ public:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"&#([0-9]{4,5});" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
@@ -426,8 +425,7 @@ private:
 		if( !reg.isCompiled() ) {
 			LPCTSTR szPattern = L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>";
 			if(! reg.compile( szPattern ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
@@ -602,8 +600,7 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 		if( !reg.isCompiled() ) {
 			LPCTSTR szPattern = L"<img[^>]*src=\"([^\"]+)\" [^>]*>";
 			if(! reg.compile( szPattern ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
@@ -658,24 +655,21 @@ public:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href='([^']+)'[^>]*>([^<]*)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
 		static MyRegex reg2;
 		if( !reg2.isCompiled() ) {
 			if(! reg2.compile( L"<a href=\"([^\"]+)\"[^>]*>([^<]*)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
 		static MyRegex reg3;
 		if( !reg3.isCompiled() ) {
 			if(! reg3.compile( L"<a href=([^>]+)>([^<]*)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
@@ -744,8 +738,7 @@ private:
 		if( !reg.isCompiled() ) {
 			LPCTSTR szPattern = L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)";
 			if(! reg.compile( szPattern ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return;
 			}
 		}
@@ -1038,8 +1031,7 @@ public:
 				static MyRegex reg;
 				if( !reg.isCompiled() ) {
 					if(! reg.compile( L"\"(view_news.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</" ) ) {
-						// コンパイル失敗なのでそのまま終了。
-						// つーかコンパイル失敗はNGだorz
+						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 						return false;
 					}
 				}
@@ -1063,8 +1055,7 @@ public:
 				static MyRegex reg;
 				if( !reg.isCompiled() ) {
 					if(! reg.compile( L"list_news_media.pl.+>([^<]+)</" ) ) {
-						// コンパイル失敗なのでそのまま終了。
-						// つーかコンパイル失敗はNGだorz
+						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 						return false;
 					}
 				}
@@ -1092,8 +1083,7 @@ public:
 				static MyRegex reg;
 				if( !reg.isCompiled() ) {
 					if(! reg.compile( L"<td[^>]+>([^<]+)</" ) ) {
-						// コンパイル失敗なのでそのまま終了。
-						// つーかコンパイル失敗はNGだorz
+						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 						return false;
 					}
 				}
@@ -1154,8 +1144,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_news_category.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -1372,8 +1361,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_bookmark.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -1620,8 +1608,7 @@ line2 : <a href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/membe
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_friend.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -1856,8 +1843,7 @@ line2: <a href="view_community.pl?id=1231285"><img src="http://img-c1.mixi.jp/ph
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_community.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -2076,8 +2062,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=show_intro.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -2254,8 +2239,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_bbs.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -2828,8 +2812,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=new_bbs.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -3049,8 +3032,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=new_friend_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -4375,8 +4357,7 @@ private:
 		static MyRegex reg;
 		if( !reg.isCompiled() ) {
 			if(! reg.compile( L"<a href=list_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				// コンパイル失敗なのでそのまま終了。
-				// つーかコンパイル失敗はNGだorz
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 				return false;
 			}
 		}
@@ -4429,8 +4410,7 @@ public:
 				static MyRegex regDate;
 				if( !regDate.isCompiled() ) {
 					if(! regDate.compile( L"<img.*>(.*)</" ) ) {
-						// コンパイル失敗なのでそのまま終了。
-						// つーかコンパイル失敗はNGだorz
+						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 						return false;
 					}
 				}
@@ -4463,8 +4443,7 @@ public:
 					if(! regBody.compile( 
 							L"<a href=\"view_diary.pl\\?id=([0-9]+)&owner_id=([0-9]+)\">(.*)</a> \\((.*)\\)" ) )
 					{
-						// コンパイル失敗なのでそのまま終了。
-						// つーかコンパイル失敗はNGだorz
+						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 						return false;
 					}
 				}
