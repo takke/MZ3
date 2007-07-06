@@ -79,8 +79,8 @@ bool CHtmlArray::GetPostConfirmData(CPostData* data)
 				MZ3LOGGER_ERROR( L"post_key ‚ª‚ ‚è‚Ü‚µ‚½‚ªAvalue ’l‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB:" + line );
 				continue;
 			}
-			data->SetPostKey(postKey);
 			MZ3LOGGER_DEBUG( L"postKey : " + postKey );
+			data->SetPostKey(postKey);
 			return true;
 		}
 

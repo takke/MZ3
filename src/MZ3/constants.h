@@ -4,7 +4,7 @@
 #pragma once
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.1.0 Beta7"
+#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.1.0 Beta8"
 
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$" 
@@ -123,3 +123,6 @@ enum CONTENT_TYPE {
 	CONTENT_TYPE_MULTIPART = 0,			///< Content-Type: multipart/form-data
 	CONTENT_TYPE_FORM_URLENCODED = 1,	///< Content-Type: application/x-www-form-urlencoded
 };
+
+/// コンパイル失敗メッセージ
+#define FAILED_TO_COMPILE_REGEX_MSG		L"コンパイル失敗"
