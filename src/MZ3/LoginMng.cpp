@@ -82,7 +82,7 @@ void Login::Write()
 		return;
 	}
 	if (m_ownerId.GetLength() == 0) {
-		m_ownerId = _T("ERROR");
+		m_ownerId = _T("");
 	}
 
 	fp = _wfopen(fileName, _T("wb"));
