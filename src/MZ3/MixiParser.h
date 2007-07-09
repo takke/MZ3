@@ -4759,7 +4759,7 @@ public:
 			theApp.m_newCommentCount = commentNum;
 		}
 
-		if (!wcscmp(theApp.m_loginMng.GetOwnerID(), _T(""))) {
+		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 			// OwnerID ‚ª–¢æ“¾‚È‚Ì‚Å‰ğÍ‚·‚é
 			MZ3LOGGER_DEBUG( L"OwnerID ‚ª–¢æ“¾‚È‚Ì‚Å‰ğÍ‚µ‚Ü‚·" );
 
@@ -4777,6 +4777,10 @@ public:
 					}
 					break;
 				}
+			}
+
+			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+				MZ3LOGGER_ERROR( L"OwnerID ‚ªæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½" );
 			}
 		}
 
