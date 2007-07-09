@@ -20,6 +20,12 @@ public:
 	{
 		CString id;
 		util::GetAfterSubString( url, _T("owner_id="), id );
+
+		// '&' ‚ªŠÜ‚Ü‚ê‚Ä‚¢‚ê‚ÎA‚»‚ÌŒã‚ë‚ğíœ‚·‚é
+		if( id.Find( '&' ) != -1 ) {
+			util::GetBeforeSubString( id, L"&", id );
+		}
+
 		return id;
 	}
 
@@ -880,7 +886,7 @@ public:
 				if( util::GetBetweenSubString( str, L"value=\"", L"\"", ownerId ) < 0 ) {
 					continue;
 				}
-				TRACE(_T("owner_id = %d\n"), _wtoi(ownerId));
+				MZ3LOGGER_DEBUG( _T("owner_id = ") + ownerId );
 				data_.SetOwnerID( _wtoi(ownerId) );
 			}
 
@@ -4711,9 +4717,7 @@ public:
 		for (int i=0; i<count; i++) {
 			const CString& line = html.GetAt(i);
 
-			if (line.Find(_T("refresh")) != -1 &&
-				line.Find(_T("home.pl")) != -1) 
-			{
+			if (util::LineHasStringsNoCase( line, L"refresh", L"home.pl" )) {
 				return true;
 			}
 		}
@@ -4756,15 +4760,21 @@ public:
 		}
 
 		if (!wcscmp(theApp.m_loginMng.GetOwnerID(), _T(""))) {
+			// OwnerID ‚ª–¢æ“¾‚È‚Ì‚Å‰ğÍ‚·‚é
+			MZ3LOGGER_DEBUG( L"OwnerID ‚ª–¢æ“¾‚È‚Ì‚Å‰ğÍ‚µ‚Ü‚·" );
 
 			for (int i=index; i<count; i++) {
 				const CString& line = html_.GetAt(i);
-				if (line.Find(_T("a href=list_community.pl")) != -1) {
-					CString buf = line.Mid(line.Find(_T("id=")) + wcslen(_T("id=")));
-					buf = buf.Left(buf.Find(_T(" ")));
-					TRACE(_T("OwnerID = %s\n"), buf);
-					theApp.m_loginMng.SetOwnerID(buf);
-					theApp.m_loginMng.Write();
+				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"list_community.pl" ) ) {
+					CString buf;
+					
+					if( util::GetBetweenSubString( line, L"id=", L"\"", buf ) == -1 ) {
+						MZ3LOGGER_ERROR( L"list_community.pl ‚Ìˆø”‚É id w’è‚ª‚ ‚è‚Ü‚¹‚ñB line[" + line + L"]" );
+					}else{
+						MZ3LOGGER_DEBUG( L"OwnerID = " + buf );
+						theApp.m_loginMng.SetOwnerID(buf);
+						theApp.m_loginMng.Write();
+					}
 					break;
 				}
 			}
