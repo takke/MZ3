@@ -216,7 +216,8 @@ void CWriteView::OnBnClickedWriteSendButton()
 	m_infoEdit.ShowWindow(SW_SHOW);
 
 	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-		MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する" );
+		MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
+
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
 		theApp.m_accessType = ACCESS_LOGIN;
@@ -310,6 +311,10 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 			+ strConfirmTempFile;
 		MessageBox( msg );
 		MZ3LOGGER_ERROR( msg );
+
+		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
+		theApp.m_loginMng.SetOwnerID( L"" );
+
 		return 0;
 	}
 
@@ -355,7 +360,7 @@ void CWriteView::StartEntryPost()
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
 				url.Format( L"http://mixi.jp/%s&owner_id=%d", m_data->GetPostAddress(), m_data->GetOwnerID());
-        //リファラ設定したら投稿で止まるようになったので保留
+				//リファラ設定したら投稿で止まるようになったので保留
 				//refUrl.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
 				break;
 			}
@@ -714,9 +719,11 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		if( mixi::HomeParser::IsLoginSucceeded(html) ) {
 			// ログイン成功
 			if (wcslen(theApp.m_loginMng.GetOwnerID()) != 0) {
+				MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
 			} else {
-				((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
+				MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
 
+				((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
 				theApp.m_accessType = ACCESS_MAIN;
 				theApp.m_inet.DoGet(L"http://mixi.jp/home.pl", L"", CInetAccess::FILE_HTML );
 				return LRESULT();
