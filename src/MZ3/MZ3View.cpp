@@ -1316,7 +1316,7 @@ void CMZ3View::OnWriteDiary()
 		bool bFound = false;
 		for( size_t i=0; i<m_selGroup->categories.size(); i++ ) {
 			CCategoryItem& category = m_selGroup->categories[i];
-			if( category.m_mixi.GetAccessType() == ACCESS_LIST_DIARY ) {
+			if( category.m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY ) {
 				// “ú‹L”­Œ©B
 				// ‘æ1—v‘f‚ð’Tõ‚·‚éB
 				if( category.GetBodyList().size() > 0 ) {
