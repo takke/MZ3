@@ -1270,6 +1270,12 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 				return TRUE;
 			}
 		}
+	}else if(pMsg->message == WM_KEYUP) {
+		if (pMsg->hwnd == m_bodyList.m_hWnd) {
+			if( OnKeyupBodyList( pMsg->wParam ) ) {
+				return TRUE;
+			}
+		}
 	}
 
 	return CFormView::PreTranslateMessage(pMsg);
@@ -1558,10 +1564,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 {
 	// ボディーリストでのキー押下
 	switch( vKey ) {
+
 	case VK_UP:
-		if( m_access ) return TRUE;	// アクセス中は無視
 		if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 			// 一番上。
+			if( m_access ) return TRUE;	// アクセス中は禁止
+
 			// カテゴリに移動
 
 			// 選択状態を末尾に。以前の選択状態をOffに。
@@ -1573,9 +1581,9 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 		break;
 	case VK_DOWN:
-		if( m_access ) return TRUE;	// アクセス中は無視
 		if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 			// 一番下なら無視。
+			if( m_access ) return TRUE;	// アクセス中は禁止
 			return TRUE;
 		}
 		break;
@@ -1616,9 +1624,20 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		MyChangeBodyHeader();
 		return TRUE;
 
-	case VK_RETURN:
+/*	case VK_RETURN:
 		// アクセス中は再アクセス不可
 		if( m_access ) return TRUE;
+
+		if( m_dwLastReturn == 0 ) {
+			// VK_PROCESSKEY が飛んできていない。
+			// 「W-ZERO3 で日本語入力モード以外」、または「W-ZERO3 以外の機種」。
+			// キー押下時刻を設定する。
+			m_dwLastReturn = GetTickCount();
+		}
+
+		break;
+*/
+	case VK_RETURN:
 
 		if( m_dwLastReturn != 0 ) {
 			if( GetTickCount() < m_dwLastReturn + theApp.m_optionMng.m_longReturnRangeMSec ) {
@@ -1641,6 +1660,9 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				return TRUE;
 			}
 		}
+
+		// アクセス中は再アクセス不可
+		if( m_access ) return TRUE;
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
@@ -1704,14 +1726,40 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		return CommandSetFocusCategoryList();
 
 	case VK_PROCESSKEY:	// 0xE5
+	case VK_F23:		// 0x86
 		// W-ZERO3 で RETURN キー押下時に飛んでくるキー。
-		// m_dwLastReturn を更新しておく。
-		m_dwLastReturn = GetTickCount();
+		if( m_dwLastReturn == 0 ) {
+			// m_dwLastReturn を更新しておく。
+			m_dwLastReturn = GetTickCount();
 
-		// 長押し判定用スレッドを開始
-		AfxBeginThread( LongReturnKey_Thread, this );
+			// 長押し判定用スレッドを開始
+			AfxBeginThread( LongReturnKey_Thread, this );
+		}
+		break;
+
+	default:
+//		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
+//			CString msg;
+//			msg.Format( L"WM_KEYDOWN, 0x%X", vKey );
+//			MZ3LOGGER_DEBUG( msg );
+//		}
 		break;
 	}
+	return FALSE;
+}
+
+/**
+ * ボディリストのキーUPイベント
+ */
+BOOL CMZ3View::OnKeyupBodyList( WORD vKey )
+{
+	// ボディーリストでのキー押下
+	switch( vKey ) {
+	case VK_RETURN:
+		MZ3LOGGER_DEBUG( L"WM_KEYUP, VK_RETURN" );
+		break;
+	}
+
 	return FALSE;
 }
 

@@ -198,6 +198,7 @@ private:
 	BOOL OnKeydownGroupTab( WORD vKey );
 	BOOL OnKeydownCategoryList( WORD vKey );
 	BOOL OnKeydownBodyList( WORD vKey );
+	BOOL OnKeyupBodyList( WORD vKey );
 
 	afx_msg void OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnOpenBrowser();
