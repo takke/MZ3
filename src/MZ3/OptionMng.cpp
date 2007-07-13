@@ -83,7 +83,7 @@ void Option::Load()
 			// 初期値
 //			m_fontHeightBig = 28;
 		}else{
-			m_fontHeightBig = (BOOL)atoi(s.c_str());
+			m_fontHeightBig = atoi(s.c_str());
 		}
 
 		// フォントサイズ（中）
@@ -92,7 +92,7 @@ void Option::Load()
 			// 初期値
 			m_fontHeightMedium = m_fontHeight;
 		}else{
-			m_fontHeightMedium = (BOOL)atoi(s.c_str());
+			m_fontHeightMedium = atoi(s.c_str());
 		}
 
 		// フォントサイズ（小）
@@ -101,7 +101,7 @@ void Option::Load()
 			// 初期値
 //			m_fontHeightSmall = 18;
 		}else{
-			m_fontHeightSmall = (BOOL)atoi(s.c_str());
+			m_fontHeightSmall = atoi(s.c_str());
 		}
 
 		// フォント名
@@ -113,6 +113,14 @@ void Option::Load()
 			// 初期値をそのまま使う
 		}else{
 			m_bUseLeftSoftKey = (s == "1");
+		}
+
+		// 長押し判定時間
+		s = inifile.GetValue( "LongReturnRangeMSec", "UI" );
+		if( s.empty() ) {
+			// 初期値
+		}else{
+			m_longReturnRangeMSec = normalizeLongReturnRangeMSec( atoi(s.c_str()) );
 		}
 
 		// 引用符号
@@ -286,6 +294,9 @@ void Option::Save()
 	inifile.SetValue( L"FontFace", m_fontFace, "UI");
 	// 左ソフトキー有効？
 	inifile.SetValue( "UseLeftSoftKey", m_bUseLeftSoftKey ? "1" : "0", "UI" );
+
+	// 長押し判定時間
+	inifile.SetValue( "LongReturnRangeMSec", (LPCSTR)util::int2str_a(m_longReturnRangeMSec), "UI" );
 
 	// 引用符号
 	// 末尾の半角スペースを保存するため、

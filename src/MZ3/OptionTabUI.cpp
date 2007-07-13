@@ -52,6 +52,9 @@ BOOL COptionTabUI::OnInitDialog()
 	// 左ソフトキーの有効・無効
 	CheckDlgButton( IDC_USE_LEFTSOFTKEY_CHECK, theApp.m_optionMng.m_bUseLeftSoftKey ? BST_CHECKED : BST_UNCHECKED );
 
+	// 長押し判定時間
+	SetDlgItemText( IDC_LONG_RETURN_RANGE_MSEC_EDIT, util::int2str(theApp.m_optionMng.m_longReturnRangeMSec) );
+
 	return TRUE;
 }
 
@@ -65,32 +68,30 @@ void COptionTabUI::OnOK()
 	{
 		CString s;
 		GetDlgItemText( IDC_FONT_BIG_EDIT, s );
-		int n = _wtoi( s );
-		if( n < 8  ) n = 8;
-		if( n > 50 ) n = 50;
-		theApp.m_optionMng.m_fontHeightBig = n;
+		theApp.m_optionMng.m_fontHeightBig = option::Option::normalizeFontSize( _wtoi(s) );;
 	}
 	// フォント（中）
 	{
 		CString s;
 		GetDlgItemText( IDC_FONT_MEDIUM_EDIT, s );
-		int n = _wtoi( s );
-		if( n < 8  ) n = 8;
-		if( n > 50 ) n = 50;
-		theApp.m_optionMng.m_fontHeightMedium = n;
+		theApp.m_optionMng.m_fontHeightMedium = option::Option::normalizeFontSize( _wtoi(s) );
 	}
 	// フォント（小）
 	{
 		CString s;
 		GetDlgItemText( IDC_FONT_SMALL_EDIT, s );
-		int n = _wtoi( s );
-		if( n < 8  ) n = 8;
-		if( n > 50 ) n = 50;
-		theApp.m_optionMng.m_fontHeightSmall = n;
+		theApp.m_optionMng.m_fontHeightSmall = option::Option::normalizeFontSize( _wtoi(s) );
 	}
 
 	// 左ソフトキーの有効・無効
 	theApp.m_optionMng.m_bUseLeftSoftKey = IsDlgButtonChecked( IDC_USE_LEFTSOFTKEY_CHECK ) == BST_CHECKED ? true : false;
+
+	// 長押し判定時間
+	{
+		CString s;
+		GetDlgItemText( IDC_LONG_RETURN_RANGE_MSEC_EDIT, s );
+		theApp.m_optionMng.m_longReturnRangeMSec = option::Option::normalizeLongReturnRangeMSec( _wtoi(s) );
+	}
 
 	CPropertyPage::OnOK();
 }

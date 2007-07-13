@@ -79,7 +79,7 @@ void COptionTabReport::OnOK()
 
 	// スクロール行数
 	theApp.m_optionMng.m_reportScrollLine
-		= option::normalizeRange( GetDlgItemInt( IDC_SCROLL_LINE_EDIT ), 1, 100 );
+		= option::Option::normalizeRange( GetDlgItemInt( IDC_SCROLL_LINE_EDIT ), 1, 100 );
 
 	CPropertyPage::OnOK();
 }

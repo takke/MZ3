@@ -5,17 +5,6 @@
 /// オプションデータ
 namespace option {
 
-inline int normalizeRange( int value, int minv, int maxv ) 
-{
-	// 下限値調整
-	value = max( value, minv );
-
-	// 上限値調整
-	value = min( value, maxv );
-
-	return value;
-}
-
 /**
  * オプションデータ管理クラス
  */
@@ -51,6 +40,8 @@ public:
 	int				m_fontHeightBig;	///< フォント（大）のサイズ（0 の場合は設定しない）
 	int				m_fontHeightMedium;	///< フォント（中）のサイズ（0 の場合は設定しない）
 	int				m_fontHeightSmall;	///< フォント（小）のサイズ（0 の場合は設定しない）
+
+	int				m_longReturnRangeMSec;	///< 長押し判定時間（ミリ秒）
 
 	CString			m_logFolder;		///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
 	bool			m_bSaveLog;			///< ログを保存するかどうか。
@@ -113,11 +104,24 @@ public:
 		, m_reportScrollLine( 7 )
 		, m_bConvertUrlForMixiMobile( true )
 		, m_bDebugMode( false )
+		, m_longReturnRangeMSec( 300 )
 	{
 	}
 
 	virtual ~Option()
 	{
+	}
+
+	/// 正規化
+	static int normalizeRange( int value, int minv, int maxv ) 
+	{
+		// 下限値調整
+		value = max( value, minv );
+
+		// 上限値調整
+		value = min( value, maxv );
+
+		return value;
 	}
 
 	void Load();
@@ -176,15 +180,9 @@ public:
 	int NormalizeRecvBufSize( int bufSize ) {
 
 		const int RECVBUFSIZE_MIN = 128;
-		if( bufSize < RECVBUFSIZE_MIN ) {
-			return RECVBUFSIZE_MIN;
-		}
 		const int RECVBUFSIZE_MAX = 32768;
-		if( bufSize > RECVBUFSIZE_MAX ) {
-			return RECVBUFSIZE_MAX;
-		}
 
-		return bufSize;
+		return normalizeRange( bufSize, RECVBUFSIZE_MIN, RECVBUFSIZE_MAX );
 	}
 
 	int GetRecvBufSize() {
@@ -194,6 +192,16 @@ public:
 
 	void SetRecvBufSize( int recvBufSize ) {
 		m_recvBufSize = NormalizeRecvBufSize( recvBufSize );
+	}
+
+	/// フォントサイズの正規化
+	static int normalizeFontSize( int n ) {
+		return normalizeRange( n, 8, 50 );
+	}
+
+	/// 長押し判定時間の正規化
+	static int normalizeLongReturnRangeMSec( int msec ) {
+		return normalizeRange( msec, 100, 1000 );
 	}
 
 };

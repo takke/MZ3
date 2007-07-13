@@ -19,9 +19,6 @@
 #define new DEBUG_NEW
 #endif
 
-/// 長押し判定時間
-#define LONG_RETURN_RANGE_MSEC	400
-
 /**
  * リストコントロールのフォーカス状態と選択状態を設定する。
  */
@@ -1624,13 +1621,15 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		if( m_access ) return TRUE;
 
 		if( m_dwLastReturn != 0 ) {
-			if( GetTickCount() < m_dwLastReturn + LONG_RETURN_RANGE_MSEC ) {
+			if( GetTickCount() < m_dwLastReturn + theApp.m_optionMng.m_longReturnRangeMSec ) {
 				// 長押し判定時間内に離されたので、通常押下とみなす。
 
 				// キー押下時刻をクリアしておく。
 				m_dwLastReturn = 0;
 			}else{
 				// 長押し判定時間以上経っているので、ログを開く
+
+				util::MySetInformationText( m_hWnd, L"ログを開いています..." );
 
 				// ログを開く
 				OnViewLog();
@@ -1724,7 +1723,7 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
 	CMZ3View* pView = (CMZ3View*)This;
 
 	// 長押し判定時間分、Sleep する。
-	Sleep( LONG_RETURN_RANGE_MSEC );
+	Sleep( theApp.m_optionMng.m_longReturnRangeMSec );
 
 	if( pView->m_dwLastReturn != 0 ) {
 		// まだ VK_RETURN が来ていないので、ログを開く
