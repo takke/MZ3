@@ -3921,8 +3921,7 @@ public:
 
 		data_.ClearAllList();
 
-		INT_PTR count;
-		count = html_.GetCount();
+		INT_PTR count = html_.GetCount();
 
 		CString str;
 		CString buf;
@@ -4046,40 +4045,37 @@ public:
 	 */
 	static int parseEventComment(int sIndex, int eIndex, CMixiData* data, const CHtmlArray& html_ )
 	{
-		CString str;
-
 		int retIndex = eIndex;
 		CMixiData cmtData;
-		BOOL findFlag = FALSE;
-		CString date;
-		CString comment;
-		int index;
+		BOOL bCommentFound = FALSE;
 
 		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
+			const CString& line = html_.GetAt(i);
 
-			if (findFlag == FALSE) {
+			if (bCommentFound == FALSE) {
 
-				if( util::LineHasStringsNoCase( str, L"<!-- end : Loop -->" ) ||
-					util::LineHasStringsNoCase( str, L"<!-- ADD_COMMENT: start -->" ) ||
-					util::LineHasStringsNoCase( str, L"<!-- COMMENT: end -->" ) ||
-					util::LineHasStringsNoCase( str, L"add_event_comment.pl" ) ) 
+				if( util::LineHasStringsNoCase( line, L"<!-- end : Loop -->" ) ||
+					util::LineHasStringsNoCase( line, L"<!-- ADD_COMMENT: start -->" ) ||
+					util::LineHasStringsNoCase( line, L"<!-- COMMENT: end -->" ) ||
+					util::LineHasStringsNoCase( line, L"add_event_comment.pl" ) ) 
 				{
 					// コメント全体の終了タグ発見
 					GetPostAddress(i, eIndex, html_, *data);
 					return -1;
 				}
 				
-				if ((index = str.Find(_T("show_friend.pl"))) != -1) {
+				int index = 0;
+				if ((index = line.Find(_T("show_friend.pl"))) != -1) {
 
-					CString buf = str.Mid(index);
+					// 名前の取得
+					CString buf = line.Mid(index);
 					MixiUrlParser::GetAuthor(buf, &cmtData);
 
 					// コメント番号を前の行から取得する
 					// [<font color="#f8a448"><b>&nbsp;25</b>&nbsp;:</font>]
-					str = html_.GetAt(i-1);
+					const CString& lineB1 = html_.GetAt(i-1);
 
-					if( util::GetBetweenSubString( str, L"<b>", L"</b>", buf ) < 0 ) {
+					if( util::GetBetweenSubString( lineB1, L"<b>", L"</b>", buf ) < 0 ) {
 						MZ3LOGGER_ERROR( L"コメント番号が取得できません。mixi 仕様変更？" );
 						return -1;
 					}
@@ -4087,59 +4083,52 @@ public:
 					while(buf.Replace(_T("&nbsp;"), _T("")));
 					cmtData.SetCommentIndex(_wtoi(buf));
 
-					// 時刻
+					// 時刻の取得
+					// 時刻は4～6行前にある
 					if (html_.GetAt(i-4).Find(_T("checkbox")) != -1) {
+						// 5, 6 行前にある
 						// 自分管理コミュ
-						date = util::XmlParser::GetElement(html_.GetAt(i-6), 1) + _T(" ")
+						CString date = util::XmlParser::GetElement(html_.GetAt(i-6), 1) + _T(" ")
 							+ util::XmlParser::GetElement(html_.GetAt(i-5), 1);
 						ParserUtil::ChangeDate(date, &cmtData);
 					}
 					else {
-						date = util::XmlParser::GetElement(html_.GetAt(i-5), 1) + _T(" ")
+						// 4, 5 行前にある
+						CString date = util::XmlParser::GetElement(html_.GetAt(i-5), 1) + _T(" ")
 							+ util::XmlParser::GetElement(html_.GetAt(i-4), 1);
 						ParserUtil::ChangeDate(date, &cmtData);
 					}
 
-					findFlag = TRUE;
+					bCommentFound = TRUE;
 				}
 			}
 			else {
 
-				// コメントコメント本文取得
-
-				if( util::LineHasStringsNoCase( str, L"<td", L"class=h120" ) ||
-					util::LineHasStringsNoCase( str, L"<td", L"class=\"h120\"" ) )
+				// コメント本文取得
+				if( util::LineHasStringsNoCase( line, L"<td", L"class=h120" ) ||
+					util::LineHasStringsNoCase( line, L"<td", L"class=\"h120\"" ) )
 				{
 					cmtData.AddBody(_T("\r\n"));
 
 					// [<tr><td class="h120" width="500">てすと</td></tr>]
 
-					ParserUtil::AddBodyWithExtract( cmtData, str );
+					// 終了タグが現れるまで解析＆追加
+					for( ;i<eIndex+1; i++ ) {
+						const CString& line1 = html_.GetAt(i);
 
-					CString line2 = html_.GetAt(i+1);
-					if( util::LineHasStringsNoCase( str,   L"</td>" ) &&
-						util::LineHasStringsNoCase( line2, L"</table>" ) )
-					{
-						// 終了タグがあった場合
-						retIndex = i + 5;
-					}else{
-						// 終了タグ未発見の場合：
-						// 終了タグが現れるまで解析＆追加。
-						while( i<eIndex ) {
-							i++;
-							const CString& line = html_.GetAt(i);
+						// 解析＆登録
+						ParserUtil::AddBodyWithExtract( cmtData, line1 );
 
-							CString buf;
-							if( util::GetBeforeSubString( line, L"</td>", buf ) >= 0 ||
-								util::GetBeforeSubString( line, L"</table>", buf ) >= 0 ) 
-							{
+						if( util::LineHasStringsNoCase( line1, L"</tr>" ) ||
+							util::LineHasStringsNoCase( line1, L"</table>" ) )
+						{
+							if( util::LineHasStringsNoCase( line1, L"</tr></table>" ) ) {
+								// "</tr></table>" は終了タグではなく画像終了タグなので無視。
+							}else{
 								// 終了タグ発見
-								ParserUtil::AddBodyWithExtract( cmtData, buf );
 								retIndex = i + 5;
 								break;
 							}
-
-							ParserUtil::AddBodyWithExtract( cmtData, line );
 						}
 					}
 					break;
@@ -4147,7 +4136,7 @@ public:
 			}
 		}
 
-		if( findFlag ) {
+		if( bCommentFound ) {
 			data->AddChild(cmtData);
 		}
 		return retIndex;
