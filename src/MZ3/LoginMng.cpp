@@ -11,19 +11,22 @@
 /// オプションデータ
 namespace option {
 
+#define CRYPT_KEY	_T("Mixi_browser_for_W-ZERO3")
+
 // Login
 
 Login::Login()
 {
-  m_ownerId = _T("");
+	m_ownerId = _T("");
 }
 
 Login::~Login()
 {
 }
 
-
-// Login メンバ関数
+/**
+ * ファイルからログイン情報を取得
+ */
 void Login::Read()
 {
 	// ----------------------------------------
@@ -31,29 +34,28 @@ void Login::Read()
 	// ----------------------------------------
 
 	// 実行ファイルのパスからデータファイル名を作成
-	CString tmp;
-	CString fileName;
-	fileName.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("user.dat"));
+	CString fileName = theApp.GetAppDirPath() + _T("\\user.dat");
 
 	// ファイルが存在していればそのファイルを読み込む
-	FILE* fp;
 
 	if( util::ExistFile(fileName) ) {
 
 		// ----------------------------------------
 		// デコード処理
 		// ----------------------------------------
-		fp = _wfopen(fileName, _T("rb"));
+		FILE* fp = _wfopen(fileName, _T("rb"));
 		if (fp == NULL) {
 			return;
 		}
 
 		m_loginMail = Read(fp);
-		m_loginPwd = Read(fp);
-		m_ownerId = Read(fp);
+		m_loginPwd  = Read(fp);
+		m_ownerId   = Read(fp);
+
 		TRACE(_T("Mail = %s\n"), m_loginMail);
 		TRACE(_T("Password = %s\n"), m_loginPwd);
 		TRACE(_T("OwnerId = %s\n"), m_ownerId);
+
 		if (m_ownerId == _T("ERROR")) {
 			m_ownerId = _T("");
 		}
@@ -61,19 +63,20 @@ void Login::Read()
 
 	}
 	else {
+		// ファイルが存在しないので初期値を設定
 		m_loginMail = _T("");
 		m_loginPwd = _T("");
 		m_ownerId = _T("");
 	}
 }
 
+/**
+ * ファイルからログイン情報を出力
+ */
 void Login::Write()
 {
 	// 実行ファイルのパスからデータファイル名を作成
-	CString fileName;
-	fileName.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("user.dat"));
-
-	FILE* fp;
+	CString fileName = theApp.GetAppDirPath() + _T("\\user.dat");
 
 	// ----------------------------------------
 	// エンコード処理
@@ -85,7 +88,7 @@ void Login::Write()
 		m_ownerId = _T("");
 	}
 
-	fp = _wfopen(fileName, _T("wb"));
+	FILE* fp = _wfopen(fileName, _T("wb"));
 	if (fp == NULL) {
 		return;
 	}
@@ -102,7 +105,7 @@ LPCTSTR Login::Read(FILE* fp)
 	// blowfishの初期化
 	char key[256];
 	memset(key, 0x00, 256);
-	wcstombs(key, _T("Mixi_browser_for_W-ZERO3"), 255); // 暗号化キー
+	wcstombs(key, CRYPT_KEY, 255); // 暗号化キー
 
 	bf::bf bf;
 	bf.init((unsigned char*)key, strlen(key)); // 初期化処理
@@ -138,7 +141,7 @@ void Login::Write(FILE* fp, LPCTSTR tmp)
 	// blowfishの初期化
 	char key[256];
 	memset(key, 0x00, 256);
-	wcstombs(key, _T("Mixi_browser_for_W-ZERO3"), 255); // 暗号化キー
+	wcstombs(key, CRYPT_KEY, 255); // 暗号化キー
 
 	bf::bf bf;
 	bf.init((unsigned char*)key, strlen(key)); // 初期化処理
