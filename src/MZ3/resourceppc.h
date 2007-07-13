@@ -81,6 +81,7 @@
 #define IDC_WRITE_TITLE_EDIT            1029
 #define IDC_FONT_SMALL_EDIT             1029
 #define IDC_WRITE_SEND_BUTTON           1030
+#define IDC_LONG_RETURN_RANGE_MSEC_EDIT 1030
 #define IDC_WRITE_CANCEL_BUTTON         1031
 #define IDC_EDIT3                       1032
 #define IDC_WRITE_INFO_EDIT             1032
@@ -92,7 +93,6 @@
 #define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
-#define IDC_SAVE_LOG_CHECK2             1036
 #define IDC_DEBUG_MODE_CHECK            1036
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
