@@ -108,7 +108,7 @@ public:
 		, m_bConvertUrlForMixiMobile( true )
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
-		, m_strUserAgent( L"MZ3.i" )
+		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
 	{
 	}
 
