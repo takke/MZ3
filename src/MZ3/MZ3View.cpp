@@ -2645,6 +2645,34 @@ void CMZ3View::MyShowHistory(void)
 }
 
 /**
+ * mz3log.txt を解析し、レポート画面で表示する。
+ */
+void CMZ3View::MyShowErrorlog(void)
+{
+	// ログを閉じる
+	theApp.m_logger.finish();
+
+	// HTML の取得
+	CHtmlArray html;
+	html.Load( theApp.m_filepath.mz3logfile );
+
+	// ログを開く
+	theApp.m_logger.init( theApp.m_filepath.mz3logfile );
+
+	// HTML 解析
+	static CMixiData mixi;
+	CMixiData dummy;
+	mixi = dummy;
+	mixi.SetAccessType( ACCESS_ERRORLOG );
+	mixi.SetTitle(L"MZ3 エラーログ");
+	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	util::MySetInformationText( m_hWnd, L"完了" );
+
+	// *** 解析結果を表示する ***
+	theApp.m_pMainView->MyShowReportView( mixi );
+}
+
+/**
  * 巡回予約
  */
 void CMZ3View::OnCheckCruise()

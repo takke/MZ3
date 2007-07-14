@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_START_CRUISE, &CMainFrame::OnStartCruise)
 	ON_COMMAND(IDM_START_CRUISE_UNREAD_ONLY, &CMainFrame::OnStartCruiseUnreadOnly)
 	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
+	ON_COMMAND(ID_ERRORLOG_MENU, &CMainFrame::OnErrorlogMenu)
 END_MESSAGE_MAP()
 
 
@@ -516,6 +517,14 @@ void CMainFrame::OnHelpMenu()
 void CMainFrame::OnHistoryMenu()
 {
 	theApp.m_pMainView->MyShowHistory();
+}
+
+/**
+ * エラーログを開く
+ */
+void CMainFrame::OnErrorlogMenu()
+{
+	theApp.m_pMainView->MyShowErrorlog();
 }
 
 /**

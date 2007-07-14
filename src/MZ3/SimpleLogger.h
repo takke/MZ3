@@ -137,6 +137,17 @@ public:
 	}
 
 	/**
+	 * flush
+	 */
+	bool flush() {
+		if( m_fp == NULL ) {
+			return false;
+		}
+		fflush( m_fp );
+		return true;
+	}
+
+	/**
 	 * FATAL メッセージ出力
 	 */
 	bool fatal( LPCTSTR message, LPCTSTR strSourceFilename=NULL, int line=-1 ) {

@@ -4687,6 +4687,110 @@ public:
 };
 
 /**
+ * [content] mz3log.txt 用パーサ
+ */
+class ErrorlogParser : public MixiContentParser
+{
+public:
+	static bool parse( CMixiData& mixi, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"ErrorlogParser.parse() start." );
+
+		mixi.ClearAllList();
+		INT_PTR count = html_.GetCount();
+
+		int iLine = 0;
+
+		int status = 0;		// 0 : start, 1 : 最初の項目, 2 : 2番目以降の項目解析中
+		CMixiData child;
+
+		mixi.SetAuthor( L"MZ3" );
+		mixi.AddBody( L"the top element.\r\n" );
+
+		CString msg;
+		msg.Format( L"mz3log.txt has %d line(s).", count );
+		mixi.AddBody( msg );
+
+		// 【解析対象概要】
+		// ---
+		// [2007/07/13△12:30:03]△DEBUG△本文△[.\InetAccess.cpp:555]
+		// ---
+		// または
+		// ---
+		// [2007/07/13△12:06:33]△DEBUG△本文
+		// ずっと本文
+		// ずっと本文△[.\MZ3View.cpp:947]
+		// ---
+		// という形式。
+		for( int iLine=0; iLine<count; iLine++ ) {
+			CString target = html_.GetAt(iLine);
+			target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+
+			child.ClearBody();
+			child.SetCommentIndex( iLine+1 );
+
+			// "[～]" を日付に。
+			CString date;
+			int index = 0;
+			index = util::GetBetweenSubString( target, L"[", L"]", date );
+			if( index == -1 ) {
+				child.AddBody( L"★ '[～]' が見つからないのでスキップ [" + target + L"]" );
+				mixi.AddChild( child );
+				continue;
+			}
+			child.SetDate( date );
+
+			// "]" 以降を切り出し
+			target = target.Mid( index );
+
+			// "△～△" をエラーレベル（名前）に。
+			CString level;
+			index = util::GetBetweenSubString( target, L" ", L" ", level );
+			if( index == -1 ) {
+				// "△～△" が見つからないのでスキップ
+				child.AddBody( L"★ '△～△' が見つからないのでスキップ [" + target + L"]" );
+				mixi.AddChild( child );
+				continue;
+			}
+
+			// 2つ目の"△"以降を切り出し
+			target = target.Mid( index );
+
+			// 名前に「レベル△本文」を設定
+			level += L" ";
+			level += target;
+			level = level.Left( 30 );
+			child.SetAuthor( level );
+
+			// 末尾が "]" なら本文に追加して終了。
+			// 末尾が "]" 以外なら次の行以降を見つかるまで本文として解析。
+			child.AddBody( L"\r\n" );
+			child.AddBody( target );
+
+			if( target.Right( 3 ) == L"]\r\n" ) {
+				// 終了
+			}else{
+				// 末尾に "]" が現れるまで解析して終了。
+				iLine ++;
+				for( ;iLine<count; iLine++ ) {
+					target = html_.GetAt( iLine );
+					target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+					child.AddBody( target );
+					if( target.Right( 3 ) == L"]\r\n" ) {
+						break;
+					}
+				}
+			}
+			mixi.AddChild( child );
+		}
+
+		MZ3LOGGER_DEBUG( L"ErrorlogParser.parse() finished." );
+		return true;
+	}
+
+};
+
+/**
  * [content] home.pl ログイン後のメイン画面用パーサ
  */
 class HomeParser : public MixiContentParser
@@ -4956,6 +5060,7 @@ inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& h
 	case ACCESS_MESSAGE:	mixi::ViewMessageParser::parse( mixi, html );	break;
 	case ACCESS_NEWS:		mixi::ViewNewsParser::parse( mixi, html );		break;
 	case ACCESS_HELP:		mixi::HelpParser::parse( mixi, html );			break;
+	case ACCESS_ERRORLOG:	mixi::ErrorlogParser::parse( mixi, html );		break;
 	}
 }
 

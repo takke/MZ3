@@ -116,13 +116,17 @@ BEGIN
             MENUITEM "全てを巡回",                       IDM_START_CRUISE
             MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
             MENUITEM "mixiモバイルを開く",                 IDM_OPEN_MIXI_MOBILE_BY_BROWSER
-            MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
         END
         POPUP "ヘルプ"
         BEGIN
             MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
             MENUITEM "改版履歴",                        ID_HISTORY_MENU
             MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+            POPUP "デバッグ情報"
+            BEGIN
+                MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
+                MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
+            END
         END
         MENUITEM SEPARATOR
         MENUITEM "終了",                          ID_MENU_CLOSE

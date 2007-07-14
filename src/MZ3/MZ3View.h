@@ -255,6 +255,7 @@ public:
 	afx_msg void OnCruise();
 	void MyShowHelp(void);
 	void MyShowHistory(void);
+	void MyShowErrorlog(void);
 	afx_msg void OnCheckCruise();
 	void StartCruise( bool unreadOnly );
 	bool CruiseToNextCategory(void);

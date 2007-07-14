@@ -705,7 +705,8 @@ void CReportView::OnLoadPageLink(UINT nID)
 void CReportView::OnReloadPage()
 {
 	// アクセス種別が「ヘルプ」なら何もしない
-	if( m_data->GetAccessType() == ACCESS_HELP ) {
+	switch( m_data->GetAccessType() ) {
+	case ACCESS_HELP:
 		return;
 	}
 
@@ -1459,16 +1460,19 @@ void CReportView::ResetColumnWidth(const CMixiData& mixi)
 	const int W_COL1 = theApp.m_optionMng.m_nReportViewListCol1Ratio;
 	const int W_COL2 = theApp.m_optionMng.m_nReportViewListCol2Ratio;
 	const int W_COL3 = theApp.m_optionMng.m_nReportViewListCol3Ratio;
-	if( mixi.GetAccessType() == ACCESS_HELP ) {
+	switch( mixi.GetAccessType() ) {
+	case ACCESS_HELP:
 		// ヘルプ
 		m_list.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2+W_COL3) );
 		m_list.SetColumnWidth(1, w * (W_COL2+W_COL3)/(W_COL1+W_COL2+W_COL3) );
 		m_list.SetColumnWidth(2, 0 );
-	}else{
+		break;
+	default:
 		// ヘルプ以外
 		m_list.SetColumnWidth(0, w * W_COL1/(W_COL1+W_COL2+W_COL3) );
 		m_list.SetColumnWidth(1, w * W_COL2/(W_COL1+W_COL2+W_COL3) );
 		m_list.SetColumnWidth(2, w * W_COL3/(W_COL1+W_COL2+W_COL3) );
+		break;
 	}
 }
 
