@@ -155,11 +155,18 @@ void CWriteView::OnBnClickedWriteSendButton()
 	CString msg;
 	GetDlgItemText( IDC_WRITE_BODY_EDIT, msg );
 
+	CString title;
+	GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
+
 	if (msg.GetLength() > 3000) {
 		// 最大文字を越えている
 		::MessageBox(m_hWnd, L"送信文字数が多すぎます", L"MZ3", MB_ICONERROR);
 		return;
 	}
+	else if (title.GetLength() == 0) {
+		::MessageBox(m_hWnd, L"タイトルを入力してください", L"MZ3", MB_ICONERROR);
+		return;
+  }
 	else if (msg.GetLength() == 0) {
 		::MessageBox(m_hWnd, L"本文を入力してください", L"MZ3", MB_ICONERROR);
 		return;
