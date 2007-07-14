@@ -2125,7 +2125,13 @@ void CMZ3View::OnViewLog()
 		return;
 	}
 
+	// âêÕ
 	MyParseMixiHtml( strLogfilePath, mixi );
+
+	// URL ê›íË
+	mixi.SetBrowseUri( util::CreateMixiUrl(GetSelectedBodyItem().GetURL()) );
+
+	// ï\é¶
 	MyShowReportView( mixi );
 }
 
