@@ -117,14 +117,23 @@ void COptionTabLog::OnBnClickedChangeLogFolderButton()
 
 }
 
+/// CountupCallback 用のデータ構造
+struct CountupData
+{
+	int nFiles;		///< ファイル数
+	DWORD dwSize;	///< ファイルサイズ
+	CountupData() : nFiles(0), dwSize(0) {}
+};
+
 /**
  * ファイル数のカウントアップ用コールバック関数
  */
 int CountupCallback( const TCHAR* szDirectory,
                      const WIN32_FIND_DATA* data,
-                     int* pnFiles)
+                     CountupData* pData)
 {
-	(*pnFiles) ++;
+	pData->nFiles ++;
+	pData->dwSize += (data->nFileSizeHigh * MAXDWORD) + data->nFileSizeLow;
 
 	return TRUE;
 }
@@ -158,24 +167,27 @@ int DeleteCallback( const TCHAR* szDirectory,
  */
 void COptionTabLog::OnBnClickedCleanLogButton()
 {
-	int nFiles = 0;	// ファイル数
+	CountupData cd;		// ファイル数, ファイルサイズ
 	int nDepthMax = 10;	// 最大再帰深度
 	
 	LPCTSTR szDeleteFilePattern = L"*";
 	CString strLogFolder = theApp.m_filepath.logFolder + L"\\";
 
 	// ログファイル数カウント
-	util::FindFileCallback( strLogFolder, szDeleteFilePattern, CountupCallback, &nFiles, nDepthMax );
+	util::FindFileCallback( strLogFolder, szDeleteFilePattern, CountupCallback, &cd, nDepthMax );
 
-	if( nFiles == 0 ) {
+	if( cd.nFiles == 0 ) {
 		MessageBox( L"削除対象ファイルがありません" );
 		return;
 	}
 
 	CString msg;
 	msg.Format( 
-		L"%d 個のログファイルを削除します。よろしいですか？\n"
-		L"（ファイル数が多い場合、数分程度かかります）", nFiles );
+		L"ログファイルを削除します。よろしいですか？\n"
+		L"（ファイル数が多い場合、数分程度かかります）\n\n"
+		L"ファイル数：%d\n"
+		L"総ファイルサイズ：%s Bytes"
+		, cd.nFiles, util::int2comma_str(cd.dwSize) );
 	if( MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION ) != IDYES ) {
 		return;
 	}
@@ -186,7 +198,7 @@ void COptionTabLog::OnBnClickedCleanLogButton()
 
 	msg.Format( 
 		L"%d 個のファイルを削除しました。\n"
-		L"（対象ファイル：%d 個）", nDeleted, nFiles );
+		L"（対象ファイル：%d 個）", nDeleted, cd.nFiles );
 	MessageBox( msg );
 }
 
