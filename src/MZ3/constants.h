@@ -4,7 +4,7 @@
 #pragma once
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.1.0 Beta11"
+#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.1.0 Beta12"
 
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$" 
@@ -95,6 +95,7 @@ enum ACCESS_TYPE {
 
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ
+	ACCESS_ERRORLOG,			///< mz3log.txt 専用の特殊タイプ
 };
 
 /**
