@@ -246,6 +246,14 @@ void Option::Load()
 
 		// 総データ受信量
 		m_totalRecvBytes = atoi( inifile.GetValue("TotalRecvBytes", "Net").c_str() );
+
+		// User-Agent
+		s = inifile.GetValue( "UserAgent", "Net" );
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_strUserAgent = s.c_str();
+		}
 	}
 
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
@@ -343,6 +351,9 @@ void Option::Save()
 
 	// 総データ受信量
 	inifile.SetValue( "TotalRecvBytes", (LPCSTR)util::int2str_a(m_totalRecvBytes), "Net" );
+
+	// User-Agent
+	inifile.SetValue( L"UserAgent", m_strUserAgent, "Net" );
 
 	// Save
 	inifile.Save( theApp.m_filepath.inifile, false );

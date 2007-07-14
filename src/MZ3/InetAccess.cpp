@@ -150,7 +150,7 @@ bool CInetAccess::Open()
 		CloseInternetHandles();
 
 		// ê⁄ë±ÇäJÇ≠
-		m_hInternet = InternetOpen(_T("MZ3"), INTERNET_OPEN_TYPE_PROXY, proxy, NULL, 0);
+		m_hInternet = InternetOpen(theApp.m_optionMng.m_strUserAgent, INTERNET_OPEN_TYPE_PROXY, proxy, NULL, 0);
 	} catch (CException &) {
 		m_hInternet = NULL;
 

@@ -16,7 +16,10 @@ private:
 	bool			m_bUseProxy;			///< プロキシを使う？
 	bool			m_bUseGlobalProxy;		///< グローバルプロキシを使う？
 											///< （自動接続ONの場合のみ有効）
+public:
+	CString			m_strUserAgent;			///< User-Agent
 
+private:
 	CString			m_proxyServer;			///< プロキシのサーバ
 	int				m_proxyPort;			///< プロキシのポート
 	CString			m_proxyUser;			///< プロキシのユーザ
@@ -105,6 +108,7 @@ public:
 		, m_bConvertUrlForMixiMobile( true )
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
+		, m_strUserAgent( L"MZ3.i" )
 	{
 	}
 
