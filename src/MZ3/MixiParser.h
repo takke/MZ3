@@ -3949,7 +3949,8 @@ public:
 					}else{
 						MZ3LOGGER_ERROR( L"show_friend.pl ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ [" + str + L"]" );
 						// ‘Ş‰ïÏ‚İ‚Ìê‡‚à‚ ‚é‚Ì‚Å‚»‚Ì‚Ü‚Ü‘±s
-						ParserUtil::AddBodyWithExtract( data_, str );
+						ParserUtil::UnEscapeHtmlElement(str);
+						data_.SetAuthor( str );
 					}
 
 					// ŠJÃ“ú‚Ìæ“¾
