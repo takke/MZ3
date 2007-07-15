@@ -3943,12 +3943,14 @@ public:
 					str = html_.GetAt(i);
 
 					index = str.Find(_T("show_friend.pl"));
-					if( index < 0 ) {
+					if( index >= 0 ) {
+						buf = str.Mid(index);
+						MixiUrlParser::GetAuthor( buf, &data_ );
+					}else{
 						MZ3LOGGER_ERROR( L"show_friend.pl ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ [" + str + L"]" );
-						break;
+						// ‘Ş‰ïÏ‚İ‚Ìê‡‚à‚ ‚é‚Ì‚Å‚»‚Ì‚Ü‚Ü‘±s
+						ParserUtil::AddBodyWithExtract( data_, str );
 					}
-					buf = str.Mid(index);
-					MixiUrlParser::GetAuthor( buf, &data_ );
 
 					// ŠJÃ“ú‚Ìæ“¾
 					i += 6;
