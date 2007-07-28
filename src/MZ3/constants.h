@@ -57,6 +57,7 @@ enum ACCESS_TYPE {
 	ACCESS_COMMUNITY,			///< コミュニティページ(view_community.pl)
 	ACCESS_ADDDIARY,			///< 日記投稿
 	ACCESS_IMAGE,				///< 画像
+	ACCESS_MOVIE,				///< 動画
 	ACCESS_DOWNLOAD,			///< ダウンロード
 
 	//--- GROUP 系：グループタブの項目。

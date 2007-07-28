@@ -163,6 +163,7 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_ADDDIARY:			text = L"日記投稿";				break;
 	case ACCESS_MESSAGE:			text = L"メッセージ";			break;
 	case ACCESS_IMAGE:				text = L"画像";					break;
+	case ACCESS_MOVIE:				text = L"動画";					break;
 	case ACCESS_DOWNLOAD:			text = L"ダウンロード";			break;
 	case ACCESS_PROFILE:			text = L"プロフィール";			break;
 	case ACCESS_COMMUNITY:			text = L"コミュニティ";			break;

@@ -277,6 +277,7 @@
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
+#define ID_REPORT_MOVIE                 36300
 
 // Next default values for new objects
 // 

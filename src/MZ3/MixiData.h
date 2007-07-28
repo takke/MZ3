@@ -33,6 +33,7 @@ protected:
 
 	std::vector<CString>	m_bodyArray;	///< 本文（コメント等の本文）
 	std::vector<CString>	m_imageArray;	///< 画像のリスト
+	std::vector<CString>	m_MovieArray;	///< 動画のリスト
 
 	CMixiDataList	m_children;				///< 子要素（コメントなど）
 											///< コミュニティページ要素の場合は、
@@ -66,6 +67,7 @@ public:
 	void ClearAllList() {
 		ClearBody();
 		ClearImage();
+		ClearMovie();
 		m_linkList.clear();
 		m_linkPage.clear();
 	}
@@ -121,9 +123,13 @@ public:
 	int GetOwnerID() const				{ return m_ownerId; };
 
 	void	AddImage(LPCTSTR str)		{ m_imageArray.push_back(str); }
+	void	AddMovie(LPCTSTR str)		{ m_MovieArray.push_back(str); }
 	int		GetImageCount()				{ return m_imageArray.size(); }
+	int		GetMovieCount()				{ return m_MovieArray.size(); }
 	LPCTSTR GetImage(int index)			{ return m_imageArray[index]; }
+	LPCTSTR GetMovie(int index)			{ return m_MovieArray[index]; }
 	void	ClearImage();
+	void	ClearMovie();
 
 	void SetOtherDiary(BOOL flag)		{ m_otherDiary = flag; }
 	BOOL IsOtherDiary()					{ return m_otherDiary; }

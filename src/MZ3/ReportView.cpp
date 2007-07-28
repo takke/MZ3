@@ -59,6 +59,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_ADD_BOOKMARK, &CReportView::OnAddBookmark)
 	ON_COMMAND(ID_DEL_BOOKMARK, &CReportView::OnDelBookmark)
     ON_COMMAND_RANGE(ID_REPORT_IMAGE+1, ID_REPORT_IMAGE+50, OnLoadImage)
+    ON_COMMAND_RANGE(ID_REPORT_MOVIE+1, ID_REPORT_MOVIE+50, OnLoadMovie)
 	ON_COMMAND_RANGE(ID_REPORT_PAGE_LINK_BASE+1, ID_REPORT_PAGE_LINK_BASE+50, OnLoadPageLink)
 	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
     ON_COMMAND(ID_IMAGE_BUTTON, OnImageButton)
@@ -641,6 +642,33 @@ void CReportView::OnLoadImage(UINT nID)
 }
 
 /**
+ * 動画ＤＬ
+ */
+void CReportView::OnLoadMovie(UINT nID)
+{
+	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
+	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
+
+	m_infoEdit.ShowWindow(SW_SHOW);
+
+	CString url = m_currentData->GetMovie(nID - ID_REPORT_MOVIE-1);
+	MZ3LOGGER_DEBUG( L"動画ダウンロード開始 url[" + url + L"]" );
+
+	m_access = TRUE;
+	m_abort = FALSE;
+
+	theApp.m_inet.Initialize( m_hWnd, NULL );
+
+	// 動画URLをCGIから取得
+	theApp.m_accessType = ACCESS_MOVIE;
+	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+}
+
+
+/**
  * ページ変更
  */
 void CReportView::OnLoadPageLink(UINT nID)
@@ -887,6 +915,74 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
+	case ACCESS_MOVIE:
+		{
+			//イメージのURLを取得
+			CString url =  theApp.m_inet.GetURL();
+
+			util::MySetInformationText( m_hWnd, _T("完了") );
+
+			m_access = FALSE;
+
+			// イメージのファイル名を生成
+			CString strFilepath;
+			CString strFilename;
+
+			// url からファイル名を抽出する。
+			// url : http://ic32.mixi.jp/p/ZZZ/ZZZ/album/ZZ/ZZ/XXXXX.flv
+
+			// とりあえず / 以降を使う
+			int idx = url.ReverseFind( '/' );
+			if( idx == -1 ) {
+				// 見つからなかったのでファイル名不正エラー
+				CString msg;
+				msg.Format( 
+					L"ファイル名が不明のため続行できません\n"
+					L" url : [%s]", url );
+				MZ3LOGGER_ERROR( msg );
+				MessageBox( msg );
+				return 0;
+			}else{ 
+				strFilename = url.Mid(idx+1);
+				strFilepath.Format(_T("%s\\%s"), 
+					theApp.m_filepath.downloadFolder, 
+					strFilename );
+			}
+
+			// 既にダウンロード済みなら再ダウンロードするか確認。
+			if( util::ExistFile( strFilepath ) ) {
+				CString msg;
+				msg.Format( 
+					L"同名のファイルがダウンロード済みです。\n"
+					L"ファイル名：%s\n\n"
+					L"再ダウンロードしますか？\n\n"
+					L"【はい】再ダウンロードする\n"
+					L"【いいえ】ダウンロード済みファイルを開く\n"
+					L"【キャンセル】やっぱりやめる", strFilename );
+				int r = MessageBox( msg, 0, MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2 );
+				switch( r ) {
+				case IDYES:
+					// 再ダウンロード
+					// ダウンロード実行。
+					bRetry = true;
+					break;
+				case IDNO:
+					// ダウンロード済みファイルを開く
+					util::OpenByShellExecute( strFilepath );
+					break;
+				default:
+					break;
+				}
+			}else{
+				bRetry = true;
+			}
+			if( bRetry ) {
+				// 動画を再をダウンロード
+				theApp.m_accessType = ACCESS_MOVIE;
+				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+			}
+		}
+		break;
 	default:
 		if( theApp.m_accessType == m_data->GetAccessType() ) {
 			// リロード or ページ変更
@@ -966,6 +1062,11 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 		case ACCESS_IMAGE:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.imageFolder, 
+				url.Mid( url.ReverseFind( '/' )+1 ) );
+			break;
+		case ACCESS_MOVIE:
+			strFilepath.Format(_T("%s\\%s"), 
+				theApp.m_filepath.downloadFolder, 
 				url.Mid( url.ReverseFind( '/' )+1 ) );
 			break;
 		default:
@@ -1334,6 +1435,18 @@ void CReportView::MyPopupReportMenu(void)
 				CString imageName;
 				imageName.Format(_T("画像%02d"), i+1);
 				pcThisMenu->AppendMenu(MF_STRING, ID_REPORT_IMAGE+i+1, imageName);
+			}
+		}
+	}
+
+	// 動画
+	if (m_currentData != NULL) {
+		if (m_currentData->GetMovieCount() > 0) {
+			pcThisMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_MOVIE, _T("-"));
+			for (int i=0; i<m_currentData->GetMovieCount(); i++) {
+				CString MovieName;
+				MovieName.Format(_T("動画%02d"), i+1);
+				pcThisMenu->AppendMenu(MF_STRING, ID_REPORT_MOVIE+i+1, MovieName);
 			}
 		}
 	}

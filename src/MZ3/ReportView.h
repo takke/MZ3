@@ -81,6 +81,7 @@ private:
 	afx_msg void OnWriteComment();
 	afx_msg void OnOpenBrowser();
 	afx_msg void OnLoadImage(UINT);
+	afx_msg void OnLoadMovie(UINT);
 	afx_msg void OnLoadPageLink(UINT);
 	afx_msg void OnReloadPage();
 	afx_msg void OnLoadUrl(UINT);

@@ -33,6 +33,7 @@ CMixiData::~CMixiData()
 {
 	ClearChildren();
 	m_imageArray.clear();
+	m_MovieArray.clear();
 }
 
 
@@ -98,4 +99,9 @@ void CMixiData::SetDate(int month, int day, int hour, int minute)
 void CMixiData::ClearImage()
 {
 	m_imageArray.clear();
+}
+
+void CMixiData::ClearMovie()
+{
+	m_MovieArray.clear();
 }

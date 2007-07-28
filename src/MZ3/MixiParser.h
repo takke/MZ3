@@ -402,6 +402,11 @@ public:
 			ExtractGeneralImageLink( str, *data );
 		}
 
+		// 動画ファイルの抽出
+		if(str.Find( L".flv" ) != -1) {
+			ExtractGeneralVideoLink( str, *data );
+		}
+
 		// リンクの抽出
 		if (str.Find( L"href" ) != -1) {
 			ExtractURI( str, *data );
@@ -628,10 +633,64 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 			line.Append( target, results[0].start );
 
 			CString text = L"<<画像>>";
-
 			// url を追加
 			LPCTSTR url = results[1].str.c_str();
 			data_.m_linkList.push_back( CMixiData::Link(url, text) );
+
+			// 置換
+			line.Append( text );
+
+			// とりあえず改行
+			line += _T("<br>");
+
+			// ターゲットを更新。
+			target.Delete( 0, results[0].end );
+		}
+
+	}
+
+	/**
+	 * 動画変換。
+	 *
+	 * str から動画リンクを抽出し、そのリンクを data に追加する。
+	 * また、str から該当する動画リンクを削除する。
+	 */
+	static void ExtractGeneralVideoLink(CString& line, CMixiData& data_)
+	{
+
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !reg.isCompiled() ) {
+			LPCTSTR szPattern = L".*video *: '([^']+)',.*";
+			if(! reg.compile( szPattern ) ) {
+				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+				return;
+			}
+		}
+
+		CString target = line;
+		line = L"";
+		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+			if( !reg.exec(target) || reg.results.size() != 2 ) {
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				line += target;
+				break;
+			}
+
+			// 発見。
+			std::vector<MyRegex::Result>& results = reg.results;
+
+			// マッチ文字列全体の左側を出力
+			line.Append( target, results[0].start );
+
+			CString text = L"<<動画>>";
+
+			// url を追加
+			LPCTSTR url = results[1].str.c_str();
+			
+			//動画を追加
+			data_.AddMovie( url );
 
 			// 置換
 			line.Append( text );
@@ -2520,7 +2579,27 @@ public:
 				if( endFlag == FALSE ) {
 					// 終了タグ未発見
 					// 日記本文解析
-					ParserUtil::AddBodyWithExtract( data_, str );
+
+					//動画用Scriptタグが見つかったらスクリプト用ループ開始
+					if( util::LineHasStringsNoCase(str,L"<script") ) {
+						while( i<count ) {
+							// 次の行をフェッチ
+							const CString& nextLine = html_.GetAt( ++i );
+							// 拡張子.flvが見つかったら投入
+							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+								ParserUtil::AddBodyWithExtract( data_, nextLine );
+							}
+							// </script> があれば終了
+							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+								break;
+							}
+						}
+					}
+					else {
+						// 2つ目の</table>タグ未発見なので、解析＆投入
+						ParserUtil::AddBodyWithExtract( data_, str );
+					}
+
 				}
 				else {
 					// 終了タグ発見
@@ -3358,8 +3437,27 @@ public:
 						break;
 					}
 				}else{
-					// 2つ目の</table>タグ未発見なので、解析＆投入
-					ParserUtil::AddBodyWithExtract( mixi, str );
+
+					//動画用Scriptタグが見つかったらスクリプト用ループ開始
+					if( util::LineHasStringsNoCase(str,L"<script") ) {
+						while( i<lastLine ) {
+							// 次の行をフェッチ
+							const CString& nextLine = html_.GetAt( ++i );
+							// 拡張子.flvが見つかったら投入
+							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+								ParserUtil::AddBodyWithExtract( mixi, nextLine );
+							}
+							// </script> があれば終了
+							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+								break;
+							}
+						}
+					}
+					else {
+						// 2つ目の</table>タグ未発見なので、解析＆投入
+						ParserUtil::AddBodyWithExtract( mixi, str );
+					}
+					
 				}
 			}
 		}
@@ -3411,6 +3509,7 @@ private:
 	static int parseBBSComment(int sIndex, int eIndex, CMixiData* data, const CHtmlArray& html_ ) 
 	{
 		CString str;
+		INT_PTR lastLine = html_.GetCount(); //行数
 
 		int retIndex = eIndex;
 		CMixiData cmtData;
@@ -3445,7 +3544,6 @@ private:
 					retIndex = -1;
 					break;
 				}
-				//2006/11/19 icchu追加ここまで
 				else if ((index = str.Find(_T("show_friend.pl"))) != -1) {
 
 					str = html_.GetAt(i-1);
@@ -3522,7 +3620,25 @@ private:
 							break;
 						}
 
-						ParserUtil::AddBodyWithExtract( cmtData, line );
+						//動画用Scriptタグが見つかったらスクリプト用ループ開始
+						if( util::LineHasStringsNoCase(line,L"<script") ) {
+							while( i<lastLine ) {
+								// 次の行をフェッチ
+								const CString& nextLine = html_.GetAt( ++i );
+								// 拡張子.flvが見つかったら投入
+								if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+									ParserUtil::AddBodyWithExtract( cmtData, nextLine );
+								}
+								// </script> があれば終了
+								if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+									break;
+								}
+							}
+						}
+						else {
+							ParserUtil::AddBodyWithExtract( cmtData, line );
+						}
+
 					}
 					break;
 				}
@@ -3949,7 +4065,7 @@ public:
 					}else{
 						MZ3LOGGER_ERROR( L"show_friend.pl が見つかりません [" + str + L"]" );
 						// 退会済みの場合もあるのでそのまま続行
-						ParserUtil::UnEscapeHtmlElement(str);
+						ParserUtil::AddBodyWithExtract( data_, str );
 						data_.SetAuthor( str );
 					}
 
@@ -4368,7 +4484,7 @@ public:
 
 				// 日付
 				const CString& str = html_.GetAt(i-1);
-        //2007/06/20 いっちゅう日記投稿不具合対応
+        //日記投稿不具合対応
 				ParserUtil::ChangeDate(util::XmlParser::GetElement(str, 5), util::XmlParser::GetElement(str, 7), &data);
 
 				for (int j=i; j<count; j++) {
@@ -4845,8 +4961,8 @@ public:
 			theApp.m_newMessageCount = messageNum;
 
 			// バイブしちゃう
-	// 		NLED_SETTINGS_INFO led;
-	//		led.LedNum = ::NLedSetDevice(0, 
+			// NLED_SETTINGS_INFO led;
+			//led.LedNum = ::NLedSetDevice(0, 
 		}
 
 		// 新着コメント数の取得
