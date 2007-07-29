@@ -10,6 +10,7 @@
 #include "BodyListCtrl.h"
 #include "PostData.h"
 #include "InetAccess.h"
+#include "XcrawlCanceler.h"
 
 class CMZ3Doc;
 
@@ -82,6 +83,9 @@ public:
 	CCategoryListCtrl	m_categoryList;	///< カテゴリリスト。ItemData は theApp.m_root.groups[].categories のインデックス
 	CBodyListCtrl		m_bodyList;		///< ボディリスト。
 	CEdit				m_infoEdit;		///< 情報表示用エディットボックス
+
+	XcrawlCanceler		m_xcrawl;		///< Xcrawl 制御
+	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 
 private:
 
@@ -199,6 +203,10 @@ private:
 	BOOL OnKeydownCategoryList( WORD vKey );
 	BOOL OnKeydownBodyList( WORD vKey );
 	BOOL OnKeyupBodyList( WORD vKey );
+	BOOL OnKeyupCategoryList( WORD vKey );
+
+	BOOL OnKeyDown(MSG* pMsg);
+	BOOL OnKeyUp(MSG* pMsg);
 
 	afx_msg void OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnOpenBrowser();
@@ -233,6 +241,11 @@ public:
 	BOOL CommandSetFocusBodyList();
 	BOOL CommandSelectGroupTabNextItem();
 	BOOL CommandSelectGroupTabBeforeItem();
+
+	BOOL CommandMoveUpCategoryList();
+	BOOL CommandMoveDownCategoryList();
+	BOOL CommandMoveUpBodyList();
+	BOOL CommandMoveDownBodyList();
 
 	/**
 	 * 現在選択中のボディアイテムを取得する

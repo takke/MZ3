@@ -19,20 +19,6 @@
 #define new DEBUG_NEW
 #endif
 
-/**
- * リストコントロールのフォーカス状態と選択状態を設定する。
- */
-inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, bool bFocusedAndSelected )
-{
-	UINT nState = 0;
-	if( bFocusedAndSelected ) {
-		nState |= LVIS_FOCUSED | LVIS_SELECTED;
-	}
-
-	listCtrl.SetItemState( idx, nState, LVIS_FOCUSED | LVIS_SELECTED );
-}
-
-
 inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType )
 {
 	CString item;
@@ -201,6 +187,7 @@ END_MESSAGE_MAP()
 CMZ3View::CMZ3View()
 	: CFormView(CMZ3View::IDD)
 	, m_dwLastReturn( 0 )
+	, m_nKeydownRepeatCount( 0 )
 {
 	m_preCategory = 0;
 
@@ -855,7 +842,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				CommandSetFocusBodyList();
 
 				// 選択解除
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
 
 				// 次の巡回項目へ。
 				if( DoNextBodyItemCruise() ) {
@@ -886,7 +873,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			m_cruise.targetBodyItem++;
 
 			// 選択解除
-			MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
 
 			if( DoNextBodyItemCruise() ) {
 				// 通信継続のためここで return する
@@ -1108,7 +1095,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	}
 
 	m_nochange = FALSE;
-	MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
 	m_bodyList.SetRedraw(TRUE);
 	m_bodyList.m_bStopDraw = false;
@@ -1178,106 +1165,146 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+BOOL CMZ3View::OnKeyUp(MSG* pMsg)
+{
+	// 共通処理
+	switch (pMsg->wParam) {
+	case VK_F1:
+		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+			// メインメニューのポップアップ
+			RECT rect;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+
+			CMenu menu;
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
+				rect.left,
+				rect.bottom,
+				pMainFrame );
+			menu.Detach();
+			return TRUE;
+		}
+		break;
+	case VK_F2:
+		if( GetFocus() == &m_bodyList ) {
+			// ボディリストでの右クリックメニュー
+			PopupBodyMenu();
+		}else{
+			// カテゴリリストでの右クリック
+			RECT rect;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+
+			POINT pt;
+			pt.x = (rect.right-rect.left) / 2;
+			pt.y = (rect.bottom-rect.top) / 2;
+			CMenu menu;
+			menu.LoadMenu(IDR_CATEGORY_MENU);
+			CMenu* pSubMenu = menu.GetSubMenu(0);
+
+			// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
+			switch( m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() ) {
+			case ACCESS_LIST_NEW_BBS:
+			case ACCESS_LIST_NEWS:
+			case ACCESS_LIST_MESSAGE_IN:
+			case ACCESS_LIST_MESSAGE_OUT:
+			case ACCESS_LIST_DIARY:
+			case ACCESS_LIST_MYDIARY:
+			case ACCESS_LIST_BBS:
+				// 巡回対象なので巡回メニューを無効化しない
+				break;
+			default:
+				// 巡回メニューを無効化する
+				pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+				pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+				break;
+			}
+
+			// 巡回予約済みであればチェックを付ける。
+			if( m_selGroup->getFocusedCategory()->m_bCruise ) {
+				pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
+			}else{
+				pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
+			}
+
+			// メニュー表示
+			pSubMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+		}
+		return TRUE;
+	case VK_BACK:
+		// 中断
+		if (m_access) {
+			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	// Xcrawl Canceler
+	if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+		// キャンセルされたので上下キーを無効にする。
+//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
+		return TRUE;
+	}
+
+	// 各ペイン毎の処理
+	if (pMsg->hwnd == m_categoryList.m_hWnd) {
+		if( OnKeyupCategoryList( pMsg->wParam ) ) {
+			return TRUE;
+		}
+	}else if (pMsg->hwnd == m_bodyList.m_hWnd) {
+		if( OnKeyupBodyList( pMsg->wParam ) ) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL CMZ3View::OnKeyDown(MSG* pMsg)
+{
+	// Xcrawl Canceler
+	if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+		return TRUE;
+	}
+
+	// 各ペイン毎の処理
+	if (pMsg->hwnd == m_groupTab.m_hWnd) {
+		if( OnKeydownGroupTab( pMsg->wParam ) ) {
+			return TRUE;
+		}
+	}else if (pMsg->hwnd == m_categoryList.m_hWnd) {
+		if( OnKeydownCategoryList( pMsg->wParam ) ) {
+			return TRUE;
+		}
+	}else if (pMsg->hwnd == m_bodyList.m_hWnd) {
+		if( OnKeydownBodyList( pMsg->wParam ) ) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
 BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYUP) {
-		switch (pMsg->wParam) {
-		case VK_F1:
-			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
-				// メインメニューのポップアップ
-				RECT rect;
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+		BOOL r = OnKeyUp( pMsg );
 
-				CMenu menu;
-				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-				menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
-					rect.left,
-					rect.bottom,
-					pMainFrame );
-				menu.Detach();
-				return TRUE;
-			}
-			break;
-		case VK_F2:
-			if( GetFocus() == &m_bodyList ) {
-				// ボディリストでの右クリックメニュー
-				PopupBodyMenu();
-			}else{
-				// カテゴリリストでの右クリック
-				RECT rect;
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+		// KEYDOWN リピート回数を初期化
+		m_nKeydownRepeatCount = 0;
 
-				POINT pt;
-				pt.x = (rect.right-rect.left) / 2;
-				pt.y = (rect.bottom-rect.top) / 2;
-				CMenu menu;
-				menu.LoadMenu(IDR_CATEGORY_MENU);
-				CMenu* pSubMenu = menu.GetSubMenu(0);
-
-				// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
-				switch( m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() ) {
-				case ACCESS_LIST_NEW_BBS:
-				case ACCESS_LIST_NEWS:
-				case ACCESS_LIST_MESSAGE_IN:
-				case ACCESS_LIST_MESSAGE_OUT:
-				case ACCESS_LIST_DIARY:
-				case ACCESS_LIST_MYDIARY:
-				case ACCESS_LIST_BBS:
-					// 巡回対象なので巡回メニューを無効化しない
-					break;
-				default:
-					// 巡回メニューを無効化する
-					pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-					pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-					break;
-				}
-
-				// 巡回予約済みであればチェックを付ける。
-				if( m_selGroup->getFocusedCategory()->m_bCruise ) {
-					pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
-				}else{
-					pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
-				}
-
-				// メニュー表示
-				pSubMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
-			}
-			return TRUE;
-		case VK_BACK:
-			// 中断
-			if (m_access) {
-				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
-			}
-			break;
-
-		default:
-			break;
-		}
+		return r;
 	}
 	else if (pMsg->message == WM_KEYDOWN) {
-		// 共通処理
-		if (pMsg->hwnd == m_groupTab.m_hWnd) {
-			if( OnKeydownGroupTab( pMsg->wParam ) ) {
-				return TRUE;
-			}
-		}else if (pMsg->hwnd == m_categoryList.m_hWnd) {
-			if( OnKeydownCategoryList( pMsg->wParam ) ) {
-				return TRUE;
-			}
-		}else if (pMsg->hwnd == m_bodyList.m_hWnd) {
-			if( OnKeydownBodyList( pMsg->wParam ) ) {
-				return TRUE;
-			}
-		}
-	}else if(pMsg->message == WM_KEYUP) {
-		if (pMsg->hwnd == m_bodyList.m_hWnd) {
-			if( OnKeyupBodyList( pMsg->wParam ) ) {
-				return TRUE;
-			}
-		}
-	}
+		// KEYDOWN リピート回数をインクリメント
+		m_nKeydownRepeatCount ++;
 
+		return OnKeyDown( pMsg );
+	}
+	
 	return CFormView::PreTranslateMessage(pMsg);
 }
 
@@ -1287,7 +1314,7 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 {
 	m_hotList->SetFocus();
-	MySetListCtrlItemFocusedAndSelected( *m_hotList, m_selGroup->getSelectedCategory()->selectedBody, true );
+	util::MySetListCtrlItemFocusedAndSelected( *m_hotList, m_selGroup->getSelectedCategory()->selectedBody, true );
 	theApp.ChangeView(theApp.m_pMainView);
 
 	// アイテムの制御
@@ -1427,7 +1454,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
-		MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
 		m_bodyList.EnsureVisible( idx, FALSE);
 	}
 	return TRUE;
@@ -1473,38 +1500,29 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 {
 	switch( vKey ) {
 	case VK_UP:
-		if( m_access ) return TRUE;	// アクセス中は無視
-		if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
-			// 一番上の項目なら無視
-			return TRUE;
+		// VK_KEYDOWN では無視。
+		// VK_KEYUP で処理する。
+		// これは、アドエスの Xcrawl 対応のため。
 
-			// 一番上の項目選択中なら、グループタブへ。
-//			return CommandSetFocusGroupTab();
+		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return CommandMoveUpCategoryList();
+		}
 
-/*			// 一番上の項目選択中なので、一番下に移動
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, 0, false );
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, m_categoryList.GetItemCount()-1, true );
-			m_categoryList.EnsureVisible( m_categoryList.GetItemCount()-1, FALSE );
-			return TRUE;
-*/		}
-		break;
+		return TRUE;
+
 	case VK_DOWN:
-		if( m_access ) return TRUE;	// アクセス中は無視
-		if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
-			// 一番下の項目選択中なら、ボディリストの先頭へ。
-			if (m_bodyList.GetItemCount() != 0) {
-				// 選択状態を先頭に。以前の選択状態をOffに。
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
-				m_selGroup->getSelectedCategory()->selectedBody = 0;
-			}
-			return CommandSetFocusBodyList();
-/*			// 一番下の項目選択中なので、一番上に移動
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, m_categoryList.GetItemCount()-1, false );
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, 0, true );
-			m_categoryList.EnsureVisible( 0, FALSE );
-			return TRUE;
-*/		}
-		break;
+		// VK_KEYDOWN では無視。
+		// VK_KEYUP で処理する。
+		// これは、アドエスの Xcrawl 対応のため。
+
+		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return CommandMoveDownCategoryList();
+		}
+
+		return TRUE;
+
 	case VK_LEFT:
 		if( m_access ) return TRUE;	// アクセス中は無視
 
@@ -1558,85 +1576,57 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 }
 
 /**
+ * カテゴリリストのキーUPイベント
+ */
+BOOL CMZ3View::OnKeyupCategoryList( WORD vKey )
+{
+	switch( vKey ) {
+	case VK_UP:
+		// キー長押しによる連続移動中なら、キーUPで移動しない。
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return TRUE;
+		}
+		return CommandMoveUpCategoryList();
+
+	case VK_DOWN:
+		// キー長押しによる連続移動中なら、キーUPで移動しない。
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return TRUE;
+		}
+		return CommandMoveDownCategoryList();
+	}
+	return FALSE;
+}
+
+/**
  * ボディリストのキーダウンイベント
  */
 BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 {
 	// ボディーリストでのキー押下
 	switch( vKey ) {
-
 	case VK_UP:
-		if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
-			// 一番上。
-			if( m_access ) return TRUE;	// アクセス中は禁止
+		// VK_KEYDOWN では無視。
+		// VK_KEYUP で処理する。
+		// これは、アドエスの Xcrawl 対応のため。
 
-			// カテゴリに移動
-
-			// 選択状態を末尾に。以前の選択状態をOffに。
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
-			m_selGroup->focusedCategory = m_categoryList.GetItemCount()-1;
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
-			
-			return CommandSetFocusCategoryList();
+		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return CommandMoveUpBodyList();
 		}
-		break;
-	case VK_DOWN:
-		if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
-			// 一番下なら無視。
-			if( m_access ) return TRUE;	// アクセス中は禁止
-			return TRUE;
-		}
-		break;
-	case VK_LEFT:
-		// 左ボタン。
-		// ショートカット移動。
-		{
-			int idxSel = m_selGroup->getSelectedCategory()->selectedBody;
-			int nItem = m_bodyList.GetItemCount();
-
-			MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
-			if( idxSel == 0 ) {
-				// 一番上 → 一番下
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-				m_bodyList.EnsureVisible( nItem-1, FALSE);
-				return TRUE;
-			}else if( idxSel == nItem-1 ) {
-				// 一番下     → 一番上
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-				m_bodyList.EnsureVisible( 0, FALSE );
-				return TRUE;
-			}else if( idxSel < nItem/2 ) {
-				// 半分より上 → 一番上
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-				m_bodyList.EnsureVisible( 0, FALSE );
-				return TRUE;
-			}else{
-				// 半分より下 → 一番下
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-				m_bodyList.EnsureVisible( nItem-1, FALSE);
-				return TRUE;
-			}
-		}
-		// カテゴリに移動
-//		return CommandSetFocusCategoryList();
-	case VK_RIGHT:
-		// 右ボタンで、２つ目の項目を変化させる
-		MyChangeBodyHeader();
 		return TRUE;
 
-/*	case VK_RETURN:
-		// アクセス中は再アクセス不可
-		if( m_access ) return TRUE;
+	case VK_DOWN:
+		// VK_KEYDOWN では無視。
+		// VK_KEYUP で処理する。
+		// これは、アドエスの Xcrawl 対応のため。
 
-		if( m_dwLastReturn == 0 ) {
-			// VK_PROCESSKEY が飛んできていない。
-			// 「W-ZERO3 で日本語入力モード以外」、または「W-ZERO3 以外の機種」。
-			// キー押下時刻を設定する。
-			m_dwLastReturn = GetTickCount();
+		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return CommandMoveDownBodyList();
 		}
+		return TRUE;
 
-		break;
-*/
 	case VK_RETURN:
 
 		if( m_dwLastReturn != 0 ) {
@@ -1717,14 +1707,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 		return TRUE;
 
-	case VK_BACK:
-		if( m_access ) {
-			// アクセス中は無視
-			return TRUE;
-		}
-		// 非アクセス中は、カテゴリリストに移動する
-		return CommandSetFocusCategoryList();
-
 	case VK_PROCESSKEY:	// 0xE5
 	case VK_F23:		// 0x86
 		// W-ZERO3 で RETURN キー押下時に飛んでくるキー。
@@ -1736,6 +1718,51 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			AfxBeginThread( LongReturnKey_Thread, this );
 		}
 		break;
+
+	case VK_LEFT:
+		// 左ボタン。
+		// ショートカット移動。
+		{
+			int idxSel = m_selGroup->getSelectedCategory()->selectedBody;
+			int nItem = m_bodyList.GetItemCount();
+
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
+			if( idxSel == 0 ) {
+				// 一番上 → 一番下
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+				m_bodyList.EnsureVisible( nItem-1, FALSE);
+				return TRUE;
+			}else if( idxSel == nItem-1 ) {
+				// 一番下     → 一番上
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+				m_bodyList.EnsureVisible( 0, FALSE );
+				return TRUE;
+			}else if( idxSel < nItem/2 ) {
+				// 半分より上 → 一番上
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+				m_bodyList.EnsureVisible( 0, FALSE );
+				return TRUE;
+			}else{
+				// 半分より下 → 一番下
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+				m_bodyList.EnsureVisible( nItem-1, FALSE);
+				return TRUE;
+			}
+		}
+		// カテゴリに移動
+//		return CommandSetFocusCategoryList();
+	case VK_RIGHT:
+		// 右ボタンで、２つ目の項目を変化させる
+		MyChangeBodyHeader();
+		return TRUE;
+
+	case VK_BACK:
+		if( m_access ) {
+			// アクセス中は無視
+			return TRUE;
+		}
+		// 非アクセス中は、カテゴリリストに移動する
+		return CommandSetFocusCategoryList();
 
 	default:
 //		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
@@ -1753,15 +1780,126 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
  */
 BOOL CMZ3View::OnKeyupBodyList( WORD vKey )
 {
-	// ボディーリストでのキー押下
 	switch( vKey ) {
-	case VK_RETURN:
-		MZ3LOGGER_DEBUG( L"WM_KEYUP, VK_RETURN" );
-		break;
+	case VK_UP:
+		// キー長押しによる連続移動中なら、キーUPで移動しない。
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return TRUE;
+		}
+
+		return CommandMoveUpBodyList();
+
+	case VK_DOWN:
+		// キー長押しによる連続移動中なら、キーUPで移動しない。
+		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+			return TRUE;
+		}
+
+		return CommandMoveDownBodyList();
 	}
 
 	return FALSE;
 }
+
+BOOL CMZ3View::CommandMoveUpCategoryList()
+{
+	if( m_access ) return TRUE;	// アクセス中は無視
+
+	if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
+		// 一番上の項目なら無視
+		return TRUE;
+	} else {
+		// 一番上ではないので、上に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
+		m_selGroup->focusedCategory --;
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+
+		// 移動先が非表示なら上方向にスクロール
+		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
+			m_categoryList.Scroll( CSize(0, -m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+		return TRUE;
+	}
+}
+
+BOOL CMZ3View::CommandMoveDownCategoryList()
+{
+	if( m_access ) return TRUE;	// アクセス中は無視
+
+	if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
+		// 一番下の項目選択中なら、ボディリストの先頭へ。
+		if (m_bodyList.GetItemCount() != 0) {
+			// 選択状態を先頭に。以前の選択状態をOffに。
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
+			m_selGroup->getSelectedCategory()->selectedBody = 0;
+		}
+		return CommandSetFocusBodyList();
+	} else {
+		// 一番下ではないので、下に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
+		m_selGroup->focusedCategory ++;
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+
+		// 移動先が非表示なら下方向にスクロール
+		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
+			m_categoryList.Scroll( CSize(0, m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+		return TRUE;
+	}
+}
+
+BOOL CMZ3View::CommandMoveUpBodyList()
+{
+	if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
+		// 一番上。
+		// カテゴリに移動
+
+		if( m_access ) return TRUE;	// アクセス中は禁止
+
+		// 選択状態を末尾に。以前の選択状態をOffに。
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
+		m_selGroup->focusedCategory = m_categoryList.GetItemCount()-1;
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+		
+		return CommandSetFocusCategoryList();
+	}else{
+		// 一番上ではない。
+		// 上に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
+		m_selGroup->getSelectedCategory()->selectedBody --;
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, true );
+
+		// 移動先が非表示なら上方向にスクロール
+		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
+			m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+		return TRUE;
+	}
+}
+
+BOOL CMZ3View::CommandMoveDownBodyList()
+{
+	if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
+		// 一番下なので無視。
+		if( m_access ) return TRUE;	// アクセス中は禁止
+		return TRUE;
+	}else{
+		// 一番下ではない。
+		// 下に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
+		m_selGroup->getSelectedCategory()->selectedBody ++;
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, true );
+
+		// 移動先が非表示なら下方向にスクロール
+		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
+			m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+
+//		m_bodyList.EnsureVisible( m_selGroup->getSelectedCategory()->selectedBody, FALSE );
+		return TRUE;
+	}
+}
+
 
 /**
  * 長押し判定用スレッド
@@ -2252,7 +2390,7 @@ void CMZ3View::MyUpdateCategoryListByGroupItem(void)
 			m_categoryList.InsertItem( category.GetIndexOnList(), category.m_name, 0 );
 		}else{
 			m_categoryList.SetItemText( i, 0, category.m_name );
-			MySetListCtrlItemFocusedAndSelected( m_categoryList, i, i==m_selGroup->focusedCategory );
+			util::MySetListCtrlItemFocusedAndSelected( m_categoryList, i, i==m_selGroup->focusedCategory );
 		}
 
 		// 取得時刻文字列の設定
@@ -2272,7 +2410,7 @@ void CMZ3View::MyUpdateCategoryListByGroupItem(void)
 
 	// フォーカス、選択状態の復帰
 	if( size > 0 ) {
-		MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
 		m_categoryList.EnsureVisible( m_selGroup->focusedCategory, FALSE );
 
 		// 選択状態（赤）の復帰
@@ -2509,8 +2647,8 @@ bool CMZ3View::PrepareViewBbsList(void)
 		int idxLast = m_selGroup->focusedCategory;
 		int idxNew  = m_categoryList.GetItemCount()-1;
 
-		MySetListCtrlItemFocusedAndSelected( m_categoryList, idxLast, false );
-		MySetListCtrlItemFocusedAndSelected( m_categoryList, idxNew, true );
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxLast, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxNew, true );
 		m_selGroup->focusedCategory  = idxNew;
 		m_selGroup->selectedCategory = idxNew;
 		m_categoryList.SetActiveItem( idxNew );
@@ -2731,9 +2869,9 @@ bool CMZ3View::CruiseToNextCategory(void)
 	}
 
 	// 「選択中のカテゴリ」を変更する。
-	MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
+	util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
 	m_selGroup->selectedCategory = m_selGroup->focusedCategory = m_cruise.targetCategoryIndex;
-	MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+	util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
 	CommandSetFocusCategoryList();
 	OnMySelchangedCategoryList();
 
@@ -2922,7 +3060,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 
 				// 項目を選択/表示状態にする
 				int idx = m_selGroup->getSelectedCategory()->selectedBody;
-				MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
 				m_bodyList.EnsureVisible( idx, FALSE );
 			}
 			return rval;
@@ -2984,7 +3122,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 
 		// 項目を選択/表示状態にする
 		int idxNext = m_cruise.targetBodyItem;
-		MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
 		m_bodyList.EnsureVisible( idxNext, FALSE );
 
 		// 取得する

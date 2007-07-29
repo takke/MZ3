@@ -23,6 +23,7 @@ IMPLEMENT_DYNCREATE(CReportView, CFormView)
  */
 CReportView::CReportView()
 	: CFormView(CReportView::IDD)
+	, m_nKeydownRepeatCount(0)
 {
 	m_data = NULL;
 	m_whiteBr = CreateSolidBrush(RGB(255, 255, 255));
@@ -477,80 +478,180 @@ void CReportView::OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-BOOL CReportView::PreTranslateMessage(MSG* pMsg)
+BOOL CReportView::CommandMoveUpList()
 {
-	CMenu menu;
-	RECT rect;
+	if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
+		// 一番上の項目選択中なので、一番下に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_list, 0, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, true );
+		m_list.EnsureVisible( m_list.GetItemCount()-1, FALSE );
+	} else {
+		// 一番上ではないので、上に移動
+		int idx = m_list.GetSelectedItem();
+		util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_list, --idx, true );
 
-	if (pMsg->message == WM_KEYUP) {
-		switch (pMsg->wParam) {
-		case VK_F1:
-			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
-				// メインメニューのポップアップ
-				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+		// 移動先が非表示なら上方向にスクロール
+		if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+			m_list.Scroll( CSize(0, -m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+	}
+	return TRUE;
+}
 
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-				menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
-					rect.left,
-					rect.bottom - TOOLBAR_HEIGHT,
-					pMainFrame );
-				menu.Detach();
+BOOL CReportView::CommandMoveDownList()
+{
+	if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
+		// 一番下の項目選択中なので、一番上に移動
+		util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_list, 0, true );
+		m_list.EnsureVisible( 0, FALSE );
+	} else {
+		// 一番下ではないので、下に移動
+		int idx = m_list.GetSelectedItem();
+		util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_list, ++idx, true );
+
+		// 移動先が非表示なら下方向にスクロール
+		if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+			m_list.Scroll( CSize(0, m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+		}
+	}
+	return TRUE;
+}
+
+BOOL CReportView::OnKeyUp(MSG* pMsg)
+{
+	switch (pMsg->wParam) {
+	case VK_F1:
+		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+			CMenu menu;
+			RECT rect;
+
+			// メインメニューのポップアップ
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
+				rect.left,
+				rect.bottom - TOOLBAR_HEIGHT,
+				pMainFrame );
+			menu.Detach();
+			return TRUE;
+		}
+		break;
+	case VK_F2:
+		// レポートメニューの表示
+		MyPopupReportMenu();
+		return TRUE;
+	}
+
+	// Xcrawl Canceler
+	if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+		// キャンセルされたので上下キーを無効にする。
+//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
+		return TRUE;
+	}
+
+	if (pMsg->hwnd == m_list.m_hWnd) {
+		// リストでのキーUPイベント
+		switch(pMsg->wParam) {
+		case VK_UP:
+			if( CommandMoveUpList() ) {
 				return TRUE;
 			}
 			break;
-		case VK_F2:
-			// レポートメニューの表示
-			MyPopupReportMenu();
+		case VK_DOWN:
+			if( CommandMoveDownList() ) {
+				return TRUE;
+			}
 			break;
 		}
 	}
-	else if (pMsg->message == WM_KEYDOWN) {
-		switch (MapVirtualKey(pMsg->wParam, 2)) {
-		case VK_BACK:				// クリアボタン
-			if (m_access != FALSE) {
-				// アクセス中は中断処理
-				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+
+	return FALSE;
+}
+
+BOOL CReportView::OnKeyDown(MSG* pMsg)
+{
+	// Xcrawl Canceler
+	if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+		return TRUE;
+	}
+
+	switch (MapVirtualKey(pMsg->wParam, 2)) {
+	case VK_BACK:				// クリアボタン
+		if (m_access != FALSE) {
+			// アクセス中は中断処理
+			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+		}
+		else {
+			OnMenuBack();
+		}
+		return TRUE;
+//	case 48:
+//		TRACE(_T("0 Down\n"));
+//		return TRUE;
+	}
+
+	if (pMsg->hwnd == m_list.m_hWnd) {
+		// リストでのキー押下イベント
+		switch(pMsg->wParam) {
+		case VK_UP:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveUpList();
 			}
-			else {
-				OnMenuBack();
-			}
+
 			return TRUE;
-		case 48:
-			TRACE(_T("0 Down\n"));
+
+		case VK_DOWN:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveDownList();
+			}
+
+			return TRUE;
+
+		case VK_RIGHT:
+			m_edit.LineScroll(m_scrollLine);
+			return TRUE;
+		case VK_LEFT:
+			m_edit.LineScroll(m_scrollLine * -1);
 			return TRUE;
 		}
+	}
 
-		if (pMsg->hwnd == m_list.m_hWnd) {
-			// リストでのキー押下イベント
-			switch(pMsg->wParam) {
-			case VK_UP:
-				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
-					// 一番上の項目選択中なので、一番下に移動
-					m_list.SetItemState(0, 0, LVIS_FOCUSED | LVIS_SELECTED );
-					m_list.SetItemState(m_list.GetItemCount()-1, 
-						LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED );
-					m_list.EnsureVisible(m_list.GetItemCount()-1,FALSE);
-					return TRUE;
-				}
-				break;
-			case VK_DOWN:
-				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
-					// 一番下の項目選択中なので、一番上に移動
-					m_list.SetItemState(m_list.GetItemCount()-1, 0, LVIS_FOCUSED | LVIS_SELECTED );
-					m_list.SetItemState(0, 
-						LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED );
-					m_list.EnsureVisible(0,FALSE);
-					return TRUE;
-				}
-				break;
-			case VK_RIGHT:
-				m_edit.LineScroll(m_scrollLine);
-				return TRUE;
-			case VK_LEFT:
-				m_edit.LineScroll(m_scrollLine * -1);
-				return TRUE;
-			}
+	return FALSE;
+}
+
+BOOL CReportView::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYUP) {
+		BOOL r = OnKeyUp(pMsg);
+
+		// KEYDOWN リピート回数を初期化
+		m_nKeydownRepeatCount = 0;
+
+		if( r ) {
+			return TRUE;
+		}
+	}
+	else if (pMsg->message == WM_KEYDOWN) {
+		// KEYDOWN リピート回数をインクリメント
+		m_nKeydownRepeatCount ++;
+
+		if( OnKeyDown(pMsg) ) {
+			return TRUE;
 		}
 	}
 

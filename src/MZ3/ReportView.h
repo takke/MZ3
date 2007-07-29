@@ -6,6 +6,7 @@
 #include "ReportListCtrl.h"
 #include "InetAccess.h"
 #include "HtmlArray.h"
+#include "XcrawlCanceler.h"
 
 // CReportView フォーム ビュー
 
@@ -50,15 +51,15 @@ private:
 
 public:
 	//--- UI
-	CReportListCtrl m_list;
-	CEdit			m_edit;
-	CEdit			m_titleEdit;
-	CEdit			m_infoEdit;
+	CReportListCtrl		m_list;
+	CEdit				m_edit;
+	CEdit				m_titleEdit;
+	CEdit				m_infoEdit;
+
+	XcrawlCanceler		m_xcrawl;				///< Xcrawl 制御
+	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 
 private:
-
-
-
 	CMixiData*	m_focusBodyItem;
 	CMixiData*	m_data;
 	CMixiData*	m_currentData;
@@ -74,6 +75,13 @@ private:
 	afx_msg void OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	BOOL OnKeyDown(MSG* pMsg);
+	BOOL OnKeyUp(MSG* pMsg);
+
+	BOOL CommandMoveUpList();
+	BOOL CommandMoveDownList();
+
+
 	afx_msg void OnAddBookmark();
 	afx_msg void OnDelBookmark();
 	afx_msg void OnImageButton();

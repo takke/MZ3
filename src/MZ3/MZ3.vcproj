@@ -1144,6 +1144,10 @@
 				RelativePath=".\stdafx.h"
 				>
 			</File>
+			<File
+				RelativePath=".\XcrawlCanceler.h"
+				>
+			</File>
 			<Filter
 				Name="util"
 				>

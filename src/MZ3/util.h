@@ -8,6 +8,37 @@ namespace util
 {
 
 /**
+ * リストコントロールのフォーカス状態と選択状態を設定する。
+ */
+inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, bool bFocusedAndSelected )
+{
+	UINT nState = 0;
+	if( bFocusedAndSelected ) {
+		nState |= LVIS_FOCUSED | LVIS_SELECTED;
+	}
+
+	listCtrl.SetItemState( idx, nState, LVIS_FOCUSED | LVIS_SELECTED );
+}
+
+/**
+ * リストコントロール内で指定されたインデックスが表示状態にあるかどうかを返す。
+ */
+inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )
+{
+	int idxTop  = listCtrl.GetTopIndex();
+	int idxLast = idxTop + listCtrl.GetCountPerPage();
+	if( idx > idxLast ) {
+		// 下方にある
+		return false;
+	}
+	if( idx < idxTop ) {
+		// 上方にある
+		return false;
+	}
+	return true;
+}
+
+/**
  * リビジョン番号を取得する
  *
  * 例："[94]"
