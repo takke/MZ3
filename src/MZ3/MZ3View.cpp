@@ -1559,6 +1559,11 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		else {
 			// 非選択項目なので、取得時刻とボディの変更。
 			// 非取得で、ログがあるならログから取得。
+
+			// アクセス中は選択不可
+			if (m_access) {
+				return TRUE;
+			}
 			m_selGroup->selectedCategory = m_selGroup->focusedCategory;
 
 			OnMySelchangedCategoryList();
@@ -1803,7 +1808,7 @@ BOOL CMZ3View::OnKeyupBodyList( WORD vKey )
 
 BOOL CMZ3View::CommandMoveUpCategoryList()
 {
-	if( m_access ) return TRUE;	// アクセス中は無視
+//	if( m_access ) return TRUE;	// アクセス中は無視
 
 	if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
 		// 一番上の項目なら無視
@@ -1824,7 +1829,7 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 
 BOOL CMZ3View::CommandMoveDownCategoryList()
 {
-	if( m_access ) return TRUE;	// アクセス中は無視
+//	if( m_access ) return TRUE;	// アクセス中は無視
 
 	if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
 		// 一番下の項目選択中なら、ボディリストの先頭へ。
@@ -1854,7 +1859,7 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 		// 一番上。
 		// カテゴリに移動
 
-		if( m_access ) return TRUE;	// アクセス中は禁止
+//		if( m_access ) return TRUE;	// アクセス中は禁止
 
 		// 選択状態を末尾に。以前の選択状態をOffに。
 		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
@@ -1894,8 +1899,6 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
 			m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
 		}
-
-//		m_bodyList.EnsureVisible( m_selGroup->getSelectedCategory()->selectedBody, FALSE );
 		return TRUE;
 	}
 }

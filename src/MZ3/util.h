@@ -25,13 +25,13 @@ inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, b
  */
 inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )
 {
-	int idxTop  = listCtrl.GetTopIndex();
-	int idxLast = idxTop + listCtrl.GetCountPerPage();
-	if( idx > idxLast ) {
+	int idxTop  = listCtrl.GetTopIndex();				// 画面の一番上の表示項目のインデックス
+	int idxLast = idxTop + listCtrl.GetCountPerPage();	// 画面の一番下の表示項目のインデックス
+	if( idx >= idxLast ) {
 		// 下方にある
 		return false;
 	}
-	if( idx < idxTop ) {
+	if( idx <= idxTop ) {
 		// 上方にある
 		return false;
 	}

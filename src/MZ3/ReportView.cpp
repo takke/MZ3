@@ -520,6 +520,19 @@ BOOL CReportView::CommandMoveDownList()
 	return TRUE;
 }
 
+BOOL CReportView::CommandScrollUpList()
+{
+	m_edit.LineScroll( -m_scrollLine );
+	return TRUE;
+}
+
+BOOL CReportView::CommandScrollDownList()
+{
+	m_edit.LineScroll( m_scrollLine );
+	return TRUE;
+}
+
+
 BOOL CReportView::OnKeyUp(MSG* pMsg)
 {
 	switch (pMsg->wParam) {
@@ -541,9 +554,20 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			return TRUE;
 		}
 		break;
+
 	case VK_F2:
 		// レポートメニューの表示
 		MyPopupReportMenu();
+		return TRUE;
+
+	case VK_BACK:				// クリアボタン
+		if (m_access != FALSE) {
+			// アクセス中は中断処理
+			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+		}
+		else {
+			OnMenuBack();
+		}
 		return TRUE;
 	}
 
@@ -558,13 +582,24 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		// リストでのキーUPイベント
 		switch(pMsg->wParam) {
 		case VK_UP:
-			if( CommandMoveUpList() ) {
-				return TRUE;
+			if( m_xcrawl.isXcrawlEnabled() ) {
+				// Xcrawl ではスクロール
+				return CommandScrollUpList();
+			}else{
+				if( CommandMoveUpList() ) {
+					return TRUE;
+				}
 			}
 			break;
+
 		case VK_DOWN:
-			if( CommandMoveDownList() ) {
-				return TRUE;
+			if( m_xcrawl.isXcrawlEnabled() ) {
+				// Xcrawl ではスクロール
+				return CommandScrollDownList();
+			}else{
+				if( CommandMoveDownList() ) {
+					return TRUE;
+				}
 			}
 			break;
 		}
@@ -581,18 +616,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 	}
 
 	switch (MapVirtualKey(pMsg->wParam, 2)) {
-	case VK_BACK:				// クリアボタン
-		if (m_access != FALSE) {
-			// アクセス中は中断処理
-			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
-		}
-		else {
-			OnMenuBack();
-		}
+	case 48:
+		TRACE(_T("0 Down\n"));
 		return TRUE;
-//	case 48:
-//		TRACE(_T("0 Down\n"));
-//		return TRUE;
 	}
 
 	if (pMsg->hwnd == m_list.m_hWnd) {
@@ -605,6 +631,7 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+//				MZ3LOGGER_ERROR( L"repeat" );
 				return CommandMoveUpList();
 			}
 
@@ -617,17 +644,17 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+//				MZ3LOGGER_ERROR( L"repeat" );
 				return CommandMoveDownList();
 			}
 
 			return TRUE;
 
 		case VK_RIGHT:
-			m_edit.LineScroll(m_scrollLine);
-			return TRUE;
+			return CommandScrollDownList();
+
 		case VK_LEFT:
-			m_edit.LineScroll(m_scrollLine * -1);
-			return TRUE;
+			return CommandScrollUpList();
 		}
 	}
 
@@ -639,6 +666,10 @@ BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYUP) {
 		BOOL r = OnKeyUp(pMsg);
 
+		CString s;
+		s.Format( L"keyup, %0X", pMsg->wParam );
+		MZ3LOGGER_ERROR( s );
+
 		// KEYDOWN リピート回数を初期化
 		m_nKeydownRepeatCount = 0;
 
@@ -649,6 +680,10 @@ BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 	else if (pMsg->message == WM_KEYDOWN) {
 		// KEYDOWN リピート回数をインクリメント
 		m_nKeydownRepeatCount ++;
+
+		CString s;
+		s.Format( L"keydown, %0X", pMsg->wParam );
+		MZ3LOGGER_ERROR( s );
 
 		if( OnKeyDown(pMsg) ) {
 			return TRUE;
