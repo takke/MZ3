@@ -115,6 +115,14 @@ void Option::Load()
 			m_bUseLeftSoftKey = (s == "1");
 		}
 
+		// Xcrawl 誤動作防止機能
+		s = inifile.GetValue( "UseXcrawlCanceler", "UI" );
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bUseXcrawlCanceler = (s == "1");
+		}
+
 		// 長押し判定時間
 		s = inifile.GetValue( "LongReturnRangeMSec", "UI" );
 		if( s.empty() ) {
@@ -302,6 +310,9 @@ void Option::Save()
 	inifile.SetValue( L"FontFace", m_fontFace, "UI");
 	// 左ソフトキー有効？
 	inifile.SetValue( "UseLeftSoftKey", m_bUseLeftSoftKey ? "1" : "0", "UI" );
+
+	// Xcrawl 誤動作防止機能
+	inifile.SetValue( "UseXcrawlCanceler", m_bUseXcrawlCanceler ? "1" : "0", "UI" );
 
 	// 長押し判定時間
 	inifile.SetValue( "LongReturnRangeMSec", (LPCSTR)util::int2str_a(m_longReturnRangeMSec), "UI" );

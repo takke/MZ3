@@ -49,7 +49,8 @@ public:
 	CString			m_logFolder;		///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
 	bool			m_bSaveLog;			///< ログを保存するかどうか。
 
-	bool			m_bUseLeftSoftKey;	///< 左ソフトキーによるメニュー表示を利用する？
+	bool			m_bUseLeftSoftKey;		///< 左ソフトキーによるメニュー表示を利用する？
+	bool			m_bUseXcrawlCanceler;	///< Xcrawl の誤動作防止機能
 
 	int				m_nMainViewCategoryListHeightRatio;	///< メイン画面のカテゴリリストの高さ（比率）[1,1000]
 	int				m_nMainViewBodyListHeightRatio;		///< メイン画面のボディリストの高さ（比率）[1,1000]
@@ -91,6 +92,7 @@ public:
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
+		, m_bUseXcrawlCanceler( true )
 		, m_quoteMark( L"> " )
 		, m_nMainViewCategoryListHeightRatio( 30 )	// カテゴリリストは 30%
 		, m_nMainViewBodyListHeightRatio( 70 )		// ボディリストは 70%

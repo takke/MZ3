@@ -1243,7 +1243,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	}
 
 	// Xcrawl Canceler
-	if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeyup( pMsg->wParam ) ) {
 		// キャンセルされたので上下キーを無効にする。
 //		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
 		return TRUE;
@@ -1266,7 +1266,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 {
 	// Xcrawl Canceler
-	if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeydown(pMsg->wParam) ) {
 		return TRUE;
 	}
 

@@ -94,6 +94,8 @@
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_DEBUG_MODE_CHECK            1036
+#define IDC_USE_LEFTSOFTKEY_CHECK2      1037
+#define IDC_USE_XCRAWL_CANCELER_CHECK   1037
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
 #define IDC_TYPE_LIST                   1038

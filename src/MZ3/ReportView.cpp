@@ -572,7 +572,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 	}
 
 	// Xcrawl Canceler
-	if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeyup( pMsg->wParam ) ) {
 		// キャンセルされたので上下キーを無効にする。
 //		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
 		return TRUE;
@@ -586,6 +586,10 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 				// Xcrawl ではスクロール
 				return CommandScrollUpList();
 			}else{
+				if( m_nKeydownRepeatCount >= 2 ) {
+					// キー長押しによる連続移動中なら、キーUPで移動しない。
+					return TRUE;
+				}
 				if( CommandMoveUpList() ) {
 					return TRUE;
 				}
@@ -597,6 +601,10 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 				// Xcrawl ではスクロール
 				return CommandScrollDownList();
 			}else{
+				if( m_nKeydownRepeatCount >= 2 ) {
+					// キー長押しによる連続移動中なら、キーUPで移動しない。
+					return TRUE;
+				}
 				if( CommandMoveDownList() ) {
 					return TRUE;
 				}
@@ -611,7 +619,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 BOOL CReportView::OnKeyDown(MSG* pMsg)
 {
 	// Xcrawl Canceler
-	if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeydown(pMsg->wParam) ) {
 		return TRUE;
 	}
 
