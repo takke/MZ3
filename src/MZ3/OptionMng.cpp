@@ -120,7 +120,7 @@ void Option::Load()
 		if( s.empty() ) {
 			// 初期値をそのまま使う
 		}else{
-			m_bUseXcrawlCanceler = (s == "1");
+			m_bUseXcrawlExtension = (s == "1");
 		}
 
 		// 長押し判定時間
@@ -312,7 +312,7 @@ void Option::Save()
 	inifile.SetValue( "UseLeftSoftKey", m_bUseLeftSoftKey ? "1" : "0", "UI" );
 
 	// Xcrawl 誤動作防止機能
-	inifile.SetValue( "UseXcrawlCanceler", m_bUseXcrawlCanceler ? "1" : "0", "UI" );
+	inifile.SetValue( "UseXcrawlCanceler", m_bUseXcrawlExtension ? "1" : "0", "UI" );
 
 	// 長押し判定時間
 	inifile.SetValue( "LongReturnRangeMSec", (LPCSTR)util::int2str_a(m_longReturnRangeMSec), "UI" );

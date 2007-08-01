@@ -572,44 +572,46 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 	}
 
 	// Xcrawl Canceler
-	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeyup( pMsg->wParam ) ) {
-		// キャンセルされたので上下キーを無効にする。
-//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
-		return TRUE;
-	}
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+			// キャンセルされたので上下キーを無効にする。
+	//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
+			return TRUE;
+		}
 
-	if (pMsg->hwnd == m_list.m_hWnd) {
-		// リストでのキーUPイベント
-		switch(pMsg->wParam) {
-		case VK_UP:
-			if( m_xcrawl.isXcrawlEnabled() ) {
-				// Xcrawl ではスクロール
-				return CommandScrollUpList();
-			}else{
-				if( m_nKeydownRepeatCount >= 2 ) {
-					// キー長押しによる連続移動中なら、キーUPで移動しない。
-					return TRUE;
+		if (pMsg->hwnd == m_list.m_hWnd) {
+			// リストでのキーUPイベント
+			switch(pMsg->wParam) {
+			case VK_UP:
+				if( m_xcrawl.isXcrawlEnabled() ) {
+					// Xcrawl ではスクロール
+					return CommandScrollUpList();
+				}else{
+					if( m_nKeydownRepeatCount >= 2 ) {
+						// キー長押しによる連続移動中なら、キーUPで移動しない。
+						return TRUE;
+					}
+					if( CommandMoveUpList() ) {
+						return TRUE;
+					}
 				}
-				if( CommandMoveUpList() ) {
-					return TRUE;
-				}
-			}
-			break;
+				break;
 
-		case VK_DOWN:
-			if( m_xcrawl.isXcrawlEnabled() ) {
-				// Xcrawl ではスクロール
-				return CommandScrollDownList();
-			}else{
-				if( m_nKeydownRepeatCount >= 2 ) {
-					// キー長押しによる連続移動中なら、キーUPで移動しない。
-					return TRUE;
+			case VK_DOWN:
+				if( m_xcrawl.isXcrawlEnabled() ) {
+					// Xcrawl ではスクロール
+					return CommandScrollDownList();
+				}else{
+					if( m_nKeydownRepeatCount >= 2 ) {
+						// キー長押しによる連続移動中なら、キーUPで移動しない。
+						return TRUE;
+					}
+					if( CommandMoveDownList() ) {
+						return TRUE;
+					}
 				}
-				if( CommandMoveDownList() ) {
-					return TRUE;
-				}
+				break;
 			}
-			break;
 		}
 	}
 
@@ -618,46 +620,86 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 BOOL CReportView::OnKeyDown(MSG* pMsg)
 {
-	// Xcrawl Canceler
-	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeydown(pMsg->wParam) ) {
-		return TRUE;
-	}
-
 	switch (MapVirtualKey(pMsg->wParam, 2)) {
 	case 48:
 		TRACE(_T("0 Down\n"));
 		return TRUE;
 	}
 
+	// VK_UP, VK_DOWN の処理
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		// Xcrawl Canceler
+		if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+			return TRUE;
+		}
+
+		if (pMsg->hwnd == m_list.m_hWnd) {
+			// リストでのキー押下イベント
+			switch(pMsg->wParam) {
+			case VK_UP:
+				// VK_KEYDOWN では無視。
+				// VK_KEYUP で処理する。
+				// これは、アドエスの Xcrawl 対応のため。
+
+				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+	//				MZ3LOGGER_ERROR( L"repeat" );
+					return CommandMoveUpList();
+				}
+
+				return TRUE;
+
+			case VK_DOWN:
+				// VK_KEYDOWN では無視。
+				// VK_KEYUP で処理する。
+				// これは、アドエスの Xcrawl 対応のため。
+
+				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+	//				MZ3LOGGER_ERROR( L"repeat" );
+					return CommandMoveDownList();
+				}
+
+				return TRUE;
+			}
+		}
+	} else {
+		if (pMsg->hwnd == m_list.m_hWnd) {
+			// リストでのキー押下イベント
+			switch(pMsg->wParam) {
+			case VK_UP:
+				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
+					// 一番上の項目選択中なので、一番下に移動
+					util::MySetListCtrlItemFocusedAndSelected( m_list, 0, false );
+					util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, true );
+					m_list.EnsureVisible( m_list.GetItemCount()-1, FALSE );
+
+					return TRUE;
+				} else {
+					// デフォルト動作
+					return FALSE;
+				}
+
+			case VK_DOWN:
+				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
+					// 一番下の項目選択中なので、一番上に移動
+					util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, false );
+					util::MySetListCtrlItemFocusedAndSelected( m_list, 0, true );
+					m_list.EnsureVisible( 0, FALSE );
+
+					return TRUE;
+				} else {
+					// デフォルト動作
+					return FALSE;
+				}
+				break;
+			}
+		}
+	}
+
 	if (pMsg->hwnd == m_list.m_hWnd) {
 		// リストでのキー押下イベント
 		switch(pMsg->wParam) {
-		case VK_UP:
-			// VK_KEYDOWN では無視。
-			// VK_KEYUP で処理する。
-			// これは、アドエスの Xcrawl 対応のため。
-
-			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-//				MZ3LOGGER_ERROR( L"repeat" );
-				return CommandMoveUpList();
-			}
-
-			return TRUE;
-
-		case VK_DOWN:
-			// VK_KEYDOWN では無視。
-			// VK_KEYUP で処理する。
-			// これは、アドエスの Xcrawl 対応のため。
-
-			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-//				MZ3LOGGER_ERROR( L"repeat" );
-				return CommandMoveDownList();
-			}
-
-			return TRUE;
-
 		case VK_RIGHT:
 			return CommandScrollDownList();
 

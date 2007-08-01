@@ -56,7 +56,7 @@ BOOL COptionTabUI::OnInitDialog()
 	SetDlgItemText( IDC_LONG_RETURN_RANGE_MSEC_EDIT, util::int2str(theApp.m_optionMng.m_longReturnRangeMSec) );
 
 	// Xcrawl åÎìÆçÏñhé~ã@î\
-	CheckDlgButton( IDC_USE_XCRAWL_CANCELER_CHECK, theApp.m_optionMng.m_bUseXcrawlCanceler ? BST_CHECKED : BST_UNCHECKED );
+	CheckDlgButton( IDC_USE_XCRAWL_CANCELER_CHECK, theApp.m_optionMng.m_bUseXcrawlExtension ? BST_CHECKED : BST_UNCHECKED );
 
 	return TRUE;
 }
@@ -97,7 +97,7 @@ void COptionTabUI::OnOK()
 	}
 
 	// Xcrawl åÎìÆçÏñhé~ã@î\
-	theApp.m_optionMng.m_bUseXcrawlCanceler = IsDlgButtonChecked( IDC_USE_XCRAWL_CANCELER_CHECK ) == BST_CHECKED ? true : false;
+	theApp.m_optionMng.m_bUseXcrawlExtension = IsDlgButtonChecked( IDC_USE_XCRAWL_CANCELER_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }

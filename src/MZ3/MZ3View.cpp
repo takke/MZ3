@@ -1243,10 +1243,12 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	}
 
 	// Xcrawl Canceler
-	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeyup( pMsg->wParam ) ) {
-		// キャンセルされたので上下キーを無効にする。
-//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
-		return TRUE;
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
+			// キャンセルされたので上下キーを無効にする。
+	//		util::MySetInformationText( GetSafeHwnd(), L"Xcrawl canceled..." );
+			return TRUE;
+		}
 	}
 
 	// 各ペイン毎の処理
@@ -1266,8 +1268,10 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 {
 	// Xcrawl Canceler
-	if( theApp.m_optionMng.m_bUseXcrawlCanceler && m_xcrawl.procKeydown(pMsg->wParam) ) {
-		return TRUE;
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		if( m_xcrawl.procKeydown(pMsg->wParam) ) {
+			return TRUE;
+		}
 	}
 
 	// 各ペイン毎の処理
@@ -1498,31 +1502,63 @@ BOOL CMZ3View::OnKeydownGroupTab( WORD vKey )
  */
 BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 {
+	// VK_UP, VK_DOWN
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		switch( vKey ) {
+		case VK_UP:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveUpCategoryList();
+			}
+
+			return TRUE;
+
+		case VK_DOWN:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveDownCategoryList();
+			}
+
+			return TRUE;
+		}
+	} else {
+		switch( vKey ) {
+		case VK_UP:
+			if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
+				// 一番上の項目なら無視
+				return TRUE;
+			} else {
+				// デフォルト動作
+				return FALSE;
+			}
+			break;
+
+		case VK_DOWN:
+			if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
+				// 一番下の項目選択中なら、ボディリストの先頭へ。
+				if (m_bodyList.GetItemCount() != 0) {
+					// 選択状態を先頭に。以前の選択状態をOffに。
+					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
+					m_selGroup->getSelectedCategory()->selectedBody = 0;
+				}
+				return CommandSetFocusBodyList();
+			} else {
+				// デフォルト動作
+				return FALSE;
+			}
+			break;
+		}
+	}
+
 	switch( vKey ) {
-	case VK_UP:
-		// VK_KEYDOWN では無視。
-		// VK_KEYUP で処理する。
-		// これは、アドエスの Xcrawl 対応のため。
-
-		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return CommandMoveUpCategoryList();
-		}
-
-		return TRUE;
-
-	case VK_DOWN:
-		// VK_KEYDOWN では無視。
-		// VK_KEYUP で処理する。
-		// これは、アドエスの Xcrawl 対応のため。
-
-		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return CommandMoveDownCategoryList();
-		}
-
-		return TRUE;
-
 	case VK_LEFT:
 		if( m_access ) return TRUE;	// アクセス中は無視
 
@@ -1585,20 +1621,22 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
  */
 BOOL CMZ3View::OnKeyupCategoryList( WORD vKey )
 {
-	switch( vKey ) {
-	case VK_UP:
-		// キー長押しによる連続移動中なら、キーUPで移動しない。
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return TRUE;
-		}
-		return CommandMoveUpCategoryList();
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		switch( vKey ) {
+		case VK_UP:
+			// キー長押しによる連続移動中なら、キーUPで移動しない。
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return TRUE;
+			}
+			return CommandMoveUpCategoryList();
 
-	case VK_DOWN:
-		// キー長押しによる連続移動中なら、キーUPで移動しない。
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return TRUE;
+		case VK_DOWN:
+			// キー長押しによる連続移動中なら、キーUPで移動しない。
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return TRUE;
+			}
+			return CommandMoveDownCategoryList();
 		}
-		return CommandMoveDownCategoryList();
 	}
 	return FALSE;
 }
@@ -1609,29 +1647,67 @@ BOOL CMZ3View::OnKeyupCategoryList( WORD vKey )
 BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 {
 	// ボディーリストでのキー押下
+
+	// VK_UP, VK_DOWN
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		switch( vKey ) {
+		case VK_UP:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveUpBodyList();
+			}
+			return TRUE;
+
+		case VK_DOWN:
+			// VK_KEYDOWN では無視。
+			// VK_KEYUP で処理する。
+			// これは、アドエスの Xcrawl 対応のため。
+
+			// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return CommandMoveDownBodyList();
+			}
+			return TRUE;
+		}
+	} else {
+		switch( vKey ) {
+		case VK_UP:
+			if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
+				// 一番上。
+				// カテゴリに移動
+
+		//		if( m_access ) return TRUE;	// アクセス中は禁止
+
+				// 選択状態を末尾に。以前の選択状態をOffに。
+				util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
+				m_selGroup->focusedCategory = m_categoryList.GetItemCount()-1;
+				util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+				
+				return CommandSetFocusCategoryList();
+			}else{
+				// デフォルト動作
+				return FALSE;
+			}
+			break;
+
+		case VK_DOWN:
+			if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
+				// 一番下なので無視。
+				if( m_access ) return TRUE;	// アクセス中は禁止
+				return TRUE;
+			}else{
+				// デフォルト動作
+				return FALSE;
+			}
+			break;
+		}
+	}
+
 	switch( vKey ) {
-	case VK_UP:
-		// VK_KEYDOWN では無視。
-		// VK_KEYUP で処理する。
-		// これは、アドエスの Xcrawl 対応のため。
-
-		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return CommandMoveUpBodyList();
-		}
-		return TRUE;
-
-	case VK_DOWN:
-		// VK_KEYDOWN では無視。
-		// VK_KEYUP で処理する。
-		// これは、アドエスの Xcrawl 対応のため。
-
-		// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return CommandMoveDownBodyList();
-		}
-		return TRUE;
-
 	case VK_RETURN:
 
 		if( m_dwLastReturn != 0 ) {
@@ -1785,22 +1861,24 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
  */
 BOOL CMZ3View::OnKeyupBodyList( WORD vKey )
 {
-	switch( vKey ) {
-	case VK_UP:
-		// キー長押しによる連続移動中なら、キーUPで移動しない。
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return TRUE;
+	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		switch( vKey ) {
+		case VK_UP:
+			// キー長押しによる連続移動中なら、キーUPで移動しない。
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return TRUE;
+			}
+
+			return CommandMoveUpBodyList();
+
+		case VK_DOWN:
+			// キー長押しによる連続移動中なら、キーUPで移動しない。
+			if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
+				return TRUE;
+			}
+
+			return CommandMoveDownBodyList();
 		}
-
-		return CommandMoveUpBodyList();
-
-	case VK_DOWN:
-		// キー長押しによる連続移動中なら、キーUPで移動しない。
-		if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-			return TRUE;
-		}
-
-		return CommandMoveDownBodyList();
 	}
 
 	return FALSE;
