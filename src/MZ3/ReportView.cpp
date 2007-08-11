@@ -1033,9 +1033,16 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	bool bRetry = false;
 	switch( theApp.m_accessType ) {
 	case ACCESS_IMAGE:
+	case ACCESS_MOVIE:
 		{
 			//イメージのURLを取得
-			CString url = mixi::ShowPictureParser::GetImageURL( html );
+			CString url;
+			switch( theApp.m_accessType ) {
+			case ACCESS_IMAGE:		url =  theApp.m_inet.GetURL();						break;
+			case ACCESS_MOVIE:		url = mixi::ShowPictureParser::GetImageURL( html );	break;
+			default:
+				break;
+			}
 
 			util::MySetInformationText( m_hWnd, _T("完了") );
 
@@ -1048,75 +1055,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// url からファイル名を抽出する。
 			// url : http://ic32.mixi.jp/p/ZZZ/ZZZ/album/ZZ/ZZ/XXXXX.jpg
 			// url : http://ic46.mixi.jp/p/ZZZ/ZZZ/diary/ZZ/ZZ/XXXXX.jpg
-			// とりあえず / 以降を使う
-			int idx = url.ReverseFind( '/' );
-			if( idx == -1 ) {
-				// 見つからなかったのでファイル名不正エラー
-				CString msg;
-				msg.Format( 
-					L"ファイル名が不明のため続行できません\n"
-					L" url : [%s]", url );
-				MZ3LOGGER_ERROR( msg );
-				MessageBox( msg );
-				return 0;
-			}else{ 
-				strFilename = url.Mid(idx+1);
-				strFilepath.Format(_T("%s\\%s"), 
-					theApp.m_filepath.imageFolder, 
-					strFilename );
-			}
-
-			// 既にダウンロード済みなら再ダウンロードするか確認。
-			if( util::ExistFile( strFilepath ) ) {
-				CString msg;
-				msg.Format( 
-					L"同名のファイルがダウンロード済みです。\n"
-					L"ファイル名：%s\n\n"
-					L"再ダウンロードしますか？\n\n"
-					L"【はい】再ダウンロードする\n"
-					L"【いいえ】ダウンロード済みファイルを開く\n"
-					L"【キャンセル】やっぱりやめる", strFilename );
-				int r = MessageBox( msg, 0, MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2 );
-				switch( r ) {
-				case IDYES:
-					// 再ダウンロード
-					// ダウンロード実行。
-					bRetry = true;
-					break;
-				case IDNO:
-					// ダウンロード済みファイルを開く
-					util::OpenByShellExecute( strFilepath );
-					break;
-				default:
-					break;
-				}
-			}else{
-				bRetry = true;
-			}
-
-			if( bRetry ) {
-				// イメージをダウンロード
-				theApp.m_accessType = ACCESS_IMAGE;
-				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
-			}
-		}
-		break;
-	case ACCESS_MOVIE:
-		{
-			//イメージのURLを取得
-			CString url =  theApp.m_inet.GetURL();
-
-			util::MySetInformationText( m_hWnd, _T("完了") );
-
-			m_access = FALSE;
-
-			// イメージのファイル名を生成
-			CString strFilepath;
-			CString strFilename;
-
-			// url からファイル名を抽出する。
 			// url : http://ic32.mixi.jp/p/ZZZ/ZZZ/album/ZZ/ZZ/XXXXX.flv
-
 			// とりあえず / 以降を使う
 			int idx = url.ReverseFind( '/' );
 			if( idx == -1 ) {
@@ -1130,9 +1069,18 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				return 0;
 			}else{ 
 				strFilename = url.Mid(idx+1);
-				strFilepath.Format(_T("%s\\%s"), 
-					theApp.m_filepath.downloadFolder, 
-					strFilename );
+				switch( theApp.m_accessType ) {
+				case ACCESS_IMAGE:
+					strFilepath.Format(_T("%s\\%s"), 
+						theApp.m_filepath.imageFolder, 
+						strFilename );
+					break;
+				case ACCESS_MOVIE:
+					strFilepath.Format(_T("%s\\%s"), 
+						theApp.m_filepath.downloadFolder, 
+						strFilename );
+					break;
+				}
 			}
 
 			// 既にダウンロード済みなら再ダウンロードするか確認。
@@ -1162,13 +1110,14 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}else{
 				bRetry = true;
 			}
+
 			if( bRetry ) {
-				// 動画を再をダウンロード
-				theApp.m_accessType = ACCESS_MOVIE;
+				// イメージ・動画を再ダウンロード
 				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
 			}
 		}
 		break;
+
 	default:
 		if( theApp.m_accessType == m_data->GetAccessType() ) {
 			// リロード or ページ変更
