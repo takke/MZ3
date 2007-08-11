@@ -691,6 +691,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CommonSelectDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HtmlArray.cpp"
 				>
 			</File>
@@ -1094,6 +1098,10 @@
 			>
 			<File
 				RelativePath=".\CategoryItem.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CommonSelectDlg.h"
 				>
 			</File>
 			<File

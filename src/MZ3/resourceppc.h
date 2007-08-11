@@ -27,6 +27,7 @@
 #define IDD_DEBUG2_DIALOG               148
 #define IDR_CATEGORY_MENU               149
 #define IDR_ATTACH_IMAGE_MENU           150
+#define IDD_COMMON_SELECT_DIALOG        151
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -94,7 +95,6 @@
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_DEBUG_MODE_CHECK            1036
-#define IDC_USE_LEFTSOFTKEY_CHECK2      1037
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
@@ -112,6 +112,9 @@
 #define IDC_CLEAN_LOG_BUTTON            1050
 #define IDC_USE_GLOBAL_PROXY_RADIO      1051
 #define IDC_USE_MANUAL_PROXY_RADIO      1052
+#define IDC_SELECT1_BUTTON              1052
+#define IDC_SELECT2_BUTTON              1053
+#define IDC_MESSAGE_STATIC              1054
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -285,9 +288,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        151
+#define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         32949
-#define _APS_NEXT_CONTROL_VALUE         1052
+#define _APS_NEXT_CONTROL_VALUE         1055
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

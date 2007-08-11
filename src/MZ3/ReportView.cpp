@@ -11,6 +11,7 @@
 #include "util.h"
 #include "QuoteDlg.h"
 #include "MixiParser.h"
+#include "CommonSelectDlg.h"
 
 #define MASK_COLOR RGB(255,0,255);
 
@@ -961,14 +962,21 @@ void CReportView::OnLoadUrl(UINT nID)
 	CString msg;
 	msg.Format( 
 		L"下記のURLを開きます。\n"
-		L"ブラウザで開きますか？\n\n"
-		L"【はい】ブラウザで開く\n"
-		L"【いいえ】MZ3でダウンロード\n"
-		L"【キャンセル】やっぱりやめる\n\n"
+		L"どの方法で開きますか？\n\n"
 		L"%s", url );
-	int r = MessageBox( msg, L"MZ3", MB_YESNOCANCEL | MB_DEFBUTTON3 | MB_ICONQUESTION );
+
+	CCommonSelectDlg dlg;
+	dlg.SetMessage( msg );
+	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"ブラウザで開く" );
+	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"MZ3でダウンロード" );
+	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_CANCEL,  L"キャンセル" );
+	if( dlg.DoModal() != IDOK ) {
+		return;
+	}
+
+	int r = dlg.m_pressedButtonCode;
 	switch( r ) {
-	case IDYES:
+	case CCommonSelectDlg::BUTTONCODE_SELECT1:
 		// ブラウザで開く
 		{
 			// 自動ログイン変換
@@ -985,7 +993,7 @@ void CReportView::OnLoadUrl(UINT nID)
 			util::OpenUrlByBrowser( requestUrl );
 		}
 		break;
-	case IDNO:
+	case CCommonSelectDlg::BUTTONCODE_SELECT2:
 		// MZ3でダウンロード
 		{
 			m_access = TRUE;
@@ -1199,6 +1207,7 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 				theApp.m_filepath.imageFolder, 
 				url.Mid( url.ReverseFind( '/' )+1 ) );
 			break;
+
 		case ACCESS_MOVIE:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.downloadFolder, 
@@ -1216,7 +1225,7 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ダウンロードの場合は、実行を確認する。
-//	if( theApp.m_accessType == ACCESS_DOWNLOAD ) {
+//	if( theApp.m_optionMng.m_bUseRunConfirmDlg ) {
 	{
 		CString msg;
 		msg.Format( 
