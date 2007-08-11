@@ -123,6 +123,14 @@ void Option::Load()
 			m_bUseXcrawlExtension = (s == "1");
 		}
 
+		// ダウンロード後の実行確認画面を表示する？
+		s = inifile.GetValue( "UseRunConfirmDlg", "UI" );
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bUseRunConfirmDlg = (s == "1");
+		}
+
 		// 長押し判定時間
 		s = inifile.GetValue( "LongReturnRangeMSec", "UI" );
 		if( s.empty() ) {
@@ -313,6 +321,9 @@ void Option::Save()
 
 	// Xcrawl 誤動作防止機能
 	inifile.SetValue( "UseXcrawlCanceler", m_bUseXcrawlExtension ? "1" : "0", "UI" );
+
+	// ダウンロード後の実行確認画面を表示する？
+	inifile.SetValue( "UseRunConfirmDlg", m_bUseRunConfirmDlg ? "1" : "0", "UI" );
 
 	// 長押し判定時間
 	inifile.SetValue( "LongReturnRangeMSec", (LPCSTR)util::int2str_a(m_longReturnRangeMSec), "UI" );

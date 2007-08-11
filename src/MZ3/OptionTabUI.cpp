@@ -58,6 +58,9 @@ BOOL COptionTabUI::OnInitDialog()
 	// Xcrawl 誤動作防止機能
 	CheckDlgButton( IDC_USE_XCRAWL_CANCELER_CHECK, theApp.m_optionMng.m_bUseXcrawlExtension ? BST_CHECKED : BST_UNCHECKED );
 
+	// ダウンロード後の確認画面
+	CheckDlgButton( IDC_USE_RUN_CONFIRM_DLG_CHECK, theApp.m_optionMng.m_bUseRunConfirmDlg ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;
 }
 
@@ -98,6 +101,9 @@ void COptionTabUI::OnOK()
 
 	// Xcrawl 誤動作防止機能
 	theApp.m_optionMng.m_bUseXcrawlExtension = IsDlgButtonChecked( IDC_USE_XCRAWL_CANCELER_CHECK ) == BST_CHECKED ? true : false;
+
+	// ダウンロード後の確認画面
+	theApp.m_optionMng.m_bUseRunConfirmDlg = IsDlgButtonChecked( IDC_USE_RUN_CONFIRM_DLG_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }

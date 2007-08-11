@@ -37,20 +37,21 @@ public:
 
 	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
 
-	int				m_fontHeight;		///< フォント（中）のサイズ（0 の場合は設定しない）
-	CString			m_fontFace;			///< フォント名（"" の場合は設定しない）
+	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
+	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）
 
-	int				m_fontHeightBig;	///< フォント（大）のサイズ（0 の場合は設定しない）
-	int				m_fontHeightMedium;	///< フォント（中）のサイズ（0 の場合は設定しない）
-	int				m_fontHeightSmall;	///< フォント（小）のサイズ（0 の場合は設定しない）
+	int				m_fontHeightBig;		///< フォント（大）のサイズ（0 の場合は設定しない）
+	int				m_fontHeightMedium;		///< フォント（中）のサイズ（0 の場合は設定しない）
+	int				m_fontHeightSmall;		///< フォント（小）のサイズ（0 の場合は設定しない）
 
 	int				m_longReturnRangeMSec;	///< 長押し判定時間（ミリ秒）
 
-	CString			m_logFolder;		///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
-	bool			m_bSaveLog;			///< ログを保存するかどうか。
+	CString			m_logFolder;			///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
+	bool			m_bSaveLog;				///< ログを保存するかどうか。
 
 	bool			m_bUseLeftSoftKey;		///< 左ソフトキーによるメニュー表示を利用する？
 	bool			m_bUseXcrawlExtension;	///< Xcrawl の誤動作防止機能
+	bool			m_bUseRunConfirmDlg;	///< ダウンロード後の実行確認画面を表示する？
 
 	int				m_nMainViewCategoryListHeightRatio;	///< メイン画面のカテゴリリストの高さ（比率）[1,1000]
 	int				m_nMainViewBodyListHeightRatio;		///< メイン画面のボディリストの高さ（比率）[1,1000]
@@ -93,6 +94,7 @@ public:
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
 		, m_bUseXcrawlExtension( true )
+		, m_bUseRunConfirmDlg( true )
 		, m_quoteMark( L"> " )
 		, m_nMainViewCategoryListHeightRatio( 30 )	// カテゴリリストは 30%
 		, m_nMainViewBodyListHeightRatio( 70 )		// ボディリストは 70%

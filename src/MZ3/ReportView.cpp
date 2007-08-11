@@ -1046,8 +1046,8 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			//イメージのURLを取得
 			CString url;
 			switch( theApp.m_accessType ) {
-			case ACCESS_IMAGE:		url =  theApp.m_inet.GetURL();						break;
-			case ACCESS_MOVIE:		url = mixi::ShowPictureParser::GetImageURL( html );	break;
+			case ACCESS_IMAGE:		url = mixi::ShowPictureParser::GetImageURL( html ); break;
+			case ACCESS_MOVIE:		url = theApp.m_inet.GetURL();						break;
 			default:
 				break;
 			}
@@ -1097,18 +1097,26 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				msg.Format( 
 					L"同名のファイルがダウンロード済みです。\n"
 					L"ファイル名：%s\n\n"
-					L"再ダウンロードしますか？\n\n"
-					L"【はい】再ダウンロードする\n"
-					L"【いいえ】ダウンロード済みファイルを開く\n"
-					L"【キャンセル】やっぱりやめる", strFilename );
-				int r = MessageBox( msg, 0, MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2 );
+					L"再ダウンロードしますか？"
+					, strFilename );
+
+				CCommonSelectDlg dlg;
+				dlg.SetMessage( msg );
+				dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"再ダウンロードする" );
+				dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"ダウンロード済みファイルを開く" );
+				dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_CANCEL,  L"やっぱりやめる" );
+				if( dlg.DoModal() != IDOK ) {
+					break;
+				}
+
+				int r = dlg.m_pressedButtonCode;
 				switch( r ) {
-				case IDYES:
+				case CCommonSelectDlg::BUTTONCODE_SELECT1:
 					// 再ダウンロード
 					// ダウンロード実行。
 					bRetry = true;
 					break;
-				case IDNO:
+				case CCommonSelectDlg::BUTTONCODE_SELECT2:
 					// ダウンロード済みファイルを開く
 					util::OpenByShellExecute( strFilepath );
 					break;
@@ -1225,8 +1233,7 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ダウンロードの場合は、実行を確認する。
-//	if( theApp.m_optionMng.m_bUseRunConfirmDlg ) {
-	{
+	if( theApp.m_optionMng.m_bUseRunConfirmDlg ) {
 		CString msg;
 		msg.Format( 
 			L"ダウンロードが完了しました！\n\n"
