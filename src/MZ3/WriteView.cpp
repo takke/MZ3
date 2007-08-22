@@ -820,7 +820,9 @@ CString CWriteView::MyShowDlgToConfirmPostImage( CString selectedFilepath )
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = MAX_PATH; 
 	ofn.lpstrTitle = L"JPEGﾌｧｲﾙを開く...";
-	ofn.lpstrFilter = L"JPEGﾌｧｲﾙ (*.jpg)\0*.jpg;*.jpeg\0すべてのﾌｧｲﾙ (*.*)\0*.*\0\0";
+	//フィルタを一個にするとホーミンさんのFileDialgChangerインストール時に画像サムネイルに対応できるため変更
+	//ofn.lpstrFilter = L"JPEGﾌｧｲﾙ (*.jpg)\0*.jpg;*.jpeg\0すべてのﾌｧｲﾙ (*.*)\0*.*\0\0";
+	ofn.lpstrFilter = L"JPEGﾌｧｲﾙ (*.jpg)\0*.jpg;*.jpeg\0\0";
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
 	ofn.lpstrInitialDir = L"";
 	if (GetOpenFileName(&ofn) == IDOK) {
