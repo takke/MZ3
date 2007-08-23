@@ -43,6 +43,9 @@ CMZ3App::CMZ3App()
 // -----------------------------------------------------------------------------
 CMZ3App::~CMZ3App()
 {
+#ifndef WINCE
+	return;
+#endif
 	if( m_pReportView != NULL ) {
 		delete m_pReportView;
 		m_pReportView = NULL;

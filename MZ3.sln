@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegexTest", "src\RegexTest\
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_Win32|Mixed Platforms = Debug_Win32|Mixed Platforms
+		Debug_Win32|Win32 = Debug_Win32|Win32
+		Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I) = Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		Debug|Mixed Platforms = Debug|Mixed Platforms
 		Debug|Win32 = Debug|Win32
 		Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I) = Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
@@ -23,6 +26,13 @@ Global
 		Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I) = Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Mixed Platforms.ActiveCfg = Debug_Win32|Win32
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Mixed Platforms.Build.0 = Debug_Win32|Win32
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Win32.ActiveCfg = Debug_Win32|Win32
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Win32.Build.0 = Debug_Win32|Win32
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Build.0 = Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Deploy.0 = Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug|Mixed Platforms.ActiveCfg = Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug|Mixed Platforms.Build.0 = Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug|Mixed Platforms.Deploy.0 = Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
@@ -53,6 +63,11 @@ Global
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Build.0 = Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Deploy.0 = Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug_Win32|Mixed Platforms.ActiveCfg = Debug_Win32
+		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug_Win32|Win32.ActiveCfg = Debug_Win32
+		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug_Win32|Win32.Build.0 = Debug_Win32
+		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug_Win32
+		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Build.0 = Debug_Win32
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug|Win32.ActiveCfg = Release_MZ3
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug
@@ -68,6 +83,9 @@ Global
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Release|Win32.ActiveCfg = Release_MZ3
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release
 		{1F943333-1B8B-4111-97DE-72FB9135296C}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).Build.0 = Release
+		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug_Win32|Mixed Platforms.ActiveCfg = Debug_Win32|Win32
+		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug_Win32|Win32.ActiveCfg = Debug_Win32|Win32
+		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug_Win32|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Debug|Win32.ActiveCfg = Release|Win32

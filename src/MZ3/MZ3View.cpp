@@ -491,19 +491,19 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	int hBody     = (cy * h2 / (h1+h2)) - (hInfo - 1);
 
 	int y = 0;
-	GetDlgItem(IDC_GROUP_TAB)  ->MoveWindow( 0, y, cx, hGroup    );
+	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
 	y += hGroup;
-	GetDlgItem(IDC_HEADER_LIST)->MoveWindow( 0, y, cx, hCategory );
+	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
 	y += hCategory;
-	GetDlgItem(IDC_BODY_LIST)  ->MoveWindow( 0, y, cx, hBody     );
+	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
 	y += hBody;
-	GetDlgItem(IDC_INFO_EDIT)  ->MoveWindow( 0, y, cx, hInfo     );
+	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
 
 	// プログレスバーは別途配置
 	// サイズは hInfo の 2/3 とする
 	int hProgress = hInfo * 2 / 3;
 	y = cy - hInfo - hProgress;
-	GetDlgItem(IDC_PROGRESS_BAR)->MoveWindow( 0, y, cx, hProgress );
+	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
 
 	// リストカラム幅の変更
 	ResetColumnWidth();

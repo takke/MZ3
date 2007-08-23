@@ -8,6 +8,23 @@ namespace util
 {
 
 /**
+ * 指定されたIDのウィンドウを移動する
+ */
+inline void MoveDlgItemWindow( CWnd* pParent, int idc, int x, int y, int nWidth, int nHeight )
+{
+	if (pParent==NULL) {
+		return;
+	}
+
+	CWnd* pDlgItem = pParent->GetDlgItem(idc);
+	if (pDlgItem==NULL) {
+		return;
+	}
+
+	pDlgItem->MoveWindow( x, y, nWidth, nHeight );
+}
+
+/**
  * リストコントロールのフォーカス状態と選択状態を設定する。
  */
 inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, bool bFocusedAndSelected )

@@ -199,10 +199,10 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	// 情報領域は必要に応じて表示されるため、上記の比率とは関係なくサイズを設定する
 	int hInfo   = theApp.GetInfoRegionHeight(fontHeight);	// 情報領域もフォントサイズ依存
 
-	GetDlgItem(IDC_TITLE_EDIT) ->MoveWindow( 0, 0,            cx, hTitle  );
-	GetDlgItem(IDC_REPORT_LIST)->MoveWindow( 0, hTitle,       cx, hList   );
-	GetDlgItem(IDC_REPORT_EDIT)->MoveWindow( 0, hTitle+hList, cx, hReport );
-	GetDlgItem(IDC_INFO_EDIT)  ->MoveWindow( 0, cy - hInfo,   cx, hInfo   );
+	util::MoveDlgItemWindow( this, IDC_TITLE_EDIT,  0, 0,            cx, hTitle  );
+	util::MoveDlgItemWindow( this, IDC_REPORT_LIST, 0, hTitle,       cx, hList   );
+	util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
+	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
 
 	// スクロールタイプが「ページ単位」なら再計算
 	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
@@ -222,7 +222,7 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	// サイズは hInfo の 2/3 とする
 	int hProgress = hInfo * 2 / 3;
 	int y = cy - hInfo - hProgress;
-	GetDlgItem(IDC_PROGRESS_BAR)->MoveWindow( 0, y, cx, hProgress );
+	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
 
 	// リストカラム幅の変更
 	if( m_data != NULL ) {

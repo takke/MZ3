@@ -140,11 +140,11 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 		break;
 	}
 
-	GetDlgItem(IDC_WRITE_TITLE_EDIT   )->MoveWindow(   0,        0,   cx, hEdit);
-	GetDlgItem(IDC_WRITE_BODY_EDIT    )->MoveWindow(   0,    hEdit,   cx, cy-hEdit*2);
-	GetDlgItem(IDC_WRITE_INFO_EDIT    )->MoveWindow(   0, cy-hEdit,   cx, hEdit);
-	GetDlgItem(IDC_WRITE_SEND_BUTTON  )->MoveWindow(   0, cy-hEdit, yBtn, hEdit);
-	GetDlgItem(IDC_WRITE_CANCEL_BUTTON)->MoveWindow(yBtn, cy-hEdit, yBtn, hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_TITLE_EDIT,       0,        0,   cx, hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_BODY_EDIT,        0,    hEdit,   cx, cy-hEdit*2);
+	util::MoveDlgItemWindow( this, IDC_WRITE_INFO_EDIT,        0, cy-hEdit,   cx, hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_SEND_BUTTON,      0, cy-hEdit, yBtn, hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_CANCEL_BUTTON, yBtn, cy-hEdit, yBtn, hEdit);
 }
 
 // -----------------------------------------------------------------------------
