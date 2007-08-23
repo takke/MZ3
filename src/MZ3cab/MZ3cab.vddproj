@@ -32,8 +32,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_73F75635673E49590860E5F10E1633A1"
+        "OwnerKey" = "8:_F1ACF2406396454D84AF361F936A2D20"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7C86FC78244435090425B4BD08B3A7F"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D77A6BA8C9D813D83971F97CE33033F2"
+        "OwnerKey" = "8:_F1ACF2406396454D84AF361F936A2D20"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -75,6 +87,18 @@
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
         "OutputFilename" = "8:Debug\\MZ3cab.cab"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "SignOutput" = "11:FALSE"
+        "CertificateHash" = "8:"
+        "TimeStampServer" = "8:"
+        }
+        "Debug_Win32"
+        {
+        "DisplayName" = "8:Debug_Win32"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:Debug_Win32\\MZ3cab.cab"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "SignOutput" = "11:FALSE"
@@ -176,6 +200,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_73F75635673E49590860E5F10E1633A1"
+            {
+            "SourcePath" = "8:comdlg32.dll"
+            "TargetName" = "8:comdlg32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_A7C86FC78244435090425B4BD08B3A7F"
             {
             "SourcePath" = "8:..\\..\\dist\\toppage_group_sample.ini"
@@ -192,6 +234,24 @@
             "Register" = "3:0"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_D77A6BA8C9D813D83971F97CE33033F2"
+            {
+            "SourcePath" = "8:WININET.dll"
+            "TargetName" = "8:WININET.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{BA458234-9B71-4F46-8107-E91156377184}:_E0975A96522C4A7A8A7A7864794515F0"
@@ -313,7 +373,7 @@
         {
             "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_F1ACF2406396454D84AF361F936A2D20"
             {
-            "SourcePath" = "8:..\\MZ3\\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\\Release_MZ3\\MZ3.exe"
+            "SourcePath" = "8:..\\mz3\\debug_win32\\MZ3.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
