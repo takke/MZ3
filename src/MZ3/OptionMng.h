@@ -93,7 +93,7 @@ public:
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
-		, m_bUseXcrawlExtension( true )
+		, m_bUseXcrawlExtension( false )
 		, m_bUseRunConfirmDlg( true )
 		, m_quoteMark( L"> " )
 		, m_nMainViewCategoryListHeightRatio( 30 )	// カテゴリリストは 30%

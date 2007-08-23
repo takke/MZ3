@@ -8,7 +8,11 @@
 #pragma comment(linker, "/nodefaultlib:libcd.lib")
 
 // メモ - この値は、ターゲットになっている Windows CE OS バージョンと相互に強く関連付けられていません。
-#define WINVER _WIN32_WCE
+#ifdef WINCE
+# define WINVER _WIN32_WCE
+#else
+# define WINVER 0x0500
+#endif
 
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN		// Windows ヘッダーから使用されていない部分を除外します。
@@ -22,9 +26,12 @@
 // 一般的で無視しても安全な MFC の警告メッセージの一部の非表示を解除します。
 #define _AFX_ALL_WARNINGS
 
-#include <ceconfig.h>
+#ifdef WINCE
+# include <ceconfig.h>
+#endif
+
 #if defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP)
-#define SHELL_AYGSHELL
+# define SHELL_AYGSHELL
 #endif
 
 #include <afxwin.h>         // MFC のコアおよび標準コンポーネント
@@ -40,8 +47,10 @@
 #include <afxcmn.h>			// MFC の Windows コモン コントロール サポート
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
+#ifdef WINCE
 #include <aygshell.h>
 #pragma comment(lib, "aygshell.lib") 
+#endif
 
 #if (_WIN32_WCE < 0x500) && ( defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP) )
 	#pragma comment(lib, "ccrtrtti.lib")
@@ -54,7 +63,9 @@
 	#endif
 #endif
 
-#include <altcecrt.h>
+#ifdef WINCE
+# include <altcecrt.h>
+#endif
 
 
 #if defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP)

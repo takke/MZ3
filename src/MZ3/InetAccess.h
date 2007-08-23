@@ -108,8 +108,13 @@ public:
 	};
 
 private:
+#ifdef WINCE
 	static unsigned int __stdcall ExecGet_Thread(LPVOID);
 	static unsigned int __stdcall ExecPost_Thread(LPVOID);
+#else
+	static unsigned int __cdecl ExecGet_Thread(LPVOID);
+	static unsigned int __cdecl ExecPost_Thread(LPVOID);
+#endif
 
 	void ParseURI();
 

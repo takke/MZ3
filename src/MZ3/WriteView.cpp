@@ -631,6 +631,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYUP) {
 		switch (pMsg->wParam) {
 		case VK_F1:
+#ifdef WINCE
 			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 				// メインメニューのポップアップ
 				RECT rect;
@@ -646,6 +647,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				menu.Detach();
 				return TRUE;
 			}
+#endif
 			break;
 
 		case VK_F2:

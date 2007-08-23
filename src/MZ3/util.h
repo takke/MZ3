@@ -124,6 +124,7 @@ inline void OpenUrlByBrowser( LPCTSTR url )
  */
 inline int GetOpenFileNameEx(OPENFILENAME* pofn)
 {
+#ifdef WINCE
 	HINSTANCE hInst = LoadLibrary(_T("gsgetfile.dll"));
 	if (hInst) {
 		BOOL (*gsGetOpenFileName)(OPENFILENAME* pofn);
@@ -136,10 +137,15 @@ inline int GetOpenFileNameEx(OPENFILENAME* pofn)
 		FreeLibrary(hInst);
 	}
 	return GetOpenFileName(pofn);
+#else
+	// for win32
+	// TODO 実装すること
+	return 0;
+#endif
 }
 
 /**
- * FDQ.DLL を用いてフォルダ選択画面を表示する
+ * フォルダ選択画面を表示する
  *
  * @param hWnd			[in] 親画面
  * @param szTitle		[in] フォルダ選択画面のタイトル
@@ -148,6 +154,9 @@ inline int GetOpenFileNameEx(OPENFILENAME* pofn)
  */
 inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath )
 {
+#ifdef WINCE
+	// FDQ.DLL を用いてフォルダ選択画面を表示する
+
 	// DLLを取得する（Windowsディレクトに無いときはフルパスで指定する）
 	HINSTANCE hInst = LoadLibrary (_T("FDQ.DLL"));
 	if( hInst == NULL ) {
@@ -176,6 +185,11 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath
 	}else{
 		return false;
 	}
+#else
+	// for win32
+	// TODO 実装すること
+	return false;
+#endif
 }
 
 /// アクセス種別を文字列に変換する

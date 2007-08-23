@@ -12,12 +12,17 @@
 #include "util.h"
 
 #pragma comment(lib, "wininet.lib")
+#ifdef WINCE
 #pragma comment( lib, "cellcore.lib" )
+#endif
 
 #include <initguid.h>
+#ifdef WINCE
 #include <connmgr.h>
 #include <connmgr_proxy.h>
-#define ARRAYSIZE( a ) (sizeof( a )/sizeof(a[0]) )
+#endif
+
+//#define ARRAYSIZE( a ) (sizeof( a )/sizeof(a[0]) )
 
 #define SZ_REG_CONNECTION_ROOT TEXT("System\\State\\Connections")
 #define SZ_REG_CONNECTION_DBVOL TEXT("Count") 
@@ -292,6 +297,7 @@ inline bool my_append_buf( kfm::kf_buf_type& out_buf, char* pData, DWORD dwSize 
  */
 HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc( CString& proxy )
 {
+#ifdef WINCE
 	CONNMGR_CONNECTIONINFO ci = {0};
 	PROXY_CONFIG pcProxy = {0};
 	DWORD dwStatus = 0;
@@ -333,6 +339,9 @@ HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc( CString& proxy )
 	}
 
 	return hr;
+#else
+	return NULL;
+#endif
 }
 
 /**

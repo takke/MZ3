@@ -279,7 +279,11 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 		this->GetClientRect( &rectClient );
 
 		if( m_hBitmap == NULL ) {
+#ifdef WINCE
 			m_hBitmap = SHLoadImageFile( theApp.m_filepath.reportBgImage );
+#else
+			m_hBitmap = (HBITMAP)LoadImage( 0, theApp.m_filepath.reportBgImage, IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+#endif
 		}
 		int x = rectClient.left;
 		int y = rectClient.top;

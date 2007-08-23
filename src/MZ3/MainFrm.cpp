@@ -89,7 +89,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-
+#ifdef WINCE
 	// dpi値によってツールバーの画像を変更
 	int id_toolbar = 0;
 
@@ -109,6 +109,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	m_wndCommandBar.SetBarStyle(m_wndCommandBar.GetBarStyle() | CBRS_SIZE_FIXED);
+#endif
 
 	return 0;
 }
@@ -251,7 +252,9 @@ void CMainFrame::OnSettingLogin()
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));  
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -259,7 +262,9 @@ void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -267,7 +272,9 @@ void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -275,7 +282,9 @@ void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -283,7 +292,9 @@ void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -291,7 +302,9 @@ void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -469,13 +482,17 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 /// 画面｜前の画面メニューの制御
 void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
+#endif
 }
 
 /// 画面｜次の画面メニューの制御
 void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 {
+#ifdef WINCE
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
+#endif
 }
 
 /// 画面｜前の画面メニューのイベント

@@ -29,7 +29,9 @@ public:
 #endif
 
 public:  // コントロール バー用メンバ
+#ifdef WINCE
 	CCommandBar m_wndCommandBar;
+#endif
 
 	// 生成された、メッセージ割り当て関数
 protected:

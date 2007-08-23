@@ -61,6 +61,7 @@ CMZ3App theApp;
 BOOL CMZ3App::InitInstance()
 {
 	// 解像度判定
+#ifdef WINCE
 	{
 		int horizontal = DRA::GetScreenCaps(HORZRES);
 		int vertical   = DRA::GetScreenCaps(VERTRES);
@@ -79,6 +80,7 @@ BOOL CMZ3App::InitInstance()
 			m_currentDisplayMode = SR_QVGA;
 		}
 	}
+#endif
 
 	// DPI 値の取得
 	{
@@ -366,7 +368,11 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 {
+#ifdef WINCE
 	return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
+#else
+	return TRUE;
+#endif
 }
 
 /**

@@ -1170,6 +1170,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	// 共通処理
 	switch (pMsg->wParam) {
 	case VK_F1:
+#ifdef WINCE
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
@@ -1185,6 +1186,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
+#endif
 		break;
 	case VK_F2:
 		if( GetFocus() == &m_bodyList ) {
@@ -2010,9 +2012,11 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
  */
 void CMZ3View::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
+#ifdef WINCE
 	CMainFrame* pFrame;
 	pFrame = (CMainFrame*)(theApp.GetMainWnd());
 	pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  
+#endif
 }
 
 /**

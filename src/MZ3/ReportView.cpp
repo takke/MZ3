@@ -538,6 +538,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 {
 	switch (pMsg->wParam) {
 	case VK_F1:
+#ifdef WINCE
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			CMenu menu;
 			RECT rect;
@@ -554,6 +555,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
+#endif
 		break;
 
 	case VK_F2:

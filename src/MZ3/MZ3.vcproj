@@ -628,7 +628,7 @@
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
-				WarningLevel="3"
+				WarningLevel="2"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -636,7 +636,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
+				PreprocessorDefinitions="NDEBUG;WINVER=0x0500"
 				Culture="1041"
 				AdditionalIncludeDirectories="$(IntDir)"
 			/>
@@ -649,7 +649,7 @@
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				EntryPointSymbol="WinMainCRTStartup"
+				EntryPointSymbol="wWinMainCRTStartup"
 				TargetMachine="0"
 			/>
 			<Tool
@@ -1336,14 +1336,6 @@
 			</File>
 			<File
 				RelativePath=".\res\photo.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\photo_ic.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\PhotoIcon.ico"
 				>
 			</File>
 			<File
