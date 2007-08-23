@@ -33,14 +33,15 @@ void Bookmark::Load( CMixiDataList& bookmark )
 
 	FILE* fp;
 	fp = _wfopen(fileName, _T("r"));
-
-	std::vector<TCHAR> line(4096);
-	while (fgetws(&line[0], 4096, fp) != NULL) {
-		// ‚Ps“Ç‚İo‚µ
-		// •ª‰ğ•Ši”[
-		Devide( &line[0], bookmark );
+	if (fp!=NULL) {
+		std::vector<TCHAR> line(4096);
+		while (fgetws(&line[0], 4096, fp) != NULL) {
+			// ‚Ps“Ç‚İo‚µ
+			// •ª‰ğ•Ši”[
+			Devide( &line[0], bookmark );
+		}
+		fclose(fp);
 	}
-	fclose(fp);
 }
 
 void Bookmark::Save( CMixiDataList& bookmark )
