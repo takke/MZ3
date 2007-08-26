@@ -49,6 +49,11 @@ inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )
 		return false;
 	}
 	if( idx <= idxTop ) {
+		// ‚½‚¾‚µAæ“ª€–Ú‚Ìê‡‚Íœ‚­
+		if( idx==0 ) {
+			return true;
+		}
+
 		// ã•û‚É‚ ‚é
 		return false;
 	}
