@@ -452,17 +452,8 @@ void CMZ3App::FilePath::init()
 	// temp_draftfile.txt のパス
 	tempdraftfile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("temp_draftfile.txt"));
 
-	// グループリスト背景画像のパス
-	groupBgImage.Format( L"%s\\skin\\group.jpg", theApp.GetAppDirPath() );
-
-	// カテゴリリスト背景画像のパス
-	categoryBgImage.Format( L"%s\\skin\\header.jpg", theApp.GetAppDirPath() );
-
-	// ボディリスト背景画像のパス
-	bodyBgImage.Format( L"%s\\skin\\body.jpg", theApp.GetAppDirPath() );
-
-	// レポートリスト背景画像のパス
-	reportBgImage.Format( L"%s\\skin\\report.jpg", theApp.GetAppDirPath() );
+	// スキンフォルダのパス
+	skinFolder.Format( L"%s\\skin", theApp.GetAppDirPath() );
 }
 
 /// ログ関連ファイルパスの初期化

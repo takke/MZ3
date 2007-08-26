@@ -49,6 +49,8 @@ public:
 	CString			m_logFolder;			///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
 	bool			m_bSaveLog;				///< ログを保存するかどうか。
 
+	CString			m_strSkinname;			///< 現在のスキン名（=フォルダ名）
+
 	bool			m_bUseLeftSoftKey;		///< 左ソフトキーによるメニュー表示を利用する？
 	bool			m_bUseXcrawlExtension;	///< Xcrawl の誤動作防止機能
 	bool			m_bUseRunConfirmDlg;	///< ダウンロード後の実行確認画面を表示する？
@@ -113,6 +115,7 @@ public:
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
+		, m_strSkinname( L"default" )
 	{
 	}
 

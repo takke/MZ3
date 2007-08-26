@@ -223,6 +223,12 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_reportScrollLine = normalizeRange( atoi(s.c_str()), 1, 100 );
 		}
+
+		// スキン名
+		s = inifile.GetValue( "SkinName", "UI" );
+		if(! s.empty() ) {
+			m_strSkinname = s.c_str();
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -354,6 +360,9 @@ void Option::Save()
 
 	// レポート画面のスクロール行数
 	inifile.SetValue( "ReportScrollLine", (LPCSTR)util::int2str_a(m_reportScrollLine), "UI" );
+
+	// スキン名
+	inifile.SetValue( L"SkinName", (LPCTSTR)m_strSkinname, "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

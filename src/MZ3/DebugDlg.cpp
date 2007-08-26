@@ -155,8 +155,12 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, util::ExistFile(util::MakeLogfilePath(*data)) ? L"true" : L"false" );
 	idx++;
 
-	m_List.InsertItem( idx, L"SM_CYBORDER" );
-	m_List.SetItemText( idx, 1, util::int2str(GetSystemMetrics(SM_CYBORDER)) );
+	m_List.InsertItem( idx, L"スキンフォルダ" );
+	m_List.SetItemText( idx, 1, theApp.m_filepath.skinFolder );
+	idx++;
+
+	m_List.InsertItem( idx, L"スキン名" );
+	m_List.SetItemText( idx, 1, theApp.m_optionMng.m_strSkinname );
 	idx++;
 
 	m_List.SetItemState( 0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );

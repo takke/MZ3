@@ -1312,6 +1312,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MZ3BackgroundImage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MZ3Doc.h"
 				>
 			</File>

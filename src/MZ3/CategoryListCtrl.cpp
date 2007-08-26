@@ -23,16 +23,10 @@ CCategoryListCtrl::CCategoryListCtrl()
 	m_clrFgFirst	= ::GetSysColor(COLOR_WINDOWTEXT);
 	m_clrFgSecond	= ::GetSysColor(COLOR_WINDOWTEXT);
 	m_activeItem	= 0;
-
-	m_hBitmap		= NULL;
 }
 
 CCategoryListCtrl::~CCategoryListCtrl()
 {
-	// ビットマップの削除
-	if( m_hBitmap != NULL ) {
-		DeleteObject( m_hBitmap );
-	}
 }
 
 
@@ -118,7 +112,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			int y = lpDrawItemStruct->rcItem.top;
 			int w = rectClient.Width();
 			int h = lpDrawItemStruct->rcItem.bottom - y;
-			util::DrawBitmap( pDC->GetSafeHdc(), m_hBitmap, x, y, w, h, x, y );
+			util::DrawBitmap( pDC->GetSafeHdc(), m_bgImage.getHandle(), x, y, w, h, x, y );
 		}
 	}
 
@@ -251,18 +245,13 @@ BOOL CCategoryListCtrl::OnEraseBkgnd(CDC* pDC)
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
-		if( m_hBitmap == NULL ) {
-#ifdef WINCE
-			m_hBitmap = SHLoadImageFile( theApp.m_filepath.categoryBgImage );
-#else
-			m_hBitmap = (HBITMAP)LoadImage( 0, theApp.m_filepath.reportBgImage, IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
-#endif
-		}
+		m_bgImage.load( L"header.jpg" );
+
 		int x = rectClient.left;
 		int y = rectClient.top;
 		int w = rectClient.Width();
 		int h = rectClient.Height();
-		util::DrawBitmap( pDC->GetSafeHdc(), m_hBitmap, x, y, w, h, x, y );
+		util::DrawBitmap( pDC->GetSafeHdc(), m_bgImage.getHandle(), x, y, w, h, x, y );
 		return TRUE;
 	}
 

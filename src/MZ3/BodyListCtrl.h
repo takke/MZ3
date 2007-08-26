@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MZ3BackgroundImage.h"
+
 /**
  * ボディーリスト（メイン画面下側領域）
  */
@@ -31,7 +33,7 @@ private:
 
 	BOOL	 m_useColor;
 
-	HBITMAP m_hBitmap;			///< 背景用ビットマップ
+	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);

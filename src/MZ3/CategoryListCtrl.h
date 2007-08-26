@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MZ3BackgroundImage.h"
 
 /**
  * カテゴリリスト（メイン画面2段目領域）
@@ -27,9 +28,9 @@ private:
 	COLORREF m_clrFgFirst;
 	COLORREF m_clrFgSecond;
 
-	int m_activeItem;			///< 赤いアイテムのインデックス
+	int m_activeItem;				///< 赤いアイテムのインデックス
 
-	HBITMAP m_hBitmap;			///< 背景用ビットマップ
+	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);

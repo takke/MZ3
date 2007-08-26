@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MZ3BackgroundImage.h"
+
 /**
  * レポートリスト（レポート画面上側領域）
  */
@@ -23,7 +25,7 @@ public:
 	COLORREF m_clrFgFirst;
 	COLORREF m_clrFgSecond;
 
-	HBITMAP m_hBitmap;			///< 背景用ビットマップ
+	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 public:
 	int GetSelectedItem(void);
