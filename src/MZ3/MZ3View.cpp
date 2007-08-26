@@ -1902,6 +1902,12 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 		// 移動先が非表示なら上方向にスクロール
 		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
 			m_categoryList.Scroll( CSize(0, -m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+
+			// 再描画
+			if (theApp.m_optionMng.IsUseBgImage()) {
+				m_categoryList.RedrawItems(0, m_categoryList.GetItemCount());
+				m_categoryList.UpdateWindow();
+			}
 		}
 		return TRUE;
 	}
@@ -1928,6 +1934,12 @@ BOOL CMZ3View::CommandMoveDownCategoryList()
 		// 移動先が非表示なら下方向にスクロール
 		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
 			m_categoryList.Scroll( CSize(0, m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+
+			// 再描画
+			if (theApp.m_optionMng.IsUseBgImage()) {
+				m_categoryList.RedrawItems(0, m_categoryList.GetItemCount());
+				m_categoryList.UpdateWindow();
+			}
 		}
 		return TRUE;
 	}
@@ -1957,6 +1969,12 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 		// 移動先が非表示なら上方向にスクロール
 		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
 			m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+
+			// 再描画
+			if (theApp.m_optionMng.IsUseBgImage()) {
+				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+				m_bodyList.UpdateWindow();
+			}
 		}
 		return TRUE;
 	}
@@ -1978,6 +1996,12 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 		// 移動先が非表示なら下方向にスクロール
 		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
 			m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+
+			// 再描画
+			if (theApp.m_optionMng.IsUseBgImage()) {
+				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+				m_bodyList.UpdateWindow();
+			}
 		}
 		return TRUE;
 	}

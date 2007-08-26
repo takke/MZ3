@@ -303,3 +303,17 @@ BOOL CReportListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	// FALSE を返すことで、親ウィンドウにもイベントを渡す
 	return FALSE;
 }
+
+void CReportListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// スクロール時の背景画像のずれ防止
+	if (theApp.m_optionMng.IsUseBgImage()) {
+		static int s_nLastPos = nPos;
+		if( s_nLastPos != nPos ) {
+			Invalidate( FALSE );
+			s_nLastPos = nPos;
+		}
+	}
+
+	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+}

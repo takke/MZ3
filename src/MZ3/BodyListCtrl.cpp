@@ -37,6 +37,7 @@ CBodyListCtrl::~CBodyListCtrl()
 BEGIN_MESSAGE_MAP(CBodyListCtrl, CListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CBodyListCtrl::OnLvnItemchanged)
+	ON_WM_VSCROLL()
 END_MESSAGE_MAP()
 
 
@@ -415,3 +416,17 @@ BOOL CBodyListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	return FALSE;
 }
 
+
+void CBodyListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// ÉXÉNÉçÅ[ÉãéûÇÃîwåiâÊëúÇÃÇ∏ÇÍñhé~
+	if (theApp.m_optionMng.IsUseBgImage()) {
+		static int s_nLastPos = nPos;
+		if( s_nLastPos != nPos ) {
+			Invalidate( FALSE );
+			s_nLastPos = nPos;
+		}
+	}
+
+	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+}

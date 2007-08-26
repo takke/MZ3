@@ -262,7 +262,13 @@ BOOL CCategoryListCtrl::OnEraseBkgnd(CDC* pDC)
 void CCategoryListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// ÉXÉNÉçÅ[ÉãéûÇÃîwåiâÊëúÇÃÇ∏ÇÍñhé~
-	Invalidate( FALSE );
+	if (theApp.m_optionMng.IsUseBgImage()) {
+		static int s_nLastPos = nPos;
+		if( s_nLastPos != nPos ) {
+			Invalidate( FALSE );
+			s_nLastPos = nPos;
+		}
+	}
 
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }

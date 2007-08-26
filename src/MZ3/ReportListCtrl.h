@@ -33,6 +33,7 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 public:
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 
