@@ -588,11 +588,33 @@ void CMainFrame::OnChangeSkin()
 	menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
 }
 
+/**
+ * スキン格納用フォルダからすべてのスキン用フォルダ名を取得する
+ */
 void CMainFrame::GetSkinFolderNameList(std::vector<std::wstring>& skinfileList)
 {
-	// TODO 実装すること
-	skinfileList.push_back( L"default" );
-	skinfileList.push_back( L"blue" );
+    int    nResult = TRUE;
+    HANDLE hFile  = INVALID_HANDLE_VALUE;
+    TCHAR  szPath[ MAX_PATH ];
+    WIN32_FIND_DATA data;
+
+    //  ファイル探索
+	_stprintf( szPath, _T("%s\\*"), (LPCTSTR)theApp.m_filepath.skinFolder);
+    hFile = FindFirstFile(szPath, &data);
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				// ディレクトリ名発見。追加する。
+				skinfileList.push_back( data.cFileName );
+			}
+        }
+        while( FindNextFile( hFile, &data) && nResult);
+
+        FindClose( hFile );
+    }
+
 }
 
 void CMainFrame::OnUpdateSkinMenuItem(CCmdUI *pCmdUI)
