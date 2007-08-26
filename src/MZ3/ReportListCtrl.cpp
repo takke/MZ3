@@ -13,7 +13,7 @@ static const int OFFSET_OTHER = 6;
 
 IMPLEMENT_DYNAMIC(CReportListCtrl, CListCtrl)
 
-CReportListCtrl::CReportListCtrl()
+CReportListCtrl::CReportListCtrl() : m_bgImage(L"report.jpg")
 {
 	// 色のデフォルト値を設定
 	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
@@ -272,7 +272,7 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
-		m_bgImage.load( L"report.jpg" );
+		m_bgImage.load();
 
 		int x = rectClient.left;
 		int y = rectClient.top;

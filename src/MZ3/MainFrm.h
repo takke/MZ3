@@ -56,6 +56,7 @@ public:
 	afx_msg void OnSettingGeneral();
 	afx_msg void OnMenuClose();
 	afx_msg void OnUpdateGetpageAll(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSkinMenuItem(CCmdUI *pCmdUI);
 	afx_msg void OnGetpageAll();
 	afx_msg void OnGetpageLatest10();
 	afx_msg void OnUpdateGetpageLatest10(CCmdUI *pCmdUI);
@@ -76,6 +77,11 @@ public:
 	afx_msg void OnStartCruiseUnreadOnly();
 	afx_msg void OnOpenMixiMobileByBrowser();
 	afx_msg void OnErrorlogMenu();
+
+	afx_msg void OnChangeSkin();
+
+	void GetSkinFolderNameList(std::vector<std::wstring>& skinfileList);
+	void OnSkinMenuItem(UINT nID);
 };
 
 

@@ -22,6 +22,9 @@ public:
 	int GetActiveItem() { return m_activeItem; };
 
 	bool	m_bStopDraw;
+
+	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
+
 private:
 	COLORREF m_clrBgFirst;
 	COLORREF m_clrBgSecond;
@@ -29,8 +32,6 @@ private:
 	COLORREF m_clrFgSecond;
 
 	int m_activeItem;				///< 赤いアイテムのインデックス
-
-	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);

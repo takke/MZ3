@@ -15,6 +15,7 @@ IMPLEMENT_DYNAMIC(CCategoryListCtrl, CListCtrl)
 
 CCategoryListCtrl::CCategoryListCtrl()
 	: m_bStopDraw(false)
+	, m_bgImage(L"header.jpg")
 {
 	// 色のデフォルト値を設定
 	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
@@ -245,7 +246,7 @@ BOOL CCategoryListCtrl::OnEraseBkgnd(CDC* pDC)
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
-		m_bgImage.load( L"header.jpg" );
+		m_bgImage.load();
 
 		int x = rectClient.left;
 		int y = rectClient.top;

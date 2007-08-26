@@ -58,6 +58,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_START_CRUISE_UNREAD_ONLY, &CMainFrame::OnStartCruiseUnreadOnly)
 	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 	ON_COMMAND(ID_ERRORLOG_MENU, &CMainFrame::OnErrorlogMenu)
+	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
+	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
 END_MESSAGE_MAP()
 
 
@@ -542,6 +545,88 @@ void CMainFrame::OnHistoryMenu()
 void CMainFrame::OnErrorlogMenu()
 {
 	theApp.m_pMainView->MyShowErrorlog();
+}
+
+/**
+ * スキン変更。
+ *
+ * さらにスキン一覧のメニューを表示する
+ */
+void CMainFrame::OnChangeSkin()
+{
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+
+	POINT pt;
+	pt.x = (rect.right-rect.left) / 2;
+	pt.y = (rect.bottom-rect.top) / 2;
+
+	CMenu menu;
+	menu.LoadMenu(IDR_SKIN_MENU);
+	CMenu* pcThisMenu = menu.GetSubMenu(0);
+
+	// スキンフォルダの一覧を生成する
+	std::vector<std::wstring> skinfileList;
+	GetSkinFolderNameList(skinfileList);
+
+	// リスト化
+	for( int i=0; i<(int)skinfileList.size(); i++ ) {
+		UINT flag = MF_STRING | MF_ENABLED;
+
+		LPCTSTR filename = skinfileList[i].c_str();
+
+		// 現在のスキンであればチェック
+		if (filename == theApp.m_optionMng.m_strSkinname) {
+			flag |= MF_CHECKED;
+		}
+		pcThisMenu->AppendMenu( flag, ID_SKIN_BASE+i, filename );
+	}
+
+	// ダミーを削除
+	pcThisMenu->DeleteMenu( ID_SKIN_DUMMY, MF_BYCOMMAND );
+
+	menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+}
+
+void CMainFrame::GetSkinFolderNameList(std::vector<std::wstring>& skinfileList)
+{
+	// TODO 実装すること
+	skinfileList.push_back( L"default" );
+	skinfileList.push_back( L"blue" );
+}
+
+void CMainFrame::OnUpdateSkinMenuItem(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable();
+}
+
+void CMainFrame::OnSkinMenuItem(UINT nID)
+{
+	int n = nID - ID_SKIN_BASE;
+
+	// スキンフォルダの一覧を生成する
+	std::vector<std::wstring> skinfileList;
+	GetSkinFolderNameList(skinfileList);
+
+	if (n < 0 || n >= (int)skinfileList.size()) {
+		return;
+	}
+
+	LPCTSTR szSkinName = skinfileList[n].c_str();
+//	MessageBox( szSkinName );
+
+	// スキン切り替え
+	theApp.m_optionMng.m_strSkinname = szSkinName;
+
+	// 各ビューの画像をリロードする
+	if (theApp.m_optionMng.IsUseBgImage()) {
+		theApp.m_pMainView->m_bodyList.m_bgImage.load();
+		theApp.m_pMainView->m_categoryList.m_bgImage.load();
+		theApp.m_pReportView->m_list.m_bgImage.load();
+	}
+
+	// リロード
+	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
 }
 
 /**

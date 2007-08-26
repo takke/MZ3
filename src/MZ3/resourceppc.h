@@ -28,6 +28,8 @@
 #define IDR_CATEGORY_MENU               149
 #define IDR_ATTACH_IMAGE_MENU           150
 #define IDD_COMMON_SELECT_DIALOG        151
+#define IDR_MENU1                       152
+#define IDR_SKIN_MENU                   152
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -281,17 +283,24 @@
 #define ID_32946                        32946
 #define ID_32947                        32947
 #define ID_ERRORLOG_MENU                32948
+#define ID_32949                        32949
+#define ID_32950                        32950
+#define ID_MENU_SKIN_BASE               32951
+#define ID_SETTING_SKIN                 32952
+#define ID_CHANGE_SKIN                  32953
+#define ID_SKIN_DUMMY                   32954
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
 #define ID_REPORT_MOVIE                 36300
+#define ID_SKIN_BASE                    36400
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        152
-#define _APS_NEXT_COMMAND_VALUE         32949
+#define _APS_NEXT_RESOURCE_VALUE        153
+#define _APS_NEXT_COMMAND_VALUE         32955
 #define _APS_NEXT_CONTROL_VALUE         1055
 #define _APS_NEXT_SYMED_VALUE           116
 #endif

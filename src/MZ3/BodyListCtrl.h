@@ -25,6 +25,8 @@ public:
 	void SetHeader(LPCTSTR, LPCTSTR);
 	bool	 m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
 
+	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
+
 private:
 	COLORREF m_clrBgFirst;
 	COLORREF m_clrBgSecond;
@@ -32,8 +34,6 @@ private:
 	COLORREF m_clrFgSecond;
 
 	BOOL	 m_useColor;
-
-	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);

@@ -10,8 +10,10 @@ public:
 	CString	m_strImageFilepath;		///< 背景用ビットマップを読み込んだときの背景画像ファイルパス。
 									///< CMZ3App 側変数が切り替わった際に、自動的にリロードするために使用する。
 
+	CString m_strImageName;			///< 画像ファイル名
+
 	/// コンストラクタ
-	CMZ3BackgroundImage() : m_hBitmap(NULL) 
+	CMZ3BackgroundImage(LPCTSTR szImageName) : m_hBitmap(NULL), m_strImageName(szImageName) 
 	{
 	}
 
@@ -30,12 +32,12 @@ public:
 	/**
 	 * ファイルが未ロード、またはスキン名が変わったらロードする
 	 */
-	bool load( LPCTSTR szFilename )
+	bool load()
 	{
 		// 画像パスの生成。
 		// スキンフォルダ名、スキン名、画像ファイル名を連結して生成する。
 		CString strImagePath;
-		strImagePath.Format( L"%s\\%s\\%s", (LPCTSTR)theApp.m_filepath.skinFolder, (LPCTSTR)theApp.m_optionMng.m_strSkinname, szFilename );
+		strImagePath.Format( L"%s\\%s\\%s", (LPCTSTR)theApp.m_filepath.skinFolder, (LPCTSTR)theApp.m_optionMng.m_strSkinname, m_strImageName );
 
 		if( m_hBitmap == NULL ) {
 			// 未ロードなのでロードする

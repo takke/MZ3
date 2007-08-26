@@ -97,6 +97,7 @@ BEGIN
                 MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
                 MENUITEM "小",                           ID_CHANGE_FONT_SMALL
             END
+            MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
         END
         POPUP "編集"
         BEGIN
@@ -252,6 +253,14 @@ BEGIN
             MENUITEM "添付をやめる",                      ID_CANCEL_ATTACH_PHOTO3
             MENUITEM "プレビュー",                       ID_PREVIEW_ATTACHED_PHOTO3
         END
+    END
+END
+
+IDR_SKIN_MENU MENU 
+BEGIN
+    POPUP "SKIN"
+    BEGIN
+        MENUITEM "dummy",                       ID_SKIN_DUMMY
     END
 END
 
