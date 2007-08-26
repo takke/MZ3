@@ -14,13 +14,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_00C439F9742649068EA0DA5E2F7671F1"
+        "MsmKey" = "8:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_109C62A450FC46EA9279D1F39C65A7A7"
+        "MsmKey" = "8:_25A66B7E75CB423A8341DDB0A12BA3E3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -32,7 +32,31 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_53C351AA9B2D43398CD71C8D9144C8C7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_593F0789DEF7447EBE746B612F8B6C72"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7C86FC78244435090425B4BD08B3A7F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C8A7425E99AF47348301322208D348CD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DC012886FD3B4679B2D78CAAF79939C3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -57,12 +81,6 @@
         "Entry"
         {
         "MsmKey" = "8:_FD424ECF0ECB45C18AD8B07BF75C05FE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FE4CF1F41AF44DF6A5EDCE45AE12A108"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -134,10 +152,10 @@
     {
         "File"
         {
-            "{BA458234-9B71-4F46-8107-E91156377184}:_00C439F9742649068EA0DA5E2F7671F1"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
             {
-            "SourcePath" = "8:skin\\report.jpg"
-            "TargetName" = "8:report.jpg"
+            "SourcePath" = "8:skin\\default\\body.jpg"
+            "TargetName" = "8:body.jpg"
             "Tag" = "8:"
             "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
             "Condition" = "8:"
@@ -152,12 +170,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_109C62A450FC46EA9279D1F39C65A7A7"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_25A66B7E75CB423A8341DDB0A12BA3E3"
             {
-            "SourcePath" = "8:skin\\header.jpg"
+            "SourcePath" = "8:skin\\aluminium\\header.jpg"
             "TargetName" = "8:header.jpg"
             "Tag" = "8:"
-            "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
+            "Folder" = "8:_8E7E0AC9B7E1484580C0F1506FE65125"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -188,12 +206,84 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_53C351AA9B2D43398CD71C8D9144C8C7"
+            {
+            "SourcePath" = "8:skin\\aluminium\\report.jpg"
+            "TargetName" = "8:report.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_8E7E0AC9B7E1484580C0F1506FE65125"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_593F0789DEF7447EBE746B612F8B6C72"
+            {
+            "SourcePath" = "8:skin\\aluminium\\body.jpg"
+            "TargetName" = "8:body.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_8E7E0AC9B7E1484580C0F1506FE65125"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_A7C86FC78244435090425B4BD08B3A7F"
             {
             "SourcePath" = "8:..\\..\\dist\\toppage_group_sample.ini"
             "TargetName" = "8:toppage_group_sample.ini"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_C8A7425E99AF47348301322208D348CD"
+            {
+            "SourcePath" = "8:skin\\default\\header.jpg"
+            "TargetName" = "8:header.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_DC012886FD3B4679B2D78CAAF79939C3"
+            {
+            "SourcePath" = "8:skin\\default\\report.jpg"
+            "TargetName" = "8:report.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -260,24 +350,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_FE4CF1F41AF44DF6A5EDCE45AE12A108"
-            {
-            "SourcePath" = "8:skin\\body.jpg"
-            "TargetName" = "8:body.jpg"
-            "Tag" = "8:"
-            "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
         }
         "Folder"
         {
@@ -301,6 +373,15 @@
                             "Name" = "8:default"
                             "Condition" = "8:"
                             "Property" = "8:_CC94FA6624BB4E179B558BB9013CFA1F"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_8E7E0AC9B7E1484580C0F1506FE65125"
+                            {
+                            "Name" = "8:aluminium"
+                            "Condition" = "8:"
+                            "Property" = "8:_95784E527A324A32884F41AE03595098"
                                 "Folders"
                                 {
                                 }
