@@ -622,33 +622,62 @@ void CMainFrame::OnUpdateSkinMenuItem(CCmdUI *pCmdUI)
 	pCmdUI->Enable();
 }
 
+/**
+ * スキン切り替え
+ */
 void CMainFrame::OnSkinMenuItem(UINT nID)
 {
+	// スキンの有効・無効チェック
+	if (!theApp.m_optionMng.IsUseBgImage()) {
+		return;
+	}
+
 	int n = nID - ID_SKIN_BASE;
 
 	// スキンフォルダの一覧を生成する
 	std::vector<std::wstring> skinfileList;
 	GetSkinFolderNameList(skinfileList);
 
+	// 入力チェック
 	if (n < 0 || n >= (int)skinfileList.size()) {
 		return;
 	}
 
+	// スキン名の解決
 	LPCTSTR szSkinName = skinfileList[n].c_str();
 //	MessageBox( szSkinName );
+
+	// スキンファイルチェック
+	if (!theApp.m_pMainView->m_bodyList.m_bgImage.isValidSkinfile(szSkinName) ||
+		!theApp.m_pMainView->m_categoryList.m_bgImage.isValidSkinfile(szSkinName) ||
+		!theApp.m_pReportView->m_list.m_bgImage.isValidSkinfile(szSkinName))
+	{
+		// スキンファイルが見つからないため終了
+		CWnd* pWnd = GetActiveView();
+		if (pWnd) {
+			util::MySetInformationText( pWnd->GetSafeHwnd(), L"スキン画像ファイルが見つかりません" );
+		}
+		return;
+	}
 
 	// スキン切り替え
 	theApp.m_optionMng.m_strSkinname = szSkinName;
 
 	// 各ビューの画像をリロードする
-	if (theApp.m_optionMng.IsUseBgImage()) {
-		theApp.m_pMainView->m_bodyList.m_bgImage.load();
-		theApp.m_pMainView->m_categoryList.m_bgImage.load();
-		theApp.m_pReportView->m_list.m_bgImage.load();
-	}
+	theApp.m_pMainView->m_bodyList.m_bgImage.load();
+	theApp.m_pMainView->m_categoryList.m_bgImage.load();
+	theApp.m_pReportView->m_list.m_bgImage.load();
 
 	// リロード
 	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+
+	// メッセージ
+	CString msg;
+	msg.Format( L"スキンを [%s] に変更しました", szSkinName );
+	CWnd* pWnd = GetActiveView();
+	if (pWnd) {
+		util::MySetInformationText( pWnd->GetSafeHwnd(), msg );
+	}
 }
 
 /**
