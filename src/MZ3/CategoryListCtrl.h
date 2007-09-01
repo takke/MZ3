@@ -1,7 +1,5 @@
 #pragma once
 
-#include "MZ3BackgroundImage.h"
-
 /**
  * カテゴリリスト（メイン画面2段目領域）
  */
@@ -22,8 +20,6 @@ public:
 	int GetActiveItem() { return m_activeItem; };
 
 	bool	m_bStopDraw;
-
-	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 private:
 	COLORREF m_clrBgFirst;

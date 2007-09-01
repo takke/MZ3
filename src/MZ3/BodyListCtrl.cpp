@@ -18,7 +18,6 @@ IMPLEMENT_DYNAMIC(CBodyListCtrl, CListCtrl)
 
 CBodyListCtrl::CBodyListCtrl()
 	: m_bStopDraw(false)
-	, m_bgImage(L"body.jpg")
 {
 	// 色のデフォルト値を設定
 	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
@@ -124,7 +123,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			int y = lpDrawItemStruct->rcItem.top;
 			int w = rectClient.Width();
 			int h = lpDrawItemStruct->rcItem.bottom - y;
-			util::DrawBitmap( pDC->GetSafeHdc(), m_bgImage.getHandle(), x, y, w, h, x, y );
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
 		}
 	}
 /*	// 色を設定してアイコンをマスクします。
@@ -384,13 +383,13 @@ BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
-		m_bgImage.load();
+		theApp.m_bgImageMainBodyCtrl.load();
 
 		int x = rectClient.left;
 		int y = rectClient.top;
 		int w = rectClient.Width();
 		int h = rectClient.Height();
-		util::DrawBitmap( pDC->GetSafeHdc(), m_bgImage.getHandle(), x, y, w, h, x, y );
+		util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
 		return TRUE;
 	}
 

@@ -648,9 +648,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 //	MessageBox( szSkinName );
 
 	// スキンファイルチェック
-	if (!theApp.m_pMainView->m_bodyList.m_bgImage.isValidSkinfile(szSkinName) ||
-		!theApp.m_pMainView->m_categoryList.m_bgImage.isValidSkinfile(szSkinName) ||
-		!theApp.m_pReportView->m_list.m_bgImage.isValidSkinfile(szSkinName))
+	if (!theApp.m_bgImageMainBodyCtrl.isValidSkinfile(szSkinName) ||
+		!theApp.m_bgImageMainCategoryCtrl.isValidSkinfile(szSkinName) ||
+		!theApp.m_bgImageReportListCtrl.isValidSkinfile(szSkinName))
 	{
 		// スキンファイルが見つからないため終了
 		CWnd* pWnd = GetActiveView();
@@ -664,9 +664,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 	theApp.m_optionMng.m_strSkinname = szSkinName;
 
 	// 各ビューの画像をリロードする
-	theApp.m_pMainView->m_bodyList.m_bgImage.load();
-	theApp.m_pMainView->m_categoryList.m_bgImage.load();
-	theApp.m_pReportView->m_list.m_bgImage.load();
+	theApp.m_bgImageMainBodyCtrl.load();
+	theApp.m_bgImageMainCategoryCtrl.load();
+	theApp.m_bgImageReportListCtrl.load();
 
 	// リロード
 	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );

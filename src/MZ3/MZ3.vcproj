@@ -858,6 +858,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MZ3BackgroundImage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MZ3Doc.cpp"
 				>
 			</File>

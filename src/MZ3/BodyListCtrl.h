@@ -1,7 +1,5 @@
 #pragma once
 
-#include "MZ3BackgroundImage.h"
-
 /**
  * ボディーリスト（メイン画面下側領域）
  */
@@ -24,8 +22,6 @@ public:
 
 	void SetHeader(LPCTSTR, LPCTSTR);
 	bool	 m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
-
-	CMZ3BackgroundImage	m_bgImage;	///< 背景用ビットマップ
 
 private:
 	COLORREF m_clrBgFirst;

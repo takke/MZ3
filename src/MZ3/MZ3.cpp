@@ -35,6 +35,9 @@ END_MESSAGE_MAP()
 CMZ3App::CMZ3App()
 	: CWinApp()
 	, m_dpi(96)
+	, m_bgImageReportListCtrl(L"report.jpg")
+	, m_bgImageMainBodyCtrl(L"body.jpg")
+	, m_bgImageMainCategoryCtrl(L"header.jpg")
 {
 }
 

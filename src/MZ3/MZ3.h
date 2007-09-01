@@ -16,6 +16,7 @@
 #include "Mz3GroupData.h"
 #include "CategoryItem.h"
 #include "SimpleLogger.h"
+#include "MZ3BackgroundImage.h"
 
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
@@ -37,6 +38,7 @@ enum ScreenResolution {
 class CWriteView;
 class CMZ3View;
 class CReportView;
+class CMZ3BackgroundImage;
 
 // CMZ3App:
 // このクラスの実装については、MZ3.cpp を参照してください。
@@ -103,6 +105,10 @@ public:
 	CMZ3View*			m_pMainView;			///< メインビュー
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
+
+	CMZ3BackgroundImage	m_bgImageMainCategoryCtrl;	///< メインビュー、カテゴリコントロールの背景用ビットマップ
+	CMZ3BackgroundImage	m_bgImageMainBodyCtrl;		///< メインビュー、ボディコントロールの背景用ビットマップ
+	CMZ3BackgroundImage	m_bgImageReportListCtrl;	///< レポートビュー、リストコントロールの背景用ビットマップ
 
 	int					m_newMessageCount;		///< 新着メッセージ数
 	int					m_newCommentCount;		///< 新着コメント数
