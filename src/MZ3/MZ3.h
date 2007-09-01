@@ -17,6 +17,7 @@
 #include "CategoryItem.h"
 #include "SimpleLogger.h"
 #include "MZ3BackgroundImage.h"
+#include "MZ3SkinInfo.h"
 
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
@@ -106,6 +107,8 @@ public:
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
 
+	CMZ3SkinInfo		m_skininfo;				///< スキン情報
+
 	CMZ3BackgroundImage	m_bgImageMainCategoryCtrl;	///< メインビュー、カテゴリコントロールの背景用ビットマップ
 	CMZ3BackgroundImage	m_bgImageMainBodyCtrl;		///< メインビュー、ボディコントロールの背景用ビットマップ
 	CMZ3BackgroundImage	m_bgImageReportListCtrl;	///< レポートビュー、リストコントロールの背景用ビットマップ
@@ -147,6 +150,8 @@ public:
 	ScreenResolution GetDisplayMode() { return m_currentDisplayMode; }
 	DWORD GetDPI() { return m_dpi; }
 	int GetInfoRegionHeight( int fontHeight );
+
+	bool LoadSkinSetting();
 };
 
 extern CMZ3App theApp;

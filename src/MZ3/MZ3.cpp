@@ -158,6 +158,9 @@ BOOL CMZ3App::InitInstance()
 	m_logfile.Load( m_filepath.logfile );
 	MZ3LOGGER_DEBUG( L"ini ファイル読み込み完了" );
 
+	// スキン関連の初期化
+	LoadSkinSetting();
+
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
@@ -526,4 +529,17 @@ int CMZ3App::GetInfoRegionHeight( int fontHeight )
 		// VGA 以外
 		return fontHeight -4;
 	}
+}
+
+bool CMZ3App::LoadSkinSetting()
+{
+	// 設定ファイルのロード
+	m_skininfo.loadSkinInifile( theApp.m_optionMng.m_strSkinname );
+
+	// 各画像ファイル名の初期化
+	theApp.m_bgImageMainBodyCtrl.setImageFileName( m_skininfo.strMainBodyCtrlImageFileName );
+	theApp.m_bgImageMainCategoryCtrl.setImageFileName( m_skininfo.strMainCategoryCtrlImageFileName );
+	theApp.m_bgImageReportListCtrl.setImageFileName( m_skininfo.strReportListCtrlImageFileName );
+
+	return true;
 }

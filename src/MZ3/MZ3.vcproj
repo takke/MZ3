@@ -858,10 +858,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MZ3BackgroundImage.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MZ3Doc.cpp"
 				>
 			</File>
@@ -1277,6 +1273,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="skin"
+				>
+				<File
+					RelativePath=".\MZ3BackgroundImage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MZ3SkinInfo.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="ヘッダー ファイル"
@@ -1313,10 +1321,6 @@
 			</File>
 			<File
 				RelativePath=".\MZ3.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MZ3BackgroundImage.h"
 				>
 			</File>
 			<File
@@ -1496,6 +1500,18 @@
 				</File>
 				<File
 					RelativePath=".\WriteView.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="skin"
+				>
+				<File
+					RelativePath=".\MZ3BackgroundImage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MZ3SkinInfo.h"
 					>
 				</File>
 			</Filter>

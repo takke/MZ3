@@ -26,6 +26,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_38FEF0A2021144588BB63719E147ACA9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5ED1D21152934C8B86CB3D8BA86E3DDC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6412E34ADCA14EA0A0E2BD7C9464997E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7C86FC78244435090425B4BD08B3A7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -44,6 +62,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E073AE9D1AC74E87A492EE04578219FB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E0975A96522C4A7A8A7A7864794515F0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -51,6 +75,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E7A0DA506C014B77AC89F930FD88BFE8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E83C7EC08CCB4D48B35208516F5C40E4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -170,6 +200,60 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_38FEF0A2021144588BB63719E147ACA9"
+            {
+            "SourcePath" = "8:skin\\aluminium\\header_.jpg"
+            "TargetName" = "8:header_.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_60AB23DB628A45B092889BD991681664"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_5ED1D21152934C8B86CB3D8BA86E3DDC"
+            {
+            "SourcePath" = "8:skin\\aluminium\\report_.jpg"
+            "TargetName" = "8:report_.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_60AB23DB628A45B092889BD991681664"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_6412E34ADCA14EA0A0E2BD7C9464997E"
+            {
+            "SourcePath" = "8:skin\\default\\skin.ini"
+            "TargetName" = "8:skin.ini"
+            "Tag" = "8:"
+            "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_A7C86FC78244435090425B4BD08B3A7F"
             {
             "SourcePath" = "8:..\\..\\dist\\toppage_group_sample.ini"
@@ -224,6 +308,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_E073AE9D1AC74E87A492EE04578219FB"
+            {
+            "SourcePath" = "8:skin\\aluminium\\body_.jpg"
+            "TargetName" = "8:body_.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_60AB23DB628A45B092889BD991681664"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_E0975A96522C4A7A8A7A7864794515F0"
             {
             "SourcePath" = "8:..\\..\\ChangeLog.txt"
@@ -248,6 +350,24 @@
             "TargetName" = "8:Readme.txt"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_E83C7EC08CCB4D48B35208516F5C40E4"
+            {
+            "SourcePath" = "8:skin\\aluminium\\skin1.ini"
+            "TargetName" = "8:skin1.ini"
+            "Tag" = "8:"
+            "Folder" = "8:_60AB23DB628A45B092889BD991681664"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -301,6 +421,15 @@
                             "Name" = "8:default"
                             "Condition" = "8:"
                             "Property" = "8:_CC94FA6624BB4E179B558BB9013CFA1F"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_60AB23DB628A45B092889BD991681664"
+                            {
+                            "Name" = "8:aluminium"
+                            "Condition" = "8:"
+                            "Property" = "8:_3BAB8A9F69094094A475567B32DB8CEC"
                                 "Folders"
                                 {
                                 }

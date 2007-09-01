@@ -579,7 +579,14 @@ void CMainFrame::OnChangeSkin()
 		if (filename == theApp.m_optionMng.m_strSkinname) {
 			flag |= MF_CHECKED;
 		}
-		pcThisMenu->AppendMenu( flag, ID_SKIN_BASE+i, filename );
+
+		// スキンタイトルを取得
+		CString title = CMZ3SkinInfo::loadSkinTitle( filename );
+
+		// スキン名も追加する
+		title.AppendFormat( L" (%s)", filename );
+
+		pcThisMenu->AppendMenu( flag, ID_SKIN_BASE+i, title );
 	}
 
 	// ダミーを削除
@@ -627,6 +634,8 @@ void CMainFrame::OnUpdateSkinMenuItem(CCmdUI *pCmdUI)
  */
 void CMainFrame::OnSkinMenuItem(UINT nID)
 {
+	CWnd* pWnd = GetActiveView();
+
 	// スキンの有効・無効チェック
 	if (!theApp.m_optionMng.IsUseBgImage()) {
 		return;
@@ -647,23 +656,35 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 	LPCTSTR szSkinName = skinfileList[n].c_str();
 //	MessageBox( szSkinName );
 
+	// 現在のスキン名の保存
+	CString strOriginalSkinName = theApp.m_optionMng.m_strSkinname;
+
+	// スキン切り替え
+	theApp.m_optionMng.m_strSkinname = szSkinName;
+
+	// スキン情報の更新
+	theApp.LoadSkinSetting();
+
 	// スキンファイルチェック
 	if (!theApp.m_bgImageMainBodyCtrl.isValidSkinfile(szSkinName) ||
 		!theApp.m_bgImageMainCategoryCtrl.isValidSkinfile(szSkinName) ||
 		!theApp.m_bgImageReportListCtrl.isValidSkinfile(szSkinName))
 	{
 		// スキンファイルが見つからないため終了
-		CWnd* pWnd = GetActiveView();
+
+		// スキン名を戻す
+		theApp.m_optionMng.m_strSkinname = strOriginalSkinName;
+		
+		// スキン情報の更新
+		theApp.LoadSkinSetting();
+
 		if (pWnd) {
 			util::MySetInformationText( pWnd->GetSafeHwnd(), L"スキン画像ファイルが見つかりません" );
 		}
 		return;
 	}
 
-	// スキン切り替え
-	theApp.m_optionMng.m_strSkinname = szSkinName;
-
-	// 各ビューの画像をリロードする
+	// 背景画像をリロードする
 	theApp.m_bgImageMainBodyCtrl.load();
 	theApp.m_bgImageMainCategoryCtrl.load();
 	theApp.m_bgImageReportListCtrl.load();
@@ -673,8 +694,7 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 
 	// メッセージ
 	CString msg;
-	msg.Format( L"スキンを [%s] に変更しました", szSkinName );
-	CWnd* pWnd = GetActiveView();
+	msg.Format( L"スキンを [%s (%s)] に変更しました", theApp.m_skininfo.strSkinTitle, szSkinName );
 	if (pWnd) {
 		util::MySetInformationText( pWnd->GetSafeHwnd(), msg );
 	}

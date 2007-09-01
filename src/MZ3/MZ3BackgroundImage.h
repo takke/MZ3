@@ -33,7 +33,7 @@ public:
 	CString makeSkinFilePath( LPCTSTR szSkinName );
 	bool load();
 
-	bool SetImageFileName( LPCTSTR szImageFileName )
+	bool setImageFileName( LPCTSTR szImageFileName )
 	{
 		m_strImageName = szImageFileName;
 		return true;
