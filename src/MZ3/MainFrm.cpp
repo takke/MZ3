@@ -584,7 +584,9 @@ void CMainFrame::OnChangeSkin()
 		CString title = CMZ3SkinInfo::loadSkinTitle( filename );
 
 		// スキン名も追加する
-		title.AppendFormat( L" (%s)", filename );
+		if (title != filename) {
+			title.AppendFormat( L" (%s)", filename );
+		}
 
 		pcThisMenu->AppendMenu( flag, ID_SKIN_BASE+i, title );
 	}
@@ -694,7 +696,11 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 
 	// メッセージ
 	CString msg;
-	msg.Format( L"スキンを [%s (%s)] に変更しました", theApp.m_skininfo.strSkinTitle, szSkinName );
+	if (theApp.m_skininfo.strSkinName != szSkinName) {
+		msg.Format( L"スキンを [%s (%s)] に変更しました", theApp.m_skininfo.strSkinTitle, szSkinName );
+	} else {
+		msg.Format( L"スキンを [%s] に変更しました", theApp.m_skininfo.strSkinTitle );
+	}
 	if (pWnd) {
 		util::MySetInformationText( pWnd->GetSafeHwnd(), msg );
 	}
