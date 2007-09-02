@@ -22,11 +22,6 @@ public:
 	bool	m_bStopDraw;
 
 private:
-	COLORREF m_clrBgFirst;
-	COLORREF m_clrBgSecond;
-	COLORREF m_clrFgFirst;
-	COLORREF m_clrFgSecond;
-
 	int m_activeItem;				///< 赤いアイテムのインデックス
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);

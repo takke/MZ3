@@ -19,9 +19,6 @@ public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
 
 	COLORREF m_clrBgFirst;
-	COLORREF m_clrBgSecond;
-	COLORREF m_clrFgFirst;
-	COLORREF m_clrFgSecond;
 
 public:
 	int GetSelectedItem(void);

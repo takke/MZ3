@@ -17,10 +17,6 @@ CReportListCtrl::CReportListCtrl()
 {
 	// 色のデフォルト値を設定
 	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
-	// とりあえず赤に設定
-	m_clrBgSecond = RGB( 255,0,0);
-	m_clrFgFirst = ::GetSysColor(COLOR_WINDOWTEXT);
-	m_clrFgSecond = ::GetSysColor(COLOR_WINDOWTEXT);
 }
 
 CReportListCtrl::~CReportListCtrl()
@@ -72,11 +68,6 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		bFocus = TRUE;
 	}
 
-	// 描画する色
-	COLORREF clrTextSave, clrBkSave;
-	COLORREF clrTextFg;
-	COLORREF clrImage = m_clrBgFirst;
-
 	TCHAR szBuff[MAX_PATH];
 	LPCTSTR pszText;
 
@@ -127,6 +118,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 色を設定してアイコンをマスクします。
+	COLORREF clrImage = m_clrBgFirst;			// 描画する色
 	if ((lvi.state & LVIS_CUT) == LVIS_CUT) {
 		uiFlags |= ILD_BLEND50;
 	}
@@ -177,13 +169,17 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcLabel.left += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
-	// システム標準の選択色で塗りつぶす
+	// 文字色の変更
+	COLORREF clrTextSave = (COLORREF)-1;
+	COLORREF clrBkSave   = (COLORREF)-1;
 	if (bSelected == TRUE) {
-		clrTextSave = pDC->SetTextColor(::GetSysColor(COLOR_HIGHLIGHTTEXT));
-		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
-	}
-	else {
-		clrTextFg = RGB(0x00, 0x00, 0x00);
+		// 選択状態
+		// システム標準の選択色で塗りつぶす
+		clrTextSave = pDC->SetTextColor( ::GetSysColor(COLOR_HIGHLIGHTTEXT) );
+		clrBkSave = pDC->SetBkColor( ::GetSysColor(COLOR_HIGHLIGHT) );
+	} else {
+		// 非選択状態
+		COLORREF clrTextFg = RGB(0x00, 0x00, 0x00);
 
 		// 色づけ処理
 		clrTextSave = pDC->SetTextColor(clrTextFg);
@@ -234,8 +230,11 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
 	}
 
-	if (bSelected == TRUE) {
+	// 色を戻す
+	if (clrTextSave != (COLORREF)-1) {
 		clrTextSave = pDC->SetTextColor(clrTextSave);
+	}
+	if (clrBkSave != (COLORREF)-1) {
 		clrBkSave = pDC->SetBkColor(clrBkSave);
 	}
 

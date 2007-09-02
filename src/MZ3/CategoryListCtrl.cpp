@@ -17,11 +17,6 @@ CCategoryListCtrl::CCategoryListCtrl()
 	: m_bStopDraw(false)
 {
 	// 色のデフォルト値を設定
-	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
-	// とりあえず赤に設定
-	m_clrBgSecond	= RGB( 255,0,0);
-	m_clrFgFirst	= ::GetSysColor(COLOR_WINDOWTEXT);
-	m_clrFgSecond	= ::GetSysColor(COLOR_WINDOWTEXT);
 	m_activeItem	= 0;
 }
 
@@ -63,10 +58,6 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (GetFocus() == this) {
 		bFocus = TRUE;
 	}
-
-	// 描画する色
-	COLORREF clrTextFg;
-	COLORREF clrImage = m_clrBgFirst;
 
 	// アイテム データを取得します。
 	LV_ITEM lvi;
@@ -116,46 +107,6 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
-	// 色を設定してアイコンをマスクします。
-/*	if ((lvi.state & LVIS_CUT) == LVIS_CUT) {
-		uiFlags |= ILD_BLEND50;
-	}
-	else if (bSelected == TRUE) {
-		clrImage = ::GetSysColor(COLOR_HIGHLIGHT);
-		uiFlags |= ILD_BLEND50;
-	}
-
-	// 状態アイコンを描画します。
-	UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
-	if ((nStateImageMask>>12) > 0) {
-
-		int nImage = (nStateImageMask>>12) - 1;
-
-		pImageList = this->GetImageList(LVSIL_STATE);
-		if (pImageList) {
-			pImageList->Draw(pDC, nImage,
-				CPoint(rcItem.left, rcItem.top),
-				ILD_TRANSPARENT);
-		}
-	}
-
-	// 通常のアイコンとオーバーレイアイコンを描画します。
-	CRect rcIcon;
-	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
-	pImageList = this->GetImageList(LVSIL_SMALL);
-
-	if (pImageList != NULL) {
-		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
-		if (rcItem.left < rcItem.right - 1) {
-			ImageList_DrawEx(
-				pImageList->m_hImageList, lvi.iImage,
-				pDC->m_hDC,
-				rcIcon.left, rcIcon.top, 16, 16,
-				m_clrBgFirst, clrImage,
-				uiFlags | nOvlImageMask);
-		}
-	}
-*/
 	// アイテムのラベルを描きます。
 	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
 
@@ -163,13 +114,16 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcLabel.left += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
-	COLORREF clrTextSave, clrBkSave;
+	// 文字色の変更
+	COLORREF clrTextSave = (COLORREF)-1;
+	COLORREF clrBkSave   = (COLORREF)-1;
 	if (bSelected) {
-		// システム標準の選択色で塗りつぶす
+		// 選択状態なので、システム標準の選択色で塗りつぶす
 		clrTextSave = pDC->SetTextColor(::GetSysColor(COLOR_HIGHLIGHTTEXT));
 		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
 	}else{
 		// 非選択状態なので、アクティブなら赤、そうでなければ黒で描画
+		COLORREF clrTextFg;
 		if (lvi.iItem == GetActiveItem()) {
 			clrTextFg = RGB(0xFF, 0x00, 0x00);
 		}
@@ -221,8 +175,11 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
 	}
 
-	if (bSelected) {
+	// 色を戻す
+	if (clrTextSave != (COLORREF)-1) {
 		clrTextSave = pDC->SetTextColor(clrTextSave);
+	}
+	if (clrBkSave != (COLORREF)-1) {
 		clrBkSave = pDC->SetBkColor(clrBkSave);
 	}
 

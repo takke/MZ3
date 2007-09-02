@@ -19,13 +19,6 @@ IMPLEMENT_DYNAMIC(CBodyListCtrl, CListCtrl)
 CBodyListCtrl::CBodyListCtrl()
 	: m_bStopDraw(false)
 {
-	// 色のデフォルト値を設定
-	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
-	// とりあえず赤に設定
-	m_clrBgSecond   = RGB( 255,0,0);
-
-	m_clrFgFirst	= ::GetSysColor(COLOR_WINDOWTEXT);
-	m_clrFgSecond	= ::GetSysColor(COLOR_WINDOWTEXT);
 }
 
 CBodyListCtrl::~CBodyListCtrl()
@@ -55,12 +48,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 再描画するItemの座標を取得
 	CRect rcItem( lpDrawItemStruct->rcItem );
 
-/*	// 背景を透明にするフラグ（イメージデータ用）
-	UINT uiFlags = ILD_TRANSPARENT;
-
-	// イメージオブジェクト格納アドレス
-	CImageList* pImageList;
-*/
 	// アイテムのID
 	int nItem = lpDrawItemStruct->itemID;
 
@@ -69,11 +56,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (GetFocus() == this) {
 		bFocus = TRUE;
 	}
-
-	// 描画する色
-	COLORREF clrTextSave, clrBkSave;
-	COLORREF clrTextFg = RGB(0x00, 0x00, 0x00);
-	COLORREF clrImage = m_clrBgFirst;
 
 	TCHAR szBuff[MAX_PATH];
 	LPCTSTR pszText;
@@ -126,46 +108,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
 		}
 	}
-/*	// 色を設定してアイコンをマスクします。
-	if ((lvi.state & LVIS_CUT) == LVIS_CUT) {
-		uiFlags |= ILD_BLEND50;
-	}
-	else if (bSelected == TRUE) {
-		clrImage = ::GetSysColor(COLOR_HIGHLIGHT);
-		uiFlags |= ILD_BLEND50;
-	}
-*/
-	// 状態アイコンを描画します。
-/*	UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
-	if ((nStateImageMask>>12) > 0) {
 
-		int nImage = (nStateImageMask>>12) - 1;
-
-		pImageList = this->GetImageList(LVSIL_STATE);
-		if (pImageList) {
-			pImageList->Draw(pDC, nImage,
-				CPoint(rcItem.left, rcItem.top),
-				ILD_TRANSPARENT);
-		}
-	}
-
-	// 通常のアイコンとオーバーレイアイコンを描画します。
-	CRect rcIcon;
-	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
-	pImageList = this->GetImageList(LVSIL_SMALL);
-
-	if (pImageList != NULL) {
-		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
-		if (rcItem.left < rcItem.right - 1) {
-			ImageList_DrawEx(
-				pImageList->m_hImageList, lvi.iImage,
-				pDC->m_hDC,
-				rcIcon.left, rcIcon.top, 16, 16,
-				m_clrBgFirst, clrImage,
-				uiFlags | nOvlImageMask);
-		}
-	}
-*/
 	// アイテムのラベルを描きます。
 	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
 
@@ -177,59 +120,49 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcLabel.left += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
-	// システム標準の選択色で塗りつぶす
+	// 文字色の変更
+	COLORREF clrTextSave = (COLORREF)-1;
+	COLORREF clrBkSave   = (COLORREF)-1;
 	if (bSelected == TRUE) {
+		// 選択状態なので、システム標準の選択色で塗りつぶす
 		clrTextSave = pDC->SetTextColor(::GetSysColor(COLOR_HIGHLIGHTTEXT));
 		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
 	}
 	else {
+		// 非選択状態なので、状態に応じて色を変更する
 		CMixiData* data = (CMixiData*)(lvi.lParam);
 
-		if( IsUseColor() ) {
-			switch (data->GetAccessType()) {
-			case ACCESS_BBS:
-			case ACCESS_EVENT:
-			case ACCESS_ENQUETE:
-				// コミュニティ、イベント、アンケート
-				// 既読数に応じて色づけ。
-				if (data->GetLastIndex() == -1) {
-					// 全くの未読
-					clrTextFg = RGB(0x00, 0x00, 0xFF);
-				}
-				else if (data->GetLastIndex() >= data->GetCommentCount()) {
-					// 更新なし
-					clrTextFg = RGB(0x00, 0x00, 0x00);
-				}
-				else {
-					// 未読分あり
-					clrTextFg = RGB(0xFF, 0x00, 0x00);
-				}
-				break;
+		COLORREF clrTextFg = RGB(0x00, 0x00, 0x00);
+		switch (data->GetAccessType()) {
+		case ACCESS_BBS:
+		case ACCESS_EVENT:
+		case ACCESS_ENQUETE:
+			// コミュニティ、イベント、アンケート
+			// 既読数に応じて色づけ。
+			if (data->GetLastIndex() == -1) {
+				// 全くの未読
+				clrTextFg = RGB(0x00, 0x00, 0xFF);
+			}
+			else if (data->GetLastIndex() >= data->GetCommentCount()) {
+				// 更新なし
+				clrTextFg = RGB(0x00, 0x00, 0x00);
+			}
+			else {
+				// 未読分あり
+				clrTextFg = RGB(0xFF, 0x00, 0x00);
+			}
+			break;
 
-			case ACCESS_DIARY:
-			case ACCESS_MYDIARY:
-				// 日記
-				// 外部ブログは薄く表示
-				if( data->GetURL().Find( L"?url=http" ) != -1 ) {
-					// "?url=http" を含むので外部ブログとみなす
-					clrTextFg = RGB(0x80, 0x80, 0x80);
-				}else{
-					// mixi 日記
-					// 未読なら青、既読なら黒
-					if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
-						// ログあり:既読
-						clrTextFg = RGB(0x00, 0x00, 0x00);
-					}else{
-						// ログなし:未読
-						clrTextFg = RGB(0x00, 0x00, 0xFF);
-					}
-				}
-				break;
-
-			case ACCESS_NEWS:
-			case ACCESS_MESSAGE:
-				// ニュース
-				// ログがあれば（既読なら）黒、未読なら青
+		case ACCESS_DIARY:
+		case ACCESS_MYDIARY:
+			// 日記
+			// 外部ブログは薄く表示
+			if( data->GetURL().Find( L"?url=http" ) != -1 ) {
+				// "?url=http" を含むので外部ブログとみなす
+				clrTextFg = RGB(0x80, 0x80, 0x80);
+			}else{
+				// mixi 日記
+				// 未読なら青、既読なら黒
 				if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
 					// ログあり:既読
 					clrTextFg = RGB(0x00, 0x00, 0x00);
@@ -237,54 +170,63 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					// ログなし:未読
 					clrTextFg = RGB(0x00, 0x00, 0xFF);
 				}
-				break;
-
-			case ACCESS_PROFILE:
-				// ユーザプロフィール
-				// マイミクなら青にする。
-				if( data->IsMyMixi() ) {
-					clrTextFg = RGB(0x00, 0x00, 0xFF);
-				}else{
-					clrTextFg = RGB(0x00, 0x00, 0x00);
-				}
-				break;
-
-			case ACCESS_COMMUNITY:
-				// コミュニティ
-				{
-					// 暫定処置として、トピック一覧のログ存在チェックで色変更を行う。
-
-					// トピック一覧用 mixi オブジェクトを生成する
-					CMixiData mixi = *data;
-					mixi.SetAccessType( ACCESS_LIST_BBS );
-					CString url;
-					url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
-					mixi.SetURL(url);
-
-					// 存在チェック。
-					if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
-						// ログあり:既読
-						clrTextFg = RGB(0x00, 0x00, 0x00);
-					}else{
-						// ログなし:未読
-						clrTextFg = RGB(0x00, 0x00, 0xFF);
-					}
-				}
-				break;
-
-			default:
-				// 色づけなし
-				// 黒にする
-				clrTextFg = RGB(0x00, 0x00, 0x00);
-				break;
 			}
-		}else{
+			break;
+
+		case ACCESS_NEWS:
+		case ACCESS_MESSAGE:
+			// ニュース
+			// ログがあれば（既読なら）黒、未読なら青
+			if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
+				// ログあり:既読
+				clrTextFg = RGB(0x00, 0x00, 0x00);
+			}else{
+				// ログなし:未読
+				clrTextFg = RGB(0x00, 0x00, 0xFF);
+			}
+			break;
+
+		case ACCESS_PROFILE:
+			// ユーザプロフィール
+			// マイミクなら青にする。
+			if( data->IsMyMixi() ) {
+				clrTextFg = RGB(0x00, 0x00, 0xFF);
+			}else{
+				clrTextFg = RGB(0x00, 0x00, 0x00);
+			}
+			break;
+
+		case ACCESS_COMMUNITY:
+			// コミュニティ
+			{
+				// 暫定処置として、トピック一覧のログ存在チェックで色変更を行う。
+
+				// トピック一覧用 mixi オブジェクトを生成する
+				CMixiData mixi = *data;
+				mixi.SetAccessType( ACCESS_LIST_BBS );
+				CString url;
+				url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
+				mixi.SetURL(url);
+
+				// 存在チェック。
+				if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
+					// ログあり:既読
+					clrTextFg = RGB(0x00, 0x00, 0x00);
+				}else{
+					// ログなし:未読
+					clrTextFg = RGB(0x00, 0x00, 0xFF);
+				}
+			}
+			break;
+
+		default:
 			// 色づけなし
 			// 黒にする
 			clrTextFg = RGB(0x00, 0x00, 0x00);
+			break;
 		}
 
-		// 色づけ処理
+		// 色の設定
 		clrTextSave = pDC->SetTextColor(clrTextFg);
 	}
 
@@ -334,8 +276,11 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
 	}
 
-	if (bSelected == TRUE) {
+	// 色を戻す
+	if (clrTextSave != (COLORREF)-1) {
 		clrTextSave = pDC->SetTextColor(clrTextSave);
+	}
+	if (clrBkSave != (COLORREF)-1) {
 		clrBkSave = pDC->SetBkColor(clrBkSave);
 	}
 

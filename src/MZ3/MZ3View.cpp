@@ -1023,16 +1023,6 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 {
 	m_nochange = TRUE;
 
-	try{
-		if (&body == &theApp.m_root.GetBookmarkList() ) {
-			// ブックマークは色づけしない
-			m_bodyList.SetUseColor( FALSE );
-		} else {
-			m_bodyList.SetUseColor( TRUE );
-		}
-	}catch( ... ) {
-	}
-
 	// リストのアイテムを削除
 	m_bodyList.m_bStopDraw = true;
 	m_bodyList.SetRedraw(FALSE);
