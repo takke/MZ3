@@ -125,10 +125,9 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 非選択状態なので、アクティブなら赤、そうでなければ黒で描画
 		COLORREF clrTextFg;
 		if (lvi.iItem == GetActiveItem()) {
-			clrTextFg = RGB(0xFF, 0x00, 0x00);
-		}
-		else {
-			clrTextFg = RGB(0x00, 0x00, 0x00);
+			clrTextFg = theApp.m_skininfo.clrMainCategoryListActiveText;
+		} else {
+			clrTextFg = theApp.m_skininfo.clrMainCategoryListInactiveText;
 		}
 
 		// 色づけ処理

@@ -15,8 +15,6 @@ IMPLEMENT_DYNAMIC(CReportListCtrl, CListCtrl)
 
 CReportListCtrl::CReportListCtrl()
 {
-	// 色のデフォルト値を設定
-	m_clrBgFirst    = ::GetSysColor(COLOR_WINDOW);
 }
 
 CReportListCtrl::~CReportListCtrl()
@@ -51,9 +49,6 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 再描画するItemの座標を取得
 	CRect rcItem(lpDrawItemStruct->rcItem);
-
-	// 背景を透明にするフラグ（イメージデータ用）
-	UINT uiFlags = ILD_TRANSPARENT;
 
 	// イメージオブジェクト格納アドレス
 	CImageList* pImageList;
@@ -118,13 +113,16 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 色を設定してアイコンをマスクします。
-	COLORREF clrImage = m_clrBgFirst;			// 描画する色
+	UINT uiFlags = ILD_TRANSPARENT;						// 背景を透明にするフラグ（イメージデータ用）
+	COLORREF clrMaskFg = ::GetSysColor(COLOR_WINDOW);	// 描画する色
+	COLORREF clrMaskBk = ::GetSysColor(COLOR_WINDOW);	// 描画する色
 	if ((lvi.state & LVIS_CUT) == LVIS_CUT) {
 		uiFlags |= ILD_BLEND50;
-	}
-	else if (bSelected == TRUE) {
-		clrImage = ::GetSysColor(COLOR_HIGHLIGHT);
-		uiFlags |= ILD_BLEND50;
+	} else {
+		if (bSelected == TRUE) {
+			clrMaskFg = ::GetSysColor(COLOR_HIGHLIGHT);
+			uiFlags |= ILD_BLEND50;
+		}
 	}
 
 	// 状態アイコンを描画します。
@@ -154,7 +152,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					pImageList->m_hImageList, lvi.iImage,
 					pDC->m_hDC,
 					rcIcon.left, rcIcon.top, 16, 16,
-					m_clrBgFirst, clrImage,
+					clrMaskBk, clrMaskFg,
 					uiFlags | nOvlImageMask);
 			}
 		}
@@ -179,7 +177,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		clrBkSave = pDC->SetBkColor( ::GetSysColor(COLOR_HIGHLIGHT) );
 	} else {
 		// 非選択状態
-		COLORREF clrTextFg = RGB(0x00, 0x00, 0x00);
+		COLORREF clrTextFg = theApp.m_skininfo.clrReportListText;
 
 		// 色づけ処理
 		clrTextSave = pDC->SetTextColor(clrTextFg);
@@ -193,7 +191,6 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// カラム用のラベルを描画
 	LV_COLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH;
-	// 元の色に戻す
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
 		rcItem.left = rcItem.right;
 		rcItem.right += lvc.cx;

@@ -18,8 +18,6 @@ public:
 public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
 
-	COLORREF m_clrBgFirst;
-
 public:
 	int GetSelectedItem(void);
 public:

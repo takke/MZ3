@@ -132,7 +132,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 非選択状態なので、状態に応じて色を変更する
 		CMixiData* data = (CMixiData*)(lvi.lParam);
 
-		COLORREF clrTextFg = RGB(0x00, 0x00, 0x00);
+		COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 		switch (data->GetAccessType()) {
 		case ACCESS_BBS:
 		case ACCESS_EVENT:
@@ -141,15 +141,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// 既読数に応じて色づけ。
 			if (data->GetLastIndex() == -1) {
 				// 全くの未読
-				clrTextFg = RGB(0x00, 0x00, 0xFF);
-			}
-			else if (data->GetLastIndex() >= data->GetCommentCount()) {
-				// 更新なし
-				clrTextFg = RGB(0x00, 0x00, 0x00);
-			}
-			else {
-				// 未読分あり
-				clrTextFg = RGB(0xFF, 0x00, 0x00);
+				clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+			} else if (data->GetLastIndex() >= data->GetCommentCount()) {
+				// 既読
+				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+			} else {
+				// 未読分あり：新着記事
+				clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
 			}
 			break;
 
@@ -159,16 +157,16 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// 外部ブログは薄く表示
 			if( data->GetURL().Find( L"?url=http" ) != -1 ) {
 				// "?url=http" を含むので外部ブログとみなす
-				clrTextFg = RGB(0x80, 0x80, 0x80);
-			}else{
+				clrTextFg = theApp.m_skininfo.clrMainBodyListExternalBlogText;
+			} else {
 				// mixi 日記
 				// 未読なら青、既読なら黒
 				if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
 					// ログあり:既読
-					clrTextFg = RGB(0x00, 0x00, 0x00);
+					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 				}else{
 					// ログなし:未読
-					clrTextFg = RGB(0x00, 0x00, 0xFF);
+					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
 				}
 			}
 			break;
@@ -179,10 +177,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// ログがあれば（既読なら）黒、未読なら青
 			if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
 				// ログあり:既読
-				clrTextFg = RGB(0x00, 0x00, 0x00);
+				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 			}else{
 				// ログなし:未読
-				clrTextFg = RGB(0x00, 0x00, 0xFF);
+				clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
 			}
 			break;
 
@@ -190,9 +188,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// ユーザプロフィール
 			// マイミクなら青にする。
 			if( data->IsMyMixi() ) {
-				clrTextFg = RGB(0x00, 0x00, 0xFF);
+				clrTextFg = theApp.m_skininfo.clrMainBodyListFootprintMyMixiText;
 			}else{
-				clrTextFg = RGB(0x00, 0x00, 0x00);
+				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 			}
 			break;
 
@@ -211,10 +209,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// 存在チェック。
 				if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
 					// ログあり:既読
-					clrTextFg = RGB(0x00, 0x00, 0x00);
+					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 				}else{
 					// ログなし:未読
-					clrTextFg = RGB(0x00, 0x00, 0xFF);
+					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
 				}
 			}
 			break;
@@ -222,7 +220,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		default:
 			// 色づけなし
 			// 黒にする
-			clrTextFg = RGB(0x00, 0x00, 0x00);
+			clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 			break;
 		}
 
