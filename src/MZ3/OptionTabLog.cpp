@@ -184,10 +184,11 @@ void COptionTabLog::OnBnClickedCleanLogButton()
 	CString msg;
 	msg.Format( 
 		L"ログファイルを削除します。よろしいですか？\n"
-		L"（ファイル数が多い場合、数分程度かかります）\n\n"
+		L"・ファイル数が多い場合、数分程度かかります\n"
+		L"・[%s]以下の全てのファイルを消去します\n\n"
 		L"ファイル数：%d\n"
 		L"総ファイルサイズ：%s Bytes"
-		, cd.nFiles, util::int2comma_str(cd.dwSize) );
+		, (LPCTSTR)strLogFolder, cd.nFiles, util::int2comma_str(cd.dwSize) );
 	if( MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION ) != IDYES ) {
 		return;
 	}
