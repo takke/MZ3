@@ -102,6 +102,10 @@ void COptionTabLog::OnBnClickedChangeLogFolderButton()
 
 	// フォルダ選択ダイアログ起動
 	if( util::GetOpenFolderPath( m_hWnd, L"ログフォルダの変更", strFolderPath ) ) {
+
+		// MZ3専用ログディレクトリ名を追加
+		strFolderPath.Append( L"\\mz3log" );
+
 		CString msg;
 		msg.Format( 
 			L"ログファイルの出力先を\n"
