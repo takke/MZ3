@@ -116,7 +116,7 @@ public:
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
-		, m_strSkinname( L"default" )
+		, m_strSkinname( L"aluminium" )
 		, m_bRenderByIE( false )
 	{
 	}
