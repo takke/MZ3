@@ -279,6 +279,8 @@ public:
 	int GetListWidth(void);
 	bool DoNextBodyItemCruise();
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg void OnLayoutCategoryMakeNarrow();
+	afx_msg void OnLayoutCategoryMakeWide();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

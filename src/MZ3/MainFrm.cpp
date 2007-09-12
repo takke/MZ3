@@ -246,7 +246,7 @@ void CMainFrame::OnSettingLogin()
 		theApp.m_optionMng.Save();
 
 		// フォントのリセット
-		ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+		ChangeAllViewFont();
 	}
 }
 
@@ -322,7 +322,7 @@ void CMainFrame::OnSettingGeneral()
 		theApp.m_optionMng.Save();
 
 		// フォントのリセット
-		ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+		ChangeAllViewFont();
 	}
 }
 
@@ -374,21 +374,21 @@ void CMainFrame::OnUpdateGetpageLatest10(CCmdUI *pCmdUI)
 void CMainFrame::OnChangeFontBig()
 {
 	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightBig;
-	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+	ChangeAllViewFont();
 }
 
 /// 「文字サイズ｜中」メニュー
 void CMainFrame::OnChangeFontMedium()
 {
 	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightMedium;
-	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+	ChangeAllViewFont();
 }
 
 /// 「文字サイズ｜小」メニュー
 void CMainFrame::OnChangeFontSmall()
 {
 	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightSmall;
-	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+	ChangeAllViewFont();
 }
 
 inline void MySetListViewFont( CListCtrl* pListCtrl )
@@ -409,6 +409,11 @@ inline void MySetListViewFont( CListCtrl* pListCtrl )
  */
 bool CMainFrame::ChangeAllViewFont(int fontHeight)
 {
+	if (fontHeight < 0) {
+		// デフォルト値補正
+		fontHeight = theApp.m_optionMng.m_fontHeight;
+	}
+
 	// フォントの作成
 	theApp.MakeNewFont( theApp.m_pMainView->GetFont(), fontHeight, theApp.m_optionMng.GetFontFace() );
 
@@ -692,7 +697,7 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 	theApp.m_bgImageReportListCtrl.load();
 
 	// リロード
-	ChangeAllViewFont( theApp.m_optionMng.m_fontHeight );
+	ChangeAllViewFont();
 
 	// メッセージ
 	CString msg;

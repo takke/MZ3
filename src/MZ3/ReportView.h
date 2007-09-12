@@ -134,6 +134,9 @@ public:
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie);
+public:
+	afx_msg void OnLayoutReportlistMakeNarrow();
+	afx_msg void OnLayoutReportlistMakeWide();
 };
 
 

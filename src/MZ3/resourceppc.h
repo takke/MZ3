@@ -289,6 +289,18 @@
 #define ID_SETTING_SKIN                 32952
 #define ID_CHANGE_SKIN                  32953
 #define ID_SKIN_DUMMY                   32954
+#define ID_32955                        32955
+#define ID_32956                        32956
+#define ID_32957                        32957
+#define IDM_LAYOUT_CATEGORY_            32958
+#define IDM_LAYOUT_CATEGORY_WIDEN       32959
+#define IDM_LAYOUT_CATEGORY_MAKE_WIDE   32960
+#define IDM_LAYOUT_CATEGORY_MAKE_NARROW 32961
+#define ID_32962                        32962
+#define ID_32963                        32963
+#define IDM_LAYOUT_REPORTLIST_MAKE_NARROW 32964
+#define ID_32965                        32965
+#define IDM_LAYOUT_REPORTLIST_MAKE_WIDE 32966
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -300,7 +312,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
-#define _APS_NEXT_COMMAND_VALUE         32955
+#define _APS_NEXT_COMMAND_VALUE         32967
 #define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           116
 #endif

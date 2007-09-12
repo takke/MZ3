@@ -172,6 +172,11 @@ BEGIN
         END
         MENUITEM "ブラウザで開く（このページ）...",           ID_OPEN_BROWSER
         MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
+        POPUP "画面レイアウト"
+        BEGIN
+            MENUITEM "↑リストを狭くする",                   IDM_LAYOUT_REPORTLIST_MAKE_NARROW
+            MENUITEM "↓リストを広くする",                   IDM_LAYOUT_REPORTLIST_MAKE_WIDE
+        END
     END
 END
 
@@ -228,6 +233,11 @@ BEGIN
         MENUITEM "巡回",                          IDM_CRUISE
         MENUITEM "巡回予約",                        IDM_CHECK_CRUISE
         MENUITEM "日記を書く",                       ID_WRITE_DIARY
+        POPUP "画面レイアウト"
+        BEGIN
+            MENUITEM "↑カテゴリリストを狭くする",               IDM_LAYOUT_CATEGORY_MAKE_NARROW
+            MENUITEM "↓カテゴリリストを広くする",               IDM_LAYOUT_CATEGORY_MAKE_WIDE
+        END
     END
 END
 

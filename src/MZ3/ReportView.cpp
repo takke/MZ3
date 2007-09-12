@@ -94,6 +94,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_BACK_MENU, &CReportView::OnBackMenu)
 	ON_COMMAND(ID_NEXT_MENU, &CReportView::OnNextMenu)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CReportView::OnHdnEndtrackReportList)
+	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_NARROW, &CReportView::OnLayoutReportlistMakeNarrow)
+	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
 END_MESSAGE_MAP()
 
 
@@ -1997,4 +1999,71 @@ BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie)
 		::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
 	} 
 	return TRUE; 
+}
+
+static const int N_HC_MIN = 10;		///< リストの最小値 [%]
+static const int N_HC_MAX = 90;		///< リストの最大値 [%]
+static const int N_HB_MIN = 10;		///< エディットの最小値 [%]
+static const int N_HB_MAX = 90;		///< エディットの最大値 [%]
+
+/**
+ * リストを狭くする
+ */
+void CReportView::OnLayoutReportlistMakeNarrow()
+{
+	int& hc = theApp.m_optionMng.m_nReportViewListHeightRatio;
+	int& hb = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
+
+	// オプション値を % に補正
+	int sum = hc + hb;
+	if (sum>0) {
+		hc = (int)(hc * 100.0 / sum);
+		hb = (int)(hb * 100.0 / sum);
+	}
+
+	// 狭める
+	const int STEP = 5;
+	hc -= STEP;
+	hb += STEP;
+
+	if (sum<=0 || hc < N_HC_MIN || hb > N_HB_MAX) {
+		// 最小値に設定
+		hc = N_HC_MIN;
+		hb = N_HB_MAX;
+	}
+
+	// 再描画
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
+}
+
+/**
+ * リストを広くする
+ */
+void CReportView::OnLayoutReportlistMakeWide()
+{
+	int& hc = theApp.m_optionMng.m_nReportViewListHeightRatio;
+	int& hb = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
+
+	// オプション値を % に補正
+	int sum = hc + hb;
+	if (sum>0) {
+		hc = (int)(hc * 100.0 / sum);
+		hb = (int)(hb * 100.0 / sum);
+	}
+
+	// 広くする
+	const int STEP = 5;
+	hc += STEP;
+	hb -= STEP;
+
+	if (sum<=0 || hc > N_HC_MAX || hb < N_HB_MIN) {
+		// 最小値に設定
+		hc = N_HC_MAX;
+		hb = N_HB_MIN;
+	}
+
+	// 再描画
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
 }

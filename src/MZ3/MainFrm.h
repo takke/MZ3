@@ -63,7 +63,7 @@ public:
 	afx_msg void OnChangeFontBig();
 	afx_msg void OnChangeFontMedium();
 	afx_msg void OnChangeFontSmall();
-	bool ChangeAllViewFont(int fontHeight);
+	bool ChangeAllViewFont(int fontHeight=-1);
 	afx_msg void OnChangeFontNormal();
 	afx_msg void OnUpdateMenuBack(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateMenuNext(CCmdUI *pCmdUI);

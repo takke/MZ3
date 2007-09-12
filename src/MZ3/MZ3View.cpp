@@ -177,6 +177,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_SEND_NEW_MESSAGE, &CMZ3View::OnSendNewMessage)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
 	ON_WM_SETTINGCHANGE()
+	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_NARROW, &CMZ3View::OnLayoutCategoryMakeNarrow)
+	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_WIDE, &CMZ3View::OnLayoutCategoryMakeWide)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -3241,4 +3243,71 @@ void CMZ3View::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 	if( uFlags & SETTINGCHANGE_RESET ) {
 	}
 */
+}
+
+static const int N_HC_MIN = 10;		///< カテゴリリストの最小値 [%]
+static const int N_HC_MAX = 90;		///< カテゴリリストの最大値 [%]
+static const int N_HB_MIN = 10;		///< ボディリストの最小値 [%]
+static const int N_HB_MAX = 90;		///< ボディリストの最大値 [%]
+
+/**
+ * カテゴリリストを狭くする
+ */
+void CMZ3View::OnLayoutCategoryMakeNarrow()
+{
+	int& hc = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+	int& hb = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+	// オプション値を % に補正
+	int sum = hc + hb;
+	if (sum>0) {
+		hc = (int)(hc * 100.0 / sum);
+		hb = (int)(hb * 100.0 / sum);
+	}
+
+	// 狭める
+	const int STEP = 5;
+	hc -= STEP;
+	hb += STEP;
+
+	if (sum<=0 || hc < N_HC_MIN || hb > N_HB_MAX) {
+		// 最小値に設定
+		hc = N_HC_MIN;
+		hb = N_HB_MAX;
+	}
+
+	// 再描画
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
+}
+
+/**
+ * カテゴリリストを広くする
+ */
+void CMZ3View::OnLayoutCategoryMakeWide()
+{
+	int& hc = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+	int& hb = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+	// オプション値を % に補正
+	int sum = hc + hb;
+	if (sum>0) {
+		hc = (int)(hc * 100.0 / sum);
+		hb = (int)(hb * 100.0 / sum);
+	}
+
+	// 広くする
+	const int STEP = 5;
+	hc += STEP;
+	hb -= STEP;
+
+	if (sum<=0 || hc > N_HC_MAX || hb < N_HB_MIN) {
+		// 最小値に設定
+		hc = N_HC_MAX;
+		hb = N_HB_MIN;
+	}
+
+	// 再描画
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
 }
