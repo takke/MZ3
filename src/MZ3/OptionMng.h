@@ -92,7 +92,7 @@ public:
 		, m_fontHeightBig( 28 )
 		, m_fontHeightMedium( 24 )
 		, m_fontHeightSmall( 18 )
-		, m_recvBufSize( 512 )
+		, m_recvBufSize( 2048 )
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
