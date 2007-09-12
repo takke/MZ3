@@ -17,7 +17,7 @@
 　MZ3 / MZ3.i は Willcom W-ZERO3 シリーズ用の mixi ブラウザです
 　ですが WindowsMobile 搭載機種なら大抵動作すると思います
 
-　本ドキュメントは MZ3.i Ver.0.8.2.0 Beta9 を元に作成しています
+　本ドキュメントは MZ3.i Ver.0.8.2.0 Beta11 を元に作成しています
 　そのため, バージョンアップが行われ, ここに記載がない機能が
 　追加されている場合も大いに考えられます
 　そのような場合は mixi 内コミュニティ
@@ -608,6 +608,7 @@
 　　　※ログを保存しない場合は「ログを開く」機能が正常に使えなくなります
 　　【保存先：変更】ボタン
 　　　ログの保管先を既定から変更する場合はここから設定します
+　　　\設定先ディレクトリ\mz3log に保存されます
 　　　デフォルトでは \MZ3\log 以下に保存されます
 　　【ログの削除】ボタン
 　　　デバイス上に保存されているログを削除します
@@ -628,130 +629,170 @@
 　ここでは画面上から設定できる項目については触れません
 
 　●toppage_group.ini
-　　このファイルは上部ペインのタブ内容を設定するファイルです
-　　ここでは標準では「日記」となっているタブ内容の変更の仕方を説明します
-
-　　【デフォルトの表記】
-　　　[Group1]
-　　　Category04=日記コメント記入履歴,NEW_COMMENT,new_comment.pl
-　　　Category03=マイミク最新日記,DIARY,new_friend_diary.pl
-　　　Category02=最近のコメント,COMMENT,list_comment.pl
-　　　Category01=最近の日記,MYDIARY,list_diary.pl
-　　　Url=list_diary.pl
-　　　Type=MYDIARY
-　　　Name=日記
-
-　　【変更後の表記】
-　　　[Group1]
-　　　Name=いろいろ
-　　　Type=OTHERS
-　　　Url=
-　　　Category01=日記,MYDIARY
-　　　Category02=マイミク最新日記,DIARY
-　　　Category03=コミュ最新書込,BBS
-　　　Category04=注目のピックアップ,NEWS,http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
-　　　Category05=エンターテインメント,NEWS,http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1
-　　　Category06=IT,NEWS,http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1
-
-　　【各項目について】
-
-　　　[Group]　　… 画面に表示される順番を表します。1からの連番です
-　　　Name　　　 … タブに表記される名称です
-　　　Type　　　 … タブ内容のタイプを設定します
-　　　Url　　　　… 取得する URI を指定します
-　　　Category　 … 画面に表示される順番を表します。01からの連番です
-
-　　Category に "NEW_COMMENT", "new_comment.pl" といった文字列がありますが,
-　　これらはプログラム上で定義された値です
-　　ですので, これらを既定外のものに変更すると正しく表示することができません
-　　また, "," 区切りの順番も変更することはできません
-　　変更する場合はこれらに注意して変更を行ってください
-　　デフォルトの設定に戻す場合は
-　　メニュー | 設定 | 一般 より「タブの初期化」を行ってください
-
-
+　　トップページのタブ構成を編集するファイルです
 　●favorite.dat
 　　ブックマークで登録したトピックスを格納するファイルです
-　　通常は画面上から追加, 削除を行いますが, コミュニティに参加していない場合は
-　　MZ3.i 上でトピックスを開けないのでこれらの作業を行うことはできません
-　　しかし, このファイルに直接記述することで非参加のコミュニティトピックスを
-　　閲覧できるようになります
-
-　　・記述例
-　　　b<>9360894<>MZ3 -Mixi for ZERO3-<>【要望】こんな機能いれてほしい
-
-　　・<>はフィールドを区切る記号です。変更しないで下さい
-
-　　・先頭のアルファベットは既定文字です
-　　　b … トピックス
-　　　v … イベント
-　　　e … アンケート
-
-　　・2項目 … トピックス ID 
-　　・3項目 … コミュニティ名
-　　・4項目 … トピックス名
-
-
 　●mz3.ini
-　　mz3.ini はオプション画面で設定した値を保存するファイルです
+　　設定画面で設定した値を保存するファイルです
+　●skin.ini
+　　背景スキンや文字色を定義するファイルです
 
-　　【RecvBufferSize - バッファサイズ】
-　　　バッファサイズは設定画面より指定することができますが,
-　　　画面上での設定値は最大で 32768 byte までになっています
-　　　しかし, mz3.ini の RecvBufferSize を変更することで
-　　　最大 102400 byte まで設定することができます
+** toppage_group.ini
+　 このファイルは上部ペインのタブ内容を設定するファイルです
+　 ここでは標準では「日記」となっているタブ内容の変更の仕方を説明します
 
-　　【Ratio系】
-　　　各画面での列幅・及びペインの上下比率を設定します
-　　　各項目は下限1, 上限1000の間で設定をしてください
-　　　※ 各比率が初期値を超えた場合は各値の比率で調整されます
-　　　　 ex) 上部ペイン：100, 下部ペイン：400 の場合,
-　　　　　　 20：80で画面調整が行われます
-　　　※ 画面レイアウトが崩れた場合は該当項目を削除し, MZ3.i を再起動してください
-　　　　 初期値に戻ります
+　 【デフォルトの表記】
+　 　[Group1]
+　 　Category04=日記コメント記入履歴,NEW_COMMENT,new_comment.pl
+　 　Category03=マイミク最新日記,DIARY,new_friend_diary.pl
+　 　Category02=最近のコメント,COMMENT,list_comment.pl
+　 　Category01=最近の日記,MYDIARY,list_diary.pl
+　 　Url=list_diary.pl
+　 　Type=MYDIARY
+　 　Name=日記
 
-　　　・レポート画面上部ペインの列幅です
-　　　　ReportViewListCol1Ratio - レコードナンバ列
-　　　　ReportViewListCol2Ratio - 名前
-　　　　ReportViewListCol3Ratio - 日時
+　 【変更後の表記】
+　 　[Group1]
+　 　Name=いろいろ
+　 　Type=OTHERS
+　 　Url=
+　 　Category01=日記,MYDIARY
+　 　Category02=マイミク最新日記,DIARY
+　 　Category03=コミュ最新書込,BBS
+　 　Category04=注目のピックアップ,NEWS,http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
+　 　Category05=エンターテインメント,NEWS,http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1
+　 　Category06=IT,NEWS,http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1
 
-　　　・メイン画面上部ペインの列幅です (画面上に列の区切り線は表示されません)
-　　　　MainViewCategoryListCol1Ratio - 項目名
-　　　　MainViewCategoryListCol2Ratio - 最終取得日時
+　 【各項目について】
 
-　　　・メイン画面下部ペインの列幅です
-　　　　MainViewBodyListCol1Ratio - タイトル
-　　　　MainViewBodyListCol2Ratio - 日時 (コミュニティ名など)
+　 　[Group]　　… 画面に表示される順番を表します。1からの連番です
+　 　Name　　　 … タブに表記される名称です
+　 　Type　　　 … タブ内容のタイプを設定します
+　 　Url　　　　… 取得する URI を指定します
+　 　Category　 … 画面に表示される順番を表します。01からの連番です
 
-　　　・レポート画面のペイン幅です
-　　　　ReportViewBodyHeightRatio - 上部ペイン
-　　　　ReportViewListHeightRatio - 下部ペイン
+　 Category に "NEW_COMMENT", "new_comment.pl" といった文字列がありますが,
+　 これらはプログラム上で定義された値です
+　 ですので, これらを既定外のものに変更すると正しく表示することができません
+　 また, "," 区切りの順番も変更することはできません
+　 変更する場合はこれらに注意して変更を行ってください
+　 デフォルトの設定に戻す場合は
+　 メニュー | 設定 | 一般 より「タブの初期化」を行ってください
 
-　　　メイン画面のペイン幅です
-　　　　MainViewBodyListHeightRatio     - 上部ペイン
-　　　　MainViewCategoryListHeightRatio - 下部ペイン
 
-　　【UserAgent - ユーザエージェント】
-　　　UserAgent の変更を行います
-　　　標準では
-　　　　UserAgent=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
-　　　となっています
+** favorite.dat
+　 ブックマークで登録したトピックスを格納するファイルです
+　 通常は画面上から追加, 削除を行いますが, コミュニティに参加していない場合は
+　 MZ3.i 上でトピックスを開けないのでこれらの作業を行うことはできません
+　 しかし, このファイルに直接記述することで非参加のコミュニティトピックスを
+　 閲覧できるようになります
 
-　●skin.ini について
-　　\MZ3\skin 以下に配置したディレクトリ内に skin.ini を配置することで
-　　GUI によるスキン切り替えメニューに出る項目をカスタムすることができます
-　　default に入っているファイルを新たなディレクトリにコピーし，
-　　title の部分を表示させたい名称に変更してください
-　　また各画像ファイル名は ini に定義することで好きな名称を付けられます
-　　ex)
-　　[skin]
-　　title=オリジナルスキン
-　　main_body_imagefile=ボディ画面.jpg
-　　main_category_imagefile=ヘッダ画面.jpg
-　　report_list_imagefile=レポート画面.jpg
+　 ・記述例
+　 　b<>9360894<>MZ3 -Mixi for ZERO3-<>【要望】こんな機能いれてほしい
 
-　　また, jpg 以外でも bmp, gif, png を利用することができます
-　　これらのファイルを扱う際は skin.ini 内の各ファイルの拡張子を変更してください
+　 ・<>はフィールドを区切る記号です。変更しないで下さい
+
+　 ・先頭のアルファベットは既定文字です
+　 　b … トピックス
+　 　v … イベント
+　 　e … アンケート
+
+　 ・2項目 … トピックス ID 
+　 ・3項目 … コミュニティ名
+　 ・4項目 … トピックス名
+
+
+** mz3.ini
+　 mz3.ini は設定画面で設定した値を保存するファイルです
+　 画面上からは設定できない項目もこのファイルを直接編集することで
+　 設定できるようななる項目もあります
+
+　 【RecvBufferSize - バッファサイズ】
+　 　バッファサイズは設定画面より指定することができますが,
+　 　画面上での設定値は最大で 32768 byte までになっています
+　 　しかし, mz3.ini の RecvBufferSize を変更することで
+　 　最大 102400 byte まで設定することができます
+
+　 【Ratio系】
+　 　各画面での列幅・及びペインの上下比率を設定します
+　 　各項目は下限1, 上限1000の間で設定をしてください
+　 　※ 各比率が初期値を超えた場合は各値の比率で調整されます
+　 　　 ex) 上部ペイン：100, 下部ペイン：400 の場合,
+　 　　　　 20：80で画面調整が行われます
+　 　※ 画面レイアウトが崩れた場合は該当項目を削除し, MZ3.i を再起動してください
+　 　　 初期値に戻ります
+
+　 　・レポート画面上部ペインの列幅です
+　 　　ReportViewListCol1Ratio - レコードナンバ列
+　 　　ReportViewListCol2Ratio - 名前
+　 　　ReportViewListCol3Ratio - 日時
+
+　 　・メイン画面上部ペインの列幅です (画面上に列の区切り線は表示されません)
+　 　　MainViewCategoryListCol1Ratio - 項目名
+　 　　MainViewCategoryListCol2Ratio - 最終取得日時
+
+　 　・メイン画面下部ペインの列幅です
+　 　　MainViewBodyListCol1Ratio - タイトル
+　 　　MainViewBodyListCol2Ratio - 日時 (コミュニティ名など)
+
+　 　・レポート画面のペイン幅です
+　 　　ReportViewBodyHeightRatio - 上部ペイン
+　 　　ReportViewListHeightRatio - 下部ペイン
+
+　 　メイン画面のペイン幅です
+　 　　MainViewBodyListHeightRatio     - 上部ペイン
+　 　　MainViewCategoryListHeightRatio - 下部ペイン
+
+　 【UserAgent - ユーザエージェント】
+　 　UserAgent の変更を行います
+　 　標準では
+　 　　UserAgent=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+　 　となっています
+
+** skin.ini
+　 skin.ini は背景スキンや文字色を定義するファイルです
+　 \MZ3\skin 以下に配置したディレクトリ内に skin.ini を配置することで
+　 GUI によるスキン切り替えメニューに出る項目をカスタムすることができます
+　 default に入っているファイルを新たなディレクトリにコピーし，
+　 title の部分を表示させたい名称に変更してください
+　 また各画像ファイル名は ini に定義することで好きな名称を付けられます
+　 ex)
+　 [skin]
+　 # スキンタイトル
+　 title=オリジナルスキン
+　 # メイン画面のボディコントロール用背景画像ファイル名
+　 main_body_imagefile=custom_body.jpg
+　 # メイン画面のカテゴリコントロール用背景画像ファイル名
+　 main_category_imagefile=custom_header.jpg
+　 # レポート画面のリストコントロール用背景画像ファイル名
+　 report_list_imagefile=custom_report.jpg
+
+　 また, jpg 以外でも bmp, gif, png を利用することができます
+　 これらのファイルを扱う際は skin.ini 内の各ファイルの拡張子を変更してください
+
+　 Ver.0.8.2.0 Beta10 より skin.ini にて文字色の設定ができるようになりました
+　 # レポート画面、リストの文字色
+　 ReportListTextColor=000000
+-- 一つだけ例示して後はコメント
+--　 # メイン画面、カテゴリコントロールのアクティブ項目の文字色
+--　 MainCategoryListActiveTextColor=ff0000
+--　 # メイン画面、カテゴリコントロールの非アクティブ項目の文字色
+--　 MainCategoryListInactiveTextColor=000000
+--　 # メイン画面、ボディコントロールのデフォルト文字色
+--　 MainBodyListDefaultTextColor=000000
+--　 # メイン画面、ボディコントロールの未読文字色
+--　 MainBodyListNonreadTextColor=0000ff
+--　 # メイン画面、ボディコントロールの新着記事の文字色
+--　 MainBodyListNewItemTextColor=ff0000
+--　 # メイン画面、ボディコントロールのあしあとのマイミクの文字色
+--　 MainBodyListFootprintMyMixiTextColor=0000ff
+--　 # メイン画面、ボディコントロールの外部ブログの文字色
+--　 MainBodyListExternalBlogTextColor=808080
+
+　 文字色を変更する場合は必ず16進法表記で記述してください
+　 " ReportListTextColor=Red " のような表記は使えません
+　 無効な表記がある場合はデフォルト値で表示します
+　 # の付いた行はコメント行になりますので, なくても問題ありません
 
 --------------------------------------------------------------------------------
 
@@ -778,6 +819,7 @@
 　A.処理が実行されていない可能性があります
 　　もう一度センターキーを押下するか, ダブルタップしてください
 　　※上部ペインでは基本的にシングルタップで選択, ダブルタップで実行になります
+--
 -- 自動接続機能の追加に伴いコメント化
 -- 　Q.ネットワークに接続できない
 -- 　A.MZ3.i には自動接続の機能はありませんので,
@@ -953,6 +995,11 @@
 
 　本ドキュメントの履歴です。MZ3.i の履歴ではありません
 　特に記載のない場合はドトールが編集しています
+
+** MZ3.i Ver.0.8.2.0 Beta11 用 (2007.09.12)
+　・ini ファイルについての「skin.ini」の記述をを修正
+　・ini ファイルについての章構成を変更
+　・その他
 
 ** MZ3.i Ver.0.8.2.0 Beta9 用 (2007.09.03)
 　・ini ファイルについての「skin.ini」の記述をを修正
