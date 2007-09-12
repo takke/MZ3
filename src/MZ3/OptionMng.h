@@ -36,6 +36,7 @@ private:
 public:
 
 	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
+	bool			m_bRenderByIE;			///< IE コントロールで閲覧するかどうか
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）
@@ -116,6 +117,7 @@ public:
 		, m_longReturnRangeMSec( 300 )
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
 		, m_strSkinname( L"default" )
+		, m_bRenderByIE( false )
 	{
 	}
 

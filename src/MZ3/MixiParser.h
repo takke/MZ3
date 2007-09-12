@@ -301,6 +301,10 @@ public:
 		}
 		while( line.Replace(_T("</div>"), _T("")) );
 
+		if (theApp.m_optionMng.m_bRenderByIE) {
+			return;
+		}
+
 		// br タグの置換
 		{
 			static MyRegex reg;
@@ -427,6 +431,10 @@ private:
 	 */
 	static void ReplaceEmojiImageToText( CString& line )
 	{
+		if (theApp.m_optionMng.m_bRenderByIE) {
+			return;
+		}
+
 		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
 		// のようなリンクを
 		// "((喫煙))" に変換する
@@ -632,16 +640,21 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 			// マッチ文字列全体の左側を出力
 			line.Append( target, results[0].start );
 
-			CString text = L"<<画像>>";
-			// url を追加
-			LPCTSTR url = results[1].str.c_str();
-			data_.m_linkList.push_back( CMixiData::Link(url, text) );
+			// class="emoji" が含まれていれば、絵文字と判断し、無視する。
+			if( util::LineHasStringsNoCase( results[0].str.c_str(), L"class=\"emoji\"" ) ) {
+				line.Append( results[0].str.c_str() );
+			} else {
+				CString text = L"<<画像>>";
+				// url を追加
+				LPCTSTR url = results[1].str.c_str();
+				data_.m_linkList.push_back( CMixiData::Link(url, text) );
 
-			// 置換
-			line.Append( text );
+				// 置換
+				line.Append( text );
 
-			// とりあえず改行
-			line += _T("<br>");
+				// とりあえず改行
+				line += _T("<br>");
+			}
 
 			// ターゲットを更新。
 			target.Delete( 0, results[0].end );

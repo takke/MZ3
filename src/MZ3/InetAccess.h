@@ -49,8 +49,10 @@ private:
 
 	HINTERNET			m_hConnection;
 	HINTERNET			m_hRequest;
+public:
 	HINTERNET			m_hInternet;			///< セッション(InternetOpenで取得)
 
+private:
 	bool				m_bAccessing;			///< 通信中フラグ
 
 
@@ -81,6 +83,7 @@ public:
 	LPCTSTR	GetURL()			{ return m_uri; }
 
 	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
+	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
 	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData );
 
 	void Initialize( HWND hwnd, void* object );

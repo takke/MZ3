@@ -161,6 +161,11 @@ BOOL CMZ3App::InitInstance()
 	// スキン関連の初期化
 	LoadSkinSetting();
 
+	// IE コンポーネントの初期化
+	if (m_optionMng.m_bRenderByIE) {	// TODO この条件はIE正式対応前のための仮設定。正式対応後は常に実行すること。
+		InitHTMLControl( AfxGetInstanceHandle() );
+	}
+
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
@@ -254,6 +259,9 @@ BOOL CMZ3App::InitInstance()
 		// ユーザ設定画面を表示する
 		((CMainFrame*)m_pMainWnd)->OnSettingLogin();
 	}
+
+	// フォーカスをメインビューに変更する
+	m_pMainView->SetFocus();
 
 	MZ3LOGGER_INFO( L"MZ3 初期化完了" );
 

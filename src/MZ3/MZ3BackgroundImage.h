@@ -39,6 +39,16 @@ public:
 		return true;
 	}
 
+	bool load( LPCTSTR szFilepath )
+	{
+		if (!m_hBitmap) {
+			deleteBitmap();
+		}
+		m_hBitmap = loadBitmap( szFilepath );
+
+		return true;
+	}
+
 private:
 
 	/// ビットマップのロード
@@ -61,5 +71,22 @@ private:
 			return true;
 		}
 	}
+
+public:
+	CSize getBitmapSize()
+	{
+		if (m_hBitmap==NULL) {
+			return CSize();
+		}
+
+		BITMAP bmp;
+		GetObject(m_hBitmap, sizeof(BITMAP), &bmp);
+		CSize size;
+		size.cx = bmp.bmWidth;
+		size.cy = bmp.bmHeight;
+
+		return size;
+	}
+
 };
 

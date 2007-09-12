@@ -82,3 +82,7 @@
 #include <afxdlgs.h>
 #include <afxctl.h>
 #include "wininet.h"
+
+// PocketIE サポート
+#include "htmlctrl.h"
+#pragma comment(lib, "htmlview.lib")

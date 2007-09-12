@@ -220,6 +220,33 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
 }
 
 /**
+ * インターネットアクセス
+ * 
+ * 指定のURIにアクセスして、ファイルを取得し、SJISに変換してファイルに保存する。
+ * ファイルは全て theApp.m_filepath.temphtml に保存する。
+ * 
+ * @param uri	[in] URI
+ * @param ref	[in] リファラ
+ *
+ * @return 常に TRUE を返す。
+ */
+BOOL CInetAccess::DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
+{
+	// 中断フラグを初期化
+	m_abort		= FALSE;
+
+	m_uri		= uri;
+	m_ref		= ref;
+	m_fileType	= type;
+	m_nRedirect = 0;
+
+	// スレッド開始
+	ExecGet_Thread(this);
+
+	return TRUE;
+}
+
+/**
  * スレッド中継
  */
 unsigned int CInetAccess::ExecGet_Thread(LPVOID This)
