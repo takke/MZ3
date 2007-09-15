@@ -42,6 +42,7 @@
 #define IDC_STATIC_5                    205
 #define IDD_OPTIONTAB_REPORT            205
 #define IDC_STATIC_6                    206
+#define IDD_OPTIONTAB_DISPLAY           206
 #define IDC_STATIC_7                    207
 #define IDC_STATIC_8                    208
 #define IDC_STATIC_9                    209
@@ -314,6 +315,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32967
 #define _APS_NEXT_CONTROL_VALUE         1057
-#define _APS_NEXT_SYMED_VALUE           116
+#define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

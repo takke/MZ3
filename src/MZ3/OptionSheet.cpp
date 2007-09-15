@@ -36,7 +36,8 @@ void COptionSheet::SetPage()
 {
 	AddPage( &m_tabUser );		// ログインタブ
 	AddPage( &m_tabGeneral );	// 一般タブ
-	AddPage( &m_tabUi );		// UIタブ
+	AddPage( &m_tabDisplay );	// 表示タブ
+	AddPage( &m_tabUi );		// 操作タブ
 	AddPage( &m_tabReport );	// レポート画面タブ
 	AddPage( &m_tabGet );		// 取得タブ
 	AddPage( &m_tabLog );		// ログタブ

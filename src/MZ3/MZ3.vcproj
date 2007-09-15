@@ -1229,6 +1229,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabDisplay.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabGeneral.cpp"
 					>
 				</File>
@@ -1456,6 +1460,10 @@
 				</File>
 				<File
 					RelativePath=".\OptionSheet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabDisplay.h"
 					>
 				</File>
 				<File

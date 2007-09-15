@@ -22,6 +22,4 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
-	afx_msg void OnBnClickedResetTabButton();
-	afx_msg void OnBnClickedSelectFontButton();
 };
