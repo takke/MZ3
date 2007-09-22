@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "ForcedDebugDlg.h"
+#include "CommonSelectDlg.h"
 
 
 // CForcedDebugDlg ダイアログ
@@ -329,8 +330,38 @@ void CForcedDebugDlg::OnPaint()
 
 void CForcedDebugDlg::OnOK()
 {
-	// TODO: ここに特定なコードを追加するか、もしくは基本クラスを呼び出してください。
 	m_bStop = true;
+
+	{
+		// 確認画面
+		CString msg;
+		msg.Format( 
+			L"絵文字表示モード（IEコンポーネントモード）を変更できます。\n"
+			L"（再起動後に有効になります）\n" );
+
+		CCommonSelectDlg dlg;
+		dlg.SetMessage( msg );
+		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"絵文字表示モードにする" );
+		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"従来のモードにする" );
+		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_CANCEL,  L"モード変更しない" );
+		if( dlg.DoModal() != IDOK ) {
+			return;
+		}
+
+		int r = dlg.m_pressedButtonCode;
+		switch( r ) {
+		case CCommonSelectDlg::BUTTONCODE_SELECT1:
+			// 絵文字表示モード
+			theApp.m_optionMng.m_bRenderByIE = true;
+			break;
+		case CCommonSelectDlg::BUTTONCODE_SELECT2:
+			// 従来のモード
+			theApp.m_optionMng.m_bRenderByIE = false;
+			break;
+		default:
+			break;
+		}
+	}
 
 	CDialog::OnOK();
 }

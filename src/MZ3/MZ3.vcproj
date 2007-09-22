@@ -1316,10 +1316,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MixiData.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MyRegex.h"
 				>
 			</File>
@@ -1410,6 +1406,10 @@
 			<Filter
 				Name="mixi"
 				>
+				<File
+					RelativePath=".\MixiData.h"
+					>
+				</File>
 				<File
 					RelativePath=".\MixiParser.h"
 					>
