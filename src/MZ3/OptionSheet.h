@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef SMARTPHONE2003_UI_MODEL
+
 #include "OptionTabUser.h"
 #include "OptionTabProxy.h"
 #include "OptionTabGetPage.h"
@@ -36,4 +38,4 @@ private:
 	COptionTabProxy		m_tabProxy;		///< PROXYƒ^ƒu
 };
 
-
+#endif

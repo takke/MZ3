@@ -6,6 +6,9 @@
 #include "util.h"
 #include "OptionTabReport.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 
 // COptionTabReport ダイアログ
 
@@ -83,3 +86,5 @@ void COptionTabReport::OnOK()
 
 	CPropertyPage::OnOK();
 }
+
+#endif

@@ -29,7 +29,7 @@ public:
 #endif
 
 public:  // コントロール バー用メンバ
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	CCommandBar m_wndCommandBar;
 #endif
 

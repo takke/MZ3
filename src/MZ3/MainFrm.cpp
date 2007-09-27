@@ -92,7 +92,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	// dpi値によってツールバーの画像を変更
 	int id_toolbar = 0;
 
@@ -239,6 +239,9 @@ void CMainFrame::OnForwardButton()
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingLogin()
 {
+// this code is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 	COptionSheet cPropSht( _T("オプション"));
 	cPropSht.SetPage();
 	cPropSht.SetActivePage(0);
@@ -248,6 +251,8 @@ void CMainFrame::OnSettingLogin()
 		// フォントのリセット
 		ChangeAllViewFont();
 	}
+
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -255,8 +260,8 @@ void CMainFrame::OnSettingLogin()
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));  
+#ifdef POCKETPC2003_UI_MODEL
+	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
 #endif
 }
 
@@ -265,7 +270,7 @@ void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
 #endif
 }
@@ -275,7 +280,7 @@ void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
 #endif
 }
@@ -285,7 +290,7 @@ void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
 #endif
 }
@@ -295,7 +300,7 @@ void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
 #endif
 }
@@ -305,7 +310,7 @@ void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
 #endif
 }
@@ -315,6 +320,9 @@ void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingGeneral()
 {
+// this code is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 	COptionSheet cPropSht( _T("オプション"));
 	cPropSht.SetPage();
 	cPropSht.SetActivePage(1);
@@ -324,6 +332,8 @@ void CMainFrame::OnSettingGeneral()
 		// フォントのリセット
 		ChangeAllViewFont();
 	}
+
+#endif
 }
 
 /// 「閉じる」メニューイベントハンドラ
@@ -490,7 +500,7 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 /// 画面｜前の画面メニューの制御
 void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
 #endif
 }
@@ -498,7 +508,7 @@ void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 /// 画面｜次の画面メニューの制御
 void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
 #endif
 }

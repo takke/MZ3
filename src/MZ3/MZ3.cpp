@@ -166,20 +166,6 @@ BOOL CMZ3App::InitInstance()
 		InitHTMLControl( AfxGetInstanceHandle() );
 	}
 
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CMZ3Doc),
-		RUNTIME_CLASS(CMainFrame),       // メイン SDI フレーム ウィンドウ
-		RUNTIME_CLASS(CMZ3View));
-	if (!pDocTemplate)
-		return FALSE;
-	AddDocTemplate(pDocTemplate);
-
-	// DDE、file open など標準のシェル コマンドのコマンドラインを解析します。
-	CCommandLineInfo cmdInfo;
-	ParseCommandLine(cmdInfo);
-
 	// トップページ用の初期化
 	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
 	bool bExistGroupFile = util::ExistFile( theApp.m_filepath.groupfile );
@@ -206,6 +192,20 @@ BOOL CMZ3App::InitInstance()
 		MZ3LOGGER_INFO( L"タブ初期化" );
 		m_root.initForTopPage();
 	}
+
+	CSingleDocTemplate* pDocTemplate;
+	pDocTemplate = new CSingleDocTemplate(
+		IDR_MAINFRAME,
+		RUNTIME_CLASS(CMZ3Doc),
+		RUNTIME_CLASS(CMainFrame),       // メイン SDI フレーム ウィンドウ
+		RUNTIME_CLASS(CMZ3View));
+	if (!pDocTemplate)
+		return FALSE;
+	AddDocTemplate(pDocTemplate);
+
+	// DDE、file open など標準のシェル コマンドのコマンドラインを解析します。
+	CCommandLineInfo cmdInfo;
+	ParseCommandLine(cmdInfo);
 
 	// コマンド ラインで指定されたディスパッチ コマンドです。アプリケーションが
 	// /RegServer、/Register、/Unregserver または /Unregister で起動された場合、FALSE を返します。
@@ -248,6 +248,7 @@ BOOL CMZ3App::InitInstance()
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
+#ifndef SMARTPHONE2003_UI_MODEL
 	if( wcslen(m_loginMng.GetEmail()) == 0 ||
 		wcslen(m_loginMng.GetPassword()) == 0 )
 	{
@@ -259,6 +260,7 @@ BOOL CMZ3App::InitInstance()
 		// ユーザ設定画面を表示する
 		((CMainFrame*)m_pMainWnd)->OnSettingLogin();
 	}
+#endif
 
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
@@ -385,7 +387,7 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
 #else
 	return TRUE;

@@ -1,6 +1,9 @@
 #pragma once
 #include "afxwin.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 
 // COptionTabGetPage ダイアログ
 
@@ -29,3 +32,5 @@ private:
 
 	CComboBox mc_RecvBufCombo;
 };
+
+#endif

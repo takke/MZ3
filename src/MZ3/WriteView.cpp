@@ -631,7 +631,6 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYUP) {
 		switch (pMsg->wParam) {
 		case VK_F1:
-#ifdef WINCE
 			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 				// メインメニューのポップアップ
 				RECT rect;
@@ -639,7 +638,11 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 
 				CMenu menu;
 				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+#ifdef POCKETPC2003_UI_MODEL
 				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+#else
+				menu.LoadMenu(IDR_MAINFRAME);
+#endif
 				menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 					rect.left,
 					rect.bottom,
@@ -647,7 +650,6 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				menu.Detach();
 				return TRUE;
 			}
-#endif
 			break;
 
 		case VK_F2:

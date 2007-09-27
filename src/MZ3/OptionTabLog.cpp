@@ -6,6 +6,9 @@
 #include "util.h"
 #include "OptionTabLog.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 
 // COptionTabLog ダイアログ
 
@@ -211,3 +214,5 @@ void COptionTabLog::OnBnClickedDebugModeCheck()
 {
 	MessageBox( L"デバッグモードの変更は再起動後に反映されます" );
 }
+
+#endif

@@ -6,6 +6,9 @@
 #include "util.h"
 #include "OptionTabGetPage.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 
 // COptionTabGetPage ダイアログ
 
@@ -143,3 +146,5 @@ void COptionTabGetPage::Save()
 		theApp.m_inet.CloseInternetHandles();
 	}
 }
+
+#endif

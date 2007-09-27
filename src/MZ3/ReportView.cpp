@@ -646,15 +646,17 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 {
 	switch (pMsg->wParam) {
 	case VK_F1:
-#ifdef WINCE
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			CMenu menu;
 			RECT rect;
 
 			// メインメニューのポップアップ
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+#ifdef POCKETPC2003_UI_MODEL
 			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-
+#else
+			menu.LoadMenu(IDR_MAINFRAME);
+#endif
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 				rect.left,
@@ -663,7 +665,6 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
-#endif
 		break;
 
 	case VK_F2:

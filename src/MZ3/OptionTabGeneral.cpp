@@ -8,6 +8,9 @@
 #include "ChooseFontDlg.h"
 #include "util.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 // COptionTabGeneral ダイアログ
 
 IMPLEMENT_DYNAMIC(COptionTabGeneral, CPropertyPage)
@@ -65,3 +68,5 @@ void COptionTabGeneral::OnOK()
 
 	CPropertyPage::OnOK();
 }
+
+#endif

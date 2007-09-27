@@ -1,5 +1,7 @@
 #pragma once
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionTabDisplay ダイアログ
 
@@ -25,3 +27,5 @@ public:
 	afx_msg void OnBnClickedResetTabButton();
 	afx_msg void OnBnClickedSelectFontButton();
 };
+
+#endif

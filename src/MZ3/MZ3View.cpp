@@ -1162,7 +1162,6 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	// 共通処理
 	switch (pMsg->wParam) {
 	case VK_F1:
-#ifdef WINCE
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
@@ -1170,7 +1169,11 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 
 			CMenu menu;
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+#ifdef POCKETPC2003_UI_MODEL
 			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+#else
+			menu.LoadMenu(IDR_MAINFRAME);
+#endif
 			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 				rect.left,
 				rect.bottom,
@@ -1178,7 +1181,6 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
-#endif
 		break;
 	case VK_F2:
 		if( GetFocus() == &m_bodyList ) {
@@ -2028,7 +2030,7 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
  */
 void CMZ3View::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
+#ifdef POCKETPC2003_UI_MODEL
 	CMainFrame* pFrame;
 	pFrame = (CMainFrame*)(theApp.GetMainWnd());
 	pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  

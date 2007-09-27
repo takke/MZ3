@@ -5,6 +5,9 @@
 #include "MZ3.h"
 #include "OptionTabProxy.h"
 
+// this file is not used in smartphone edition
+#ifndef SMARTPHONE2003_UI_MODEL
+
 
 // COptionTabProxy ダイアログ
 
@@ -197,3 +200,5 @@ void COptionTabProxy::OnBnClickedUseManualProxyRadio()
 	// コントロールの表示状態の更新
 	DoUpdateControlViewStatus();
 }
+
+#endif
