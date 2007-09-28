@@ -62,6 +62,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
+	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
 END_MESSAGE_MAP()
 
 
@@ -93,27 +94,45 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-#ifdef POCKETPC2003_UI_MODEL
-	// dpi値によってツールバーの画像を変更
-	int id_toolbar = 0;
+	if( theApp.m_bPocketPC ) {
+		// dpi値によってツールバーの画像を変更
+		int id_toolbar = 0;
 
-	// RealVGA化していたら(dpi値が96以下だったら)コマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
-	if (theApp.GetDPI() <= 96) {
-		id_toolbar = IDR_TOOLBAR_QVGA;
-	} else {
-		id_toolbar = IDR_TOOLBAR;
+		// RealVGA化していたら(dpi値が96以下だったら)コマンドバーに小さい画像を使用。それより大きいDpiは大きいの。
+		if (theApp.GetDPI() <= 96) {
+			id_toolbar = IDR_TOOLBAR_QVGA;
+		} else {
+			id_toolbar = IDR_TOOLBAR;
+		}
+
+		if (!m_wndCommandBar.Create(this) ||
+			!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
+			!m_wndCommandBar.AddAdornments(dwAdornmentFlags) ||
+			!m_wndCommandBar.LoadToolBar(id_toolbar)) {
+				TRACE0("CommandBar の作成に失敗しました\n");
+				return -1;      // 作成できませんでした。
+		}
+
+		m_wndCommandBar.SetBarStyle(m_wndCommandBar.GetBarStyle() | CBRS_SIZE_FIXED);
 	}
 
-	if (!m_wndCommandBar.Create(this) ||
-		!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
-		!m_wndCommandBar.AddAdornments(dwAdornmentFlags) ||
-		!m_wndCommandBar.LoadToolBar(id_toolbar)) {
-			TRACE0("CommandBar の作成に失敗しました\n");
-			return -1;      // 作成できませんでした。
-	}
+	if( theApp.m_bSmartphone ) {
+		// Smartphone/Standard Edition の場合はメニューバーを作成する
+		SHMENUBARINFO mbi;
 
-	m_wndCommandBar.SetBarStyle(m_wndCommandBar.GetBarStyle() | CBRS_SIZE_FIXED);
-#endif
+		memset(&mbi, 0, sizeof(SHMENUBARINFO));
+		mbi.cbSize = sizeof(SHMENUBARINFO);
+		mbi.hwndParent = m_hWnd;
+		mbi.nToolBarId = IDR_MAINFRAME;
+		mbi.hInstRes = AfxGetInstanceHandle();
+		mbi.nBmpId = 0;
+		mbi.cBmpImages = 0;
+
+		if (SHCreateMenuBar(&mbi)==FALSE) {
+			MZ3LOGGER_FATAL(L"Couldn't create menu bar");
+		}
+		HWND hwndMenuBar = mbi.hwndMB;
+	}
 
 	return 0;
 }
@@ -249,9 +268,9 @@ void CMainFrame::OnSettingLogin()
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -259,9 +278,9 @@ void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -269,9 +288,9 @@ void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -279,9 +298,9 @@ void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -289,9 +308,9 @@ void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -299,9 +318,9 @@ void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -309,25 +328,22 @@ void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingGeneral()
 {
-#ifdef SMARTPHONE2003_UI_MODEL
-	// Smartphone/Standard Edition では COptionSheet 等が利用できないため、警告メッセージを表示する。
-	MessageBox( 
-		L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
-		L"お手数ですが、MZ3.ini を直接編集してください" );
+	if( theApp.m_bSmartphone ) {
+		// Smartphone/Standard Edition では COptionSheet 等が利用できないため、警告メッセージを表示する。
+		MessageBox( 
+			L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
+			L"お手数ですが、MZ3.ini を直接編集してください" );
+	} else {
+		COptionSheet cPropSht( _T("オプション"));
+		cPropSht.SetPage();
+		cPropSht.SetActivePage(1);
+		if (cPropSht.DoModal() == IDOK) {
+			theApp.m_optionMng.Save();
 
-#else
-
-	COptionSheet cPropSht( _T("オプション"));
-	cPropSht.SetPage();
-	cPropSht.SetActivePage(1);
-	if (cPropSht.DoModal() == IDOK) {
-		theApp.m_optionMng.Save();
-
-		// フォントのリセット
-		ChangeAllViewFont();
+			// フォントのリセット
+			ChangeAllViewFont();
+		}
 	}
-
-#endif
 }
 
 /// 「閉じる」メニューイベントハンドラ
@@ -480,8 +496,13 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 		int w = rect.Width();
 		int h = rect.Height() - rect.top;
-		SetWindowPos( NULL, 0, 0, w, h,
-			SWP_NOMOVE | SWP_NOZORDER );
+
+		// Smartphone/Standard Edition の場合はツールバーの分だけ微調整
+		if( theApp.m_bSmartphone ) {
+			h += MZ3_TOOLBAR_HEIGHT;
+		}
+
+		SetWindowPos( NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
 
 		// 各Viewに通知を送る
 		theApp.m_pMainView->OnSize( 0, w, h );
@@ -494,17 +515,17 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 /// 画面｜前の画面メニューの制御
 void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
+	}
 }
 
 /// 画面｜次の画面メニューの制御
 void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
-#endif
+	if( theApp.m_bPocketPC ) {
+		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
+	}
 }
 
 /// 画面｜前の画面メニューのイベント
@@ -738,4 +759,11 @@ void CMainFrame::OnOpenMixiMobileByBrowser()
 {
 	CString url = theApp.MakeLoginUrlForMixiMobile( L"home.pl" );
 	util::OpenUrlByBrowser( url );
+}
+
+/**
+ * 右ソフトキー押下イベント：ポップアップ
+ */
+void CMainFrame::OnMenuAction()
+{
 }

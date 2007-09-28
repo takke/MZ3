@@ -29,9 +29,7 @@ public:
 #endif
 
 public:  // コントロール バー用メンバ
-#ifdef POCKETPC2003_UI_MODEL
 	CCommandBar m_wndCommandBar;
-#endif
 
 	// 生成された、メッセージ割り当て関数
 protected:
@@ -82,6 +80,7 @@ public:
 
 	void GetSkinFolderNameList(std::vector<std::wstring>& skinfileList);
 	void OnSkinMenuItem(UINT nID);
+	afx_msg void OnMenuAction();
 };
 
 

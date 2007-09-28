@@ -29,7 +29,7 @@
 
 #define TOOLBAR_HEIGHT 24
 
-/// 現行のWM5デバイスで利用されている解像度の列挙。(Phone editionは除く)
+/// 現行のWMデバイスで利用されている解像度の列挙。(Phone editionは除く)
 enum ScreenResolution { 
 	SR_QVGA,			///< 320x240
 	SR_SQUARE240,		///< 240x240
@@ -93,11 +93,17 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
-private:
+public:
 	DWORD				m_dpi;					///< DPI
 	ScreenResolution	m_currentDisplayMode;	///< 解像度
-public:
+	/// プラットフォーム用のフラグ
+	BOOL				m_bPocketPC;
+	BOOL				m_bSmartphone;
+	BOOL				m_bWinMoFiveOh;
+	BOOL				m_bWinMo2003;
+	BOOL				m_bWinMo2003_SE;
 
+public:
 	//--- ロガー
 	CSimpleLogger		m_logger;				///< ログ出力オブジェクト
 
@@ -152,6 +158,8 @@ public:
 	int GetInfoRegionHeight( int fontHeight );
 
 	bool LoadSkinSetting();
+	void InitPlatformFlags();
+	void InitResolutionFlags();
 };
 
 extern CMZ3App theApp;

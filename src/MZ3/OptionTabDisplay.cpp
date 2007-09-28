@@ -8,9 +8,6 @@
 #include "ChooseFontDlg.h"
 #include "util.h"
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionTabDisplay ダイアログ
 
@@ -118,5 +115,3 @@ void COptionTabDisplay::OnBnClickedSelectFontButton()
 		theApp.m_optionMng.m_fontFace = dlg.m_strSelectedFont;
 	}
 }
-
-#endif

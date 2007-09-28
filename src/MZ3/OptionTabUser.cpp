@@ -5,9 +5,6 @@
 #include "MZ3.h"
 #include "OptionTabUser.h"
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionTabUser ダイアログ
 
@@ -58,5 +55,3 @@ void COptionTabUser::OnOK()
 
 	CPropertyPage::OnOK();
 }
-
-#endif

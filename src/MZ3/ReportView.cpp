@@ -652,11 +652,11 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 			// メインメニューのポップアップ
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-#ifdef POCKETPC2003_UI_MODEL
-			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-#else
-			menu.LoadMenu(IDR_MAINFRAME);
-#endif
+			if( theApp.m_bPocketPC ) {
+				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+			} else {
+				menu.LoadMenu(IDR_MAINFRAME);
+			}
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 				rect.left,
@@ -1554,7 +1554,9 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 {
 	RECT rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
+	if( theApp.m_bPocketPC ) {
+		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
+	}
 
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary());
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);

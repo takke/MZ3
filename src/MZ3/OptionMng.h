@@ -82,16 +82,16 @@ private:
 
 public:
 	Option()
-		: m_GetPageType( GETPAGE_ALL )
+		: m_GetPageType( GETPAGE_LATEST10 )
 		, m_bUseAutoConnection( true )
 		, m_bUseProxy( false )
 		, m_bUseGlobalProxy( true )
 		, m_bBootCheckMnC( FALSE )
 		, m_bUseBgImage( TRUE )
-		, m_fontHeight( 24 )
-		, m_fontHeightBig( 28 )
-		, m_fontHeightMedium( 24 )
-		, m_fontHeightSmall( 18 )
+		, m_fontHeight( 24 )				// 初期値は Load() 内で設定される
+		, m_fontHeightBig( 28 )				// 初期値は Load() 内で設定される
+		, m_fontHeightMedium( 24 )			// 初期値は Load() 内で設定される
+		, m_fontHeightSmall( 18 )			// 初期値は Load() 内で設定される
 		, m_recvBufSize( 2048 )
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )

@@ -451,7 +451,7 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	CFormView::OnSize(nType, cx, cy);
 
 	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );
-	{
+/*	{
 		CRect rect;
 		CString msg;
 
@@ -463,7 +463,7 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
 		MZ3LOGGER_DEBUG( msg );
 	}
-
+*/
 	int fontHeight = theApp.m_optionMng.m_fontHeight;
 	if( fontHeight == 0 ) {
 		fontHeight = 24;
@@ -474,7 +474,8 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 
 	// グループタブ
 	int hGroup    = fontHeight -2;				// デフォルト値
-	if( theApp.GetDisplayMode() == SR_VGA ) {
+	switch( theApp.GetDisplayMode() ) {
+	case SR_VGA:
 		if( theApp.GetDPI() > 96 ) {
 			// VGA かつ非RealVGA環境
 			hGroup    = fontHeight +12;
@@ -482,6 +483,14 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 			// VGA かつRealVGA環境
 			hGroup    = fontHeight + 8;
 		}
+		break;
+
+	case SR_QVGA:
+		if( theApp.m_bSmartphone ) {
+			// Smartphone/Standard Edition 環境
+			hGroup    = fontHeight + 8;
+		}
+		break;
 	}
 
 	// カテゴリ、ボディリストの領域を % で指定
@@ -1169,11 +1178,11 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 
 			CMenu menu;
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-#ifdef POCKETPC2003_UI_MODEL
-			menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-#else
-			menu.LoadMenu(IDR_MAINFRAME);
-#endif
+			if( theApp.m_bPocketPC ) {
+				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+			}else{
+				menu.LoadMenu(IDR_MAINFRAME);
+			}
 			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 				rect.left,
 				rect.bottom,
@@ -2030,11 +2039,11 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
  */
 void CMZ3View::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
-#ifdef POCKETPC2003_UI_MODEL
-	CMainFrame* pFrame;
-	pFrame = (CMainFrame*)(theApp.GetMainWnd());
-	pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  
-#endif
+	if( theApp.m_bPocketPC ) {
+		CMainFrame* pFrame;
+		pFrame = (CMainFrame*)(theApp.GetMainWnd());
+		pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  
+	}
 }
 
 /**

@@ -1,9 +1,6 @@
 #pragma once
 #include "afxwin.h"
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionTabLog ダイアログ
 
@@ -35,5 +32,3 @@ public:
 	afx_msg void OnBnClickedCleanLogButton();
 	afx_msg void OnBnClickedDebugModeCheck();
 };
-
-#endif

@@ -1,8 +1,5 @@
 #pragma once
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionTabGeneral ダイアログ
 
@@ -26,5 +23,3 @@ public:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 };
-
-#endif

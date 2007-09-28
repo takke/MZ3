@@ -38,6 +38,12 @@ CMZ3App::CMZ3App()
 	, m_bgImageReportListCtrl(L"report.jpg")
 	, m_bgImageMainBodyCtrl(L"body.jpg")
 	, m_bgImageMainCategoryCtrl(L"header.jpg")
+	// プラットフォーム用のフラグ
+	, m_bPocketPC(FALSE)
+	, m_bSmartphone(FALSE)
+	, m_bWinMoFiveOh(FALSE)
+	, m_bWinMo2003(FALSE)
+	, m_bWinMo2003_SE(FALSE)
 {
 }
 
@@ -66,50 +72,11 @@ CMZ3App theApp;
 
 BOOL CMZ3App::InitInstance()
 {
-	// 解像度判定
-#ifdef WINCE
-	{
-		int horizontal = DRA::GetScreenCaps(HORZRES);
-		int vertical   = DRA::GetScreenCaps(VERTRES);
+	// プラットフォーム判定
+	InitPlatformFlags();
 
-		if( (horizontal == 240 && vertical == 320) || (horizontal == 320 && vertical == 240) ) {
-			m_currentDisplayMode = SR_QVGA;
-		}else if( (horizontal == 480 && vertical == 640) || (horizontal == 640 && vertical == 480) ) {
-			m_currentDisplayMode = SR_VGA;
-		}else if( (horizontal == 480 && vertical == 800) || (horizontal == 800 && vertical == 480) ) {
-			// EM･ONE対応
-			m_currentDisplayMode = SR_VGA;
-		}else if( (horizontal == 240 && vertical == 240) ) {
-			m_currentDisplayMode = SR_SQUARE240;
-		}else{
-			// デフォルト値
-			m_currentDisplayMode = SR_QVGA;
-		}
-	}
-#endif
-
-	// DPI 値の取得
-	{
-		HKEY  hKey = NULL;
-		DWORD dwDpi = m_dpi;	// "Dpi"のデータを受け取る
-		DWORD dwType;			// 値の種類を受け取る
-		DWORD dwSize;			// データのサイズを受け取る
-
-		// レジストリをオープン
-		
-		// エラーなければ値を取得
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,SZ_REG_ROOT,0,KEY_READ,&hKey) == 0) 
-		{ 
-			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,NULL,&dwSize);
-			RegQueryValueEx(hKey,SZ_REG_DBVOL,NULL,&dwType,(LPBYTE)&dwDpi,&dwSize);
-
-			// エラーがなければ取得した値を保存。
-			m_dpi = dwDpi;
-
-			//レジストリのクローズ
-			RegCloseKey(hKey);
-		}
-	}
+	// 解像度/DPI判定
+	InitResolutionFlags();
 
 	// CAPEDIT および SIPPREF のような Windows Mobile 特有のコントロールを初期化するには、アプリケーションの
 	// 初期化中に SHInitExtraControls を一度呼び出す必要があります。
@@ -246,6 +213,24 @@ BOOL CMZ3App::InitInstance()
 	m_pMainWnd->ShowWindow( SW_SHOW );
 	m_pMainWnd->UpdateWindow();
 
+	if( m_bSmartphone ) {
+		// 全画面表示
+		::SHFullScreen(m_pMainWnd->m_hWnd, SHFS_HIDETASKBAR | SHFS_HIDESIPBUTTON );
+		::ShowWindow(((CMainFrame*)m_pMainWnd)->m_hCommandBar, SW_HIDE);
+
+		RECT rc;
+
+		//get window size
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
+
+		m_pMainWnd->MoveWindow( 
+			rc.left, 
+			rc.top, 
+			rc.right, 
+			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
+			TRUE);
+	}
+
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
 	if( wcslen(m_loginMng.GetEmail()) == 0 ||
@@ -263,15 +248,93 @@ BOOL CMZ3App::InitInstance()
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
 
-#ifdef SMARTPHONE2003_UI_MODEL
-	// Smartphone/Standard だと初期描画されないっぽいので、ここで再描画しておく
-	((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
-#endif
+	if( m_bSmartphone ) {
+		// Smartphone/Standard だと初期描画されないっぽいので、ここで再描画しておく
+		((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
+	}
 
 	MZ3LOGGER_INFO( L"MZ3 初期化完了" );
 
 	return TRUE;
 }
+
+/// プラットフォーム用のフラグの設定
+void CMZ3App::InitPlatformFlags()
+{
+	// プラットフォーム名の問い合わせ
+	TCHAR atchPlat[64];
+	SystemParametersInfo(SPI_GETPLATFORMTYPE, 64, (PVOID)atchPlat, 0);
+
+	if (_tcsncmp(atchPlat, L"PocketPC", 64) == 0)
+	{
+		m_bPocketPC = TRUE;
+	}
+
+	if (_tcsncmp(atchPlat, L"SmartPhone", 64) == 0)
+	{
+		m_bSmartphone = TRUE;
+	}
+
+	OSVERSIONINFO osvi;
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion == 01)) 
+		m_bWinMoFiveOh = TRUE;
+	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 20)) 
+		m_bWinMo2003 = TRUE;
+	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 21)) 
+		m_bWinMo2003_SE = TRUE;
+}
+
+/**
+ * 解像度/DPIの判定
+ */
+void CMZ3App::InitResolutionFlags()
+{
+	// 解像度の判定
+#ifdef WINCE
+	int horizontal = DRA::GetScreenCaps(HORZRES);
+	int vertical   = DRA::GetScreenCaps(VERTRES);
+
+	if( (horizontal == 240 && vertical == 320) || (horizontal == 320 && vertical == 240) ) {
+		m_currentDisplayMode = SR_QVGA;
+	}else if( (horizontal == 480 && vertical == 640) || (horizontal == 640 && vertical == 480) ) {
+		m_currentDisplayMode = SR_VGA;
+	}else if( (horizontal == 480 && vertical == 800) || (horizontal == 800 && vertical == 480) ) {
+		// EM･ONE対応
+		m_currentDisplayMode = SR_VGA;
+	}else if( (horizontal == 240 && vertical == 240) ) {
+		m_currentDisplayMode = SR_SQUARE240;
+	}else{
+		// デフォルト値
+		m_currentDisplayMode = SR_QVGA;
+	}
+#endif
+
+	// DPI 値の取得
+	{
+		HKEY  hKey = NULL;
+		DWORD dwDpi = m_dpi;	// "Dpi"のデータを受け取る
+		DWORD dwType;			// 値の種類を受け取る
+		DWORD dwSize;			// データのサイズを受け取る
+
+		// レジストリをオープン
+		
+		// エラーなければ値を取得
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, SZ_REG_ROOT, 0, KEY_READ, &hKey) == 0) 
+		{ 
+			RegQueryValueEx(hKey, SZ_REG_DBVOL, NULL, &dwType, NULL, &dwSize);
+			RegQueryValueEx(hKey, SZ_REG_DBVOL, NULL, &dwType, (LPBYTE)&dwDpi, &dwSize);
+
+			// エラーがなければ取得した値を保存。
+			m_dpi = dwDpi;
+
+			//レジストリのクローズ
+			RegCloseKey(hKey);
+		}
+	}
+}
+
 
 int CMZ3App::ExitInstance()
 {
@@ -390,11 +453,11 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 {
-#ifdef POCKETPC2003_UI_MODEL
-	return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
-#else
-	return TRUE;
-#endif
+	if( theApp.m_bPocketPC ) {
+		return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
+	} else {
+		return TRUE;
+	}
 }
 
 /**
@@ -540,7 +603,11 @@ int CMZ3App::GetInfoRegionHeight( int fontHeight )
 		break;
 	default:
 		// VGA 以外
-		return fontHeight -4;
+		if (m_bSmartphone) {
+			return fontHeight +6;
+		} else {
+			return fontHeight -4;
+		}
 	}
 }
 

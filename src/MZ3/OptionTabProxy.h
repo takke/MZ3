@@ -1,9 +1,6 @@
 #pragma once
 #include "afxwin.h"
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionTabProxy ダイアログ
 
@@ -44,5 +41,3 @@ public:
 	afx_msg void OnBnClickedUseGlobalProxyRadio();
 	afx_msg void OnBnClickedUseManualProxyRadio();
 };
-
-#endif

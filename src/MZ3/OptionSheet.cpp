@@ -5,9 +5,6 @@
 #include "MZ3.h"
 #include "OptionSheet.h"
 
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
 
 // COptionSheet
 
@@ -46,5 +43,3 @@ void COptionSheet::SetPage()
 	AddPage( &m_tabLog );		// ログタブ
 	AddPage( &m_tabProxy );		// プロキシタブ
 }
-
-#endif

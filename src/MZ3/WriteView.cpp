@@ -638,11 +638,11 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 
 				CMenu menu;
 				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-#ifdef POCKETPC2003_UI_MODEL
-				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-#else
-				menu.LoadMenu(IDR_MAINFRAME);
-#endif
+				if( theApp.m_bPocketPC ) {
+					menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+				} else {
+					menu.LoadMenu(IDR_MAINFRAME);
+				}
 				menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
 					rect.left,
 					rect.bottom,
@@ -706,8 +706,9 @@ LRESULT CWriteView::OnFit(WPARAM wParam, LPARAM lParam)
 {
 	RECT rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	TRACE(L"Rect = (%d, %d - (%d, %d)\n", rect.left, rect.top, rect.right, rect.bottom);
-	OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
+	if( theApp.m_bPocketPC ) {
+		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
+	}
 
 	return LRESULT();
 }

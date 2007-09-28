@@ -28,7 +28,7 @@ void Option::Load()
 	}
 
 	if(! inifile.Load( theApp.m_filepath.inifile ) ) {
-		return;
+//		return;
 	}
 
 	if (inifile.SectionExists("Proxy") != FALSE) {
@@ -56,7 +56,8 @@ void Option::Load()
 			= (atoi(inifile.GetValue("ConvertUrlForMixiMobile", "General").c_str()) != 0) ? true : false;
 	}
 
-	if (inifile.SectionExists("UI") != FALSE) {
+//	if (inifile.SectionExists("UI") != FALSE) {
+	{
 		// UI セクション
 
 		// IE コントロールで閲覧するかどうか
@@ -77,15 +78,26 @@ void Option::Load()
 		s = inifile.GetValue("FontHeight", "UI");
 		if( s.empty() ) {
 			// 初期値
-			m_fontHeight = 0;
+//			m_fontHeight = 0;
+			switch( theApp.GetDisplayMode() ) {
+			case SR_VGA:		m_fontHeight = 24; break;
+			case SR_QVGA:
+			default:			m_fontHeight = 12; break;
+			}
 		}else{
 			m_fontHeight = (BOOL)atoi(s.c_str());
 		}
+
 		// フォントサイズ（大）
 		s = inifile.GetValue("FontHeight_Big", "UI");
 		if( s.empty() ) {
 			// 初期値
 //			m_fontHeightBig = 28;
+			switch( theApp.GetDisplayMode() ) {
+			case SR_VGA:		m_fontHeightBig = 28; break;
+			case SR_QVGA:
+			default:			m_fontHeightBig = 14; break;
+			}
 		}else{
 			m_fontHeightBig = atoi(s.c_str());
 		}
@@ -104,6 +116,11 @@ void Option::Load()
 		if( s.empty() ) {
 			// 初期値
 //			m_fontHeightSmall = 18;
+			switch( theApp.GetDisplayMode() ) {
+			case SR_VGA:		m_fontHeightSmall = 18; break;
+			case SR_QVGA:
+			default:			m_fontHeightSmall = 10; break;
+			}
 		}else{
 			m_fontHeightSmall = atoi(s.c_str());
 		}
