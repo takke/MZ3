@@ -248,7 +248,6 @@ BOOL CMZ3App::InitInstance()
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
-#ifndef SMARTPHONE2003_UI_MODEL
 	if( wcslen(m_loginMng.GetEmail()) == 0 ||
 		wcslen(m_loginMng.GetPassword()) == 0 )
 	{
@@ -260,10 +259,14 @@ BOOL CMZ3App::InitInstance()
 		// ユーザ設定画面を表示する
 		((CMainFrame*)m_pMainWnd)->OnSettingLogin();
 	}
-#endif
 
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
+
+#ifdef SMARTPHONE2003_UI_MODEL
+	// Smartphone/Standard だと初期描画されないっぽいので、ここで再描画しておく
+	((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
+#endif
 
 	MZ3LOGGER_INFO( L"MZ3 初期化完了" );
 

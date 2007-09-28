@@ -30,6 +30,7 @@
 #define IDD_COMMON_SELECT_DIALOG        151
 #define IDR_MENU1                       152
 #define IDR_SKIN_MENU                   152
+#define IDD_USER_DIALOG                 154
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -302,6 +303,7 @@
 #define IDM_LAYOUT_REPORTLIST_MAKE_NARROW 32964
 #define ID_32965                        32965
 #define IDM_LAYOUT_REPORTLIST_MAKE_WIDE 32966
+#define ID_32967                        32967
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -312,8 +314,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        154
-#define _APS_NEXT_COMMAND_VALUE         32967
+#define _APS_NEXT_RESOURCE_VALUE        155
+#define _APS_NEXT_COMMAND_VALUE         32968
 #define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

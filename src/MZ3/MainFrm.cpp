@@ -12,6 +12,7 @@
 #include "ReportView.h"
 #include "WriteView.h"
 #include "MZ3View.h"
+#include "UserDlg.h"
 #include "util.h"
 #include "url_encoder.h"
 
@@ -239,20 +240,8 @@ void CMainFrame::OnForwardButton()
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingLogin()
 {
-// this code is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
-
-	COptionSheet cPropSht( _T("オプション"));
-	cPropSht.SetPage();
-	cPropSht.SetActivePage(0);
-	if (cPropSht.DoModal() == IDOK) {
-		theApp.m_optionMng.Save();
-
-		// フォントのリセット
-		ChangeAllViewFont();
-	}
-
-#endif
+	CUserDlg dlg;
+	dlg.DoModal();
 }
 
 // -----------------------------------------------------------------------------
@@ -320,8 +309,13 @@ void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingGeneral()
 {
-// this code is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
+#ifdef SMARTPHONE2003_UI_MODEL
+	// Smartphone/Standard Edition では COptionSheet 等が利用できないため、警告メッセージを表示する。
+	MessageBox( 
+		L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
+		L"お手数ですが、MZ3.ini を直接編集してください" );
+
+#else
 
 	COptionSheet cPropSht( _T("オプション"));
 	cPropSht.SetPage();

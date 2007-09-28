@@ -1,43 +1,41 @@
-// UserTab.cpp : 実装ファイル
+// UserDlg.cpp : 実装ファイル
 //
 
 #include "stdafx.h"
 #include "MZ3.h"
-#include "OptionTabUser.h"
-
-// this file is not used in smartphone edition
-#ifndef SMARTPHONE2003_UI_MODEL
+#include "UserDlg.h"
 
 
-// COptionTabUser ダイアログ
+// CUserDlg ダイアログ
 
-IMPLEMENT_DYNAMIC(COptionTabUser, CPropertyPage)
+IMPLEMENT_DYNAMIC(CUserDlg, CDialog)
 
-COptionTabUser::COptionTabUser()
-	: CPropertyPage(COptionTabUser::IDD)
+CUserDlg::CUserDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CUserDlg::IDD, pParent)
 {
 
 }
 
-COptionTabUser::~COptionTabUser()
+CUserDlg::~CUserDlg()
 {
 }
 
-void COptionTabUser::DoDataExchange(CDataExchange* pDX)
+void CUserDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);
 }
 
 
-BEGIN_MESSAGE_MAP(COptionTabUser, CPropertyPage)
+BEGIN_MESSAGE_MAP(CUserDlg, CDialog)
+	ON_BN_CLICKED(IDOK, &CUserDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
-// COptionTabUser メッセージ ハンドラ
+// CUserDlg メッセージ ハンドラ
 
-BOOL COptionTabUser::OnInitDialog()
+BOOL CUserDlg::OnInitDialog()
 {
-	CPropertyPage::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	((CEdit*)GetDlgItem(IDC_LOGIN_MAIL_EDIT))->SetWindowText(theApp.m_loginMng.GetEmail());
 	((CEdit*)GetDlgItem(IDC_LOGIN_PASSWORD_EDIT))->SetWindowText(theApp.m_loginMng.GetPassword());
@@ -46,7 +44,7 @@ BOOL COptionTabUser::OnInitDialog()
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
 
-void COptionTabUser::OnOK()
+void CUserDlg::OnBnClickedOk()
 {
 	CString buf;
 	((CEdit*)GetDlgItem(IDC_LOGIN_MAIL_EDIT))->GetWindowText(buf);
@@ -56,7 +54,5 @@ void COptionTabUser::OnOK()
 
 	theApp.m_loginMng.Write();
 
-	CPropertyPage::OnOK();
+	OnOK();
 }
-
-#endif

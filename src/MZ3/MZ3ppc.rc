@@ -86,6 +86,7 @@ BEGIN
         POPUP "設定"
         BEGIN
             MENUITEM "一般...",                       ID_SETTING_GENERAL
+            MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
             POPUP "記事取得"
             BEGIN
                 MENUITEM "全件取得",                        IDM_GETPAGE_ALL
@@ -532,6 +533,19 @@ BEGIN
     CONTROL         "ダウンロード後に確認画面を表示する",IDC_USE_RUN_CONFIRM_DLG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,74,124,10
 END
 
+IDD_USER_DIALOG DIALOG  0, 0, 123, 103
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ログイン設定"
+FONT 9, "MS UI Gothic"
+BEGIN
+    LTEXT           "メールアドレス",IDC_STATIC,6,6,84,8
+    EDITTEXT        IDC_LOGIN_MAIL_EDIT,6,18,84,14,ES_AUTOHSCROLL
+    LTEXT           "パスワード",IDC_STATIC,6,37,84,8
+    EDITTEXT        IDC_LOGIN_PASSWORD_EDIT,6,49,84,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,7,82,40,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,50,82,40,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -734,6 +748,14 @@ BEGIN
         HORZGUIDE, 25
         HORZGUIDE, 39
         HORZGUIDE, 60
+    END
+
+    IDD_USER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 116
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
     END
 END
 #endif    // APSTUDIO_INVOKED
