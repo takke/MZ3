@@ -99,12 +99,24 @@
     }
     "Configurations"
     {
-        "Debug"
+        "Debug_WM"
         {
-        "DisplayName" = "8:Debug"
-        "IsDebugOnly" = "11:TRUE"
+        "DisplayName" = "8:Debug_WM"
+        "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\MZ3cab.cab"
+        "OutputFilename" = "8:Debug_WM\\MZ3cab.cab"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "SignOutput" = "11:FALSE"
+        "CertificateHash" = "8:"
+        "TimeStampServer" = "8:"
+        }
+        "Debug_WM6Standard"
+        {
+        "DisplayName" = "8:Debug_WM6Standard"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:Debug_WM6Standard\\MZ3cab.cab"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "SignOutput" = "11:FALSE"
@@ -123,24 +135,24 @@
         "CertificateHash" = "8:"
         "TimeStampServer" = "8:"
         }
-        "Release"
+        "Release_WM"
         {
-        "DisplayName" = "8:Release"
+        "DisplayName" = "8:Release_WM"
         "IsDebugOnly" = "11:FALSE"
-        "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\MZ3.cab"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:Release_WM\\MZ3cab.cab"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "SignOutput" = "11:FALSE"
         "CertificateHash" = "8:"
         "TimeStampServer" = "8:"
         }
-        "Release_MZ3"
+        "Release_WM6Standard"
         {
-        "DisplayName" = "8:Release_MZ3"
+        "DisplayName" = "8:Release_WM6Standard"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Release_MZ3\\MZ3cab.cab"
+        "OutputFilename" = "8:Release_WM6Standard\\MZ3cab.cab"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "SignOutput" = "11:FALSE"
@@ -463,7 +475,7 @@
         {
             "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_F1ACF2406396454D84AF361F936A2D20"
             {
-            "SourcePath" = "8:..\\MZ3\\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\\Release_MZ3\\MZ3.exe"
+            "SourcePath" = "8:..\\mz3\\windows mobile 6 standard sdk (armv4i)\\debug_wm6standard\\MZ3.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
