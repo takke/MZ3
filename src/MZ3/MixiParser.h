@@ -971,31 +971,68 @@ public:
 	static bool parsePageLink( CMixiData& data, const CHtmlArray& html, int startIndex=180 )
 	{
 		// startIndex 以降に下記を発見したら、解析開始。
-		// 未発見なら終了。
-		// <table ... bgcolor="#eed6b5">
+/*
+<div class="pageNavigation01">
+<div class="pageList01">
+<div>[<ul><li><a href="view_bbs.pl?page=1&comm_id=xxx&id=yyy">1</a></li><li><a href="view_bbs.pl?page=2&comm_id=xxx&id=23332197">2</a></li><li><a href="view_bbs.pl?page=3&comm_id=xxx&id=23332197">3</a></li><li><a href="view_bbs.pl?page=4&comm_id=xxx&id=23332197">4</a></li><li><a href="view_bbs.pl?page=5&comm_id=xxx&id=23332197">5</a></li><li><a href="view_bbs.pl?page=6&comm_id=xxx&id=23332197">6</a></li></ul>]</div>
+</div>
+<div class="pageList02">
+<ul>
+<li><a href="view_bbs.pl?id=23332197&comm_id=xxx&page=all">全てを表示</a></li>
+<li>最新の20件を表示</li>
+</ul>
+</div>
+</div>
+*/
 		const int count = html.GetCount();
-		int iLine=startIndex;
-		for( ; iLine<count; iLine++ ) {
-			const CString& line = html.GetAt(iLine);
-			if( util::LineHasStringsNoCase( line, L"<table", L"bgcolor=\"#eed6b5\">" ) )
-			{
+		int i=startIndex;
+
+		// pageList01
+		for( ; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<div", L"class", L"pageList01" ) ) {
 				break;
 			}
 		}
-		if( iLine >= count ) {
+		if( i >= count ) {
 			return false;
 		}
 
-		// </table> 発見するまでパターンマッチを繰り返す。
-		for( iLine=iLine+1; iLine<count; iLine++ ) {
-			const CString& line = html.GetAt(iLine);
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
-				break;
-			}
+		// </div> 発見するまでパターンマッチを繰り返す。
+		for( i=i+1; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
 
 			CString str = line;
 			ParserUtil::ExtractURI( str, data.m_linkPage );
+
+			if( util::LineHasStringsNoCase( line, L"</div>" ) ) {
+				break;
+			}
 		}
+
+		// pageList02
+		for( ; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<div", L"class", L"pageList02" ) ) {
+				break;
+			}
+		}
+		if( i >= count ) {
+			return false;
+		}
+
+		// </div> 発見するまでパターンマッチを繰り返す。
+		for( i=i+1; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
+
+			CString str = line;
+			ParserUtil::ExtractURI( str, data.m_linkPage );
+
+			if( util::LineHasStringsNoCase( line, L"</div>" ) ) {
+				break;
+			}
+		}
+
 
 		return !data.m_linkPage.empty();
 	}
@@ -1006,30 +1043,34 @@ public:
 	static bool parseRecentTopics( CMixiData& data, const CHtmlArray& html, int startIndex=200 )
 	{
 		// startIndex 以降に下記を発見したら、解析開始。
-		// 未発見なら終了。
-		// <table ... bgcolor="#E8C79B">
+		// <ul class="newTopicList01">
+
 		const int count = html.GetCount();
-		int iLine=startIndex;
-		for( ; iLine<count; iLine++ ) {
-			const CString& line = html.GetAt(iLine);
-			if( util::LineHasStringsNoCase( line, L"<table", L"bgcolor=\"#E8C79B\">" ) )
-			{
+		int i=startIndex;
+		for( ; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<ul", L"class", L"newTopicList01" ) ) {
 				break;
 			}
 		}
-		if( iLine >= count ) {
+		if( i >= count ) {
 			return false;
 		}
 
-		// </table> 発見するまでパターンマッチを繰り返す。
-		for( iLine=iLine+1; iLine<count; iLine++ ) {
-			const CString& line = html.GetAt(iLine);
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+		// 終了タグを発見するまでパターンマッチを繰り返す。
+		for( i=i+1; i<count; i++ ) {
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<p", L"class", L"utilityLinks03" ) ) {
 				break;
 			}
 
 			CString str = line;
-			ParserUtil::ExtractURI( str, data.m_linkPage );
+			if( line.Find( L"view_enquete.pl" ) != -1 ||
+				line.Find( L"view_event.pl" ) != -1 ||
+				line.Find( L"view_bbs.pl" ) != -1 )
+			{
+				ParserUtil::ExtractURI( str, data.m_linkPage );
+			}
 		}
 
 		return !data.m_linkPage.empty();
@@ -3309,101 +3350,80 @@ public:
 
 			if (findFlag == FALSE) {
 				// フラグを発見するまで廻す
-				// フラグ：class="h120"
+				// フラグ：<dd class="bbsContent">
 
-				// "show_friend.pl" つまりトピ作成者のプロフィールリンクがあれば、
-				// トピ作成者のユーザ名と投稿日時を取得する。
-				if ( util::LineHasStringsNoCase( str, L"show_friend.pl" ) ) {
-
-					parseTopicAuthorAndCreateDate( i, html_, mixi );
-
-					// この行にはないので次の行へ。
-					continue;
+				// 投稿日時を取得する
+				// <span class="date">2007年07月14日 22:22</span></dt>
+				if( util::LineHasStringsNoCase( str, L"span", L"class", L"date" ) ) {
+					CString date;
+					util::GetBetweenSubString( str, L">", L"<", date );
+					ParserUtil::ChangeDate(date, &mixi);
 				}
 
-				if (util::LineHasStringsNoCase( str, L"class=\"h120\"" ) ) {
-					// </table>を探す
+
+				if (util::LineHasStringsNoCase( str, L"<dd", L"class", L"bbsContent" ) ) {
+					// 本文開始。トピック本文ね。
 					findFlag = TRUE;
 
 					// とりあえず改行
 					mixi.AddBody(_T("\r\n"));
 
-					// 解析対象(str) のパターンは下記の２通り。
-					// ●画像なしパターン1：（1行）
-					// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
-					// <table><tr></tr></table>内容
-					// ●画像なしパターン2：（1行）
-					// <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120">
-					// <table><tr></tr></table>内容</td></tr></table>
-					// ●画像ありパターン1：（2行）
-					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-					//        <tr><td width="130" height="140" align="center" valign="middle">
-					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
-					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-					//        <img src="http://ic52.mixi.jp/p/xxx.jpg" border="0"></a></td>
-					// line2: </tr></table>写真付きトピック</td></tr></table>
-					// ●画像ありパターン2：（2行）
-					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-					//        <tr><td width="130" height="140" align="center" valign="middle">
-					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&number=xxx',
-					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-					//        <img src="http://ic39.mixi.jp/p/xxx.jpg" border="0"></a></td>
-					// line2: </tr></table>本文がちょっと長い
-					// ●画像ありパターン3：（3行）
-					// line1: <table width="500" border="0" cellspacing="0" cellpadding="5"><tr><td class="h120"><table>
-					//        <tr><td width="130" height="140" align="center" valign="middle">
-					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
-					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-					//        <img src="http://ic57.mixi.jp/p/xxx.jpg" border="0"></a></td>
-					// line2: <td width="130" height="140" align="center" valign="middle">
-					//        <a href="javascript:void(0)" onClick="MM_openBrWindow('show_bbs_picture.pl?id=xxx&comm_id=xxx&number=xxx',
-					//        'pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')">
-					//        <img src="http://ic43.mixi.jp/p/xxx.jpg" border="0"></a></td>
-					// line3: </tr></table>本文表示される？
+					// <dd>
+					// から
+					// </dd>
+					// までを取得し、解析する。
 
-					// </table> が現れるまで各行をバッファリング。
-					// これは、画像が複数あるような場合に、</table> が次の行に含まれるため。
+					// <dd> を探す。
+					for( ; i<lastLine; i++ ) {
+						const CString& line = html_.GetAt( i );
 
-					// 現在の行をバッファリング
-					CString line = str;
+						// "show_friend.pl" つまりトピ作成者のプロフィールリンクがあれば、
+						// トピ作成者のユーザ名を取得する。
+						if( util::LineHasStringsNoCase( line, L"show_friend.pl" ) ) {
 
-					// </table> がなければ </table> が見つかるまでバッファリング
-					if( !util::LineHasStringsNoCase( line, L"</table>" ) ) {
+							MixiUrlParser::GetAuthor(line, &mixi);
 
-						while( i<lastLine ) {
-							// 次の行をフェッチ
-							const CString& nextLine = html_.GetAt( ++i );
+							// この行にはないので次の行へ。
+							continue;
+						}
 
-							// バッファリング
-							line += nextLine;
+						if (util::LineHasStringsNoCase( line, L"<dd>" )) {
+							// <dd>以降を取得し、あれば つっこんで終了。
+							CString after;
+							util::GetAfterSubString( line, L"<dd>", after );
+							ParserUtil::AddBodyWithExtract( mixi, after );
+							++i;
+							break;
+						}
+					}
 
-							// </table> があれば終了
-							if( util::LineHasStringsNoCase( nextLine, L"</table>" ) ) {
-								break;
+					// </dd> が現れるまで、解析する。
+					for( ; i<lastLine; i++ ) {
+						const CString& line = html_.GetAt( i );
+
+						if (util::LineHasStringsNoCase( line, L"</dd>" )) {
+							// 終了。
+							break;
+						}
+
+						// 動画用Scriptタグが見つかったらスクリプト用ループ開始
+						if( util::LineHasStringsNoCase(line, L"<script") ) {
+							while( i<lastLine ) {
+								// 次の行をフェッチ
+								const CString& nextLine = html_.GetAt( ++i );
+								// 拡張子.flvが見つかったら投入
+								if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+									ParserUtil::AddBodyWithExtract( mixi, nextLine );
+								}
+								// </script> があれば終了
+								if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+									break;
+								}
 							}
+						} else {
+							// ふつうに解析＆投入
+							ParserUtil::AddBodyWithExtract( mixi, line );
 						}
-					}
-
-					// 最初の </table> までについて、
-					// 画像リンクがあれば、解析し、投入。
-					{
-						CString strBeforeTableEndTag;
-						util::GetBeforeSubString( line, L"</table>", strBeforeTableEndTag );
-						if( LINE_HAS_DIARY_IMAGE(strBeforeTableEndTag) ) {
-							ParserUtil::AddBodyWithExtract( mixi, strBeforeTableEndTag );
-						}
-					}
-
-					// 最初の </table> 以降を取得。
-					CString strAfterTableEndTag;
-					util::GetAfterSubString( line, L"</table>", strAfterTableEndTag );
-
-					// 最初の </table> 以降を解析＆投入
-					ParserUtil::AddBodyWithExtract( mixi, strAfterTableEndTag );
-
-					// さらに </table> がある(パターン2)なら、終了フラグを立てておく
-					if( util::LineHasStringsNoCase( strAfterTableEndTag, L"</table>" ) ) {
-						bFound2ndTableEndTag = TRUE;
 					}
 
 				}else{
@@ -3412,54 +3432,22 @@ public:
 			}
 			else {
 				// フラグ発見済み。
-				// 最初の </table> が見つかる行までは解析済み。
-				// 「既にトピックの終了フラグ（2つ目の</table>タグ）が発見済み」
-				// または
-				// 「</table> を発見」すればコメント取得処理を行う。
 
-				if( util::LineHasStringsNoCase(str,L"</table>") || bFound2ndTableEndTag ) {
-					if (str.Find(tagBR) != -1) {
-						str.Replace(_T("</td></tr>"), _T(""));
-						str.Replace(_T("</tbody>"), _T(""));
-						str.Replace(_T("</table>"), _T(""));
-						ParserUtil::AddBodyWithExtract( mixi, str );
-					}
-
-					// コメントの開始まで探す
+				// <div class="pageNavigation01"> を発見したら、コメント取得処理を行う。
+				if (util::LineHasStringsNoCase( str, L"<div", L"class", L"pageNavigation01" )) {
 					mixi.ClearChildren();
 
-					int index = i;
+					int index = ++i;
 					while( index < lastLine ) {
 						index = parseBBSComment(index, lastLine, &mixi, html_);
 						if( index == -1 ) {
+							// エラーなので終了
 							break;
 						}
 					}
 					if (index == -1 || index >= lastLine) {
 						break;
 					}
-				}else{
-
-					//動画用Scriptタグが見つかったらスクリプト用ループ開始
-					if( util::LineHasStringsNoCase(str,L"<script") ) {
-						while( i<lastLine ) {
-							// 次の行をフェッチ
-							const CString& nextLine = html_.GetAt( ++i );
-							// 拡張子.flvが見つかったら投入
-							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-								ParserUtil::AddBodyWithExtract( mixi, nextLine );
-							}
-							// </script> があれば終了
-							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-								break;
-							}
-						}
-					}
-					else {
-						// 2つ目の</table>タグ未発見なので、解析＆投入
-						ParserUtil::AddBodyWithExtract( mixi, str );
-					}
-					
 				}
 			}
 		}
@@ -3477,175 +3465,111 @@ public:
 private:
 
 	/**
-	 * i 行目から投稿ユーザ名を取得し、上方向に投稿日時を探索する
-	 */
-	static bool parseTopicAuthorAndCreateDate( int i, const CHtmlArray& html_, CMixiData& mixi )
-	{
-		// 投稿ユーザ名
-		const CString& line = html_.GetAt( i );
-		MixiUrlParser::GetAuthor(line, &mixi);
-
-		// 日付を取得
-		// i 行目⇒2行目まで探索する。
-		// 通常は3行程度前に下記がある。
-		// <td rowspan="3" width="110" bgcolor="#ffd8b0" align="center" valign="top" nowrap>
-		// 2007年05月10日<br>19:57</td>
-		for (int j=i; j>0; j--) {
-			const CString& line = html_.GetAt(j);
-			if( util::LineHasStringsNoCase( line, L"年", L"月", L"日" ) ) {
-				// TODO XmlParser 使わない方が柔軟では？(takke)
-				ParserUtil::ChangeDate(
-					util::XmlParser::GetElement(line, 2) + _T(" ") + util::XmlParser::GetElement(line, 4),
-					&mixi);
-				return true;
-			}
-		}
-
-		// 未発見のため終了
-		return false;
-	}
-
-	/**
 	 * ＢＢＳコメント取得 トピック コメント一覧
 	 */
 	static int parseBBSComment(int sIndex, int eIndex, CMixiData* data, const CHtmlArray& html_ ) 
 	{
-		CString str;
 		INT_PTR lastLine = html_.GetCount(); //行数
 
 		int retIndex = eIndex;
 		CMixiData cmtData;
-		BOOL findFlag = FALSE;
-		CString date;
-		CString comment;
-		int index;
+		bool findFlag = false;
 
-		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
+/*
+<dt class="commentDate clearfix"><span class="senderId">&nbsp;&nbsp;番号
+</span>
+<span class="date">2007年07月28日 21:09</span></dt>
+<dd>
+<dl class="commentContent01">
+<dt><a href="show_friend.pl?id=XXX">なまえ</a></dt>
+<dd>
+...
+</dd>
+*/
+		int i=0;
+		for( i=sIndex; i<eIndex; i++ ) {
+			const CString& line = html_.GetAt(i);
+			// 番号取得
+			// <dt class="commentDate clearfix"><span class="senderId">&nbsp;&nbsp;番号
+			if (util::LineHasStringsNoCase( line, L"<dt", L"commentDate" )) {
+				CString number;
+				util::GetAfterSubString( line, L"senderId\">", number );
+				// &nbsp; を消す
+				while(number.Replace(L"&nbsp;",L"")) {}
 
-			if (findFlag == FALSE) {
-				CString buf;
-
-				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1) {
-					// コメントなし
-					// 投稿アドレスの取得
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if (str.Find(_T("<!-- COMMENT: end -->")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				//コメント終了条件追加(2006/11/19 icchu追加)
-				else if (str.Find(_T("add_bbs_comment.pl")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if ((index = str.Find(_T("show_friend.pl"))) != -1) {
-
-					str = html_.GetAt(i-1);
-					util::GetAfterSubString( str, L"<b>", buf );
-					buf = util::XmlParser::GetElement(buf, 1);
-					while(buf.Replace(_T("&nbsp;"), _T("")));
-					cmtData.SetCommentIndex(_wtoi(buf));
-
-					str = html_.GetAt(i);
-					buf = str.Mid(index);
-					MixiUrlParser::GetAuthor(buf, &cmtData);
-
-					if (html_.GetAt(i-4).Find(_T("checkbox")) != -1) {
-						// 自分管理コミュ
-						// 時刻
-						str = html_.GetAt(i-6);
-						buf = util::XmlParser::GetElement(str, 1);
-						date = buf;
-						str = html_.GetAt(i-5);
-						buf = util::XmlParser::GetElement(str, 1);
-						date += _T(" ");
-						date += buf;
-					}
-					else {
-						if (html_.GetAt(i-5).Find(_T(":")) != -1) {
-							// 時刻
-							str = html_.GetAt(i-5);
-							buf = util::XmlParser::GetElement(str, 1);
-							date = buf;
-							buf = util::XmlParser::GetElement(str, 3);
-							date += _T(" ");
-							date += buf;
-						}
-						else {
-							// 時刻
-							str = html_.GetAt(i-5);
-							buf = util::XmlParser::GetElement(str, 1);
-							date = buf;
-							str = html_.GetAt(i-4);
-							buf = util::XmlParser::GetElement(str, 1);
-							date += _T(" ");
-							date += buf;
-						}
-					}
-
-					ParserUtil::ChangeDate(date, &cmtData);
-
-					findFlag = TRUE;
-
-				}
+				cmtData.SetCommentIndex(_wtoi(number));
 			}
-			else {
 
-				if( util::LineHasStringsNoCase(str, L"class=\"h120\"") ) {
-					// コメント本文取得
-					str = html_.GetAt(i);
+			// 日付
+			// <span class="date">2007年07月28日 21:09</span></dt>
+			if (util::LineHasStringsNoCase( line, L"<span", L"class", L"date" ) ) {
+				CString date;
+				util::GetBetweenSubString( line, L">", L"<", date );
+				ParserUtil::ChangeDate(date, &cmtData);
+			}
 
-					cmtData.AddBody(_T("\r\n"));
-					ParserUtil::AddBodyWithExtract( cmtData, str );
+			// <div class="pageNavigation01"> を発見したら、コメント終了なので抜ける
+			if (util::LineHasStringsNoCase( line, L"<div", L"class", L"pageNavigation01" )) {
+				return -1;
+			}
 
-					i++;
-					for( ; i+1<eIndex; i++ ) {
-						const CString& line  = html_.GetAt(i);
-						const CString& line2 = html_.GetAt(i+1);
-
-						if (util::LineHasStringsNoCase( line, L"</tr>") && 
-							util::LineHasStringsNoCase( line2,L"</table>") )
-						{
-							// 一番最後の改行を削除
-							ParserUtil::AddBodyWithExtract( cmtData, line );
-
-							// 終了タグが出てきたのでここで終わり
-							retIndex = i + 5;
-							break;
-						}
-
-						//動画用Scriptタグが見つかったらスクリプト用ループ開始
-						if( util::LineHasStringsNoCase(line,L"<script") ) {
-							while( i<lastLine ) {
-								// 次の行をフェッチ
-								const CString& nextLine = html_.GetAt( ++i );
-								// 拡張子.flvが見つかったら投入
-								if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-									ParserUtil::AddBodyWithExtract( cmtData, nextLine );
-								}
-								// </script> があれば終了
-								if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-									break;
-								}
-							}
-						}
-						else {
-							ParserUtil::AddBodyWithExtract( cmtData, line );
-						}
-
-					}
-					break;
-				}
+			// <dl class="commentContent01"> を発見したらループ抜ける
+			if (util::LineHasStringsNoCase( line, L"<dl", L"class", L"commentContent01" )) {
+				findFlag = true;
+				i++;
+				break;
 			}
 		}
+
+		for( ; i<eIndex; i++ ) {
+			const CString& line = html_.GetAt(i);
+			// なまえ
+			// <dt><a href="show_friend.pl?id=XXX">なまえ</a></dt>
+			if (util::LineHasStringsNoCase( line, L"<dt", L"show_friend.pl" )) {
+
+				MixiUrlParser::GetAuthor( line, &cmtData );
+			}
+
+			// <dd> 発見したらループ抜ける
+			if (util::LineHasStringsNoCase( line, L"<dd>" )) {
+				i++;
+
+				// 改行追加
+				cmtData.AddBody(_T("\r\n"));
+				break;
+			}
+		}
+
+		// </dd> まで解析＆追加
+		for( ; i<eIndex; i++ ) {
+			const CString& line = html_.GetAt(i);
+
+			// </dd> 発見したらループ抜ける
+			if (util::LineHasStringsNoCase( line, L"</dd>" )) {
+				i++;
+				break;
+			}
+
+			// 動画用Scriptタグが見つかったらスクリプト用ループ開始
+			if( util::LineHasStringsNoCase(line, L"<script") ) {
+				while( i<lastLine ) {
+					// 次の行をフェッチ
+					const CString& nextLine = html_.GetAt( ++i );
+					// 拡張子.flvが見つかったら投入
+					if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+						ParserUtil::AddBodyWithExtract( cmtData, nextLine );
+					}
+					// </script> があれば終了
+					if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+						break;
+					}
+				}
+			} else {
+				// ふつうに解析＆投入
+				ParserUtil::AddBodyWithExtract( cmtData, line );
+			}
+		}
+		retIndex = i;
 
 		if( findFlag ) {
 			data->AddChild(cmtData);
