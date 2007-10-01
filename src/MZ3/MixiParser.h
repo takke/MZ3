@@ -4933,7 +4933,7 @@ public:
 	 *
 	 * ログイン成功したかどうかを判定
 	 *
-	 * @return ログイン成功時はTRUE、失敗時はFALSEを返す
+	 * @return ログイン成功時は次のURL、失敗時は空の文字列を返す
 	 */
 	static bool IsLoginSucceeded( const CHtmlArray& html )
 	{
@@ -4942,7 +4942,8 @@ public:
 		for (int i=0; i<count; i++) {
 			const CString& line = html.GetAt(i);
 
-			if (util::LineHasStringsNoCase( line, L"refresh", L"home.pl" )) {
+			if (util::LineHasStringsNoCase( line, L"refresh", L"check.pl" )) {
+				// <html><head><meta http-equiv="refresh" content="0;url=/check.pl?n=%2Fhome.pl"></head></html>
 				return true;
 			}
 		}
@@ -5104,8 +5105,8 @@ public:
 	 */
 	static bool isLogout( LPCTSTR szHtmlFilename )
 	{
-		// 最大で 30 行目までチェックする
-		const int CHECK_LINE_NUM_MAX = 30;
+		// 最大で N 行目までチェックする
+		const int CHECK_LINE_NUM_MAX = 100;
 
 		FILE* fp = _wfopen(szHtmlFilename, _T("r"));
 		if( fp != NULL ) {

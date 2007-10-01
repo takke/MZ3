@@ -644,7 +644,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// ログアウト状態になっている
 //			MessageBox(_T("ログアウトしてます\n"));
-			TRACE(_T("再度ログインしてからデータを取得します。\n"));
+			MZ3LOGGER_DEBUG(_T("再度ログインしてからデータを取得します。\n"));
 
 			util::MySetInformationText( m_hWnd, L"再度ログインしてからデータを取得します" );
 
@@ -686,7 +686,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 					// オーナーＩＤを取得する
 					data->SetAccessType(ACCESS_MAIN); // アクセス種別を設定
-					AccessProc(data, _T("http://mixi.jp/home.pl"));
+					AccessProc(data, _T("http://mixi.jp/check.pl?n=%2Fhome.pl"));
 				}
 				else {
 					// データを待避データに戻す
