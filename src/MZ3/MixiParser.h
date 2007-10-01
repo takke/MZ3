@@ -2843,75 +2843,64 @@ public:
 			}
 
 			// 項目探索
-			if( str.Find(_T("/pen_r.gif")) != -1 && str.Find(_T("<img")) != -1 ) 
-			{
+			// <dt class="iconTopic">2007年10月01日&nbsp;22:14</dt>
+			if( util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconTopic" ) ) {
 				dataFind = TRUE;
 
 				CMixiData data;
 
 				// 日付
-				ParserUtil::ChangeDate(util::XmlParser::GetElement(str, 3), &data);
+				CString date;
+				util::GetBetweenSubString( str, L">", L"</", date );
+				ParserUtil::ChangeDate(date, &data);
 
 				// 見出し
-				i+=2;
+				i += 1;
 				CString str = html_.GetAt(i);
-				CString buf;
-				{
-					LPCTSTR key = _T("class=\"new_link\">");
-					int index = str.Find(key);
-					buf = str.Mid(index + wcslen(key));
+				// <dd><a href="view_bbs.pl?id=20728968&comment_count=3&comm_id=1198460">【チャット】集え！xxx</a> (MZ3 -Mixi for ZERO3-)</dd>
+				CString after;
+				if (!util::GetAfterSubString( str, L"href=", after )) {
+					MZ3LOGGER_ERROR(L"取得できません:" + str );
+					return false;
 				}
-				str = buf;
-				{
-					int index = str.Find(_T("</a> ("));
-					buf = str.Left(index);
-				}
-				data.SetTitle(buf);
+				CString title;
+				util::GetBetweenSubString( after, L">", L"<", title );
+				data.SetTitle(title);
 
 				// ＵＲＩ
-				str = html_.GetAt(i);
-				buf = util::XmlParser::GetElement(str, 1);
-				buf = util::XmlParser::GetAttribute(buf, _T("href="));
-				// "を取り除く
-				buf = buf.Right(buf.GetLength() -1);
-				buf = buf.Left(buf.Find(_T("\"")));
+				CString href;
+				util::GetBetweenSubString( str, L"\"", L"\"", href );
 
-
-				// ＵＲＩ
 				// &で分解する
-				while (buf.Replace(_T("&amp;"), _T("&")));
+				while (href.Replace(_T("&amp;"), _T("&")));
 
-				data.SetURL(buf);
+				data.SetURL(href);
 				data.SetCommentCount(
-					MixiUrlParser::GetCommentCount( buf ) );
+					MixiUrlParser::GetCommentCount( href ) );
 
 				// URL に応じてアクセス種別を設定
-				data.SetAccessType( util::EstimateAccessTypeByUrl(buf) );
+				data.SetAccessType( util::EstimateAccessTypeByUrl(href) );
 
 				// ＩＤを設定
-				buf = buf.Mid(buf.Find(_T("id=")) + wcslen(_T("id=")));
-				buf = buf.Left(buf.Find(_T("&")));
-				data.SetID(_wtoi(buf));
+				CString id;
+				util::GetBetweenSubString( href, L"id=", L"&", id );
+				data.SetID(_wtoi(id));
 
 				// 前回のインデックスを取得
 				ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 				// コミュニティ名
-				{
-					LPCTSTR key = _T("</a> (");
-					int index = str.Find(key);
-					key = _T("</a>");
-					buf = str.Mid(index + wcslen(key));
-				}
+				CString communityName;
+				util::GetBetweenSubString( str, L"</a>", L"</dd>", communityName );
+
 				// 整形：最初と最後の括弧を取り除く
-				buf.Trim();
-				buf.Replace(_T("\n"), _T(""));
-				buf = buf.Mid( 1, buf.GetLength()-2 );
-				data.SetName(buf);
+				communityName.Trim();
+				util::GetBetweenSubString( communityName, L"(", L")", communityName );
+				data.SetName(communityName);
 				out_.push_back( data );
 			}
 			else if ( dataFind ) {
-				if( str.Find(_T("</table>")) != -1 ) {
+				if( str.Find(_T("</ul>")) != -1 ) {
 					// 終了タグ発見
 					break;
 				}
