@@ -3495,9 +3495,24 @@ private:
 			const CString& line = html_.GetAt(i);
 			// 番号取得
 			// <dt class="commentDate clearfix"><span class="senderId">&nbsp;&nbsp;番号
-			if (util::LineHasStringsNoCase( line, L"<dt", L"commentDate" )) {
+			if (util::LineHasStringsNoCase( line, L"<dt", L"commentDate", L"senderId" )) {
 				CString number;
 				util::GetAfterSubString( line, L"senderId\">", number );
+				// &nbsp; を消す
+				while(number.Replace(L"&nbsp;",L"")) {}
+
+				cmtData.SetCommentIndex(_wtoi(number));
+			}
+
+			// 番号取得２（編集可能なコミュ）
+			// <span class="senderId"><input id="commentCheck01" name="comment_id" type="checkbox" value="291541807" /><label for="commentCheck01">&nbsp;12</label></span>
+			if (util::LineHasStringsNoCase( line, L"<span", L"senderId", L"checkbox" )) {
+				CString number;
+				util::GetAfterSubString( line, L"<label", number );
+				//  for="commentCheck01">&nbsp;12</label></span>
+
+				util::GetBetweenSubString( number, L">", L"<", number );
+
 				// &nbsp; を消す
 				while(number.Replace(L"&nbsp;",L"")) {}
 
