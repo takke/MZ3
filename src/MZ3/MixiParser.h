@@ -2472,9 +2472,9 @@ public:
 
 		// 自分の日記かどうかを判断する（名前の取得のため）
 		bool bMyDiary = true;
-		for( int i=75; i<min(100,count); i++ ) {
+		for( int i=180; i<min(100,count); i++ ) {
 			const CString& line = html_.GetAt( i );
-			if( util::LineHasStringsNoCase( line, L"f_np_0_message.gif')\">'" ) ) {
+			if( util::LineHasStringsNoCase( line, L"diaryTitleFriend" ) ) {
 				// 上記があるということは、自分の日記ではない。
 				bMyDiary = false;
 				break;
@@ -2524,7 +2524,7 @@ public:
 				// 解析
 				// 下記の形式で「最近の日記」リンクが存在する
 				// <td BGCOLOR=#FFFFFF><a HREF="view_diary.pl?id=xxx&owner_id=xxx" CLASS=wide>
-				// <img src=http://img.mixi.jp/img/pt_or.gif ALIGN=left BORDER=0 WIDTH=8 HEIGHT=16>
+        // <img src=http://img.mixi.jp/img/pt_or.gif ALIGN=left BORDER=0 WIDTH=8 HEIGHT=16>
 				// タイトル</a></td>
 				if( util::LineHasStringsNoCase( line, L"view_diary.pl" ) ) {
 					CString url;
@@ -2616,7 +2616,7 @@ public:
 						ParserUtil::AddBodyWithExtract( data_, str );
 					}
 				}
-				else if (str.Find(_T("さんは外部ブログを使われています。<br>")) != -1) {
+				else if (str.Find(_T("さんは外部ブログを使われています。")) != -1) {
 					// 外部ブログ解析
 					parseExternalBlog( data_, html_, i );
 					break;
@@ -2626,7 +2626,7 @@ public:
 				// 日記開始フラグ発見済み。
 
 				// 終了タグまでデータ取得
-				if (str.Find(_T("</td>")) != -1 ) {
+				if (str.Find(_T("</div>")) != -1 ) {
 					endFlag = TRUE;
 				}
 
@@ -2657,7 +2657,7 @@ public:
 				}
 				else {
 					// 終了タグ発見
-					if (str.Find(_T("<br>")) != -1) {
+					if (str.Find(_T("</div>")) != -1) {
 						ParserUtil::AddBodyWithExtract( data_, str );
 					}
 
@@ -4367,17 +4367,17 @@ public:
 		CMixiData data;
 		data.SetAccessType( ACCESS_MYDIARY );
 
-		for (int i=200; i<count; i++) {
+		for (int i=170; i<count; i++) {
 			const CString& str = html_.GetAt(i);
 
 			if( findFlag ) {
-				if( str.Find(_T("</td></tr></table>")) != -1 ) {
+				if( str.Find(_T("/bodyMainAreaMain")) != -1 ) {
 					// 終了
 					break;
 				}
 
 				// 「前を表示」「次を表示」の抽出
-				LPCTSTR key = L"=#EED6B5>";
+				LPCTSTR key = L"件を表示";
 				if( str.Find( key ) != -1 ) {
 					// リンクっぽいので正規表現マッチングで抽出
 					if( parseNextBackLink( nextLink, backLink, str ) ) {
@@ -4387,37 +4387,45 @@ public:
 			}
 
 			// 名前の取得
-			// "bg_w.gif" があり、"<font COLOR=#605048>" があり、"の日記" がある行。
-			if (str.Find(_T("bg_w.gif")) != -1 && str.Find(_T("の日記")) != -1) {
-				// "<font COLOR=#605048>" と "の日記" で囲まれた部分を抽出する
+			// "の日記</h2>" がある行。
+			if (str.Find(_T("の日記")) != -1) {
+				// "<h2>" と "の日記</h2>" で囲まれた部分を抽出する
 				CString name;
-				util::GetBetweenSubString( str, L"<font COLOR=#605048>", L"の日記", name );
+				util::GetBetweenSubString( str, L"<h2>", L"の日記</h2>", name );
 
 				// 名前
 				data.SetName( name );
 				data.SetAuthor( name );
 			}
 
-			const CString& key = _T("<td bgcolor=\"#FFF4E0\">&nbsp;");
+			const CString& key = _T("<dt><input");
 			if (str.Find(key) != -1) {
 				findFlag = TRUE;
 
 				// タイトル
 				// 解析対象：
-				// <td bgcolor="#FFF4E0">&nbsp;<a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a></td>
+        //<dt><input name="diary_id" type="checkbox" value="xxxxx"  /><a href="view_diary.pl?id=xxxx&owner_id=xxxx">タイトル</a><span><a href="edit_diary.pl?id=xxxx">編集する</a></span></dt>
+
 				CString buf;
-				util::GetBetweenSubString( str, key, L"</td>", buf );
+				util::GetBetweenSubString( str, key, L"</dt>", buf );
 
 				CString title;
-				util::GetBetweenSubString( buf, L">", L"</", title );
+				util::GetBetweenSubString( buf, L"\">", L"</a><span><a", title );
 				data.SetTitle( title );
 
 				// 日付
-				const CString& str = html_.GetAt(i-1);
-        //日記投稿不具合対応
-				ParserUtil::ChangeDate(util::XmlParser::GetElement(str, 5), util::XmlParser::GetElement(str, 7), &data);
+        //<dd>2007年06月18日12:10</dd>
+				const CString& str = html_.GetAt(i+1);
 
-				for (int j=i; j<count; j++) {
+				CString MonthDay;
+				util::GetBetweenSubString( str, L"年", L"日", MonthDay );
+
+				CString HourMin;
+				util::GetBetweenSubString( str, L"日", L"</dd>", HourMin );
+
+				ParserUtil::ChangeDate(MonthDay + L"日", HourMin, &data);
+       		
+        for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
 
 					LPCTSTR key = _T("<a href=\"view_diary.pl?id");
