@@ -2885,7 +2885,10 @@ public:
 
 			// €–Ú’Tõ
 			// <dt class="iconTopic">2007”N10Œ01“ú&nbsp;22:14</dt>
-			if( util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconTopic" ) ) {
+			if( util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconTopic" ) ||
+				util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEvent" ) ||
+				util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEnquete" ) )
+			{
 				dataFind = TRUE;
 
 				CMixiData data;
@@ -2893,6 +2896,7 @@ public:
 				// “ú•t
 				CString date;
 				util::GetBetweenSubString( str, L">", L"</", date );
+				date.Replace( L"&nbsp;", L"" );
 				ParserUtil::ChangeDate(date, &data);
 
 				// Œ©o‚µ
