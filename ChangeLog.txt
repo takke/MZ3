@@ -6,14 +6,21 @@ $Id$
 
 * MZ3.i by Takke
 
+** MZ3.i Ver.0.8.2.0 Beta16	(2007.10.02)
+- mixiリニューアル対応中・・・
+- ログインできるようにした。
+- 最新書き込み一覧、トピックの閲覧をできるようにした。
+- 最新の日記（一覧）を取得できるようにした。（Thanks いっちゅうさん！）
+- その他
+
+http://www.mz3.jp/bin/MZ3.0.8.2.0b16.CAB
+
 ** MZ3.i Ver.0.8.2.0 Beta15	(2007.09.28)
 - メインメニュー｜設定｜ログイン設定 を追加(Smartphone/Standard Edition 対応のため)。
 - フォントサイズ等のデフォルト値を変更。
 - 画面構成の Smartphone/Standard Edition 対応
 - Smartphone/Standard Edition にてオプション画面を無効にした（ini ファイルを直接編集してください）。
 - その他
-
-http://www.mz3.jp/bin/MZ3.0.8.2.0b15.CAB
 
 ** MZ3.i Ver.0.8.2.0 Beta14	(2007.09.22)
 - オプション画面を再構成（UI タブを表示・操作タブに分離）
