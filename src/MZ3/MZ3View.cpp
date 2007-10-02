@@ -2355,6 +2355,8 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 		// æ“¾•¶š—ñ‚Ìİ’è
 		category.SetAccessTime( time );
 		m_categoryList.SetItemText( category.GetIndexOnList(), 1, category.GetAccessTime() );
+
+		util::MySetInformationText( m_hWnd, msgHead + _T("Š®—¹") );
 	}
 
 	return true;
