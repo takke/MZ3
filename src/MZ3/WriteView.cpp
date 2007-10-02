@@ -639,7 +639,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				CMenu menu;
 				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 				if( theApp.m_bPocketPC ) {
+#ifdef WINCE
 					menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+#endif
 				} else {
 					menu.LoadMenu(IDR_MAINFRAME);
 				}

@@ -184,6 +184,7 @@ void CReportView::OnInitialUpdate()
 	m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
 
 	// PocketIE コントロールの初期化
+#ifdef WINCE
 	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
 		DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER;
 		CString sInfo;
@@ -206,6 +207,7 @@ void CReportView::OnInitialUpdate()
 
 		::SetWindowLong( m_hwndHtml, GWL_ID, 12321);
 	}
+#endif
 }
 
 /**
@@ -213,6 +215,7 @@ void CReportView::OnInitialUpdate()
  */
 void CReportView::SetHtmlText(LPCTSTR szHtmlText)
 {
+#ifdef WINCE
 	::SendMessage( m_hwndHtml, WM_SETTEXT, 0, (LPARAM)(LPCTSTR)_T(""));
 
 	CString s;
@@ -227,6 +230,7 @@ void CReportView::SetHtmlText(LPCTSTR szHtmlText)
 	::SendMessage(m_hwndHtml, DTM_ADDTEXTW, FALSE, (LPARAM)(LPCTSTR)L"</pre></body></html>");
 
 	::SendMessage(m_hwndHtml, DTM_ENDOFSOURCE, 0, 0);
+#endif
 }
 
 /**
@@ -614,12 +618,14 @@ BOOL CReportView::CommandMoveDownList()
 BOOL CReportView::CommandScrollUpList()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
+#ifdef WINCE
 		// アンカーによりスクロールする
 		m_posHtmlScroll = max(m_posHtmlScroll-1, 0);
 
 		CString s;
 		s.Format(L"mz3line%d", m_posHtmlScroll);
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
+#endif
 	} else {
 		m_edit.LineScroll( -m_scrollLine );
 	}
@@ -629,12 +635,14 @@ BOOL CReportView::CommandScrollUpList()
 BOOL CReportView::CommandScrollDownList()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
+#ifdef WINCE
 		// アンカーによりスクロールする
 		m_posHtmlScroll = min(m_posHtmlScroll+1, m_posHtmlScrollMax);
 
 		CString s;
 		s.Format(L"mz3line%d", m_posHtmlScroll);
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
+#endif
 	} else {
 		m_edit.LineScroll( m_scrollLine );
 	}
@@ -653,7 +661,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			// メインメニューのポップアップ
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 			if( theApp.m_bPocketPC ) {
+#ifdef WINCE
 				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+#endif
 			} else {
 				menu.LoadMenu(IDR_MAINFRAME);
 			}
@@ -1909,6 +1919,7 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
 	case WM_NOTIFY:
+#ifdef WINCE
 		NM_HTMLVIEW * pnmHTML = (NM_HTMLVIEW *) lParam;
 		if (!pnmHTML)
 			break;
@@ -1927,6 +1938,7 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			// バグ回避のため親プロシージャへの転送を抑止する。
 			return TRUE;
 		}
+#endif
 		break;
 	}
 
@@ -1935,6 +1947,7 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie) 
 {
+#ifdef WINCE
 	// TODO 絵文字のローカルキャッシュ化、またはキュー化＆HTML再ロードの仕組みを実装すること。
 	CFile file;
 	LPCTSTR szCacheFile = theApp.m_filepath.temphtml;
@@ -2001,6 +2014,7 @@ BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie)
 		MZ3LOGGER_ERROR(_T("Load Not Ok"));
 		::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
 	} 
+#endif
 	return TRUE; 
 }
 

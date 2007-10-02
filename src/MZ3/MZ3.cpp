@@ -129,9 +129,11 @@ BOOL CMZ3App::InitInstance()
 	LoadSkinSetting();
 
 	// IE コンポーネントの初期化
+#ifdef WINCE
 	if (m_optionMng.m_bRenderByIE) {	// TODO この条件はIE正式対応前のための仮設定。正式対応後は常に実行すること。
 		InitHTMLControl( AfxGetInstanceHandle() );
 	}
+#endif
 
 	// トップページ用の初期化
 	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
@@ -213,6 +215,7 @@ BOOL CMZ3App::InitInstance()
 	m_pMainWnd->ShowWindow( SW_SHOW );
 	m_pMainWnd->UpdateWindow();
 
+#ifdef WINCE
 	if( m_bSmartphone ) {
 		// 全画面表示
 		::SHFullScreen(m_pMainWnd->m_hWnd, SHFS_HIDETASKBAR | SHFS_HIDESIPBUTTON );
@@ -230,6 +233,7 @@ BOOL CMZ3App::InitInstance()
 			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
 			TRUE);
 	}
+#endif
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
@@ -261,6 +265,7 @@ BOOL CMZ3App::InitInstance()
 /// プラットフォーム用のフラグの設定
 void CMZ3App::InitPlatformFlags()
 {
+#ifdef WINCE
 	// プラットフォーム名の問い合わせ
 	TCHAR atchPlat[64];
 	SystemParametersInfo(SPI_GETPLATFORMTYPE, 64, (PVOID)atchPlat, 0);
@@ -284,6 +289,7 @@ void CMZ3App::InitPlatformFlags()
 		m_bWinMo2003 = TRUE;
 	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 21)) 
 		m_bWinMo2003_SE = TRUE;
+#endif
 }
 
 /**
@@ -453,11 +459,15 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 {
+#ifdef WINCE
 	if( theApp.m_bPocketPC ) {
 		return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
 	} else {
 		return TRUE;
 	}
+#else
+	return TRUE;
+#endif
 }
 
 /**

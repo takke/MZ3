@@ -1179,7 +1179,9 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			CMenu menu;
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 			if( theApp.m_bPocketPC ) {
+#ifdef WINCE
 				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+#endif
 			}else{
 				menu.LoadMenu(IDR_MAINFRAME);
 			}
@@ -2040,9 +2042,11 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
 void CMZ3View::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
 	if( theApp.m_bPocketPC ) {
+#ifdef WINCE
 		CMainFrame* pFrame;
 		pFrame = (CMainFrame*)(theApp.GetMainWnd());
 		pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  
+#endif
 	}
 }
 

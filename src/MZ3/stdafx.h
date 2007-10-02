@@ -84,5 +84,7 @@
 #include "wininet.h"
 
 // PocketIE サポート
+#ifdef WINCE
 #include "htmlctrl.h"
 #pragma comment(lib, "htmlview.lib")
+#endif
