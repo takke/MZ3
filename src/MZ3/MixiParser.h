@@ -2493,7 +2493,7 @@ public:
 
 		// 自分の日記かどうかを判断する（名前の取得のため）
 		bool bMyDiary = true;
-		for( int i=180; i<min(100,count); i++ ) {
+		for( int i=170; i<min(100,count); i++ ) {
 			const CString& line = html_.GetAt( i );
 			if( util::LineHasStringsNoCase( line, L"diaryTitleFriend" ) ) {
 				// 上記があるということは、自分の日記ではない。
@@ -2525,20 +2525,20 @@ public:
 
 		// 「最近の日記」の取得
 		bool bStartRecentDiary = false;
-		for( int iLine=100; iLine<count; iLine++ ) {
-			// <table BORDER=0 CELLSPACING=0 CELLPADDING=0 BGCOLOR=#F8A448>
+		for( int iLine=400; iLine<count; iLine++ ) {
+			// <h3>最近の日記</h3>
 			// があれば「最近の日記」開始とみなす。
 			const CString& line = html_.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"<table", L"#F8A448" ) )
+			if( util::LineHasStringsNoCase( line, L"<h3>", L"最近の日記" ) )
 			{
 				bStartRecentDiary = true;
 				continue;
 			}
 
 			if( bStartRecentDiary ) {
-				// </table>
+				// </div>
 				// があれば「最近の日記」終了とみなす。
-				if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+				if( util::LineHasStringsNoCase( line, L"</div>" ) ) {
 					break;
 				}
 
@@ -2549,7 +2549,7 @@ public:
 				// タイトル</a></td>
 				if( util::LineHasStringsNoCase( line, L"view_diary.pl" ) ) {
 					CString url;
-					int idx = util::GetBetweenSubString( line, L"<a HREF=\"", L"\"", url );
+					int idx = util::GetBetweenSubString( line, L"<a href=\"", L"\"", url );
 					if( idx > 0 ) {
 						CString buf = line.Mid( idx );
 						// buf:
@@ -2578,9 +2578,8 @@ public:
 
 			if (findFlag == FALSE) {
 				// 日記開始フラグを発見するまで廻す
-
-				if (util::LineHasStringsNoCase( str, L"<td", L"class=\"h12\"" ) ||
-					util::LineHasStringsNoCase( str, L"<td", L"CLASS=h12" ) )
+         
+				if (util::LineHasStringsNoCase( str, L"<div id=\"diary_body\">" ) )
 				{
 					// 日記開始フラグ発見（日記本文発見）
 					findFlag = TRUE;
@@ -2595,7 +2594,7 @@ public:
 						// <td WIDTH=490 background=http://img.mixi.jp/img/bg_w.gif><b><font COLOR=#605048>XXXさんの日記</font></b></td>
 						for( int iBack=-50; iBack<0; iBack++ ) {
 							const CString& line = html_.GetAt( i+iBack );
-							LPCTSTR pattern = L"bg_w.gif><b><font ";
+							LPCTSTR pattern = L"show_friend.pl";
 							int idx = line.Find( pattern );
 							if( idx >= 0 ) {
 								// 発見。
@@ -2626,10 +2625,10 @@ public:
 					parseImageLink( data_, html_, i );
 
 					// "<td" 以降に整形
-					str = str.Mid( str.Find(L"<td") );
+					str = str.Mid( str.Find(L"<div") );
 
 					// 現在の行を解析、追加。
-					if( util::GetBeforeSubString( str, L"</td>", buf ) > 0 ) {
+					if( util::GetBeforeSubString( str, L"</div>", buf ) > 0 ) {
 						// この１行で終わり
 						ParserUtil::AddBodyWithExtract( data_, buf );
 						endFlag = TRUE;
@@ -2802,7 +2801,7 @@ private:
 
 			if (findFlag == FALSE) {
 				if( util::LineHasStringsNoCase( str, L"add_comment.pl" ) ||	// コメントなし
-					util::LineHasStringsNoCase( str, L"<!-- ///// コメント : end ///// -->" ) ) // コメント全体の終了タグ発見
+					util::LineHasStringsNoCase( str, L"<!--/comment-->" ) ) // コメント全体の終了タグ発見
 				{
 					GetPostAddress(i, eIndex, html_, data_);
 					return -1;
@@ -2819,13 +2818,15 @@ private:
 					MixiUrlParser::GetAuthor(buf, &cmtData);
 
 					// 時刻
-					for (int j=i; j>0; j--) {
+					for (int j=i+3; j>0; j--) {
 						str = html_.GetAt(j);
-						if (str.Find(_T("日<br>")) != -1) {
+						if (str.Find(_T("日&nbsp;")) != -1) {
 
-							ParserUtil::ChangeDate( 
-								util::XmlParser::GetElement(str, 1) + _T(" ") + util::XmlParser::GetElement(str, 3),
-								&cmtData);
+					    CString date;
+					    util::GetBetweenSubString( str, L">", L"<", date );
+				      date.Replace( L"&nbsp;", L"" );
+					    ParserUtil::ChangeDate(date, &cmtData);
+
 							break;
 						}
 					}
@@ -2836,12 +2837,12 @@ private:
 			}
 			else {
 
-				if (str.Find(_T("CLASS=h12")) != -1) {
+				if (str.Find(_T("<dd>")) != -1) {
 					// コメント本文取得
 					i++;
 					str = html_.GetAt(i);
 
-					if (str.Find(_T("<br>")) != 0) {
+					if (str.Find(_T("<dd>")) != 0) {
 						cmtData.AddBody(_T("\r\n"));
 					}
 
@@ -2850,7 +2851,7 @@ private:
 					i++;
 					for( ; i<eIndex; i++ ) {
 						str = html_.GetAt(i);
-						if (str.Find(_T("</td></tr>")) != -1) {
+						if (str.Find(_T("</dd>")) != -1) {
 							// 終了タグが出てきたのでここで終わり
 							retIndex = i+5;
 							break;
@@ -3118,12 +3119,12 @@ public:
 		BOOL dataFind = FALSE;
 		int index;
 
-		for (int i=76; i<count; i++) {
+		for (int i=170; i<count; i++) {
 
 			str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
-				if (str.Find(_T("bg_w.gif")) != -1) {
+				if (str.Find(_T("NewFriendDiaryArea")) != -1) {
 					findFlag = TRUE;
 				}
 				continue;
@@ -3135,17 +3136,22 @@ public:
 					continue;
 				}
 
-				if (util::LineHasStringsNoCase( str, L"<img", L"pen.gif" ) ) {
+				if (util::LineHasStringsNoCase( str, L"<dt>", L"</dt>" ) ) {
 
 					dataFind = TRUE;
 
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-					ParserUtil::ChangeDate(
-						util::XmlParser::GetElement(str, 3) + _T("") + util::XmlParser::GetElement(str, 5), 
-						&data);
+			    //--- 時刻の抽出
+          //<dt>2007年10月02日&nbsp;22:22</dt>
+				  CString Date;
+				  util::GetBetweenSubString( str, L"<dt>", L"</dt>", Date );
 
+					Date.Replace(_T("&nbsp;"), _T(" "));
+
+				  ParserUtil::ChangeDate(Date, &data);
+         		
 					// 見出し
 					i++;
 					str = html_.GetAt(i);
@@ -3168,6 +3174,7 @@ public:
 						continue;
 					}
 					buf = util::XmlParser::GetElement(str, 2);
+          buf.Replace(_T("\""), _T(""));
 					data.SetURL(util::XmlParser::GetAttribute(buf, _T("href=")));
 
 					// ＩＤを設定
@@ -3178,22 +3185,16 @@ public:
 					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
-					key = _T("</a> (");
-					index = str.Find(key);
-					key = _T("</a>");
-					buf = str.Mid(index + key.GetLength());
-					// 最初と最後の括弧を取り除く
-					buf.Trim();
-					buf.Replace(_T("\n"), _T(""));
-					buf = buf.Left(buf.GetLength() -1);
-					buf = buf.Right(buf.GetLength() -1);
-					data.SetName(buf);
-					data.SetAuthor(buf);
+          CString NameData;
+				  util::GetBetweenSubString( str, L"</a> (", L")<div", NameData);
+
+					data.SetName(NameData);
+					data.SetAuthor(NameData);
 
 					out_.push_back( data );
 					i += 5;
 				}
-				else if (str.Find(_T("</table>")) != -1 && dataFind != FALSE) {
+				else if (str.Find(_T("/newFriendDiaryArea")) != -1 && dataFind != FALSE) {
 					// 終了タグ発見
 					break;
 				}
@@ -4453,16 +4454,12 @@ public:
 
 				// 日付
         //<dd>2007年06月18日12:10</dd>
-				const CString& str = html_.GetAt(i+1);
+				const CString& str = html_.GetAt(i+1);	
+				CString date;
+				util::GetBetweenSubString( str, L">", L"<", date );
+				ParserUtil::ChangeDate(date, &data);
 
-				CString MonthDay;
-				util::GetBetweenSubString( str, L"年", L"日", MonthDay );
 
-				CString HourMin;
-				util::GetBetweenSubString( str, L"日", L"</dd>", HourMin );
-
-				ParserUtil::ChangeDate(MonthDay + L"日", HourMin, &data);
-       		
         for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
 
