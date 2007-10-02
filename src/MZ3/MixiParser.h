@@ -918,44 +918,65 @@ protected:
 class MixiContentParser : public MixiParserBase
 {
 public:
+	/** deprecated... */
 	static void GetPostAddress(int sIndex, int eIndex, const CHtmlArray& html_, CMixiData& data_)
 	{
-		CString str;
-		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
+		parsePostURL( sIndex, data_, html_ );
+	}
 
-			// <form name="bbs_comment_form" action="add_bbs_comment.pl?id=xxx&comm_id=xxx"
-			// method="post" enctype="multipart/form-data">
-			if (str.Find(_T("<form")) != -1 &&
-				str.Find(_T("method=")) != -1 &&
-				str.Find(_T("action=")) != -1 &&
-				str.Find(_T("post")) != -1) 
+	/**
+	 * 記事投稿用URL等の取得
+	 */
+	static void parsePostURL(int startIndex, CMixiData& data_, const CHtmlArray& html_)
+	{
+		const int lastLine = html_.GetCount();
+
+		for (int i=startIndex; i<lastLine; i++) {
+			const CString& line = html_.GetAt(i);
+
+			// <form name="bbs_comment_form" action="add_bbs_comment.pl?id=xxx&comm_id=yyy" enctype="multipart/form-data" method="post">
+			if (line.Find(L"<form") != -1 &&
+				line.Find(L"method=") != -1 &&
+				line.Find(L"action=") != -1 &&
+				line.Find(L"post") != -1) 
 			{
+				// delete_xxx.pl の場合は無視
+				if (line.Find(L"delete_") != -1) {
+					continue;
+				}
+
 				// Content-Type/enctype 解決
-				if (str.Find(_T("multipart")) != -1) {
+				if (line.Find(_T("multipart")) != -1) {
 					data_.SetContentType(CONTENT_TYPE_MULTIPART);
 				} else {
 					data_.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
 				}
 
-				// action 取得
+				// action/URL 取得
 				CString action;
-				if( util::GetBetweenSubString( str, L"action=\"", L"\"", action ) < 0 ) {
+				if( util::GetBetweenSubString( line, L"action=\"", L"\"", action ) < 0 ) {
 					continue;
 				}
 				data_.SetPostAddress( action );
 
-				if (data_.GetAccessType() != ACCESS_DIARY &&
-					data_.GetAccessType() != ACCESS_MYDIARY)
-				{
+				switch(data_.GetAccessType()) {
+				case ACCESS_DIARY:
+				case ACCESS_MYDIARY:
 					break;
+				default:
+					// 以降の解析は不要。
+					return;
 				}
 				continue;
 			}
-			else if (str.Find(_T("owner_id")) != -1) {
-
+			
+			// <input type="hidden" name="owner_id" value="yyy" />
+			if (line.Find(L"<input") != -1 &&
+				line.Find(L"hidden") != -1 &&
+				line.Find(L"owner_id") != -1)
+			{
 				CString ownerId;
-				if( util::GetBetweenSubString( str, L"value=\"", L"\"", ownerId ) < 0 ) {
+				if( util::GetBetweenSubString( line, L"value=\"", L"\"", ownerId ) < 0 ) {
 					continue;
 				}
 				MZ3LOGGER_DEBUG( _T("owner_id = ") + ownerId );
@@ -3349,7 +3370,7 @@ public:
 
 		const CString& tagBR  = _T("<br>");
 
-		for (int i=180; i<lastLine; i++) {
+		for (int i=100; i<lastLine; i++) {
 			CString str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
@@ -3461,6 +3482,9 @@ public:
 
 		// 「最新のトピック」の抽出
 		parseRecentTopics( mixi, html_ );
+
+		// 書き込み先URLの取得
+		parsePostURL( 200, mixi, html_ );
 
 		MZ3LOGGER_DEBUG( L"ViewBbsParser.parse() finished." );
 		return true;
@@ -3595,7 +3619,6 @@ private:
 		}
 		return retIndex;
 	}
-
 };
 
 /**
