@@ -3259,22 +3259,22 @@ public:
 		BOOL dataFind = FALSE;
 
 		int index;
-		for (int i=76; i<count; i++) {
+		for (int i=160; i<count; i++) {
 
 			str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
-				if (util::LineHasStringsNoCase( str, L"img/bg_w.gif>") ) {
+				if (util::LineHasStringsNoCase( str, L"entryList01") ) {
 					// 開始フラグ発見。
 					// とりあえずN行無視する。
-					i+=10;
+					i+=3;
 					findFlag = TRUE;
 				}
 				continue;
 			}
 			else {
 
-				if (util::LineHasStringsNoCase( str, L"<img", L"pen_y.gif" ) ) {
+				if (util::LineHasStringsNoCase( str, L"<dt>") ) {
 					// 項目発見
 
 					dataFind = TRUE;
@@ -3282,23 +3282,25 @@ public:
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-					// 日付
-					ParserUtil::ChangeDate( util::XmlParser::GetElement(str, 3), &data );
+		      // 日付
+		      // <dt>2007年10月01日&nbsp;01:11</dt>
+          CString date;
+          util::GetBetweenSubString( str, L">", L"<", date );
+          date.Replace(L"&nbsp;",L"");
+          ParserUtil::ChangeDate(date, &data);
 					TRACE(_T("%s\n"), data.GetDate());
 
-					// 見出し
-					i+=2;
-					str = html_.GetAt(i);
-					key = _T("class=\"new_link\">");
-					index = str.Find(key);
-					buf = str.Mid(index + key.GetLength());
-					buf.Trim();
-					buf.Replace(_T("\n"), _T(""));
-					data.SetTitle(buf);
-					TRACE(_T("%s\n"), data.GetTitle());
+					// 見出しタイトル
+          i+=1;
+          str = html_.GetAt(i);
+
+          CString title;
+          util::GetBetweenSubString( str, L"\">", L"</a>", title );          
+          data.SetTitle(title);
+          TRACE(_T("%s\n"), data.GetTitle());
 
 					// ＵＲＩ
-					buf = util::XmlParser::GetElement(str, 1);
+					buf = util::XmlParser::GetElement(str, 2);
 					buf = util::XmlParser::GetAttribute(buf, _T("href="));
 					buf = buf.Left(buf.GetLength() -1);
 					buf = buf.Right(buf.GetLength() -1);
@@ -3313,25 +3315,19 @@ public:
 					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
-					// +1～+2 行目にある
-					for( int iInc=1; iInc<=2; iInc++ ) {
-						str = html_.GetAt( ++i );
-
-						CString author;
-						if( util::GetBetweenSubString( str, L"(", L")", author ) < 0 ) {
-							// not found.
-							continue;
-						}
-
-						data.SetName( author );
-						data.SetAuthor( author );
-						TRACE(_T("%s\n"), data.GetName());
-						break;
+					CString author;
+					if( util::GetBetweenSubString( str, L"&nbsp;(", L")</dd>", author ) < 0 ) {
+						// not found.
+						continue;
 					}
+
+					data.SetName( author );
+					data.SetAuthor( author );
+					TRACE(_T("%s\n"), data.GetName());
 
 					out_.push_back(data);
 				}
-				else if (str.Find(_T("</table>")) != -1 && dataFind != FALSE) {
+				else if (str.Find(_T("/newCommentArea")) != -1 && dataFind != FALSE) {
 					// 終了タグ発見
 					break;
 				}
