@@ -3455,8 +3455,8 @@ public:
 			else {
 				// フラグ発見済み。
 
-				// <div class="pageNavigation01"> を発見したら、コメント取得処理を行う。
-				if (util::LineHasStringsNoCase( str, L"<div", L"class", L"pageNavigation01" )) {
+				// <dl class="commentList01"> を発見したら、コメント取得処理を行う。
+				if (util::LineHasStringsNoCase( str, L"<dl", L"class", L"commentList01" )) {
 					mixi.ClearChildren();
 
 					int index = ++i;
@@ -3550,6 +3550,11 @@ private:
 
 			// <div class="pageNavigation01"> を発見したら、コメント終了なので抜ける
 			if (util::LineHasStringsNoCase( line, L"<div", L"class", L"pageNavigation01" )) {
+				return -1;
+			}
+
+			// <!-- ADD_COMMENT: start -->を発見したら、コメント終了なので抜ける
+			if (util::LineHasStringsNoCase( line, L"<!", L"ADD_COMMENT", L"start" )) {
 				return -1;
 			}
 
