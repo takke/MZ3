@@ -3258,7 +3258,6 @@ public:
 		BOOL findFlag = FALSE;
 		BOOL dataFind = FALSE;
 
-		int index;
 		for (int i=160; i<count; i++) {
 
 			str = html_.GetAt(i);
