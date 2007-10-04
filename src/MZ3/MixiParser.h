@@ -1786,12 +1786,13 @@ public:
 
 		/**
 		 * 方針：
-		 * ★ table で5件ずつ並んでいる。
+		 * ★ <ul>で5件ずつ並んでいる。
 		 *   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
 		 *   従って、「5件分のリンク抽出」「5件分の名前抽出」「突き合わせ」「データ追加」という手順で行う。
 		 *
-		 * ● <table ... CELLPADDING=2 ...>
-		 *    が見つかれば、そこから項目開始とみなす。</table> が現れるまで以下を実行する。
+		 * ● <ul>
+     *    <div class="iconListImage"><a href="view_community.pl?id=2640122"
+		 *    が見つかれば、そこから項目開始とみなす。</span>が現れるまで以下を実行する。
 		 *   (1) </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、URL と時刻を取得する。
 		 *   (2) 次の </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、名前を抽出する。
 		 *   (3) (1), (2) で抽出したデータを out_ に追加する。
@@ -1799,13 +1800,13 @@ public:
 
 		// 項目開始を探す
 		bool bInItems = false;	// 項目開始？
-		int iLine = 100;		// とりあえず読み飛ばす
+		int iLine = 160;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
 			if( !bInItems ) {
 				// 項目開始？
-				if( util::LineHasStringsNoCase( line, L"<table", L"cellpadding=\"2\"", L">" ) ) {
+				if( util::LineHasStringsNoCase( line, L"iconList") ) {
 					bInItems = true;
 				}
 			}
@@ -1817,17 +1818,17 @@ public:
 					break;
 				}
 
-				// </table> が見つかれば終了
+				// pageNavigation が見つかれば終了
 				const CString& line = html_.GetAt(iLine);
-				if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+				if( util::LineHasStringsNoCase( line, L"pageNavigation" ) ) {
 					break;
 				}
 			}
 		}
 
-		// </table> が見つかったので、その後の行から次、前のリンクを抽出
+		// pageNavigationが見つかったので、その後の行から次、前のリンクを抽出
 		for( ; iLine<count; iLine++ ) {
-			const CString& str = html_.GetAt(iLine);
+			const CString& str = html_.GetAt(iLine-10);
 
 			// 「次を表示」、「前を表示」のリンクを抽出する
 			if( parseNextBackLink( nextLink, backLink, str ) ) {
@@ -1860,46 +1861,30 @@ private:
 	{
 		const int lastLine = html.GetCount();
 
-		// 一時的な CMixiData のリスト
-		CMixiDataList tmp_list;
-
-		// 1つ目の </tr> までの解析
 		bool bBreak = false;
 		for( ; iLine < lastLine && bBreak == false; iLine++ ) {
 			const CString& line = html.GetAt( iLine );
 
-			// </table> が見つかれば終了
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+			//// /messageAreaが見つかれば終了
+			if( util::LineHasStringsNoCase( line, L"/messageArea" ) ) {
 				return false;
 			}
 
-			if( util::LineHasStringsNoCase( line, L"</tr>" ) ) {
-				// </tr> 発見、名前抽出に移る。
-				bBreak = true;
-			}
-
-			// <td で始まるなら、抽出する
-			if( line.Left( 3 ).CompareNoCase( L"<td" ) == 0 ) {
-				/* 行の形式：
-line1: <td width="20%" height="100" background="http://img.mixi.jp/img/bg_line.gif">
-line2: <a href="view_community.pl?id=1231285"><img src="http://img-c1.mixi.jp/photo/comm/12/85/1231285_120s.jpg" alt=""  border="0" /></a></td>
-*/
+			//view_community.pl で始まるなら、抽出する
+			if( util::LineHasStringsNoCase( line, L"view_community.pl" ) ) {
+        /* 行の形式：
+        line1: <div class="iconListImage"><a href="view_community.pl?id=2640122" style="background: url(http://img-c3.mixi.jp/photo/comm/1/22/2640122_234s.jpg); text-indent: -9999px;" class="iconTitle" title="xxxxxx">xxxxxxの写真</a></div><span>xxxxxx(41)</span>
+        line2: <div id="2640122" class="memo_pop"></div><p><a href="show_community_memo.pl?id=2640122" onClick="openMemo(event,'community',2640122);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
+        */
 				CMixiData mixi;
-
-				// 次の行をフェッチ
-				const CString& line2 = html.GetAt( ++iLine );
-				if( util::LineHasStringsNoCase( line2, L"</tr>" ) ) {
-					// </tr> 発見、名前抽出に移る。
-					bBreak = true;
-				}
 
 				// <a 以降のみにする
 				CString target;
-				if( util::GetAfterSubString( line2, L"<a", target ) < 0 ) {
+				if( util::GetAfterSubString( line, L"<a", target ) < 0 ) {
 					// <a がなかったので次の行解析へ。
 					continue;
 				}
-				// target:  href="view_community.pl?id=1231285"><img src="http://img-c1.mixi.jp/photo/comm/12/85/1231285_120s.jpg" alt=""  border="0" /></a></td>
+
 				// URL 抽出
 				CString url;
 				if( util::GetBetweenSubString( target, L"href=\"", L"\"", url ) < 0 ) {
@@ -1911,65 +1896,16 @@ line2: <a href="view_community.pl?id=1231285"><img src="http://img-c1.mixi.jp/ph
 				url.Insert( 0, L"http://mixi.jp/" );
 				mixi.SetBrowseUri( url );
 
-				// Image 抽出
-				if( util::GetAfterSubString( target, L"<img", target ) < 0 ) {
-					continue;
-				}
-				// target:  src="http://img-c1.mixi.jp/photo/comm/12/85/1231285_120s.jpg" alt=""  border="0" /></a></td>
+				//// Image 抽出
 				CString image_url;
-				if( util::GetBetweenSubString( target, L"src=\"", L"\"", image_url ) < 0 ) {
+				if( util::GetBetweenSubString( target, L"url(", L"); text-indent", image_url ) < 0 ) {
 					continue;
 				}
 				mixi.AddImage( image_url );
 
-				// 解析成功なので追加する。
-				tmp_list.push_back( mixi );
-			}
-		}
-		if( iLine >= lastLine ) {
-			return false;
-		}
-
-		// 2つ目の </tr> までの解析
-		bBreak = false;
-		int mixiIndex = 0;		// 何番目の項目を解析しているかを表すインデックス
-		for( ; iLine < lastLine && bBreak == false; iLine++ ) {
-			const CString& line = html.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"</tr>" ) ) {
-				// </tr> 発見、終了
-				bBreak = true;
-			}
-
-			if( mixiIndex >= (int)tmp_list.size() ) {
-				// リスト数以上見つかったので、終了。
-				break;
-			}
-
-			// </table> が見つかれば終了
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
-				return false;
-			}
-
-			// <td があれば、抽出する
-			if( util::LineHasStringsNoCase( line, L"<td" ) ) {
-				CMixiData& mixi = tmp_list[mixiIndex];
-				mixiIndex ++;
-
-				// 行の形式：
-				// <tr align="center" bgcolor="#FFF4E0"><td valign="top">MZ3 Debuggers(50)
-				// または
-				// </td><td valign="top">MZ3 -Mixi for ZERO3-(1504)
-
-				// 名前抽出
-
-				// <td 以降を抽出
+				// <span>と</span>の間のコミュ名を抽出
 				CString name;
-				if( util::GetAfterSubString( line, L"<td ", name ) < 0 ) {
-					continue;
-				}
-
-				// > 以降を抽出
-				if( util::GetBetweenSubString( name, L">", L"\n", name ) < 0 ) {
+				if( util::GetBetweenSubString( target, L"<span>", L"</span>", name ) < 0 ) {
 					continue;
 				}
 				mixi.SetName( name );
@@ -1977,13 +1913,12 @@ line2: <a href="view_community.pl?id=1231285"><img src="http://img-c1.mixi.jp/ph
 
 				// mixi_list に追加する。
 				mixi_list.push_back( mixi );
+
 			}
 		}
 		if( iLine >= lastLine ) {
 			return false;
 		}
-
-
 		return true;
 	}
 
@@ -3258,6 +3193,7 @@ public:
 		BOOL findFlag = FALSE;
 		BOOL dataFind = FALSE;
 
+		//int index;
 		for (int i=160; i<count; i++) {
 
 			str = html_.GetAt(i);
