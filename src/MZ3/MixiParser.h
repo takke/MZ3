@@ -1570,17 +1570,11 @@ public:
 
 		data_.ClearAllList();
 
-		INT_PTR count = html_.GetCount();
-
-		CString str;
-		BOOL findFlag = FALSE;
-		BOOL endFlag = FALSE;
-		int index;
-		CString buf;
+		INT_PTR lastLine = html_.GetCount();
 
 		// 自分の日記かどうかを判断する（名前の取得のため）
 		bool bMyDiary = true;
-		for( int i=170; i<min(100,count); i++ ) {
+		for( int i=170; i<min(100,lastLine); i++ ) {
 			const CString& line = html_.GetAt( i );
 			if( util::LineHasStringsNoCase( line, L"diaryTitleFriend" ) ) {
 				// 上記があるということは、自分の日記ではない。
@@ -1591,7 +1585,7 @@ public:
 
 		// 最初の10行目までを検索し、<title> タグを解析することで、
 		// タイトルを取得する
-		for( int i=3; i<min(10,count); i++ ) {
+		for( int i=3; i<min(10,lastLine); i++ ) {
 			const CString& line = html_.GetAt( i );
 			CString title;
 			if( util::GetBetweenSubString( line, L"<title>[mixi] ", L"</title>", title ) >= 0 ) {
@@ -1612,70 +1606,64 @@ public:
 
 		// 「最近の日記」の取得
 		bool bStartRecentDiary = false;
-		for( int iLine=400; iLine<count; iLine++ ) {
+		for( int iLine=400; iLine<lastLine; iLine++ ) {
 			// <h3>最近の日記</h3>
 			// があれば「最近の日記」開始とみなす。
 			const CString& line = html_.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"<h3>", L"最近の日記" ) )
-			{
+			if( util::LineHasStringsNoCase( line, L"<h3>", L"最近の日記" ) ) {
 				bStartRecentDiary = true;
 				continue;
 			}
 
 			if( bStartRecentDiary ) {
-				// </div>
+				// </ul>
 				// があれば「最近の日記」終了とみなす。
-				if( util::LineHasStringsNoCase( line, L"</div>" ) ) {
+				if( util::LineHasStringsNoCase( line, L"</ul>" ) ) {
 					break;
 				}
 
 				// 解析
 				// 下記の形式で「最近の日記」リンクが存在する
-				// <td BGCOLOR=#FFFFFF><a HREF="view_diary.pl?id=xxx&owner_id=xxx" CLASS=wide>
-        // <img src=http://img.mixi.jp/img/pt_or.gif ALIGN=left BORDER=0 WIDTH=8 HEIGHT=16>
-				// タイトル</a></td>
+				// <li><a href="view_diary.pl?id=xxx&owner_id=xxx">たいとる</a></li>
 				if( util::LineHasStringsNoCase( line, L"view_diary.pl" ) ) {
 					CString url;
 					int idx = util::GetBetweenSubString( line, L"<a href=\"", L"\"", url );
-					if( idx > 0 ) {
+					if( idx >= 0 ) {
 						CString buf = line.Mid( idx );
 						// buf:
-						//  CLASS=wide>
-						// <img src=http://img.mixi.jp/img/pt_or.gif ALIGN=left BORDER=0 WIDTH=8 HEIGHT=16>
-						// タイトル</a></td>
+						// >たいとる</a></li>
 
-						// > を読み飛ばす
-						CString after;
-						if( util::GetAfterSubString( buf, L">", after ) > 0 ) {
-							CString title;
-							if( util::GetBetweenSubString( after, L">", L"</a>", title ) > 0 ) {
-								CMixiData::Link link( url, title );
-								data_.m_linkPage.push_back( link );
-							}
+						// タイトル抽出
+						CString title;
+						if( util::GetBetweenSubString( buf, L">", L"<", title ) > 0 ) {
+							CMixiData::Link link( url, title );
+							data_.m_linkPage.push_back( link );
 						}
 					}
 				}
 			}
 		}
 
-		// 日記開始フラグ
+		// 日記本文＆コメント解析
+		bool bStartDiary = false;	// 日記本文開始フラグ
+		bool bEndDiary   = false;	// 日記本文終了フラグ
+		for (int i=75; i<lastLine; i++) {
+			const CString& line = html_.GetAt(i);
 
-		for (int i=75; i<count; i++) {
-			str = html_.GetAt(i);
-
-			if (findFlag == FALSE) {
+			if (bStartDiary == false) {
 				// 日記開始フラグを発見するまで廻す
 
-				if (util::LineHasStringsNoCase( str, L"<div id=\"diary_body\">" ) )
+				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) )
 				{
 					// 日記開始フラグ発見（日記本文発見）
-					findFlag = TRUE;
+					bStartDiary = true;
 
 					// とりあえず改行出力
 					data_.AddBody(_T("\r\n"));
 
 					// 日記の著者
-					{
+					// ここで取得しなくても呼び出しもと（一覧）にて取得済みなので、コメントアウトしておく。
+/*					{
 						// フラグの５０行くらい前に、日記の著者があるはず。
 						// <td WIDTH=490 background=http://img.mixi.jp/img/bg_w.gif><b><font COLOR=#605048>XXXの日記</font></b></td>
 						// <td WIDTH=490 background=http://img.mixi.jp/img/bg_w.gif><b><font COLOR=#605048>XXXさんの日記</font></b></td>
@@ -1701,7 +1689,7 @@ public:
 							}
 						}
 					}
-
+*/
 					// 公開レベル
 					{
 						// フラグの５０行くらい前に、「友人まで公開」といった情報があるはず。
@@ -1711,19 +1699,20 @@ public:
 					// 日記の添付画像取得
 					parseImageLink( data_, html_, i );
 
-					// "<td" 以降に整形
-					str = str.Mid( str.Find(L"<div") );
+					// "<div" の前を除去
+					CString str = line.Mid( line.Find(L"<div") );
 
 					// 現在の行を解析、追加。
-					if( util::GetBeforeSubString( str, L"</div>", buf ) > 0 ) {
+					CString before;
+					if( util::GetBeforeSubString( str, L"</div>", before ) > 0 ) {
 						// この１行で終わり
-						ParserUtil::AddBodyWithExtract( data_, buf );
-						endFlag = TRUE;
+						ParserUtil::AddBodyWithExtract( data_, before );
+						bEndDiary = true;
 					}else{
 						ParserUtil::AddBodyWithExtract( data_, str );
 					}
 				}
-				else if (str.Find(_T("さんは外部ブログを使われています。")) != -1) {
+				else if (line.Find(_T("さんは外部ブログを使われています。")) != -1) {
 					// 外部ブログ解析
 					parseExternalBlog( data_, html_, i );
 					break;
@@ -1733,17 +1722,17 @@ public:
 				// 日記開始フラグ発見済み。
 
 				// 終了タグまでデータ取得
-				if (str.Find(_T("</div>")) != -1 ) {
-					endFlag = TRUE;
+				if (line.Find(_T("</div>")) != -1 ) {
+					bEndDiary = true;
 				}
 
-				if( endFlag == FALSE ) {
-					// 終了タグ未発見
+				if( bEndDiary == false ) {
+					// 本文終了タグ未発見
 					// 日記本文解析
 
-					//動画用Scriptタグが見つかったらスクリプト用ループ開始
-					if( util::LineHasStringsNoCase(str,L"<script") ) {
-						while( i<count ) {
+					// 動画用Scriptタグが見つかったらスクリプト用ループ開始
+					if( util::LineHasStringsNoCase(line,L"<script") ) {
+						while( i<lastLine ) {
 							// 次の行をフェッチ
 							const CString& nextLine = html_.GetAt( ++i );
 							// 拡張子.flvが見つかったら投入
@@ -1757,32 +1746,30 @@ public:
 						}
 					}
 					else {
-						// 2つ目の</table>タグ未発見なので、解析＆投入
-						ParserUtil::AddBodyWithExtract( data_, str );
+						// 本文終了タグ未発見なので、解析＆投入
+						ParserUtil::AddBodyWithExtract( data_, line );
 					}
 
-				}
-				else {
+				} else {
 					// 終了タグ発見
-					if (str.Find(_T("</div>")) != -1) {
-						ParserUtil::AddBodyWithExtract( data_, str );
+					if (line.Find(_T("</div>")) != -1) {
+						ParserUtil::AddBodyWithExtract( data_, line );
 					}
 
 					// コメント取得
 					i += 10;
 					data_.ClearChildren();
 
-					int cmtNum = 0;
-
-					index = i;
-					while( index < count ) {
+					int cmtNum = 0;		// コメント番号
+					int index = i;
+					while( index < lastLine ) {
 						cmtNum++;
-						index  = parseDiaryComment(index, count, data_, html_, cmtNum);
+						index  = parseDiaryComment(index, lastLine, data_, html_, cmtNum);
 						if (index == -1) {
 							break;
 						}
 					}
-					if (index == -1 || index >= count) {
+					if (index == -1 || index >= lastLine) {
 						break;
 					}
 				}
@@ -1829,7 +1816,7 @@ private:
 	{
 		// フラグのN行前に画像リンクがあるかも。
 		int n_images_begin = -25;
-		int n_images_end   = -5;
+		int n_images_end   = -1;
 		bool bImageFound = false;
 		for( int iBack=n_images_begin; iBack<=n_images_end; iBack++ ) {
 			if( iLine_+iBack >= html_.GetCount() ) {
@@ -1864,9 +1851,9 @@ private:
 	 * @param sIndex [in] 開始インデックス
 	 * @param eIndex [in] 終了インデックス
 	 * @param data   [in/out] CMixiData* データ
-	 * @param id
+	 * @param cmtNum [in] コメント番号
 	 */
-	static int parseDiaryComment(int sIndex, int eIndex, CMixiData& data_, const CHtmlArray& html_, int id)
+	static int parseDiaryComment(int sIndex, int eIndex, CMixiData& data_, const CHtmlArray& html_, int cmtNum)
 	{
 		CString name;
 		CString date;
@@ -1898,7 +1885,7 @@ private:
 					// コメントヘッダ取得
 
 					// ＩＤ
-					cmtData.SetCommentIndex(id);
+					cmtData.SetCommentIndex(cmtNum);
 
 					// 名前
 					buf = str.Mid(index);
@@ -4195,13 +4182,18 @@ public:
 
 		/* 
 		 * 解析対象文字列：
-		 * <img src="http://ic39.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" border=0>
+		 * <img SRC="http://ic76.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" BORDER=0>
 		 */
 		CString uri;
 		for (int i=0; i<count; i++) {
 			// 画像へのリンクを抽出
-			if( util::GetBetweenSubString( html.GetAt(i), _T("<img src=\""), _T("\" border="), uri ) > 0 ) {
-				break;
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<img src=\"", L"\"" ) ) {
+				// " から " までを取得する。
+				if( util::GetBetweenSubString( line, L"\"", L"\"", uri ) > 0 ) {
+					MZ3LOGGER_DEBUG( L"画像へのリンク抽出OK, url[" + uri + L"]" );
+					break;
+				}
 			}
 		}
 		return uri;

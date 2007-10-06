@@ -501,7 +501,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 
 			// タグ開始前までを追加
 			CString left;
-			if( util::GetBeforeSubString( buf, tag_MMBegin, left ) == -1 ) {
+			if( util::GetBeforeSubString( buf, tag_AlbumBegin, left ) == -1 ) {
 				// not found
 				ret += buf;
 				break;
@@ -518,6 +518,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 			TRACE(_T("%s\n"), url_right);
 			CString url_image = url_mixi + url_right;
 			data_.AddImage(url_image);
+			MZ3LOGGER_DEBUG( L"アルバム画像URL [" + url_image + L"]" );
 
 #define REPLACE_ALBUMURL_STRING
 #ifdef  REPLACE_ALBUMURL_STRING
@@ -551,6 +552,12 @@ owner_id=ZZZZZ&id=ZZZZZ&number=ZZZZZ','pict','width=680,height=660,toolbar=
 no,scrollbars=yes,left=5,top=5')"><img src="http://ic29.mixi.jp/p/ZZZZZZZ/
 ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 */
+/*
+<td><a href="javascript:void(0);" onClick="MM_openBrWindow('show_diary_picture.pl?
+owner_id=zzz&id=zzz&number=zz','pict','width=680,height=660,toolbar=no,scrollbars=
+yes,left=5,top=5');"><img src="http://ic77.mixi.jp/p/zzz/zzz/diary/zz/zz/zzs.jpg"
+alt="" /></a></td>
+*/
 		LPCTSTR url_mixi		= _T("http://mixi.jp/");
 
 		// 入出力文字列を解析対象とする。
@@ -580,10 +587,8 @@ ZZZ/diary/ZZ/ZZ/ZZs.jpg" border="0"></a></td>
 					break;
 				}
 
-				TRACE(_T("%s\n"), url_right);
 				CString url_image = url_mixi + url_right;
 				data_.AddImage( url_image );
-
 				MZ3LOGGER_DEBUG( L"画像URL [" + url_image + L"]" );
 
 				// 画像リンクを置換する

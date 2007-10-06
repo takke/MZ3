@@ -2249,6 +2249,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\MixiParserUtil.h"
+					>
+				</File>
+				<File
 					RelativePath=".\PostData.h"
 					>
 				</File>
