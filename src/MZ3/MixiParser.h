@@ -2185,20 +2185,15 @@ public:
 
 		INT_PTR count = html_.GetCount();
 
-		CString str;
-		CString buf;
-		CString key;
-
 		BOOL findFlag = FALSE;
 		BOOL dataFind = FALSE;
-		int index;
 
 		for (int i=170; i<count; i++) {
 
-			str = html_.GetAt(i);
+			const CString& line = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
-				if (str.Find(_T("NewFriendDiaryArea")) != -1) {
+				if (line.Find(_T("NewFriendDiaryArea")) != -1) {
 					findFlag = TRUE;
 				}
 				continue;
@@ -2206,11 +2201,11 @@ public:
 			else {
 
 				// 「次を表示」、「前を表示」のリンクを抽出する
-				if( parseNextBackLink( nextLink, backLink, str ) ) {
+				if( parseNextBackLink( nextLink, backLink, line ) ) {
 					continue;
 				}
 
-				if (util::LineHasStringsNoCase( str, L"<dt>", L"</dt>" ) ) {
+				if (util::LineHasStringsNoCase( line, L"<dt>", L"</dt>" ) ) {
 
 					dataFind = TRUE;
 
@@ -2219,62 +2214,59 @@ public:
 
 					//--- 時刻の抽出
 					//<dt>2007年10月02日&nbsp;22:22</dt>
-					CString Date;
-					util::GetBetweenSubString( str, L"<dt>", L"</dt>", Date );
+					CString date;
+					util::GetBetweenSubString( line, L"<dt>", L"</dt>", date );
+					date.Replace(_T("&nbsp;"), _T(" "));
+					ParserUtil::ChangeDate(date, &data);
 
-					Date.Replace(_T("&nbsp;"), _T(" "));
-
-				  ParserUtil::ChangeDate(Date, &data);
-
-					// 見出し
+					//--- 見出しの抽出
+					//<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
+					// or
+					//<dd><a href="view_diary.pl?url=xxx&owner_id=xxx">タイトル</a> (なまえ)
 					i++;
-					str = html_.GetAt(i);
-					// 二つめの>までデータを捨てる
-					index = str.Find(_T("><"));
-					buf = str.Mid(index + 10);
-					str = buf;
-					index = str.Find('>');
-					buf = str.Mid(index+1);
-					str = buf;
-					key = _T("</a> (");
-					index = str.Find(key);
-					buf = str.Left(index);
-					data.SetTitle(buf);
+					const CString& line2 = html_.GetAt(i);
+
+					CString after;
+					util::GetAfterSubString( line2, L"<a", after );
+					CString title;
+					util::GetBetweenSubString( after, L">", L"<", title );
+					data.SetTitle(title);
 
 					// ＵＲＩ
-					str = html_.GetAt(i);
-					if (util::LineHasStringsNoCase( str, L"list_diary.pl" ) ) {
+					if (util::LineHasStringsNoCase( line2, L"list_diary.pl" ) ) {
 						i += 5;
 						continue;
 					}
-					buf = util::XmlParser::GetElement(str, 2);
-					buf.Replace(_T("\""), _T(""));
-					data.SetURL(util::XmlParser::GetAttribute(buf, _T("href=")));
+					CString url;
+					util::GetBetweenSubString( after, L"\"", L"\"", url );
+					data.SetURL(url);
 
 					// ＩＤを設定
-					buf = data.GetURL();
-					buf = buf.Mid(buf.Find(_T("id=")) + wcslen(_T("id=")));
-					buf = buf.Left(buf.Find(_T("&")));
-					data.SetID(_wtoi(buf));
+					CString id;
+					util::GetBetweenSubString( url, L"id=", L"&", id );
+					data.SetID(_wtoi(id));
 					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
-					CString NameData;
-					util::GetBetweenSubString( str, L"</a> (", L")<div", NameData);
+					CString name;
+					if (util::GetBetweenSubString( line2, L"</a> (", L")<div", name) < 0) {
+						util::GetBetweenSubString( line2, L"</a> (", L")", name);
+					}
 
-					data.SetName(NameData);
-					data.SetAuthor(NameData);
+					data.SetName(name);
+					data.SetAuthor(name);
 
 					out_.push_back( data );
 					i += 5;
 				}
-				else if (str.Find(_T("/newFriendDiaryArea")) != -1 && dataFind != FALSE) {
+				else if (line.Find(_T("/newFriendDiaryArea")) != -1 && dataFind != FALSE) {
 					// 終了タグ発見
 					break;
 				}
 
 			}
 		}
+
 		// 前、次のリンクがあれば、追加する。
 		if( !backLink.GetTitle().IsEmpty() ) {
 			out_.insert( out_.begin(), backLink );
