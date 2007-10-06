@@ -2449,101 +2449,101 @@ public:
 			return false;
 		}
 
-		BOOL findFlag = FALSE;
-		BOOL bFound2ndTableEndTag = FALSE;
+		bool bFoundMainText = false;	///< 本文解析成功？
 
-		const CString& tagBR  = _T("<br>");
+		// 本文取得
+		int i=100;
+		for (; i<lastLine; i++) {
+			const CString& line = html_.GetAt(i);
 
-		for (int i=100; i<lastLine; i++) {
-			CString str = html_.GetAt(i);
+			if (bFoundMainText) {
+				// 本文取得済みなので終了。
+				break;
+			}
 
-			if (findFlag == FALSE) {
-				// フラグを発見するまで廻す
-				// フラグ：<dd class="bbsContent">
+			// 投稿日時を取得する
+			// <span class="date">2007年07月14日 22:22</span></dt>
+			if( util::LineHasStringsNoCase( line, L"span", L"class", L"date" ) ) {
+				CString date;
+				util::GetBetweenSubString( line, L">", L"<", date );
+				ParserUtil::ChangeDate(date, &mixi);
+			}
 
-				// 投稿日時を取得する
-				// <span class="date">2007年07月14日 22:22</span></dt>
-				if( util::LineHasStringsNoCase( str, L"span", L"class", L"date" ) ) {
-					CString date;
-					util::GetBetweenSubString( str, L">", L"<", date );
-					ParserUtil::ChangeDate(date, &mixi);
+
+			if (util::LineHasStringsNoCase( line, L"<dd", L"class", L"bbsContent" ) ) {
+				// 本文開始。トピック本文ね。
+				bFoundMainText = true;
+
+				// とりあえず改行
+				mixi.AddBody(_T("\r\n"));
+
+				// <dd>
+				// から
+				// </dd>
+				// までを取得し、解析する。
+
+				// <dd> を探す。
+				for( ; i<lastLine; i++ ) {
+					const CString& line = html_.GetAt( i );
+
+					// "show_friend.pl" つまりトピ作成者のプロフィールリンクがあれば、
+					// トピ作成者のユーザ名を取得する。
+					if( util::LineHasStringsNoCase( line, L"show_friend.pl" ) ) {
+
+						MixiUrlParser::GetAuthor(line, &mixi);
+
+						// この行にはないので次の行へ。
+						continue;
+					}
+
+					if (util::LineHasStringsNoCase( line, L"<dd>" )) {
+						// <dd>以降を取得し、あれば つっこんで終了。
+						CString after;
+						util::GetAfterSubString( line, L"<dd>", after );
+						ParserUtil::AddBodyWithExtract( mixi, after );
+						++i;
+						break;
+					}
 				}
 
+				// </dd> が現れるまで、解析する。
+				for( ; i<lastLine; i++ ) {
+					const CString& line = html_.GetAt( i );
 
-				if (util::LineHasStringsNoCase( str, L"<dd", L"class", L"bbsContent" ) ) {
-					// 本文開始。トピック本文ね。
-					findFlag = TRUE;
-
-					// とりあえず改行
-					mixi.AddBody(_T("\r\n"));
-
-					// <dd>
-					// から
-					// </dd>
-					// までを取得し、解析する。
-
-					// <dd> を探す。
-					for( ; i<lastLine; i++ ) {
-						const CString& line = html_.GetAt( i );
-
-						// "show_friend.pl" つまりトピ作成者のプロフィールリンクがあれば、
-						// トピ作成者のユーザ名を取得する。
-						if( util::LineHasStringsNoCase( line, L"show_friend.pl" ) ) {
-
-							MixiUrlParser::GetAuthor(line, &mixi);
-
-							// この行にはないので次の行へ。
-							continue;
-						}
-
-						if (util::LineHasStringsNoCase( line, L"<dd>" )) {
-							// <dd>以降を取得し、あれば つっこんで終了。
-							CString after;
-							util::GetAfterSubString( line, L"<dd>", after );
-							ParserUtil::AddBodyWithExtract( mixi, after );
-							++i;
-							break;
-						}
+					if (util::LineHasStringsNoCase( line, L"</dd>" )) {
+						// 終了。
+						break;
 					}
 
-					// </dd> が現れるまで、解析する。
-					for( ; i<lastLine; i++ ) {
-						const CString& line = html_.GetAt( i );
-
-						if (util::LineHasStringsNoCase( line, L"</dd>" )) {
-							// 終了。
-							break;
-						}
-
-						// 動画用Scriptタグが見つかったらスクリプト用ループ開始
-						if( util::LineHasStringsNoCase(line, L"<script") ) {
-							while( i<lastLine ) {
-								// 次の行をフェッチ
-								const CString& nextLine = html_.GetAt( ++i );
-								// 拡張子.flvが見つかったら投入
-								if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-									ParserUtil::AddBodyWithExtract( mixi, nextLine );
-								}
-								// </script> があれば終了
-								if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-									break;
-								}
+					// 動画用Scriptタグが見つかったらスクリプト用ループ開始
+					if( util::LineHasStringsNoCase(line, L"<script") ) {
+						while( i<lastLine ) {
+							// 次の行をフェッチ
+							const CString& nextLine = html_.GetAt( ++i );
+							// 拡張子.flvが見つかったら投入
+							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
+								ParserUtil::AddBodyWithExtract( mixi, nextLine );
 							}
-						} else {
-							// ふつうに解析＆投入
-							ParserUtil::AddBodyWithExtract( mixi, line );
+							// </script> があれば終了
+							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+								break;
+							}
 						}
+					} else {
+						// ふつうに解析＆投入
+						ParserUtil::AddBodyWithExtract( mixi, line );
 					}
-
-				}else{
-					// フラグがないので読み飛ばす
 				}
 			}
-			else {
-				// フラグ発見済み。
+		}
+
+		if (bFoundMainText) {
+			// 本文取得済みなので、コメント取得処理を行う。
+			for (; i<lastLine; i++) {
+				const CString& line = html_.GetAt(i);
 
 				// <dl class="commentList01"> を発見したら、コメント取得処理を行う。
-				if (util::LineHasStringsNoCase( str, L"<dl", L"class", L"commentList01" )) {
+				if (util::LineHasStringsNoCase( line, L"<dl", L"class", L"commentList01" )) {
 					mixi.ClearChildren();
 
 					int index = ++i;
