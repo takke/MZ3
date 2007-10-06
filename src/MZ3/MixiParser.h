@@ -1635,7 +1635,7 @@ line2 : <a href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/membe
 */
 				CMixiData mixi;
 
-				// 時刻判定
+			// 時刻判定
 				{
 					// "bg_orange1-.gif" があれば、「1時間以内」
 					// "bg_orange2-.gif" があれば、「1日以内」
@@ -1785,19 +1785,15 @@ public:
 		CMixiData nextLink;
 
 		/**
-		 * 方針：
-		 * ★ <ul>で5件ずつ並んでいる。
-		 *   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
-		 *   従って、「5件分のリンク抽出」「5件分の名前抽出」「突き合わせ」「データ追加」という手順で行う。
-		 *
-		 * ● <ul>
-     *    <div class="iconListImage"><a href="view_community.pl?id=2640122"
-		 *    が見つかれば、そこから項目開始とみなす。</span>が現れるまで以下を実行する。
-		 *   (1) </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、URL と時刻を取得する。
-		 *   (2) 次の </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、名前を抽出する。
-		 *   (3) (1), (2) で抽出したデータを out_ に追加する。
-		 */
-
+		* 方針：
+		* ★ <ul>で5件ずつ並んでいる。
+		*   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
+		*   従って、「5件分のリンク抽出」「5件分の名前抽出」という手順で行う。
+		*
+		* ●iconListが見つかれば、そこから項目開始とみなす。/messageAreaが現れるまで以下を実行する。
+		*   (1) view_community.plが見つかるまでの各行をパースし、所定の形式に一致していれば、URLと画像、コミュ名を取得する。
+		*   (2) 抽出したデータを out_ に追加する。
+		*/
 		// 項目開始を探す
 		bool bInItems = false;	// 項目開始？
 		int iLine = 160;		// とりあえず読み飛ばす
@@ -1851,12 +1847,11 @@ public:
 
 private:
 	/**
-	 * 5件分のユーザの内容を抽出する
-	 *
-	 * (1) </tr> が現れるまでの各行をパースし、5件分のURL、時刻を生成する。
-	 * (2) </tr> が現れるまでの各行をパースし、5件分の名前を生成する。
-	 * (3) mixi_list に追加する。
-	 */
+	* 内容を抽出する
+	*
+	* (1) /messageArea が現れるまでの各行をパースし、のURL、名前を生成する。
+	* (2) mixi_list に追加する。
+	*/
 	static bool parseTwoTR( CMixiDataList& mixi_list, const CHtmlArray& html, int& iLine )
 	{
 		const int lastLine = html.GetCount();
@@ -1872,10 +1867,10 @@ private:
 
 			//view_community.pl で始まるなら、抽出する
 			if( util::LineHasStringsNoCase( line, L"view_community.pl" ) ) {
-        /* 行の形式：
-        line1: <div class="iconListImage"><a href="view_community.pl?id=2640122" style="background: url(http://img-c3.mixi.jp/photo/comm/1/22/2640122_234s.jpg); text-indent: -9999px;" class="iconTitle" title="xxxxxx">xxxxxxの写真</a></div><span>xxxxxx(41)</span>
-        line2: <div id="2640122" class="memo_pop"></div><p><a href="show_community_memo.pl?id=2640122" onClick="openMemo(event,'community',2640122);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
-        */
+			/* 行の形式：
+			line1: <div class="iconListImage"><a href="view_community.pl?id=2640122" style="background: url(http://img-c3.mixi.jp/photo/comm/1/22/2640122_234s.jpg); text-indent: -9999px;" class="iconTitle" title="xxxxxx">xxxxxxの写真</a></div><span>xxxxxx(41)</span>
+			line2: <div id="2640122" class="memo_pop"></div><p><a href="show_community_memo.pl?id=2640122" onClick="openMemo(event,'community',2640122);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
+			*/
 				CMixiData mixi;
 
 				// <a 以降のみにする
@@ -2162,7 +2157,7 @@ private:
 };
 
 /**
- * [list] list_bbs.pl 用パーサ。
+ * [list] list_bbs.pl 用パーサ。(コミュニティーのトピック一覧)
  * 
  * http://mixi.jp/list_bbs.pl
  */
@@ -2199,7 +2194,7 @@ public:
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			if( util::LineHasStringsNoCase( line, L"<table", L"#EED6B5" ) ) 
+			if( util::LineHasStringsNoCase( line, L"<div", L"pageTitle" ) ) 
 			{
 				// 項目開始行発見。
 				bInItems = true;
@@ -2209,7 +2204,7 @@ public:
 
 			if( bInItems ) {
 				// 無駄な行のスキップ
-				if( util::LineHasStringsNoCase( line, L"</td></tr></table>" ) ) {
+				if( util::LineHasStringsNoCase( line, L"pageTitle" ) ) {
 					// 無駄な行のスキップ完了。
 					iLine ++;
 					break;
@@ -2225,10 +2220,10 @@ public:
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			// "<table ... BGCOLOR=#EED6B5>" が現れたらナビゲーション行。
+			// <span class="titleSpan"> が現れたらナビゲーション行。
 			// 「次」、「前」のリンクを含む。
 			// 解析を終了する。
-			if( util::LineHasStringsNoCase( line, L"<td", L"#EED6B5" ) ) 
+			if( util::LineHasStringsNoCase( line, L"<ul><li>", L"件を表示" ) ) 
 			{
 				// 「次を表示」、「前を表示」のリンクを抽出する
 				parseNextBackLink( nextLink, backLink, line );
@@ -2238,27 +2233,17 @@ public:
 			}
 
 			// 項目？
-			//   <td align="center" rowspan="3" nowrap="nowrap" bgcolor="#FFD8B0">0X月XX日<br />XX:XX</td>
-			//   <td bgcolor="#FFF4E0">&nbsp;<a href="view_bbs.pl?id=xxx&comm_id=xxx">【報告】動作しました</a></td></tr>
-			if( util::LineHasStringsNoCase( line, L"<td", L"#FFD8B0" ) ) {
+			//   <span class="titleSpan"><a href="view_bbs.pl?id=23469005&comm_id=1198460" class="title">【報告】10/1リニューアルで動かない！</a>
+			//   <span class="date">2007年09月30日 16:40</span>
+			if( util::LineHasStringsNoCase( line, L"<a href=\"view_bbs.pl", L"title" ) ) {
 				// 解析
 				CMixiData mixi;
-
-				// 日付
-				CString date, time;
-				util::GetBetweenSubString( line, L">", L"<br />", date );
-				util::GetBetweenSubString( line, L"<br />", L"<", time );
-				ParserUtil::ChangeDate( date, time, &mixi );
-
-				// 次の行を取得し、見出しとリンクを抽出する
-				iLine += 1;
-				const CString& line2 = html_.GetAt(iLine);
 
 				// 見出し抽出
 				CString target;
 				{
 					// まず "<a href=" まで読み飛ばす
-					util::GetAfterSubString( line2, L"<a href=", target );
+					util::GetAfterSubString( line, L"class=\"title\">", target );
 					// buf : "view_bbs.pl?id=xxx&comm_id=xxx">内容</a></td></tr>
 					CString title;
 					util::GetBetweenSubString( target, L">", L"<", title );
@@ -2267,19 +2252,27 @@ public:
 
 				// URL 抽出
 				CString url;
-				util::GetBetweenSubString( target, L"\"", L"\"", url );
+				util::GetBetweenSubString( target, L"href=\"", L"\" class=", url );
 				mixi.SetURL( url );
+
+				// 次の行を取得し、見出しとリンクを抽出する
+				iLine += 1;
+				const CString& line2 = html_.GetAt(iLine);
+
+				// 日付
+				CString date;
+				util::GetBetweenSubString( line2, L"年", L"</span>", date );
+				ParserUtil::ChangeDate(date, &mixi);
 
 				// URL に応じてアクセス種別を設定
 				mixi.SetAccessType( util::EstimateAccessTypeByUrl(url) );
 
 				// IDの抽出、設定
 				mixi.SetID( MixiUrlParser::GetID(url) );
-
 				// コメント数解析
 				{
 					// 下記の行を取得して解析する。
-					// <td ALIGN=right bgcolor="#FFFFFF"><a href=view_bbs.pl?id=xxx&comm_id=xxx>書き込み(19)</a>
+					// <em><a href="view_bbs.pl?id=14823636&comm_id=4043">37</a></em>
 					int commentCount = -1;
 					for( iLine++; iLine<count; iLine++ ) {
 						const CString& line = html_.GetAt(iLine);
@@ -2513,7 +2506,7 @@ public:
 
 			if (findFlag == FALSE) {
 				// 日記開始フラグを発見するまで廻す
-         
+
 				if (util::LineHasStringsNoCase( str, L"<div id=\"diary_body\">" ) )
 				{
 					// 日記開始フラグ発見（日記本文発見）
@@ -2757,10 +2750,10 @@ private:
 						str = html_.GetAt(j);
 						if (str.Find(_T("日&nbsp;")) != -1) {
 
-					    CString date;
-					    util::GetBetweenSubString( str, L">", L"<", date );
-				      date.Replace( L"&nbsp;", L"" );
-					    ParserUtil::ChangeDate(date, &cmtData);
+							CString date;
+							util::GetBetweenSubString( str, L">", L"<", date );
+							date.Replace( L"&nbsp;", L"" );
+							ParserUtil::ChangeDate(date, &cmtData);
 
 							break;
 						}
@@ -3078,15 +3071,15 @@ public:
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-			    //--- 時刻の抽出
-          //<dt>2007年10月02日&nbsp;22:22</dt>
-				  CString Date;
-				  util::GetBetweenSubString( str, L"<dt>", L"</dt>", Date );
+					//--- 時刻の抽出
+					//<dt>2007年10月02日&nbsp;22:22</dt>
+					CString Date;
+					util::GetBetweenSubString( str, L"<dt>", L"</dt>", Date );
 
 					Date.Replace(_T("&nbsp;"), _T(" "));
 
 				  ParserUtil::ChangeDate(Date, &data);
-         		
+
 					// 見出し
 					i++;
 					str = html_.GetAt(i);
@@ -3109,7 +3102,7 @@ public:
 						continue;
 					}
 					buf = util::XmlParser::GetElement(str, 2);
-          buf.Replace(_T("\""), _T(""));
+					buf.Replace(_T("\""), _T(""));
 					data.SetURL(util::XmlParser::GetAttribute(buf, _T("href=")));
 
 					// ＩＤを設定
@@ -3120,8 +3113,8 @@ public:
 					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
-          CString NameData;
-				  util::GetBetweenSubString( str, L"</a> (", L")<div", NameData);
+					CString NameData;
+					util::GetBetweenSubString( str, L"</a> (", L")<div", NameData);
 
 					data.SetName(NameData);
 					data.SetAuthor(NameData);
@@ -3217,22 +3210,22 @@ public:
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-		      // 日付
-		      // <dt>2007年10月01日&nbsp;01:11</dt>
-          CString date;
-          util::GetBetweenSubString( str, L">", L"<", date );
-          date.Replace(L"&nbsp;",L"");
-          ParserUtil::ChangeDate(date, &data);
+					// 日付
+					// <dt>2007年10月01日&nbsp;01:11</dt>
+					CString date;
+					util::GetBetweenSubString( str, L">", L"<", date );
+					date.Replace(L"&nbsp;",L"");
+					ParserUtil::ChangeDate(date, &data);
 					TRACE(_T("%s\n"), data.GetDate());
 
 					// 見出しタイトル
-          i+=1;
-          str = html_.GetAt(i);
+					i+=1;
+					str = html_.GetAt(i);
 
-          CString title;
-          util::GetBetweenSubString( str, L"\">", L"</a>", title );          
-          data.SetTitle(title);
-          TRACE(_T("%s\n"), data.GetTitle());
+					CString title;
+					util::GetBetweenSubString( str, L"\">", L"</a>", title );
+					data.SetTitle(title);
+					TRACE(_T("%s\n"), data.GetTitle());
 
 					// ＵＲＩ
 					buf = util::XmlParser::GetElement(str, 2);
@@ -5043,12 +5036,12 @@ public:
 
 		/* 
 		 * 解析対象文字列：
-		 * <img SRC="http://ic39.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" BORDER=0>
+		 * <img src="http://ic39.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" border=0>
 		 */
 		CString uri;
 		for (int i=0; i<count; i++) {
 			// 画像へのリンクを抽出
-			if( util::GetBetweenSubString( html.GetAt(i), _T("<img SRC=\""), _T("\" BORDER=0>"), uri ) > 0 ) {
+			if( util::GetBetweenSubString( html.GetAt(i), _T("<img src=\""), _T("\" border="), uri ) > 0 ) {
 				break;
 			}
 		}
