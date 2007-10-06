@@ -839,9 +839,9 @@ BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->message == WM_KEYUP) {
 			BOOL r = OnKeyUp(pMsg);
 
-			CString s;
-			s.Format( L"keyup, %0X", pMsg->wParam );
-			MZ3LOGGER_ERROR( s );
+//			CString s;
+//			s.Format( L"keyup, %0X", pMsg->wParam );
+//			MZ3LOGGER_ERROR( s );
 
 			// KEYDOWN リピート回数を初期化
 			m_nKeydownRepeatCount = 0;
@@ -854,9 +854,9 @@ BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 			// KEYDOWN リピート回数をインクリメント
 			m_nKeydownRepeatCount ++;
 
-			CString s;
-			s.Format( L"keydown, %0X", pMsg->wParam );
-			MZ3LOGGER_ERROR( s );
+//			CString s;
+//			s.Format( L"keydown, %0X", pMsg->wParam );
+//			MZ3LOGGER_ERROR( s );
 
 			if( OnKeyDown(pMsg) ) {
 				return TRUE;
