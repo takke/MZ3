@@ -528,7 +528,7 @@ public:
 
 				// タイトル
 				// 解析対象：
-        //<dt><input name="diary_id" type="checkbox" value="xxxxx"  /><a href="view_diary.pl?id=xxxx&owner_id=xxxx">タイトル</a><span><a href="edit_diary.pl?id=xxxx">編集する</a></span></dt>
+				//<dt><input name="diary_id" type="checkbox" value="xxxxx"  /><a href="view_diary.pl?id=xxxx&owner_id=xxxx">タイトル</a><span><a href="edit_diary.pl?id=xxxx">編集する</a></span></dt>
 
 				CString buf;
 				util::GetBetweenSubString( str, key, L"</dt>", buf );
@@ -538,14 +538,14 @@ public:
 				data.SetTitle( title );
 
 				// 日付
-        //<dd>2007年06月18日12:10</dd>
+				//<dd>2007年06月18日12:10</dd>
 				const CString& str = html_.GetAt(i+1);	
 				CString date;
 				util::GetBetweenSubString( str, L">", L"<", date );
 				ParserUtil::ChangeDate(date, &data);
 
 
-        for (int j=i; j<count; j++) {
+				for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
 
 					LPCTSTR key = _T("<a href=\"view_diary.pl?id");
@@ -1064,8 +1064,7 @@ public:
 			if (bStartDiary == false) {
 				// 日記開始フラグを発見するまで廻す
 
-				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) )
-				{
+				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) ) {
 					// 日記開始フラグ発見（日記本文発見）
 					bStartDiary = true;
 
@@ -1193,31 +1192,26 @@ public:
 
 private:
 	/// 外部ブログ解析
-	static bool parseExternalBlog( CMixiData& data_, const CHtmlArray& html_, int i )
+	static bool parseExternalBlog( CMixiData& mixi_, const CHtmlArray& html_, int i )
 	{
-		CString str;
+		// 外部ブログフラグを立てる
+		mixi_.SetOtherDiary(TRUE);
 
-		data_.AddBody(_T("\r\n"));
+		// とりあえず改行
+		mixi_.AddBody(_T("\r\n"));
 
-		str = html_.GetAt(i-1);
-		ParserUtil::UnEscapeHtmlElement(str);
-		data_.AddBody(str);
+		// 本文解析
+		int lastLine = html_.GetCount();
+		for (; i<lastLine; i++ ) {
+			const CString& line = html_.GetAt(i);
 
-		str = html_.GetAt(i);
-		ParserUtil::UnEscapeHtmlElement(str);
-		data_.AddBody(str);
+			if (util::LineHasStringsNoCase(line, L"</div>")) {
+				break;
+			}
 
-		i += 5;
-		str = html_.GetAt(i);
-		data_.AddBody(_T("\r\n"));
-		CString buf = str.Mid(str.Find(_T("href=\"")) + wcslen(_T("href=\"")));
-		buf = buf.Left(buf.Find(_T("\"")));
-
-		// 外部ブログフラグを立て、外部ブログのURLを設定しておく。
-		data_.SetOtherDiary(TRUE);
-		data_.SetBrowseUri(buf);
-
-		data_.AddBody(buf);
+			// 本文追加
+			ParserUtil::AddBodyWithExtract(mixi_, line);
+		}
 
 		return true;
 	}
