@@ -9,8 +9,6 @@
 #include "IniFile.h"
 #include "util.h"
 
-#include "MixiParser.h"
-
 //#include <nled.h>			// LED êßå‰
 
 // CHtmlArray
