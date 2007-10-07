@@ -630,104 +630,94 @@ public:
 
 		// 項目開始を探す
 		bool bInItems = false;	// 項目が見つかったか。
-		int iLine = 76;		// とりあえず読み飛ばす
+
+		int iLine = 180;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& str = html_.GetAt(iLine);
 
-			if( str.Find( L"<img" ) != -1 && str.Find( L"pen_y.gif" ) != -1 ) {
+			if(util::LineHasStringsNoCase( str, L"<dt>", L"</dt>" ) )  {
 				// 項目発見。
 				bInItems = true;
-
-				//--- 時刻の抽出
-				// 正規表現のコンパイル（一回のみ）
-				static MyRegex regDate;
-				if( !regDate.isCompiled() ) {
-					if(! regDate.compile( L"<img.*>(.*)</" ) ) {
-						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-						return false;
-					}
-				}
-				// 探索
-				if( regDate.exec(str) == false || regDate.results.size() != 2 ) {
-					// 未発見。
-					continue;
-				}
-				// 発見。
-				const std::wstring& date = regDate.results[1].str;	// 時刻文字列
-
-				//--- 内容の抽出
-				// 2行後ろ以降にある
-				// 複数行にわたっている場合があるので、とりあえず１０行プリフェッチ。
-				// 但し、</a> が見つかれば終了。
-				CString target = L"";
-				for( int i=0; i<10 && iLine+2+i < count; i++ ) {
-					CString s = html_.GetAt(iLine+2+i);
-					target += s;
-					if( s.Find( L"</a>" ) >= 0 ) {
-						break;
-					}
-				}
-				// 改行は消す
-				while( target.Replace( L"\n", L"" ) );
-
-				// 正規表現のコンパイル（一回のみ）
-				static MyRegex regBody;
-				if( !regBody.isCompiled() ) {
-					if(! regBody.compile( 
-							L"<a href=\"view_diary.pl\\?id=([0-9]+)&owner_id=([0-9]+)\">(.*)</a> \\((.*)\\)" ) )
-					{
-						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-						return false;
-					}
-				}
-
-				// 探索
-				if( regBody.exec(target) == false || regBody.results.size() != 5 ) {
-					// 未発見。
-					continue;
-				}
-
-				// 発見。
-				const std::wstring& id        = regBody.results[1].str;	// id
-				const std::wstring& ownder_id = regBody.results[2].str;	// ownder_id
-				const std::wstring& body      = regBody.results[3].str;	// リンク文字列
-				const std::wstring& author    = regBody.results[4].str;	// 投稿者
-
-				// URL 再構築
-				CString url;
-				url.Format( L"view_diary.pl?id=%s&owner_id=%s", id.c_str(), ownder_id.c_str() );
 
 				// mixi データの作成
 				{
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-					// 日付
-					ParserUtil::ChangeDate( date.c_str(), &data );
+					//--- 時刻の抽出
+					//<dt>2007年10月02日&nbsp;22:22</dt>
+					CString date;
+					util::GetBetweenSubString( str, L"<dt>", L"</dt>", date );
+					date.Replace(_T("&nbsp;"), _T(" "));
+					ParserUtil::ChangeDate(date, &data);
 
 					// 見出し
-					data.SetTitle( body.c_str() );
+					//<dd><a href="view_diary.pl?
+					{
+						//4行以内で<span class="date">行が見つかるまで
+						for( iLine; iLine<count; iLine++ ) {
+							bool findFlag = false;
+							const CString& line = html_.GetAt(iLine);
+							if( util::LineHasStringsNoCase( line, L"<dd>", L"view_diary") )
+							{
+								// ＵＲＩ
+								CString url;
+								util::GetBetweenSubString( line, L"href=\"", L"\">", url );
+								
+								// ＩＤを設定
+								CString id;
+								util::GetBetweenSubString( url, L"id=", L"&", id );
+								data.SetID(_wtoi(id));
+								ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
-					// ＵＲＩ
-					data.SetURL( url );
+								data.SetURL( url );
 
-					// ＩＤを設定
-					data.SetID(_wtoi(id.c_str()));
-					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
-
-					// 名前
-					data.SetName( author.c_str() );
-					data.SetAuthor( author.c_str() );
-
+								// 本文プレビュー
+								CString target = L"";
+								for( iLine; iLine<count; iLine++ ) {
+								
+									const CString& line2 = html_.GetAt(iLine);
+									
+									if( util::LineHasStringsNoCase( line2, L"</dd>") )
+									{
+										target += line2;
+										if( util::LineHasStringsNoCase( target, L"\">", L"</a>") )
+										{
+											CString between;
+											util::GetBetweenSubString( target, L"\">", L"</a>", between );
+											//改行を削除
+											between.Replace(_T("\n"), _T(""));
+											data.SetTitle(between);
+											findFlag = true;
+										}
+										//名前を抽出
+										CString author;
+										util::GetBetweenSubString( target, L"&nbsp;(", L")", author );
+										data.SetName( author );
+										data.SetAuthor( author );
+										break;
+									} else {
+										//</dd>が現れるまで結合
+										target += line2;
+									}
+								}
+								//break;
+							}
+							//フラグがあったらループを抜ける
+							if(findFlag == true) 
+							{
+								break;
+							}
+						}
+					}
 					out_.push_back(data);
 				}
-
-				// 5行読み飛ばす
-				iLine += 5;
-				continue;
+				//// 5行読み飛ばす
+				//iLine += 5;
+				//continue;
 			}
 
-			if( bInItems && str.Find(_T("</table>")) != -1 ) {
+			if( bInItems && str.Find(_T("/listCommentArea")) != -1 ) {
 				// 終了タグ発見
 				break;
 			}
