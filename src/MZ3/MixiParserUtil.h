@@ -301,6 +301,17 @@ public:
 		}
 		while( line.Replace(_T("</div>"), _T("")) );
 
+		// span ƒ^ƒO‚Ìœ‹
+		{
+			static MyRegex reg;
+			if( !reg.isCompiled() ) 
+				if(! reg.compile( L"<span[^>]*>" ) ) 
+					return;
+			if( line.Find( L"<span" ) != -1 ) 
+				reg.replaceAll( line, L"" );
+		}
+		while( line.Replace(_T("</span>"), _T("")) );
+
 		if (theApp.m_optionMng.m_bRenderByIE) {
 			return;
 		}
