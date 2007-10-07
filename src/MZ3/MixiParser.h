@@ -259,7 +259,7 @@ public:
 
 /**
  * [list] list_news_category.pl 用パーサ。
- * 
+ * 【ニュースのカテゴリ】
  * http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
  */
 class ListNewsCategoryParser : public MixiListParser
@@ -459,7 +459,7 @@ private:
 
 /**
  * [list] list_bookmark.pl 用パーサ。
- * 
+ * 【お気に入り】
  * http://mixi.jp/list_bookmark.pl
  */
 class ListBookmarkParser : public MixiListParser
@@ -1316,9 +1316,9 @@ private:
 };
 
 /**
- * [list] list_bbs.pl 用パーサ。(コミュニティーのトピック一覧)
- * 
+ * [list] list_comment.pl 用パーサ
  * http://mixi.jp/list_bbs.pl
+ * コミュニティーのトピック一覧の取得
  */
 class ListBbsParser : public MixiListParser
 {
@@ -1336,15 +1336,16 @@ public:
 		/**
 		 * 方針：
 		 * - 下記のロジックで項目開始行を取得する。
-		 *   - "<table ... BGCOLOR="#EED6B5">" の行を探す。
-		 *   - "</td></tr></table>" が現れるまで読み飛ばす。
+		 *   - 無条件で200行読み飛ばす。
+		 *   - "<dt class="bbsTitle clearfix">" の行が現れるまで読み飛ばす。
 		 *   - 次の行以降が項目。
 		 *
 		 * - 下記の行をパースし、項目を生成する。
-		 *   <td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#FFD8B0>0X月XX日<br>XX:XX</td>
-		 *   <td bgcolor=#FFF4E0>&nbsp;<a href="view_bbs.pl?id=xxx&comm_id=xxx">内容</a></td></tr>
-		 * - 再度 "<table ... BGCOLOR=#EED6B5>" が現れたら終了とする。
-		 *   この行は（次へ、前へを含む）ナビゲーション行。
+		 *   <span class="titleSpan"><a href="view_bbs.pl?id=23469005&comm_id=1198460" class="title">【報告】10/1リニューアルで動かない！</a>
+		 *   </span>←この行は管理者の場合編集リンクなどが入る
+		 *   <span class="date">2007年09月30日 16:40</span>
+		 * - "/#bodyMainArea" が現れたら無条件で終了とする。
+		 *   "<ul><li>～件を表示"が現れたら（次へ、前へを含む）ナビゲーション行。
 		 */
 
 		// 項目開始行を探す
@@ -1352,22 +1353,12 @@ public:
 		bool bInItems = false;
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
-
-			if( util::LineHasStringsNoCase( line, L"<div", L"pageTitle" ) ) 
+			//<div class="pageTitle communityTitle002">
+			if( util::LineHasStringsNoCase( line, L"<dt", L"bbsTitle" ) ) 
 			{
-				// 項目開始行発見。
+				// 項目開始行発見。本文開始
 				bInItems = true;
-
-				// さらに無駄な行をスキップするため、break しない。
-			}
-
-			if( bInItems ) {
-				// 無駄な行のスキップ
-				if( util::LineHasStringsNoCase( line, L"pageTitle" ) ) {
-					// 無駄な行のスキップ完了。
-					iLine ++;
-					break;
-				}
+				break;
 			}
 		}
 
@@ -1379,55 +1370,60 @@ public:
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			// <span class="titleSpan"> が現れたらナビゲーション行。
-			// 「次」、「前」のリンクを含む。
-			// 解析を終了する。
-			if( util::LineHasStringsNoCase( line, L"<ul><li>", L"件を表示" ) ) 
+			// /#bodyMainAreaがあったら解析を終了する。
+			if( util::LineHasStringsNoCase( line, L"/#bodyMainArea") ) 
 			{
-				// 「次を表示」、「前を表示」のリンクを抽出する
-				parseNextBackLink( nextLink, backLink, line );
-
 				// 抽出の成否にかかわらず終了する。
 				break;
 			}
 
-			// 項目？
+			// <ul><li>が現れたらナビゲーション行。
+			// 「次」、「前」のリンクを含む。
+			if( util::LineHasStringsNoCase( line, L"<ul><li>", L"件を表示" ) ) 
+			{
+				// 「次を表示」、「前を表示」のリンクを抽出する
+				parseNextBackLink( nextLink, backLink, line );
+			}
+
+			// 項目
 			//   <span class="titleSpan"><a href="view_bbs.pl?id=23469005&comm_id=1198460" class="title">【報告】10/1リニューアルで動かない！</a>
 			//   <span class="date">2007年09月30日 16:40</span>
-			if( util::LineHasStringsNoCase( line, L"<a href=\"view_bbs.pl", L"title" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<span", L"titleSpan", L"view_bbs") ) {
 				// 解析
 				CMixiData mixi;
 
-				// 見出し抽出
-				CString target;
-				{
-					// まず "<a href=" まで読み飛ばす
-					util::GetAfterSubString( line, L"class=\"title\">", target );
-					// buf : "view_bbs.pl?id=xxx&comm_id=xxx">内容</a></td></tr>
-					CString title;
-					util::GetBetweenSubString( target, L">", L"<", title );
-					mixi.SetTitle(title);
-				}
+				// タイトル抽出
+				CString title;
+				util::GetBetweenSubString( line, L"class=\"title\">", L"</a>", title );
+				mixi.SetTitle(title);
 
 				// URL 抽出
 				CString url;
-				util::GetBetweenSubString( target, L"href=\"", L"\" class=", url );
+				util::GetBetweenSubString( line, L"href=\"", L"\" class=", url );
 				mixi.SetURL( url );
-
-				// 次の行を取得し、見出しとリンクを抽出する
-				iLine += 1;
-				const CString& line2 = html_.GetAt(iLine);
-
-				// 日付
-				CString date;
-				util::GetBetweenSubString( line2, L"年", L"</span>", date );
-				ParserUtil::ChangeDate(date, &mixi);
 
 				// URL に応じてアクセス種別を設定
 				mixi.SetAccessType( util::EstimateAccessTypeByUrl(url) );
 
 				// IDの抽出、設定
 				mixi.SetID( MixiUrlParser::GetID(url) );
+
+				// 日付解析
+				{
+					//<span class="date">2007年09月22日 12:55</span>
+					//4行以内で<span class="date">行が見つかるまで
+					for( iLine++; iLine<iLine+4; iLine++ ) {
+						const CString& line = html_.GetAt(iLine);
+						if( util::LineHasStringsNoCase( line, L"<span", L"date") )
+						{
+							CString date;
+							util::GetBetweenSubString( line, L"class=\"date\">", L"</span>", date );
+							ParserUtil::ChangeDate(date, &mixi);
+							break;
+						}
+					}
+				}
+
 				// コメント数解析
 				{
 					// 下記の行を取得して解析する。
@@ -1436,11 +1432,11 @@ public:
 					for( iLine++; iLine<count; iLine++ ) {
 						const CString& line = html_.GetAt(iLine);
 
-						if( util::LineHasStringsNoCase( line, L"<td", url, L"書き込み(" ) )
+						if( util::LineHasStringsNoCase( line, L"<em>", url) )
 						{
 							// 発見。コメント数解析
 							CString cc;
-							util::GetBetweenSubString( line, L"書き込み(", L")", cc );
+							util::GetBetweenSubString( line, L"\">", L"</a></em", cc );
 							commentCount = _wtoi(cc);
 							break;
 						}
