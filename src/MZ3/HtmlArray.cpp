@@ -4,9 +4,6 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "HtmlArray.h"
-#include "XmlParser.h"
-#include "MixiData.h"
-#include "IniFile.h"
 #include "util.h"
 
 //#include <nled.h>			// LED êßå‰
