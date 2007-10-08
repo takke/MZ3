@@ -618,37 +618,25 @@ public:
 
 		/**
 		 * 方針：
-		 * - <img src=http://img.mixi.jp/img/pen_y.gif ALIGN=left WIDTH=14 HEIGHT=16>
-		 *   が見つかればそこから項目開始とみなす
-		 * - その行の
-		 *   <img ...>2006年09月20日 07:47</td>
-		 *   を正規表現でパースし、時刻を抽出する
-		 * - 上記の2行下に
-		 *   <a href="view_diary.pl?id=ZZZ&owner_id=ZZZ">内容</a> (Author)
-		 *   という形式で項目が存在する。
-		 * - これを正規表現でパースし、追加する。
-		 * - 項目が見つかって以降に、
-		 *   </table>
-		 *   があれば、処理を終了する
+		 * - <dt>2007年10月02日&nbsp;22:22</dt>
+		 *   のような日付見つかればそこから項目開始とみなす
+		 *   <dd><a href="view_diary.pl?が見つかるまで行を飛ばし(通常日付の次の行)たら本文開始。
+		 *   まずURLとIDを抜き出し、
+		 * - 終了タグ</dd>が見つかるまで、行を結合して、最後に本文を抜き取る。
+		 * - 以降に、"/listCommentArea"があれば、処理を終了する
+		 *   
 		 */
-
-		// 項目開始を探す
-		bool bInItems = false;	// 項目が見つかったか。
-
 		int iLine = 180;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& str = html_.GetAt(iLine);
-
+			//最初の日時を発見したら行検索ループ開始
 			if(util::LineHasStringsNoCase( str, L"<dt>", L"</dt>" ) )  {
-				// 項目発見。
-				bInItems = true;
-
 				// mixi データの作成
 				{
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-					//--- 時刻の抽出
+					//日時の抽出
 					//<dt>2007年10月02日&nbsp;22:22</dt>
 					CString date;
 					util::GetBetweenSubString( str, L"<dt>", L"</dt>", date );
@@ -658,15 +646,17 @@ public:
 					// 見出し
 					//<dd><a href="view_diary.pl?
 					{
-						//4行以内で<span class="date">行が見つかるまで
+						//<dd><a href="view_diary.pl?行が見つかるまで
 						for( iLine; iLine<count; iLine++ ) {
 							bool findFlag = false;
 							const CString& line = html_.GetAt(iLine);
+							//コメント開始行を発見したら
 							if( util::LineHasStringsNoCase( line, L"<dd>", L"view_diary") )
 							{
 								// ＵＲＩ
 								CString url;
 								util::GetBetweenSubString( line, L"href=\"", L"\">", url );
+								data.SetURL( url );
 								
 								// ＩＤを設定
 								CString id;
@@ -674,24 +664,24 @@ public:
 								data.SetID(_wtoi(id));
 								ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
-								data.SetURL( url );
-
 								// 本文プレビュー
 								CString target = L"";
 								for( iLine; iLine<count; iLine++ ) {
-								
 									const CString& line2 = html_.GetAt(iLine);
-									
+									//</dd>が見つかったら次のコメントへ
 									if( util::LineHasStringsNoCase( line2, L"</dd>") )
 									{
 										target += line2;
+										//本文を抽出
 										if( util::LineHasStringsNoCase( target, L"\">", L"</a>") )
 										{
-											CString between;
-											util::GetBetweenSubString( target, L"\">", L"</a>", between );
+											CString title;
+											util::GetBetweenSubString( target, L"\">", L"</a>", title );
 											//改行を削除
-											between.Replace(_T("\n"), _T(""));
-											data.SetTitle(between);
+											title.Replace(_T("\n"), _T(""));
+											//タイトルをセット
+											data.SetTitle(title);
+											//ループを抜けるフラグをセット
 											findFlag = true;
 										}
 										//名前を抽出
@@ -705,7 +695,6 @@ public:
 										target += line2;
 									}
 								}
-								//break;
 							}
 							//フラグがあったらループを抜ける
 							if(findFlag == true) 
@@ -716,12 +705,9 @@ public:
 					}
 					out_.push_back(data);
 				}
-				//// 5行読み飛ばす
-				//iLine += 5;
-				//continue;
 			}
 
-			if( bInItems && str.Find(_T("/listCommentArea")) != -1 ) {
+			if( str.Find(_T("/listCommentArea")) != -1 ) {
 				// 終了タグ発見
 				break;
 			}
@@ -2133,41 +2119,46 @@ public:
 
 		INT_PTR lastLine = html_.GetCount();
 
-		/*
-		 * 解析方針：
-		 * ●設問内容解析。
-		 *   "BGCOLOR=#FFD8B0", "COLOR=#996600", "設問内容" がある行を見つけたら、設問内容解析を行う。
-		 *   詳細は parseBody のコメント参照。
-		 *   これ以降を「アンケート開始」とする。
-		 * ●企画者解析。
-		 *   "BGCOLOR=#FFD8B0", "COLOR=#996600", "企画者" がある行を見つけたら、企画者解析を行う。
-		 *   次の行に、下記の形式で企画者がある。
-		 *   <td BGCOLOR=#FFFFFF><a href="show_friend.pl?id=xxx">名前</a></td></tr>
-		 * ●集計結果解析。
-		 *   下記の形式の行から集計結果開始。
-		 *   <td BGCOLOR=#FFD8B0 ALIGN=center><font COLOR=#996600>集計結果</font></td>
-		 *   詳細は parseEnqueteResult 参照。
-		 * ●</table> のみの行があれば、「アンケート終了」とし、コメント解析に移る。
-		 */
 		bool bInEnquete = false;
 		int iLine=240;
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
+			// ●タイトル
+			//<dt class="bbsTitle clearfix"><span class="titleSpan">XXXXXXXX</span>
+			if( util::LineHasStringsNoCase( line, L"<dt", L"bbsTitle" ) )
+			{
+				const CString& line = html_.GetAt(iLine );
+				CString title;
+				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
+				data_.SetTitle(title);
+				continue;
+			}
+			
+			// ●日時
+			//<span class="date">2007年10月06日 17:20</span>	</dt>
+			if( util::LineHasStringsNoCase( line, L"<span", L"date" ) )
+			{
+				const CString& line = html_.GetAt(iLine );
+				CString date;
+				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", date );
+				//ParserUtil::ChangeDate(date, &cmtData);
+				data_.SetDate(date);
+				continue;
+			}
+
 			// ●企画者解析
 			if( util::LineHasStringsNoCase( line, L"<dt>", L"show_friend" ) )
 			{
-				// 次の行にある。
 				const CString& line = html_.GetAt(iLine );
-				
 				MixiUrlParser::GetAuthor( line, &data_ );
-				data_.SetDate(_T(""));
 				continue;
 			}
 
 			// ●質問内容解析
 			if( util::LineHasStringsNoCase( line, L"<dd>" ) )
 			{
+				//内容解析関数へ、<dd class="enqueteBlock">が見つかったら戻る
 				if( !parseBody( data_, html_, iLine ) )
 					return false;
 				bInEnquete = true;
@@ -2183,11 +2174,12 @@ public:
 				continue;
 			}
 
-			// ●アンケート終了？
-			if( bInEnquete && util::LineHasStringsNoCase( line, L"<!-- COMMENT: end -->" ) ) {
+			// ●アンケート内容終了
+			if( bInEnquete && util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ) {
 				bInEnquete = false;
 				break;
 			}
+
 		}
 
 		// コメント解析
@@ -2215,8 +2207,8 @@ private:
 	 *
 	 * iLine は "設問内容" が存在する行。
 	 *
-	 * (1) "</table>" が現れるまで無視。その直後から、設問内容本文。解析して、AddBody する。
-	 * (2) "</td></tr>" が現れたら終了。
+	 * (1) "<dd class=\"enqueteBlock\">" が現れるまで無視。その直後から、設問内容本文。解析して、AddBody する。
+	 * (2) "</dd>" が現れたら終了。
 	 */
 	static bool parseBody( CMixiData& mixi, const CHtmlArray& html, int& iLine )
 	{
@@ -2228,22 +2220,22 @@ private:
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html.GetAt(iLine);
 
-			// <!-- COMMENT: end --> があれば、その後ろを本文とする。
+			// <dd class=\"enqueteBlock\"> があれば、その後ろを本文とする。
 			CString target;
-			if( util::GetAfterSubString( line, L"<!-- COMMENT: end -->", target ) >= 0 ) {
-				// <!-- COMMENT: end --> 発見。
+			if( util::GetAfterSubString( line, L"<dd class=\"enqueteBlock\">", target ) >= 0 ) {
+				// <dd class=\"enqueteBlock\">発見。
 			}else{
-				// <!-- COMMENT: end --> 未発見。
+				// <dd class=\"enqueteBlock\">未発見。
 				target = line;
 			}
 
-			// </td></tr> があれば、その前を追加し、終了。
+			// </dd>があれば、その前を追加し、終了。
 			// なければ、その行を追加し、次の行へ。
 			if( util::GetBeforeSubString( target, L"</dd>", target ) < 0 ) {
-				// </td></tr> が見つからなかった。
+				// </dd> が見つからなかった。
 				ParserUtil::AddBodyWithExtract( mixi, target );
 			}else{
-				// </td></tr> が見つかったので終了。
+				// </dd>が見つかったので終了。
 				ParserUtil::AddBodyWithExtract( mixi, target );
 				break;
 			}
@@ -2262,18 +2254,18 @@ private:
 	 * ● "</table>" が現れたら終了。
 	 *
 	 * ● 下記の形式で、ある選択肢に対する要素がある。
-<tr>
-<td bgcolor="#fdf9f2">
-アンケート選択肢内容<br>
-<img alt="" src="http://img.mixi.jp/img/bar.gif" width="355" height="16" hspace="1" vspace="1">
-</td>
-<td width="50" bgcolor="#fff4e0" align="right" valign="bottom"><font color="#996600">投票数 (百分率%)</font></td>
-</tr>
-     * 解析、整形して、AddBody する。
+	 * <!-- oneMeter -->
+	 * <dl class="enqueteList">
+	 * <dt>回答選択肢<br />
+	 * <img src="http://img.mixi.jp/img/bar.gif" width="28" height="16" alt="" />
+	 * </dt>
+	 * <dd><span>9</span>(3%)</dd>
+	 * </dl>
+	 * <!-- oneMeter -->
+	 * 解析、整形して、AddBody する。
 	 *
 	 * ● 下記の形式で、合計があるので、解析、整形して、AddBodyする。
-<td height="26" bgcolor="#f7f0e6"><font color="#996600">合 計</font>&nbsp;</td>
-<td width="50" bgcolor="#ffd8b0"><b><font color="#996600">34</font></b></td>
+	 * <dl class="enqueteTotal"><dt class="enqueteTotalNumber">合計<span>244</span></dt></dl>
 	 */
 	static bool parseEnqueteResult( CMixiData& mixi, const CHtmlArray& html, int& iLine )
 	{
@@ -2287,13 +2279,13 @@ private:
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html.GetAt(iLine);
 
-			// </table> があれば、終了。
-			if( util::LineHasStringsNoCase( line, L"<!-- oneMeter -->" ) ) {
+			// <dd class="formButtons01">があれば、解析終了。
+			if( util::LineHasStringsNoCase( line, L"<dd class=\"formButtons" ) ) {
 				break;
 			}
 
 			// 選択肢、投票数、百分率を解析して、AddBody する。
-			if( util::LineHasStringsNoCase( line, L"<dd><span>" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<dl class=\"enqueteList\">" ) ) {
 				// 境界値チェック
 				if( iLine+5 >= lastLine ) {
 					break;
@@ -2301,17 +2293,21 @@ private:
 				// 次の行に本文がある。
 				const CString& line1 = html.GetAt(++iLine);
 				CString item;
-				util::GetBeforeSubString( line1, L"<br>", item );
-
+				util::GetBetweenSubString( line1, L"<dt>", L"<br />", item );
+				
 				// +3 行目に下記の形式で、投票数、百分率がある。
-				// <td width="50" bgcolor="#fff4e0" align="right" valign="bottom"><font color="#996600">xx (yy%)</font></td>
+				// <dd><span>125</span>(51%)</dd>
 				iLine += 3;
 				const CString& line2 = html.GetAt( iLine );
 				CString target;
-				util::GetAfterSubString( line2, L"</span>", target );
-				// xx (yy%)</dd>
+				util::GetBetweenSubString( line2, L"<span>", L"</span>", target );
+
+				CString target2;
+				util::GetBetweenSubString( line2, L"</span>", L"</dd>", target2 );
+				
+				// xx (yy%)
 				CString num_rate;
-				util::GetBeforeSubString( target, L"</dd>", num_rate );
+				num_rate = target + target2;
 
 				CString str;
 				str.Format( L"  ●%s\r\n", item );
@@ -2321,13 +2317,13 @@ private:
 			}
 
 			// 合計を解析する。
-			if( util::LineHasStringsNoCase( line, L"<dd><span>" ) )
+			if( util::LineHasStringsNoCase( line, L"enqueteTotal" ) )
 			{
 				// 次の行に合計がある。
-				const CString& line1 = html.GetAt( ++iLine );
+				const CString& line1 = html.GetAt( iLine );
 
 				CString total;
-				util::GetBetweenSubString( line1, L"<dd><span>", L"</span>", total );
+				util::GetBetweenSubString( line1, L"<span>", L"</span>", total );
 
 				CString str;
 				str.Format( L"  ●合計\r\n" );
@@ -2376,44 +2372,45 @@ private:
 					retIndex = -1;
 					break;
 				}
-				//コメント終了条件追加(2006/11/19 icchu追加)
 				else if (str.Find(_T("add_enquete_comment.pl")) != -1) {
 					// コメント全体の終了タグ発見
 					GetPostAddress(i, eIndex, html_, *data);
 					retIndex = -1;
 					break;
-				}
-				//2006/11/19 icchu追加ここまで
-				else if ((index = str.Find(_T("show_friend.pl"))) != -1) {
+				}else{
 
-					// 2行前に下記の形式でコメント番号が存在する。
-					// &nbsp;<font color="#f8a448"><b>&nbsp;&nbsp;1</b>:</font>&nbsp;
-					const CString& line1 = html_.GetAt( i-2 );
+					const CString& line = html_.GetAt(i);
+					//コメント番号を取得
+					// <label for="commentCheck01">37</label>
+					if( util::LineHasStringsNoCase( line, L"\">", L"</label>")) {
+						CString strIndex;
+						util::GetBetweenSubString( line, L"\">", L"</label>", strIndex );
+						cmtData.SetCommentIndex( _wtoi(strIndex) );
+					}
+					
+					//日付を取得
+					//<span class="date">2007年10月07日 11:25</span></dt>
+					if( util::LineHasStringsNoCase( line, L"date\">", L"</span>")) {
+						CString date;
+						util::GetBetweenSubString( line, L"date\">", L"</span>", date );
+						ParserUtil::ChangeDate(date, &cmtData);
+					}
+					
+					//名前を取得
+					//<dt><a href="show_friend.pl?id=xxxxxx">なまえ</a></dt>
+					if( util::LineHasStringsNoCase( line, L"<dt>", L"</dt>")) {
+						CString Author;
+						util::GetBetweenSubString( line, L"<dt>", L"</dt>", Author );
+						MixiUrlParser::GetAuthor( Author, &cmtData );
+						//コメント開始フラグをON
+						findFlag = TRUE;
+					}
 
-					CString strIndex;
-					util::GetBetweenSubString( line1, L"<b>", L"</b>", strIndex );
-					while( strIndex.Replace( L"&nbsp;", L"" ) );
-					cmtData.SetCommentIndex( _wtoi(strIndex) );
-
-					// この行に、コメント者が下記の形式で存在する。
-					// <a href="show_friend.pl?id=xxxx">なまえ</a>
-					const CString& line2 = html_.GetAt(i);
-					MixiUrlParser::GetAuthor( line2, &cmtData );
-
-					// 10行前に、下記の形式で時刻が存在する。
-					// 2006年12月xx日<br>HH:MM<br>
-					const CString& line3 = html_.GetAt(i-10);
-					CString date = line3;
-					while( date.Replace( L"<br>", L" " ) );
-
-					ParserUtil::ChangeDate(date, &cmtData);
-
-					findFlag = TRUE;
 				}
 			}
 			else {
 
-				if( util::LineHasStringsNoCase( str, L"<dt class=\"commentDate\">") ) {
+				if( util::LineHasStringsNoCase( str, L"<dd>") ) {
 					// コメントコメント本文取得
 					str = html_.GetAt(i);
 
@@ -2422,19 +2419,9 @@ private:
 					// ----------------------------------------
 					cmtData.AddBody(_T("\r\n"));
 
-					// [    <tr><td class="h120" width="500">０１２３４５６７８９０]
-					// ↓
-					// [<td class="h120" width="500">０１２３４５６７８９０]
-
-					// [    <tr><td class="h120" width="500">テストあげ</td></tr></table>]
-					// ↓
-					// [<td class="h120" width="500">テストあげ</td></tr></table>]
 					util::GetAfterSubString( str, L">", buf );
 
-					if( util::GetBeforeSubString( buf, L"</td></tr></table>", buf ) > 0 ) {
-						// [<td class="h120" width="500">テストあげ</td></tr></table>]
-						// ↓
-						// [<td class="h120" width="500">テストあげ]
+					if( util::GetBeforeSubString( buf, L"</dd>", buf ) > 0 ) {
 
 						// 終了タグがあった場合
 						ParserUtil::AddBodyWithExtract( cmtData, buf );
@@ -2463,7 +2450,7 @@ private:
 							retIndex = i + 5;
 							break;
 						}
-						else if ((index = line.Find(_T("</td></tr>"))) != -1) {
+						else if ((index = line.Find(_T("</dd>"))) != -1) {
 							// 終了タグ発見
 							buf = line.Left(index);
 							ParserUtil::AddBodyWithExtract( cmtData, buf );
