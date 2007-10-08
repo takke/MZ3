@@ -1732,7 +1732,7 @@ public:
 			// 項目
 			//   <span class="titleSpan"><a href="view_bbs.pl?id=23469005&comm_id=1198460" class="title">【報告】10/1リニューアルで動かない！</a>
 			//   <span class="date">2007年09月30日 16:40</span>
-			if( util::LineHasStringsNoCase( line, L"<span", L"titleSpan", L"view_bbs") ) {
+			if( util::LineHasStringsNoCase( line, L"<span", L"titleSpan" ) ) {
 				// 解析
 				CMixiData mixi;
 
