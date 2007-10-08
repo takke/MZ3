@@ -3300,51 +3300,49 @@ public:
 	{
 		MZ3LOGGER_DEBUG( L"ShowIntroParser.parse() start." );
 
-		INT_PTR count = html_.GetCount();
+		INT_PTR lastLine = html_.GetCount();
 
 		// 「次」、「前」のリンク
 		CMixiData backLink;
 		CMixiData nextLink;
 
-		/**
-		 * 方針：
-		 * - bg_line.gif が見つかれば、そこから項目開始とみなす。
-		 * - </tr> が現れるまでをパースし、項目を生成する。
-		 * - </td></tr></table> が現れたら終了とする。
-		 */
-
 		// 項目開始を探す
 		bool bInItems = false;	// 項目開始？
 		int iLine = 100;		// とりあえず読み飛ばす
-		for( ; iLine<count; iLine++ ) {
-			const CString& str = html_.GetAt(iLine);
+		for( ; iLine<lastLine; iLine++ ) {
+			const CString& line = html_.GetAt(iLine);
 
-			// 「次」、「前」のリンク
-			// 項目発見後にのみ存在する
-			if( bInItems ) {
-				// 「次を表示」、「前を表示」のリンクを抽出する
-				if( parseNextBackLink( nextLink, backLink, str ) ) {
-					// 抽出できたら終了タグとみなす。
+			// 項目開始？
+			if( !bInItems ) {
+				//<ul class="introListContents">
+				if( util::LineHasStringsNoCase( line, L"<ul", L"class=", L"introListContents" ) ) {
+					bInItems = true;
+				}
+			} else {
+
+				//<div class="pageNavigation01"> で終了
+				if( util::LineHasStringsNoCase( line, L"<div", L"class=", L"pageNavigation01" ) ) {
 					break;
 				}
-			}
 
-			// 項目？
-			if( str.Find( L"<td" ) != -1 && str.Find( L"bg_line.gif" ) != -1 ) {
-				bInItems = true;
-
-				// 解析
-				CMixiData mixi;
-				if( parseOneIntro( mixi, html_, iLine ) ) {
-					out_.push_back( mixi );
+				// show_friend.pl があれば項目っぽい
+				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"show_friend.pl" ) ) {
+					CMixiData mixi;
+					if( parseOneIntro( mixi, html_, iLine ) ) {
+						out_.push_back( mixi );
+					}
 				}
 			}
+		}
 
-			if( bInItems ) {
-				// </td></tr></table> が見つかれば終了
-				if( str.Find( L"</td></tr></table>" ) != -1 ) {
-					break;
-				}
+		// 終了タグが見つかったので、その後の行から次、前のリンクを抽出
+		for( ; iLine<lastLine; iLine++ ) {
+			const CString& line = html_.GetAt(iLine);
+
+			// 「次を表示」、「前を表示」のリンクを抽出する
+			if( parseNextBackLink( nextLink, backLink, line ) ) {
+				// 抽出できたら終了タグ
+				break;
 			}
 		}
 
@@ -3363,33 +3361,24 @@ public:
 private:
 	/**
 	 * １つの紹介文を抽出する。
-	 * iLine は bg_line.gif が現れた行。
-	 *
-	 * (1) iLine からURL、名前を抽出する。
-	 * (2) <td WIDTH=480>という行を探す。その次の行に下記の形式で「関係」が存在する。
-     *     関係：かんけい<br>
-	 * (3) 下記の形式で紹介文があるので、AddBodyする。
-	 *     <div style="width:286px; margin:0; padding:0;">ほんぶん</div>
-	 * (4) </tr> が見つかれば終了する。
+	 * iLine は show_friend.pl が現れた行。
 	 */
 	static bool parseOneIntro( CMixiData& mixi, const CHtmlArray& html, int& iLine )
 	{
 		const int lastLine = html.GetCount();
 
-		const CString& line = html.GetAt( iLine );
+		if (iLine+2>lastLine) {
+			return false;
+		}
 
-		// 現在の行(1)と次の行(2)に、
-		// 下記の形式で「URL」「画像URL」「名前」が存在するので、抽出する。
-		// (1)：<td WIDTH=150 background=http://img.mixi.jp/img/bg_line.gif align="center">
-		// (1)：<a href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/member/xxx.jpg" border=0><br>
-		// (2)：なまえ</td></a>
+		const CString& line2 = html.GetAt( ++iLine );
 
 		// URL 抽出
 		CString target;
-		if( util::GetAfterSubString( line, L"<a ", target ) < 0 ) {
+		if( util::GetAfterSubString( line2, L"<a ", target ) < 0 ) {
 			return false;
 		}
-		// target: href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/member/xxx.jpg" border=0><br>
+		// target: href="show_friend.pl?id=xxx">なまえ</a></dt>
 		CString url;
 		if( util::GetBetweenSubString( target, L"href=\"", L"\"", url ) < 0 ) {
 			return false;
@@ -3400,91 +3389,33 @@ private:
 		url.Insert( 0, L"http://mixi.jp/" );
 		mixi.SetBrowseUri( url );
 
-		// 画像URL抽出
-		if( util::GetAfterSubString( target, L"<img ", target ) < 0 ) {
-			return false;
-		}
-		// target: src="http://img.mixi.jp/photo/member/xxx.jpg" border=0><br>
-		CString image_url;
-		if( util::GetBetweenSubString( target, L"src=\"", L"\"", image_url ) < 0 ) {
-			return false;
-		}
-		mixi.AddImage( image_url );
-
-		// 次の行から名前抽出
-		const CString& line2 = html.GetAt( ++iLine );
-		// </td> の前までを名前とする。
+		// 名前抽出
 		CString name;
-		if( util::GetBeforeSubString( line2, L"</td>", name ) < 0 ) {
+		if( util::GetBetweenSubString( target, L">", L"<", name ) < 0 ) {
 			return false;
 		}
 		mixi.SetName( name );
 
 		mixi.SetAccessType( ACCESS_PROFILE );
 
-		// 関係：の抽出
-		for( ++iLine; iLine+1<lastLine; iLine++ ) {
-			const CString& line = html.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"<td WIDTH=480>" ) ) {
-				// 関係：かんけい<br>
-				CString line1 = html.GetAt( ++iLine );
-
-				if( line1.Find( L"関係：" ) == -1 ) {
-					break;
-				}
-
-				// 半角スペース " " を追加しておく
-				line1.Replace( L"<br>", L" <br>" );
-
-				ParserUtil::AddBodyWithExtract( mixi, line1 );
-				break;
-			}
-		}
-
-
-		// </tr> が見つかるまで、紹介文を探す
-		bool bInIntro = false;
-		for( ++iLine; iLine< lastLine; iLine++ ) {
+		// </div> が見つかるまで、紹介文を探す
+		for( ++iLine; iLine<lastLine; iLine++ ) {
 			const CString& line = html.GetAt( iLine );
 
-			if( util::LineHasStringsNoCase( line, L"</tr>" ) ) {
+			// <ul> or </div> があれば終了。
+			if( util::LineHasStringsNoCase( line, L"</div>" ) ||
+				util::LineHasStringsNoCase( line, L"<ul>" ) ) {
 				break;
-			}
-			if( !bInIntro ) {
-				// <div style="width:286px; margin:0; padding:0;">ほんぶん</div>
-				if( util::LineHasStringsNoCase( line, L"<div" ) ) {
-					// この行以降に紹介文がある。
-					bInIntro = true;
-
-					// <div ... > を削除
-					CString result;
-					if( util::GetAfterSubString( line, L">", result ) < 0 ) {
-						continue;
-					}
-					// </div> があれば削除＆紹介文終了
-					if( util::GetBeforeSubString( result, L"</div>", result ) >= 0 ) {
-						// 紹介文追加。
-						mixi.AddBody( result );
-						bInIntro = false;
-					}else{
-						// 紹介文追加。
-						mixi.AddBody( result );
-					}
-				}
 			}else{
-				// </div> があればその前までを追加し、終了。
-				// </div> がなければ、追加し、継続。
-				if( util::LineHasStringsNoCase( line, L"</div>" ) ) {
-					CString result;
-					util::GetBeforeSubString( line, L"</div>", result );
-
-					ParserUtil::AddBodyWithExtract( mixi, result );
-					bInIntro = false;
-				}else{
-					ParserUtil::AddBodyWithExtract( mixi, line );
+				CString tagStripedLine = line;
+				ParserUtil::StripAllTags( tagStripedLine );
+				if (!tagStripedLine.IsEmpty()) {
+					ParserUtil::AddBodyWithExtract( mixi, tagStripedLine );
+					mixi.AddBody( L"\r\n" );
 				}
 			}
 		}
+
 		if( iLine >= lastLine ) {
 			return false;
 		}
