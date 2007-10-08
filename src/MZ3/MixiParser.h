@@ -363,20 +363,16 @@ public:
 			// OwnerID が未取得なので解析する
 			MZ3LOGGER_DEBUG( L"OwnerID が未取得なので解析します" );
 
-			for (int i=0; i<count; i++) {
+			for (int i=index; i<count; i++) {
 				const CString& line = html_.GetAt(i);
 				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"list_community.pl" ) ) {
-
-					// list_community.pl 以降を抽出
-					CString after;
-					util::GetAfterSubString( line, L"list_community.pl", after );
-
-					CString id;					
-					if( util::GetBetweenSubString( after, L"id=", L"\"", id ) == -1 ) {
-						MZ3LOGGER_ERROR( L"list_community.pl の引数に id 指定がありません。 line[" + line + L"], after[" + after + L"]" );
+					CString buf;
+					
+					if( util::GetBetweenSubString( line, L"id=", L"\"", buf ) == -1 ) {
+						MZ3LOGGER_ERROR( L"list_community.pl の引数に id 指定がありません。 line[" + line + L"]" );
 					}else{
-						MZ3LOGGER_DEBUG( L"OwnerID = " + id );
-						theApp.m_loginMng.SetOwnerID(id);
+						MZ3LOGGER_DEBUG( L"OwnerID = " + buf );
+						theApp.m_loginMng.SetOwnerID(buf);
 						theApp.m_loginMng.Write();
 					}
 					break;
@@ -384,7 +380,7 @@ public:
 			}
 
 			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-				MZ3LOGGER_ERROR( L"OwnerID を取得できませんでした" );
+				MZ3LOGGER_ERROR( L"OwnerID が取得できませんでした" );
 			}
 		}
 
@@ -532,7 +528,7 @@ public:
 
 				// タイトル
 				// 解析対象：
-				//<dt><input name="diary_id" type="checkbox" value="xxxxx"  /><a href="view_diary.pl?id=xxxx&owner_id=xxxx">タイトル</a><span><a href="edit_diary.pl?id=xxxx">編集する</a></span></dt>
+        //<dt><input name="diary_id" type="checkbox" value="xxxxx"  /><a href="view_diary.pl?id=xxxx&owner_id=xxxx">タイトル</a><span><a href="edit_diary.pl?id=xxxx">編集する</a></span></dt>
 
 				CString buf;
 				util::GetBetweenSubString( str, key, L"</dt>", buf );
@@ -542,14 +538,14 @@ public:
 				data.SetTitle( title );
 
 				// 日付
-				//<dd>2007年06月18日12:10</dd>
+        //<dd>2007年06月18日12:10</dd>
 				const CString& str = html_.GetAt(i+1);	
 				CString date;
 				util::GetBetweenSubString( str, L">", L"<", date );
 				ParserUtil::ChangeDate(date, &data);
 
 
-				for (int j=i; j<count; j++) {
+        for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
 
 					LPCTSTR key = _T("<a href=\"view_diary.pl?id");
@@ -618,37 +614,25 @@ public:
 
 		/**
 		 * 方針：
-		 * - <img src=http://img.mixi.jp/img/pen_y.gif ALIGN=left WIDTH=14 HEIGHT=16>
-		 *   が見つかればそこから項目開始とみなす
-		 * - その行の
-		 *   <img ...>2006年09月20日 07:47</td>
-		 *   を正規表現でパースし、時刻を抽出する
-		 * - 上記の2行下に
-		 *   <a href="view_diary.pl?id=ZZZ&owner_id=ZZZ">内容</a> (Author)
-		 *   という形式で項目が存在する。
-		 * - これを正規表現でパースし、追加する。
-		 * - 項目が見つかって以降に、
-		 *   </table>
-		 *   があれば、処理を終了する
+		 * - <dt>2007年10月02日&nbsp;22:22</dt>
+		 *   のような日付見つかればそこから項目開始とみなす
+		 *   <dd><a href="view_diary.pl?が見つかるまで行を飛ばし(通常日付の次の行)たら本文開始。
+		 *   まずURLとIDを抜き出し、
+		 * - 終了タグ</dd>が見つかるまで、行を結合して、最後に本文を抜き取る。
+		 * - 以降に、"/listCommentArea"があれば、処理を終了する
+		 *   
 		 */
-
-		// 項目開始を探す
-		bool bInItems = false;	// 項目が見つかったか。
-
 		int iLine = 180;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& str = html_.GetAt(iLine);
-
+			//最初の日時を発見したら行検索ループ開始
 			if(util::LineHasStringsNoCase( str, L"<dt>", L"</dt>" ) )  {
-				// 項目発見。
-				bInItems = true;
-
 				// mixi データの作成
 				{
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
-					//--- 時刻の抽出
+					//日時の抽出
 					//<dt>2007年10月02日&nbsp;22:22</dt>
 					CString date;
 					util::GetBetweenSubString( str, L"<dt>", L"</dt>", date );
@@ -658,15 +642,17 @@ public:
 					// 見出し
 					//<dd><a href="view_diary.pl?
 					{
-						//4行以内で<span class="date">行が見つかるまで
+						//<dd><a href="view_diary.pl?行が見つかるまで
 						for( iLine; iLine<count; iLine++ ) {
 							bool findFlag = false;
 							const CString& line = html_.GetAt(iLine);
+							//コメント開始行を発見したら
 							if( util::LineHasStringsNoCase( line, L"<dd>", L"view_diary") )
 							{
 								// ＵＲＩ
 								CString url;
 								util::GetBetweenSubString( line, L"href=\"", L"\">", url );
+								data.SetURL( url );
 								
 								// ＩＤを設定
 								CString id;
@@ -674,24 +660,24 @@ public:
 								data.SetID(_wtoi(id));
 								ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
-								data.SetURL( url );
-
 								// 本文プレビュー
 								CString target = L"";
 								for( iLine; iLine<count; iLine++ ) {
-								
 									const CString& line2 = html_.GetAt(iLine);
-									
+									//</dd>が見つかったら次のコメントへ
 									if( util::LineHasStringsNoCase( line2, L"</dd>") )
 									{
 										target += line2;
+										//本文を抽出
 										if( util::LineHasStringsNoCase( target, L"\">", L"</a>") )
 										{
-											CString between;
-											util::GetBetweenSubString( target, L"\">", L"</a>", between );
+											CString title;
+											util::GetBetweenSubString( target, L"\">", L"</a>", title );
 											//改行を削除
-											between.Replace(_T("\n"), _T(""));
-											data.SetTitle(between);
+											title.Replace(_T("\n"), _T(""));
+											//タイトルをセット
+											data.SetTitle(title);
+											//ループを抜けるフラグをセット
 											findFlag = true;
 										}
 										//名前を抽出
@@ -705,7 +691,6 @@ public:
 										target += line2;
 									}
 								}
-								//break;
 							}
 							//フラグがあったらループを抜ける
 							if(findFlag == true) 
@@ -716,12 +701,9 @@ public:
 					}
 					out_.push_back(data);
 				}
-				//// 5行読み飛ばす
-				//iLine += 5;
-				//continue;
 			}
 
-			if( bInItems && str.Find(_T("/listCommentArea")) != -1 ) {
+			if( str.Find(_T("/listCommentArea")) != -1 ) {
 				// 終了タグ発見
 				break;
 			}
@@ -1068,7 +1050,8 @@ public:
 			if (bStartDiary == false) {
 				// 日記開始フラグを発見するまで廻す
 
-				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) ) {
+				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) )
+				{
 					// 日記開始フラグ発見（日記本文発見）
 					bStartDiary = true;
 
@@ -1196,26 +1179,31 @@ public:
 
 private:
 	/// 外部ブログ解析
-	static bool parseExternalBlog( CMixiData& mixi_, const CHtmlArray& html_, int i )
+	static bool parseExternalBlog( CMixiData& data_, const CHtmlArray& html_, int i )
 	{
-		// 外部ブログフラグを立てる
-		mixi_.SetOtherDiary(TRUE);
+		CString str;
 
-		// とりあえず改行
-		mixi_.AddBody(_T("\r\n"));
+		data_.AddBody(_T("\r\n"));
 
-		// 本文解析
-		int lastLine = html_.GetCount();
-		for (; i<lastLine; i++ ) {
-			const CString& line = html_.GetAt(i);
+		str = html_.GetAt(i-1);
+		ParserUtil::UnEscapeHtmlElement(str);
+		data_.AddBody(str);
 
-			if (util::LineHasStringsNoCase(line, L"</div>")) {
-				break;
-			}
+		str = html_.GetAt(i);
+		ParserUtil::UnEscapeHtmlElement(str);
+		data_.AddBody(str);
 
-			// 本文追加
-			ParserUtil::AddBodyWithExtract(mixi_, line);
-		}
+		i += 5;
+		str = html_.GetAt(i);
+		data_.AddBody(_T("\r\n"));
+		CString buf = str.Mid(str.Find(_T("href=\"")) + wcslen(_T("href=\"")));
+		buf = buf.Left(buf.Find(_T("\"")));
+
+		// 外部ブログフラグを立て、外部ブログのURLを設定しておく。
+		data_.SetOtherDiary(TRUE);
+		data_.SetBrowseUri(buf);
+
+		data_.AddBody(buf);
 
 		return true;
 	}
@@ -2155,12 +2143,23 @@ public:
 		 * ●</table> のみの行があれば、「アンケート終了」とし、コメント解析に移る。
 		 */
 		bool bInEnquete = false;
-		int iLine=180;
+		int iLine=240;
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			// ●設問内容解析
-			if( util::LineHasStringsNoCase( line, L"BGCOLOR=#FFD8B0", L"COLOR=#996600", L"設問内容" ) )
+			// ●企画者解析
+			if( util::LineHasStringsNoCase( line, L"<dt>", L"show_friend" ) )
+			{
+				// 次の行にある。
+				const CString& line = html_.GetAt(iLine );
+				
+				MixiUrlParser::GetAuthor( line, &data_ );
+				data_.SetDate(_T(""));
+				continue;
+			}
+
+			// ●質問内容解析
+			if( util::LineHasStringsNoCase( line, L"<dd>" ) )
 			{
 				if( !parseBody( data_, html_, iLine ) )
 					return false;
@@ -2168,19 +2167,9 @@ public:
 				continue;
 			}
 
-			// ●企画者解析
-			if( util::LineHasStringsNoCase( line, L"BGCOLOR=#FFD8B0", L"COLOR=#996600", L"企画者" ) )
-			{
-				// 次の行にある。
-				const CString& line = html_.GetAt( ++iLine );
-				MixiUrlParser::GetAuthor( line, &data_ );
-				data_.SetDate(_T(""));
-				continue;
-			}
-
 			// ●集計結果解析。
 			// <td BGCOLOR=#FFD8B0 ALIGN=center><font COLOR=#996600>集計結果</font></td>
-			if( util::LineHasStringsNoCase( line, L"BGCOLOR=#FFD8B0", L"COLOR=#996600", L"集計結果" ) )
+			if( util::LineHasStringsNoCase( line, L"<h3>", L"集計結果" ) )
 			{
 				if( !parseEnqueteResult( data_, html_, iLine ) )
 					return false;
@@ -2188,7 +2177,7 @@ public:
 			}
 
 			// ●アンケート終了？
-			if( bInEnquete && util::LineHasStringsNoCase( line, L"</table>" ) ) {
+			if( bInEnquete && util::LineHasStringsNoCase( line, L"<!-- COMMENT: end -->" ) ) {
 				bInEnquete = false;
 				break;
 			}
@@ -2232,18 +2221,18 @@ private:
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html.GetAt(iLine);
 
-			// </table> があれば、その後ろを本文とする。
+			// <!-- COMMENT: end --> があれば、その後ろを本文とする。
 			CString target;
-			if( util::GetAfterSubString( line, L"</table>", target ) >= 0 ) {
-				// </table> 発見。
+			if( util::GetAfterSubString( line, L"<!-- COMMENT: end -->", target ) >= 0 ) {
+				// <!-- COMMENT: end --> 発見。
 			}else{
-				// </table> 未発見。
+				// <!-- COMMENT: end --> 未発見。
 				target = line;
 			}
 
 			// </td></tr> があれば、その前を追加し、終了。
 			// なければ、その行を追加し、次の行へ。
-			if( util::GetBeforeSubString( target, L"</td></tr>", target ) < 0 ) {
+			if( util::GetBeforeSubString( target, L"</dd>", target ) < 0 ) {
 				// </td></tr> が見つからなかった。
 				ParserUtil::AddBodyWithExtract( mixi, target );
 			}else{
@@ -2292,12 +2281,12 @@ private:
 			const CString& line = html.GetAt(iLine);
 
 			// </table> があれば、終了。
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<!-- oneMeter -->" ) ) {
 				break;
 			}
 
 			// 選択肢、投票数、百分率を解析して、AddBody する。
-			if( util::LineHasStringsNoCase( line, L"<td bgcolor=\"#fdf9f2\">" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<dd><span>" ) ) {
 				// 境界値チェック
 				if( iLine+5 >= lastLine ) {
 					break;
@@ -2312,10 +2301,10 @@ private:
 				iLine += 3;
 				const CString& line2 = html.GetAt( iLine );
 				CString target;
-				util::GetAfterSubString( line2, L"#996600\">", target );
-				// xx (yy%)</font></td>
+				util::GetAfterSubString( line2, L"</span>", target );
+				// xx (yy%)</dd>
 				CString num_rate;
-				util::GetBeforeSubString( target, L"</font>", num_rate );
+				util::GetBeforeSubString( target, L"</dd>", num_rate );
 
 				CString str;
 				str.Format( L"  ●%s\r\n", item );
@@ -2325,13 +2314,13 @@ private:
 			}
 
 			// 合計を解析する。
-			if( util::LineHasStringsNoCase( line, L"<td", L"#f7f0e6", L"#996600", L"合 計" ) )
+			if( util::LineHasStringsNoCase( line, L"<dd><span>" ) )
 			{
 				// 次の行に合計がある。
 				const CString& line1 = html.GetAt( ++iLine );
 
 				CString total;
-				util::GetBetweenSubString( line1, L"#996600\">", L"</font>", total );
+				util::GetBetweenSubString( line1, L"<dd><span>", L"</span>", total );
 
 				CString str;
 				str.Format( L"  ●合計\r\n" );
@@ -2417,7 +2406,7 @@ private:
 			}
 			else {
 
-				if( util::LineHasStringsNoCase( str, L"<tr", L"<td", L"class=\"h120\"") ) {
+				if( util::LineHasStringsNoCase( str, L"<dt class=\"commentDate\">") ) {
 					// コメントコメント本文取得
 					str = html_.GetAt(i);
 
