@@ -3155,7 +3155,7 @@ public:
 	{
 		MZ3LOGGER_DEBUG( L"ListFriendParser.parse() start." );
 
-		INT_PTR count = html_.GetCount();
+		INT_PTR lastLine = html_.GetCount();
 
 		// 「次」、「前」のリンク
 		CMixiData backLink;
@@ -3163,47 +3163,91 @@ public:
 
 		/**
 		 * 方針：
-		 * ★ table で5人ずつ並んでいる。
-		 *   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
-		 *   従って、「5人分のリンク抽出」「5人分の名前抽出」「突き合わせ」「データ追加」という手順で行う。
-		 *
-		 * ● <table ... CELLPADDING=2 ...>
-		 *    が見つかれば、そこから項目開始とみなす。</table> が現れるまで以下を実行する。
-		 *   (1) </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、URL と時刻を取得する。
-		 *   (2) 次の </tr> が見つかるまでの各行をパースし、所定の形式に一致していれば、名前を抽出する。
-		 *   (3) (1), (2) で抽出したデータを out_ に追加する。
+		 * ふつうに ul, li, div 要素で並んでいるのでふつうにパースするだけ。
 		 */
-
-		// 項目開始を探す
 		bool bInItems = false;	// 項目開始？
 		int iLine = 100;		// とりあえず読み飛ばす
-		for( ; iLine<count; iLine++ ) {
+		for( ; iLine+1<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
 			if( !bInItems ) {
 				// 項目開始？
-				if( util::LineHasStringsNoCase( line, L"<table", L"cellpadding=\"2\"", L">" ) ) {
+				// <div class="iconList03">
+				if( util::LineHasStringsNoCase( line, L"<div", L"class=", L"iconList03" ) ) {
 					bInItems = true;
 				}
 			}
 
 			if( bInItems ) {
-				// </table> が見つかれば終了
-				if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
+				// <div class="pageNavigation01"> が見つかれば終了
+				if( util::LineHasStringsNoCase( line, L"<div", L"class=", L"pageNavigation01" ) ) {
 					break;
 				}
 
-				// </table> が見つからなかったので5人分取得＆追加
-				if( parseTwoTR( out_, html_, iLine ) ) {
-				}else{
-					// 解析エラー
-					break;
+				// 終了タグが見つからなかったので、解析＋追加
+				//<li><div class="iconState0X" id="xxxx">
+				//<div class="iconListImage"><a href="show_friend.pl?id=xxx" style="background: url(http://member.img.mixi.jp/photo/member/xx/xx/xxs.jpg); text-indent: -9999px;" class="iconTitle" title="なまえさん">なまえさんの写真</a></div><span>なまえさん(11)</span>
+				//<div id="xxx" class="memo_pop"></div><p><a href="show_friend_memo.pl?id=xxx" onClick="openMemo(event,'friend',xxx);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
+				//</div></li>
+				if( util::LineHasStringsNoCase( line, L"<li", L"<div", L"class=", L"iconState0" ) ) {
+					// iconState01 : 1日以上
+					// iconState02 : 1日以内
+					// iconState03 : 1時間以内
+					CMixiData mixi;
+					if( util::LineHasStringsNoCase( line, L"iconState03" ) ) {
+						mixi.SetDate( L"1時間以内" );
+					}else if( util::LineHasStringsNoCase( line, L"iconState02" ) ) {
+						mixi.SetDate( L"1日以内" );
+					}else{
+						mixi.SetDate( L"-" );
+					}
+
+					// 次の行をフェッチ
+					const CString& line2 = html_.GetAt( ++iLine );
+
+					// <a 以降のみにする
+					CString target;
+					if( util::GetAfterSubString( line2, L"<a", target ) < 0 ) {
+						// <a がなかったので次の行解析へ。
+						continue;
+					}
+					// target:  href="show_friend.pl?id=xxx" style="background: url(http://member.img.mixi.jp/photo/member/xx/xx/xxs.jpg); text-indent: -9999px;" class="iconTitle" title="なまえさん">なまえさんの写真</a></div><span>なまえさん(11)</span>
+					// URL 抽出
+					CString url;
+					if( util::GetBetweenSubString( target, L"href=\"", L"\"", url ) < 0 ) {
+						continue;
+					}
+					mixi.SetURL( url );
+
+					// URL 構築＆設定
+					url.Insert( 0, L"http://mixi.jp/" );
+					mixi.SetBrowseUri( url );
+
+					// Image 抽出
+					CString image_url;
+					if( util::GetBetweenSubString( target, L"url(", L")", image_url ) < 0 ) {
+						continue;
+					}
+					mixi.AddImage( image_url );
+
+					// 名前抽出
+					// <span>なまえさん(11)</span>
+					CString name;
+					if( util::GetBetweenSubString( target, L"<span>", L"</span>", name ) < 0 ) {
+						continue;
+					}
+					mixi.SetName( name );
+
+					mixi.SetAccessType( ACCESS_PROFILE );
+
+					// 追加する。
+					out_.push_back( mixi );
 				}
 			}
 		}
 
-		// </table> が見つかったので、その後の行から次、前のリンクを抽出
-		for( ; iLine<count; iLine++ ) {
+		// 終了タグが見つかったので、その後の行から次、前のリンクを抽出
+		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
 			// 「次を表示」、「前を表示」のリンクを抽出する
@@ -3226,155 +3270,6 @@ public:
 	}
 
 private:
-	/**
-	 * 5人分のユーザの内容を抽出する
-	 *
-	 * (1) </tr> が現れるまでの各行をパースし、5人分のURL、時刻を生成する。
-	 * (2) </tr> が現れるまでの各行をパースし、5人分の名前を生成する。
-	 * (3) mixi_list に追加する。
-	 */
-	static bool parseTwoTR( CMixiDataList& mixi_list, const CHtmlArray& html, int& iLine )
-	{
-		const int lastLine = html.GetCount();
-
-		// 一時的な CMixiData のリスト
-		CMixiDataList tmp_list;
-
-		// 1つ目の </tr> までの解析
-		bool bBreak = false;
-		for( ; iLine < lastLine && bBreak == false; iLine++ ) {
-			const CString& line = html.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"</tr>" ) ) {
-				// </tr> 発見、名前抽出に移る。
-				bBreak = true;
-			}
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
-				// </table> 発見、終了
-				return false;
-			}
-
-			// <td で始まるなら、抽出する
-			if( line.Left( 3 ).CompareNoCase( L"<td" ) == 0 ) {
-				/* 行の形式：
-line1 : <td width="20%" height="100" background="http://img.mixi.jp/img/bg_orange2-.gif">
-line2 : <a href="show_friend.pl?id=xxx"><img src="http://img.mixi.jp/photo/member/xxx.jpg" alt=""  border="0" /></a></td>
-*/
-				CMixiData mixi;
-
-			// 時刻判定
-				{
-					// "bg_orange1-.gif" があれば、「1時間以内」
-					// "bg_orange2-.gif" があれば、「1日以内」
-					// いずれもなければ、「1日以上」
-					if( util::LineHasStringsNoCase( line, L"bg_orange1-.gif" ) ) {
-						mixi.SetDate( L"1時間以内" );
-					}else if( util::LineHasStringsNoCase( line, L"bg_orange2-.gif" ) ) {
-						mixi.SetDate( L"1日以内" );
-					}else{
-						mixi.SetDate( L"-" );
-					}
-				}
-
-				// line2 のフェッチ
-				const CString& line2 = html.GetAt( ++iLine );
-				if( line2.Find( L"</tr>" ) != -1 ) {
-					// </tr> 発見、名前抽出に移る。
-					bBreak = true;
-				}
-				if( util::LineHasStringsNoCase( line2, L"</table>" ) ) {
-					// </table> 発見、終了
-					return false;
-				}
-
-				// <a 以降のみにする
-				CString target;
-				if( util::GetAfterSubString( line2, L"<a", target ) < 0 ) {
-					// <a がなかったので次の行解析へ。
-					continue;
-				}
-				// target:  href="show_friend.pl?id=xxx"><img ...
-				// URL 抽出
-				CString url;
-				if( util::GetBetweenSubString( target, L"href=\"", L"\"", url ) < 0 ) {
-					continue;
-				}
-				mixi.SetURL( url );
-
-				// URL 構築＆設定
-				url.Insert( 0, L"http://mixi.jp/" );
-				mixi.SetBrowseUri( url );
-
-				// Image 抽出
-				if( util::GetAfterSubString( target, L"<img", target ) < 0 ) {
-					continue;
-				}
-				// target:  src="http://img.mixi.jp/photo/member/xxx.jpg" alt=""  border="0" /></a></td>
-				CString image_url;
-				if( util::GetBetweenSubString( target, L"src=\"", L"\"", image_url ) < 0 ) {
-					continue;
-				}
-				mixi.AddImage( image_url );
-
-				// 解析成功なので追加する。
-				tmp_list.push_back( mixi );
-			}
-		}
-		if( iLine >= lastLine ) {
-			return false;
-		}
-
-		// 2つ目の </tr> までの解析
-		int mixiIndex = 0;		// 何番目の項目を解析しているかを表すインデックス
-		for( ; iLine < lastLine; iLine++ ) {
-			const CString& line = html.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"</tr>" ) ) {
-				// </tr> 発見、終了
-				break;
-			}
-			if( util::LineHasStringsNoCase( line, L"</table>" ) ) {
-				// </table> 発見、終了
-				return false;
-			}
-
-			if( mixiIndex >= (int)tmp_list.size() ) {
-				// リスト数以上見つかったので、終了。
-				break;
-			}
-
-			// <td があるなら、抽出する
-			if( util::LineHasStringsNoCase( line, L"<td" ) ) {
-				CMixiData& mixi = tmp_list[mixiIndex];
-				mixiIndex ++;
-
-				// 行の形式：
-				// <tr align="center" bgcolor="#FFF4E0"><td valign="top">xxxさん(xx)
-				// または
-				// </td><td valign="top">xxxさん(xx)
-
-				// 名前抽出
-				CString name = line;
-
-				// 全てのタグを除去
-				ParserUtil::StripAllTags( name );
-
-				// 末尾の \n を削除
-				name.Replace( L"\n", L"" );
-
-				mixi.SetName( name );
-				mixi.SetAccessType( ACCESS_PROFILE );
-
-				// mixi_list に追加する。
-				mixi_list.push_back( mixi );
-			}
-		}
-		if( iLine >= lastLine ) {
-			return false;
-		}
-
-
-		return true;
-	}
-
 	/// 「次を表示」、「前を表示」のリンクを抽出する
 	/// <td align="right" bgcolor="#EED6B5">1件～50件を表示&nbsp;&nbsp;<a href=list_friend.pl?page=2&id=xxx>次を表示</a></td></tr>
 	static bool parseNextBackLink( CMixiData& nextLink, CMixiData& backLink, CString str )
