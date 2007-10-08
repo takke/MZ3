@@ -363,16 +363,20 @@ public:
 			// OwnerID が未取得なので解析する
 			MZ3LOGGER_DEBUG( L"OwnerID が未取得なので解析します" );
 
-			for (int i=index; i<count; i++) {
+			for (int i=0; i<count; i++) {
 				const CString& line = html_.GetAt(i);
 				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"list_community.pl" ) ) {
-					CString buf;
-					
-					if( util::GetBetweenSubString( line, L"id=", L"\"", buf ) == -1 ) {
-						MZ3LOGGER_ERROR( L"list_community.pl の引数に id 指定がありません。 line[" + line + L"]" );
+
+					// list_community.pl 以降を抽出
+					CString after;
+					util::GetAfterSubString( line, L"list_community.pl", after );
+
+					CString id;					
+					if( util::GetBetweenSubString( after, L"id=", L"\"", id ) == -1 ) {
+						MZ3LOGGER_ERROR( L"list_community.pl の引数に id 指定がありません。 line[" + line + L"], after[" + after + L"]" );
 					}else{
-						MZ3LOGGER_DEBUG( L"OwnerID = " + buf );
-						theApp.m_loginMng.SetOwnerID(buf);
+						MZ3LOGGER_DEBUG( L"OwnerID = " + id );
+						theApp.m_loginMng.SetOwnerID(id);
 						theApp.m_loginMng.Write();
 					}
 					break;
@@ -380,7 +384,7 @@ public:
 			}
 
 			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-				MZ3LOGGER_ERROR( L"OwnerID が取得できませんでした" );
+				MZ3LOGGER_ERROR( L"OwnerID を取得できませんでした" );
 			}
 		}
 
