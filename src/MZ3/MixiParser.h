@@ -1076,25 +1076,20 @@ public:
 					data_.AddBody(_T("\r\n"));
 
 					// 日記の著者
-					// ここで取得しなくても呼び出しもと（一覧）にて取得済みなので、コメントアウトしておく。
-/*					{
+					{
 						// フラグの５０行くらい前に、日記の著者があるはず。
-						// <td WIDTH=490 background=http://img.mixi.jp/img/bg_w.gif><b><font COLOR=#605048>XXXの日記</font></b></td>
-						// <td WIDTH=490 background=http://img.mixi.jp/img/bg_w.gif><b><font COLOR=#605048>XXXさんの日記</font></b></td>
+						//<div class="diaryTitle clearfix">
+						//<h2>たっけの日記</h2>
 						for( int iBack=-50; iBack<0; iBack++ ) {
 							const CString& line = html_.GetAt( i+iBack );
-							LPCTSTR pattern = L"show_friend.pl";
-							int idx = line.Find( pattern );
-							if( idx >= 0 ) {
-								// 発見。
-								CString target = line.Mid( idx+wcslen(pattern) );
+							if (util::LineHasStringsNoCase(line, L"<h2>", L"</h2>")) {
 								// 自分の日記なら「XXXの日記」、自分以外なら「XXXさんの日記」のはず。
 								// この規則で著者を解析。
 								CString author;
 								if( bMyDiary ) {
-									util::GetBetweenSubString( target, L">", L"の日記<", author );
+									util::GetBetweenSubString( line, L">", L"の日記<", author );
 								}else{
-									util::GetBetweenSubString( target, L">", L"さんの日記<", author );
+									util::GetBetweenSubString( line, L">", L"さんの日記<", author );
 								}
 								// 著者設定
 								data_.SetAuthor( author );
@@ -1103,7 +1098,7 @@ public:
 							}
 						}
 					}
-*/
+
 					// 公開レベル
 					{
 						// フラグの５０行くらい前に、「友人まで公開」といった情報があるはず。
