@@ -2430,7 +2430,6 @@ private:
 					}
 
 					// ‚»‚êˆÈŠO‚Ìê‡
-					buf.Replace(_T("\n"), _T("\r\n"));
 					ParserUtil::AddBodyWithExtract( cmtData, buf );
 
 					while( i<eIndex ) {
