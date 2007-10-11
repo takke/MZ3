@@ -2599,7 +2599,7 @@ public:
 		// 「最新のトピック」の抽出
 		parseRecentTopics( data_, html_ );
 
-		MZ3LOGGER_DEBUG( L"ViewEnqueteParser.parse() finished." );
+		MZ3LOGGER_DEBUG( L"ViewEventParser.parse() finished." );
 		return true;
 	}
 
