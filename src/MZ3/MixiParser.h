@@ -1125,23 +1125,9 @@ public:
 					// 本文終了タグ未発見
 					// 日記本文解析
 
-					// 動画用Scriptタグが見つかったらスクリプト用ループ開始
-					if( util::LineHasStringsNoCase(line,L"<script") ) {
-						while( i<lastLine ) {
-							// 次の行をフェッチ
-							const CString& nextLine = html_.GetAt( ++i );
-							// 拡張子.flvが見つかったら投入
-							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-								ParserUtil::AddBodyWithExtract( data_, nextLine );
-							}
-							// </script> があれば終了
-							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-								break;
-							}
-						}
-					}
-					else {
-						// 本文終了タグ未発見なので、解析＆投入
+					// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
+					if(! ParserUtil::ExtractVideoLinkFromScriptTag( data_, i, html_ ) ) {
+						// scriptタグ未発見なので、解析＆投入
 						ParserUtil::AddBodyWithExtract( data_, line );
 					}
 
@@ -1915,22 +1901,9 @@ public:
 						break;
 					}
 
-					// 動画用Scriptタグが見つかったらスクリプト用ループ開始
-					if( util::LineHasStringsNoCase(line, L"<script") ) {
-						while( i<lastLine ) {
-							// 次の行をフェッチ
-							const CString& nextLine = html_.GetAt( ++i );
-							// 拡張子.flvが見つかったら投入
-							if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-								ParserUtil::AddBodyWithExtract( mixi, nextLine );
-							}
-							// </script> があれば終了
-							if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-								break;
-							}
-						}
-					} else {
-						// ふつうに解析＆投入
+					// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
+					if(! ParserUtil::ExtractVideoLinkFromScriptTag( mixi, i, html_ ) ) {
+						// scriptタグ未発見なので、解析＆投入
 						ParserUtil::AddBodyWithExtract( mixi, line );
 					}
 				}
@@ -2082,22 +2055,9 @@ private:
 				break;
 			}
 
-			// 動画用Scriptタグが見つかったらスクリプト用ループ開始
-			if( util::LineHasStringsNoCase(line, L"<script") ) {
-				while( i<lastLine ) {
-					// 次の行をフェッチ
-					const CString& nextLine = html_.GetAt( ++i );
-					// 拡張子.flvが見つかったら投入
-					if( util::LineHasStringsNoCase(nextLine,L".flv") ) {
-						ParserUtil::AddBodyWithExtract( cmtData, nextLine );
-					}
-					// </script> があれば終了
-					if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
-						break;
-					}
-				}
-			} else {
-				// ふつうに解析＆投入
+			// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
+			if(! ParserUtil::ExtractVideoLinkFromScriptTag( cmtData, i, html_ ) ) {
+				// scriptタグ未発見なので、解析＆投入
 				ParserUtil::AddBodyWithExtract( cmtData, line );
 			}
 		}

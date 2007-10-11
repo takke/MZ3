@@ -433,6 +433,40 @@ public:
 		}
 	}
 
+	/**
+	 * 動画リンクの抽出
+	 *
+	 * <script> タグを抽出するため、複数行のパースを行う。
+	 * iLine_ パラメータが参照である点に注意！
+	 */
+	static bool ExtractVideoLinkFromScriptTag( CMixiData& mixi_, int& iLine_, const CHtmlArray& html_ )
+	{
+		const int lastLine = html_.GetCount();
+		if( iLine_>=lastLine ) {
+			return false;
+		}
+
+		// 動画用Scriptタグが見つかったらスクリプト用ループ開始
+		const CString& line = html_.GetAt( iLine_ );
+		if( util::LineHasStringsNoCase( line, L"<script") ) {
+			while( iLine_<lastLine ) {
+				// 次の行をフェッチ
+				const CString& nextLine = html_.GetAt( ++iLine_ );
+				// 拡張子.flvが見つかったら投入
+				if( util::LineHasStringsNoCase( nextLine, L".flv" ) ) {
+					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
+				}
+				// </script> があれば終了
+				if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+					break;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 private:
 
 	/**
