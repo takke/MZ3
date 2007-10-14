@@ -84,6 +84,11 @@ BOOL CMZ3App::InitInstance()
 	SHInitExtraControls();
 #endif
 
+#ifndef	WINCE
+	// Win32 用にロケールを設定
+	setlocale( LC_ALL, "Japanese" ); 
+#endif
+
 	// ファイルパス群を初期化
 	m_filepath.init();
 
@@ -478,6 +483,7 @@ BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
  */
 bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 {
+#ifdef WINCE
 	CFont *pFont = pBaseFont;
 	if (pFont)
 	{
@@ -494,6 +500,21 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 		theApp.m_font.Detach();
 		theApp.m_font.CreateFontIndirect( &lf );
 	}
+#else
+	CFont *pFont = pBaseFont;
+	if (pFont)
+	{
+		LOGFONT lf;
+		pFont->GetLogFont( &lf );
+
+		if( fontHeight != 0 ) {
+			lf.lfHeight = fontHeight;
+		}
+
+		theApp.m_font.Detach();
+		theApp.m_font.CreateFontIndirect( &lf );
+	}
+#endif
 	return true;
 }
 
