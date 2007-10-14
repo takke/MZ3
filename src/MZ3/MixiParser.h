@@ -589,11 +589,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"list_diary.pl", ACCESS_LIST_MYDIARY );
@@ -835,11 +833,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=new_friend_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=new_friend_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		if( parseNextBackLinkBase( nextLink, backLink, str, reg, L"new_friend_diary.pl", ACCESS_LIST_DIARY ) ) {
@@ -1465,11 +1461,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=new_bbs.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=new_bbs.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		if( parseNextBackLinkBase( nextLink, backLink, str, reg, L"new_bbs.pl", ACCESS_LIST_NEW_BBS ) ) {
@@ -1640,11 +1634,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_community.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_community.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str,
@@ -1815,11 +1807,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_bbs.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_bbs.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"list_bbs.pl", ACCESS_LIST_BBS );
@@ -2823,11 +2813,9 @@ public:
 			{
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !reg.isCompiled() ) {
-					if(! reg.compile( L"\"(view_news.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</" ) ) {
-						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-						return false;
-					}
+				if( !util::CompileRegex( reg, L"\"(view_news.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</" ) ) {
+					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+					return false;
 				}
 				// 探索
 				if( reg.exec(str) == false || reg.results.size() != 3 ) {
@@ -2847,11 +2835,9 @@ public:
 
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !reg.isCompiled() ) {
-					if(! reg.compile( L"list_news_media.pl.+>([^<]+)</" ) ) {
-						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-						return false;
-					}
+				if( !util::CompileRegex( reg, L"list_news_media.pl.+>([^<]+)</" ) ) {
+					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+					return false;
 				}
 				// 探索
 				if( reg.exec(line2) == false || reg.results.size() != 2 ) {
@@ -2875,11 +2861,9 @@ public:
 			{
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !reg.isCompiled() ) {
-					if(! reg.compile( L"<td[^>]+>([^<]+)</" ) ) {
-						MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-						return false;
-					}
+				if( !util::CompileRegex( reg, L"<td.+?>(.+?)</" ) ) {
+					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+					return false;
 				}
 				// 探索
 				if( reg.exec(line3) == false || reg.results.size() != 2 ) {
@@ -2937,11 +2921,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_news_category.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_news_category.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, 
@@ -3311,11 +3293,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_friend.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_friend.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"list_friend.pl", ACCESS_LIST_FRIEND );
@@ -3464,11 +3444,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=show_intro.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=show_intro.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"show_intro.pl", ACCESS_LIST_INTRO );
@@ -3776,11 +3754,9 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href=list_bookmark.pl([?][^>]+)>([^<]+)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return false;
-			}
+		if( !util::CompileRegex( reg, L"<a href=list_bookmark.pl([?][^>]+)>([^<]+)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str,

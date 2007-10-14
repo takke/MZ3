@@ -260,9 +260,9 @@ public:
 		// table タグの除去
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<table[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<table[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<table" ) != -1 ) 
 				reg.replaceAll( line, L"" );
 		}
@@ -271,9 +271,9 @@ public:
 		// tr タグの除去
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<tr[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<tr[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<tr" ) != -1 ) 
 				reg.replaceAll( line, L"" );
 		}
@@ -282,9 +282,9 @@ public:
 		// td タグの除去
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<td[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<td[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<td" ) != -1 ) 
 				reg.replaceAll( line, L"" );
 		}
@@ -293,9 +293,9 @@ public:
 		// div タグの除去
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<div[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<div[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<div" ) != -1 ) 
 				reg.replaceAll( line, L"" );
 		}
@@ -304,9 +304,9 @@ public:
 		// span タグの除去
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<span[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<span[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<span" ) != -1 ) 
 				reg.replaceAll( line, L"" );
 		}
@@ -319,11 +319,21 @@ public:
 		// br タグの置換
 		{
 			static MyRegex reg;
-			if( !reg.isCompiled() ) 
-				if(! reg.compile( L"<br[^>]*>" ) ) 
-					return;
+			if( !util::CompileRegex( reg, L"<br[^>]*>" ) ) {
+				return;
+			}
 			if( line.Find( L"<br" ) != -1 ) 
 				reg.replaceAll( line, L"\r\n" );
+		}
+
+		// コメントの置換
+		{
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"<!--.*?-->" ) ) {
+				return;
+			}
+			if( line.Find( L"<!--" ) != -1 ) 
+				reg.replaceAll( line, L"" );
 		}
 
 		// "<p>" → 削除
@@ -350,11 +360,8 @@ public:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"&#([0-9]{4,5});" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg, L"&#([0-9]{4,5});" ) ) {
+			return;
 		}
 
 		CString target = str;
@@ -486,12 +493,8 @@ private:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			LPCTSTR szPattern = L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>";
-			if(! reg.compile( szPattern ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
+			return;
 		}
 
 		// ((喫煙)) に変換する
@@ -666,12 +669,8 @@ alt="" /></a></td>
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			LPCTSTR szPattern = L"<img[^>]*src=\"([^\"]+)\" [^>]*>";
-			if(! reg.compile( szPattern ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg, L"<img[^>]*src=\"([^\"]+)\" [^>]*>" ) ) {
+			return;
 		}
 
 		CString target = line;
@@ -723,12 +722,9 @@ alt="" /></a></td>
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			LPCTSTR szPattern = L".*video *: '([^']+)',.*";
-			if(! reg.compile( szPattern ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg, L".*video *: '([^']+)',.*" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
 		}
 
 		CString target = line;
@@ -781,25 +777,19 @@ public:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			if(! reg.compile( L"<a href='([^']+)'[^>]*>([^<]*)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg, L"<a href='([^']+)'[^>]*>([^<]*)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
 		}
 		static MyRegex reg2;
-		if( !reg2.isCompiled() ) {
-			if(! reg2.compile( L"<a href=\"([^\"]+)\"[^>]*>([^<]*)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg2, L"<a href=\"([^\"]+)\"[^>]*>([^<]*)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
 		}
 		static MyRegex reg3;
-		if( !reg3.isCompiled() ) {
-			if(! reg3.compile( L"<a href=([^>]+)>([^<]*)</a>" ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg3, L"<a href=([^>]+)>([^<]*)</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
 		}
 
 		CString target = str;
@@ -863,19 +853,14 @@ private:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !reg.isCompiled() ) {
-			LPCTSTR szPattern = L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)";
-			if(! reg.compile( szPattern ) ) {
-				MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-				return;
-			}
+		if( !util::CompileRegex( reg, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
 		}
 
 		CString target = str;
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			if( reg.exec(target) == false || 
-				reg.results.size() != 2 )
-			{
+			if( reg.exec(target) == false || reg.results.size() != 2 ) {
 				// 未発見。終了。
 				break;
 			}

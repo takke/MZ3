@@ -3,6 +3,8 @@
  */
 #pragma once
 
+#include "MyRegex.h"
+
 /// MZ3 用ユーティリティ
 namespace util
 {
@@ -1016,6 +1018,29 @@ int FindFileCallback(const TCHAR* szDirectory,
     }
 
     return nResult;
+}
+
+
+/**
+ * 未コンパイルであればコンパイルする。
+ *
+ * コンパイル失敗時はエラーログを出力する
+ */
+inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
+{
+	if( reg.isCompiled() ) {
+		return true;
+	} else {
+		if(! reg.compile( szPattern ) ) {
+			CString msg = FAILED_TO_COMPILE_REGEX_MSG;
+			msg += L", pattern[";
+			msg += szPattern;
+			msg += L"]";
+			MZ3LOGGER_FATAL( msg );
+			return false;
+		}
+		return true;
+	}
 }
 
 }
