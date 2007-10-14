@@ -144,6 +144,9 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	if (!CFrameWnd::PreCreateWindow(cs))
 		return FALSE;
 
+	// ドキュメントの名称を表示しない
+	cs.style &= ~FWS_ADDTOTITLE;
+
 	return TRUE;
 }
 
@@ -506,6 +509,7 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 	// サイズ変更
 	{
 		CRect rect;
+#ifdef WINCE
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 		int w = rect.Width();
 		int h = rect.Height() - rect.top;
@@ -514,6 +518,14 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		if( theApp.m_bSmartphone ) {
 			h += MZ3_TOOLBAR_HEIGHT;
 		}
+#else
+		// Win32 の場合は現在の大きさを継続する
+		// TODO レイアウト処理を変更すること。この方法では同一サイズにはならない。
+		GetWindowRect( &rect );
+//		GetClientRect( &rect );
+		int w = rect.Width();
+		int h = rect.Height();
+#endif
 
 		SetWindowPos( NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
 
