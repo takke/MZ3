@@ -191,8 +191,8 @@ public:
 			// 成功。
 			// 検索結果を results にセット。
 			for( u_int i=0; i<reg->backrefcnt; i++ ) {
-				u_int start = reg->backref[i].start;
-				u_int width = reg->backref[i].match-1;
+				int start = reg->backref[i].start;
+				int width = reg->backref[i].match-1;
 				if( width <= 0 ) {
 					results.push_back( Result( -1, -1, std::wstring() ) );
 				}else{
