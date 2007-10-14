@@ -2660,11 +2660,18 @@ private:
 
 					const CString& line = html_.GetAt(i);
 					//コメント番号を取得
+					// <dt class="commentDate clearfix"><span class="senderId">183
+					// or
 					// <dt class="commentDate clearfix"><span class="senderId"><input type="checkbox" name="comment_id" id="commentCheck290675880" value="290675880" /><label for="commentCheck290675880">44</label></span>
 					if( util::LineHasStringsNoCase( line, L"commentDate", L"senderId")) {
 						CString number;
-						util::GetAfterSubString( line, L"<label", number );
-						util::GetBetweenSubString( number, L">", L"</label", number );
+						if (util::GetAfterSubString( line, L"<label", number ) >= 0) {
+							// 管理コミュ版
+							util::GetBetweenSubString( number, L">", L"</label", number );
+						} else {
+							util::GetAfterSubString( line, L"<span", number );
+							util::GetAfterSubString( number, L">", number );
+						}
 						// &nbsp; を消す
 						while(number.Replace(L"&nbsp;",L"")) {}
 						cmtData.SetCommentIndex(_wtoi(number));
