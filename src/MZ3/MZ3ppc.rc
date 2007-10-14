@@ -90,7 +90,7 @@ BEGIN
             POPUP "記事取得"
             BEGIN
                 MENUITEM "全件取得",                        IDM_GETPAGE_ALL
-                MENUITEM "最新１０件取得",                     IDM_GETPAGE_LATEST10
+                MENUITEM "最新２０件取得",                     IDM_GETPAGE_LATEST10
             END
             POPUP "文字サイズ"
             BEGIN
@@ -141,7 +141,7 @@ BEGIN
     BEGIN
         MENUITEM "ログを開く",                       ID_VIEW_LOG
         MENUITEM "全部読む",                        ID_GET_ALL
-        MENUITEM "最新の１０件を読む",                   ID_GET_LAST10
+        MENUITEM "最新の２０件を読む",                   ID_GET_LAST10
         MENUITEM SEPARATOR
         MENUITEM "未読にする",                       IDM_SET_NO_READ
     END
@@ -389,7 +389,7 @@ CAPTION "取得"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL         "全データ取得",IDC_PAGE_GETALL_RADIO,"Button",BS_AUTORADIOBUTTON,14,20,55,10
-    CONTROL         "最新１０件取得",IDC_PAGE_GETLATEST_RADIO,"Button",BS_AUTORADIOBUTTON,69,20,59,10
+    CONTROL         "最新２０件取得",IDC_PAGE_GETLATEST_RADIO,"Button",BS_AUTORADIOBUTTON,69,20,59,10
     GROUPBOX        "記事取得",IDC_STATIC,7,7,125,28
     LTEXT           "受信バッファ",IDC_STATIC,14,54,38,8
     COMBOBOX        IDC_RECV_BUF_COMBO,69,52,52,48,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP

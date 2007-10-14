@@ -82,7 +82,7 @@ private:
 
 public:
 	Option()
-		: m_GetPageType( GETPAGE_LATEST10 )
+		: m_GetPageType( GETPAGE_LATEST20 )
 		, m_bUseAutoConnection( true )
 		, m_bUseProxy( false )
 		, m_bUseGlobalProxy( true )

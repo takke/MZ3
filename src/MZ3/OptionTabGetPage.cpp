@@ -124,7 +124,7 @@ void COptionTabGetPage::Save()
 		type = GETPAGE_ALL;
 	}
 	else {
-		type = GETPAGE_LATEST10;
+		type = GETPAGE_LATEST20;
 	}
 	theApp.m_optionMng.SetPageType(type);
 

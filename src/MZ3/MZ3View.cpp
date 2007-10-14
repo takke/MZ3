@@ -2205,8 +2205,8 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url)
 	case ACCESS_ENQUETE:
 		// コミュニティ、アンケートなら、取得件数を変更
 		switch( theApp.m_optionMng.GetPageType() ) {
-		case GETPAGE_LATEST10:
-			// 最新１０件取得
+		case GETPAGE_LATEST20:
+			// 最新２０件取得
 			{
 				uri = a_url;
 			}
@@ -2282,7 +2282,7 @@ void CMZ3View::OnGetAll()
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
 }
 
-/// 右ソフトキーメニュー｜最新の10件を読む
+/// 右ソフトキーメニュー｜最新の20件を読む
 void CMZ3View::OnGetLast10()
 {
 	// チェック
@@ -2299,8 +2299,8 @@ void CMZ3View::OnGetLast10()
 		return;
 	}
 
-	// 10件に設定し、アクセス開始
-	theApp.m_optionMng.SetPageType( GETPAGE_LATEST10 );
+	// 20件に設定し、アクセス開始
+	theApp.m_optionMng.SetPageType( GETPAGE_LATEST20 );
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
 }
 
@@ -2692,18 +2692,18 @@ bool CMZ3View::PopupBodyMenu(void)
 			case ACCESS_ENQUETE:
 			case ACCESS_BBS:
 				// BBS, アンケート
-				// 10件or全件の切り替えメニューを出す
+				// 20件or全件の切り替えメニューを出す
 				if( theApp.m_optionMng.GetPageType() == GETPAGE_ALL ) {
 					// 「全件」にチェック
 					pSubMenu->CheckMenuItem( ID_GET_ALL, MF_CHECKED | MF_BYCOMMAND );
 				}
-				if( theApp.m_optionMng.GetPageType() == GETPAGE_LATEST10 ) {
-					// 「最新の10件」にチェック
+				if( theApp.m_optionMng.GetPageType() == GETPAGE_LATEST20 ) {
+					// 「最新の20件」にチェック
 					pSubMenu->CheckMenuItem( ID_GET_LAST10, MF_CHECKED | MF_BYCOMMAND );
 				}
 				break;
 			default:
-				// それ以外では、「全件」と「最新の10件」を削除。
+				// それ以外では、「全件」と「最新の20件」を削除。
 				pSubMenu->EnableMenuItem( ID_GET_ALL, MF_GRAYED | MF_BYCOMMAND );
 				pSubMenu->EnableMenuItem( ID_GET_LAST10, MF_GRAYED | MF_BYCOMMAND );
 			}

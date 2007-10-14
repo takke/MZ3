@@ -394,13 +394,13 @@ void CMainFrame::OnUpdateGetpageAll(CCmdUI *pCmdUI)
 /// 「最新１０件取得」メニュー押下イベント
 void CMainFrame::OnGetpageLatest10()
 {
-	theApp.m_optionMng.SetPageType( GETPAGE_LATEST10 );
+	theApp.m_optionMng.SetPageType( GETPAGE_LATEST20 );
 }
 
 /// 「最新１０件取得」メニューのチェック状態制御
 void CMainFrame::OnUpdateGetpageLatest10(CCmdUI *pCmdUI)
 {
-	if( theApp.m_optionMng.GetPageType() == GETPAGE_LATEST10 ) {
+	if( theApp.m_optionMng.GetPageType() == GETPAGE_LATEST20 ) {
 		pCmdUI->SetCheck( TRUE );
 	}else{
 		pCmdUI->SetCheck( FALSE );

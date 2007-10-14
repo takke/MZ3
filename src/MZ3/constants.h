@@ -4,7 +4,7 @@
 #pragma once
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.2.0 Beta23"
+#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.2.0 Beta24"
 
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$"
@@ -105,7 +105,7 @@ enum ACCESS_TYPE {
 enum GETPAGE_TYPE
 {
 	GETPAGE_ALL = 0,		///< 全件取得
-	GETPAGE_LATEST10 = 1,	///< 最新の１０件取得
+	GETPAGE_LATEST20 = 1,	///< 最新の２０件取得
 };
 
 /**
