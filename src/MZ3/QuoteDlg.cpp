@@ -131,9 +131,9 @@ void CQuoteDlg::OnSize(UINT nType, int cx, int cy)
 	int hInfo = theApp.GetInfoRegionHeight(theApp.m_optionMng.m_fontHeight);
 	int hList = cy/2 - hInfo;
 
-	GetDlgItem(IDC_MESSAGE_EDIT)->MoveWindow(   0,        0, cx, hInfo          );
-	GetDlgItem(IDC_SAMPLE_EDIT )->MoveWindow(   0,    hInfo, cx, cy-hList-hInfo );
-	GetDlgItem(IDC_TYPE_LIST   )->MoveWindow(   0, cy-hList, cx, hList          );
+	util::MoveDlgItemWindow( this, IDC_MESSAGE_EDIT,   0,        0, cx, hInfo          );
+	util::MoveDlgItemWindow( this, IDC_SAMPLE_EDIT,    0,    hInfo, cx, cy-hList-hInfo );
+	util::MoveDlgItemWindow( this, IDC_TYPE_LIST,      0, cy-hList, cx, hList          );
 }
 
 void CQuoteDlg::OnLbnSelchangeTypeList()

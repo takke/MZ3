@@ -1551,8 +1551,12 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 				// 一番上の項目なら無視
 				return TRUE;
 			} else {
+#ifdef WINCE
 				// デフォルト動作
 				return FALSE;
+#else
+				return CommandMoveUpCategoryList();
+#endif
 			}
 			break;
 
@@ -1566,8 +1570,12 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 				}
 				return CommandSetFocusBodyList();
 			} else {
+#ifdef WINCE
 				// デフォルト動作
 				return FALSE;
+#else
+				return CommandMoveDownCategoryList();
+#endif
 			}
 			break;
 		}
@@ -1704,8 +1712,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				
 				return CommandSetFocusCategoryList();
 			}else{
+#ifdef WINCE
 				// デフォルト動作
 				return FALSE;
+#else
+				return CommandMoveUpBodyList();
+#endif
 			}
 			break;
 
@@ -1715,8 +1727,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				if( m_access ) return TRUE;	// アクセス中は禁止
 				return TRUE;
 			}else{
+#ifdef WINCE
 				// デフォルト動作
 				return FALSE;
+#else
+				return CommandMoveDownBodyList();
+#endif
 			}
 			break;
 		}

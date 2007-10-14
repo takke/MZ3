@@ -807,8 +807,12 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 					return TRUE;
 				} else {
+#ifdef WINCE
 					// デフォルト動作
 					return FALSE;
+#else
+					return CommandMoveUpList();
+#endif
 				}
 
 			case VK_DOWN:
@@ -820,8 +824,12 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 					return TRUE;
 				} else {
+#ifdef WINCE
 					// デフォルト動作
 					return FALSE;
+#else
+					return CommandMoveDownList();
+#endif
 				}
 				break;
 			}
