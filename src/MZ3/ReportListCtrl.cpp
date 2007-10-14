@@ -39,7 +39,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	this->GetClientRect( &rectClient );
 
 	// ƒrƒbƒgƒ}ƒbƒv‚Ì•`‰æ
-	if( theApp.m_optionMng.IsUseBgImage() ) {
+	if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageReportListCtrl.isEnableImage() ) {
 		int x = lpDrawItemStruct->rcItem.left;
 		int y = lpDrawItemStruct->rcItem.top;
 		int w = rectClient.Width();
@@ -102,7 +102,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcItemStr.right =	rcItemStr.left + szSize.cx + OFFSET_OTHER;
 
 	// ”wŒi‚Ì“h‚è‚Â‚Ô‚µi”wŒi‰æ‘œ‚È‚µ‚Ìê‡j
-	if( !theApp.m_optionMng.IsUseBgImage() ) {
+	if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageReportListCtrl.isEnableImage() ) {
 		pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 	}
 

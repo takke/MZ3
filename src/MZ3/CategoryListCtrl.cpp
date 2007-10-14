@@ -91,7 +91,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// ”wŒi‚Ì“h‚è‚Â‚Ô‚µ
-		if( !theApp.m_optionMng.IsUseBgImage() ) {
+		if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainCategoryCtrl.isEnableImage() ) {
 			// ”wŒi‰æ‘œ‚È‚µ‚Ìê‡
 			pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 		}else{
@@ -197,7 +197,7 @@ BOOL CCategoryListCtrl::OnEraseBkgnd(CDC* pDC)
 	pDC->SetBkMode( TRANSPARENT );
 
 	// ƒrƒbƒgƒ}ƒbƒv‚Ì‰Šú‰»‚Æ•`‰æ
-	if( theApp.m_optionMng.IsUseBgImage() ) {
+	if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageMainCategoryCtrl.isEnableImage()) {
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 

@@ -456,7 +456,6 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		CMZ3View* pView = (CMZ3View*)theApp.m_pMainView;
 
 		// グループタブ
-//		MySetListViewFont( &pView->m_groupList );
 		pView->m_groupTab.SetFont( &theApp.m_font );
 
 		// カテゴリリスト

@@ -29,6 +29,8 @@ public:
 		return m_hBitmap;
 	}
 
+	bool isEnableImage() { return m_hBitmap!=NULL ? true : false; }
+
 	bool isValidSkinfile( LPCTSTR szSkinName );
 	CString makeSkinFilePath( LPCTSTR szSkinName );
 	bool load();
@@ -57,7 +59,7 @@ private:
 #ifdef WINCE
 		return SHLoadImageFile( szFilepath );
 #else
-		return (HBITMAP)LoadImage( 0, szFilepath, IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+		return (HBITMAP)LoadImage( 0, szFilepath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
 #endif
 	}
 
