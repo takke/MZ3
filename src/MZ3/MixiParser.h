@@ -2003,13 +2003,9 @@ private:
 			if (util::LineHasStringsNoCase( line, L"<span", L"senderId", L"checkbox" )) {
 				CString number;
 				util::GetAfterSubString( line, L"<label", number );
-				//  for="commentCheck01">&nbsp;12</label></span>
-
 				util::GetBetweenSubString( number, L">", L"</label", number );
-
 				// &nbsp; ‚ðÁ‚·
 				while(number.Replace(L"&nbsp;",L"")) {}
-
 				cmtData.SetCommentIndex(_wtoi(number));
 			}
 
@@ -2664,11 +2660,14 @@ private:
 
 					const CString& line = html_.GetAt(i);
 					//ƒRƒƒ“ƒg”Ô†‚ðŽæ“¾
-					// <label for="commentCheck01">37</label>
+					// <dt class="commentDate clearfix"><span class="senderId"><input type="checkbox" name="comment_id" id="commentCheck290675880" value="290675880" /><label for="commentCheck290675880">44</label></span>
 					if( util::LineHasStringsNoCase( line, L"commentDate", L"senderId")) {
-						CString strIndex;
-						util::GetAfterSubString( line,  L"senderId\">", strIndex );
-						cmtData.SetCommentIndex( _wtoi(strIndex) );
+						CString number;
+						util::GetAfterSubString( line, L"<label", number );
+						util::GetBetweenSubString( number, L">", L"</label", number );
+						// &nbsp; ‚ðÁ‚·
+						while(number.Replace(L"&nbsp;",L"")) {}
+						cmtData.SetCommentIndex(_wtoi(number));
 					}
 					
 					//“ú•t‚ðŽæ“¾
