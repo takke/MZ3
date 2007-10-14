@@ -545,9 +545,8 @@ public:
 				//<dd>2007年06月18日12:10</dd>
 				const CString& str = html_.GetAt(i+1);	
 				CString date;
-				util::GetBetweenSubString( str, L">", L"<", date );
+				util::GetBetweenSubString( str, L"<dd>", L"</dd>", date );
 				ParserUtil::ChangeDate(date, &data);
-
 
 				for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
@@ -642,7 +641,7 @@ public:
 					util::GetBetweenSubString( str, L"<dt>", L"</dt>", date );
 					date.Replace(_T("&nbsp;"), _T(" "));
 					ParserUtil::ChangeDate(date, &data);
-
+					
 					// 見出し
 					//<dd><a href="view_diary.pl?
 					{
@@ -1048,12 +1047,21 @@ public:
 		// 日記本文＆コメント解析
 		bool bStartDiary = false;	// 日記本文開始フラグ
 		bool bEndDiary   = false;	// 日記本文終了フラグ
-		for (int i=75; i<lastLine; i++) {
+		for (int i=180; i<lastLine; i++) {
 			const CString& line = html_.GetAt(i);
 
 			if (bStartDiary == false) {
-				// 日記開始フラグを発見するまで廻す
 
+				//日時の抽出	
+				if( util::LineHasStringsNoCase( line, L"<dt>", L"<span>", L"edit_diary.pl" ) ) {
+					const CString& line2 = html_.GetAt( i+1 );
+					//<dd>2007年10月02日 22:22</dd>
+					CString date;
+					util::GetBetweenSubString( line2, L"<dd>", L"</dd>", date );
+					data_.SetDate( date );
+				}
+			
+				// 日記開始フラグを発見するまで廻す
 				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) ) {
 					// 日記開始フラグ発見（日記本文発見）
 					bStartDiary = true;
@@ -1115,6 +1123,11 @@ public:
 			}
 			else {
 				// 日記開始フラグ発見済み。
+
+				// 終了タグまでデータ取得
+				if (line.Find(_T("/viewDiaryBox")) != -1 ) {
+					bEndDiary = true;
+				}
 
 				// 終了タグまでデータ取得
 				if (line.Find(_T("</div>")) != -1 ) {
@@ -1992,7 +2005,7 @@ private:
 				util::GetAfterSubString( line, L"<label", number );
 				//  for="commentCheck01">&nbsp;12</label></span>
 
-				util::GetBetweenSubString( number, L">", L"<", number );
+				util::GetBetweenSubString( number, L">", L"</label", number );
 
 				// &nbsp; を消す
 				while(number.Replace(L"&nbsp;",L"")) {}
@@ -2004,7 +2017,7 @@ private:
 			// <span class="date">2007年07月28日 21:09</span></dt>
 			if (util::LineHasStringsNoCase( line, L"<span", L"class", L"date" ) ) {
 				CString date;
-				util::GetBetweenSubString( line, L">", L"<", date );
+				util::GetBetweenSubString( line, L">", L"</span", date );
 				ParserUtil::ChangeDate(date, &cmtData);
 			}
 
