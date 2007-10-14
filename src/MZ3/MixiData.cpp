@@ -87,8 +87,11 @@ void CMixiData::SetAuthor(CString author)
 
 void CMixiData::SetDate(int year, int month, int day, int hour, int minute)
 {
-	m_date.Format(_T("%04d/%02d/%02d %02d:%02d"), year, month, day, hour, minute);
-//	m_date.Format(_T("%02d/%02d %02d:%02d"), month, day, hour, minute);
+	if (year==0) {
+		SetDate(month, day, hour, minute);
+	} else {
+		m_date.Format(_T("%04d/%02d/%02d %02d:%02d"), year, month, day, hour, minute);
+	}
 }
 
 void CMixiData::SetDate(int month, int day, int hour, int minute)

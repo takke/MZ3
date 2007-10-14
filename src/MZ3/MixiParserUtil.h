@@ -151,59 +151,37 @@ public:
 	}
 
 	/**
-	 * 時刻変換
+	 * 時刻変換(日付・時刻っぽい文字列を抽出し、mixi にSetDateする)
 	 *
-	 * @param strDate [in]  日付文字列。例："12月08日"
-	 * @param strTime [in]  時刻文字列。例："23:31"
-	 * @param data    [out] 解析結果を SetDate で保存する。
+	 * @param line [in]  日時文字列を含む文字列。
+	 *                   例："2006年11月19日 17:12"
+	 *                       "<span class="date">2007年07月05日 21:55</span></dt>"
+	 *                       "<td>10月08日</td></tr>"
+	 * @param mixi [out] 解析結果を SetDate で保存する。
 	 */
-	static void ChangeDate( CString strDate, CString strTime, CMixiData* data )
+	static void ParseDate(LPCTSTR line, CMixiData& mixi)
 	{
-		int month  = _wtoi( strDate.Left(strDate.Find(_T("月")) ) );
-
-		strDate = strDate.Mid(strDate.Find(_T("月")) + wcslen(_T("月")));
-		int day    = _wtoi( strDate.Left(strDate.Find(_T("日"))) );
-
-		int hour   = _wtoi( strTime.Left( strTime.Find(_T(":")) ) );
-		int minute = _wtoi( strTime.Mid( strTime.Find(_T(":")) + wcslen(_T(":")) ) );
-
-		// 全て 0 なら設定しない
-		if( month!=0 || day!=0 || hour!=0 || minute!=0 ) {
-			data->SetDate(month, day, hour, minute);
+		// 正規表現のコンパイル
+		static MyRegex reg;
+		if( !util::CompileRegex( reg, L"([0-9]{2,4})?年?([0-9]{1,2}?)月([0-9]{1,2})日[^0-9]*([0-9]{1,2})?:?時?([0-9]{2})?" ) ) {
+			return;
 		}
-	}
-
-	/**
-	 * 時刻変換
-	 *
-	 * @param buf  [in]  日時文字列。例："2006年11月19日 17:12"
-	 * @param data [out] 解析結果を SetDate で保存する。
-	 */
-	static void ChangeDate(CString buf, CMixiData* data)
-	{
-		int year = _wtoi(buf.Left(buf.Find(_T("年"))));
-
-		buf = buf.Mid(buf.Find(_T("年")) + wcslen(_T("年")));
-		int month = _wtoi(buf.Left(buf.Find(_T("月"))));
-
-		buf = buf.Mid(buf.Find(_T("月")) + wcslen(_T("月")));
-		int day = _wtoi(buf.Left(buf.Find(_T("日"))));
-
-		buf = buf.Mid(buf.Find(_T("日")) + wcslen(_T("日")));
-		buf.Trim();
-		int hour = _wtoi(buf.Left(buf.Find(_T(":"))));
-
-		buf = buf.Mid(buf.Find(_T(":")) + wcslen(_T(":")));
-		int minute = _wtoi(buf);
-
-		// 全て 0 なら設定しない
-		if( year!=0 || month!=0 || day!=0 || hour!=0 || minute!=0 ) {
-			if( year==0 ) {
-				data->SetDate(month, day, hour, minute);
-			}else{
-				data->SetDate(year, month, day, hour, minute);
-			}
+		// 検索
+		if( !reg.exec(line) || reg.results.size() != 6 ) {
+			CString msg = L"文字列内に日付・時刻が見つかりません : [";
+			msg += line;
+			msg += L"]";
+			MZ3LOGGER_DEBUG( msg );
+			return;
 		}
+
+		// 抽出
+		int year   = _wtoi( reg.results[1].str.c_str() );
+		int month  = _wtoi( reg.results[2].str.c_str() );
+		int day    = _wtoi( reg.results[3].str.c_str() );
+		int hour   = _wtoi( reg.results[4].str.c_str() );
+		int minute = _wtoi( reg.results[5].str.c_str() );
+		mixi.SetDate(year, month, day, hour, minute);
 	}
 
 	/**

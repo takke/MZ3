@@ -544,9 +544,7 @@ public:
 				// 日付
 				//<dd>2007年06月18日12:10</dd>
 				const CString& str = html_.GetAt(i+1);	
-				CString date;
-				util::GetBetweenSubString( str, L"<dd>", L"</dd>", date );
-				ParserUtil::ChangeDate(date, &data);
+				ParserUtil::ParseDate(str, data);
 
 				for (int j=i; j<count; j++) {
 					const CString& str = html_.GetAt(j);
@@ -635,10 +633,7 @@ public:
 
 					//日時の抽出
 					//<dt>2007年10月02日&nbsp;22:22</dt>
-					CString date;
-					util::GetBetweenSubString( str, L"<dt>", L"</dt>", date );
-					date.Replace(_T("&nbsp;"), _T(" "));
-					ParserUtil::ChangeDate(date, &data);
+					ParserUtil::ParseDate(str, data);
 					
 					// 見出し
 					//<dd><a href="view_diary.pl?
@@ -762,10 +757,7 @@ public:
 
 					//--- 時刻の抽出
 					//<dt>2007年10月02日&nbsp;22:22</dt>
-					CString date;
-					util::GetBetweenSubString( line, L"<dt>", L"</dt>", date );
-					date.Replace(_T("&nbsp;"), _T(" "));
-					ParserUtil::ChangeDate(date, &data);
+					ParserUtil::ParseDate(line, data);
 
 					//--- 見出しの抽出
 					//<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
@@ -896,10 +888,7 @@ public:
 
 					// 日付
 					// <dt>2007年10月01日&nbsp;01:11</dt>
-					CString date;
-					util::GetBetweenSubString( str, L">", L"<", date );
-					date.Replace(L"&nbsp;",L"");
-					ParserUtil::ChangeDate(date, &data);
+					ParserUtil::ParseDate(str, data);
 					TRACE(_T("%s\n"), data.GetDate());
 
 					// 見出しタイトル
@@ -1280,12 +1269,7 @@ private:
 					for (int j=i+3; j>0; j--) {
 						str = html_.GetAt(j);
 						if (str.Find(_T("日&nbsp;")) != -1) {
-
-							CString date;
-							util::GetBetweenSubString( str, L">", L"<", date );
-							date.Replace( L"&nbsp;", L"" );
-							ParserUtil::ChangeDate(date, &cmtData);
-
+							ParserUtil::ParseDate(str, cmtData);
 							break;
 						}
 					}
@@ -1377,10 +1361,7 @@ public:
 				CMixiData data;
 
 				// 日付
-				CString date;
-				util::GetBetweenSubString( str, L">", L"</", date );
-				date.Replace( L"&nbsp;", L"" );
-				ParserUtil::ChangeDate(date, &data);
+				ParserUtil::ParseDate(str, data);
 
 				// 見出し
 				i += 1;
@@ -1743,11 +1724,8 @@ public:
 					//4行以内で<span class="date">行が見つかるまで
 					for( iLine++; iLine<iLine+4; iLine++ ) {
 						const CString& line = html_.GetAt(iLine);
-						if( util::LineHasStringsNoCase( line, L"<span", L"date") )
-						{
-							CString date;
-							util::GetBetweenSubString( line, L"class=\"date\">", L"</span>", date );
-							ParserUtil::ChangeDate(date, &mixi);
+						if( util::LineHasStringsNoCase( line, L"<span", L"date") ) {
+							ParserUtil::ParseDate(line, mixi);
 							break;
 						}
 					}
@@ -1853,9 +1831,7 @@ public:
 			// 投稿日時を取得する
 			// <span class="date">2007年07月14日 22:22</span></dt>
 			if( util::LineHasStringsNoCase( line, L"span", L"class", L"date" ) ) {
-				CString date;
-				util::GetBetweenSubString( line, L">", L"<", date );
-				ParserUtil::ChangeDate(date, &mixi);
+				ParserUtil::ParseDate(line, mixi);
 			}
 
 
@@ -2002,9 +1978,7 @@ private:
 			// 日付
 			// <span class="date">2007年07月28日 21:09</span></dt>
 			if (util::LineHasStringsNoCase( line, L"<span", L"class", L"date" ) ) {
-				CString date;
-				util::GetBetweenSubString( line, L">", L"</span", date );
-				ParserUtil::ChangeDate(date, &cmtData);
+				ParserUtil::ParseDate(line, cmtData);
 			}
 
 			// <div class="pageNavigation01"> を発見したら、コメント終了なので抜ける
@@ -2107,10 +2081,7 @@ public:
 			if( util::LineHasStringsNoCase( line, L"<span", L"date" ) )
 			{
 				const CString& line = html_.GetAt(iLine );
-				CString date;
-				util::GetBetweenSubString( line, L"date\">", L"</span>", date );
-				//ParserUtil::ChangeDate(date, &cmtData);
-				data_.SetDate(date);
+				ParserUtil::ParseDate(line, data_);
 				continue;
 			}
 
@@ -2358,9 +2329,7 @@ private:
 					//日付を取得
 					//<span class="date">2007年10月07日 11:25</span></dt>
 					if( util::LineHasStringsNoCase( line, L"date\">", L"</span>")) {
-						CString date;
-						util::GetBetweenSubString( line, L"date\">", L"</span>", date );
-						ParserUtil::ChangeDate(date, &cmtData);
+						ParserUtil::ParseDate(line, cmtData);
 					}
 					
 					//名前を取得
@@ -2467,7 +2436,7 @@ public:
 				const CString& line2 = html_.GetAt(iLine+1);
 				CString date;
 				util::GetBetweenSubString( line2, L"<dd>", L"</dd>", date );
-				//ParserUtil::ChangeDate(date, &cmtData);
+				//ParserUtil::ParseDate(date, cmtData);
 				//data_.SetDate(date);
 				buf = _T("開催日時 ") + date;
 				data_.AddBody(_T("\r\n"));
@@ -2670,9 +2639,7 @@ private:
 					//日付を取得
 					//<span class="date">2007年10月07日 11:25</span></dt>
 					if( util::LineHasStringsNoCase( line, L"date\">", L"</span>")) {
-						CString date;
-						util::GetBetweenSubString( line, L"date\">", L"</span>", date );
-						ParserUtil::ChangeDate(date, &cmtData);
+						ParserUtil::ParseDate(line, cmtData);
 					}
 					
 					//名前を取得
@@ -2855,25 +2822,8 @@ public:
 
 			//--- 配信時刻の抽出
 			iLine += 1;
-			const CString& line3 = html_.GetAt(iLine);
-
-			std::wstring date;
-			{
-				// 正規表現のコンパイル（一回のみ）
-				static MyRegex reg;
-				if( !util::CompileRegex( reg, L"<td.+?>(.+?)</" ) ) {
-					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-					return false;
-				}
-				// 探索
-				if( reg.exec(line3) == false || reg.results.size() != 2 ) {
-					// 未発見。
-					continue;
-				}
-				// 発見。
-				date = reg.results[1].str;	// 配信時刻
-			}
-
+			// <td WIDTH="1%" nowrap CLASS="f08">10月14日 16:47</td></tr>
+			const CString& date = html_.GetAt(iLine);
 
 			// mixi データの作成
 			{
@@ -2881,7 +2831,7 @@ public:
 				data.SetAccessType( ACCESS_NEWS );
 
 				// 日付
-				ParserUtil::ChangeDate( date.c_str(), &data );
+				ParserUtil::ParseDate( date, data );
 				TRACE(_T("%s\n"), data.GetDate());
 
 				// 見出し
@@ -3110,13 +3060,11 @@ public:
 			CString str = html_.GetAt(i);
 
 			// 日付抽出
+			// <font COLOR=#996600>日　付</font>&nbsp;:&nbsp;2007年10月08日 21時52分&nbsp;&nbsp;
 			if( util::LineHasStringsNoCase( str, L"<font", L" COLOR=#996600", L">", L"日　付" ) ) {
-				CString buf = str.Mid(str.Find(_T("</font>")) + wcslen(_T("</font>")));
-				while( buf.Replace(_T("&nbsp;"), _T(" ")) );
-				buf.Replace(_T(":"), _T(""));
-				buf.Replace(_T(" "), _T(""));
+				CString buf = str;
 				buf.Replace(_T("時"), _T(":"));
-				ParserUtil::ChangeDate(buf, &data_);
+				ParserUtil::ParseDate(buf, data_);
 				continue;
 			}
 
@@ -3529,7 +3477,7 @@ public:
 				data.SetName( name );
 				data.SetURL( url );
 				data.SetBrowseUri( L"http://mixi.jp/" + url );
-				ParserUtil::ChangeDate( strDate, &data );
+				ParserUtil::ParseDate( strDate, data );
 				data.SetMyMixi( bMyMixi );
 
 				out_.push_back( data );
