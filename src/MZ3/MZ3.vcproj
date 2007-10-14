@@ -1153,6 +1153,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName)_win32.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -1340,15 +1341,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="false"
-				FavorSizeOrSpeed="1"
-				WholeProgramOptimization="true"
-				PreprocessorDefinitions="NDEBUG;"
-				StringPooling="true"
-				MinimalRebuild="false"
-				RuntimeLibrary="0"
+				Optimization="0"
+				WholeProgramOptimization="false"
+				PreprocessorDefinitions="_DEBUG;"
+				StringPooling="false"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="2"
 				DebugInformationFormat="3"
@@ -1367,12 +1365,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName)_win32.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
 				EntryPointSymbol="wWinMainCRTStartup"
-				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"

@@ -357,9 +357,12 @@ void CReportView::SetData(CMixiData* data)
 	switch (m_data->GetAccessType()) {
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
-		tmp = m_data->GetURL().Mid(m_data->GetURL().Find(_T("id="))+wcslen(_T("id=")));
-		tmp = tmp.Left(tmp.Find(_T("&")));
-		tmp.Format(_T("d%s"), tmp);
+		{
+			CString id;
+			if (util::GetBetweenSubString( m_data->GetURL(), L"id=", L"&", id ) >= 0) {
+				tmp.Format(_T("d%s"), id);
+			}
+		}
 		break;
 	case ACCESS_BBS:
 		tmp.Format(_T("b%d"), m_data->GetID());
@@ -523,6 +526,11 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 		str += _T("\r\n");			// ÅŒã‚É‚Ps“ü‚ê‚ÄŒ©‚â‚·‚­‚·‚é
 		m_edit.SetWindowText(str);
+
+		// Win32 ‚Ìê‡‚ÍÄ•`‰æ
+#ifndef WINCE
+		m_edit.Invalidate();
+#endif
 	}
 }
 
@@ -645,6 +653,7 @@ BOOL CReportView::CommandScrollDownList()
 #endif
 	} else {
 		m_edit.LineScroll( m_scrollLine );
+
 	}
 	return TRUE;
 }

@@ -88,3 +88,8 @@
 #include "htmlctrl.h"
 #pragma comment(lib, "htmlview.lib")
 #endif
+
+// Win32 用依存ファイル
+#ifndef WINCE
+#include <math.h>
+#endif

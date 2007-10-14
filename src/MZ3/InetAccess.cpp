@@ -155,7 +155,12 @@ bool CInetAccess::Open()
 		CloseInternetHandles();
 
 		// 接続を開く
+#ifdef WINCE
 		m_hInternet = InternetOpen(theApp.m_optionMng.m_strUserAgent, INTERNET_OPEN_TYPE_PROXY, proxy, NULL, 0);
+#else
+		// Win32 の場合はプロキシが動かないっぽいので、とりあえず直接接続にしておきます。
+		m_hInternet = InternetOpen(theApp.m_optionMng.m_strUserAgent, INTERNET_OPEN_TYPE_DIRECT, L"", NULL, 0);
+#endif
 	} catch (CException &) {
 		m_hInternet = NULL;
 

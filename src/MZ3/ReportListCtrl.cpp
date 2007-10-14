@@ -264,7 +264,7 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 	pDC->SetBkMode( TRANSPARENT );
 
 	// ビットマップの初期化と描画
-	if( theApp.m_optionMng.IsUseBgImage() ) {
+	if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageReportListCtrl.isEnableImage() ) {
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 

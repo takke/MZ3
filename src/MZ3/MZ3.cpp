@@ -238,6 +238,22 @@ BOOL CMZ3App::InitInstance()
 			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
 			TRUE);
 	}
+#else
+	// for Win32, resize
+	{
+		CRect rc;
+		m_pMainWnd->GetWindowRect( &rc );
+
+		rc.right = rc.left + 240;
+		rc.bottom = rc.top + 320;
+
+		m_pMainWnd->MoveWindow( 
+			rc.left, 
+			rc.top, 
+			rc.right, 
+			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
+			TRUE);
+	}
 #endif
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
@@ -483,7 +499,6 @@ BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
  */
 bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 {
-#ifdef WINCE
 	CFont *pFont = pBaseFont;
 	if (pFont)
 	{
@@ -500,21 +515,6 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 		theApp.m_font.Detach();
 		theApp.m_font.CreateFontIndirect( &lf );
 	}
-#else
-	CFont *pFont = pBaseFont;
-	if (pFont)
-	{
-		LOGFONT lf;
-		pFont->GetLogFont( &lf );
-
-		if( fontHeight != 0 ) {
-			lf.lfHeight = fontHeight;
-		}
-
-		theApp.m_font.Detach();
-		theApp.m_font.CreateFontIndirect( &lf );
-	}
-#endif
 	return true;
 }
 
@@ -622,6 +622,7 @@ void CMZ3App::FilePath::init_logpath()
  */
 int CMZ3App::GetInfoRegionHeight( int fontHeight )
 {
+#ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
 		if( theApp.GetDPI() > 96 ) {
@@ -640,6 +641,9 @@ int CMZ3App::GetInfoRegionHeight( int fontHeight )
 			return fontHeight -4;
 		}
 	}
+#else
+	return fontHeight +6*2;
+#endif
 }
 
 bool CMZ3App::LoadSkinSetting()

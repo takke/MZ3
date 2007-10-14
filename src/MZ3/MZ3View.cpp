@@ -474,6 +474,7 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 
 	// グループタブ
 	int hGroup    = fontHeight -2;				// デフォルト値
+#ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
 		if( theApp.GetDPI() > 96 ) {
@@ -492,6 +493,10 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 		}
 		break;
 	}
+#else
+	// for win32
+	hGroup = fontHeight + 12;
+#endif
 
 	// カテゴリ、ボディリストの領域を % で指定
 	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
@@ -528,6 +533,9 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	m_hotList = &m_categoryList;
+	if (lpnmlv->iItem<0) {
+		return;
+	}
 
 	// カテゴリリスト中の「現在選択されている項目」を更新
 	int idx = (int)m_categoryList.GetItemData(lpnmlv->iItem);

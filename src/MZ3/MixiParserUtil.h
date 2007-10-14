@@ -113,15 +113,21 @@ public:
 	 */
 	static void GetLastIndexFromIniFile(LPCTSTR uri, CMixiData* data)
 	{
+		if (data==NULL) {
+			return;
+		}
 		// URI‚ð•ª‰ð
 		CString buf = uri;
 
 		switch (data->GetAccessType()) {
 		case ACCESS_DIARY:
 		case ACCESS_MYDIARY:
-			buf = buf.Mid(buf.Find(_T("id="))+ wcslen(_T("id=")));
-			buf = buf.Left(buf.Find(_T("&")));
-			buf.Format(_T("d%s"), buf);
+			{
+				CString id;
+				if (util::GetBetweenSubString( buf, L"id=", L"&", id ) >= 0) {
+					buf.Format(_T("d%s"), id);
+				}
+			}
 			break;
 		case ACCESS_BBS:
 			buf.Format(_T("b%d"), data->GetID());
