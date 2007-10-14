@@ -40,7 +40,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Mixed Platforms.ActiveCfg = Debug_Win32|Win32
-		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Mixed Platforms.Build.0 = Debug_Win32|Win32
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Win32.ActiveCfg = Debug_Win32|Win32
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Win32.Build.0 = Debug_Win32|Win32
 		{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}.Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
@@ -186,6 +185,7 @@ Global
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_Win32|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_WM|Mixed Platforms.ActiveCfg = Release|Win32
+		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_WM|Mixed Platforms.Build.0 = Release|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_WM|Win32.ActiveCfg = Release|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_WM|Win32.Build.0 = Release|Win32
 		{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}.Release_WM|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
