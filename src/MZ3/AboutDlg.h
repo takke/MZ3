@@ -26,9 +26,7 @@ protected:
 
 // ŽÀ‘•
 protected:
-#ifdef _DEVICE_RESOLUTION_AWARE
 	afx_msg void OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/);
-#endif
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:

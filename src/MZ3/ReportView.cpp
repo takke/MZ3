@@ -96,6 +96,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CReportView::OnHdnEndtrackReportList)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_NARROW, &CReportView::OnLayoutReportlistMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
+//	ON_EN_VSCROLL(IDC_INFO_EDIT, &CReportView::OnEnVscrollInfoEdit)
+ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
 END_MESSAGE_MAP()
 
 
@@ -574,10 +576,6 @@ void CReportView::OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
 
-	if (pLVKeyDow->wVKey == VK_RETURN) {
-		// レポートメニューの表示
-		MyPopupReportMenu();
-	}
 	*pResult = 0;
 }
 
@@ -636,6 +634,11 @@ BOOL CReportView::CommandScrollUpList()
 #endif
 	} else {
 		m_edit.LineScroll( -m_scrollLine );
+
+		// Win32 の場合は再描画
+#ifndef WINCE
+//		m_edit.Invalidate();
+#endif
 	}
 	return TRUE;
 }
@@ -654,6 +657,10 @@ BOOL CReportView::CommandScrollDownList()
 	} else {
 		m_edit.LineScroll( m_scrollLine );
 
+		// Win32 の場合は再描画
+#ifndef WINCE
+//		m_edit.Invalidate();
+#endif
 	}
 	return TRUE;
 }
@@ -664,10 +671,17 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 	switch (pMsg->wParam) {
 	case VK_F1:
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
-			CMenu menu;
-			RECT rect;
-
 			// メインメニューのポップアップ
+			RECT rect;
+#ifdef WINCE
+			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+			int flags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+			GetWindowRect(&rect);
+#endif
+
+			CMenu menu;
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 			if( theApp.m_bPocketPC ) {
 #ifdef WINCE
@@ -676,10 +690,10 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			} else {
 				menu.LoadMenu(IDR_MAINFRAME);
 			}
-			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
+
+			menu.GetSubMenu(0)->TrackPopupMenu(flags,
 				rect.left,
-				rect.bottom - TOOLBAR_HEIGHT,
+				rect.bottom,
 				pMainFrame );
 			menu.Detach();
 			return TRUE;
@@ -692,6 +706,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		return TRUE;
 
 	case VK_BACK:				// クリアボタン
+#ifndef WINCE
+	case VK_ESCAPE:
+#endif
 		if (m_access != FALSE) {
 			// アクセス中は中断処理
 			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
@@ -699,6 +716,11 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		else {
 			OnMenuBack();
 		}
+		return TRUE;
+
+	case VK_RETURN:
+		// レポートメニューの表示
+		MyPopupReportMenu();
 		return TRUE;
 	}
 
@@ -1668,10 +1690,14 @@ void CReportView::MyPopupReportMenu(void)
 	CMenu menu;
 	POINT pt;
 	RECT rect;
+#ifdef WINCE
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+	GetWindowRect(&rect);
+#endif
 
-	pt.x = (rect.right - rect.left) / 2;
-	pt.y = (rect.bottom - rect.top) / 2;
+	pt.x = rect.left + (rect.right - rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom - rect.top) / 2;
 
 	menu.LoadMenu(IDR_REPORT_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
@@ -2100,4 +2126,12 @@ void CReportView::OnLayoutReportlistMakeWide()
 	// 再描画
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 	pMainFrame->ChangeAllViewFont();
+}
+
+void CReportView::OnEnVscrollReportEdit()
+{
+	// Win32 の場合は再描画
+#ifndef WINCE
+	m_edit.Invalidate();
+#endif
 }

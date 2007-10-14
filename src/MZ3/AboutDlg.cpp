@@ -20,25 +20,39 @@ BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+#ifndef WINCE
+	// バージョン番号
+	CWnd* item = NULL;
+	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
+		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
+
+		CString version = MZ3_VERSION_TEXT;
+		version += util::GetSourceRevision();
+		item->SetWindowTextW( version );
+	}
+
+	// 総データ受信量
+	SetTotalBytes();
+#endif
+
 	return TRUE;	// フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 	// 例外: OCX プロパティ ページは FALSE を返さなければなりません
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-#ifdef _DEVICE_RESOLUTION_AWARE
 	ON_WM_SIZE()
-#endif
 	ON_STN_CLICKED(IDC_STATIC_1, &CAboutDlg::OnStnClickedStatic1)
 	ON_BN_CLICKED(IDC_RESET_TOTAL_RECV_BYTES_BUTTON, &CAboutDlg::OnBnClickedResetTotalRecvBytesButton)
 END_MESSAGE_MAP()
 
-#ifdef _DEVICE_RESOLUTION_AWARE
 void CAboutDlg::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 {
+#ifdef _DEVICE_RESOLUTION_AWARE
 	DRA::RelayoutDialog(
 						AfxGetInstanceHandle(), 
 						this->m_hWnd, 
 						DRA::GetDisplayMode() != DRA::Portrait ? MAKEINTRESOURCE(IDD_ABOUTBOX_WIDE) : MAKEINTRESOURCE(IDD_ABOUTBOX));
+#endif
 
 	CWnd* item = NULL;
 
@@ -54,7 +68,6 @@ void CAboutDlg::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 	// 総データ受信量
 	SetTotalBytes();
 }
-#endif
 
 void CAboutDlg::OnStnClickedStatic1()
 {

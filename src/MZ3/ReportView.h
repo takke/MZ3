@@ -137,6 +137,8 @@ protected:
 public:
 	afx_msg void OnLayoutReportlistMakeNarrow();
 	afx_msg void OnLayoutReportlistMakeWide();
+//	afx_msg void OnEnVscrollInfoEdit();
+	afx_msg void OnEnVscrollReportEdit();
 };
 
 

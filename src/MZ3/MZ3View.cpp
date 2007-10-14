@@ -1182,7 +1182,13 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
+#ifdef WINCE
+			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+			int flags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+			GetWindowRect(&rect);
+#endif
 
 			CMenu menu;
 			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
@@ -1193,7 +1199,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			}else{
 				menu.LoadMenu(IDR_MAINFRAME);
 			}
-			menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
+			menu.GetSubMenu(0)->TrackPopupMenu(flags,
 				rect.left,
 				rect.bottom,
 				pMainFrame );
@@ -1208,11 +1214,15 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		}else{
 			// カテゴリリストでの右クリック
 			RECT rect;
+#ifdef WINCE
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+			GetWindowRect(&rect);
+#endif
 
 			POINT pt;
-			pt.x = (rect.right-rect.left) / 2;
-			pt.y = (rect.bottom-rect.top) / 2;
+			pt.x = rect.left + (rect.right-rect.left) / 2;
+			pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 			CMenu menu;
 			menu.LoadMenu(IDR_CATEGORY_MENU);
 			CMenu* pSubMenu = menu.GetSubMenu(0);
@@ -1247,6 +1257,9 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		}
 		return TRUE;
 	case VK_BACK:
+#ifndef WINCE
+	case VK_ESCAPE:
+#endif
 		// 中断
 		if (m_access) {
 			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
@@ -1629,6 +1642,9 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		}
 		return TRUE;
 	case VK_BACK:
+#ifndef WINCE
+	case VK_ESCAPE:
+#endif
 		if( m_access ) {
 			// アクセス中は無視
 			return TRUE;
@@ -1869,6 +1885,9 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		return TRUE;
 
 	case VK_BACK:
+#ifndef WINCE
+	case VK_ESCAPE:
+#endif
 		if( m_access ) {
 			// アクセス中は無視
 			return TRUE;
@@ -2668,11 +2687,15 @@ bool CMZ3View::PopupBodyMenu(void)
 {
 	// 右クリックメニュー表示位置
 	RECT rect;
+#ifdef WINCE
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+	GetWindowRect(&rect);
+#endif
 
 	POINT pt;
-	pt.x = (rect.right-rect.left) / 2;
-	pt.y = (rect.bottom-rect.top) / 2;
+	pt.x = rect.left + (rect.right-rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	switch( bodyItem.GetAccessType() ) {

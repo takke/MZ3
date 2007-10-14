@@ -634,7 +634,13 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 				// メインメニューのポップアップ
 				RECT rect;
+#ifdef WINCE
+				int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+				int flags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+				GetWindowRect(&rect);
+#endif
 
 				CMenu menu;
 				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
@@ -645,7 +651,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				} else {
 					menu.LoadMenu(IDR_MAINFRAME);
 				}
-				menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
+				menu.GetSubMenu(0)->TrackPopupMenu(flags,
 					rect.left,
 					rect.bottom,
 					pMainFrame );
@@ -660,10 +666,14 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				POINT pt;
 
 				CMenu menu;
+#ifdef WINCE
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+				GetWindowRect(&rect);
+#endif
 
-				pt.x = (rect.right-rect.left) / 2;
-				pt.y = (rect.bottom-rect.top) / 2;
+				pt.x = rect.left + (rect.right-rect.left) / 2;
+				pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 				menu.LoadMenu(IDR_WRITE_MENU);
 				CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -680,6 +690,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 			break;
 
 		case VK_BACK:
+#ifndef WINCE
+		case VK_ESCAPE:
+#endif
 			if (m_access != FALSE) {
 				// アクセス中は中断処理
 				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);

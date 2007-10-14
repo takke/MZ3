@@ -173,6 +173,9 @@ BOOL CQuoteDlg::PreTranslateMessage(MSG* pMsg)
 			OnOK();
 			return TRUE;
 		case VK_BACK:
+#ifndef WINCE
+		case VK_ESCAPE:
+#endif
 			// ƒLƒƒƒ“ƒZƒ‹“®ì
 			m_quoteType = quote::QUOTETYPE_INVALID;
 			OnOK();
