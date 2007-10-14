@@ -28,7 +28,7 @@ public:
 	LPCTSTR GetOwnerID() { return m_ownerId; };
 
 private:
-	LPCTSTR Read(FILE*);
+	CString Read(FILE*);
 	void Write(FILE*, LPCTSTR);
 };
 

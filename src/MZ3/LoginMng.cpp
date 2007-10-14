@@ -37,7 +37,6 @@ void Login::Read()
 	CString fileName = theApp.GetAppDirPath() + _T("\\user.dat");
 
 	// ファイルが存在していればそのファイルを読み込む
-
 	if( util::ExistFile(fileName) ) {
 
 		// ----------------------------------------
@@ -100,7 +99,7 @@ void Login::Write()
 	fclose(fp);
 }
 
-LPCTSTR Login::Read(FILE* fp)
+CString Login::Read(FILE* fp)
 {
 	// blowfishの初期化
 	char key[256];
