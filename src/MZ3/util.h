@@ -245,6 +245,7 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_LIST_FAVORITE:		text = L"お気に入り";			break;
 	case ACCESS_LIST_FRIEND:		text = L"マイミク一覧";			break;
 	case ACCESS_LIST_COMMUNITY:		text = L"コミュニティ一覧";		break;
+	case ACCESS_LIST_NEW_BBS_COMMENT:text = L"コミュコメント記入履歴";		break;
 	case ACCESS_LIST_NEW_BBS:		text = L"コミュ書込一覧";		break;
 	case ACCESS_LIST_BBS:			text = L"トピック一覧";			break;
 	case ACCESS_LIST_MYDIARY:		text = L"日記一覧";				break;
@@ -589,6 +590,19 @@ inline CString MakeLogfilePath( const CMixiData& data )
 
 			CString path;
 			path.Format( L"%s\\list_community%s.html", theApp.m_filepath.logFolder, page );
+			return path;
+		}
+	case ACCESS_LIST_NEW_BBS_COMMENT:
+		{
+			// url(1) : http://mixi.jp/new_bbs_comment.pl?id=xxx
+			// url(2) : http://mixi.jp/new_bbs_comment.pl?id=xxx&page=2
+
+			// ページ分割
+			CString page;
+			util::GetAfterSubString( data.GetURL(), L"page=", page );
+
+			CString path;
+			path.Format( L"%s\\new_bbs_comment%s.html", theApp.m_filepath.logFolder, page );
 			return path;
 		}
 	case ACCESS_LIST_INTRO:

@@ -98,6 +98,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 	case ACCESS_LIST_INTRO:
 		return L"紹介文";
 	case ACCESS_LIST_NEW_BBS:
+	case ACCESS_LIST_NEW_BBS_COMMENT:
 		switch( bodyIndicateType ) {
 		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
 			return _T("コミュニティ>>");
@@ -781,6 +782,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_FRIEND:
 	case ACCESS_LIST_COMMUNITY:
 	case ACCESS_LIST_NEW_BBS:
+	case ACCESS_LIST_NEW_BBS_COMMENT:
 	case ACCESS_LIST_MYDIARY:
 	case ACCESS_LIST_FOOTSTEP:
 	case ACCESS_LIST_MESSAGE_IN:
@@ -1076,6 +1078,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
 		break;
 	case ACCESS_LIST_NEW_BBS:
+	case ACCESS_LIST_NEW_BBS_COMMENT:
 	case ACCESS_LIST_BBS:
 	case ACCESS_LIST_BOOKMARK:
 		m_bodyList.SetHeader( _T("トピック"), szHeaderTitle2 );
@@ -2490,6 +2493,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	case ACCESS_LIST_NEW_BBS:
 	case ACCESS_LIST_MESSAGE_IN:
 	case ACCESS_LIST_MESSAGE_OUT:
+	case ACCESS_LIST_NEW_BBS_COMMENT:
 		// 「名前」と「時刻」
 		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_NAME ) {
 			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;

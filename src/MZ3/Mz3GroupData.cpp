@@ -28,6 +28,7 @@ bool Mz3GroupData::initForTopPage()
 	group.init( L"コミュニティ", L"", ACCESS_GROUP_COMMUNITY );
 	{
 		appendCategoryByIniData( group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
+		appendCategoryByIniData( group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
 		appendCategoryByIniData( group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
 	}
 	this->groups.push_back( group );
@@ -138,8 +139,15 @@ bool Mz3GroupData::appendCategoryByIniData(
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		break;
 
+	// コミュニティコメント記入履歴
+	case ACCESS_LIST_NEW_BBS_COMMENT:
+		default_category_url = L"new_bbs_comment.pl";
+		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
+		break;
+
+	// コミュニティ一覧
 	case ACCESS_LIST_COMMUNITY:
-		// コミュニティ一覧
 		default_category_url = L"list_community.pl";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NONE;

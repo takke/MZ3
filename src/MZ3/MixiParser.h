@@ -1459,6 +1459,26 @@ private:
 };
 
 /**
+ * [list] new_bbs_comment.pl 用パーサ
+ * 【コミュニティコメント記入履歴】
+ * http://mixi.jp/new_bbs_comment.pl
+ */
+class ListNewBbsCommentParser : public MixiListParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"ListNewBbsCommentParser.parse() start." );
+
+		// NewBbsParser に委譲
+		bool rval = NewBbsParser::parse( out_, html_ );
+
+		MZ3LOGGER_DEBUG( L"ListNewBbsCommentParser.parse() finished." );
+		return rval;
+	}
+};
+
+/**
  * [list] list_community.pl 用パーサ。
  * 【コミュニティ一覧】
  * http://mixi.jp/list_community.pl
@@ -3987,20 +4007,21 @@ public:
 inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html )
 {
 	switch (aType) {
-	case ACCESS_LIST_DIARY:			mixi::ListNewFriendDiaryParser::parse( body, html );	break;
-	case ACCESS_LIST_NEW_COMMENT:	mixi::NewCommentParser::parse( body, html );			break;
-	case ACCESS_LIST_COMMENT:		mixi::ListCommentParser::parse( body, html );			break;
-	case ACCESS_LIST_NEW_BBS:		mixi::NewBbsParser::parse( body, html );				break;
-	case ACCESS_LIST_MYDIARY:		mixi::ListDiaryParser::parse( body, html );				break;
-	case ACCESS_LIST_FOOTSTEP:		mixi::ShowLogParser::parse( body, html );				break;
-	case ACCESS_LIST_MESSAGE_IN:	mixi::ListMessageParser::parse( body, html );			break;
-	case ACCESS_LIST_MESSAGE_OUT:	mixi::ListMessageParser::parse( body, html );			break;
-	case ACCESS_LIST_NEWS:			mixi::ListNewsCategoryParser::parse( body, html );		break;
-	case ACCESS_LIST_FAVORITE:		mixi::ListBookmarkParser::parse( body, html );			break;
-	case ACCESS_LIST_FRIEND:		mixi::ListFriendParser::parse( body, html );			break;
-	case ACCESS_LIST_COMMUNITY:		mixi::ListCommunityParser::parse( body, html );			break;
-	case ACCESS_LIST_INTRO:			mixi::ShowIntroParser::parse( body, html );				break;
-	case ACCESS_LIST_BBS:			mixi::ListBbsParser::parse( body, html );				break;
+	case ACCESS_LIST_DIARY:				mixi::ListNewFriendDiaryParser::parse( body, html );	break;
+	case ACCESS_LIST_NEW_COMMENT:		mixi::NewCommentParser::parse( body, html );			break;
+	case ACCESS_LIST_COMMENT:			mixi::ListCommentParser::parse( body, html );			break;
+	case ACCESS_LIST_NEW_BBS:			mixi::NewBbsParser::parse( body, html );				break;
+	case ACCESS_LIST_MYDIARY:			mixi::ListDiaryParser::parse( body, html );				break;
+	case ACCESS_LIST_FOOTSTEP:			mixi::ShowLogParser::parse( body, html );				break;
+	case ACCESS_LIST_MESSAGE_IN:		mixi::ListMessageParser::parse( body, html );			break;
+	case ACCESS_LIST_MESSAGE_OUT:		mixi::ListMessageParser::parse( body, html );			break;
+	case ACCESS_LIST_NEWS:				mixi::ListNewsCategoryParser::parse( body, html );		break;
+	case ACCESS_LIST_FAVORITE:			mixi::ListBookmarkParser::parse( body, html );			break;
+	case ACCESS_LIST_FRIEND:			mixi::ListFriendParser::parse( body, html );			break;
+	case ACCESS_LIST_COMMUNITY:			mixi::ListCommunityParser::parse( body, html );			break;
+	case ACCESS_LIST_INTRO:				mixi::ShowIntroParser::parse( body, html );				break;
+	case ACCESS_LIST_BBS:				mixi::ListBbsParser::parse( body, html );				break;
+	case ACCESS_LIST_NEW_BBS_COMMENT:	mixi::ListNewBbsCommentParser::parse( body, html );		break;
 	}
 }
 
