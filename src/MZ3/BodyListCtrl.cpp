@@ -322,18 +322,20 @@ BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 	pDC->SetBkMode( TRANSPARENT );
 
 	// ビットマップの初期化と描画
-	if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageMainBodyCtrl.isEnableImage() ) {
+	if( theApp.m_optionMng.IsUseBgImage() ) {
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
 		theApp.m_bgImageMainBodyCtrl.load();
 
-		int x = rectClient.left;
-		int y = rectClient.top;
-		int w = rectClient.Width();
-		int h = rectClient.Height();
-		util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
-		return TRUE;
+		if (theApp.m_bgImageMainBodyCtrl.isEnableImage()) {
+			int x = rectClient.left;
+			int y = rectClient.top;
+			int w = rectClient.Width();
+			int h = rectClient.Height();
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
+			return TRUE;
+		}
 	}
 
 	return CListCtrl::OnEraseBkgnd(pDC);
