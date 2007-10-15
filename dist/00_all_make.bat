@@ -15,3 +15,7 @@
 
 :----- doc ファイルの圧縮 -----
 :@call 40_archive_doxygen.bat
+
+:----- Win32, lzh ファイルの生成 -----
+@call 50_archive_win32.bat
+

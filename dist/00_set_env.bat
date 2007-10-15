@@ -3,7 +3,7 @@
 : ******************************
 
 : バージョン番号
-@set MZ3_VERSION=0.8.2.0bX
+@set MZ3_VERSION=0.8.2.0b25
 
 : unlha パスの設定
 @set UNLHA_EXE=c:\bin\other\unlha\unlha
