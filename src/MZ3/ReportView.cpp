@@ -701,6 +701,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		break;
 
 	case VK_F2:
+#ifndef WINCE
+	case VK_APPS:
+#endif
 		// レポートメニューの表示
 		MyPopupReportMenu();
 		return TRUE;

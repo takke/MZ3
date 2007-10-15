@@ -661,6 +661,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 			break;
 
 		case VK_F2:
+#ifndef WINCE
+		case VK_APPS:
+#endif
 			{
 				RECT rect;
 				POINT pt;

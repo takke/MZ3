@@ -1208,6 +1208,9 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		}
 		break;
 	case VK_F2:
+#ifndef WINCE
+	case VK_APPS:
+#endif
 		if( GetFocus() == &m_bodyList ) {
 			// ボディリストでの右クリックメニュー
 			PopupBodyMenu();
