@@ -44,6 +44,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A611C203CE3D4AAC9BF58E771918CBA3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7C86FC78244435090425B4BD08B3A7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -81,12 +87,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E83C7EC08CCB4D48B35208516F5C40E4"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F1ACF2406396454D84AF361F936A2D20"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -473,9 +473,9 @@
         }
         "ProjectOutput"
         {
-            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_F1ACF2406396454D84AF361F936A2D20"
+            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_A611C203CE3D4AAC9BF58E771918CBA3"
             {
-            "SourcePath" = "8:..\\mz3\\windows mobile 6 standard sdk (armv4i)\\debug_wm6standard\\MZ3.exe"
+            "SourcePath" = "8:..\\MZ3\\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\\Release_WM\\MZ3.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
@@ -491,7 +491,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:0"
-            "OutputConfiguration" = "8:"
+            "OutputConfiguration" = "8:Release_WM|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}"
             "ShowKeyOutput" = "11:TRUE"
@@ -535,13 +535,13 @@
         }
         "Shortcut"
         {
-            "{971D45E9-E38C-49AC-B36E-4C5BEA533350}:_851EBAD89E554EF9BF020AD8C237D3AE"
+            "{971D45E9-E38C-49AC-B36E-4C5BEA533350}:_DC2F8A9E395143579467C9101F902FE8"
             {
             "Name" = "8:MZ3"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "Target" = "8:_F1ACF2406396454D84AF361F936A2D20"
+            "Target" = "8:_A611C203CE3D4AAC9BF58E771918CBA3"
             "Folder" = "8:_8B60D109A4714E0FB24564285CDF93C4"
             "WorkingFolder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
             }
