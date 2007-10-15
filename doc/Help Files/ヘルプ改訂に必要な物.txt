@@ -1,0 +1,13 @@
+ヘルプ改訂に必要な物
+
+・SpeedHelpPad
+　http://textexpage.s154.xrea.com/
+
+・HTMLHelpWorkShop
+　http://msdn2.microsoft.com/en-us/library/ms669985.aspx
+
+・根気
+
+
+
+このフォルダ ( MZ3 for Windows フォルダ ) を \\speedhelppad\SpeedHelpPad\Project の下に放り込んでください

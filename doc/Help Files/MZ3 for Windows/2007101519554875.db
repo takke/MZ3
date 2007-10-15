@@ -1,0 +1,21 @@
+[Info]
+Name=はじめに
+KeyWord=はじめに
+Context=IDH_HELP0
+[Date]
+<P><FONT face="ＭＳ ゴシック">--------------------------------------------------------------------------------<BR>&nbsp;XX&nbsp;&nbsp; XX XXXXXXX&nbsp;&nbsp; XXX&nbsp; <BR>&nbsp; X&nbsp;&nbsp; X&nbsp; X&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp; X&nbsp;&nbsp; X <BR>&nbsp; XX XX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X<BR>&nbsp; XX XX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X <BR>&nbsp; X X X&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X<BR>&nbsp; X X X&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X<BR>&nbsp; X&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X<BR>&nbsp; X&nbsp;&nbsp; X&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp; X&nbsp; X&nbsp;&nbsp; X&nbsp; XX&nbsp;&nbsp; X<BR>&nbsp;XXX XXX XXXXXXX&nbsp;&nbsp; XXX&nbsp;&nbsp; XX&nbsp; XXX&nbsp;&nbsp; MZ3 for Windows<BR>--------------------------------------------------------------------------------</FONT></P>
+<P><FONT face="ＭＳ ゴシック">--------------------------------------------------------------------------------</FONT></P>
+<P><FONT face="ＭＳ ゴシック">* はじめに</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　MZ3 / MZ3.i は Willcom W-ZERO3 シリーズ用の mixi ブラウザです<BR>　この MZ3.i を Windows に改修したものが MZ3 for Windows です</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　本ドキュメントに記載のない事柄についての質問は mixi 内コミュニティ</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　MZ3 -Mixi for ZERO3-<BR>　　</FONT><A href="http://mixi.jp/view_community.pl?id=1198460"><FONT face="ＭＳ ゴシック">http://mixi.jp/view_community.pl?id=1198460</FONT></A></P>
+<P><FONT face="ＭＳ ゴシック">　にて質問してください</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　リリース履歴に関しては改版履歴（ChangeLog.txt）をご覧下さい</FONT></P>
+<P><BR><FONT face="ＭＳ ゴシック">　!! 重要 !!</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●本ドキュメントの筆者と MZ3 / MZ3.i / MZ3 for Windows の作成者は別になります<BR>　　ですので, 本ドキュメントについて作成者に直接問い合わせるのはやめてください<BR>　　必ず上記コミュニティにてお願いします</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●本ドキュメントの複製, 再配布は自由に行っていただいて結構です<BR>　　但し, 変更を加える場合は必ず修正箇所を改定履歴に記述し,<BR>　　その上で上記コミュニティへ必ず報告してください</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●MZ3 / MZ3.i は基本的に WM5 端末での使用を前提に作られています<BR>　　WM6 Professional 端末の実機テストは行っていますが, 完全ではないかも知れません<BR>　　動作する上でクリティカルな症状などがあった場合は<BR>　　コミュニティへの報告をお願いします</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　また，WM6 Standard 端末での動作確認は取れていません<BR>　　これは OS 自体にある程度の制約がかかり，動作が異なるためです<BR>　　SoftBank の X02HT などをお使いの方は注意してください</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●MZ3 for Windows は Windows OS 用アプリです<BR>　　対応 OS は Windows 2000 以降です<BR>　　Windows 9x 系では使用できないと思いますが，頑張ればどうにかなるかもしれません</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●MZ3 / MZ3.i / MZ3 for Windows はフリーソフトウェアです<BR>　　ソフトウェア使用による損害や問題に対して一切の責任も負いかねますので,<BR>　　すべて使用者の責任において使用してください</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　# 本ドキュメントは等幅フォントでの閲覧を前提に作成しています<BR>　# 文字フォントはＭＳ ゴシック推奨です<BR>　# プロポーショナルフォントの場合, レイアウトが崩れる場合があります</FONT></P>

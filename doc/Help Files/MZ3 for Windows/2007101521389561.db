@@ -1,0 +1,7 @@
+[Info]
+Name=上部ペインに xxx が表示されない
+KeyWord=上部ペインに xxx が表示されない
+Context=IDH_HELP31
+[Date]
+<P>　Q.上部ペインに xxx が表示されない</P>
+<P>　A.toppage_group.ini が壊れている可能性があります <BR>　　メニュー | 設定 | 一般 より「タブの初期化」を行ってみてください</P>
