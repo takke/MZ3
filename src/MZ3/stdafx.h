@@ -92,4 +92,6 @@
 // Win32 用依存ファイル
 #ifndef WINCE
 #include <math.h>
+// GDI+
+#include <atlimage.h>
 #endif

@@ -11,6 +11,9 @@ public:
 									///< CMZ3App 側変数が切り替わった際に、自動的にリロードするために使用する。
 
 	CString m_strImageName;			///< 画像ファイル名
+#ifndef WINCE
+	CImage  m_gdiPlusImage;			///< GDI+ の CImage クラスオブジェクト
+#endif
 
 	/// コンストラクタ
 	CMZ3BackgroundImage(LPCTSTR szImageName) : m_hBitmap(NULL), m_strImageName(szImageName) 
@@ -54,12 +57,15 @@ public:
 private:
 
 	/// ビットマップのロード
-	static inline HBITMAP loadBitmap( LPCTSTR szFilepath )
+	inline HBITMAP loadBitmap( LPCTSTR szFilepath )
 	{
 #ifdef WINCE
 		return SHLoadImageFile( szFilepath );
 #else
-		return (HBITMAP)LoadImage( 0, szFilepath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
+//		HBITMAP hBitmap = (HBITMAP)LoadImage( NULL, szFilepath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
+//		return hBitmap;
+		m_gdiPlusImage.Load( szFilepath );
+		return (HBITMAP) m_gdiPlusImage;
 #endif
 	}
 
@@ -68,7 +74,12 @@ private:
 	{
 		// ビットマップの削除
 		if( m_hBitmap != NULL ) {
-			return DeleteObject( m_hBitmap ) ? true : false;
+			BOOL rval = DeleteObject( m_hBitmap );
+			if (rval) {
+				m_hBitmap = NULL;
+				return true;
+			}
+			return false;
 		} else {
 			return true;
 		}
