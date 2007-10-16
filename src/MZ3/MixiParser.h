@@ -2081,7 +2081,7 @@ public:
 		INT_PTR lastLine = html_.GetCount();
 
 		bool bInEnquete = false;
-		int iLine=240;
+		int iLine=100;
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
@@ -2133,7 +2133,10 @@ public:
 			}
 
 			// ●アンケート内容終了
-			if( bInEnquete && util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ) {
+			if( bInEnquete && 
+				(util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ||
+				 util::LineHasStringsNoCase( line, L"<div", L"id", L"enqueteComment") ) )
+			{
 				bInEnquete = false;
 				break;
 			}
@@ -2434,7 +2437,7 @@ public:
 
 		INT_PTR lastLine = html_.GetCount();
 
-		int iLine=240;
+		int iLine=100;
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
@@ -2527,7 +2530,8 @@ public:
 			}
 
 			// ●イベント内容終了
-			if( util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ||
+				util::LineHasStringsNoCase( line, L"<div", L"id", L"eventComment") ) {
 				break;
 			}
 
