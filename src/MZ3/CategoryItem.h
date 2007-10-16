@@ -61,7 +61,16 @@ public:
 	virtual ~CCategoryItem()				{}
 
 	/// 現在選択中のボディアイテムを取得する
-	CMixiData& GetSelectedBody()			{ return m_body[ selectedBody ]; }
+	CMixiData& GetSelectedBody() {
+		if (selectedBody < 0 || selectedBody >= (int)m_body.size()) {
+			// ダミーを返す。本来はNULLを返すなり、Exception投げるなりすべき。
+			static CMixiData s_dummy;
+			CMixiData dummy;
+			s_dummy = dummy;	// 初期化
+			return s_dummy;
+		}
+		return m_body[ selectedBody ];
+	}
 
 	CMixiDataList& GetBodyList()			{ return m_body; };
 

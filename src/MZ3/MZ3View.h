@@ -254,7 +254,15 @@ public:
 	 */
 	CMixiData& GetSelectedBodyItem(void)
 	{
-		return m_selGroup->getSelectedCategory()->GetSelectedBody();
+		CCategoryItem* pSelectedCategory = m_selGroup->getSelectedCategory();
+		if (pSelectedCategory==NULL) {
+			// ダミーを返す。本来はNULLを返すなり、Exception投げるなりすべき。
+			static CMixiData s_dummy;
+			CMixiData dummy;
+			s_dummy = dummy;	// 初期化
+			return s_dummy;
+		}
+		return pSelectedCategory->GetSelectedBody();
 	}
 	CProgressCtrl mc_progressBar;
 	afx_msg void OnOpenBrowserUser();
