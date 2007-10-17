@@ -675,7 +675,11 @@ void CMainFrame::GetSkinFolderNameList(std::vector<std::wstring>& skinfileList)
         {
 			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				// ディレクトリ名発見。追加する。
-				skinfileList.push_back( data.cFileName );
+
+				// . から始まるディレクトリは除外
+				if (data.cFileName[0] != '.') {
+					skinfileList.push_back( data.cFileName );
+				}
 			}
         }
         while( FindNextFile( hFile, &data) && nResult);
