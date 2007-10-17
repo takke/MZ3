@@ -631,23 +631,17 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYUP) {
 		switch (pMsg->wParam) {
 		case VK_F1:
+#ifdef WINCE
 			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 				// メインメニューのポップアップ
 				RECT rect;
-#ifdef WINCE
 				int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-				int flags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
-				GetWindowRect(&rect);
-#endif
 
 				CMenu menu;
 				CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 				if( theApp.m_bPocketPC ) {
-#ifdef WINCE
 					menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-#endif
 				} else {
 					menu.LoadMenu(IDR_MAINFRAME);
 				}
@@ -658,6 +652,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				menu.Detach();
 				return TRUE;
 			}
+#else
+			// TODO ヘルプ表示
+#endif
 			break;
 
 		case VK_F2:
