@@ -297,7 +297,6 @@ BEGIN
             MENUITEM "新着チェック",                      IDM_CHECK_NEW
             MENUITEM "全てを巡回",                       IDM_START_CRUISE
             MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
-            MENUITEM "mixiモバイルを開く",                 IDM_OPEN_MIXI_MOBILE_BY_BROWSER
         END
         MENUITEM SEPARATOR
         MENUITEM "終了",                          ID_MENU_CLOSE
@@ -373,7 +372,7 @@ IDD_ABOUTBOX DIALOGEX 0, 0, 147, 179
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 EXSTYLE 0x80000000L
 CAPTION "バージョン情報 MZ3"
-FONT 9, "MS UI Gothic", 0, 0, 0x1
+FONT 9, "MS UI Gothic"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC_1,7,7,20,20,SS_REALSIZEIMAGE
     LTEXT           "MZ3 Version 0.0.0.0",IDC_STATIC_2,27,7,112,8,SS_NOPREFIX
