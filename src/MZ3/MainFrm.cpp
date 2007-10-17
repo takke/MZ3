@@ -110,7 +110,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
 			!m_wndCommandBar.AddAdornments(dwAdornmentFlags) ||
 			!m_wndCommandBar.LoadToolBar(id_toolbar)) {
-				MZ3LOGGER_FATAL("CommandBar の作成に失敗しました\n");
+				MZ3LOGGER_FATAL(L"CommandBar の作成に失敗しました\n");
 				return -1;      // 作成できませんでした。
 		}
 
@@ -148,7 +148,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
     //ツールバーをロード
-	int idToolbar = IDR_TOOLBAR;
+//	int idToolbar = IDR_TOOLBAR;
+//	int nToolbarWidth  = 32;
+//	int nToolbarHeight = 32;
+	int idToolbar = IDR_TOOLBAR_QVGA;
+	int nToolbarWidth  = 16;
+	int nToolbarHeight = 16;
+
 	m_wndToolBar.LoadToolBar(idToolbar);
 
 	// 256 色ビットマップをロード
@@ -165,7 +171,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 256 色ビットマップを割り当て
 	int nBtnCnt = 8;	//ボタンの数
 	static CImageList m_ImageList;
-	m_ImageList.Create( 32, 32, ILC_COLOR32, nBtnCnt, 1 );
+	m_ImageList.Create( nToolbarWidth, nToolbarHeight, ILC_COLOR32, nBtnCnt, 1 );
 	m_ImageList.Add(&bm, (CBitmap*)NULL);
 	m_wndToolBar.GetToolBarCtrl().SetImageList(&m_ImageList);
 
@@ -642,7 +648,13 @@ void CMainFrame::OnCheckNew()
  */
 void CMainFrame::OnHelpMenu()
 {
+#ifdef WINCE
+	// Readme.txt を解析して表示
 	theApp.m_pMainView->MyShowHelp();
+#else
+	// Win32 の場合はヘルプ表示
+	util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
+#endif
 }
 
 /**

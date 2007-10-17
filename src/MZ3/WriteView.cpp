@@ -653,7 +653,8 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				return TRUE;
 			}
 #else
-			// TODO ƒwƒ‹ƒv•\Ž¦
+			// ƒwƒ‹ƒv•\Ž¦
+			util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
 #endif
 			break;
 

@@ -1204,7 +1204,8 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			return TRUE;
 		}
 #else
-		// TODO ヘルプ表示
+		// ヘルプ表示
+		util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
 #endif
 		break;
 	case VK_F2:
@@ -1800,11 +1801,15 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				// 操作をメニューで選択
 				{
 					RECT rect;
+#ifdef WINCE
 					SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+					GetWindowRect(&rect);
+#endif
 
 					POINT pt;
-					pt.x = (rect.right-rect.left) / 2;
-					pt.y = (rect.bottom-rect.top) / 2;
+					pt.x = rect.left + (rect.right-rect.left) / 2;
+					pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 					CMenu menu;
 					menu.LoadMenu( IDR_PROFILE_ITEM_MENU );
 					CMenu* pSubMenu = menu.GetSubMenu(0);

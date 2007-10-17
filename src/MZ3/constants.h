@@ -16,6 +16,11 @@
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$"
 
+// CHM ヘルプファイルパス
+#ifndef WINCE
+#define MZ3_CHM_HELPFILENAME		L"MZ3 for Windows.chm"
+#endif
+
 // Window メッセージ
 
 /// データ取得完了（正常終了）
