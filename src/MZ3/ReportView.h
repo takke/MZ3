@@ -114,12 +114,12 @@ private:
 	BOOL m_abort;
 
 	int m_scrollLine;
-	void MyPopupReportMenu(void);
 	afx_msg void OnShowDebugInfo();
 	afx_msg void OnOpenBrowserUser();
 	afx_msg void OnUpdateWriteComment(CCmdUI *pCmdUI);
 	afx_msg void OnMenuBack();
 public:
+	void MyPopupReportMenu(void);
 	afx_msg void OnBackMenu();
 	afx_msg void OnNextMenu();
 	void ResetColumnWidth(const CMixiData& mixi);

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "ReportListCtrl.h"
+#include "ReportView.h"
 #include "util.h"
 
 static const int OFFSET_FIRST = 2;
@@ -314,4 +315,25 @@ void CReportListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+}
+
+BOOL CReportListCtrl::PreTranslateMessage(MSG* pMsg)
+{
+#ifndef WINCE
+	// Win32 ‚Ìê‡‚Í VK_RETURN ‚Ì OnLvnKeydownReportList ‚ª”ò‚Î‚È‚¢‚Ì‚Å‚±‚±‚Åˆ—‚·‚é
+	switch (pMsg->message) {
+	case WM_KEYDOWN:
+		switch (pMsg->wParam) {
+		case VK_RETURN:
+			{
+				CReportView* pView = (CReportView*)GetParent();
+				pView->MyPopupReportMenu();
+			}
+			break;
+		}
+		break;
+	}
+#endif
+
+	return CListCtrl::PreTranslateMessage(pMsg);
 }

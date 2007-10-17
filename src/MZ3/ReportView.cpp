@@ -96,8 +96,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CReportView::OnHdnEndtrackReportList)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_NARROW, &CReportView::OnLayoutReportlistMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
-//	ON_EN_VSCROLL(IDC_INFO_EDIT, &CReportView::OnEnVscrollInfoEdit)
-ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
+	ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
 END_MESSAGE_MAP()
 
 
@@ -576,6 +575,10 @@ void CReportView::OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
 
+	if (pLVKeyDow->wVKey == VK_RETURN) {
+		// レポートメニューの表示
+		MyPopupReportMenu();
+	}
 	*pResult = 0;
 }
 
@@ -712,20 +715,26 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 #ifndef WINCE
 	case VK_ESCAPE:
 #endif
-		if (m_access != FALSE) {
-			// アクセス中は中断処理
-			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+		if (pMsg->hwnd == m_list.m_hWnd) {
+			if (m_access != FALSE) {
+				// アクセス中は中断処理
+				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+			}
+			else {
+				OnMenuBack();
+			}
+			return TRUE;
 		}
-		else {
-			OnMenuBack();
-		}
-		return TRUE;
+		break;
 
-	case VK_RETURN:
-		// レポートメニューの表示
-		MyPopupReportMenu();
-		return TRUE;
-	}
+/*	case VK_RETURN:
+		if (pMsg->hwnd == m_list.m_hWnd) {
+			// レポートメニューの表示
+			MyPopupReportMenu();
+			return TRUE;
+		}
+		break;
+*/	}
 
 	// Xcrawl Canceler
 	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
