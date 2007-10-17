@@ -1616,8 +1616,12 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 	}
 
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary());
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
+	if (m_data) {
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary() );
+	}else{
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE );
+	}
+	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 
 	return LRESULT();
 }

@@ -30,7 +30,11 @@ public:
 
 public:  // コントロール バー用メンバ
 #ifdef WINCE
+	// WindowsMobile の場合はコマンドバー
 	CCommandBar m_wndCommandBar;
+#else
+	// Windows の場合はツールバー
+	CToolBar    m_wndToolBar;
 #endif
 
 	// 生成された、メッセージ割り当て関数

@@ -110,7 +110,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
 			!m_wndCommandBar.AddAdornments(dwAdornmentFlags) ||
 			!m_wndCommandBar.LoadToolBar(id_toolbar)) {
-				TRACE0("CommandBar の作成に失敗しました\n");
+				MZ3LOGGER_FATAL("CommandBar の作成に失敗しました\n");
 				return -1;      // 作成できませんでした。
 		}
 
@@ -134,6 +134,45 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 		HWND hwndMenuBar = mbi.hwndMB;
 	}
+#endif
+
+#ifndef WINCE
+	// ツールバーの生成
+	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, 
+		                       WS_CHILD | WS_VISIBLE | 
+							   CBRS_TOP | CBRS_GRIPPER | 
+							   CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC))
+	{
+		MZ3LOGGER_FATAL(L"ツールバー の作成に失敗しました");
+		return -1;      // fail to create
+	}
+
+    //ツールバーをロード
+	int idToolbar = IDR_TOOLBAR;
+	m_wndToolBar.LoadToolBar(idToolbar);
+
+	// 256 色ビットマップをロード
+	HBITMAP hbm = (HBITMAP)::LoadImage(
+		AfxGetInstanceHandle(),
+		MAKEINTRESOURCE(idToolbar),
+		IMAGE_BITMAP,
+		0, 0,
+		LR_CREATEDIBSECTION | LR_LOADMAP3DCOLORS);
+
+	CBitmap bm;
+	bm.Attach(hbm);
+
+	// 256 色ビットマップを割り当て
+	int nBtnCnt = 8;	//ボタンの数
+	static CImageList m_ImageList;
+	m_ImageList.Create( 32, 32, ILC_COLOR32, nBtnCnt, 1 );
+	m_ImageList.Add(&bm, (CBitmap*)NULL);
+	m_wndToolBar.GetToolBarCtrl().SetImageList(&m_ImageList);
+
+
+	//  スタイルを設定する
+	m_wndToolBar.SetBarStyle(m_wndToolBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
+	m_wndToolBar.EnableDocking( CBRS_ALIGN_ANY );		//  ドッキングモードを設定
 #endif
 
 	return 0;
@@ -277,6 +316,8 @@ void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
 #endif
 }
 
@@ -289,6 +330,8 @@ void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));
 #endif
 }
 
@@ -301,6 +344,8 @@ void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));
 #endif
 }
 
@@ -313,6 +358,8 @@ void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));
 #endif
 }
 
@@ -325,6 +372,8 @@ void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));
 #endif
 }
 
@@ -337,6 +386,8 @@ void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));
 #endif
 }
 
@@ -544,6 +595,8 @@ void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));
 #endif
 }
 
@@ -554,6 +607,8 @@ void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 	if( theApp.m_bPocketPC ) {
 		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
 	}
+#else
+	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));
 #endif
 }
 
@@ -614,11 +669,15 @@ void CMainFrame::OnErrorlogMenu()
 void CMainFrame::OnChangeSkin()
 {
 	RECT rect;
+#ifdef WINCE
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+#else
+	GetWindowRect(&rect);
+#endif
 
 	POINT pt;
-	pt.x = (rect.right-rect.left) / 2;
-	pt.y = (rect.bottom-rect.top) / 2;
+	pt.x = rect.left + (rect.right-rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 
 	CMenu menu;
 	menu.LoadMenu(IDR_SKIN_MENU);

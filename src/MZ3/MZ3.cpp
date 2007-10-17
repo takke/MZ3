@@ -492,7 +492,7 @@ BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 		return TRUE;
 	}
 #else
-	return TRUE;
+	return ((CMainFrame*)m_pMainWnd)->m_wndToolBar.GetToolBarCtrl().EnableButton( nID, bEnable);
 #endif
 }
 
