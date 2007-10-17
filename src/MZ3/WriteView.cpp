@@ -160,15 +160,15 @@ void CWriteView::OnBnClickedWriteSendButton()
 
 	if (msg.GetLength() > 3000) {
 		// 最大文字を越えている
-		::MessageBox(m_hWnd, L"送信文字数が多すぎます", L"MZ3", MB_ICONERROR);
+		::MessageBox(m_hWnd, L"送信文字数が多すぎます", MZ3_APP_NAME, MB_ICONERROR);
 		return;
 	}
 	else if (title.GetLength() == 0) {
-		::MessageBox(m_hWnd, L"タイトルを入力してください", L"MZ3", MB_ICONERROR);
+		::MessageBox(m_hWnd, L"タイトルを入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
   }
 	else if (msg.GetLength() == 0) {
-		::MessageBox(m_hWnd, L"本文を入力してください", L"MZ3", MB_ICONERROR);
+		::MessageBox(m_hWnd, L"本文を入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
 	}
 
@@ -210,7 +210,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 			}
 		}
 
-		int ret = ::MessageBox(m_hWnd, s, L"MZ3", MB_ICONQUESTION | MB_OKCANCEL);
+		int ret = ::MessageBox(m_hWnd, s, MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
 		if (ret == IDCANCEL) {
 			// 処理を中止
 			return;
@@ -254,7 +254,7 @@ void CWriteView::OnBnClickedWriteCancelButton()
 
 	if (msg.GetLength() > 0) {
 		ret = ::MessageBox(m_hWnd, L"未投稿のデータがあります\n破棄されますがいいですか？",
-			L"MZ3", MB_ICONQUESTION | MB_OKCANCEL);
+			MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
 		if (ret == IDCANCEL) {
 			// 処理を中止
 			return;
@@ -313,7 +313,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 		CString msg = 
 			L"エラーが発生しました\r\n"
 			L"確認画面にエラー内容が表示されていますが、"
-			L"本バージョンのMZ3ではエラー内容を表示できません・・・\r\n"
+			L"本バージョンの" MZ3_APP_NAME L"ではエラー内容を表示できません・・・\r\n"
 			L"お手数ですが、下記ファイルを直接解析してくださいm(_ _)m\r\n"
 			+ strConfirmTempFile;
 		MessageBox( msg );
@@ -477,10 +477,10 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			switch (m_writeViewType ) {
 			case WRITEVIEW_TYPE_REPLYMESSAGE:
 			case WRITEVIEW_TYPE_NEWMESSAGE:
-				::MessageBox(m_hWnd, L"メッセージを送信しました", L"MZ3", MB_OK);
+				::MessageBox(m_hWnd, L"メッセージを送信しました", MZ3_APP_NAME, MB_OK);
 				break;
 			default:
-				::MessageBox(m_hWnd, L"投稿しました", L"MZ3", MB_OK);
+				::MessageBox(m_hWnd, L"投稿しました", MZ3_APP_NAME, MB_OK);
 				break;
 			}
 		}
@@ -520,7 +520,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		s.Format( 
 			L"%s\n\n"
 			L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
-		::MessageBox(m_hWnd, s, L"MZ3", MB_ICONERROR);
+		::MessageBox(m_hWnd, s, MZ3_APP_NAME, MB_ICONERROR);
 
 		// 失敗したのでダンプする
 		DumpToTemporaryDraftFile();
@@ -599,7 +599,7 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 		msg = L"中断しました";
 	}
 	util::MySetInformationText( m_hWnd, msg );
-	::MessageBox(m_hWnd, msg, L"MZ3", MB_ICONSTOP | MB_OK);
+	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
 	// 中止ボタンを使用不可にする
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
@@ -762,7 +762,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// ログイン失敗
 			LPCTSTR msg = L"ログインに失敗しました";
 			util::MySetInformationText( m_hWnd, msg );
-			::MessageBox(m_hWnd, msg, L"MZ3", MB_ICONERROR);
+			::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONERROR);
 
 			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
 			return LRESULT();
@@ -783,7 +783,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			s.Format( 
 				L"%s\n\n"
 				L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
-			::MessageBox(m_hWnd, s, L"MZ3", MB_ICONERROR);
+			::MessageBox(m_hWnd, s, MZ3_APP_NAME, MB_ICONERROR);
 
 			// 失敗したのでダンプする
 			DumpToTemporaryDraftFile();

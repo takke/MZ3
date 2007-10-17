@@ -3883,7 +3883,7 @@ public:
 		int status = 0;		// 0 : start, 1 : Å‰‚Ì€–Ú, 2 : 2”Ô–ÚˆÈ~‚Ì€–Ú‰ğÍ’†
 		CMixiData child;
 
-		mixi.SetAuthor( L"MZ3" );
+		mixi.SetAuthor( MZ3_APP_NAME );
 		mixi.AddBody( L"the top element.\r\n" );
 
 		CString msg;

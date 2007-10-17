@@ -194,7 +194,7 @@ void CMainFrame::OnBackButton()
 			if (theApp.m_pWriteView->IsSendEnd() == FALSE) {
 				// 未送信データ有り
 				int ret = ::MessageBox(m_hWnd, _T("未投稿のデータがあります\n破棄されますがよろしいですか？"),
-					_T("MZ3"), MB_ICONQUESTION | MB_OKCANCEL);
+					MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
 				if (ret == IDCANCEL) {
 					// 処理を中止
 					return;
@@ -349,7 +349,7 @@ void CMainFrame::OnSettingGeneral()
 		// Smartphone/Standard Edition では COptionSheet 等が利用できないため、警告メッセージを表示する。
 		MessageBox( 
 			L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
-			L"お手数ですが、MZ3.ini を直接編集してください" );
+			L"お手数ですが、mz3.ini を直接編集してください" );
 	} else {
 		COptionSheet cPropSht( _T("オプション"));
 		cPropSht.SetPage();

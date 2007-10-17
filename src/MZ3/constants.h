@@ -3,8 +3,15 @@
  */
 #pragma once
 
+/// アプリケーション名
+#ifdef WINCE
+#define	MZ3_APP_NAME				L"MZ3"
+#else
+#define	MZ3_APP_NAME				L"MZ4"
+#endif
+
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"MZ3.i Version 0.8.2.0 Beta25"
+#define MZ3_VERSION_TEXT			L"Version 0.8.2.0 Beta26"
 
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$"

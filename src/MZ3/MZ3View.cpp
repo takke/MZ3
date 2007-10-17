@@ -706,7 +706,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			} else {
 				// ログイン失敗
 				LPCTSTR emsg = _T("ログイン出来ませんでした");
-				::MessageBox(m_hWnd, emsg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+				::MessageBox(m_hWnd, emsg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 				MZ3LOGGER_ERROR( emsg );
 
 				// データを待避データに戻す
@@ -947,7 +947,7 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	msg.Format( 
 		L"%s\n\n"
 		L"原因：%s", smsg, theApp.m_inet.GetErrorMessage() );
-	::MessageBox(m_hWnd, msg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
 	MZ3LOGGER_ERROR( msg );
 
@@ -996,7 +996,7 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	LPCTSTR msg = _T("中断しました");
 	util::MySetInformationText( m_hWnd, msg );
-//	::MessageBox(m_hWnd, msg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+//	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
 	return LRESULT();
 }
@@ -2922,7 +2922,7 @@ void CMZ3View::MyShowHelp(void)
 	CMixiData dummy;
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
-	mixi.SetTitle(L"MZ3 ヘルプ");
+	mixi.SetTitle(MZ3_APP_NAME L" ヘルプ");
 	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
@@ -2946,7 +2946,7 @@ void CMZ3View::MyShowHistory(void)
 	CMixiData dummy;
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
-	mixi.SetTitle(L"MZ3 改版履歴");
+	mixi.SetTitle(MZ3_APP_NAME L" 改版履歴");
 	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
@@ -2974,7 +2974,7 @@ void CMZ3View::MyShowErrorlog(void)
 	CMixiData dummy;
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_ERRORLOG );
-	mixi.SetTitle(L"MZ3 エラーログ");
+	mixi.SetTitle(MZ3_APP_NAME L" エラーログ");
 	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 

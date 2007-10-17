@@ -949,15 +949,15 @@ void CReportView::OnAddBookmark()
 	if (m_data->GetAccessType() != ACCESS_BBS &&
 		m_data->GetAccessType() != ACCESS_EVENT &&
 		m_data->GetAccessType() != ACCESS_ENQUETE) {
-			::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), _T("MZ3"), NULL);
+			::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
 			return;
 	}
 
 	if( theApp.m_bookmarkMng.Add( m_data, theApp.m_root.GetBookmarkList() ) != FALSE ) {
-		::MessageBox(m_hWnd, _T("登録しました"), _T("MZ3"), NULL);
+		::MessageBox(m_hWnd, _T("登録しました"), MZ3_APP_NAME, NULL);
 	}
 	else {
-		::MessageBox(m_hWnd, _T("既に登録されています"), _T("MZ3"), NULL);
+		::MessageBox(m_hWnd, _T("既に登録されています"), MZ3_APP_NAME, NULL);
 	}
 
 
@@ -969,10 +969,10 @@ void CReportView::OnAddBookmark()
 void CReportView::OnDelBookmark()
 {
 	if (theApp.m_bookmarkMng.Delete(m_data,theApp.m_root.GetBookmarkList()) != FALSE) {
-		::MessageBox(m_hWnd, _T("削除しました"), _T("MZ3"), NULL);
+		::MessageBox(m_hWnd, _T("削除しました"), MZ3_APP_NAME, NULL);
 	}
 	else {
-		::MessageBox(m_hWnd, _T("登録されていません"), _T("MZ3"), NULL);
+		::MessageBox(m_hWnd, _T("登録されていません"), MZ3_APP_NAME, NULL);
 	}
 }
 
@@ -1142,7 +1142,7 @@ void CReportView::OnLoadUrl(UINT nID)
 	CCommonSelectDlg dlg;
 	dlg.SetMessage( msg );
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"ブラウザで開く" );
-	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"MZ3でダウンロード" );
+	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, MZ3_APP_NAME L"でダウンロード" );
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_CANCEL,  L"キャンセル" );
 	if( dlg.DoModal() != IDOK ) {
 		return;
@@ -1453,7 +1453,7 @@ LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 	msg.Format( 
 		L"%s\n\n"
 		L"原因：%s", smsg, theApp.m_inet.GetErrorMessage() );
-	::MessageBox(m_hWnd, msg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
 	m_access = FALSE;
 	m_infoEdit.ShowWindow(SW_HIDE);
@@ -1503,7 +1503,7 @@ LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	LPCTSTR msg = _T("中断しました");
 	util::MySetInformationText( m_hWnd, msg );
-//	::MessageBox(m_hWnd, msg, _T("MZ3"), MB_ICONSTOP | MB_OK);
+//	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
 	// 中止ボタンを使用不可にする
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);

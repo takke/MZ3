@@ -26,7 +26,7 @@ BOOL CAboutDlg::OnInitDialog()
 	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
 		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
 
-		CString version = MZ3_VERSION_TEXT;
+		CString version = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
 		version += util::GetSourceRevision();
 		item->SetWindowTextW( version );
 	}
@@ -60,7 +60,7 @@ void CAboutDlg::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
 		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
 
-		CString version = MZ3_VERSION_TEXT;
+		CString version = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
 		version += util::GetSourceRevision();
 		item->SetWindowTextW( version );
 	}

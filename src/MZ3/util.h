@@ -911,7 +911,7 @@ inline void OpenBrowserForUrl( LPCTSTR url )
 		L"下記のURLをブラウザで開きます。\n\n"
 		L"%s\n\n"
 		L"よろしいですか？", url );
-	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
+	if( MessageBox( NULL, msg, MZ3_APP_NAME, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
 	{
 		// YES ボタン以外なので終了
 		return;
@@ -942,7 +942,7 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 		L"%s さんのプロフィールページをブラウザで開きます。\n\n"
 		L"%s\n\n"
 		L"よろしいですか？", szUserName, url );
-	if( MessageBox( NULL, msg, L"MZ3", MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
+	if( MessageBox( NULL, msg, MZ3_APP_NAME, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
 	{
 		// YES ボタン以外なので終了
 		return;

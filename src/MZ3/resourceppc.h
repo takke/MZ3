@@ -11,6 +11,8 @@
 #define IDD_OPTIONTAB_GENERAL           115
 #define IDR_MAINFRAME                   128
 #define IDR_MZ3TYPE                     129
+#define IDR_MAINFRAME2                  129
+#define IDR_MAINFRAME_WIN32             130
 #define IDR_TOOLBAR                     131
 #define IDR_BODY_MENU                   134
 #define IDR_REPORT_MENU                 137

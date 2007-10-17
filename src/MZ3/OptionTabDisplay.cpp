@@ -90,9 +90,8 @@ void COptionTabDisplay::OnOK()
 
 void COptionTabDisplay::OnBnClickedResetTabButton()
 {
-	if( MessageBox( L"タブをリセットしてもよろしいですか？\n（初期化後にMZ3を終了します）", 
-			0, MB_YESNO | MB_ICONQUESTION ) != IDYES ) 
-	{
+	LPCTSTR msg =  L"タブをリセットしてもよろしいですか？\n（初期化後に" MZ3_APP_NAME L"を終了します）";
+	if( MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION ) != IDYES ) {
 		return;
 	}
 
@@ -101,7 +100,7 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 
 	// 再起動
 	// ・・・できないのでメッセージを表示して終了。
-	MessageBox( L"初期化処理が完了したためMZ3を終了します" );
+	MessageBox( L"初期化処理が完了したため" MZ3_APP_NAME L"を終了します" );
 	theApp.m_pReportView->SaveIndex();
 	ShowWindow(SW_HIDE);
 	AfxGetMainWnd()->PostMessage(WM_CLOSE);

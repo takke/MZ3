@@ -109,7 +109,7 @@ BOOL CMZ3App::InitInstance()
 #endif
 #endif
 
-	MZ3LOGGER_INFO( L"MZ3 起動開始 " + util::GetSourceRevision() );
+	MZ3LOGGER_INFO( MZ3_APP_NAME L" 起動開始 " + util::GetSourceRevision() );
 
 	// オプション読み込み
 	m_optionMng.Load();
@@ -154,8 +154,8 @@ BOOL CMZ3App::InitInstance()
 			if( MessageBox( NULL, 
 					L"グループ定義ファイルの読み込みに失敗しました。\n"
 					L"デフォルトのグループ定義で起動しますか？\n\n"
-					L"「いいえ」：MZ3を終了します。",
-					L"MZ3", MB_YESNO ) != IDYES ) 
+					L"「いいえ」：" MZ3_APP_NAME L"を終了します。",
+					MZ3_APP_NAME, MB_YESNO ) != IDYES ) 
 			{
 				MZ3LOGGER_INFO( L"ユーザによるキャンセルのため終了" );
 				return FALSE;
@@ -169,7 +169,11 @@ BOOL CMZ3App::InitInstance()
 
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
+#ifdef WINCE
 		IDR_MAINFRAME,
+#else
+		IDR_MAINFRAME_WIN32,
+#endif
 		RUNTIME_CLASS(CMZ3Doc),
 		RUNTIME_CLASS(CMainFrame),       // メイン SDI フレーム ウィンドウ
 		RUNTIME_CLASS(CMZ3View));
@@ -207,12 +211,12 @@ BOOL CMZ3App::InitInstance()
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 
 	// レポートビューの初期化
-	((CView*)m_pReportView)->Create(NULL, _T("MZ3 ReportView"), WS_CHILD, rect,
+	((CView*)m_pReportView)->Create(NULL, MZ3_APP_NAME _T(" ReportView"), WS_CHILD, rect,
 		m_pMainWnd, viewID, &newContext);
 	m_pReportView->OnInitialUpdate();
 
 	// 書き込みビューの初期化
-	((CView*)m_pWriteView)->Create(NULL, _T("MZ3 WriteView"), WS_CHILD, rect,
+	((CView*)m_pWriteView)->Create(NULL, MZ3_APP_NAME _T(" WriteView"), WS_CHILD, rect,
 		m_pMainWnd, viewID, &newContext);
 	m_pWriteView->OnInitialUpdate();
 
@@ -262,9 +266,10 @@ BOOL CMZ3App::InitInstance()
 		wcslen(m_loginMng.GetPassword()) == 0 )
 	{
 		CString msg;
-		msg += L"MZ3 をダウンロードしていただきありがとうございます！\n\n";
+		msg += MZ3_APP_NAME;
+		msg += L" をダウンロードしていただきありがとうございます！\n\n";
 		msg += L"次の画面で初期設定（ログイン設定）を行ってください。";
-		MessageBox( NULL, msg, L"MZ3.i", MB_OK );
+		MessageBox( NULL, msg, MZ3_APP_NAME, MB_OK );
 
 		// ユーザ設定画面を表示する
 		((CMainFrame*)m_pMainWnd)->OnSettingLogin();
@@ -278,7 +283,7 @@ BOOL CMZ3App::InitInstance()
 		((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
 	}
 
-	MZ3LOGGER_INFO( L"MZ3 初期化完了" );
+	MZ3LOGGER_INFO( MZ3_APP_NAME L" 初期化完了" );
 
 	return TRUE;
 }
@@ -369,7 +374,7 @@ int CMZ3App::ExitInstance()
 //	msg.Format( L"ログファイルを\n%s\nに保存します", logfile );
 //	MessageBox( NULL, msg, 0, MB_OK );
 
-	MZ3LOGGER_DEBUG( L"MZ3 終了処理開始" );
+	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理開始" );
 
 	// ログファイルの保存
 	if( m_logfile.Save( m_filepath.logfile ) == false ) {
@@ -382,9 +387,9 @@ int CMZ3App::ExitInstance()
 	// グループ定義ファイルの保存
 	Mz3GroupDataWriter::save( m_root, m_filepath.groupfile );
 
-	MZ3LOGGER_DEBUG( L"MZ3 終了処理完了" );
+	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理完了" );
 
-	MZ3LOGGER_INFO( L"MZ3 終了" );
+	MZ3LOGGER_INFO( MZ3_APP_NAME L" 終了" );
 
 	return CWinApp::ExitInstance();
 }
@@ -453,7 +458,7 @@ CString CMZ3App::MakeLoginUrl( LPCTSTR nextUrl )
 		encodedNextUrl
 		);
 
-//	MessageBox( NULL, uri, L"MZ3", MB_OK );
+//	MessageBox( NULL, uri, MZ3_APP_NAME, MB_OK );
 	return uri;
 }
 
