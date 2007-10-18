@@ -449,6 +449,17 @@ CMZ3Doc* CMZ3View::GetDocument() const // デバッグ以外のバージョンはインラインで
  */
 void CMZ3View::OnSize(UINT nType, int cx, int cy)
 {
+	// 前回の値を保存し、(0,0) の場合はその値を利用する
+	static int s_cx = 0;
+	static int s_cy = 0;
+	if (cx==0 && cy==0) {
+		cx = s_cx;
+		cy = s_cy;
+	} else {
+		s_cx = cx;
+		s_cy = cy;
+	}
+
 	CFormView::OnSize(nType, cx, cy);
 
 	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );

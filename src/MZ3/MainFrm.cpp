@@ -424,7 +424,7 @@ void CMainFrame::OnSettingGeneral()
 void CMainFrame::OnMenuClose()
 {
 	int iRet;
-	iRet = ::MessageBox(m_hWnd, _T("ＭＺ３を終了しますか？"), _T("ＭＺ３"), MB_ICONQUESTION | MB_OKCANCEL);
+	iRet = ::MessageBox(m_hWnd, MZ3_APP_NAME _T("を終了しますか？"), MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
 	if (iRet == IDOK) {
 		theApp.m_pReportView->SaveIndex();
 		ShowWindow(SW_HIDE);
@@ -565,8 +565,8 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 
 	// サイズ変更
 	{
-		CRect rect;
 #ifdef WINCE
+		CRect rect;
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 		int w = rect.Width();
 		int h = rect.Height() - rect.top;
@@ -575,16 +575,14 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		if( theApp.m_bSmartphone ) {
 			h += MZ3_TOOLBAR_HEIGHT;
 		}
-#else
-		// Win32 の場合は現在の大きさを継続する
-		// TODO レイアウト処理を変更すること。この方法では同一サイズにはならない。
-		GetWindowRect( &rect );
-//		GetClientRect( &rect );
-		int w = rect.Width();
-		int h = rect.Height();
-#endif
 
 		SetWindowPos( NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
+#else
+		// Win32 の場合は現在の大きさを継続する
+		// (0,0) を送ることで、前回のサイズ値を再利用する。
+		int w = 0;
+		int h = 0;
+#endif
 
 		// 各Viewに通知を送る
 		theApp.m_pMainView->OnSize( 0, w, h );

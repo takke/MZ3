@@ -239,6 +239,17 @@ void CReportView::SetHtmlText(LPCTSTR szHtmlText)
  */
 void CReportView::OnSize(UINT nType, int cx, int cy)
 {
+	// 前回の値を保存し、(0,0) の場合はその値を利用する
+	static int s_cx = 0;
+	static int s_cy = 0;
+	if (cx==0 && cy==0) {
+		cx = s_cx;
+		cy = s_cy;
+	} else {
+		s_cx = cx;
+		s_cy = cy;
+	}
+
 	CFormView::OnSize(nType, cx, cy);
 
 	int fontHeight = theApp.m_optionMng.GetFontHeight();
