@@ -35,6 +35,10 @@ private:
 
 public:
 
+#ifndef WINCE
+	CString			m_strWindowPos;			///< ウィンドウ位置・サイズ
+#endif
+
 	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
 	bool			m_bRenderByIE;			///< IE コントロールで閲覧するかどうか
 

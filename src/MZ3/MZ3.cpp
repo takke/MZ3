@@ -242,22 +242,6 @@ BOOL CMZ3App::InitInstance()
 			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
 			TRUE);
 	}
-#else
-	// for Win32, resize
-	{
-		CRect rc;
-		m_pMainWnd->GetWindowRect( &rc );
-
-		rc.right = rc.left + 240;
-		rc.bottom = rc.top + 320;
-
-		m_pMainWnd->MoveWindow( 
-			rc.left, 
-			rc.top, 
-			rc.right, 
-			rc.bottom + MZ3_TOOLBAR_HEIGHT, 
-			TRUE);
-	}
 #endif
 
 	// 初回起動時（ユーザID、パスワード未設定時）は

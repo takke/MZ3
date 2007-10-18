@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -191,6 +192,22 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	// ドキュメントの名称を表示しない
 	cs.style &= ~FWS_ADDTOTITLE;
+
+#ifndef WINCE
+	cs.cx = 240;
+	cs.cy = 320;
+
+	// 前回のサイズを復帰する
+	if (theApp.m_optionMng.m_strWindowPos.GetLength() > 16) {
+		LPCTSTR strrc = theApp.m_optionMng.m_strWindowPos;
+		CRect    rc(_wtoi(strrc), _wtoi(strrc+5), _wtoi(strrc+10), _wtoi(strrc+15));
+		cs.cx = rc.Width();
+		cs.cy = rc.Height();
+
+		cs.x  = rc.left;
+		cs.y  = rc.top;
+	}
+#endif
 
 	return TRUE;
 }
@@ -868,4 +885,19 @@ void CMainFrame::OnOpenMixiMobileByBrowser()
  */
 void CMainFrame::OnMenuAction()
 {
+}
+
+void CMainFrame::OnDestroy()
+{
+	CFrameWnd::OnDestroy();
+
+#ifndef WINCE
+	WINDOWPLACEMENT    wp;
+    if (GetWindowPlacement(&wp)) {
+		CString    cb;
+		cb.Format( L"%04d %04d %04d %04d", 
+			wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right, wp.rcNormalPosition.bottom);
+		theApp.m_optionMng.m_strWindowPos = cb;
+	}
+#endif
 }

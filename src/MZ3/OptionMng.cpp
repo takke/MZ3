@@ -250,6 +250,14 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_strSkinname = s.c_str();
 		}
+
+#ifndef WINCE
+		// ウィンドウ位置・サイズ
+		s = inifile.GetValue( "WindowPos", "UI" );
+		if(! s.empty() ) {
+			m_strWindowPos = s.c_str();
+		}
+#endif
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -387,6 +395,11 @@ void Option::Save()
 
 	// スキン名
 	inifile.SetValue( L"SkinName", (LPCTSTR)m_strSkinname, "UI" );
+
+#ifndef WINCE
+	// ウィンドウ位置・サイズ
+	inifile.SetValue( L"WindowPos", (LPCTSTR)m_strWindowPos, "UI" );
+#endif
 
 	//--- Log 関連
 	// 保存フラグ

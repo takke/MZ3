@@ -87,6 +87,7 @@ public:
 	void GetSkinFolderNameList(std::vector<std::wstring>& skinfileList);
 	void OnSkinMenuItem(UINT nID);
 	afx_msg void OnMenuAction();
+	afx_msg void OnDestroy();
 };
 
 
