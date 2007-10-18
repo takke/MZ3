@@ -97,6 +97,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_NARROW, &CReportView::OnLayoutReportlistMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
 	ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
+	ON_NOTIFY(NM_RCLICK, IDC_REPORT_LIST, &CReportView::OnNMRclickReportList)
 END_MESSAGE_MAP()
 
 
@@ -1712,18 +1713,22 @@ void CReportView::OnOpenBrowserUser()
 
 void CReportView::MyPopupReportMenu(void)
 {
-	CMenu menu;
 	POINT pt;
-	RECT rect;
 #ifdef WINCE
+	// MZ3 : 画面の中心でポップアップする
+	RECT rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	pt.x = rect.left + (rect.right-rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
+	
+	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
 #else
-	GetWindowRect(&rect);
+	// MZ4 : マウスの位置でポップアップする
+	GetCursorPos(&pt);
+	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
 #endif
 
-	pt.x = rect.left + (rect.right - rect.left) / 2;
-	pt.y = rect.top  + (rect.bottom - rect.top) / 2;
-
+	CMenu menu;
 	menu.LoadMenu(IDR_REPORT_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -1813,8 +1818,7 @@ void CReportView::MyPopupReportMenu(void)
 	}
 
 	// メニューのポップアップ
-	menu.GetSubMenu(0)->
-		TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);	  
+	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this);	  
 }
 
 /**
@@ -2159,4 +2163,14 @@ void CReportView::OnEnVscrollReportEdit()
 #ifndef WINCE
 	m_edit.Invalidate();
 #endif
+}
+
+/**
+ * リストの右クリックイベント
+ */
+void CReportView::OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	MyPopupReportMenu();
+
+	*pResult = 0;
 }

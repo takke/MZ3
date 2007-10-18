@@ -139,6 +139,7 @@ public:
 	afx_msg void OnLayoutReportlistMakeWide();
 //	afx_msg void OnEnVscrollInfoEdit();
 	afx_msg void OnEnVscrollReportEdit();
+	afx_msg void OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 

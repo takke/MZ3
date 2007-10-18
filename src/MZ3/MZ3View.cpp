@@ -180,6 +180,9 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_WM_SETTINGCHANGE()
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_NARROW, &CMZ3View::OnLayoutCategoryMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_WIDE, &CMZ3View::OnLayoutCategoryMakeWide)
+	ON_NOTIFY(NM_RCLICK, IDC_HEADER_LIST, &CMZ3View::OnNMRclickHeaderList)
+//	ON_NOTIFY(NM_RDBLCLK, IDC_BODY_LIST, &CMZ3View::OnNMRdblclkBodyList)
+	ON_NOTIFY(NM_RCLICK, IDC_BODY_LIST, &CMZ3View::OnNMRclickBodyList)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1228,47 +1231,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			PopupBodyMenu();
 		}else{
 			// カテゴリリストでの右クリック
-			RECT rect;
-#ifdef WINCE
-			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-			GetWindowRect(&rect);
-#endif
-
-			POINT pt;
-			pt.x = rect.left + (rect.right-rect.left) / 2;
-			pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-			CMenu menu;
-			menu.LoadMenu(IDR_CATEGORY_MENU);
-			CMenu* pSubMenu = menu.GetSubMenu(0);
-
-			// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
-			switch( m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() ) {
-			case ACCESS_LIST_NEW_BBS:
-			case ACCESS_LIST_NEWS:
-			case ACCESS_LIST_MESSAGE_IN:
-			case ACCESS_LIST_MESSAGE_OUT:
-			case ACCESS_LIST_DIARY:
-			case ACCESS_LIST_MYDIARY:
-			case ACCESS_LIST_BBS:
-				// 巡回対象なので巡回メニューを無効化しない
-				break;
-			default:
-				// 巡回メニューを無効化する
-				pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-				pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-				break;
-			}
-
-			// 巡回予約済みであればチェックを付ける。
-			if( m_selGroup->getFocusedCategory()->m_bCruise ) {
-				pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
-			}else{
-				pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
-			}
-
-			// メニュー表示
-			pSubMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+			PopupCategoryMenu();
 		}
 		return TRUE;
 	case VK_BACK:
@@ -2706,16 +2669,20 @@ void CMZ3View::OnSetNoRead()
 bool CMZ3View::PopupBodyMenu(void)
 {
 	// 右クリックメニュー表示位置
-	RECT rect;
-#ifdef WINCE
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-	GetWindowRect(&rect);
-#endif
-
 	POINT pt;
+#ifdef WINCE
+	// MZ3 : 画面の中心でポップアップする
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 	pt.x = rect.left + (rect.right-rect.left) / 2;
 	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
+	
+	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	GetCursorPos(&pt);
+	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
+#endif
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	switch( bodyItem.GetAccessType() ) {
@@ -2759,7 +2726,7 @@ bool CMZ3View::PopupBodyMenu(void)
 			}
 
 			// メニューを開く
-			pSubMenu->TrackPopupMenu( TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this );
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
 		break;
 
@@ -2783,7 +2750,7 @@ bool CMZ3View::PopupBodyMenu(void)
 			}
 
 			// メニューを開く
-			pSubMenu->TrackPopupMenu( TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this );
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
 		break;
 	}
@@ -3394,4 +3361,77 @@ void CMZ3View::OnLayoutCategoryMakeWide()
 	// 再描画
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
 	pMainFrame->ChangeAllViewFont();
+}
+
+/**
+ * カテゴリリストの右クリックイベント
+ */
+void CMZ3View::OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// カテゴリリストでの右クリック
+	PopupCategoryMenu();
+
+	*pResult = 0;
+}
+
+/**
+ * カテゴリリストのポップアップメニュー
+ */
+void CMZ3View::PopupCategoryMenu(void)
+{
+	POINT pt;
+#ifdef WINCE
+	// MZ3 : 画面の中心でポップアップする
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	pt.x = rect.left + (rect.right-rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
+	
+	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	GetCursorPos(&pt);
+	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
+#endif
+
+	CMenu menu;
+	menu.LoadMenu(IDR_CATEGORY_MENU);
+	CMenu* pSubMenu = menu.GetSubMenu(0);
+
+	// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
+	switch( m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() ) {
+	case ACCESS_LIST_NEW_BBS:
+	case ACCESS_LIST_NEWS:
+	case ACCESS_LIST_MESSAGE_IN:
+	case ACCESS_LIST_MESSAGE_OUT:
+	case ACCESS_LIST_DIARY:
+	case ACCESS_LIST_MYDIARY:
+	case ACCESS_LIST_BBS:
+		// 巡回対象なので巡回メニューを無効化しない
+		break;
+	default:
+		// 巡回メニューを無効化する
+		pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+		pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+		break;
+	}
+
+	// 巡回予約済みであればチェックを付ける。
+	if( m_selGroup->getFocusedCategory()->m_bCruise ) {
+		pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
+	}else{
+		pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
+	}
+
+	// メニュー表示
+	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
+}
+
+/**
+ * ボディリストの右クリックイベント
+ */
+void CMZ3View::OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	PopupBodyMenu();
+	*pResult = 0;
 }

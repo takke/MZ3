@@ -289,6 +289,9 @@ public:
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 	afx_msg void OnLayoutCategoryMakeNarrow();
 	afx_msg void OnLayoutCategoryMakeWide();
+	afx_msg void OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
+	void PopupCategoryMenu(void);
+	afx_msg void OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
