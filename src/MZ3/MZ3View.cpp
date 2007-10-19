@@ -19,6 +19,8 @@
 #define new DEBUG_NEW
 #endif
 
+#define TIMERID_INTERVAL_CHECK	101
+
 inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType )
 {
 	CString item;
@@ -183,6 +185,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_NOTIFY(NM_RCLICK, IDC_HEADER_LIST, &CMZ3View::OnNMRclickHeaderList)
 //	ON_NOTIFY(NM_RDBLCLK, IDC_BODY_LIST, &CMZ3View::OnNMRdblclkBodyList)
 	ON_NOTIFY(NM_RCLICK, IDC_BODY_LIST, &CMZ3View::OnNMRclickBodyList)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -351,6 +354,10 @@ void CMZ3View::OnInitialUpdate()
 
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
+
+	// インターバルタイマー生成
+	UINT x = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
+	DWORD e = ::GetLastError();
 }
 
 /**
@@ -1314,7 +1321,7 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 
 		return OnKeyDown( pMsg );
 	}
-	
+
 	return CFormView::PreTranslateMessage(pMsg);
 }
 
@@ -1592,19 +1599,7 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 //		return CommandSetFocusBodyList();
 	case VK_RETURN:
 		if (m_selGroup->selectedCategory == m_selGroup->focusedCategory) {
-			// アクセス中は再アクセス不可
-			if (m_access) {
-				return TRUE;
-			}
-			if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
-				SetBodyList( m_selGroup->getFocusedCategory()->GetBodyList() );
-				return TRUE;
-			}
-			// インターネットにアクセス
-			m_hotList = &m_bodyList;
-			AccessProc( 
-				&m_selGroup->getFocusedCategory()->m_mixi, 
-				util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
+			RetrieveCategoryItem();
 		}
 		else {
 			// 非選択項目なので、取得時刻とボディの変更。
@@ -3434,4 +3429,81 @@ void CMZ3View::OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	PopupBodyMenu();
 	*pResult = 0;
+}
+
+void CMZ3View::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == TIMERID_INTERVAL_CHECK) {
+		// 定期取得機能
+		if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+			// フォーカスチェック
+			// 現在のアプリが MZ3：
+			//  フォーカスがカテゴリリストにある場合
+			// 現在のアプリが MZ3 以外：
+			//  View が MZ3View である場合
+			// というチェックをしたいけど、とりあえずViewのチェックのみ。
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			if (pMainFrame->GetActiveView() != theApp.m_pMainView) {
+				// 現在のViewがMZ3View以外なので定期取得を行わない。
+				
+				// タイマーを更新（さらにN秒経つまで待つ）
+				m_dwIntervalTimerStartMsec = GetTickCount();
+				return;
+			}
+/*
+			if( GetFocus() != &m_categoryList ) {
+				// フォーカスが違うので、タイマーを更新（さらにN秒経つまで待つ）
+				m_dwIntervalTimerStartMsec = GetTickCount();
+				return;
+			}
+*/
+			// タイマー開始から N 秒経過したか？
+			int nElapsedSec = (GetTickCount() - m_dwIntervalTimerStartMsec)/1000;
+			if( nElapsedSec >= theApp.m_optionMng.m_nIntervalCheckSec ) {
+				util::MySetInformationText( m_hWnd, _T("☆定期取得を開始します") );
+
+				// 経過。取得開始。
+				RetrieveCategoryItem();
+
+				// タイマーを更新
+				m_dwIntervalTimerStartMsec = GetTickCount();
+			} else {
+				// カウントダウン
+				int restSec = theApp.m_optionMng.m_nIntervalCheckSec - nElapsedSec;
+				switch( restSec ) {
+				case 1:
+					util::MySetInformationText( m_hWnd, _T("☆定期取得1秒前") );
+					break;
+				case 2:
+					util::MySetInformationText( m_hWnd, _T("☆定期取得2秒前") );
+					break;
+				case 3:
+					util::MySetInformationText( m_hWnd, _T("☆定期取得3秒前") );
+					break;
+				}
+			}
+		}
+		return;
+	}
+
+	CFormView::OnTimer(nIDEvent);
+}
+
+bool CMZ3View::RetrieveCategoryItem(void)
+{
+	// アクセス中は再アクセス不可
+	if (m_access) {
+		return false;
+	}
+	if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
+		SetBodyList( m_selGroup->getFocusedCategory()->GetBodyList() );
+		return false;
+	}
+	// インターネットにアクセス
+	m_hotList = &m_bodyList;
+	AccessProc( 
+		&m_selGroup->getFocusedCategory()->m_mixi, 
+		util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
+
+	return true;
 }

@@ -88,6 +88,8 @@ public:
 	void OnSkinMenuItem(UINT nID);
 	afx_msg void OnMenuAction();
 	afx_msg void OnDestroy();
+	afx_msg void OnEnableIntervalCheck();
+	afx_msg void OnUpdateEnableIntervalCheck(CCmdUI *pCmdUI);
 };
 
 

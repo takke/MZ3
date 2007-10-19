@@ -34,6 +34,8 @@ private:
 	int				m_totalRecvBytes;		///< 総データ受信量
 
 public:
+	int				m_nIntervalCheckSec;	///< 定期取得間隔[sec]
+	bool			m_bEnableIntervalCheck;	///< 定期取得機能が有効か？
 
 #ifndef WINCE
 	CString			m_strWindowPos;			///< ウィンドウ位置・サイズ
@@ -122,6 +124,8 @@ public:
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
 		, m_strSkinname( L"aluminium" )
 		, m_bRenderByIE( false )
+		, m_nIntervalCheckSec( 15 )
+		, m_bEnableIntervalCheck( false )
 	{
 	}
 
@@ -221,6 +225,10 @@ public:
 		return normalizeRange( msec, 100, 1000 );
 	}
 
+	/// 定期取得間隔の正規化
+	static int normalizeIntervalCheckSec( int sec ) {
+		return normalizeRange( sec, 10, 600 );
+	}
 };
 
 }

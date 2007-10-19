@@ -104,6 +104,9 @@ void COptionTabGetPage::Load()
 
 		mc_RecvBufCombo.SetCurSel( idx );
 	}
+
+	// 定期取得間隔
+	SetDlgItemText( IDC_INTERVAL_CHECK_SEC_EDIT, util::int2str(theApp.m_optionMng.m_nIntervalCheckSec) );
 }
 
 /**
@@ -142,4 +145,8 @@ void COptionTabGetPage::Save()
 		// 再接続フラグが ON なのでクローズする（再接続は必要時に行われる）
 		theApp.m_inet.CloseInternetHandles();
 	}
+
+	// 定期取得間隔
+	GetDlgItemText( IDC_INTERVAL_CHECK_SEC_EDIT, buf );
+	theApp.m_optionMng.m_nIntervalCheckSec = option::Option::normalizeIntervalCheckSec( _wtoi( buf ) );
 }

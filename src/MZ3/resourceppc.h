@@ -82,6 +82,7 @@
 #define IDC_LOGFOLDER_EDIT              1027
 #define IDC_QUOTE_MARK_EDIT             1027
 #define IDC_SCROLL_LINE_EDIT            1027
+#define IDC_INTERVAL_CHECK_SEC_EDIT     1027
 #define IDC_WRITE_BODY_EDIT             1028
 #define IDC_FONT_MEDIUM_EDIT            1028
 #define IDC_MESSAGE_EDIT                1028
@@ -309,6 +310,10 @@
 #define ID_32968                        32968
 #define ID_MENU_ACTION                  32969
 #define ID_32970                        32970
+#define ID_32971                        32971
+#define ID_ENABLE_INTERVAL_CHECK        32972
+#define ID_32973                        32973
+#define ID_SET_INTERVAL_CHECK           32974
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -320,7 +325,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        157
-#define _APS_NEXT_COMMAND_VALUE         32971
+#define _APS_NEXT_COMMAND_VALUE         32975
 #define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

@@ -225,7 +225,6 @@ private:
 	static unsigned int LongReturnKey_Thread( LPVOID This );
 
 	bool DoInitialize();
-//	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnViewLog();
 	void MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi);
 	void MyShowReportView(CMixiData& mixi);
@@ -292,6 +291,11 @@ public:
 	afx_msg void OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
 	void PopupCategoryMenu(void);
 	afx_msg void OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	bool RetrieveCategoryItem(void);
+public:
+	DWORD m_dwIntervalTimerStartMsec;			///< 定期取得用タイマーの開始時刻
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

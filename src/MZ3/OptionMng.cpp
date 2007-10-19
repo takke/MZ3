@@ -258,6 +258,12 @@ void Option::Load()
 			m_strWindowPos = s.c_str();
 		}
 #endif
+
+		// 定期取得間隔
+		s = inifile.GetValue( "IntervalCheckSec", "UI" );
+		if(! s.empty() ) {
+			m_nIntervalCheckSec = normalizeIntervalCheckSec(atoi(s.c_str()));
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -400,6 +406,9 @@ void Option::Save()
 	// ウィンドウ位置・サイズ
 	inifile.SetValue( L"WindowPos", (LPCTSTR)m_strWindowPos, "UI" );
 #endif
+
+	// 定期取得間隔
+	inifile.SetValue( "IntervalCheckSec", (LPCSTR)util::int2str_a(m_nIntervalCheckSec), "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

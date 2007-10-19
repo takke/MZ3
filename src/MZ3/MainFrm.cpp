@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
 	ON_WM_DESTROY()
+	ON_COMMAND(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnEnableIntervalCheck)
+	ON_UPDATE_COMMAND_UI(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnUpdateEnableIntervalCheck)
 END_MESSAGE_MAP()
 
 
@@ -633,6 +635,37 @@ void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 #endif
 }
 
+/// 定期取得メニュー
+void CMainFrame::OnEnableIntervalCheck()
+{
+	if (theApp.m_optionMng.m_bEnableIntervalCheck == false) {
+		// 有効になったので、メッセージを表示する
+		CString msg;
+		msg.Format( 
+			L"定期取得機能は、カテゴリの項目を定期的に取得する機能です。\n"
+			L"\n"
+//			L"・フォーカスがカテゴリリスト（メイン画面上側のリスト）にある場合のみ有効です。\n"
+			L"・メイン画面を開いている場合のみ有効です。\n"
+			L"・取得間隔はオプション画面で設定できます。\n"
+			L"　（現在の取得間隔は【%d秒】です）\n"
+			, theApp.m_optionMng.m_nIntervalCheckSec );
+		MessageBox( msg );
+
+		// 設定する
+		theApp.m_pMainView->m_dwIntervalTimerStartMsec = GetTickCount();
+	}
+
+	// オプションのトグル
+	theApp.m_optionMng.m_bEnableIntervalCheck = !theApp.m_optionMng.m_bEnableIntervalCheck;
+}
+
+/// 定期取得メニューの制御
+void CMainFrame::OnUpdateEnableIntervalCheck(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable();
+	pCmdUI->SetCheck( theApp.m_optionMng.m_bEnableIntervalCheck ? TRUE : FALSE );
+}
+
 /// 画面｜前の画面メニューのイベント
 void CMainFrame::OnMenuBack()
 {
@@ -644,7 +677,6 @@ void CMainFrame::OnMenuNext()
 {
 	OnForwardButton();
 }
-
 
 void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 {
@@ -901,3 +933,4 @@ void CMainFrame::OnDestroy()
 	}
 #endif
 }
+

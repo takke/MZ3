@@ -88,6 +88,7 @@ BEGIN
         BEGIN
             MENUITEM "一般...",                       ID_SETTING_GENERAL
             MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
+            MENUITEM "定期取得",                        ID_ENABLE_INTERVAL_CHECK
             POPUP "記事取得"
             BEGIN
                 MENUITEM "全件取得",                        IDM_GETPAGE_ALL
@@ -310,6 +311,7 @@ BEGIN
     BEGIN
         MENUITEM "一般...",                       ID_SETTING_GENERAL
         MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
+        MENUITEM "定期取得",                        ID_ENABLE_INTERVAL_CHECK
         POPUP "記事取得"
         BEGIN
             MENUITEM "全件取得",                        IDM_GETPAGE_ALL
@@ -368,7 +370,7 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 147, 179
+IDD_ABOUTBOX DIALOG  0, 0, 147, 179
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 EXSTYLE 0x80000000L
 CAPTION "バージョン情報 MZ3"
@@ -455,7 +457,7 @@ BEGIN
     EDITTEXT        IDC_PROXY_PASSWPRD_EDIT,39,91,45,14,ES_AUTOHSCROLL
 END
 
-IDD_OPTIONTAB_GETPAGE DIALOG  0, 0, 139, 116
+IDD_OPTIONTAB_GETPAGE DIALOGEX 0, 0, 139, 116
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 CAPTION "取得"
 FONT 9, "ＭＳ Ｐゴシック"
@@ -467,6 +469,9 @@ BEGIN
     COMBOBOX        IDC_RECV_BUF_COMBO,69,52,52,48,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "受信",IDC_STATIC,7,41,125,28
     CONTROL         "自動接続する",IDC_USE_AUTOCONNECTION_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,77,56,10
+    EDITTEXT        IDC_INTERVAL_CHECK_SEC_EDIT,92,95,24,14,ES_AUTOHSCROLL
+    LTEXT           "定期取得の間隔(10～600)：",IDC_STATIC,7,98,81,8
+    LTEXT           "[秒]",IDC_STATIC,119,98,12,8
 END
 
 IDD_WRITEVIEW DIALOG  0, 0, 81, 98
@@ -714,6 +719,7 @@ BEGIN
         BOTTOMMARGIN, 109
         HORZGUIDE, 25
         HORZGUIDE, 58
+        HORZGUIDE, 102
     END
 
     IDD_WRITEVIEW, DIALOG
