@@ -35,6 +35,7 @@ void CQuoteDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CQuoteDlg, CDialog)
 	ON_WM_SIZE()
 	ON_LBN_SELCHANGE(IDC_TYPE_LIST, &CQuoteDlg::OnLbnSelchangeTypeList)
+	ON_LBN_DBLCLK(IDC_TYPE_LIST, &CQuoteDlg::OnLbnDblclkTypeList)
 END_MESSAGE_MAP()
 
 
@@ -120,6 +121,13 @@ BOOL CQuoteDlg::OnInitDialog()
 
 	OnLbnSelchangeTypeList();
 
+#ifndef WINCE
+	// 画面サイズを変更
+	int w = 360;
+	int h = 480;
+	SetWindowPos( NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOOWNERZORDER );
+#endif
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -185,4 +193,9 @@ BOOL CQuoteDlg::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CQuoteDlg::OnLbnDblclkTypeList()
+{
+	OnOK();
 }

@@ -31,4 +31,5 @@ public:
 	CEdit m_sampleEdit;
 	CEdit m_msgEdit;
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnLbnDblclkTypeList();
 };
