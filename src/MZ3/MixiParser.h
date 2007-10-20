@@ -2092,6 +2092,8 @@ public:
 				const CString& line = html_.GetAt(iLine );
 				CString title;
 				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
+				// タグの除去
+				ParserUtil::StripAllTags( title );
 				data_.SetTitle(title);
 				continue;
 			}
@@ -2344,9 +2346,12 @@ private:
 					//コメント番号を取得
 					// <label for="commentCheck01">37</label>
 					if( util::LineHasStringsNoCase( line, L"\">", L"</label>")) {
-						CString strIndex;
-						util::GetBetweenSubString( line, L"\">", L"</label>", strIndex );
-						cmtData.SetCommentIndex( _wtoi(strIndex) );
+						CString number;
+						util::GetAfterSubString( line, L"<label", number );
+						util::GetBetweenSubString( number, L">", L"</label", number );
+						// &nbsp; を消す
+						while(number.Replace(L"&nbsp;",L"")) {}
+						cmtData.SetCommentIndex(_wtoi(number));
 					}
 					
 					//日付を取得
