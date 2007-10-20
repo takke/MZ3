@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MyRegex.h"
-#include "XmlParser.h"
+//#include "XmlParser.h"
 #include "HtmlArray.h"
 #include "MixiParserUtil.h"
 
@@ -855,69 +855,62 @@ public:
 
 		INT_PTR count = html_.GetCount();
 
-		CString str;
-		CString buf;
-		CString key;
-
-		BOOL findFlag = FALSE;
-		BOOL dataFind = FALSE;
+		BOOL bEntryStarted = FALSE;
+		BOOL bItemFound = FALSE;
 
 		//int index;
 		for (int i=160; i<count; i++) {
 
-			str = html_.GetAt(i);
+			const CString& line = html_.GetAt(i);
 
-			if (findFlag == FALSE) {
-				if (util::LineHasStringsNoCase( str, L"entryList01") ) {
+			if (bEntryStarted == FALSE) {
+				if (util::LineHasStringsNoCase( line, L"entryList01") ) {
 					// 開始フラグ発見。
 					// とりあえずN行無視する。
-					i+=3;
-					findFlag = TRUE;
+					i += 3;
+					bEntryStarted = TRUE;
 				}
 				continue;
 			}
 			else {
 
-				if (util::LineHasStringsNoCase( str, L"<dt>") ) {
+				if (util::LineHasStringsNoCase( line, L"<dt>") ) {
 					// 項目発見
-
-					dataFind = TRUE;
+					bItemFound = TRUE;
 
 					CMixiData data;
 					data.SetAccessType(ACCESS_DIARY);
 
 					// 日付
 					// <dt>2007年10月01日&nbsp;01:11</dt>
-					ParserUtil::ParseDate(str, data);
-					TRACE(_T("%s\n"), data.GetDate());
+					ParserUtil::ParseDate(line, data);
+					MZ3LOGGER_DEBUG( L"date : " + data.GetDate() );
 
 					// 見出しタイトル
-					i+=1;
-					str = html_.GetAt(i);
+					//<dd><a href="view_diary.pl?id=xxx&owner_id=yyy&comment_count=2">タイトル(2)</a>&nbsp;(なまえ)</dd>
+					i += 1;
+					const CString& line2 = html_.GetAt(i);
 
 					CString title;
-					util::GetBetweenSubString( str, L"\">", L"</a>", title );
+					util::GetBetweenSubString( line2, L"\">", L"</a>", title );
 					data.SetTitle(title);
-					TRACE(_T("%s\n"), data.GetTitle());
+					MZ3LOGGER_DEBUG( L"title : " + data.GetTitle() );
 
-					// ＵＲＩ
-					buf = util::XmlParser::GetElement(str, 2);
-					buf = util::XmlParser::GetAttribute(buf, _T("href="));
-					buf = buf.Left(buf.GetLength() -1);
-					buf = buf.Right(buf.GetLength() -1);
-					data.SetURL(buf);
-					TRACE(_T("%s\n"), data.GetURL());
+					// URL
+					CString url;
+					util::GetBetweenSubString( line2, L"href=\"", L"\"", url );
+					data.SetURL(url);
+					MZ3LOGGER_DEBUG( L"URL : " + data.GetURL() );
 
 					// ＩＤを設定
-					buf = data.GetURL();
-					buf = buf.Mid(buf.Find(_T("id=")) + wcslen(_T("id=")));
-					buf = buf.Left(buf.Find(_T("&")));
-					data.SetID(_wtoi(buf));
+					CString id;
+					util::GetBetweenSubString( data.GetURL(), L"id=", L"&", id );
+					data.SetID(_wtoi(id));
 					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
 					CString author;
-					if( util::GetBetweenSubString( str, L"&nbsp;(", L")</dd>", author ) < 0 ) {
+					if( util::GetBetweenSubString( line2, L"&nbsp;(", L")</dd>", author ) < 0 ) {
 						// not found.
 						continue;
 					}
@@ -928,7 +921,7 @@ public:
 
 					out_.push_back(data);
 				}
-				else if (str.Find(_T("/newCommentArea")) != -1 && dataFind != FALSE) {
+				else if (line.Find(_T("/newCommentArea")) != -1 && bItemFound) {
 					// 終了タグ発見
 					break;
 				}

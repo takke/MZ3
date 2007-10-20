@@ -1635,10 +1635,6 @@
 					RelativePath=".\kfm.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\XmlParser.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="net"
@@ -2203,10 +2199,6 @@
 				</File>
 				<File
 					RelativePath=".\util.h"
-					>
-				</File>
-				<File
-					RelativePath=".\XmlParser.h"
 					>
 				</File>
 			</Filter>
