@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MyRegex.h"
-#include "XmlParser.h"
 #include "HtmlArray.h"
 
 /// mixi 用HTMLパーサ
