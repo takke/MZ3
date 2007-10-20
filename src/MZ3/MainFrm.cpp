@@ -211,7 +211,9 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	// タイトル変更
-	SetTitle(MZ3_APP_NAME L" " MZ3_VERSION_TEXT);
+	CString title = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
+	title.Replace( L"Version ", L"v" );
+	SetTitle(title);
 #endif
 
 	return TRUE;
