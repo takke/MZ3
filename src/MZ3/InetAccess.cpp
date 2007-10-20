@@ -574,7 +574,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		// logging
 		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 			CString msg;
-			msg.Format( L"url : %s", m_strPath );
+			msg.Format( L"url : %s", (LPCTSTR)m_strPath );
 
 			// パスワードを消す
 			static MyRegex reg;
@@ -777,11 +777,19 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 						// リダイレクト先が取得できたので、リダイレクト実行。
 						// とりあえず再帰で。
 						m_uri = szLocation;
+
+						// "://" がなければ、プロトコル・サーバ名を引き継ぐ。
+						if( m_uri.Find(L"://")==-1 ) {
+							CString url;
+							url.Format( L"%s://%s/%s", m_lpszScheme, m_lpszHostName, (LPCTSTR)m_uri );
+							m_uri = url;
+						}
+
 						m_nRedirect ++;
 
 						if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 							CString msg;
-							msg.Format( L"リダイレクト：[%s]", m_uri );
+							msg.Format( L"リダイレクト：[%s]", (LPCTSTR)m_uri );
 							MZ3LOGGER_DEBUG( msg );
 						}
 						return ExecSendRecv( execType );
@@ -983,7 +991,6 @@ void CInetAccess::CloseInternetHandles()
  */
 void CInetAccess::ParseURI()
 {
-	TCHAR lpszScheme[256];
 	TCHAR lpszUrlPath[1024];
 	TCHAR lpszExtraInfo[1024];
 
@@ -991,8 +998,8 @@ void CInetAccess::ParseURI()
 	m_sComponents.dwStructSize		= sizeof(URL_COMPONENTS);
 	m_sComponents.lpszHostName		= m_lpszHostName;
 	m_sComponents.dwHostNameLength	= sizeof(m_lpszHostName) / sizeof(TCHAR);
-	m_sComponents.lpszScheme		= lpszScheme;
-	m_sComponents.dwSchemeLength	= sizeof(lpszScheme) / sizeof(TCHAR);
+	m_sComponents.lpszScheme		= m_lpszScheme;
+	m_sComponents.dwSchemeLength	= sizeof(m_lpszScheme) / sizeof(TCHAR);
 	m_sComponents.lpszUserName		= m_lpszUserName;
 	m_sComponents.dwUserNameLength	= sizeof(m_lpszUserName) / sizeof(TCHAR);
 	m_sComponents.lpszPassword		= m_lpszPassword;

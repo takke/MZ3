@@ -27,6 +27,7 @@ public:
 		EXEC_SENDRECV_TYPE_POST,	///< POST ƒƒ\ƒbƒh
 	};
 private:
+	TCHAR				m_lpszScheme[256];
 	TCHAR				m_lpszHostName[256];
 	TCHAR				m_lpszUserName[256];
 	TCHAR				m_lpszPassword[256];
