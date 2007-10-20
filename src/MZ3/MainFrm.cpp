@@ -209,6 +209,9 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		cs.x  = rc.left;
 		cs.y  = rc.top;
 	}
+
+	// タイトル変更
+	SetTitle(MZ3_APP_NAME L" " MZ3_VERSION_TEXT);
 #endif
 
 	return TRUE;
