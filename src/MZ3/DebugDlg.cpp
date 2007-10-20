@@ -165,6 +165,13 @@ BOOL CDebugDlg::OnInitDialog()
 
 	m_List.SetItemState( 0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 
+#ifndef WINCE
+	// 画面サイズを変更
+	int w = 360;
+	int h = 480;
+	SetWindowPos( NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOOWNERZORDER );
+#endif
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -173,6 +180,10 @@ void CDebugDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 
+
+	if (m_List.GetSafeHwnd()==NULL) {
+		return;
+	}
 
 	m_List.MoveWindow( 0, 0, cx, cy );
 }
