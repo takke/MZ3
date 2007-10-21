@@ -48,7 +48,13 @@ inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDI
 	}
 
 	// 上限設定
+#ifdef WINCE
+	// WindowsMobile の場合は、30文字くらいで切らないと落ちるので制限する。
 	return item.Left( 30 );
+#else
+	// Windows の場合は、とりあえず100文字で切っておく。
+	return item.Left( 100 );
+#endif
 }
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
