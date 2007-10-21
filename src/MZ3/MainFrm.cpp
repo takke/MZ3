@@ -143,7 +143,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// ツールバーの生成
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, 
 		                       WS_CHILD | WS_VISIBLE | 
-							   CBRS_TOP | CBRS_GRIPPER | 
+							   CBRS_TOP | 
 							   CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC))
 	{
 		MZ3LOGGER_FATAL(L"ツールバー の作成に失敗しました");
