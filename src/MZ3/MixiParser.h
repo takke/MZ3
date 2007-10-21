@@ -983,7 +983,7 @@ public:
 
 		// 「最近の日記」の取得
 		bool bStartRecentDiary = false;
-		for( int iLine=400; iLine<lastLine; iLine++ ) {
+		for( int iLine=300; iLine<lastLine; iLine++ ) {
 			// <h3>最近の日記</h3>
 			// があれば「最近の日記」開始とみなす。
 			const CString& line = html_.GetAt( iLine );
