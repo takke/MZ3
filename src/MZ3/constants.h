@@ -11,7 +11,7 @@
 #endif
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT			L"Version 0.8.2.0 Beta27" 
+#define MZ3_VERSION_TEXT			L"Version 0.8.2.0 Beta28" 
 
 /// リビジョン番号
 #define MZ3_SVN_REVISION			L"$Rev$"
