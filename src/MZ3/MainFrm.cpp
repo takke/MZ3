@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
-
 #include "MainFrm.h"
 #include "OptionSheet.h"
 #include "OptionTabUser.h"
@@ -15,6 +14,7 @@
 #include "UserDlg.h"
 #include "util.h"
 #include "url_encoder.h"
+#include "version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

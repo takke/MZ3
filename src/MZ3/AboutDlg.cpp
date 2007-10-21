@@ -6,6 +6,7 @@
 #include "AboutDlg.h"
 #include "util.h"
 #include "ForcedDebugDlg.h"
+#include "version.h"
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {

@@ -1039,6 +1039,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release_Win32|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
+			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
 			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
@@ -1137,7 +1138,7 @@
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				WarningLevel="2"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -2175,6 +2176,10 @@
 			</File>
 			<File
 				RelativePath=".\UserDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\version.h"
 				>
 			</File>
 			<File

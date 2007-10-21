@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MainFrm.h"
-
 #include "MZ3Doc.h"
 #include "MZ3View.h"
 #include "ReportView.h"
@@ -13,6 +12,7 @@
 #include "util.h"
 #include "DebugDlg.h"
 #include "url_encoder.h"
+#include "version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
