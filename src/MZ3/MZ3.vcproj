@@ -2376,6 +2376,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\MZ4.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\NoPhotoIcon.ico"
 				>
 			</File>
