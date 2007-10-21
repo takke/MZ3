@@ -65,7 +65,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\MZ3.ico"
-IDR_MAINFRAME_WIN32     ICON                    "res\\MZ3.ico"
+IDR_MAINFRAME_WIN32     ICON                    "res\\MZ4.ico"
 IDR_MZ3TYPE             ICON                    "res\\MZ3Doc.ico"
 IDI_NO_PHOTO_ICON       ICON                    "res\\NoPhotoIcon.ico"
 IDI_PHOTO_ICON          ICON                    "res\\photo.ico"
@@ -868,6 +868,18 @@ BEGIN
     BUTTON      ID_APP_ABOUT
 END
 
+IDR_TOOLBAR_WIN32 TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_BACK_BUTTON
+    BUTTON      ID_FORWARD_BUTTON
+    BUTTON      ID_STOP_BUTTON
+    BUTTON      ID_WRITE_BUTTON
+    BUTTON      ID_IMAGE_BUTTON
+    BUTTON      ID_OPEN_BROWSER
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -876,6 +888,7 @@ END
 
 IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
 IDR_TOOLBAR_QVGA        BITMAP                  "res\\toolbarQVGA.bmp"
+IDR_TOOLBAR_WIN32       BITMAP                  "res\\toolbar_win32.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

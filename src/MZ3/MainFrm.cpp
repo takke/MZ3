@@ -154,7 +154,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 //	int idToolbar = IDR_TOOLBAR;
 //	int nToolbarWidth  = 32;
 //	int nToolbarHeight = 32;
-	int idToolbar = IDR_TOOLBAR_QVGA;
+	int idToolbar = IDR_TOOLBAR_WIN32;
 	int nToolbarWidth  = 16;
 	int nToolbarHeight = 16;
 

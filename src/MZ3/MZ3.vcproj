@@ -1155,7 +1155,8 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)_win32.exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				EntryPointSymbol="wWinMainCRTStartup"
@@ -2384,6 +2385,10 @@
 			</File>
 			<File
 				RelativePath=".\res\toolbar.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toolbar_win32.bmp"
 				>
 			</File>
 			<File

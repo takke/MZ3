@@ -25,6 +25,7 @@
 #define IDR_TOOLBAR_QVGA                145
 #define IDD_DEBUG_DIALOG                145
 #define IDD_QUOTE_DIALOG                146
+#define IDR_TOOLBAR_WIN32               146
 #define IDR_PROFILE_ITEM_MENU           147
 #define IDD_DEBUG2_DIALOG               148
 #define IDR_CATEGORY_MENU               149
