@@ -33,6 +33,12 @@ BOOL CAboutDlg::OnInitDialog()
 
 	// 総データ受信量
 	SetTotalBytes();
+
+	// アイコンの変更
+	CStatic* icon = NULL;
+	if( (icon=(CStatic*)GetDlgItem( IDC_STATIC_1 )) != NULL ) {
+		icon->SetIcon( ::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME_WIN32)) );
+	}
 #endif
 
 	return TRUE;	// フォーカスをコントロールに設定した場合を除き、TRUE を返します。
