@@ -2081,7 +2081,6 @@ public:
 			//<dt class="bbsTitle clearfix"><span class="titleSpan">XXXXXXXX</span>
 			if( util::LineHasStringsNoCase( line, L"<dt", L"bbsTitle" ) )
 			{
-				const CString& line = html_.GetAt(iLine );
 				CString title;
 				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
 				// タグの除去
@@ -2094,7 +2093,6 @@ public:
 			//<span class="date">2007年10月06日 17:20</span>	</dt>
 			if( util::LineHasStringsNoCase( line, L"<span", L"date" ) )
 			{
-				const CString& line = html_.GetAt(iLine );
 				ParserUtil::ParseDate(line, data_);
 				continue;
 			}
@@ -2102,7 +2100,6 @@ public:
 			// ●企画者解析
 			if( util::LineHasStringsNoCase( line, L"<dt>", L"show_friend" ) )
 			{
-				const CString& line = html_.GetAt(iLine );
 				MixiUrlParser::GetAuthor( line, &data_ );
 				continue;
 			}
@@ -2129,7 +2126,11 @@ public:
 			// ●アンケート内容終了
 			if( bInEnquete && 
 				(util::LineHasStringsNoCase( line, L"<!-- COMMENT: start -->" ) ||
-				 util::LineHasStringsNoCase( line, L"<div", L"id", L"enqueteComment") ) )
+				 util::LineHasStringsNoCase( line, L"<div", L"id", L"enqueteComment") ||
+				 // 送信ボタン
+				 //<li><input type="submit" value="送信する" class="formBt01" /></li>
+				 util::LineHasStringsNoCase( line, L"<input", L"type=", L"submit", L"送信する" )
+				 ) )
 			{
 				bInEnquete = false;
 				break;
@@ -2192,6 +2193,11 @@ private:
 			}else{
 				// </dd>が見つかったので終了。
 				ParserUtil::AddBodyWithExtract( mixi, target );
+				break;
+			}
+
+			// reply_enquete.pl 用：</ul> があれば終了。
+			if( target.Find(L"</ul>") != -1 ) {
 				break;
 			}
 		}
