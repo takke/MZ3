@@ -362,8 +362,8 @@ void CMZ3View::OnInitialUpdate()
 	AfxBeginThread( Initialize_Thread, this );
 
 	// インターバルタイマー生成
-	UINT x = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
-	DWORD e = ::GetLastError();
+	UINT result = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
+//	DWORD e = ::GetLastError();
 }
 
 /**
@@ -2586,7 +2586,11 @@ void CMZ3View::OnSelchangedGroupTab(void)
 	m_categoryList.m_bStopDraw = true;
 	OnMySelchangedCategoryList();
 	m_categoryList.m_bStopDraw = false;
+#ifdef WINCE
 	m_categoryList.Invalidate( FALSE );
+#else
+	m_categoryList.Invalidate( TRUE );
+#endif
 }
 
 /**
