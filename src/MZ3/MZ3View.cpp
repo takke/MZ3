@@ -108,6 +108,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 			return _T("日時>>");
 		}
 		break;
+	case ACCESS_LIST_CALENDAR:
 	case ACCESS_LIST_BBS:
 		return L"日付";
 	case ACCESS_LIST_BOOKMARK:
@@ -809,6 +810,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_MESSAGE_OUT:
 	case ACCESS_LIST_INTRO:
 	case ACCESS_LIST_BBS:
+	case ACCESS_LIST_CALENDAR:
 		// --------------------------------------------------
 		// カテゴリ項目の取得
 		// --------------------------------------------------
@@ -1076,6 +1078,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	case ACCESS_LIST_DIARY:
 	case ACCESS_LIST_NEW_COMMENT:
 	case ACCESS_LIST_COMMENT:
+	case ACCESS_LIST_CALENDAR:
 		m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
 		break;
 	case ACCESS_LIST_NEWS:
@@ -2485,6 +2488,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	case ACCESS_LIST_BOOKMARK:
 	case ACCESS_LIST_MYDIARY:
 	case ACCESS_LIST_INTRO:
+	case ACCESS_LIST_CALENDAR:
 	default:
 		// それ以外では変更しないので終了。
 		return false;
@@ -3092,7 +3096,9 @@ int CMZ3View::GetListWidth(void)
 	CRect rect;
 	GetWindowRect( &rect );
 	int w = rect.Width();
+
 	// ピクセル数の微調整（スクリーン幅より少し小さくする）
+#ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
 		w -= 35;
@@ -3102,6 +3108,9 @@ int CMZ3View::GetListWidth(void)
 		w -= 35/2;
 		break;
 	}
+#else
+	w -= 35;
+#endif
 	return w;
 }
 

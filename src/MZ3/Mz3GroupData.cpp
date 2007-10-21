@@ -79,6 +79,7 @@ bool Mz3GroupData::initForTopPage()
 		appendCategoryByIniData( group, "ブックマーク", ACCESS_LIST_BOOKMARK );
 		appendCategoryByIniData( group, "お気に入りユーザー", ACCESS_LIST_FAVORITE, "list_bookmark.pl" );
 		appendCategoryByIniData( group, "お気に入りコミュ", ACCESS_LIST_FAVORITE, "list_bookmark.pl?kind=community" );
+		appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
 	}
 	this->groups.push_back( group );
 
@@ -210,6 +211,13 @@ bool Mz3GroupData::appendCategoryByIniData(
 		default_category_url = L"";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
+		break;
+
+	case ACCESS_LIST_CALENDAR: //icchu追加
+		// カレンダー
+		default_category_url = L"show_calendar.pl";
+		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		break;
 
 	default:

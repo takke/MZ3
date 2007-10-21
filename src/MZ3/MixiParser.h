@@ -3739,6 +3739,137 @@ private:
 	}
 };
 
+/**
+ * [list] show_calendar.pl 用パーサ。
+ * 【カレンダー】
+ * http://mixi.jp/show_calendar.pl
+ */
+class ShowCalendarParser : public MixiListParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"ShowCalendarParser.parse() start." );
+
+		INT_PTR count = html_.GetCount();
+
+		BOOL findFlag = FALSE;
+		BOOL findFlag2 = FALSE;
+		CString YearMonth;
+		CString date;
+		CString strDate;
+				
+		for (int i=0; i<count; i++) {
+
+			CString str = html_.GetAt(i);
+
+			//</form>が現れたら解析終了
+			if (str.Find(_T("</form>")) != -1) {
+				break;
+			}
+			
+			//年月を抽出
+			if( util::LineHasStringsNoCase( str, L"<title>[mixi]", L"のカレンダー</title>" ) ) {
+				util::GetBetweenSubString( str, L"<title>[mixi]", L"のカレンダー</title>", YearMonth );
+				findFlag = TRUE;
+			}
+			
+			//開始フラグ
+			if( util::LineHasStringsNoCase( str, L"calendarTable01" ) ) {
+				findFlag2 = TRUE;
+			}
+
+			if (findFlag != FALSE && findFlag2 != FALSE ) {
+
+				CString target = str;
+				CString title;
+				CString url;
+				BOOL findFlag3 = FALSE;
+				CMixiData data;
+					
+				//<img src="http://img.mixi.jp/img/calendaricon2/i_iv2.gif" width="16" height="16" align="middle" /><a href="view_event.pl?id=xxxx&comm_id=xxxx">XXXXXXXXXXXXXXX</a></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">9</font></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">10</font>
+
+				//i_iv2.gif イベント
+				if( util::LineHasStringsNoCase( target, L"i_iv2.gif" ) ) {
+					util::GetBetweenSubString( target, L"\">", L"</a>", title );
+					
+					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
+					
+					data.SetAccessType( ACCESS_EVENT );
+					findFlag3 = TRUE;
+				}
+				//i_bd.gif　誕生日
+				if( util::LineHasStringsNoCase( target, L"i_bd.gif" ) ) {
+				
+					//show_friend.pl以降を取り出す
+					CString after;
+					util::GetAfterSubString( target, L"show_friend.pl", after );
+					util::GetBetweenSubString( after, L">", L"</a>", title );
+					
+					title = L"【誕生日】" + title;
+					//飛ばし先のプロフィールがまだ未実装のため保留
+					//util::GetBetweenSubString( target, L"<a href=", L">", url );
+					
+					data.SetAccessType( ACCESS_PROFILE );
+					findFlag3 = TRUE;
+				}
+				//i_sc-.gif　自分スケジュール
+				if( util::LineHasStringsNoCase( target, L"i_sc-.gif" ) ) {
+					util::GetBetweenSubString( target, L"align=\"absmiddle\" />", L"</a>", title );
+
+					title = L"【スケジュール】" + title;
+					//飛ばし先のスケジュール詳細がまだ未実装のため保留
+					//util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
+
+					data.SetAccessType( ACCESS_PROFILE );
+					findFlag3 = TRUE;
+				}
+
+				if (findFlag3 != FALSE) {
+					// オブジェクト生成
+
+					data.SetTitle( title );
+					data.SetURL( url );
+					strDate.Trim();
+					data.SetDate( strDate );
+					out_.push_back( data );
+				}
+				
+				////最後の「<font style=」以降の文字を切り出す
+				CString after = target;
+				while( after.Find(_T("<font style=")) != -1 ) {
+					util::GetAfterSubString( after, L"<font style=", after );
+				}
+
+				//今日の場合　font-weight: bold;">21</font>
+				if( util::LineHasStringsNoCase( after, L"font-weight: bold;\">" ) ) {
+					util::GetBetweenSubString( after, L"font-weight: bold;\">", L"</font>", date );
+					strDate = YearMonth + date + L"日";
+				}
+				
+				//<font style="color: #996600;"> があれば平日 
+				if( util::LineHasStringsNoCase( after, L"color: #996600;\">" ) ) {
+					util::GetBetweenSubString( after, L"color: #996600;\">", L"</font>", date );
+					strDate = YearMonth + date + L"日";
+				}
+				//<font style="color: #0000ff;">があれば土曜日
+				if( util::LineHasStringsNoCase( after, L"color: #0000ff;\">" ) ) {
+					util::GetBetweenSubString( after, L"color: #0000ff;\">", L"</font>", date );
+					strDate = YearMonth + date + L"日";
+				}
+				//<font style="color: #ff0000;">があれば休日
+				if( util::LineHasStringsNoCase( after, L"color: #ff0000;\">" ) ) {
+					util::GetBetweenSubString( after, L"color: #ff0000;\">", L"</font>", date );
+					strDate = YearMonth + date + L"日";
+				}
+
+			}
+		}
+
+		MZ3LOGGER_DEBUG( L"ShowCalendarParser.parse() finished." );
+		return true;
+	}
+};
 
 //■■■MZ3独自■■■
 /**
@@ -4029,6 +4160,7 @@ inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArra
 	case ACCESS_LIST_INTRO:				mixi::ShowIntroParser::parse( body, html );				break;
 	case ACCESS_LIST_BBS:				mixi::ListBbsParser::parse( body, html );				break;
 	case ACCESS_LIST_NEW_BBS_COMMENT:	mixi::ListNewBbsCommentParser::parse( body, html );		break;
+	case ACCESS_LIST_CALENDAR:			mixi::ShowCalendarParser::parse( body, html );			break;
 	}
 }
 

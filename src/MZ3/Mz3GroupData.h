@@ -112,6 +112,7 @@ private:
 		category_string2type[ L"INTRO"       ] = ACCESS_LIST_INTRO;
 		category_string2type[ L"COMMUNITY"   ] = ACCESS_LIST_COMMUNITY;
 		category_string2type[ L"NEW_BBS_COMMENT" ] = ACCESS_LIST_NEW_BBS_COMMENT;
+		category_string2type[ L"CALENDAR"    ] = ACCESS_LIST_CALENDAR;  //icchu’Ç‰Á
 
 		category_type2string.RemoveAll();
 		category_type2string.InitHashTable( 20 );
@@ -130,6 +131,7 @@ private:
 		category_type2string[ ACCESS_LIST_INTRO       ] = L"INTRO";
 		category_type2string[ ACCESS_LIST_COMMUNITY   ] = L"COMMUNITY";
 		category_type2string[ ACCESS_LIST_NEW_BBS_COMMENT ] = L"NEW_BBS_COMMENT";
+		category_type2string[ ACCESS_LIST_CALENDAR    ] = L"CALENDAR";  //icchu’Ç‰Á
 	}
 
 public:

@@ -1893,7 +1893,9 @@ int CReportView::GetListWidth(void)
 	CRect rect;
 	GetWindowRect( &rect );
 	int w = rect.Width();
+
 	// ピクセル数の微調整（スクリーン幅より少し小さくする）
+#ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
 		w -= 30;
@@ -1903,6 +1905,9 @@ int CReportView::GetListWidth(void)
 		w -= 30/2;
 		break;
 	}
+#else
+	w -= 30;
+#endif
 	return w;
 }
 

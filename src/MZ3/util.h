@@ -253,6 +253,7 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_LIST_MESSAGE_IN:	text = L"メッセージ(受信箱)";	break;
 	case ACCESS_LIST_MESSAGE_OUT:	text = L"メッセージ(送信箱)";	break;
 	case ACCESS_LIST_BOOKMARK:		text = L"ブックマーク";			break;
+	case ACCESS_LIST_CALENDAR:		text = L"カレンダー";			break;  //icchu追加
 
 	case ACCESS_GROUP_COMMUNITY:	text = L"コミュニティG";		break;
 	case ACCESS_GROUP_MESSAGE:		text = L"メッセージG";			break;
@@ -511,6 +512,7 @@ inline CString MakeLogfilePath( const CMixiData& data )
 	case ACCESS_LIST_MESSAGE_OUT:	return theApp.m_filepath.logFolder + L"\\list_message_out.html";
 	case ACCESS_LIST_FOOTSTEP:		return theApp.m_filepath.logFolder + L"\\show_log.html";
 	case ACCESS_LIST_MYDIARY:		return theApp.m_filepath.logFolder + L"\\list_diary.html";
+	case ACCESS_LIST_CALENDAR:		return theApp.m_filepath.logFolder + L"\\show_calendar.html";  //icchu追加
 	case ACCESS_LIST_NEWS:
 		{
 			// カテゴリ、ページ番号毎に分割
