@@ -31,27 +31,16 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     ON_COMMAND(ID_BACK_BUTTON, OnBackButton)
     ON_COMMAND(ID_FORWARD_BUTTON, OnForwardButton)
     ON_COMMAND(ID_STOP_BUTTON, OnStopButton)
-    ON_UPDATE_COMMAND_UI(ID_BACK_BUTTON, OnUpdateBackButton)
-    ON_UPDATE_COMMAND_UI(ID_FORWARD_BUTTON, OnUpdateForwardButton)
-    ON_UPDATE_COMMAND_UI(ID_STOP_BUTTON, OnUpdateStopButton)
-    ON_UPDATE_COMMAND_UI(ID_IMAGE_BUTTON, OnUpdateImageButton)
-    ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
-    ON_UPDATE_COMMAND_UI(ID_OPEN_BROWSER, OnUpdateBrowserButton)
 	ON_COMMAND(ID_SETTING_LOGIN, &CMainFrame::OnSettingLogin)
 	ON_COMMAND(ID_SETTING_GENERAL, &CMainFrame::OnSettingGeneral)
 	ON_COMMAND(ID_MENU_CLOSE, &CMainFrame::OnMenuClose)
-	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_ALL, &CMainFrame::OnUpdateGetpageAll)
 	ON_COMMAND(IDM_GETPAGE_ALL, &CMainFrame::OnGetpageAll)
 	ON_COMMAND(IDM_GETPAGE_LATEST10, &CMainFrame::OnGetpageLatest10)
-	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_LATEST10, &CMainFrame::OnUpdateGetpageLatest10)
 	ON_COMMAND(ID_CHANGE_FONT_BIG, &CMainFrame::OnChangeFontBig)
 	ON_COMMAND(ID_CHANGE_FONT_MEDIUM, &CMainFrame::OnChangeFontMedium)
 	ON_COMMAND(ID_CHANGE_FONT_SMALL, &CMainFrame::OnChangeFontSmall)
-	ON_UPDATE_COMMAND_UI(ID_MENU_BACK, &CMainFrame::OnUpdateMenuBack)
-	ON_UPDATE_COMMAND_UI(ID_MENU_NEXT, &CMainFrame::OnUpdateMenuNext)
 	ON_COMMAND(ID_MENU_BACK, &CMainFrame::OnMenuBack)
 	ON_COMMAND(ID_MENU_NEXT, &CMainFrame::OnMenuNext)
-	ON_WM_ACTIVATE()
 	ON_COMMAND(IDM_CHECK_NEW, &CMainFrame::OnCheckNew)
 	ON_COMMAND(ID_HELP_MENU, &CMainFrame::OnHelpMenu)
 	ON_COMMAND(ID_HISTORY_MENU, &CMainFrame::OnHistoryMenu)
@@ -60,12 +49,23 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 	ON_COMMAND(ID_ERRORLOG_MENU, &CMainFrame::OnErrorlogMenu)
 	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
-	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
-	ON_WM_DESTROY()
 	ON_COMMAND(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnEnableIntervalCheck)
+	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
+    ON_UPDATE_COMMAND_UI(ID_BACK_BUTTON, OnUpdateBackButton)
+    ON_UPDATE_COMMAND_UI(ID_FORWARD_BUTTON, OnUpdateForwardButton)
+    ON_UPDATE_COMMAND_UI(ID_STOP_BUTTON, OnUpdateStopButton)
+    ON_UPDATE_COMMAND_UI(ID_IMAGE_BUTTON, OnUpdateImageButton)
+    ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
+    ON_UPDATE_COMMAND_UI(ID_OPEN_BROWSER, OnUpdateBrowserButton)
+	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_ALL, &CMainFrame::OnUpdateGetpageAll)
+	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_LATEST10, &CMainFrame::OnUpdateGetpageLatest10)
+	ON_UPDATE_COMMAND_UI(ID_MENU_BACK, &CMainFrame::OnUpdateMenuBack)
+	ON_UPDATE_COMMAND_UI(ID_MENU_NEXT, &CMainFrame::OnUpdateMenuNext)
 	ON_UPDATE_COMMAND_UI(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnUpdateEnableIntervalCheck)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
+	ON_WM_ACTIVATE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -141,7 +141,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 #ifndef WINCE
 	// ツールバーの生成
-	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, 
+	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT | TBSTYLE_TOOLTIPS, 
 		                       WS_CHILD | WS_VISIBLE | 
 							   CBRS_TOP | 
 							   CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC))
@@ -211,9 +211,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	// タイトル変更
-	CString title = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
-	title.Replace( L"Version ", L"v" );
-	SetTitle(title);
+	MySetTitle();
 #endif
 
 	return TRUE;
@@ -662,6 +660,9 @@ void CMainFrame::OnEnableIntervalCheck()
 
 	// オプションのトグル
 	theApp.m_optionMng.m_bEnableIntervalCheck = !theApp.m_optionMng.m_bEnableIntervalCheck;
+
+	// タイトル変更
+	MySetTitle();
 }
 
 /// 定期取得メニューの制御
@@ -939,3 +940,58 @@ void CMainFrame::OnDestroy()
 #endif
 }
 
+BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	LPNMHDR nmhdr = (LPNMHDR)lParam;
+
+	switch (nmhdr->code) {
+#ifndef WINCE
+	case TTN_NEEDTEXT:
+		{
+			static LPTOOLTIPTEXT lptip;
+			lptip = (LPTOOLTIPTEXT)lParam;
+			switch (lptip->hdr.idFrom) {
+			case ID_BACK_BUTTON:	lptip->lpszText = L"戻る";				break;
+			case ID_FORWARD_BUTTON:	lptip->lpszText = L"進む";				break;
+			case ID_STOP_BUTTON:	lptip->lpszText = L"停止";				break;
+			case ID_WRITE_BUTTON:
+				// View によって違う
+				if (GetActiveView() == theApp.m_pMainView) {
+					lptip->lpszText = L"日記を書く";
+				} else {
+					lptip->lpszText = L"コメントを書く";
+				}
+				break;
+			case ID_IMAGE_BUTTON:	lptip->lpszText = L"画像を開く";		break;
+			case ID_OPEN_BROWSER:	lptip->lpszText = L"ブラウザで開く";	break;
+			case ID_APP_ABOUT:		lptip->lpszText = L"バージョン情報";	break;
+			}
+		}
+		break;
+#endif
+	default:
+		break;
+	}
+
+	return CFrameWnd::OnNotify(wParam, lParam, pResult);
+}
+
+/// タイトル変更
+void CMainFrame::MySetTitle(void)
+{
+#ifndef WINCE
+	// タイトル変更
+	CString title = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
+	title.Replace( L"Version ", L"v" );
+
+	// 定期取得状態
+	if( theApp.m_optionMng.m_bEnableIntervalCheck ) {
+		title += L" 【定期取得】";
+	}
+
+	SetTitle(title);
+	if (m_hWnd) {
+		SetWindowText(title);
+	}
+#endif
+}
