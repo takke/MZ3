@@ -271,21 +271,25 @@ public:
 	static bool isLogout( LPCTSTR szHtmlFilename )
 	{
 		// 最大で N 行目までチェックする
-		const int CHECK_LINE_NUM_MAX = 100;
+		const int CHECK_LINE_NUM_MAX = 300;
 
 		FILE* fp = _wfopen(szHtmlFilename, _T("r"));
-		if( fp != NULL ) {
-			TCHAR buf[4096];
-
-			for( int i=0; i<CHECK_LINE_NUM_MAX && fgetws(buf, 4096, fp) != NULL; i++ ) {
-				if( wcsstr( buf, L"regist.pl" ) != NULL ) {
-					// ログアウト状態
-					fclose( fp );
-					return true;
-				}
-			}
-			fclose(fp);
+		if( fp == NULL ) {
+			// 取得失敗
+			return false;
 		}
+
+		TCHAR buf[4096];
+		for( int i=0; i<CHECK_LINE_NUM_MAX && fgetws(buf, 4096, fp) != NULL; i++ ) {
+			// <form action="/login.pl" method="post">
+			// があればログアウト状態と判定する。
+			if (util::LineHasStringsNoCase( buf, L"<form", L"action=", L"login.pl" )) {
+				// ログアウト状態
+				fclose( fp );
+				return true;
+			}
+		}
+		fclose(fp);
 
 		// ここにはデータがなかったのでログアウトとは判断しない
 		return false;
