@@ -408,8 +408,18 @@ public:
 		}
 
 		// 動画ファイルの抽出
-		if(str.Find( L".flv" ) != -1) {
+		if (str.Find( L".flv" ) != -1) {
 			ExtractGeneralVideoLink( str, *data );
+		}
+
+		// Youtube 動画の抽出(下記が1行で存在する)
+		//youtube_write('<div class="insert_video"><object width="450" height="373"><param name="movie" value="
+		//http://www.youtube.com/v/xxx"></param><param name="wmode" value="transparent"></param>
+		//<embed src="http://www.youtube.com/v/xxx" type="application/x-shockwave-flash" wmode="transparent" 
+		//width="450" height="373"></embed></object></div>');
+#define LINE_HAS_YOUTUBE_LINK(line)		util::LineHasStringsNoCase( line, L"<embed", L"src=", L"youtube.com" )
+		if (LINE_HAS_YOUTUBE_LINK(str)) {
+			ExtractYoutubeVideoLink( str, *data );
 		}
 
 		// リンクの抽出
@@ -444,6 +454,10 @@ public:
 				const CString& nextLine = html_.GetAt( ++iLine_ );
 				// 拡張子.flvが見つかったら投入
 				if( util::LineHasStringsNoCase( nextLine, L".flv" ) ) {
+					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
+				}
+				// Youtube対応
+				if( LINE_HAS_YOUTUBE_LINK(nextLine) ) {
 					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
 				}
 				// </script> があれば終了
@@ -697,8 +711,8 @@ alt="" /></a></td>
 	/**
 	 * 動画変換。
 	 *
-	 * str から動画リンクを抽出し、そのリンクを data に追加する。
-	 * また、str から該当する動画リンクを削除する。
+	 * line から動画リンクを抽出し、そのリンクを data に追加する。
+	 * また、line から該当する動画リンクを削除する。
 	 */
 	static void ExtractGeneralVideoLink(CString& line, CMixiData& data_)
 	{
@@ -743,7 +757,57 @@ alt="" /></a></td>
 			// ターゲットを更新。
 			target.Delete( 0, results[0].end );
 		}
+	}
 
+	/**
+	 * Youtube 動画変換。
+	 *
+	 * line から動画リンクを抽出し、そのリンクを data に追加する。
+	 * また、line から該当する動画リンクを削除する。
+	 */
+	static void ExtractYoutubeVideoLink(CString& line, CMixiData& data_)
+	{
+
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !util::CompileRegex( reg, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+
+		CString target = line;
+		line = L"";
+		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+			if( !reg.exec(target) || reg.results.size() != 2 ) {
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				line += target;
+				break;
+			}
+
+			// 発見。
+			std::vector<MyRegex::Result>& results = reg.results;
+
+			// マッチ文字列全体の左側を出力
+			line.Append( target, results[0].start );
+
+			CString text = L"<<Youtube動画>>";
+
+			// url を追加
+			LPCTSTR url = results[1].str.c_str();
+			
+			//動画を追加
+			data_.m_linkList.push_back( CMixiData::Link(url,url) );
+
+			// 置換
+			line.Append( text );
+
+			// とりあえず改行
+			line += _T("<br>");
+
+			// ターゲットを更新。
+			target.Delete( 0, results[0].end );
+		}
 	}
 
 public:

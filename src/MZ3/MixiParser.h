@@ -357,7 +357,7 @@ public:
 		}
 
 		// 新着コメント数の取得
-		int commentNum = GetNewCommentCount( html_, 100, index, index);
+		int commentNum = GetNewCommentCount( html_, 100, count, index);
 		if (commentNum != 0) {
 			theApp.m_newCommentCount = commentNum;
 		}
@@ -1093,7 +1093,11 @@ public:
 						ParserUtil::AddBodyWithExtract( data_, before );
 						bEndDiary = true;
 					}else{
-						ParserUtil::AddBodyWithExtract( data_, str );
+						// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
+						if(! ParserUtil::ExtractVideoLinkFromScriptTag( data_, i, html_ ) ) {
+							// scriptタグ未発見なので、解析＆投入
+							ParserUtil::AddBodyWithExtract( data_, line );
+						}
 					}
 				}
 				else if (line.Find(_T("さんは外部ブログを使われています。")) != -1) {
