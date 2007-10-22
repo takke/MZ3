@@ -9,7 +9,7 @@
 
 :----- ファイルのコピー -----
 @echo ■ ファイルを収集します
-copy ..\src\MZ3\Release_Win32\MZ3_win32.exe MZ3_win32\
+copy ..\src\MZ3\Release_Win32\MZ4.exe MZ3_win32\
 copy "..\doc\Help Files\MZ3 for Windows\MZ3 for Windows.chm" MZ3_win32\
 copy ..\doc\Readme.txt MZ3_win32\
 copy ..\ChangeLog.txt MZ3_win32\
@@ -24,7 +24,7 @@ copy toppage_group_sample.ini MZ3_win32\
 
 :----- アーカイブファイルの移動 -----
 @echo ■ アーカイブファイルを移動します
-@set archive_to=..\MZ3.%MZ3_VERSION%.win32.lzh
+@set archive_to=..\MZ4.%MZ3_VERSION%.lzh
 @echo %archive% ⇒ %archive_to%
 @move %archive% %archive_to%
 @cd %dist_dir%

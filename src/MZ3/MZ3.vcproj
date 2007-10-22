@@ -1154,7 +1154,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName)_win32.exe"
+				OutputFile="$(OutDir)\MZ4.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -1368,7 +1368,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName)_win32.exe"
+				OutputFile="$(OutDir)\MZ4.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				LinkTimeCodeGeneration="0"

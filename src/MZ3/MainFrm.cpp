@@ -944,8 +944,8 @@ BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	LPNMHDR nmhdr = (LPNMHDR)lParam;
 
-	switch (nmhdr->code) {
 #ifndef WINCE
+	switch (nmhdr->code) {
 	case TTN_NEEDTEXT:
 		{
 			static LPTOOLTIPTEXT lptip;
@@ -968,10 +968,10 @@ BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			}
 		}
 		break;
-#endif
 	default:
 		break;
 	}
+#endif
 
 	return CFrameWnd::OnNotify(wParam, lParam, pResult);
 }
