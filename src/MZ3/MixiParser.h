@@ -3804,10 +3804,12 @@ public:
 					
 				//<img src="http://img.mixi.jp/img/calendaricon2/i_iv2.gif" width="16" height="16" align="middle" /><a href="view_event.pl?id=xxxx&comm_id=xxxx">XXXXXXXXXXXXXXX</a></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">9</font></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">10</font>
 
-				//i_iv2.gif イベント
-				if( util::LineHasStringsNoCase( target, L"i_iv2.gif" ) ) {
+				//i_iv1.gif イベント・自分が立てた
+				//i_iv2.gif イベント・他人が立てた
+				if( util::LineHasStringsNoCase( target, L"i_iv1.gif" ) ||
+				    util::LineHasStringsNoCase( target, L"i_iv2.gif" ) ) 
+				{
 					util::GetBetweenSubString( target, L"\">", L"</a>", title );
-					
 					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
 					
 					data.SetAccessType( ACCESS_EVENT );
