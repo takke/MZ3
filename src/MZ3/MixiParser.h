@@ -3763,12 +3763,15 @@ public:
 		BOOL findFlag = FALSE;
 		BOOL findFlag2 = FALSE;
 		CString YearMonth;
-		CString date;
 		CString strDate;
-				
+
+		// 「次」、「前」のリンク
+		CMixiData backLink;
+		CMixiData nextLink;
+			
 		for (int i=0; i<count; i++) {
 
-			CString str = html_.GetAt(i);
+			const CString& str = html_.GetAt(i);
 
 			//</form>が現れたら解析終了
 			if (str.Find(_T("</form>")) != -1) {
@@ -3784,6 +3787,11 @@ public:
 			//開始フラグ
 			if( util::LineHasStringsNoCase( str, L"calendarTable01" ) ) {
 				findFlag2 = TRUE;
+			}
+
+			// 次・前の月リンクの抽出
+			if (findFlag && !findFlag2) {
+				parseNextBackLink(nextLink, backLink, str);
 			}
 
 			if (findFlag != FALSE && findFlag2 != FALSE ) {
@@ -3850,22 +3858,26 @@ public:
 
 				//今日の場合　font-weight: bold;">21</font>
 				if( util::LineHasStringsNoCase( after, L"font-weight: bold;\">" ) ) {
+					CString date;
 					util::GetBetweenSubString( after, L"font-weight: bold;\">", L"</font>", date );
 					strDate = YearMonth + date + L"日";
 				}
 				
 				//<font style="color: #996600;"> があれば平日 
 				if( util::LineHasStringsNoCase( after, L"color: #996600;\">" ) ) {
+					CString date;
 					util::GetBetweenSubString( after, L"color: #996600;\">", L"</font>", date );
 					strDate = YearMonth + date + L"日";
 				}
 				//<font style="color: #0000ff;">があれば土曜日
 				if( util::LineHasStringsNoCase( after, L"color: #0000ff;\">" ) ) {
+					CString date;
 					util::GetBetweenSubString( after, L"color: #0000ff;\">", L"</font>", date );
 					strDate = YearMonth + date + L"日";
 				}
 				//<font style="color: #ff0000;">があれば休日
 				if( util::LineHasStringsNoCase( after, L"color: #ff0000;\">" ) ) {
+					CString date;
 					util::GetBetweenSubString( after, L"color: #ff0000;\">", L"</font>", date );
 					strDate = YearMonth + date + L"日";
 				}
@@ -3873,8 +3885,36 @@ public:
 			}
 		}
 
+		// 前、次のリンクがあれば、追加する。
+		if( !backLink.GetTitle().IsEmpty() ) {
+			out_.insert( out_.begin(), backLink );
+		}
+		if( !nextLink.GetTitle().IsEmpty() ) {
+			out_.push_back( nextLink );
+		}
+
 		MZ3LOGGER_DEBUG( L"ShowCalendarParser.parse() finished." );
 		return true;
+	}
+
+private:
+	/// 「次を表示」、「前を表示」のリンクを抽出する
+	static bool parseNextBackLink( CMixiData& nextLink, CMixiData& backLink, CString str )
+	{
+		// 正規表現のコンパイル（一回のみ）
+/*
+	<a href="show_calendar.pl?year=2007&month=9&pref_id=13">&lt;&lt;&nbsp;前の月</a>
+	<a href="show_calendar.pl?year=2007&month=10&pref_id=13">当月</a>
+	<a href="show_calendar.pl?year=2007&month=11&pref_id=13">次の月&nbsp;&gt;&gt;</a>&nbsp;
+*/
+		static MyRegex reg;
+		if( !util::CompileRegex( reg, L"<a href=\"show_calendar.pl([?].+?)\">.*?(前の月|次の月).*?</a>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return false;
+		}
+
+		return parseNextBackLinkBase( nextLink, backLink, str,
+			reg, L"show_calendar.pl", ACCESS_LIST_CALENDAR );
 	}
 };
 
