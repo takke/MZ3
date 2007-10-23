@@ -2452,17 +2452,16 @@ public:
 		for( ; iLine<lastLine; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
-			// ●タイトル
+			// ●タイトル(pattern1)
 			//<dt class="bbsTitle clearfix"><span class="titleSpan"><span class="title">xxxxx</span></span>
-			if( util::LineHasStringsNoCase( line, L"<dt", L"bbsTitle" ) )
+			if( util::LineHasStringsNoCase( line, L"<span", L"titleSpan" ) )
 			{
-				const CString& line2 = html_.GetAt(iLine );
 				CString title;
-				util::GetBetweenSubString( line2, L"class=\"title\">", L"</span></span>", title );
+				util::GetBetweenSubString( line, L"class=\"title\">", L"</span>", title );
 				data_.SetTitle(title);
 				continue;
 			}
-			
+
 			// ●日時
 			//<dd>2007年09月27日(地域によっては遅れる場合あり)</dd>
 			if( util::LineHasStringsNoCase( line, L"<dt>開催日時</dt>" ) )
