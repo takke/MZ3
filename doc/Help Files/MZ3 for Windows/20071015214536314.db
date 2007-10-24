@@ -3,10 +3,11 @@ Name=概要
 KeyWord=概要
 Context=IDH_HELP33
 [Date]
-<P>MZ3 for Windows を使う上で知っておくと便利な TIPS です<BR>　バージョンアップごとに随時追加は行いますが，追加漏れがある場合は本家コミュニティにて報告してください </P>
-<P>　・<A href="20071015214558118.htm">ブラウザ連携機能</A></P>
-<P>　・<A href="2007101521468163.htm">受信バッファの設定</A></P>
-<P>　・<A href="20071015214613341.htm">ログの削除</A></P>
-<P>　・<A href="20071015214623257.htm">下部ペインの文字色</A></P>
-<P>　・<A href="20071015214630138.htm">バージョン情報</A></P>
-<P>　・<A href="20071015214639295.htm">カラム幅の変更</A></P>
+<P><FONT face="ＭＳ ゴシック">　MZ4 を使う上で知っておくと便利な TIPS です</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="20071015214558118.htm">ブラウザ連携機能</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="2007101521468163.htm">受信バッファの設定</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="20071015214613341.htm">ログの削除</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="20071015214623257.htm">下部ペインの文字色</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="2007101893040895.htm">背景スキンを変更する</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="20071015214639295.htm">カラム幅の変更</A></FONT><FONT face="ＭＳ ゴシック"></P>
+<P><FONT face="ＭＳ ゴシック">　・<A href="file:///I:/mz3_svn/mz3_svn/doc/Help%20Files/MZ3%20for%20Windows/20071015214630138.htm">バージョン情報</A></FONT></FONT></P>

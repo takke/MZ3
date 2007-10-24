@@ -1,11 +1,11 @@
 [Project]
-Title=MZ3 for Windows
-Copyright=ÉhÉgÅ[Éã
+Title=MZ4 - MZ3 for Windows -
+Copyright=MZ3 -Mixi for ZERO3-
 Web=http://mixi.jp/view_community.pl?id=1198460
 Theme=TortoiseSVN
-ContextUpdate=41
+ContextUpdate=58
 deploy=
-defaultpage=
+defaultpage=2007101519554875.db
 GenNameTitle=0
 deployname=
 HelpType=0

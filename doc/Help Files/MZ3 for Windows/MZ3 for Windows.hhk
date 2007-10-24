@@ -1,9 +1,13 @@
 <html>
 <head>
-<title>MZ3 for Windows</title>
+<title>MZ4 - MZ3 for Windows -</title>
 </head>
 <body>
 <UL>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="目次">
+<param name="Local" value="2007102393625771.htm">
+</OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="はじめに">
 <param name="Local" value="2007101519554875.htm">
@@ -55,12 +59,12 @@
 <param name="Local" value="2007101520254759.htm">
 <param name="Name" value="キー操作について">
 <param name="Local" value="200710152144713.htm">
-<param name="Name" value="F1 キー">
-<param name="Local" value="2007101521515667.htm">
 <param name="Name" value="F2 キー">
 <param name="Local" value="2007101521525162.htm">
 <param name="Name" value="エンターキー">
 <param name="Local" value="2007101521539457.htm">
+<param name="Name" value="Esc / BackSpace">
+<param name="Local" value="200710181218241.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="概要">
@@ -71,16 +75,49 @@
 <param name="Local" value="200710152144713.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="F1 キー">
-<param name="Local" value="2007101521515667.htm">
-</OBJECT>
-<LI><OBJECT type="text/sitemap">
 <param name="Name" value="F2 キー">
 <param name="Local" value="2007101521525162.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="エンターキー">
 <param name="Local" value="2007101521539457.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Esc / BackSpace">
+<param name="Local" value="200710181218241.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="メインメニュー">
+<param name="Name" value="メニューバー">
+<param name="Local" value="20071018112458678.htm">
+<param name="Name" value="ファイル">
+<param name="Local" value="20071018113110234.htm">
+<param name="Name" value="ウィンドウ">
+<param name="Local" value="2007101811312273.htm">
+<param name="Name" value="設定">
+<param name="Local" value="20071018113126550.htm">
+<param name="Name" value="ヘルプ">
+<param name="Local" value="20071018113132571.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="メニューバー">
+<param name="Local" value="20071018112458678.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="ファイル">
+<param name="Local" value="20071018113110234.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="ウィンドウ">
+<param name="Local" value="2007101811312273.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="設定">
+<param name="Local" value="20071018113126550.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="ヘルプ">
+<param name="Local" value="20071018113132571.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="ini ファイル編集">
@@ -92,6 +129,8 @@
 <param name="Local" value="2007101521202861.htm">
 <param name="Name" value="mz3.ini 編集">
 <param name="Local" value="20071015212038156.htm">
+<param name="Name" value="skin.ini 編集">
+<param name="Local" value="20071016114848779.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="概要">
@@ -108,6 +147,10 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="mz3.ini 編集">
 <param name="Local" value="20071015212038156.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="skin.ini 編集">
+<param name="Local" value="20071016114848779.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="FAQ">
@@ -125,6 +168,10 @@
 <param name="Local" value="20071015212950282.htm">
 <param name="Name" value="上部ペインに xxx が表示されない">
 <param name="Local" value="2007101521389561.htm">
+<param name="Name" value="一覧に表示される時刻がおかしい">
+<param name="Local" value="2007101911119379.htm">
+<param name="Name" value="マウスを使用してスクロールすると残像が残る">
+<param name="Local" value="2007101911133503.htm">
 <param name="Name" value="なんかおかしい">
 <param name="Local" value="20071015213024886.htm">
 </OBJECT>
@@ -157,6 +204,14 @@
 <param name="Local" value="2007101521389561.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
+<param name="Name" value="一覧に表示される時刻がおかしい">
+<param name="Local" value="2007101911119379.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="マウスを使用してスクロールすると残像が残る">
+<param name="Local" value="2007101911133503.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
 <param name="Name" value="なんかおかしい">
 <param name="Local" value="20071015213024886.htm">
 </OBJECT>
@@ -172,6 +227,8 @@
 <param name="Local" value="20071015214613341.htm">
 <param name="Name" value="下部ペインの文字色">
 <param name="Local" value="20071015214623257.htm">
+<param name="Name" value="背景スキンを変更する">
+<param name="Local" value="2007101893040895.htm">
 <param name="Name" value="カラム幅の変更">
 <param name="Local" value="20071015214639295.htm">
 <param name="Name" value="バージョン情報">
@@ -196,6 +253,10 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="下部ペインの文字色">
 <param name="Local" value="20071015214623257.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="背景スキンを変更する">
+<param name="Local" value="2007101893040895.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="カラム幅の変更">

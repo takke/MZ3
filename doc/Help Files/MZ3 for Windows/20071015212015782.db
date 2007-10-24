@@ -3,9 +3,9 @@ Name=タブ編集
 KeyWord=タブ編集
 Context=IDH_HELP17
 [Date]
-<P>** toppage_group.ini<BR>　 toppage_group.ini は上部ペインのタブ内容を設定するファイルです<BR>　 ここでは標準では「日記」となっているタブ内容の変更の仕方を説明します</P>
-<P>　 【デフォルトの表記】<BR>　 　[Group1]<BR>　 　Category04=日記コメント記入履歴,NEW_COMMENT,new_comment.pl<BR>　 　Category03=マイミク最新日記,DIARY,new_friend_diary.pl<BR>　 　Category02=最近のコメント,COMMENT,list_comment.pl<BR>　 　Category01=最近の日記,MYDIARY,list_diary.pl<BR>　 　Url=list_diary.pl<BR>　 　Type=MYDIARY<BR>　 　Name=日記</P>
-<P>　 【変更後の表記】<BR>　 　[Group1]<BR>　 　Name=いろいろ<BR>　 　Type=OTHERS<BR>　 　Url=<BR>　 　Category01=日記,MYDIARY<BR>　 　Category02=マイミク最新日記,DIARY<BR>　 　Category03=コミュ最新書込,BBS<BR>　 　Category04=注目のピックアップ,NEWS,http://news.mixi.jp/list_news_category.pl?id=pickup&amp;type=bn<BR>　 　Category05=エンターテインメント,NEWS,http://news.mixi.jp/list_news_category.pl?id=7&amp;type=bn&amp;sort=1<BR>　 　Category06=IT,NEWS,http://news.mixi.jp/list_news_category.pl?id=8&amp;type=bn&amp;sort=1</P>
-<P>　 【各項目について】</P>
-<P>　 　[Group]　　… 画面に表示される順番を表します。1からの連番です<BR>　 　Name　　　 … タブに表記される名称です<BR>　 　Type　　　 … タブ内容のタイプを設定します<BR>　 　Url　　　　… 取得する URI を指定します<BR>　 　Category　 … 画面に表示される順番を表します。01からの連番です</P>
-<P>　 Category に "NEW_COMMENT", "new_comment.pl" といった文字列がありますが,<BR>　 これらはプログラム上で定義された値です<BR>　 ですので, これらを既定外のものに変更すると正しく表示することができません<BR>　 また, "," 区切りの順番も変更することはできません<BR>　 変更する場合はこれらに注意して変更を行ってください<BR>　 デフォルトの設定に戻す場合は<BR>　 メニュー | 設定 | 一般 より「タブの初期化」を行ってください</P>
+<P><FONT face="ＭＳ ゴシック">** toppage_group.ini<BR>　 toppage_group.ini は上部ペインのタブ内容を設定するファイルです<BR>　 ここでは標準では「日記」となっているタブ内容の変更の仕方を説明します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　 【デフォルトの表記】<BR>　 　[Group1]<BR>　 　Category04=日記コメント記入履歴,NEW_COMMENT,new_comment.pl<BR>　 　Category03=マイミク最新日記,DIARY,new_friend_diary.pl<BR>　 　Category02=最近のコメント,COMMENT,list_comment.pl<BR>　 　Category01=最近の日記,MYDIARY,list_diary.pl<BR>　 　Url=list_diary.pl<BR>　 　Type=MYDIARY<BR>　 　Name=日記</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　 【変更後の表記】<BR>　 　[Group1]<BR>　 　Name=いろいろ<BR>　 　Type=OTHERS<BR>　 　Url=<BR>　 　Category01=日記,MYDIARY<BR>　 　Category02=マイミク最新日記,DIARY<BR>　 　Category03=コミュ最新書込,BBS<BR>　 　Category04=注目のピックアップ,NEWS,http://news.mixi.jp/list_news_category.pl?id=pickup&amp;type=bn<BR>　 　Category05=エンターテインメント,NEWS,http://news.mixi.jp/list_news_category.pl?id=7&amp;type=bn&amp;sort=1<BR>　 　Category06=IT,NEWS,http://news.mixi.jp/list_news_category.pl?id=8&amp;type=bn&amp;sort=1</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　 【各項目について】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　 　[Group]　　… 画面に表示される順番を表します。1からの連番です<BR>　 　Name　　　 … タブに表記される名称です<BR>　 　Type　　　 … タブ内容のタイプを設定します<BR>　 　Url　　　　… 取得する URI を指定します<BR>　 　Category　 … 画面に表示される順番を表します。01からの連番です</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　 Category に "NEW_COMMENT", "new_comment.pl" といった文字列がありますが,<BR>　 これらはプログラム上で定義された値です<BR>　 ですので, これらを既定外のものに変更すると正しく表示することができません<BR>　 また, "," 区切りの順番も変更することはできません<BR>　 変更する場合はこれらに注意して変更を行ってください<BR>　 デフォルトの設定に戻す場合は<BR>　 メニュー | 設定 | 一般 より「タブの初期化」を行ってください</FONT></P>
