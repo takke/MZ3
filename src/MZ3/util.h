@@ -1023,7 +1023,6 @@ int FindFileCallback(const TCHAR* szDirectory,
     return nResult;
 }
 
-
 /**
  * 未コンパイルであればコンパイルする。
  *

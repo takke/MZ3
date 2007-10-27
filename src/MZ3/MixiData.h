@@ -124,8 +124,8 @@ public:
 
 	void	AddImage(LPCTSTR str)		{ m_imageArray.push_back(str); }
 	void	AddMovie(LPCTSTR str)		{ m_MovieArray.push_back(str); }
-	int		GetImageCount()				{ return m_imageArray.size(); }
-	int		GetMovieCount()				{ return m_MovieArray.size(); }
+	int		GetImageCount()				{ return (int)m_imageArray.size(); }
+	int		GetMovieCount()				{ return (int)m_MovieArray.size(); }
 	LPCTSTR GetImage(int index)			{ return m_imageArray[index]; }
 	LPCTSTR GetMovie(int index)			{ return m_MovieArray[index]; }
 	void	ClearImage();
