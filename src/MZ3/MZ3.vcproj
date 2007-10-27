@@ -2209,6 +2209,10 @@
 					RelativePath=".\util.h"
 					>
 				</File>
+				<File
+					RelativePath=".\util_base.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="net"

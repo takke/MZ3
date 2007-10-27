@@ -135,6 +135,45 @@ private:
 	}
 
 public:
+
+	/**
+	 * グループ種別一覧の取得
+	 */
+	std::vector<ACCESS_TYPE> GetGroupTypeList()
+	{
+		std::vector<ACCESS_TYPE> list;
+		POSITION pos = group_type2string.GetStartPosition();
+
+		ACCESS_TYPE key;
+		CString     value;
+		while (pos != NULL) {
+			group_type2string.GetNextAssoc( pos, key, value );
+
+			list.push_back( key );
+		}
+
+		return list;
+	}
+
+	/**
+	 * カテゴリ種別一覧の取得
+	 */
+	std::vector<ACCESS_TYPE> GetCategoryTypeList()
+	{
+		std::vector<ACCESS_TYPE> list;
+		POSITION pos = category_type2string.GetStartPosition();
+
+		ACCESS_TYPE key;
+		CString     value;
+		while (pos != NULL) {
+			category_type2string.GetNextAssoc( pos, key, value );
+
+			list.push_back( key );
+		}
+
+		return list;
+	}
+
 	/**
 	 * グループ種別 → グループ種別文字列 変換
 	 */
