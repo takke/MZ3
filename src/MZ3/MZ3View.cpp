@@ -149,33 +149,35 @@ IMPLEMENT_DYNCREATE(CMZ3View, CFormView)
 
 BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_WM_SIZE()
+	ON_WM_SETTINGCHANGE()
+	ON_WM_TIMER()
 	ON_NOTIFY(NM_CLICK, IDC_HEADER_LIST, &CMZ3View::OnNMClickCategoryList)
-	ON_NOTIFY(NM_DBLCLK, IDC_HEADER_LIST, &CMZ3View::OnNMDblclkCategoryList)
-
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_HEADER_LIST, &CMZ3View::OnLvnItemchangedCategoryList)
-    
+	ON_NOTIFY(NM_DBLCLK, IDC_HEADER_LIST, &CMZ3View::OnNMDblclkCategoryList)
+	ON_NOTIFY(NM_SETFOCUS, IDC_HEADER_LIST, &CMZ3View::OnNMSetfocusHeaderList)
+	ON_NOTIFY(NM_RCLICK, IDC_HEADER_LIST, &CMZ3View::OnNMRclickHeaderList)
+
+	ON_NOTIFY(NM_DBLCLK, IDC_BODY_LIST, &CMZ3View::OnNMDblclkBodyList)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_BODY_LIST, &CMZ3View::OnLvnItemchangedBodyList)
+	ON_NOTIFY(NM_SETFOCUS, IDC_BODY_LIST, &CMZ3View::OnNMSetfocusBodyList)
+	ON_NOTIFY(HDN_ITEMCLICK, 0, &CMZ3View::OnHdnItemclickBodyList)
+	ON_NOTIFY(NM_RCLICK, IDC_BODY_LIST, &CMZ3View::OnNMRclickBodyList)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_GROUP_TAB, &CMZ3View::OnTcnSelchangeGroupTab)
+	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
 	ON_MESSAGE(WM_MZ3_GET_END, OnGetEnd)
     ON_MESSAGE(WM_MZ3_GET_ERROR, OnGetError)
     ON_MESSAGE(WM_MZ3_GET_ABORT, OnGetAbort)
     ON_MESSAGE(WM_MZ3_ABORT, OnAbort)
     ON_MESSAGE(WM_MZ3_ACCESS_INFORMATION, OnAccessInformation)
 	ON_MESSAGE(WM_MZ3_ACCESS_LOADED, OnAccessLoaded)
-	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
-	ON_NOTIFY(NM_DBLCLK, IDC_BODY_LIST, &CMZ3View::OnNMDblclkBodyList)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_BODY_LIST, &CMZ3View::OnLvnItemchangedBodyList)
     ON_MESSAGE(WM_MZ3_CHANGE_VIEW, OnChangeView)
 	ON_COMMAND(ID_WRITE_DIARY, &CMZ3View::OnWriteDiary)
-    ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
-	ON_NOTIFY(NM_SETFOCUS, IDC_BODY_LIST, &CMZ3View::OnNMSetfocusBodyList)
 	ON_COMMAND(ID_OPEN_BROWSER, &CMZ3View::OnOpenBrowser)
-	ON_NOTIFY(NM_SETFOCUS, IDC_HEADER_LIST, &CMZ3View::OnNMSetfocusHeaderList)
 	ON_COMMAND(ID_SHOW_DEBUG_INFO, &CMZ3View::OnShowDebugInfo)
 	ON_COMMAND(ID_GET_ALL, &CMZ3View::OnGetAll)
 	ON_COMMAND(ID_GET_LAST10, &CMZ3View::OnGetLast10)
 	ON_COMMAND(ID_VIEW_LOG, &CMZ3View::OnViewLog)
-	ON_NOTIFY(HDN_ITEMCLICK, 0, &CMZ3View::OnHdnItemclickBodyList)
-	ON_NOTIFY(TCN_SELCHANGE, IDC_GROUP_TAB, &CMZ3View::OnTcnSelchangeGroupTab)
 	ON_COMMAND(ID_OPEN_BROWSER_USER, &CMZ3View::OnOpenBrowserUser)
 	ON_COMMAND(ID_OPEN_INTRO, &CMZ3View::OnOpenIntro)
 	ON_COMMAND(ID_OPEN_SELFINTRO, &CMZ3View::OnOpenSelfintro)
@@ -185,13 +187,10 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CRUISE, &CMZ3View::OnCruise)
 	ON_COMMAND(IDM_CHECK_CRUISE, &CMZ3View::OnCheckCruise)
 	ON_COMMAND(ID_SEND_NEW_MESSAGE, &CMZ3View::OnSendNewMessage)
-	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
-	ON_WM_SETTINGCHANGE()
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_NARROW, &CMZ3View::OnLayoutCategoryMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_WIDE, &CMZ3View::OnLayoutCategoryMakeWide)
-	ON_NOTIFY(NM_RCLICK, IDC_HEADER_LIST, &CMZ3View::OnNMRclickHeaderList)
-	ON_NOTIFY(NM_RCLICK, IDC_BODY_LIST, &CMZ3View::OnNMRclickBodyList)
-	ON_WM_TIMER()
+	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
+    ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1315,6 +1314,18 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 
 BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 {
+	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		// メッセージに応じて、定期取得のキャンセル処理を行う
+		switch (pMsg->message) {
+		case WM_KEYUP:
+		case WM_KEYDOWN:
+			ResetIntervalTimer();
+			break;
+		default:
+			break;
+		}
+	}
+
 	if (pMsg->message == WM_KEYUP) {
 		BOOL r = OnKeyUp( pMsg );
 
@@ -3465,13 +3476,13 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 				// 現在のViewがMZ3View以外なので定期取得を行わない。
 				
 				// タイマーを更新（さらにN秒経つまで待つ）
-				m_dwIntervalTimerStartMsec = GetTickCount();
+				ResetIntervalTimer();
 				return;
 			}
 /*
 			if( GetFocus() != &m_categoryList ) {
 				// フォーカスが違うので、タイマーを更新（さらにN秒経つまで待つ）
-				m_dwIntervalTimerStartMsec = GetTickCount();
+				ResetIntervalTimer();
 				return;
 			}
 */
@@ -3484,7 +3495,7 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 				RetrieveCategoryItem();
 
 				// タイマーを更新
-				m_dwIntervalTimerStartMsec = GetTickCount();
+				ResetIntervalTimer();
 			} else {
 				// カウントダウン
 				int restSec = theApp.m_optionMng.m_nIntervalCheckSec - nElapsedSec;
@@ -3524,4 +3535,43 @@ bool CMZ3View::RetrieveCategoryItem(void)
 		util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
 
 	return true;
+}
+
+/**
+ * タイマーを更新（さらにN秒経つまで待つ）
+ */
+void CMZ3View::ResetIntervalTimer(void)
+{
+	m_dwIntervalTimerStartMsec = GetTickCount();
+}
+
+BOOL CMZ3View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		// メッセージに応じて、定期取得のキャンセル処理を行う
+		LPNMHDR pnmhdr = (LPNMHDR)lParam;
+		int id = wParam;
+		switch( id ) {
+		case IDC_HEADER_LIST:
+		case IDC_BODY_LIST:
+			switch( pnmhdr->code ) {
+			case NM_RCLICK:
+			case NM_CLICK:
+			case NM_DBLCLK:
+//			case LVN_ITEMCHANGED:
+				ResetIntervalTimer();
+				break;
+			}
+			break;
+		case IDC_GROUP_TAB:
+			switch(pnmhdr->code ) {
+			case TCN_SELCHANGE:
+				ResetIntervalTimer();
+				break;
+			}
+			break;
+		}
+	}
+
+	return CFormView::OnNotify(wParam, lParam, pResult);
 }

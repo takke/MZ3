@@ -296,6 +296,9 @@ public:
 	bool RetrieveCategoryItem(void);
 public:
 	DWORD m_dwIntervalTimerStartMsec;			///< 定期取得用タイマーの開始時刻
+	void ResetIntervalTimer(void);
+protected:
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

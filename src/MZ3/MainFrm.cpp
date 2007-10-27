@@ -655,7 +655,7 @@ void CMainFrame::OnEnableIntervalCheck()
 		MessageBox( msg );
 
 		// 設定する
-		theApp.m_pMainView->m_dwIntervalTimerStartMsec = GetTickCount();
+		theApp.m_pMainView->ResetIntervalTimer();
 	}
 
 	// オプションのトグル
