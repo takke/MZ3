@@ -102,7 +102,7 @@ public:
 	int GetCommentIndex() const			{ return m_commentIndex; };
 
 	void SetID(int value)				{ m_id = value; };
-	int GetID()							{ return m_id; };
+	int GetID()	const					{ return m_id; };
 
 	void SetCommentID(int value)		{ m_commId = value; };
 	int GetCommentID()					{ return m_commId; };

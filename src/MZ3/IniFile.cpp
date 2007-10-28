@@ -607,6 +607,16 @@ vector<string> IniFile::GetSectionNames()
 	return data;															// Return the data
 }
 
+bool IniFile::DeleteRecord(string KeyName, string SectionName)
+{
+	vector<Record>::iterator iter = std::find_if(contents_.begin(), 
+			contents_.end(), 
+			StaticMethod::RecordSectionKeyIs(SectionName,KeyName));			// Locate the Section/Key
 
+	if (iter == contents_.end()) return false;							// The Section/Key was not found
+
+	contents_.erase(iter);												// Remove the Record
+	return true;
+}
 
 }

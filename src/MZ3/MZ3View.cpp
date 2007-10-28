@@ -2674,8 +2674,8 @@ void CMZ3View::OnSetNoRead()
 	mixi.SetLastIndex( -1 );
 
 	// ログINIファイルの項目を初期化
-	// （本当は項目ごと削除すべき）
-	theApp.m_logfile.SetValue( (LPCSTR)util::int2str_a(mixi.GetID()), "-1", "Log" );
+	CString logId = util::GetLogIdString( mixi );
+	theApp.m_logfile.DeleteRecord( util::my_wcstombs((LPCTSTR)logId), "Log" );
 
 	// ログファイル削除
 	DeleteFile( util::MakeLogfilePath(mixi) );

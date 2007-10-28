@@ -357,40 +357,17 @@ void CReportView::SetData(CMixiData* data)
 	TRACE(_T("Address = %s\n"), m_data->GetURL());
 
 	// URI‚ð•ª‰ð
-	CString tmp;
 
 	if (m_data->GetID() == -1) {
 		// ‚±‚±‚Å‚h‚c‚ðì‚é
-		tmp = m_data->GetURL();
-		tmp = tmp.Mid(tmp.Find(_T("id=")) + wcslen(_T("id=")));
-		tmp = tmp.Left(tmp.Find(_T("&")));
-		data->SetID(_wtoi(tmp));
-	}
-
-	switch (m_data->GetAccessType()) {
-	case ACCESS_DIARY:
-	case ACCESS_MYDIARY:
-		{
-			CString id;
-			if (util::GetBetweenSubString( m_data->GetURL(), L"id=", L"&", id ) >= 0) {
-				tmp.Format(_T("d%s"), id);
-			}
+		CString id;
+		if (util::GetBetweenSubString( m_data->GetURL(), L"id=", L"&", id ) >= 0) {
+			data->SetID(_wtoi(id));
 		}
-		break;
-	case ACCESS_BBS:
-		tmp.Format(_T("b%d"), m_data->GetID());
-		break;
-	case ACCESS_EVENT:
-		tmp.Format(_T("v%d"), m_data->GetID());
-		break;
-	case ACCESS_ENQUETE:
-		tmp.Format(_T("e%d"), m_data->GetID());
-		break;
-
 	}
 
-	memset(m_idKey, 0x00, sizeof(char) * 24);
-	wcstombs(m_idKey, tmp, 24);
+	CString logId = util::GetLogIdString( *m_data );
+	m_idKey = util::my_wcstombs((LPCTSTR)logId);
 
 	// Šù“ÇˆÊ’u‚Ì•ÏX
 	m_lastIndex = m_data->GetLastIndex();

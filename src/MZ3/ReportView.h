@@ -68,7 +68,7 @@ private:
 	BOOL m_nochange;
 	BOOL m_access;
 
-	char m_idKey[24];
+	std::string m_idKey;
 	int m_lastIndex;
 	BOOL m_imageState;
 

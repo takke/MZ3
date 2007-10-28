@@ -788,4 +788,39 @@ inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
 	}
 }
 
+/**
+ * 未読・既読状態管理ログファイル用のIDを生成する。
+ */
+inline CString GetLogIdString( const CMixiData& mixi )
+{
+	CString logId;
+
+	switch (mixi.GetAccessType()) {
+	case ACCESS_DIARY:
+	case ACCESS_MYDIARY:
+		{
+			CString id;
+			if (util::GetBetweenSubString( mixi.GetURL(), L"id=", L"&", id ) >= 0) {
+				logId.Format(_T("d%s"), id);
+			}
+		}
+		break;
+	case ACCESS_BBS:
+		logId.Format(_T("b%d"), mixi.GetID());
+		break;
+	case ACCESS_EVENT:
+		logId.Format(_T("v%d"), mixi.GetID());
+		break;
+	case ACCESS_ENQUETE:
+		logId.Format(_T("e%d"), mixi.GetID());
+		break;
+
+	default:
+		logId = L"";
+		break;
+	}
+
+	return logId;
+}
+
 }

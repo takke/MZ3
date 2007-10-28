@@ -116,29 +116,7 @@ public:
 			return;
 		}
 		// URI‚ğ•ª‰ğ
-		CString buf = uri;
-
-		switch (data->GetAccessType()) {
-		case ACCESS_DIARY:
-		case ACCESS_MYDIARY:
-			{
-				CString id;
-				if (util::GetBetweenSubString( buf, L"id=", L"&", id ) >= 0) {
-					buf.Format(_T("d%s"), id);
-				}
-			}
-			break;
-		case ACCESS_BBS:
-			buf.Format(_T("b%d"), data->GetID());
-			break;
-		case ACCESS_EVENT:
-			buf.Format(_T("v%d"), data->GetID());
-			break;
-		case ACCESS_ENQUETE:
-			buf.Format(_T("e%d"), data->GetID());
-			break;
-		}
-
+		CString buf = util::GetLogIdString(*data);
 		std::string idKey = util::my_wcstombs( (LPCTSTR)buf );
 
 		// ƒL[æ“¾

@@ -128,29 +128,8 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 	// last index ÇÃê∂ê¨
 	{
 		// URIÇï™â
-		CString buf = data.GetURL();
-
-		switch (data.GetAccessType()) {
-		case ACCESS_DIARY:
-		case ACCESS_MYDIARY:
-			buf = buf.Mid(buf.Find(_T("id="))+ wcslen(_T("id=")));
-			buf = buf.Left(buf.Find(_T("&")));
-			buf.Format(_T("d%s"), buf);
-			break;
-		case ACCESS_BBS:
-			buf.Format(_T("b%d"), data.GetID());
-			break;
-		case ACCESS_EVENT:
-			buf.Format(_T("v%d"), data.GetID());
-			break;
-		case ACCESS_ENQUETE:
-			buf.Format(_T("e%d"), data.GetID());
-			break;
-		}
-
-		char idKey[24];
-		memset(idKey, 0x00, sizeof(char) * 24);
-		wcstombs(idKey, buf, 24);
+		CString logId = util::GetLogIdString( data );
+		std::string idKey = util::my_wcstombs((LPCTSTR)logId);
 
 		// ÉLÅ[éÊìæ
 		int lastIndex = -1;
