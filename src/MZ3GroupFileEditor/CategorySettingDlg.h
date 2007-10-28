@@ -30,4 +30,7 @@ public:
 	CString mc_strName;
 	CComboBox mc_comboType;
 	CString mc_strUrl;
+	afx_msg void OnBnClickedTemplateButton();
+	afx_msg void OnTemplateMenuItems(UINT nID);
+	void MyLoadItem(void);
 };

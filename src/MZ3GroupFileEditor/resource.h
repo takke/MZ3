@@ -13,13 +13,15 @@
 #define IDD_NAME_DIALOG                 132
 #define IDR_CATEGORY_MENU               132
 #define IDD_CATEGORY_SETTING_DIALOG     133
+#define IDR_CATEGORY_MENU1              133
+#define IDR_CATEGORY_TEMPLATE_MENU      133
 #define IDC_CATEGORY_LIST               1001
 #define IDC_TAB1                        1002
 #define IDC_NAME_EDIT                   1008
 #define IDC_URL_EDIT                    1009
 #define IDC_CRUISE_CHECK                1010
-#define IDC_COMBO1                      1014
 #define IDC_TYPE_COMBO                  1014
+#define IDC_TEMPLATE_BUTTON             1015
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -52,14 +54,16 @@
 #define ID_CATEGORY_MOVE_RIGHT          32801
 #define ID_CATEGORY_MOVE_UP             32802
 #define ID_CATEGORY_MOVE_DOWN           32803
+#define ID_DUMMY                        32805
+#define ID_CATEGORY_TEMPLATE_START      34000
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        134
-#define _APS_NEXT_COMMAND_VALUE         32804
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_COMMAND_VALUE         32806
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

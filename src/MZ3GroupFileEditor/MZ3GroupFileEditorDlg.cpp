@@ -101,6 +101,7 @@ BEGIN_MESSAGE_MAP(CMZ3GroupFileEditorDlg, CDialog)
 	ON_COMMAND(ID_CATEGORY_MOVE_LEFT, &CMZ3GroupFileEditorDlg::OnCategoryMoveLeft)
 	ON_COMMAND(ID_CATEGORY_MOVE_RIGHT, &CMZ3GroupFileEditorDlg::OnCategoryMoveRight)
 	ON_NOTIFY(NM_DBLCLK, IDC_CATEGORY_LIST, &CMZ3GroupFileEditorDlg::OnNMDblclkCategoryList)
+	ON_NOTIFY(NM_CLICK, IDC_TAB1, &CMZ3GroupFileEditorDlg::OnNMClickTab1)
 END_MESSAGE_MAP()
 
 
@@ -843,9 +844,40 @@ void CMZ3GroupFileEditorDlg::OnCategoryMoveRight()
 	OnAcceleratorMoveRight();
 }
 
+/**
+ * カテゴリリストのダブルクリック
+ */
 void CMZ3GroupFileEditorDlg::OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	OnCategorySetting();
+
+	*pResult = 0;
+}
+
+/**
+ * タブクリック
+ */
+void CMZ3GroupFileEditorDlg::OnNMClickTab1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// 仮想的にダブルクリックを判定し、変更画面を表示する。
+	static int s_idxLast = -1;
+	static DWORD s_dwLastClickedTickCount = GetTickCount();
+
+	int idx = mc_tab.GetCurSel();
+	if (s_idxLast != idx) {
+		s_idxLast = idx;
+		s_dwLastClickedTickCount = GetTickCount();
+	} else {
+
+		// しきい値をシステムから取得し、ダブルクリック判定
+		if (GetTickCount() - s_dwLastClickedTickCount < GetDoubleClickTime()) {
+			s_idxLast = -1;
+			// 変更画面表示
+			OnTabRename();
+		} else {
+			s_dwLastClickedTickCount = GetTickCount();
+		}
+	}
 
 	*pResult = 0;
 }
