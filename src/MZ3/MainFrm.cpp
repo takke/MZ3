@@ -196,8 +196,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.style &= ~FWS_ADDTOTITLE;
 
 #ifndef WINCE
-	cs.cx = 240;
-	cs.cy = 320;
+	cs.cx = 320;
+	cs.cy = 480;
 
 	// 前回のサイズを復帰する
 	if (theApp.m_optionMng.m_strWindowPos.GetLength() > 16) {

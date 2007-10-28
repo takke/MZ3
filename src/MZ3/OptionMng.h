@@ -116,15 +116,19 @@ public:
 		, m_nMainViewCategoryListCol2Ratio( 20 )	// カテゴリリスト、カラム２は 20/N
 		, m_nMainViewBodyListCol1Ratio( 24 )		// ボディリスト、カラム１は 24/N
 		, m_nMainViewBodyListCol2Ratio( 21 )		// ボディリスト、カラム２は 21/N
-		, m_reportScrollType( REPORT_SCROLL_TYPE_PAGE )
+		, m_reportScrollType( REPORT_SCROLL_TYPE_LINE )
 		, m_reportScrollLine( 7 )
+#ifdef WINCE
 		, m_bConvertUrlForMixiMobile( true )
+#else
+		, m_bConvertUrlForMixiMobile( false )
+#endif
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )
 		, m_strSkinname( L"aluminium" )
 		, m_bRenderByIE( false )
-		, m_nIntervalCheckSec( 15 )
+		, m_nIntervalCheckSec( 60 )
 		, m_bEnableIntervalCheck( false )
 	{
 	}

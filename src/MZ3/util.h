@@ -15,6 +15,7 @@ namespace util
  *
  * 成功時は IDOK が返る
  */
+/*
 inline int GetOpenFileNameEx(OPENFILENAME* pofn)
 {
 #ifdef WINCE
@@ -36,6 +37,7 @@ inline int GetOpenFileNameEx(OPENFILENAME* pofn)
 	return 0;
 #endif
 }
+*/
 
 /**
  * フォルダ選択画面を表示する
@@ -45,7 +47,7 @@ inline int GetOpenFileNameEx(OPENFILENAME* pofn)
  * @param strFolderPath	[in/out] 初期選択フォルダ＆選択済みフォルダパス
  * @return 成功時は true、失敗時は false を返す。
  */
-inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath )
+inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& strFolderPath )
 {
 #ifdef WINCE
 	// FDQ.DLL を用いてフォルダ選択画面を表示する
@@ -73,15 +75,47 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& szFolderPath
 	FreeLibrary (hInst);
 
 	if( rc == IDOK && util::ExistFile(szFileName) ) {
-		szFolderPath = szFileName;
+		strFolderPath = szFileName;
 		return true;
 	}else{
 		return false;
 	}
 #else
-	// for win32
-	// TODO 実装すること
-	return false;
+    BROWSEINFO bInfo;
+    LPITEMIDLIST pIDList;
+    TCHAR szDisplayName[MAX_PATH];
+    
+    // BROWSEINFO構造体に値を設定
+    bInfo.hwndOwner             = hWnd;						// ダイアログの親ウインドウのハンドル
+    bInfo.pidlRoot              = NULL;                     // ルートフォルダを示すITEMIDLISTのポインタ (NULLの場合デスクトップフォルダが使われます）
+    bInfo.pszDisplayName        = szDisplayName;            // 選択されたフォルダ名を受け取るバッファのポインタ
+    bInfo.lpszTitle             = szTitle;					// ツリービューの上部に表示される文字列 
+    bInfo.ulFlags               = BIF_RETURNONLYFSDIRS;     // 表示されるフォルダの種類を示すフラグ
+    bInfo.lpfn                  = NULL;                     // BrowseCallbackProc関数のポインタ
+    bInfo.lParam                = (LPARAM)0;                // コールバック関数に渡す値
+
+    // フォルダ選択ダイアログを表示
+    pIDList = ::SHBrowseForFolder(&bInfo);
+    if(pIDList == NULL){
+
+        // フォルダが選択されずにダイアログが閉じられた
+		return false;
+
+    }else{
+
+        // ItemIDListをパス名に変換します
+        if(!::SHGetPathFromIDList(pIDList, szDisplayName)){
+            // エラー処理
+			return false;
+        }
+
+        // szDisplayNameに選択されたフォルダのパスが入っています
+		strFolderPath = szDisplayName;
+
+        // 最後にpIDListのポイントしているメモリを開放します
+        ::CoTaskMemFree( pIDList );
+    }
+	return true;
 #endif
 }
 
