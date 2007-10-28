@@ -149,6 +149,15 @@ BOOL CMZ3GroupFileEditorDlg::OnInitDialog()
 
 	MyUpdateControlsState();
 
+	// ファイルがあればロード
+	LPCTSTR inifilename = L"toppage_group.ini";
+	if (util::ExistFile(inifilename)) {
+		theApp.m_strGroupInifilePath = inifilename;
+		Mz3GroupDataReader::load( theApp.m_group_info, theApp.m_strGroupInifilePath);
+
+		MyReloadTabs();
+	}
+
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 }
 

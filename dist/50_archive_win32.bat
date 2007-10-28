@@ -14,6 +14,7 @@ copy "..\doc\Help Files\MZ3 for Windows\MZ3 for Windows.chm" MZ3_win32\
 copy ..\doc\Readme.txt MZ3_win32\
 copy ..\ChangeLog.txt MZ3_win32\
 copy toppage_group_sample.ini MZ3_win32\
+copy ..\src\MZ3GroupFileEditor\Release\MZ3GroupFileEditor.exe MZ3_win32\
 
 :----- ÉtÉ@ÉCÉãÇÃà≥èk -----
 @set archive=MZ3_win32.lzh

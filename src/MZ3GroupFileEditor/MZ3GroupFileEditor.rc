@@ -143,13 +143,13 @@ BEGIN
     BEGIN
         BLOCK "041103a4"
         BEGIN
-            VALUE "CompanyName", "TODO: <会社名>"
-            VALUE "FileDescription", "TODO: <ファイルの説明>"
+            VALUE "CompanyName", "takke"
+            VALUE "FileDescription", "MZ3 グループ設定ファイルエディタ"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "MZ3GroupFileEditor.exe"
-            VALUE "LegalCopyright", "TODO: (C) <会社名>.  All rights reserved."
+            VALUE "LegalCopyright", "takke.  All rights reserved."
             VALUE "OriginalFilename", "MZ3GroupFileEditor.exe"
-            VALUE "ProductName", "TODO: <製品名>"
+            VALUE "ProductName", "MZ3 グループ設定ファイルエディタ"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
