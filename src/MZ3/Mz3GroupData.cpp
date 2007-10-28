@@ -76,10 +76,10 @@ bool Mz3GroupData::initForTopPage()
 		appendCategoryByIniData( group, "マイミク一覧", ACCESS_LIST_FRIEND );
 		appendCategoryByIniData( group, "紹介文", ACCESS_LIST_INTRO );
 		appendCategoryByIniData( group, "足あと", ACCESS_LIST_FOOTSTEP );
+		appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
 		appendCategoryByIniData( group, "ブックマーク", ACCESS_LIST_BOOKMARK );
 		appendCategoryByIniData( group, "お気に入りユーザー", ACCESS_LIST_FAVORITE, "list_bookmark.pl" );
 		appendCategoryByIniData( group, "お気に入りコミュ", ACCESS_LIST_FAVORITE, "list_bookmark.pl?kind=community" );
-		appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
 	}
 	this->groups.push_back( group );
 

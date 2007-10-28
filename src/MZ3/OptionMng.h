@@ -98,7 +98,11 @@ public:
 		, m_fontHeightBig( 28 )				// ‰Šú’l‚Í Load() “à‚Åİ’è‚³‚ê‚é
 		, m_fontHeightMedium( 24 )			// ‰Šú’l‚Í Load() “à‚Åİ’è‚³‚ê‚é
 		, m_fontHeightSmall( 18 )			// ‰Šú’l‚Í Load() “à‚Åİ’è‚³‚ê‚é
+#ifdef WINCE
 		, m_recvBufSize( 2048 )
+#else
+		, m_recvBufSize( 8192 )
+#endif
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
 		, m_bUseLeftSoftKey( true )
