@@ -979,7 +979,20 @@ BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 /// タイトル変更
 void CMainFrame::MySetTitle(void)
 {
-#ifndef WINCE
+#ifdef WINCE
+	// タイトル変更
+	CString title = MZ3_APP_NAME;
+
+	// 定期取得状態
+	if( theApp.m_optionMng.m_bEnableIntervalCheck ) {
+		title += L".i";
+	}
+
+	SetTitle(title);
+	if (m_hWnd) {
+		SetWindowText(title);
+	}
+#else
 	// タイトル変更
 	CString title = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
 	title.Replace( L"Version ", L"v" );

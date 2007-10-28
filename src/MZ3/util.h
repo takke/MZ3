@@ -68,7 +68,7 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& strFolderPat
 
 	// ï€ë∂êÊïœçXâÊñ ÇÃï\é¶
 	TCHAR szFileName[256] = L"";
-	wcsncpy( szFileName, szFolderPath, 255 );
+	wcsncpy( szFileName, strFolderPath, 255 );
 	TCHAR szTitleBuf[256] = L"";
 	wcsncpy( szTitleBuf, szTitle, 255 );
 	int rc = FolderTree (hWnd, szTitleBuf, szFileName);
