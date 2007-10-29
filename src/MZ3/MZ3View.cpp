@@ -3524,15 +3524,21 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	if (m_access) {
 		return false;
 	}
-	if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
-		SetBodyList( m_selGroup->getFocusedCategory()->GetBodyList() );
+	if (m_selGroup==NULL) {
 		return false;
 	}
-	// インターネットにアクセス
-	m_hotList = &m_bodyList;
-	AccessProc( 
-		&m_selGroup->getFocusedCategory()->m_mixi, 
-		util::CreateMixiUrl(m_selGroup->getFocusedCategory()->m_mixi.GetURL()));
+	CCategoryItem* item = m_selGroup->getSelectedCategory();
+	if (item==NULL) {
+		return false;
+	}
+	if (item->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
+		// ブックマークはアクセスなし
+		SetBodyList( item->GetBodyList() );
+	} else {
+		// インターネットにアクセス
+		m_hotList = &m_bodyList;
+		AccessProc( &item->m_mixi, util::CreateMixiUrl(item->m_mixi.GetURL()));
+	}
 
 	return true;
 }
