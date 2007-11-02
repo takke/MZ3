@@ -80,11 +80,14 @@ public:
 		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
 		REPORT_SCROLL_TYPE_PAGE = 1,	///< ページ単位
 	};
-	REPORT_SCROLL_TYPE	m_reportScrollType;	///< レポート画面のスクロールタイプ
-	int				m_reportScrollLine;	///< レポート画面のスクロール行数
+	REPORT_SCROLL_TYPE	m_reportScrollType;		///< レポート画面のスクロールタイプ
+	int				m_reportScrollLine;			///< レポート画面のスクロール行数
+
+	int				m_lastTopPageTabIndex;		///< 前回終了時のタブのインデックス
+	int				m_lastTopPageCategoryIndex;	///< 前回終了時のカテゴリのインデックス
 
 private:
-	int				m_recvBufSize;		///< 受信バッファサイズ
+	int				m_recvBufSize;				///< 受信バッファサイズ
 
 public:
 	Option()
@@ -134,6 +137,8 @@ public:
 		, m_bRenderByIE( false )
 		, m_nIntervalCheckSec( 60 )
 		, m_bEnableIntervalCheck( false )
+		, m_lastTopPageTabIndex( 0 )
+		, m_lastTopPageCategoryIndex( 0 )
 	{
 	}
 

@@ -264,6 +264,18 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_nIntervalCheckSec = normalizeIntervalCheckSec(atoi(s.c_str()));
 		}
+
+		// 前回終了時のタブのインデックス
+		s = inifile.GetValue( "LastTopPageTabIndex", "UI" );
+		if(! s.empty() ) {
+			m_lastTopPageTabIndex = atoi(s.c_str());
+		}
+
+		// 前回終了時のカテゴリのインデックス
+		s = inifile.GetValue( "LastTopPageCategoryIndex", "UI" );
+		if(! s.empty() ) {
+			m_lastTopPageCategoryIndex = atoi(s.c_str());
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
@@ -409,6 +421,12 @@ void Option::Save()
 
 	// 定期取得間隔
 	inifile.SetValue( "IntervalCheckSec", (LPCSTR)util::int2str_a(m_nIntervalCheckSec), "UI" );
+
+	// 前回終了時のタブのインデックス
+	inifile.SetValue( "LastTopPageTabIndex", (LPCSTR)util::int2str_a(m_lastTopPageTabIndex), "UI" );
+
+	// 前回終了時のカテゴリのインデックス
+	inifile.SetValue( "LastTopPageCategoryIndex", (LPCSTR)util::int2str_a(m_lastTopPageCategoryIndex), "UI" );
 
 	//--- Log 関連
 	// 保存フラグ

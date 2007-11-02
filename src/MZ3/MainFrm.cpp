@@ -929,7 +929,13 @@ void CMainFrame::OnDestroy()
 {
 	CFrameWnd::OnDestroy();
 
+	// 終了時のタブ・カテゴリ選択状態を保存
+	CMZ3View* pView = (CMZ3View*)theApp.m_pMainView;
+	theApp.m_optionMng.m_lastTopPageTabIndex      = pView->m_groupTab.GetCurSel();
+	theApp.m_optionMng.m_lastTopPageCategoryIndex = pView->m_selGroup->selectedCategory;
+
 #ifndef WINCE
+	// 終了時の位置・サイズを保存
 	WINDOWPLACEMENT    wp;
     if (GetWindowPlacement(&wp)) {
 		CString    cb;

@@ -182,8 +182,10 @@ private:
 	bool			m_checkNewComment;	///< 新着コメント＆メッセージチェック中？
 	BOOL			m_login;
 
+public:
 	CGroupItem*		m_selGroup;			///< 現在選択されているグループタブ項目
 
+private:
 	int				m_preCategory;		///< 前回選択していたカテゴリリスト項目のインデックス
 
 	CListCtrl*		m_hotList;			///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）

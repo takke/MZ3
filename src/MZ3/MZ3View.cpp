@@ -433,15 +433,24 @@ void CMZ3View::InsertInitialData()
 	}
 
 	// 初期選択項目設定
-	m_groupTab.SetCurSel( 0 );
+	int tabIndex = 0;
+	if (0 <= theApp.m_optionMng.m_lastTopPageTabIndex && theApp.m_optionMng.m_lastTopPageTabIndex < m_groupTab.GetItemCount()) {
+		// 前回終了時のタブを復帰。
+		tabIndex = theApp.m_optionMng.m_lastTopPageTabIndex;
+	}
+	m_groupTab.SetCurSel( tabIndex );
 
 	// 選択中のグループ項目の設定
-	m_selGroup = &theApp.m_root.groups[0];
+	m_selGroup = &theApp.m_root.groups[tabIndex];
+
+	// カテゴリの選択状態を復帰
+	int nCategory = m_selGroup->categories.size();
+	if (0 <= theApp.m_optionMng.m_lastTopPageCategoryIndex && theApp.m_optionMng.m_lastTopPageCategoryIndex < nCategory) {
+		m_selGroup->focusedCategory = m_selGroup->selectedCategory = theApp.m_optionMng.m_lastTopPageCategoryIndex;
+	}
 
 	// カテゴリーリストを初期化する
 	MyUpdateCategoryListByGroupItem();
-
-//	m_categoryList.SetFocus();
 }
 
 // CMZ3View 診断
