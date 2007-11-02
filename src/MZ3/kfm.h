@@ -5,6 +5,12 @@
 /// In Memory Kanji-Filter
 namespace kfm {
 
+#define DEFAULT_OCODE  JIS      /* デフォールトは JIS 出力 */
+#define BUFFER_SIZE    4096
+
+/* MAXMIMELEN は規格では 75 だが守られていないので多めにとる */
+#define MAXMIMELEN      512
+
 typedef std::vector<unsigned char> kf_buf_type;
 
 /**
@@ -70,20 +76,25 @@ public:
  */
 class kfm
 {
+public:
+	enum CODE_TYPE { UNKNOWN, SJIS, EUC, JIS };
+
 private:
 	int verbose;
 	int mime;
 	int text;
 	int quote;
+	CODE_TYPE icode;
+	CODE_TYPE default_icode;
+	CODE_TYPE ocode;
 
 	kf_buf_reader	inbuf;
 	kf_buf_writer	outbuf;
-
 public:
 //	kfm( FILE* fp_in, FILE* fp_out )
 //		: infile(fp_in), outfile(fp_out)
 	kfm( const kf_buf_type& buf_in, kf_buf_type& buf_out )
-		: inbuf(buf_in), outbuf(buf_out)
+		: inbuf(buf_in), outbuf(buf_out), default_icode(UNKNOWN), ocode(DEFAULT_OCODE)
 	{
 		verbose = 0;
 		mime = 0;
@@ -103,6 +114,11 @@ public:
 	void tosjis(void);
 	void tojis(void);
 	void toeuc(void);
+
+	void set_default_input_code( CODE_TYPE t )
+	{
+		default_icode = t;
+	}
 
 private:
 	void sjis_to_jis(int *ph, int *pl);

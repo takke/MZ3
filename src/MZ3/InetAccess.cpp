@@ -904,6 +904,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		{
 			out_buf.reserve( recv_buffer.size() );
 			kfm::kfm k( recv_buffer, out_buf );
+			k.set_default_input_code( kfm::kfm::EUC );
 			k.tosjis();
 		}
 

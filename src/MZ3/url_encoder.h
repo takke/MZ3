@@ -81,6 +81,7 @@ private:
 		// sjis を euc に変換
 		kfm::kf_buf_type buf_euc;
 		kfm::kfm filter( buf_sjis, buf_euc );
+		filter.set_default_input_code( kfm::kfm::SJIS );
 		filter.toeuc();
 
 		// URLエンコード

@@ -12,12 +12,6 @@
 
 namespace kfm {
 
-#define DEFAULT_OCODE  JIS      /* デフォールトは JIS 出力 */
-#define BUFFER_SIZE    4096
-
-/* MAXMIMELEN は規格では 75 だが守られていないので多めにとる */
-#define MAXMIMELEN      512
-
 #define isjis(c) (((c)>=0x21 && (c)<=0x7e))
 #define iseuc(c) (((c)>=0xa1 && (c)<=0xfe))
 
@@ -29,10 +23,6 @@ namespace kfm {
 
 /* いわゆる半角カナ */
 #define ishankana(c) ((c)>=0xa0 && (c)<=0xdf)
-
-enum { UNKNOWN, SJIS, EUC, JIS }
-//  icode, default_icode = UNKNOWN, ocode = DEFAULT_OCODE;
-    icode, default_icode = EUC, ocode = DEFAULT_OCODE;
 
 char *codename[] = { "UNKNOWN", "SJIS", "EUC", "JIS" };
 
