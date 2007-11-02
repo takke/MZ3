@@ -1836,6 +1836,10 @@ public:
 		MZ3LOGGER_DEBUG( L"ViewBbsParser.parse() start." );
 
 		mixi.ClearAllList();
+		mixi.ClearChildren();
+
+		// 名前を初期化
+		mixi.SetName(L"");
 
 		INT_PTR lastLine = html_.GetCount();
 
@@ -1859,8 +1863,19 @@ public:
 
 			// 投稿日時を取得する
 			// <span class="date">2007年07月14日 22:22</span></dt>
-			if( util::LineHasStringsNoCase( line, L"span", L"class", L"date" ) ) {
+			if( util::LineHasStringsNoCase( line, L"<span", L"class", L"date" ) ) {
 				ParserUtil::ParseDate(line, mixi);
+			}
+
+			// タイトルを取得する
+			// <span class="titleSpan"><span class="title">xxxxx</span>...
+			if( util::LineHasStringsNoCase( line, L"<span", L"class", L"titleSpan", L"title" ) ) {
+				CString title;
+				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
+				// タグの除去
+				ParserUtil::StripAllTags( title );
+				mixi.SetTitle( title );
+				continue;
 			}
 
 
@@ -2086,6 +2101,9 @@ public:
 
 		data_.ClearAllList();
 		data_.ClearChildren();
+
+		// 名前を初期化
+		data_.SetName(L"");
 
 		INT_PTR lastLine = html_.GetCount();
 
@@ -2453,6 +2471,9 @@ public:
 		data_.ClearAllList();
 		data_.ClearChildren();
 		
+		// 名前を初期化
+		data_.SetName(L"");
+
 		CString buf;
 
 		INT_PTR lastLine = html_.GetCount();
@@ -2938,8 +2959,24 @@ public:
 		MZ3LOGGER_DEBUG( L"ViewNewsParser.parse() start." );
 
 		data_.ClearAllList();
+		data_.ClearChildren();
+		data_.SetName(L"");
 
 		INT_PTR count = html_.GetCount();
+
+		// タイトルは title タグから抽出する
+		for (int iLine=0; iLine<20 && iLine<count; iLine++) {
+			const CString& line = html_.GetAt(iLine);
+	
+			//<title>[mixi] たいとる（配信元名称）</title>
+			if (util::LineHasStringsNoCase( line, L"<title>[mixi]", L"</title>" ) ) {
+				CString title;
+				util::GetBetweenSubString( line, L"<title>[mixi]", L"</title>", title );
+				title.Trim();
+				data_.SetTitle(title);
+				break;
+			}
+		}
 
 		/**
 		 * 方針：
@@ -2981,9 +3018,7 @@ public:
 				break;
 			}
 
-			CString str = line;
-
-			ParserUtil::AddBodyWithExtract( data_, str );
+			ParserUtil::AddBodyWithExtract( data_, line );
 		}
 
 		MZ3LOGGER_DEBUG( L"ViewNewsParser.parse() finished." );
