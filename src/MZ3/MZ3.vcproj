@@ -1620,10 +1620,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\UserDlg.cpp"
-				>
-			</File>
 			<Filter
 				Name="util"
 				>
@@ -2100,6 +2096,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UserDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\WriteView.cpp"
 					>
 				</File>
@@ -2172,10 +2172,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UserDlg.h"
 				>
 			</File>
 			<File
@@ -2351,6 +2347,10 @@
 				</File>
 				<File
 					RelativePath=".\ReportView.h"
+					>
+				</File>
+				<File
+					RelativePath=".\UserDlg.h"
 					>
 				</File>
 				<File
