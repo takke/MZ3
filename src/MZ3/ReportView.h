@@ -63,7 +63,7 @@ private:
 	CMixiData*	m_focusBodyItem;
 	CMixiData 	m_data;
 	CMixiData*	m_currentData;
-	CImageList* m_pimgList;
+	CImageList  m_pimgList;
 
 	BOOL m_nochange;
 	BOOL m_access;

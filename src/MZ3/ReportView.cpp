@@ -20,7 +20,9 @@
 
 IMPLEMENT_DYNCREATE(CReportView, CFormView)
 
+#ifdef WINCE
 static HINSTANCE g_HtmlViewInstance = NULL;			///< htmlview.dll のインスタンス
+#endif
 
 /**
  * コンストラクタ
@@ -41,9 +43,6 @@ CReportView::CReportView()
  */
 CReportView::~CReportView()
 {
-	m_pimgList->DeleteImageList();
-	delete m_pimgList;
-	m_pimgList = NULL;
 }
 
 void CReportView::DoDataExchange(CDataExchange* pDX)
@@ -155,11 +154,10 @@ void CReportView::OnInitialUpdate()
 		// スタイルの更新
 		m_list.ModifyStyle(0, dwStyle);
 
-		m_pimgList = new CImageList();
-		m_pimgList->Create(16, 16, ILC_COLOR4, 2, 0);
-		m_pimgList->Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
-		m_pimgList->Add( AfxGetApp()->LoadIcon(IDI_PHOTO_ICON) );
-		m_list.SetImageList(m_pimgList, LVSIL_SMALL);
+		m_pimgList.Create(16, 16, ILC_COLOR4, 2, 0);
+		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
+		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_PHOTO_ICON) );
+		m_list.SetImageList(&m_pimgList, LVSIL_SMALL);
 
 		// カラムの追加
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
