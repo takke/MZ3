@@ -299,6 +299,8 @@ public:
 	void ResetIntervalTimer(void);
 protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+public:
+	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

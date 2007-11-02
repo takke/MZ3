@@ -193,6 +193,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_WIDE, &CMZ3View::OnLayoutCategoryMakeWide)
 	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
     ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
+	ON_NOTIFY(NM_CLICK, IDC_GROUP_TAB, &CMZ3View::OnNMClickGroupTab)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -603,17 +604,9 @@ void CMZ3View::OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 		m_categoryList.Update(lpnmlv->iItem);
 	}
 
-	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-	TRACE(_T("http://mixi.jp/%s\n"), pCategory->m_mixi.GetURL());
-
-	if (pCategory->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
-		theApp.m_root.GetBookmarkList().clear();
-		theApp.m_bookmarkMng.Load( theApp.m_root.GetBookmarkList() );
-		SetBodyList( pCategory->GetBodyList() );
+	// アクセス開始
+	if (!RetrieveCategoryItem()) {
 		return;
-	}else{
-		// インターネットにアクセス
-		AccessProc( &pCategory->m_mixi, util::CreateMixiUrl(pCategory->m_mixi.GetURL()));
 	}
 
 	*pResult = 0;
@@ -3581,4 +3574,31 @@ BOOL CMZ3View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	}
 
 	return CFormView::OnNotify(wParam, lParam, pResult);
+}
+
+void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// 仮想的にダブルクリックを判定する。
+	static int s_idxLast = -1;
+	static DWORD s_dwLastClickedTickCount = GetTickCount();
+
+	int idx = m_groupTab.GetCurSel();
+	if (s_idxLast != idx) {
+		s_idxLast = idx;
+		s_dwLastClickedTickCount = GetTickCount();
+	} else {
+
+		// しきい値をシステムから取得し、ダブルクリック判定
+		if (GetTickCount() - s_dwLastClickedTickCount < GetDoubleClickTime()) {
+			s_idxLast = -1;
+
+			// ダブルクリック時の処理を実行：
+			// 選択カテゴリのリロード
+			RetrieveCategoryItem();
+		} else {
+			s_dwLastClickedTickCount = GetTickCount();
+		}
+	}
+
+	*pResult = 0;
 }
