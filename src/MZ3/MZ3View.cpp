@@ -102,7 +102,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 	case ACCESS_LIST_FRIEND:
 		return _T("ÉçÉOÉCÉìéûçè");
 	case ACCESS_LIST_COMMUNITY:
-		return L"";
+		return _T("êlêî");
 	case ACCESS_LIST_INTRO:
 		return L"è–âÓï∂";
 	case ACCESS_LIST_NEW_BBS:
@@ -137,6 +137,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 		}
 	case ACCESS_LIST_FOOTSTEP:
 		return _T("éûçè");
+
 	default:
 		return L"";
 	}

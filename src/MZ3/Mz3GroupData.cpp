@@ -151,7 +151,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 	case ACCESS_LIST_COMMUNITY:
 		default_category_url = L"list_community.pl";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NONE;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		break;
 
 	// ÉjÉÖÅ[ÉXån

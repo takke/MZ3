@@ -1572,17 +1572,17 @@ private:
 		for( ; iLine < lastLine && bBreak == false; iLine++ ) {
 			const CString& line = html.GetAt( iLine );
 
-			//// /messageAreaが見つかれば終了
+			// "/messageArea"が見つかれば終了
 			if( util::LineHasStringsNoCase( line, L"/messageArea" ) ) {
 				return false;
 			}
 
-			//view_community.pl で始まるなら、抽出する
+			// view_community.pl で始まるなら、抽出する
 			if( util::LineHasStringsNoCase( line, L"view_community.pl" ) ) {
-			/* 行の形式：
-			line1: <div class="iconListImage"><a href="view_community.pl?id=2640122" style="background: url(http://img-c3.mixi.jp/photo/comm/1/22/2640122_234s.jpg); text-indent: -9999px;" class="iconTitle" title="xxxxxx">xxxxxxの写真</a></div><span>xxxxxx(41)</span>
-			line2: <div id="2640122" class="memo_pop"></div><p><a href="show_community_memo.pl?id=2640122" onClick="openMemo(event,'community',2640122);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
-			*/
+				/* 行の形式：
+				line1: <div class="iconListImage"><a href="view_community.pl?id=2640122" style="background: url(http://img-c3.mixi.jp/photo/comm/1/22/2640122_234s.jpg); text-indent: -9999px;" class="iconTitle" title="xxxxxx">xxxxxxの写真</a></div><span>xxxxxx(41)</span>
+				line2: <div id="2640122" class="memo_pop"></div><p><a href="show_community_memo.pl?id=2640122" onClick="openMemo(event,'community',2640122);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
+				*/
 				CMixiData mixi;
 
 				// <a 以降のみにする
@@ -1603,7 +1603,7 @@ private:
 				url.Insert( 0, L"http://mixi.jp/" );
 				mixi.SetBrowseUri( url );
 
-				//// Image 抽出
+				// Image 抽出
 				CString image_url;
 				if( util::GetBetweenSubString( target, L"url(", L"); text-indent", image_url ) < 0 ) {
 					continue;
@@ -1615,7 +1615,16 @@ private:
 				if( util::GetBetweenSubString( target, L"<span>", L"</span>", name ) < 0 ) {
 					continue;
 				}
+				// コミュ名と人数に分解
+				CString userCount;
+				int idxStart = name.ReverseFind( '(' );
+				int idxEnd   = idxStart>0 ? (name.Find(')', idxStart+1)) : -1;
+				if (idxStart > 0 && idxEnd > 0 && idxEnd-idxStart-1>0) {
+					userCount = name.Mid(idxStart+1, idxEnd-idxStart-1) + L"人";
+					name = name.Left(idxStart);
+				}
 				mixi.SetName( name );
+				mixi.SetDate( userCount );	// 仮に日付として登録する
 				mixi.SetAccessType( ACCESS_COMMUNITY );
 
 				// mixi_list に追加する。
