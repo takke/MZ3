@@ -1,123 +1,17 @@
-/**
- * その他のユーティリティ関数
- */
 #pragma once
+/**
+ * MZ3依存ユーティリティ関数群
+ * 
+ * 主に theApp に依存するもの。
+ */
 
 #include "MyRegex.h"
 #include "util_base.h"
+#include "mixi_util.h"
 
 /// MZ3 用ユーティリティ
 namespace util
 {
-
-/**
- * gsgetfile.dll を用いてファイル選択画面を表示する
- *
- * 成功時は IDOK が返る
- */
-/*
-inline int GetOpenFileNameEx(OPENFILENAME* pofn)
-{
-#ifdef WINCE
-	HINSTANCE hInst = LoadLibrary(_T("gsgetfile.dll"));
-	if (hInst) {
-		BOOL (*gsGetOpenFileName)(OPENFILENAME* pofn);
-		(FARPROC&)gsGetOpenFileName = GetProcAddress(hInst, _T("gsGetOpenFileName"));
-		if (gsGetOpenFileName) {
-			BOOL ret = gsGetOpenFileName(pofn);
-			FreeLibrary(hInst);
-			return ret;
-		}
-		FreeLibrary(hInst);
-	}
-	return GetOpenFileName(pofn);
-#else
-	// for win32
-	// TODO 実装すること
-	return 0;
-#endif
-}
-*/
-
-/**
- * フォルダ選択画面を表示する
- *
- * @param hWnd			[in] 親画面
- * @param szTitle		[in] フォルダ選択画面のタイトル
- * @param strFolderPath	[in/out] 初期選択フォルダ＆選択済みフォルダパス
- * @return 成功時は true、失敗時は false を返す。
- */
-inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& strFolderPath )
-{
-#ifdef WINCE
-	// FDQ.DLL を用いてフォルダ選択画面を表示する
-
-	// DLLを取得する（Windowsディレクトに無いときはフルパスで指定する）
-	HINSTANCE hInst = LoadLibrary (_T("FDQ.DLL"));
-	if( hInst == NULL ) {
-		MessageBox( NULL, L"FDQ.DLL not found", L"", MB_OK );
-		return false;
-	}
-	int (pascal *FolderTree) (HWND,TCHAR*,TCHAR*);
-
-	FolderTree = (int (pascal *) (HWND,TCHAR*,TCHAR*)) GetProcAddress (hInst, TEXT("FolderTree"));
-	if (FolderTree == 0) {
-		FreeLibrary (hInst);
-		return false;	//エラー
-	}
-
-	// 保存先変更画面の表示
-	TCHAR szFileName[256] = L"";
-	wcsncpy( szFileName, strFolderPath, 255 );
-	TCHAR szTitleBuf[256] = L"";
-	wcsncpy( szTitleBuf, szTitle, 255 );
-	int rc = FolderTree (hWnd, szTitleBuf, szFileName);
-	FreeLibrary (hInst);
-
-	if( rc == IDOK && util::ExistFile(szFileName) ) {
-		strFolderPath = szFileName;
-		return true;
-	}else{
-		return false;
-	}
-#else
-    BROWSEINFO bInfo;
-    LPITEMIDLIST pIDList;
-    TCHAR szDisplayName[MAX_PATH];
-    
-    // BROWSEINFO構造体に値を設定
-    bInfo.hwndOwner             = hWnd;						// ダイアログの親ウインドウのハンドル
-    bInfo.pidlRoot              = NULL;                     // ルートフォルダを示すITEMIDLISTのポインタ (NULLの場合デスクトップフォルダが使われます）
-    bInfo.pszDisplayName        = szDisplayName;            // 選択されたフォルダ名を受け取るバッファのポインタ
-    bInfo.lpszTitle             = szTitle;					// ツリービューの上部に表示される文字列 
-    bInfo.ulFlags               = BIF_RETURNONLYFSDIRS;     // 表示されるフォルダの種類を示すフラグ
-    bInfo.lpfn                  = NULL;                     // BrowseCallbackProc関数のポインタ
-    bInfo.lParam                = (LPARAM)0;                // コールバック関数に渡す値
-
-    // フォルダ選択ダイアログを表示
-    pIDList = ::SHBrowseForFolder(&bInfo);
-    if(pIDList == NULL){
-
-        // フォルダが選択されずにダイアログが閉じられた
-		return false;
-
-    }else{
-
-        // ItemIDListをパス名に変換します
-        if(!::SHGetPathFromIDList(pIDList, szDisplayName)){
-            // エラー処理
-			return false;
-        }
-
-        // szDisplayNameに選択されたフォルダのパスが入っています
-		strFolderPath = szDisplayName;
-
-        // 最後にpIDListのポイントしているメモリを開放します
-        ::CoTaskMemFree( pIDList );
-    }
-	return true;
-#endif
-}
 
 /**
  * 画面下部の情報領域にメッセージを設定する
@@ -145,69 +39,6 @@ inline void MySetInformationText( HWND hWnd, LPCTSTR szMessage )
 	::SendMessage( hWnd, WM_MZ3_ACCESS_INFORMATION, NULL, (LPARAM)&text );
 }
 
-/**
- * 指定されたビットマップ hBitmap を hdc に描画する
- */
-inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int tox, int toy )
-{
-	if( hBitmap == NULL ) {
-		return false;
-	}
-
-	BITMAP	bmp;
-	GetObject( hBitmap, sizeof(bmp), &bmp );
-
-	HDC hdc1 = CreateCompatibleDC(NULL);
-	HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdc1,hBitmap);
-
-	// 転送
-//	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
-	BitBlt( hdc, x, y, w, h, hdc1, tox, toy, SRCCOPY );
-
-	SelectObject( hdc1, hBitmapOld );
-
-	DeleteDC( hdc1 );
-	return true;
-}
-
-/**
- * ストップウォッチ
- *
- * 処理時間計測用
- */
-class StopWatch
-{
-	DWORD dwStart;		///< 計測開始時刻
-	DWORD dwStop;		///< 計測停止時刻
-public:
-	// コンストラクタ
-	StopWatch() {
-		start();
-	}
-
-	/// 停止、経過時間を取得する
-	DWORD stop() {
-		dwStop = ::GetTickCount();
-		return getElapsedMilliSecUntilStoped();
-	}
-
-	/// 計測開始
-	void start() {
-		dwStop = dwStart = ::GetTickCount();
-	}
-
-	/// 停止時までの経過時間を msec 単位で取得する
-	DWORD getElapsedMilliSecUntilStoped()
-	{
-		return dwStop - dwStart;
-	}
-
-	/// 現在の経過時間を msec 単位で取得する
-	DWORD getElapsedMilliSecUntilNow()
-	{
-		return ::GetTickCount() - dwStart;
-	}
-};
 
 /**
  * CMixiData に対応するログファイルのパスを生成する
@@ -489,116 +320,6 @@ inline CString MakeLogfilePath( const CMixiData& data )
 }
 
 /**
- * URL からアクセス種別を推定する
- */
-inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url ) 
-{
-	// とりあえず view 系のみ
-	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // メイン
-	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // 日記内容
-	if( url.Find( L"view_bbs.pl" ) != -1 ) 		{ return ACCESS_BBS;       } // コミュニティ内容
-	if( url.Find( L"view_enquete.pl" ) != -1 ) 	{ return ACCESS_ENQUETE;   } // アンケート
-	if( url.Find( L"view_event.pl" ) != -1 ) 	{ return ACCESS_EVENT;     } // イベント
-	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_MYDIARY;   } // 自分の日記内容
-	if( url.Find( L"view_message.pl" ) != -1 ) 	{ return ACCESS_MESSAGE;   } // メッセージ
-	if( url.Find( L"view_news.pl" ) != -1 ) 	{ return ACCESS_NEWS;      } // ニュース内容
-	if( url.Find( L"show_friend.pl" ) != -1 ) 	{ return ACCESS_PROFILE;   } // 個人ページ
-	if( url.Find( L"view_community.pl" ) != -1 ){ return ACCESS_COMMUNITY; } // コミュニティページ
-
-	// 不明なので INVALID とする
-	return ACCESS_INVALID;
-}
-
-/// UNICODE -> ANSI
-inline std::string my_wcstombs( const std::wstring& wide_string ) {
-	static std::vector<char> ansi_string(1024);
-	memset( &ansi_string[0], 0x00, sizeof(char) * 1024 );
-	wcstombs( &ansi_string[0], wide_string.c_str(), 1023 );
-	return &ansi_string[0];
-}
-
-/// ANSI -> UNICODE
-inline std::wstring my_mbstowcs( const std::string& ansi_string ) {
-	std::vector<wchar_t> wide_string(1024);
-	memset( &wide_string[0], 0x00, sizeof(wchar_t) * 1024 );
-	mbstowcs( &wide_string[0], ansi_string.c_str(), 1023 );
-	return &wide_string[0];
-}
-
-/// カンマ区切りで文字列リスト化する。
-inline bool split_by_comma( std::vector<std::string>& values, const std::string& value )
-{
-	values.clear();
-
-	size_t idxFrom = 0;
-	while( idxFrom < value.length() ) {
-		size_t at = value.find( ',', idxFrom );
-		if( at == std::string::npos ) {
-			// not found.
-			// idxFrom 以降を追加して終了。
-			values.push_back( value.substr(idxFrom) );
-			return true;
-		}
-
-		// カンマ発見。
-		// idxFrom からカンマの前まで（[idxFrom,at-1]）を追加。
-		values.push_back( value.substr(idxFrom,at-idxFrom) );
-
-		// 検索開始位置更新
-		idxFrom = at+1;
-	}
-
-	return true;
-}
-
-/**
- * url 作成（http://mixi.jp/ の補完）
- */
-inline CString CreateMixiUrl(LPCTSTR str)
-{
-	if( wcsstr( str, L"mixi.jp" ) == NULL ) {
-		CString uri;
-		uri.Format(_T("http://mixi.jp/%s"), str);
-		return uri;
-	}else{
-		return str;
-	}
-}
-
-/**
- * line に、
- * 指定された全ての文字列が順に存在すれば true を返す。
- * 大文字小文字は区別しない。
- */
-inline bool LineHasStringsNoCase( 
-				const CString& line, 
-				LPCTSTR str1, LPCTSTR str2=NULL, LPCTSTR str3=NULL, LPCTSTR str4=NULL, LPCTSTR str5=NULL )
-{
-	// 大文字に変換した文字列を対象とする
-	CString target( line );
-	target.MakeUpper();
-
-	// 検索文字列群
-	LPCTSTR findStrings[] = { str1, str2, str3, str4, str5 };
-
-	int idx = 0;
-	for( int i=0; i<5; i++ ) {
-		if( findStrings[i] != NULL ) {
-			CString str = findStrings[i];
-			str.MakeUpper();
-
-			idx = target.Find( str, idx );
-			if( idx < 0 ) {
-				return false;
-			}
-			idx += str.GetLength();
-		}
-	}
-
-	return true;
-}
-
-/**
  * 指定されたURLが mixi の URL であれば、
  * mixi モバイルの自動ログイン用URLに変換する
  */
@@ -695,78 +416,6 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 }
 
 /**
- * code from http://techtips.belution.com/ja/vc/0083/
- */
-template< class T>
-int FindFileCallback(const TCHAR* szDirectory,
-                    const TCHAR* szFile,
-                    int (*pFindCallback)(const TCHAR* szDirectory,
-                                         const WIN32_FIND_DATA* Data,
-                                         T    pCallbackProbe),
-                    T    pCallbackProbe = NULL,
-                    int  nDepth = -1)
-{
-    int            nResult = TRUE;
-    HANDLE          hFile  = INVALID_HANDLE_VALUE;
-    TCHAR          szPath[ MAX_PATH ];
-    WIN32_FIND_DATA data;
-
-    //_/_/_/_/_/_/_/_/_/_/_/_/_/
-    //
-    //  探索深度が尽きたら次のディレクトリは探さない．
-    //
-    if( nDepth == 0 || nResult == FALSE) return nResult;
-
-    //_/_/_/_/_/_/_/_/_/_/_/_/_/
-    //
-    //  ディレクトリ潜航
-    //
-    _stprintf( szPath, _T("%s*.*"), szDirectory);
-    hFile = FindFirstFile( szPath, &data);
-    if( hFile != INVALID_HANDLE_VALUE )
-    {
-        do
-        {
-            // ディレクトリでないならやりなおし．
-            if( (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                != FILE_ATTRIBUTE_DIRECTORY ) continue;
-
-            // カレント及び親ディレクトリならやりなおし．
-            if( _tcscmp(data.cFileName, _T(".")) == 0
-                || _tcscmp(data.cFileName, _T("..")) == 0 ) continue;
-
-            // 発見ディレクトリの潜航準備．
-            _stprintf( szPath, _T("%s%s\\"), szDirectory, data.cFileName);
-
-            //再帰呼び出し．ただし Depth -1 で渡す．ブクブク．
-            nResult = FindFileCallback( szPath, szFile, pFindCallback, pCallbackProbe, nDepth -1);
-        }
-        while( FindNextFile( hFile, &data) && nResult);
-
-        FindClose( hFile );
-    }
-
-    //_/_/_/_/_/_/_/_/_/_/_/_/_/
-    //
-    //  ファイル探索
-    //
-    _stprintf( szPath, _T("%s%s"), szDirectory, szFile);
-    hFile = FindFirstFile( szPath, &data);
-    if( hFile != INVALID_HANDLE_VALUE )
-    {
-        do
-        {
-            nResult = (pFindCallback)( szDirectory, &data, pCallbackProbe);
-        }
-        while( FindNextFile( hFile, &data) && nResult);
-
-        FindClose( hFile );
-    }
-
-    return nResult;
-}
-
-/**
  * 未コンパイルであればコンパイルする。
  *
  * コンパイル失敗時はエラーログを出力する
@@ -786,41 +435,6 @@ inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
 		}
 		return true;
 	}
-}
-
-/**
- * 未読・既読状態管理ログファイル用のIDを生成する。
- */
-inline CString GetLogIdString( const CMixiData& mixi )
-{
-	CString logId;
-
-	switch (mixi.GetAccessType()) {
-	case ACCESS_DIARY:
-	case ACCESS_MYDIARY:
-		{
-			CString id;
-			if (util::GetBetweenSubString( mixi.GetURL(), L"id=", L"&", id ) >= 0) {
-				logId.Format(_T("d%s"), id);
-			}
-		}
-		break;
-	case ACCESS_BBS:
-		logId.Format(_T("b%d"), mixi.GetID());
-		break;
-	case ACCESS_EVENT:
-		logId.Format(_T("v%d"), mixi.GetID());
-		break;
-	case ACCESS_ENQUETE:
-		logId.Format(_T("e%d"), mixi.GetID());
-		break;
-
-	default:
-		logId = L"";
-		break;
-	}
-
-	return logId;
 }
 
 }

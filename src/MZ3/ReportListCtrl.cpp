@@ -6,6 +6,7 @@
 #include "ReportListCtrl.h"
 #include "ReportView.h"
 #include "util.h"
+#include "util_gui.h"
 
 static const int OFFSET_FIRST = 2;
 static const int OFFSET_OTHER = 6;

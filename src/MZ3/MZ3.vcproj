@@ -2202,6 +2202,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\mixi_util.h"
+					>
+				</File>
+				<File
 					RelativePath=".\url_encoder.h"
 					>
 				</File>
@@ -2211,6 +2215,10 @@
 				</File>
 				<File
 					RelativePath=".\util_base.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util_gui.h"
 					>
 				</File>
 			</Filter>

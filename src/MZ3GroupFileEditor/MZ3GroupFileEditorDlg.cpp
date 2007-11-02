@@ -5,6 +5,7 @@
 #include "MZ3GroupFileEditor.h"
 #include "MZ3GroupFileEditorDlg.h"
 #include "../MZ3/util_base.h"
+#include "../MZ3/util_gui.h"
 #include "NameDlg.h"
 #include "CategorySettingDlg.h"
 

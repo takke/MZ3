@@ -6,7 +6,6 @@
 #include "DebugDlg.h"
 #include "util.h"
 
-
 // CDebugDlg ダイアログ
 
 IMPLEMENT_DYNAMIC(CDebugDlg, CDialog)

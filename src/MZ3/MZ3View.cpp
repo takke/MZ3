@@ -13,6 +13,7 @@
 #include "MainFrm.h"
 #include "WriteView.h"
 #include "util.h"
+#include "util_gui.h"
 #include "MixiParser.h"
 
 #ifdef _DEBUG

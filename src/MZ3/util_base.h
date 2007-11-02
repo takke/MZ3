@@ -1,64 +1,11 @@
+#pragma once
 /**
  * MZ3非依存ユーティリティ
  */
-#pragma once
 
 /// MZ3 用ユーティリティ
 namespace util
 {
-/**
- * 指定されたIDのウィンドウを移動する
- */
-inline void MoveDlgItemWindow( CWnd* pParent, int idc, int x, int y, int nWidth, int nHeight )
-{
-	if (pParent==NULL) {
-		return;
-	}
-
-	CWnd* pDlgItem = pParent->GetDlgItem(idc);
-	if (pDlgItem==NULL) {
-		return;
-	}
-
-	pDlgItem->MoveWindow( x, y, nWidth, nHeight );
-}
-
-/**
- * リストコントロールのフォーカス状態と選択状態を設定する。
- */
-inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, bool bFocusedAndSelected )
-{
-	UINT nState = 0;
-	if( bFocusedAndSelected ) {
-		nState |= LVIS_FOCUSED | LVIS_SELECTED;
-	}
-
-	listCtrl.SetItemState( idx, nState, LVIS_FOCUSED | LVIS_SELECTED );
-}
-
-/**
- * リストコントロール内で指定されたインデックスが表示状態にあるかどうかを返す。
- */
-inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )
-{
-	int idxTop  = listCtrl.GetTopIndex();				// 画面の一番上の表示項目のインデックス
-	int idxLast = idxTop + listCtrl.GetCountPerPage();	// 画面の一番下の表示項目のインデックス
-	if( idx >= idxLast ) {
-		// 下方にある
-		return false;
-	}
-	if( idx <= idxTop ) {
-		// ただし、先頭項目の場合は除く
-		if( idx==0 ) {
-			return true;
-		}
-
-		// 上方にある
-		return false;
-	}
-	return true;
-}
-
 /**
  * ファイルを開く
  */
@@ -123,67 +70,6 @@ inline void OpenUrlByBrowser( LPCTSTR url )
 	sei.nShow        = SW_NORMAL;
 
 	ShellExecuteEx(&sei);
-}
-
-/// アクセス種別を文字列に変換する
-inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
-{
-	LPCTSTR text = L"";
-	switch( type ) {
-	case ACCESS_LOGIN:				text = L"ログイン";				break;
-	case ACCESS_MAIN:				text = L"メイン";				break;
-	case ACCESS_DIARY:				text = L"日記内容";				break;
-	case ACCESS_NEWS:				text = L"ニュース";				break;
-	case ACCESS_BBS:				text = L"コミュ書込";			break;
-	case ACCESS_ENQUETE:			text = L"アンケート";			break;
-	case ACCESS_EVENT:				text = L"イベント";				break;
-	case ACCESS_MYDIARY:			text = L"日記";					break;
-	case ACCESS_ADDDIARY:			text = L"日記投稿";				break;
-	case ACCESS_MESSAGE:			text = L"メッセージ";			break;
-	case ACCESS_IMAGE:				text = L"画像";					break;
-	case ACCESS_MOVIE:				text = L"動画";					break;
-	case ACCESS_DOWNLOAD:			text = L"ダウンロード";			break;
-	case ACCESS_PROFILE:			text = L"プロフィール";			break;
-	case ACCESS_COMMUNITY:			text = L"コミュニティ";			break;
-	case ACCESS_LIST_INTRO:			text = L"紹介文";				break;
-
-	case ACCESS_LIST_DIARY:			text = L"日記一覧";				break;
-	case ACCESS_LIST_NEW_COMMENT:	text = L"新着コメント一覧";		break;
-	case ACCESS_LIST_COMMENT:		text = L"コメント一覧";			break;
-	case ACCESS_LIST_NEWS:			text = L"ニュース一覧";			break;
-	case ACCESS_LIST_FAVORITE:		text = L"お気に入り";			break;
-	case ACCESS_LIST_FRIEND:		text = L"マイミク一覧";			break;
-	case ACCESS_LIST_COMMUNITY:		text = L"コミュニティ一覧";		break;
-	case ACCESS_LIST_NEW_BBS_COMMENT:text = L"コミュコメント記入履歴";		break;
-	case ACCESS_LIST_NEW_BBS:		text = L"コミュ書込一覧";		break;
-	case ACCESS_LIST_BBS:			text = L"トピック一覧";			break;
-	case ACCESS_LIST_MYDIARY:		text = L"日記一覧";				break;
-	case ACCESS_LIST_FOOTSTEP:		text = L"足あと";				break;
-	case ACCESS_LIST_MESSAGE_IN:	text = L"メッセージ(受信箱)";	break;
-	case ACCESS_LIST_MESSAGE_OUT:	text = L"メッセージ(送信箱)";	break;
-	case ACCESS_LIST_BOOKMARK:		text = L"ブックマーク";			break;
-	case ACCESS_LIST_CALENDAR:		text = L"カレンダー";			break;  //icchu追加
-
-	case ACCESS_GROUP_COMMUNITY:	text = L"コミュニティG";		break;
-	case ACCESS_GROUP_MESSAGE:		text = L"メッセージG";			break;
-	case ACCESS_GROUP_MYDIARY:		text = L"日記G";				break;
-	case ACCESS_GROUP_NEWS:			text = L"ニュースG";			break;
-	case ACCESS_GROUP_OTHERS:		text = L"その他G";				break;
-
-	// POST 系
-	case ACCESS_POST_CONFIRM_COMMENT:		text = L"コメント投稿（確認）";		break;
-	case ACCESS_POST_ENTRY_COMMENT:			text = L"コメント投稿（書込）";		break;
-	case ACCESS_POST_CONFIRM_REPLYMESSAGE:	text = L"メッセージ返信（確認）";	break;
-	case ACCESS_POST_ENTRY_REPLYMESSAGE:	text = L"メッセージ返信（書込）";	break;
-	case ACCESS_POST_CONFIRM_NEWMESSAGE:	text = L"新規メッセージ（確認）";	break;
-	case ACCESS_POST_ENTRY_NEWMESSAGE:		text = L"新規メッセージ（書込）";	break;
-	case ACCESS_POST_CONFIRM_NEWDIARY:		text = L"日記投稿（確認）";			break;
-	case ACCESS_POST_ENTRY_NEWDIARY:		text = L"コメント投稿（書込）";		break;
-
-	case ACCESS_INVALID:			text = L"<invalid>";			break;
-	default:						text = L"<unknown>";			break;
-	}
-	return text;
 }
 
 /// int 型数値を文字列に変換する
@@ -296,6 +182,192 @@ inline CString int2comma_str(int n)
 	}
 
 	return s;
+}
+
+/// UNICODE -> ANSI
+inline std::string my_wcstombs( const std::wstring& wide_string ) {
+	static std::vector<char> ansi_string(1024);
+	memset( &ansi_string[0], 0x00, sizeof(char) * 1024 );
+	wcstombs( &ansi_string[0], wide_string.c_str(), 1023 );
+	return &ansi_string[0];
+}
+
+/// ANSI -> UNICODE
+inline std::wstring my_mbstowcs( const std::string& ansi_string ) {
+	std::vector<wchar_t> wide_string(1024);
+	memset( &wide_string[0], 0x00, sizeof(wchar_t) * 1024 );
+	mbstowcs( &wide_string[0], ansi_string.c_str(), 1023 );
+	return &wide_string[0];
+}
+
+/// カンマ区切りで文字列リスト化する。
+inline bool split_by_comma( std::vector<std::string>& values, const std::string& value )
+{
+	values.clear();
+
+	size_t idxFrom = 0;
+	while( idxFrom < value.length() ) {
+		size_t at = value.find( ',', idxFrom );
+		if( at == std::string::npos ) {
+			// not found.
+			// idxFrom 以降を追加して終了。
+			values.push_back( value.substr(idxFrom) );
+			return true;
+		}
+
+		// カンマ発見。
+		// idxFrom からカンマの前まで（[idxFrom,at-1]）を追加。
+		values.push_back( value.substr(idxFrom,at-idxFrom) );
+
+		// 検索開始位置更新
+		idxFrom = at+1;
+	}
+
+	return true;
+}
+
+/**
+ * line に、
+ * 指定された全ての文字列が順に存在すれば true を返す。
+ * 大文字小文字は区別しない。
+ */
+inline bool LineHasStringsNoCase( 
+				const CString& line, 
+				LPCTSTR str1, LPCTSTR str2=NULL, LPCTSTR str3=NULL, LPCTSTR str4=NULL, LPCTSTR str5=NULL )
+{
+	// 大文字に変換した文字列を対象とする
+	CString target( line );
+	target.MakeUpper();
+
+	// 検索文字列群
+	LPCTSTR findStrings[] = { str1, str2, str3, str4, str5 };
+
+	int idx = 0;
+	for( int i=0; i<5; i++ ) {
+		if( findStrings[i] != NULL ) {
+			CString str = findStrings[i];
+			str.MakeUpper();
+
+			idx = target.Find( str, idx );
+			if( idx < 0 ) {
+				return false;
+			}
+			idx += str.GetLength();
+		}
+	}
+
+	return true;
+}
+
+/**
+ * ストップウォッチ
+ *
+ * 処理時間計測用
+ */
+class StopWatch
+{
+	DWORD dwStart;		///< 計測開始時刻
+	DWORD dwStop;		///< 計測停止時刻
+public:
+	// コンストラクタ
+	StopWatch() {
+		start();
+	}
+
+	/// 停止、経過時間を取得する
+	DWORD stop() {
+		dwStop = ::GetTickCount();
+		return getElapsedMilliSecUntilStoped();
+	}
+
+	/// 計測開始
+	void start() {
+		dwStop = dwStart = ::GetTickCount();
+	}
+
+	/// 停止時までの経過時間を msec 単位で取得する
+	DWORD getElapsedMilliSecUntilStoped()
+	{
+		return dwStop - dwStart;
+	}
+
+	/// 現在の経過時間を msec 単位で取得する
+	DWORD getElapsedMilliSecUntilNow()
+	{
+		return ::GetTickCount() - dwStart;
+	}
+};
+
+/**
+ * code from http://techtips.belution.com/ja/vc/0083/
+ */
+template< class T>
+int FindFileCallback(const TCHAR* szDirectory,
+                    const TCHAR* szFile,
+                    int (*pFindCallback)(const TCHAR* szDirectory,
+                                         const WIN32_FIND_DATA* Data,
+                                         T    pCallbackProbe),
+                    T    pCallbackProbe = NULL,
+                    int  nDepth = -1)
+{
+    int            nResult = TRUE;
+    HANDLE          hFile  = INVALID_HANDLE_VALUE;
+    TCHAR          szPath[ MAX_PATH ];
+    WIN32_FIND_DATA data;
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  探索深度が尽きたら次のディレクトリは探さない．
+    //
+    if( nDepth == 0 || nResult == FALSE) return nResult;
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  ディレクトリ潜航
+    //
+    _stprintf( szPath, _T("%s*.*"), szDirectory);
+    hFile = FindFirstFile( szPath, &data);
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            // ディレクトリでないならやりなおし．
+            if( (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                != FILE_ATTRIBUTE_DIRECTORY ) continue;
+
+            // カレント及び親ディレクトリならやりなおし．
+            if( _tcscmp(data.cFileName, _T(".")) == 0
+                || _tcscmp(data.cFileName, _T("..")) == 0 ) continue;
+
+            // 発見ディレクトリの潜航準備．
+            _stprintf( szPath, _T("%s%s\\"), szDirectory, data.cFileName);
+
+            //再帰呼び出し．ただし Depth -1 で渡す．ブクブク．
+            nResult = FindFileCallback( szPath, szFile, pFindCallback, pCallbackProbe, nDepth -1);
+        }
+        while( FindNextFile( hFile, &data) && nResult);
+
+        FindClose( hFile );
+    }
+
+    //_/_/_/_/_/_/_/_/_/_/_/_/_/
+    //
+    //  ファイル探索
+    //
+    _stprintf( szPath, _T("%s%s"), szDirectory, szFile);
+    hFile = FindFirstFile( szPath, &data);
+    if( hFile != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            nResult = (pFindCallback)( szDirectory, &data, pCallbackProbe);
+        }
+        while( FindNextFile( hFile, &data) && nResult);
+
+        FindClose( hFile );
+    }
+
+    return nResult;
 }
 
 }

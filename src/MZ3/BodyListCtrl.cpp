@@ -7,6 +7,7 @@
 #include "MixiData.h"
 #include "IniFile.h"
 #include "util.h"
+#include "util_gui.h"
 #include "MixiParserUtil.h"
 
 static const int OFFSET_FIRST	= 2*2;

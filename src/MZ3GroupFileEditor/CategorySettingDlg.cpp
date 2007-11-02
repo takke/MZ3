@@ -5,6 +5,7 @@
 #include "MZ3GroupFileEditor.h"
 #include "CategorySettingDlg.h"
 #include "../MZ3/util_base.h"
+#include "../MZ3/mixi_util.h"
 
 
 // CCategorySettingDlg ダイアログ

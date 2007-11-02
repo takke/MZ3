@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "util.h"
+#include "util_gui.h"
 #include "QuoteDlg.h"
 
 

@@ -10,6 +10,7 @@
 #include "HtmlArray.h"
 #include "MainFrm.h"
 #include "util.h"
+#include "util_gui.h"
 #include "url_encoder.h"
 #include "PostDataGenerator.h"
 #include "MixiParser.h"

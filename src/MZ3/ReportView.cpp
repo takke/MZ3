@@ -9,6 +9,7 @@
 #include "WriteView.h"
 #include "HtmlArray.h"
 #include "util.h"
+#include "util_gui.h"
 #include "QuoteDlg.h"
 #include "MixiParser.h"
 #include "CommonSelectDlg.h"
