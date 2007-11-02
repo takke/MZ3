@@ -12,25 +12,25 @@
 
 class CReportView : public CFormView
 {
-  DECLARE_DYNCREATE(CReportView)
+	DECLARE_DYNCREATE(CReportView)
 
 public:
-  CReportView();           // 動的生成で使用される protected コンストラクタ
-  virtual ~CReportView();
+	CReportView();           // 動的生成で使用される protected コンストラクタ
+	virtual ~CReportView();
 
 public:
-  enum { IDD = IDD_REPORTVIEW };
+	enum { IDD = IDD_REPORTVIEW };
 #ifdef _DEBUG
-  virtual void AssertValid() const;
+	virtual void AssertValid() const;
 #ifndef _WIN32_WCE
-  virtual void Dump(CDumpContext& dc) const;
+	virtual void Dump(CDumpContext& dc) const;
 #endif
 #endif
 
 protected:
-  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
 
-  DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();
 public:
@@ -140,6 +140,9 @@ public:
 //	afx_msg void OnEnVscrollInfoEdit();
 	afx_msg void OnEnVscrollReportEdit();
 	afx_msg void OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult);
+
+private:
+	bool MyLoadMixiViewPage( const CMixiData::Link& link );
 };
 
 

@@ -1029,51 +1029,70 @@ void CReportView::OnLoadPageLink(UINT nID)
 		return;
 	}
 
-	// 既読位置を保存
-	SaveIndex();
+	MyLoadMixiViewPage( m_data->m_linkPage[idx] );
+}
 
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-
-	const CMixiData::Link& link = m_data->m_linkPage[idx];
-
-	m_access = TRUE;
-	m_abort = FALSE;
-
-	// m_data の書き換え
-	{
-		// 実体はとりあえず static にしておく。
-		// m_data 自身を書き換えると「ログを開く」が異なってしまうため。
-		static CMixiData s_mixi;
-		// 初期化
-		CMixiData mixi;	// 初期化用
-
-		// データ構築
-		mixi.SetURL( link.url );
-		mixi.SetTitle( link.text );
-
-		// 名前は引き継ぐ
-		mixi.SetName( m_data->GetName() );
-
-		// アクセス種別を URL から推定
-		ACCESS_TYPE estimatedAccessType = util::EstimateAccessTypeByUrl( link.url );
-		if( estimatedAccessType != ACCESS_INVALID ) {
-			mixi.SetAccessType( estimatedAccessType );
-		}
-
-		s_mixi = mixi;
-		m_data = &s_mixi;
+bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
+{
+	if (m_access) {
+		return false;
 	}
 
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	ACCESS_TYPE estimatedAccessType = util::EstimateAccessTypeByUrl( link.url );
+	switch (estimatedAccessType) {
+	case ACCESS_MYDIARY:
+	case ACCESS_DIARY:
+	case ACCESS_BBS:
+	case ACCESS_ENQUETE:
+	case ACCESS_EVENT:
+	case ACCESS_MESSAGE:
+	case ACCESS_NEWS:
 
-	theApp.m_accessType = m_data->GetAccessType();
-	theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
+		// 既読位置を保存
+		SaveIndex();
+
+		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
+
+		m_infoEdit.ShowWindow(SW_SHOW);
+
+		m_access = TRUE;
+		m_abort = FALSE;
+
+		// m_data の書き換え
+		{
+			// 実体はとりあえず static にしておく。
+			// m_data 自身を書き換えると「ログを開く」が異なってしまうため。
+			static CMixiData s_mixi;
+			// 初期化
+			CMixiData mixi;	// 初期化用
+
+			// データ構築
+			mixi.SetURL( link.url );
+			mixi.SetTitle( link.text );
+
+			// 名前は引き継ぐ
+			mixi.SetName( m_data->GetName() );
+
+			// アクセス種別を設定
+			mixi.SetAccessType( estimatedAccessType );
+			
+			s_mixi = mixi;
+			m_data = &s_mixi;
+		}
+		theApp.m_inet.Initialize( m_hWnd, NULL );
+
+		theApp.m_accessType = m_data->GetAccessType();
+		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
+		return true;
+	default:
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -1119,6 +1138,13 @@ void CReportView::OnLoadUrl(UINT nID)
 
 	LPCTSTR url  = m_currentData->m_linkList[idx].url;
 	LPCTSTR text = m_currentData->m_linkList[idx].text;
+
+	// mixi 内リンクであればここでロードする。
+	if (MyLoadMixiViewPage( m_currentData->m_linkList[idx] )) {
+		return;
+	}
+
+	// mixi 内リンクでなかったたので、ブラウザで開く等の処理を行う
 
 	// 確認画面
 	CString msg;
