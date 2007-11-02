@@ -2673,9 +2673,6 @@ void CMZ3View::OnSetNoRead()
 {
 	CMixiData& mixi = GetSelectedBodyItem();
 
-	// メモリ上の lastIndex を初期化
-	mixi.SetLastIndex( -1 );
-
 	// ログINIファイルの項目を初期化
 	CString logId = util::GetLogIdString( mixi );
 	theApp.m_logfile.DeleteRecord( util::my_wcstombs((LPCTSTR)logId), "Log" );
@@ -3272,15 +3269,18 @@ bool CMZ3View::DoNextBodyItemCruise()
 			case ACCESS_ENQUETE:
 				// コミュニティ、イベント、アンケートなので、
 				// 該当トピックのコメントを全て既読なら既読と判定する。
-				if (mixi.GetLastIndex() == -1) {
-					// 全くの未読
-					unread = true;
-				} else if (mixi.GetLastIndex() >= mixi.GetCommentCount()) {
-					// 更新なし
-					unread = false;
-				} else {
-					// 未読あり
-					unread = true;
+				{
+					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(mixi);
+					if (lastIndex == -1) {
+						// 全くの未読
+						unread = true;
+					} else if (lastIndex >= mixi.GetCommentCount()) {
+						// 更新なし
+						unread = false;
+					} else {
+						// 未読あり
+						unread = true;
+					}
 				}
 				break;
 			default:

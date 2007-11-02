@@ -26,7 +26,6 @@ protected:
 	int				m_commId;				///< コメントID
 	int				m_commentIndex;			///< コメント番号
 	int				m_commentCount;			///< コメントの数
-	int				m_lastIndex;			///< 最後に読んだコメントの番号
 	CONTENT_TYPE	m_contentType;			///< Content-Type
 
 	int				m_ownerId;				///< オーナーID（投稿者IDに設定される場合もある）
@@ -115,9 +114,6 @@ public:
 
 	void SetCommentCount(int value)	    { m_commentCount = value; };
 	int GetCommentCount() const			{ return m_commentCount; };
-
-	void SetLastIndex(int value)		{ m_lastIndex = value; };
-	int GetLastIndex()					{ return m_lastIndex; };
 
 	void SetOwnerID(int value)			{ m_ownerId = value; };
 	int GetOwnerID() const				{ return m_ownerId; };

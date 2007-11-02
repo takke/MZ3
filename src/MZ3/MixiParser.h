@@ -562,7 +562,6 @@ public:
 						CString id;
 						util::GetBetweenSubString( uri, L"id=", L"&", id );
 						data.SetID( _wtoi(id) );
-						ParserUtil::GetLastIndexFromIniFile( data.GetURL(), &data );
 
 						i = j;
 						break;
@@ -657,7 +656,6 @@ public:
 								CString id;
 								util::GetBetweenSubString( url, L"id=", L"&", id );
 								data.SetID(_wtoi(id));
-								ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 								// 本文プレビュー
 								CString target = L"";
@@ -788,7 +786,6 @@ public:
 					CString id;
 					util::GetBetweenSubString( url, L"id=", L"&", id );
 					data.SetID(_wtoi(id));
-					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
 					CString name;
@@ -909,7 +906,6 @@ public:
 					CString id;
 					util::GetBetweenSubString( data.GetURL(), L"id=", L"&", id );
 					data.SetID(_wtoi(id));
-					ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
 
 					// 名前
 					CString author;
@@ -1403,9 +1399,6 @@ public:
 				util::GetBetweenSubString( href, L"id=", L"&", id );
 				data.SetID(_wtoi(id));
 
-				// 前回のインデックスを取得
-				ParserUtil::GetLastIndexFromIniFile(data.GetURL(), &data);
-
 				// コミュニティ名
 				CString communityName;
 				util::GetBetweenSubString( str2, L"</a>", L"</dd>", communityName );
@@ -1785,9 +1778,6 @@ public:
 					title.AppendFormat( L"(%d)", commentCount );
 					mixi.SetTitle( title );
 				}
-
-				// 前回のインデックスを取得
-				ParserUtil::GetLastIndexFromIniFile(mixi.GetURL(), &mixi);
 
 				// コミュニティ名:とりあえず未設定
 				mixi.SetName(L"");

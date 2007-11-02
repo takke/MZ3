@@ -5,6 +5,7 @@
 #include "MZ3.h"
 #include "DebugDlg.h"
 #include "util.h"
+#include "MixiParserUtil.h"
 
 // CDebugDlg ダイアログ
 
@@ -103,7 +104,8 @@ BOOL CDebugDlg::OnInitDialog()
 	idx++;
 
 	m_List.InsertItem( idx, L"既読コメント番号" );
-	m_List.SetItemText( idx, 1, util::int2str( data->GetLastIndex() ) );
+	int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*data);
+	m_List.SetItemText( idx, 1, util::int2str( lastIndex ) );
 	idx++;
 
 	m_List.InsertItem( idx, L"POST種別" );

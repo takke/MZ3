@@ -366,7 +366,7 @@ void CReportView::SetData(const CMixiData& data)
 	m_idKey = util::my_wcstombs((LPCTSTR)logId);
 
 	// ä˘ì«à íuÇÃïœçX
-	m_lastIndex = m_data.GetLastIndex();
+	m_lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(m_data);
 	if (m_lastIndex == -1) {
 		m_lastIndex = 0;
 	} else {
@@ -916,8 +916,6 @@ void CReportView::EndProc()
 void CReportView::SaveIndex()
 {
 	theApp.m_logfile.SetValue(m_idKey, (const char*)util::int2str_a(m_lastIndex), "Log");
-
-	m_data.SetLastIndex(m_lastIndex);
 }
 
 /**

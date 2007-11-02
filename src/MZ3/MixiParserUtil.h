@@ -110,14 +110,11 @@ public:
 	/**
 	 * URL に最後にアクセスしたときの、投稿件数を取得する
 	 */
-	static void GetLastIndexFromIniFile(LPCTSTR uri, CMixiData* data)
+	static int GetLastIndexFromIniFile(LPCTSTR uri, const CMixiData& mixi)
 	{
-		if (data==NULL) {
-			return;
-		}
 		// URIを分解
-		CString buf = util::GetLogIdString(*data);
-		std::string idKey = util::my_wcstombs( (LPCTSTR)buf );
+		CString strLogId = util::GetLogIdString(mixi);
+		std::string idKey = util::my_wcstombs( (LPCTSTR)strLogId );
 
 		// キー取得
 		int lastIndex = -1;
@@ -130,7 +127,15 @@ public:
 			lastIndex = -1;
 		}
 
-		data->SetLastIndex(lastIndex);
+		return lastIndex;
+	}
+
+	/**
+	 * URL に最後にアクセスしたときの、投稿件数を取得する
+	 */
+	static int GetLastIndexFromIniFile(const CMixiData& mixi)
+	{
+		return GetLastIndexFromIniFile( mixi.GetURL(), mixi );
 	}
 
 	/**

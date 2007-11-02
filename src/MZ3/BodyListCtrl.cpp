@@ -140,15 +140,18 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		case ACCESS_ENQUETE:
 			// コミュニティ、イベント、アンケート
 			// 既読数に応じて色づけ。
-			if (data->GetLastIndex() == -1) {
-				// 全くの未読
-				clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-			} else if (data->GetLastIndex() >= data->GetCommentCount()) {
-				// 既読
-				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-			} else {
-				// 未読分あり：新着記事
-				clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+			{
+				int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*data);
+				if (lastIndex == -1) {
+					// 全くの未読
+					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+				} else if (lastIndex >= data->GetCommentCount()) {
+					// 既読
+					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+				} else {
+					// 未読分あり：新着記事
+					clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+				}
 			}
 			break;
 

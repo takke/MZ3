@@ -125,26 +125,6 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 		data.SetURL(uri);
 	}
 
-	// last index の生成
-	{
-		// URIを分解
-		CString logId = util::GetLogIdString( data );
-		std::string idKey = util::my_wcstombs((LPCTSTR)logId);
-
-		// キー取得
-		int lastIndex = -1;
-		{
-			if (theApp.m_logfile.RecordExists(idKey, "Log") != false) {
-				// レコードが在ればそれを使う
-				lastIndex = atoi(theApp.m_logfile.GetValue(idKey, "Log").c_str());
-			}
-			else {
-				lastIndex = -1;
-			}
-		}
-		data.SetLastIndex(lastIndex);
-	}
-
 	bookmark.push_back( data );
 }
 
@@ -164,24 +144,22 @@ BOOL Bookmark::Add( CMixiData* master, CMixiDataList& bookmark )
 	data.SetName(master->GetName());
 	data.SetID(master->GetID());
 	data.SetAccessType(master->GetAccessType());
-	data.SetLastIndex(master->GetLastIndex());
 	data.SetCommentCount(master->GetCommentCount());
 	data.SetURL(master->GetURL());
 
-	TCHAR uri[256];
-	memset(uri, 0x00, sizeof(TCHAR) * 256);
+/*	CString url;
 	switch (data.GetAccessType()) {
 	case ACCESS_BBS:
-		swprintf(uri, _T("view_bbs.pl?id=%d"), data.GetID());
+		url.Format(_T("view_bbs.pl?id=%d"), data.GetID());
 		break;
 	case ACCESS_ENQUETE:
-		swprintf(uri, _T("view_enquete.pl?id=%d"), data.GetID());
+		url.Format(_T("view_enquete.pl?id=%d"), data.GetID());
 		break;
 	case ACCESS_EVENT:
-		swprintf(uri, _T("view_event.pl?id=%d"), data.GetID());
+		url.Format(_T("view_event.pl?id=%d"), data.GetID());
 		break;
 	}
-
+*/
 	data.SetURL(master->GetURL());
 
 	data.SetTitle(master->GetTitle());
