@@ -31,7 +31,8 @@ namespace kfm {
 #define ishankana(c) ((c)>=0xa0 && (c)<=0xdf)
 
 enum { UNKNOWN, SJIS, EUC, JIS }
-    icode, default_icode = UNKNOWN, ocode = DEFAULT_OCODE;
+//  icode, default_icode = UNKNOWN, ocode = DEFAULT_OCODE;
+    icode, default_icode = EUC, ocode = DEFAULT_OCODE;
 
 char *codename[] = { "UNKNOWN", "SJIS", "EUC", "JIS" };
 
