@@ -1,0 +1,54 @@
+[Info]
+Name=目次
+KeyWord=目次
+Context=IDH_HELP57
+[Date]
+<P><BR><FONT face="ＭＳ ゴシック">　●<A href="2007101519554875.htm">はじめに</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●<A href="2007101520112677.htm">改定履歴</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●<A href="20071015202046918.htm">謝辞</A></FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●画面上での操作</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015202313302.htm">画面構成について</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015203825483.htm">メイン画面</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015204217469.htm">レポート画面</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015204554227.htm">書き込み画面</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015204230561.htm">設定画面</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●キー操作</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101520254759.htm">概要</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="200710152144713.htm">キー操作について</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521525162.htm">F2 キー</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521539457.htm">エンターキー</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="200710181218241.htm">Esc / BackSpace</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●メインメニュー</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521515667.htm">メインメニュー</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071018112458678.htm">メニューバー</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071018113110234.htm">ファイル</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101811312273.htm">ウィンドウ</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071018113126550.htm">設定</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071018113132571.htm">ヘルプ</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●ini ファイル編集</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101520254759.htm">概要</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212015782.htm">タブ編集</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521202861.htm">ブックマーク編集</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212038156.htm">mz3.ini 編集</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071016114848779.htm">skin.ini 編集</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●FAQ</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212744984.htm">概要</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212856682.htm">ログインできない</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015213350238.htm">データが表示されない / 表示が更新されない</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212924953.htm">ブラウザを変更したい</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212940495.htm">文字サイズにチェックが付かない</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015212950282.htm">既読判定の色がおかしい</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521389561.htm">上部ペインに xxx が表示されない</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101911119379.htm">一覧に表示される時刻がおかしい</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101911133503.htm">マウスを使用してスクロールすると残像が残る</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015213024886.htm">なんかおかしい</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●TIPS</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214536314.htm">概要</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214558118.htm">ブラウザ連携機能</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101521468163.htm">受信バッファの設定</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214613341.htm">ログの削除</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214623257.htm">下部ペインの文字色</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="2007101893040895.htm">背景スキンを変更する</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214639295.htm">カラム幅の変更</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　　【<A href="20071015214630138.htm">バージョン情報</A>】</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　●<A href="20071015215259966.htm">既知のバグ</A></FONT></P>

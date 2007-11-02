@@ -4,6 +4,7 @@ KeyWord=書き込み画面
 Context=IDH_HELP9
 [Date]
 <P><FONT face="ＭＳ ゴシック">* レポート画面</FONT></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/11_レポート画面_トップ.jpg"><IMG height=200 src="Capture/11_レポート画面_トップ.jpg"></FONT></A></P>
 <P><FONT face="ＭＳ ゴシック">　メイン画面で選択した項目を表示します<BR>　この画面は以下の項目から成り立っています</FONT></P>
 <P><FONT face="ＭＳ ゴシック">　●タイトル<BR>　●記事リスト<BR>　●記事本文<BR>　●情報領域</FONT></P>
 <P><FONT face="ＭＳ ゴシック">** タイトル<BR>　 最上部にあるタイトルを表示させる領域です</FONT></P>

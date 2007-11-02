@@ -1,0 +1,47 @@
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/01_メイン画面_日記.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/01_メイン画面_日記.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/01_メイン画面_日記.jpg"><IMG height=200 src="Capture/01_メイン画面_日記.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/01_メイン画面_コミュニティ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/01_メイン画面_コミュニティ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/02_メイン画面_コミュニティ.jpg"><IMG height=200 src="Capture/02_メイン画面_コミュニティ.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/03_メイン画面_ニュース.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/03_メイン画面_ニュース.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/03_メイン画面_ニュース.jpg"><IMG height=200 src="Capture/03_メイン画面_ニュース.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/04_メイン画面_メッセージ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/04_メイン画面_メッセージ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/04_メイン画面_メッセージ.jpg"><IMG height=200 src="Capture/04_メイン画面_メッセージ.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/05_メイン画面_その他.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/05_メイン画面_その他.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/05_メイン画面_その他.jpg"><IMG height=200 src="Capture/05_メイン画面_その他.jpg"></FONT></A></P>
+
+
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/11_レポート画面_トップ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/11_レポート画面_トップ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/11_レポート画面_トップ.jpg"><IMG height=200 src="Capture/11_レポート画面_トップ.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/21_書き込み画面_トップ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/21_書き込み画面_トップ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/21_書き込み画面_トップ.jpg"><IMG height=200 src="Capture/21_書き込み画面_トップ.jpg"></FONT></A></P>
+
+
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/31_設定画面_ログイン.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/31_設定画面_ログイン.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/31_設定画面_ログイン.jpg"><IMG height=200 src="Capture/31_設定画面_ログイン.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/32_設定画面_一般.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/32_設定画面_一般.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/32_設定画面_一般.jpg"><IMG height=200 src="Capture/32_設定画面_一般.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/33_設定画面_表示.jpg"><IMG height=200 src="Capture/33_設定画面_表示.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/34_設定画面_操作.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/34_設定画面_操作.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/34_設定画面_操作.jpg"><IMG height=200 src="Capture/34_設定画面_操作.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/35_設定画面_レポート画面.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/35_設定画面_レポート画面.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/35_設定画面_レポート画面.jpg"><IMG height=200 src="Capture/35_設定画面_レポート画面.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/36_設定画面_取得.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/36_設定画面_取得.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/36_設定画面_取得.jpg"><IMG height=200 src="Capture/36_設定画面_取得.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/37_設定画面_ログ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/37_設定画面_ログ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/37_設定画面_ログ.jpg"><IMG height=200 src="Capture/37_設定画面_ログ.jpg"></FONT></A></P>
+
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/38_設定画面_プロクシ.jpg"><IMG style="WIDTH: 200px; HEIGHT: 200px" height=200 src="Capture/38_設定画面_プロクシ.jpg" width=200></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/38_設定画面_プロクシ.jpg"><IMG height=200 src="Capture/38_設定画面_プロクシ.jpg"></FONT></A></P>
