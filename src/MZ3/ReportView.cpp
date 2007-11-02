@@ -30,7 +30,6 @@ CReportView::CReportView()
 	, m_nKeydownRepeatCount(0)
 	, m_hwndHtml(NULL)
 {
-	m_data = NULL;
 	m_whiteBr = CreateSolidBrush(RGB(255, 255, 255));
 	m_imageState = FALSE;
 	m_posHtmlScroll = 0;
@@ -309,9 +308,7 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
 
 	// リストカラム幅の変更
-	if( m_data != NULL ) {
-		ResetColumnWidth( *m_data );
-	}
+	ResetColumnWidth( m_data );
 }
 
 HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
@@ -340,7 +337,7 @@ HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 /**
  * データ設定
  */
-void CReportView::SetData(CMixiData* data)
+void CReportView::SetData(const CMixiData& data)
 {
 	m_access = FALSE;
 	m_nochange = TRUE;
@@ -352,26 +349,26 @@ void CReportView::SetData(CMixiData* data)
 	m_list.SetRedraw(FALSE);
 
 	// カラムサイズを変更する
-	ResetColumnWidth( *data );
+	ResetColumnWidth( m_data );
 
 	// どこまでデータを取得したかを設定する
-	TRACE(_T("Address = %s\n"), m_data->GetURL());
+	TRACE(_T("Address = %s\n"), m_data.GetURL());
 
 	// URIを分解
 
-	if (m_data->GetID() == -1) {
+	if (m_data.GetID() == -1) {
 		// ここでＩＤを作る
 		CString id;
-		if (util::GetBetweenSubString( m_data->GetURL(), L"id=", L"&", id ) >= 0) {
-			data->SetID(_wtoi(id));
+		if (util::GetBetweenSubString( m_data.GetURL(), L"id=", L"&", id ) >= 0) {
+			m_data.SetID(_wtoi(id));
 		}
 	}
 
-	CString logId = util::GetLogIdString( *m_data );
+	CString logId = util::GetLogIdString( m_data );
 	m_idKey = util::my_wcstombs((LPCTSTR)logId);
 
 	// 既読位置の変更
-	m_lastIndex = m_data->GetLastIndex();
+	m_lastIndex = m_data.GetLastIndex();
 	if (m_lastIndex == -1) {
 		m_lastIndex = 0;
 	} else {
@@ -380,10 +377,10 @@ void CReportView::SetData(CMixiData* data)
 
 
 	int focusItem = 0;
-	INT_PTR count = m_data->GetChildrenSize();
+	INT_PTR count = m_data.GetChildrenSize();
 
 	if (count != 0 && m_lastIndex != 0) {
-		CMixiData& cmtData = m_data->GetChild( count-1 );
+		CMixiData& cmtData = m_data.GetChild( count-1 );
 		if (cmtData.GetCommentIndex() <= m_lastIndex && m_lastIndex != 0) {
 			m_lastIndex = cmtData.GetCommentIndex();
 		}
@@ -391,16 +388,16 @@ void CReportView::SetData(CMixiData* data)
 
 	// タイトルの設定
 	int index;
-	CString title = m_data->GetTitle();
+	CString title = m_data.GetTitle();
 	index = title.ReverseFind(_T('('));
 	if (index != -1) {
 		title = title.Left(index);
 	}
-	if (m_data->GetAccessType() != ACCESS_MYDIARY &&
-		m_data->GetAccessType() != ACCESS_MESSAGE) 
+	if (m_data.GetAccessType() != ACCESS_MYDIARY &&
+		m_data.GetAccessType() != ACCESS_MESSAGE) 
 	{
-		if( !m_data->GetName().IsEmpty() ) {
-			title.AppendFormat( _T("(%s)"), (LPCTSTR)m_data->GetName() );
+		if( !m_data.GetName().IsEmpty() ) {
+			title.AppendFormat( _T("(%s)"), (LPCTSTR)m_data.GetName() );
 		}
 	}
 	m_titleEdit.SetWindowText( title );
@@ -415,7 +412,7 @@ void CReportView::SetData(CMixiData* data)
 	TRACE(_T("コメント数 = [%d]\n"), count);
 
 	for (int i=0; i<count; i++) {
-		CMixiData& cmtData = m_data->GetChild(i);
+		CMixiData& cmtData = m_data.GetChild(i);
 
 		if (cmtData.GetImageCount() == 0) {
 			imgNo = 0;
@@ -435,15 +432,15 @@ void CReportView::SetData(CMixiData* data)
 	}
 
 	// 親をリストに表示
-	if (m_data->GetImageCount() == 0) {
+	if (m_data.GetImageCount() == 0) {
 		imgNo = 0;
 	}
 	else {
 		imgNo = 1;
 	}
 	nItem = m_list.InsertItem(0, _T("-"), imgNo);
-	m_list.SetItem(nItem, 1, LVIF_TEXT, m_data->GetAuthor(), 0, 0, 0, 0);
-	m_list.SetItemData(0, (DWORD_PTR)m_data);
+	m_list.SetItem(nItem, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
+	m_list.SetItemData(0, (DWORD_PTR)&m_data);
 
 	m_nochange = FALSE;
 
@@ -452,7 +449,7 @@ void CReportView::SetData(CMixiData* data)
 	}
 	else {
 		// 先頭のデータを取得
-		CMixiData& cmtData = m_data->GetChild(0);
+		CMixiData& cmtData = m_data.GetChild(0);
 		if (cmtData.GetCommentIndex() > m_lastIndex && m_lastIndex != 0) {
 			m_lastIndex = cmtData.GetCommentIndex();
 			focusItem = 1;
@@ -537,8 +534,7 @@ void CReportView::OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 
-	CMixiData* data;
-	data = (CMixiData*)m_list.GetItemData(pNMLV->iItem);
+	CMixiData* data = (CMixiData*)m_list.GetItemData(pNMLV->iItem);
 	m_currentData = data;
 	if (data->GetCommentIndex() > m_lastIndex) {
 		m_lastIndex = data->GetCommentIndex();
@@ -921,11 +917,9 @@ void CReportView::EndProc()
  */
 void CReportView::SaveIndex()
 {
-	if (m_data != NULL) {
-		theApp.m_logfile.SetValue(m_idKey, (const char*)util::int2str_a(m_lastIndex), "Log");
+	theApp.m_logfile.SetValue(m_idKey, (const char*)util::int2str_a(m_lastIndex), "Log");
 
-		m_data->SetLastIndex(m_lastIndex);
-	}
+	m_data.SetLastIndex(m_lastIndex);
 }
 
 /**
@@ -934,14 +928,14 @@ void CReportView::SaveIndex()
 void CReportView::OnAddBookmark()
 {
 
-	if (m_data->GetAccessType() != ACCESS_BBS &&
-		m_data->GetAccessType() != ACCESS_EVENT &&
-		m_data->GetAccessType() != ACCESS_ENQUETE) {
+	if (m_data.GetAccessType() != ACCESS_BBS &&
+		m_data.GetAccessType() != ACCESS_EVENT &&
+		m_data.GetAccessType() != ACCESS_ENQUETE) {
 			::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
 			return;
 	}
 
-	if( theApp.m_bookmarkMng.Add( m_data, theApp.m_root.GetBookmarkList() ) != FALSE ) {
+	if( theApp.m_bookmarkMng.Add( &m_data, theApp.m_root.GetBookmarkList() ) != FALSE ) {
 		::MessageBox(m_hWnd, _T("登録しました"), MZ3_APP_NAME, NULL);
 	}
 	else {
@@ -956,7 +950,7 @@ void CReportView::OnAddBookmark()
  */
 void CReportView::OnDelBookmark()
 {
-	if (theApp.m_bookmarkMng.Delete(m_data,theApp.m_root.GetBookmarkList()) != FALSE) {
+	if (theApp.m_bookmarkMng.Delete(&m_data,theApp.m_root.GetBookmarkList()) != FALSE) {
 		::MessageBox(m_hWnd, _T("削除しました"), MZ3_APP_NAME, NULL);
 	}
 	else {
@@ -976,6 +970,10 @@ void CReportView::OnLoadImage(UINT nID)
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
 	m_infoEdit.ShowWindow(SW_SHOW);
+
+	if (m_currentData==NULL) {
+		return;
+	}
 
 	CString url = m_currentData->GetImage(nID - ID_REPORT_IMAGE-1);
 	MZ3LOGGER_DEBUG( L"画像ダウンロード開始 url[" + url + L"]" );
@@ -1003,6 +1001,10 @@ void CReportView::OnLoadMovie(UINT nID)
 
 	m_infoEdit.ShowWindow(SW_SHOW);
 
+	if (m_currentData==NULL) {
+		return;
+	}
+
 	CString url = m_currentData->GetMovie(nID - ID_REPORT_MOVIE-1);
 	MZ3LOGGER_DEBUG( L"動画ダウンロード開始 url[" + url + L"]" );
 
@@ -1023,13 +1025,13 @@ void CReportView::OnLoadMovie(UINT nID)
 void CReportView::OnLoadPageLink(UINT nID)
 {
 	int idx = nID - ID_REPORT_PAGE_LINK_BASE-1;
-	if( 0 <= idx && idx <(int)m_data->m_linkPage.size() ) {
+	if( 0 <= idx && idx <(int)m_data.m_linkPage.size() ) {
 		// ok.
 	}else{
 		return;
 	}
 
-	MyLoadMixiViewPage( m_data->m_linkPage[idx] );
+	MyLoadMixiViewPage( m_data.m_linkPage[idx] );
 }
 
 bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
@@ -1064,28 +1066,24 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
 
 		// m_data の書き換え
 		{
-			// 実体はとりあえず static にしておく。
-			// m_data 自身を書き換えると「ログを開く」が異なってしまうため。
-			static CMixiData s_mixi;
 			// 初期化
-			CMixiData mixi;	// 初期化用
+			CMixiData mixi;
 
 			// データ構築
 			mixi.SetURL( link.url );
 			mixi.SetTitle( link.text );
 
 			// 名前は引き継ぐ
-			mixi.SetName( m_data->GetName() );
+			mixi.SetName( m_data.GetName() );
 
 			// アクセス種別を設定
 			mixi.SetAccessType( estimatedAccessType );
 			
-			s_mixi = mixi;
-			m_data = &s_mixi;
+			m_data = mixi;
 		}
 		theApp.m_inet.Initialize( m_hWnd, NULL );
 
-		theApp.m_accessType = m_data->GetAccessType();
+		theApp.m_accessType = m_data.GetAccessType();
 		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
 		return true;
 	default:
@@ -1101,7 +1099,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
 void CReportView::OnReloadPage()
 {
 	// アクセス種別が「ヘルプ」なら何もしない
-	switch( m_data->GetAccessType() ) {
+	switch( m_data.GetAccessType() ) {
 	case ACCESS_HELP:
 		return;
 	}
@@ -1122,8 +1120,8 @@ void CReportView::OnReloadPage()
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 
-	theApp.m_accessType = m_data->GetAccessType();
-	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data->GetURL()), _T(""), CInetAccess::FILE_HTML );
+	theApp.m_accessType = m_data.GetAccessType();
+	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
 }
 
 /**
@@ -1131,18 +1129,22 @@ void CReportView::OnReloadPage()
  */
 void CReportView::OnLoadUrl(UINT nID)
 {
+	if (m_currentData==NULL) {
+		return;
+	}
+
 	UINT idx = nID - (ID_REPORT_URL_BASE+1);
 	if( idx > m_currentData->m_linkList.size() ) {
 		return;
 	}
 
-	LPCTSTR url  = m_currentData->m_linkList[idx].url;
-	LPCTSTR text = m_currentData->m_linkList[idx].text;
-
 	// mixi 内リンクであればここでロードする。
 	if (MyLoadMixiViewPage( m_currentData->m_linkList[idx] )) {
 		return;
 	}
+
+	LPCTSTR url  = m_currentData->m_linkList[idx].url;
+	LPCTSTR text = m_currentData->m_linkList[idx].text;
 
 	// mixi 内リンクでなかったたので、ブラウザで開く等の処理を行う
 
@@ -1323,14 +1325,14 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		break;
 
 	default:
-		if( theApp.m_accessType == m_data->GetAccessType() ) {
+		if( theApp.m_accessType == m_data.GetAccessType() ) {
 			// リロード or ページ変更
 
 			CHtmlArray html;
 			html.Load( theApp.m_filepath.temphtml );
 
 			// HTML 解析
-			mixi::MyDoParseMixiHtml( m_data->GetAccessType(), *m_data, html );
+			mixi::MyDoParseMixiHtml( m_data.GetAccessType(), m_data, html );
 			util::MySetInformationText( m_hWnd, _T("wait...") );
 
 			theApp.m_pReportView->SetData( m_data );
@@ -1344,7 +1346,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// ログファイルに保存
 			if( theApp.m_optionMng.m_bSaveLog ) {
 				// 保存ファイルパスの生成
-				CString strLogfilePath = util::MakeLogfilePath( *m_data );
+				CString strLogfilePath = util::MakeLogfilePath( m_data );
 				if( !strLogfilePath.IsEmpty() ) {
 					// 保存ファイルにコピー
 					CopyFile( theApp.m_filepath.temphtml, strLogfilePath, FALSE/*bFailIfExists, 上書き*/ );
@@ -1549,6 +1551,10 @@ LRESULT CReportView::OnAccessInformation(WPARAM wParam, LPARAM lParam)
  */
 void CReportView::OnImageButton()
 {
+	if (m_currentData==NULL) {
+		return;
+	}
+
 	POINT pt;
 	RECT rect;
 	CMenu menu;
@@ -1602,10 +1608,10 @@ void CReportView::OnWriteComment()
 
 	// 書き込みビューを表示
 	CWriteView* pWriteView = ((CWriteView*)theApp.m_pWriteView);
-	if (m_data->GetAccessType() == ACCESS_MESSAGE) {
-		pWriteView->StartWriteView( WRITEVIEW_TYPE_REPLYMESSAGE, m_data );
+	if (m_data.GetAccessType() == ACCESS_MESSAGE) {
+		pWriteView->StartWriteView( WRITEVIEW_TYPE_REPLYMESSAGE, &m_data );
 	} else {
-		pWriteView->StartWriteView( WRITEVIEW_TYPE_COMMENT, m_data );
+		pWriteView->StartWriteView( WRITEVIEW_TYPE_COMMENT, &m_data );
 	}
 
 	// 引用する
@@ -1636,11 +1642,11 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 	}
 
-	if (m_data) {
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data->IsOtherDiary() );
-	}else{
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE );
-	}
+//	if (m_data) {
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data.IsOtherDiary() );
+//	}else{
+//		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE );
+//	}
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 
 	return LRESULT();
@@ -1679,8 +1685,8 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
-	theApp.m_accessType = m_data->GetAccessType();
-	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data->GetURL()), _T(""), CInetAccess::FILE_HTML );
+	theApp.m_accessType = m_data.GetAccessType();
+	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
 
 	return LRESULT();
 }
@@ -1690,7 +1696,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
  */
 void CReportView::OnOpenBrowser()
 {
-	util::OpenBrowserForUrl( m_data->GetBrowseUri() );
+	util::OpenBrowserForUrl( m_data.GetBrowseUri() );
 }
 
 /**
@@ -1740,10 +1746,10 @@ void CReportView::MyPopupReportMenu(void)
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
 	// 「書き込み」に関する処理
-	switch( m_data->GetAccessType() ) {
+	switch( m_data.GetAccessType() ) {
 	case ACCESS_MESSAGE:
 		// メッセージなら、送信箱か受信箱かによって処理が異なる
-		if( m_data->GetURL().Find( L"&box=outbox" ) != -1 ) {
+		if( m_data.GetURL().Find( L"&box=outbox" ) != -1 ) {
 			// 送信箱なので、書き込み無効
 			pcThisMenu->RemoveMenu( ID_WRITE_COMMENT, MF_BYCOMMAND);
 		}else{
@@ -1761,7 +1767,7 @@ void CReportView::MyPopupReportMenu(void)
 	}
 
 	// 外部ブログなら、書き込み無効
-	if (m_data->IsOtherDiary() != FALSE) {
+	if (m_data.IsOtherDiary() != FALSE) {
 		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
 	}
 
@@ -1774,13 +1780,13 @@ void CReportView::MyPopupReportMenu(void)
 
 	// 「ページ」の追加
 	// ページリンクがあれば追加。
-	if( !m_data->m_linkPage.empty() ) {
+	if( !m_data.m_linkPage.empty() ) {
 		// リンクがあるので追加。
 		CMenu* pSubMenu = pcThisMenu->GetSubMenu( idxPage );
 		if( pSubMenu != NULL ) {
 			// 追加
-			for (int i=0; i<(int)m_data->m_linkPage.size(); i++) {
-				const CMixiData::Link& link = m_data->m_linkPage[i];
+			for (int i=0; i<(int)m_data.m_linkPage.size(); i++) {
+				const CMixiData::Link& link = m_data.m_linkPage[i];
 				pSubMenu->AppendMenu(MF_STRING, ID_REPORT_PAGE_LINK_BASE+i+1, link.text);
 			}
 		}

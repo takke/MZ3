@@ -2445,7 +2445,7 @@ void CMZ3View::MyShowReportView(CMixiData& mixi)
 {
 	// レポートビューに遷移
 	util::MySetInformationText( m_hWnd, L"wait..." );
-	theApp.m_pReportView->SetData( &mixi );
+	theApp.m_pReportView->SetData( mixi );
 
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
 	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, (theApp.m_pWriteView->m_sendEnd == FALSE) ? TRUE : FALSE );
