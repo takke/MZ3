@@ -519,7 +519,16 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			::SendMessage(theApp.m_pMainView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
 		}else{
 			::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
-			::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_RELOAD, NULL, NULL);
+
+			switch (m_writeViewType ) {
+			case WRITEVIEW_TYPE_REPLYMESSAGE:
+			case WRITEVIEW_TYPE_NEWMESSAGE:
+				// メッセージならリロードしない
+				break;
+			default:
+				::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_RELOAD, NULL, NULL);
+				break;
+			}
 		}
 	}
 	else {
