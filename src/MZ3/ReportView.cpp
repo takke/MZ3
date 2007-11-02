@@ -1441,7 +1441,8 @@ LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 	msg.Format( 
 		L"%s\n\n"
 		L"å¥àˆÅF%s", smsg, theApp.m_inet.GetErrorMessage() );
-	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
+//	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
+	MZ3LOGGER_ERROR( msg );
 
 	m_access = FALSE;
 	m_infoEdit.ShowWindow(SW_HIDE);
