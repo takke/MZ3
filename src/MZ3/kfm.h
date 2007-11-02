@@ -91,15 +91,16 @@ private:
 	kf_buf_reader	inbuf;
 	kf_buf_writer	outbuf;
 public:
-//	kfm( FILE* fp_in, FILE* fp_out )
-//		: infile(fp_in), outfile(fp_out)
 	kfm( const kf_buf_type& buf_in, kf_buf_type& buf_out )
-		: inbuf(buf_in), outbuf(buf_out), default_icode(UNKNOWN), ocode(DEFAULT_OCODE)
+		: inbuf(buf_in)
+		, outbuf(buf_out)
+		, verbose(0)
+		, mime(0)
+		, text(0)
+		, quote(0)
+		, default_icode(UNKNOWN)
+		, ocode(DEFAULT_OCODE)
 	{
-		verbose = 0;
-		mime = 0;
-		text = 0;
-		quote = 0;
 	}
 
 	virtual ~kfm()
@@ -108,8 +109,6 @@ public:
 
 public:
 	void error(char *format, ...);
-
-//	void setInBuffer( kf_buf_type* buf ) {}
 
 	void tosjis(void);
 	void tojis(void);

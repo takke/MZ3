@@ -24,9 +24,9 @@ namespace kfm {
 /* ‚¢‚í‚ä‚é”¼ŠpƒJƒi */
 #define ishankana(c) ((c)>=0xa0 && (c)<=0xdf)
 
-char *codename[] = { "UNKNOWN", "SJIS", "EUC", "JIS" };
+static char *codename[] = { "UNKNOWN", "SJIS", "EUC", "JIS" };
 
-unsigned char mimetbl[256] = {
+static unsigned char mimetbl[256] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
