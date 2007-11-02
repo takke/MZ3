@@ -374,7 +374,7 @@ public:
 					CString after;
 					util::GetAfterSubString( line, L"list_community.pl", after );
 
-					CString id;					
+					CString id;
 					if( util::GetBetweenSubString( after, L"id=", L"\"", id ) == -1 ) {
 						MZ3LOGGER_ERROR( L"list_community.pl ‚Ìˆø”‚É id w’è‚ª‚ ‚è‚Ü‚¹‚ñB line[" + line + L"], after[" + after + L"]" );
 					}else{
@@ -559,9 +559,7 @@ public:
 						data.SetURL( uri );
 
 						// ‚h‚c‚ğİ’è
-						CString id;
-						util::GetBetweenSubString( uri, L"id=", L"&", id );
-						data.SetID( _wtoi(id) );
+						data.SetID( MixiUrlParser::GetID(uri) );
 
 						i = j;
 						break;
@@ -653,9 +651,7 @@ public:
 								data.SetURL( url );
 								
 								// ‚h‚c‚ğİ’è
-								CString id;
-								util::GetBetweenSubString( url, L"id=", L"&", id );
-								data.SetID(_wtoi(id));
+								data.SetID( MixiUrlParser::GetID(url) );
 
 								// –{•¶ƒvƒŒƒrƒ…[
 								CString target = L"";
@@ -783,9 +779,7 @@ public:
 					data.SetURL(url);
 
 					// ‚h‚c‚ğİ’è
-					CString id;
-					util::GetBetweenSubString( url, L"id=", L"&", id );
-					data.SetID(_wtoi(id));
+					data.SetID( MixiUrlParser::GetID(url) );
 
 					// –¼‘O
 					CString name;
@@ -903,9 +897,7 @@ public:
 					MZ3LOGGER_DEBUG( L"URL : " + data.GetURL() );
 
 					// ‚h‚c‚ğİ’è
-					CString id;
-					util::GetBetweenSubString( data.GetURL(), L"id=", L"&", id );
-					data.SetID(_wtoi(id));
+					data.SetID( MixiUrlParser::GetID(url) );
 
 					// –¼‘O
 					CString author;
@@ -1395,9 +1387,7 @@ public:
 				data.SetAccessType( util::EstimateAccessTypeByUrl(href) );
 
 				// ‚h‚c‚ğİ’è
-				CString id;
-				util::GetBetweenSubString( href, L"id=", L"&", id );
-				data.SetID(_wtoi(id));
+				data.SetID( MixiUrlParser::GetID(href) );
 
 				// ƒRƒ~ƒ…ƒjƒeƒB–¼
 				CString communityName;

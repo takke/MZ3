@@ -159,6 +159,37 @@ inline int GetBeforeSubString( const CString& str, LPCTSTR szKey, CString& resul
 }
 
 /**
+ * URL から GET パラメータを取得する。
+ *
+ * 取得できない場合は空文字列を返す。
+ */
+inline CString GetParamFromURL( const CString& url, LPCTSTR paramName )
+{
+	// ? 以降を抽出する
+	int idxQuestion = url.Find( '?' );
+	if (idxQuestion == -1) {
+		return L"";
+	}
+	
+	// "{paramName}=" を探索する
+	CString pattern = paramName;
+	pattern += L"=";
+	int idxStart = url.Find( pattern, idxQuestion+1 );
+	if (idxStart == -1) {
+		return L"";
+	}
+	// '&' があれば、そこまでを抽出。なければ全てを抽出。
+	int idxEnd = url.Find( '&', idxStart + pattern.GetLength() );
+	if (idxEnd == -1) {
+		// '&' なし
+		return url.Mid( idxStart + pattern.GetLength() );
+	} else {
+		// '&' あり
+		return url.Mid( idxStart + pattern.GetLength(), idxEnd - (idxStart + pattern.GetLength()) );
+	}
+}
+
+/**
  * 数値を3桁区切り文字列に変換する
  */
 inline CString int2comma_str(int n)

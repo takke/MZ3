@@ -2,6 +2,7 @@
 
 #include "MyRegex.h"
 #include "HtmlArray.h"
+#include "util_base.h"
 
 /// mixi 用HTMLパーサ
 namespace mixi {
@@ -15,28 +16,21 @@ public:
 	 *
 	 * view_diary.pl?id=xxx&owner_id=xxx
 	 */
-	static CString GetOwnerID( CString url )
+	static CString GetOwnerID( const CString& url )
 	{
-		CString id;
-		util::GetAfterSubString( url, _T("owner_id="), id );
-
-		// '&' が含まれていれば、その後ろを削除する
-		if( id.Find( '&' ) != -1 ) {
-			util::GetBeforeSubString( id, L"&", id );
-		}
-
+		CString id = util::GetParamFromURL( url, L"owner_id" );
 		return id;
 	}
 
 	/**
 	 * URL からIDを取得する。
 	 *
-	 * view_community.pl?id=1231285
+	 * view_community.pl?id=1231285 => 1231285
+	 * view_diary.pl?id=xxxx&owner_id=yyyy => xxxx
 	 */
-	static int GetID( CString url )
+	static int GetID( const CString& url )
 	{
-		CString id;
-		util::GetAfterSubString( url, _T("id="), id );
+		CString id = util::GetParamFromURL( url, L"id" );
 		return _wtoi(id);
 	}
 
@@ -45,11 +39,11 @@ public:
 	 *
 	 * http://mixi.jp/view_bbs.pl?id=xxx&comment_count=yyy&comm_id=zzz
 	 */
-	static int GetCommentCount(LPCTSTR uri)
+	static int GetCommentCount(LPCTSTR url)
 	{
 		// "comment_count="と"&"に囲まれた文字列を数値変換したもの。
-		CString strCommentCount;
-		if( util::GetBetweenSubString( uri, L"comment_count=", L"&", strCommentCount ) == -1 ) {
+		CString strCommentCount = util::GetParamFromURL( url, L"comment_count" );
+		if (strCommentCount.IsEmpty()) {
 			// not found.
 			return -1;
 		}
