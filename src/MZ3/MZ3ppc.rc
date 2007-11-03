@@ -69,6 +69,9 @@ IDR_MAINFRAME_WIN32     ICON                    "res\\MZ4.ico"
 IDR_MZ3TYPE             ICON                    "res\\MZ3Doc.ico"
 IDI_NO_PHOTO_ICON       ICON                    "res\\NoPhotoIcon.ico"
 IDI_PHOTO_ICON          ICON                    "res\\photo.ico"
+IDI_TOPIC_ICON          ICON                    "res\\topic.ico"
+IDI_EVENT_ICON          ICON                    "res\\event.ico"
+IDI_ENQUETE_ICON        ICON                    "res\\enquete.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

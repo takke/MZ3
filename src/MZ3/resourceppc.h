@@ -33,6 +33,9 @@
 #define IDR_MENU1                       152
 #define IDR_SKIN_MENU                   152
 #define IDD_USER_DIALOG                 154
+#define IDI_TOPIC_ICON                  157
+#define IDI_EVENT_ICON                  158
+#define IDI_ENQUETE_ICON                159
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -324,7 +327,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        157
+#define _APS_NEXT_RESOURCE_VALUE        158
 #define _APS_NEXT_COMMAND_VALUE         32975
 #define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           117
