@@ -34,7 +34,6 @@ END_MESSAGE_MAP()
 
 void COptionSheet::SetPage()
 {
-	AddPage( &m_tabUser );		// ログインタブ
 	AddPage( &m_tabGeneral );	// 一般タブ
 	AddPage( &m_tabDisplay );	// 表示タブ
 	AddPage( &m_tabUi );		// 操作タブ

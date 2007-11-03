@@ -1,6 +1,5 @@
 #pragma once
 
-#include "OptionTabUser.h"
 #include "OptionTabProxy.h"
 #include "OptionTabGetPage.h"
 #include "OptionTabGeneral.h"
@@ -26,7 +25,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	COptionTabUser		m_tabUser;		///< ログインタブ
 	COptionTabGeneral	m_tabGeneral;	///< 一般タブ
 	COptionTabDisplay	m_tabDisplay;	///< 表示タブ
 	COptionTabUI		m_tabUi;		///< 操作タブ

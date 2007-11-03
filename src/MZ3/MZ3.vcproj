@@ -2080,10 +2080,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\OptionTabUser.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\QuoteDlg.cpp"
 					>
 				</File>
@@ -2331,10 +2327,6 @@
 				</File>
 				<File
 					RelativePath=".\OptionTabUI.h"
-					>
-				</File>
-				<File
-					RelativePath=".\OptionTabUser.h"
 					>
 				</File>
 				<File
