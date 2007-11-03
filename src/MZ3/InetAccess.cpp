@@ -496,9 +496,9 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		LPTSTR user  = const_cast<LPTSTR>(theApp.m_optionMng.GetProxyUser());
 		LPTSTR pass  = const_cast<LPTSTR>(theApp.m_optionMng.GetProxyPassword());
 
-		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY, proxy, sizeof(proxy));
-		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_USERNAME, user, sizeof(user));
-		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_PASSWORD, pass, sizeof(pass));
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY, proxy, lstrlen(proxy));
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_USERNAME, user, lstrlen(user));
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_PASSWORD, pass, lstrlen(pass));
 	}
 
 	// リクエスト送信
