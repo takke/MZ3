@@ -76,12 +76,6 @@ protected:
 class MixiContentParser : public MixiParserBase
 {
 public:
-	/** deprecated... */
-	static void GetPostAddress(int sIndex, int eIndex, const CHtmlArray& html_, CMixiData& data_)
-	{
-		parsePostURL( sIndex, data_, html_ );
-	}
-
 	/**
 	 * 記事投稿用URL等の取得
 	 */
@@ -725,79 +719,80 @@ public:
 
 		INT_PTR count = html_.GetCount();
 
-		BOOL findFlag = FALSE;
-		BOOL dataFind = FALSE;
+		// 日記開始フラグの探索
+		int iLine = 100;
+		for (; iLine<count; iLine++) {
+			const CString& line = html_.GetAt(iLine);
 
-		for (int i=170; i<count; i++) {
+			if (util::LineHasStringsNoCase( line, _T("newFriendDiaryArea"))) {
+				// 日記開始
+				break;
+			}
+		}
 
-			const CString& line = html_.GetAt(i);
+		// 各日記項目の取得
+		// 日記が開始していなければ最終行なのでループしない。
+		bool bDataFound   = false;
+		for (; iLine<count; iLine++) {
+			const CString& line = html_.GetAt(iLine);
 
-			if (findFlag == FALSE) {
-				if (line.Find(_T("NewFriendDiaryArea")) != -1) {
-					findFlag = TRUE;
-				}
+			// 「次を表示」、「前を表示」のリンクを抽出する
+			if( parseNextBackLink( nextLink, backLink, line ) ) {
 				continue;
 			}
-			else {
 
-				// 「次を表示」、「前を表示」のリンクを抽出する
-				if( parseNextBackLink( nextLink, backLink, line ) ) {
+			if (util::LineHasStringsNoCase( line, L"<dt>", L"</dt>" ) ) {
+
+				bDataFound = true;
+
+				CMixiData data;
+				data.SetAccessType(ACCESS_DIARY);
+
+				//--- 時刻の抽出
+				//<dt>2007年10月02日&nbsp;22:22</dt>
+				ParserUtil::ParseDate(line, data);
+
+				//--- 見出しの抽出
+				//<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
+				// or
+				//<dd><a href="view_diary.pl?url=xxx&owner_id=xxx">タイトル</a> (なまえ)
+				iLine++;
+				const CString& line2 = html_.GetAt(iLine);
+
+				CString after;
+				util::GetAfterSubString( line2, L"<a", after );
+				CString title;
+				util::GetBetweenSubString( after, L">", L"<", title );
+				data.SetTitle(title);
+
+				// ＵＲＩ
+				if (util::LineHasStringsNoCase( line2, L"list_diary.pl" ) ) {
+					iLine += 5;
 					continue;
 				}
+				CString url;
+				util::GetBetweenSubString( after, L"\"", L"\"", url );
+				data.SetURL(url);
 
-				if (util::LineHasStringsNoCase( line, L"<dt>", L"</dt>" ) ) {
+				// ＩＤを設定
+				data.SetID( MixiUrlParser::GetID(url) );
 
-					dataFind = TRUE;
-
-					CMixiData data;
-					data.SetAccessType(ACCESS_DIARY);
-
-					//--- 時刻の抽出
-					//<dt>2007年10月02日&nbsp;22:22</dt>
-					ParserUtil::ParseDate(line, data);
-
-					//--- 見出しの抽出
-					//<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
-					// or
-					//<dd><a href="view_diary.pl?url=xxx&owner_id=xxx">タイトル</a> (なまえ)
-					i++;
-					const CString& line2 = html_.GetAt(i);
-
-					CString after;
-					util::GetAfterSubString( line2, L"<a", after );
-					CString title;
-					util::GetBetweenSubString( after, L">", L"<", title );
-					data.SetTitle(title);
-
-					// ＵＲＩ
-					if (util::LineHasStringsNoCase( line2, L"list_diary.pl" ) ) {
-						i += 5;
-						continue;
-					}
-					CString url;
-					util::GetBetweenSubString( after, L"\"", L"\"", url );
-					data.SetURL(url);
-
-					// ＩＤを設定
-					data.SetID( MixiUrlParser::GetID(url) );
-
-					// 名前
-					CString name;
-					if (util::GetBetweenSubString( line2, L"</a> (", L")<div", name) < 0) {
-						util::GetBetweenSubString( line2, L"</a> (", L")", name);
-					}
-
-					data.SetName(name);
-					data.SetAuthor(name);
-
-					out_.push_back( data );
-					i += 5;
-				}
-				else if (line.Find(_T("/newFriendDiaryArea")) != -1 && dataFind != FALSE) {
-					// 終了タグ発見
-					break;
+				// 名前
+				CString name;
+				if (util::GetBetweenSubString( line2, L"</a> (", L")<div", name) < 0) {
+					// 失敗したので ")" までを抽出
+					util::GetBetweenSubString( line2, L"</a> (", L")", name);
 				}
 
+				data.SetName(name);
+				data.SetAuthor(name);
+
+				out_.push_back( data );
+				iLine += 5;
+			}
+			else if (bDataFound && line.Find(_T("pageNavigation01")) != -1) {
+				// 終了タグ発見
+				break;
 			}
 		}
 
@@ -1239,7 +1234,7 @@ private:
 				if( util::LineHasStringsNoCase( str, L"add_comment.pl" ) ||	// コメントなし
 					util::LineHasStringsNoCase( str, L"<!--/comment-->" ) ) // コメント全体の終了タグ発見
 				{
-					GetPostAddress(i, eIndex, html_, data_);
+					parsePostURL( i, data_, html_ );
 					return -1;
 				}
 
@@ -2320,44 +2315,31 @@ private:
 	 */
 	static int parseEnqueteComment(int sIndex, CMixiData* data, const CHtmlArray& html_ )
 	{
-		CString str;
-
-		int eIndex = html_.GetCount();
-		int retIndex = eIndex;
+		int count = html_.GetCount();
+		int retIndex = count;
 
 		CMixiData cmtData;
 		BOOL findFlag = FALSE;
-		CString buf;
-		CString comment;
-		int index;
 
-		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
+		for (int i=sIndex; i<count; i++) {
+			const CString& str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
 
-				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1) {
-					// コメントなし
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if (str.Find(_T("<!-- COMMENT: end -->")) != -1) {
+				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1 ||
+				    str.Find(_T("<!-- COMMENT: end -->")) != -1 ||
+				    str.Find(_T("add_enquete_comment.pl")) != -1) 
+				{
 					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
+					parsePostURL( i, *data, html_ );
 					retIndex = -1;
 					break;
-				}
-				else if (str.Find(_T("add_enquete_comment.pl")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}else{
+
+				} else {
 
 					const CString& line = html_.GetAt(i);
-					//コメント番号を取得
-					// <label for="commentCheck01">37</label>
+					// コメント番号を取得
+					//<label for="commentCheck01">37</label>
 					if( util::LineHasStringsNoCase( line, L"\">", L"</label>")) {
 						CString number;
 						util::GetAfterSubString( line, L"<label", number );
@@ -2367,13 +2349,13 @@ private:
 						cmtData.SetCommentIndex(_wtoi(number));
 					}
 					
-					//日付を取得
+					// 日付を取得
 					//<span class="date">2007年10月07日 11:25</span></dt>
 					if( util::LineHasStringsNoCase( line, L"date\">", L"</span>")) {
 						ParserUtil::ParseDate(line, cmtData);
 					}
 					
-					//名前を取得
+					// 名前を取得
 					//<dt><a href="show_friend.pl?id=xxxxxx">なまえ</a></dt>
 					if( util::LineHasStringsNoCase( line, L"<dt>", L"</dt>")) {
 						CString Author;
@@ -2389,13 +2371,14 @@ private:
 
 				if( util::LineHasStringsNoCase( str, L"<dd>") ) {
 					// コメントコメント本文取得
-					str = html_.GetAt(i);
+					const CString& str = html_.GetAt(i);
 
 					// ----------------------------------------
 					// アンケートのパターン
 					// ----------------------------------------
 					cmtData.AddBody(_T("\r\n"));
 
+					CString buf;
 					util::GetAfterSubString( str, L">", buf );
 
 					if( util::GetBeforeSubString( buf, L"</dd>", buf ) > 0 ) {
@@ -2409,14 +2392,15 @@ private:
 					// それ以外の場合
 					ParserUtil::AddBodyWithExtract( cmtData, buf );
 
-					while( i<eIndex ) {
+					while( i<count ) {
 						i++;
 						const CString& line  = html_.GetAt(i);
-						if ((index = line.Find(_T("</dd>"))) != -1) {
+						int index = line.Find(_T("</dd>"));
+						if (index != -1) {
 							// 終了タグ発見
 							buf = line.Left(index);
 							ParserUtil::AddBodyWithExtract( cmtData, buf );
-							retIndex = i + 5;
+							retIndex = i + 1;
 							break;
 						}
 
@@ -2454,8 +2438,6 @@ public:
 		// 名前を初期化
 		data_.SetName(L"");
 
-		CString buf;
-
 		INT_PTR lastLine = html_.GetCount();
 
 		int iLine=100;
@@ -2481,7 +2463,7 @@ public:
 				util::GetBetweenSubString( line2, L"<dd>", L"</dd>", date );
 				//ParserUtil::ParseDate(date, cmtData);
 				//data_.SetDate(date);
-				buf = _T("開催日時 ") + date;
+				CString buf = _T("開催日時 ") + date;
 				data_.AddBody(_T("\r\n"));
 				data_.AddBody(buf);
 				data_.AddBody(_T("\r\n"));
@@ -2496,7 +2478,7 @@ public:
 				const CString& line2 = html_.GetAt(iLine+1);
 				CString area;
 				util::GetBetweenSubString( line2, L"<dd>", L"</dd>", area );
-				buf = _T("開催場所 ") + area;
+				CString buf = _T("開催場所 ") + area;
 				data_.AddBody(_T("\r\n"));
 				data_.AddBody(buf);
 				data_.AddBody(_T("\r\n"));
@@ -2526,7 +2508,7 @@ public:
 				const CString& line2 = html_.GetAt(iLine+1);
 				CString limit;
 				util::GetBetweenSubString( line2, L"<dd>", L"</dd>", limit );
-				buf = _T("募集期限 ") + limit;
+				CString buf = _T("募集期限 ") + limit;
 				data_.AddBody(_T("\r\n"));
 				data_.AddBody(buf);
 				data_.AddBody(_T("\r\n"));
@@ -2541,7 +2523,7 @@ public:
 				const CString& line2 = html_.GetAt(iLine+1);
 				CString people;
 				util::GetBetweenSubString( line2, L"<dd>", L"</dd>", people );
-				buf = _T("参加者 ") + people;
+				CString buf = _T("参加者 ") + people;
 				data_.AddBody(_T("\r\n"));
 				data_.AddBody(buf);
 				data_.AddBody(_T("\r\n"));
@@ -2626,40 +2608,27 @@ private:
 	 */
 	static int parseEventComment(int sIndex, CMixiData* data, const CHtmlArray& html_ )
 	{
-		CString str;
-
-		int eIndex = html_.GetCount();
-		int retIndex = eIndex;
+		int count = html_.GetCount();
+		int retIndex = count;
 
 		CMixiData cmtData;
 		BOOL findFlag = FALSE;
-		CString buf;
-		CString comment;
-		int index;
 
-		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
+		for (int i=sIndex; i<count; i++) {
+			const CString& str = html_.GetAt(i);
 
 			if (findFlag == FALSE) {
 
-				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1) {
-					// コメントなし
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}
-				else if (str.Find(_T("<!-- COMMENT: end -->")) != -1) {
+				if (str.Find(_T("<!-- ADD_COMMENT: start -->")) != -1 ||
+				    str.Find(_T("<!-- COMMENT: end -->")) != -1 ||
+				    str.Find(_T("add_event_comment.pl")) != -1)
+				{
 					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
+					parsePostURL( i, *data, html_ );
 					retIndex = -1;
 					break;
-				}
-				else if (str.Find(_T("add_event_comment.pl")) != -1) {
-					// コメント全体の終了タグ発見
-					GetPostAddress(i, eIndex, html_, *data);
-					retIndex = -1;
-					break;
-				}else{
+				
+				} else {
 
 					const CString& line = html_.GetAt(i);
 					//コメント番号を取得
@@ -2677,7 +2646,7 @@ private:
 						}
 						// &nbsp; を消す
 						while(number.Replace(L"&nbsp;",L"")) {}
-						cmtData.SetCommentIndex(_wtoi(number));
+						cmtData.SetCommentIndex( _wtoi(number) );
 					}
 					
 					//日付を取得
@@ -2702,34 +2671,36 @@ private:
 
 				if( util::LineHasStringsNoCase( str, L"<dd>") ) {
 					// コメントコメント本文取得
-					str = html_.GetAt(i);
+					const CString& str = html_.GetAt(i);
 
 					// ----------------------------------------
 					// イベントのパターン
 					// ----------------------------------------
 					cmtData.AddBody(_T("\r\n"));
 
+					CString buf;
 					util::GetAfterSubString( str, L">", buf );
 
 					if( util::GetBeforeSubString( buf, L"</dd>", buf ) > 0 ) {
 
 						// 終了タグがあった場合
 						ParserUtil::AddBodyWithExtract( cmtData, buf );
-						retIndex = i + 5;
+						retIndex = i + 1;
 						break;
 					}
 
 					// それ以外の場合
 					ParserUtil::AddBodyWithExtract( cmtData, buf );
 
-					while( i<eIndex ) {
+					while( i<count ) {
 						i++;
 						const CString& line  = html_.GetAt(i);
-						if ((index = line.Find(_T("</dd>"))) != -1) {
+						int index = line.Find(_T("</dd>"));
+						if (index != -1) {
 							// 終了タグ発見
 							buf = line.Left(index);
 							ParserUtil::AddBodyWithExtract( cmtData, buf );
-							retIndex = i + 5;
+							retIndex = i + 1;
 							break;
 						}
 
