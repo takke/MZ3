@@ -5,7 +5,6 @@
 #include "MZ3.h"
 #include "OptionTabGeneral.h"
 #include "ReportView.h"
-#include "ChooseFontDlg.h"
 #include "util.h"
 
 // COptionTabGeneral ダイアログ
@@ -44,6 +43,10 @@ BOOL COptionTabGeneral::OnInitDialog()
 	// mixi モバイル対応
 	CheckDlgButton( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK, 
 		theApp.m_optionMng.m_bConvertUrlForMixiMobile ? BST_CHECKED : BST_UNCHECKED );
+#ifndef WINCE
+	// Win32 では無効
+	GetDlgItem( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK )->EnableWindow( FALSE );
+#endif
 
 	return TRUE;
 }

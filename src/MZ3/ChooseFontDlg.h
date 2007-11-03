@@ -30,4 +30,5 @@ protected:
 	virtual void OnOK();
 public:
 	afx_msg void OnLvnKeydownFontList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkFontList(NMHDR *pNMHDR, LRESULT *pResult);
 };

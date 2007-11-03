@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(CChooseFontDlg, CDialog)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_RETURN, IDC_FONT_LIST, &CChooseFontDlg::OnNMReturnFontList)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_FONT_LIST, &CChooseFontDlg::OnLvnKeydownFontList)
+	ON_NOTIFY(NM_DBLCLK, IDC_FONT_LIST, &CChooseFontDlg::OnNMDblclkFontList)
 END_MESSAGE_MAP()
 
 /// 各フォントに対するコールバック
@@ -56,7 +57,6 @@ BOOL CChooseFontDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  ここに初期化を追加してください
 	// フォント
 //	m_FontList.SetFont( &theApp.m_font );
 
@@ -81,6 +81,11 @@ BOOL CChooseFontDlg::OnInitDialog()
 			break;
 		}
 	}
+
+	// Win32 では画面サイズ変更
+#ifndef WINCE
+	SetWindowPos( NULL, 0, 0, 300, 400, SWP_NOMOVE | SWP_NOZORDER );
+#endif
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
@@ -117,9 +122,15 @@ void CChooseFontDlg::OnOK()
 void CChooseFontDlg::OnLvnKeydownFontList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
-	// TODO: ここにコントロール通知ハンドラ コードを追加します。
 	if (pLVKeyDow->wVKey == VK_RETURN) {
 		OnOK();
 	}
+	*pResult = 0;
+}
+
+void CChooseFontDlg::OnNMDblclkFontList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	OnOK();
+
 	*pResult = 0;
 }

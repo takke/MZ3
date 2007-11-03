@@ -37,12 +37,24 @@ BOOL COptionTabUI::OnInitDialog()
 
 	// 左ソフトキーの有効・無効
 	CheckDlgButton( IDC_USE_LEFTSOFTKEY_CHECK, theApp.m_optionMng.m_bUseLeftSoftKey ? BST_CHECKED : BST_UNCHECKED );
+#ifndef WINCE
+	// Win32 では無効
+	GetDlgItem( IDC_USE_LEFTSOFTKEY_CHECK )->EnableWindow( FALSE );
+#endif
 
 	// 長押し判定時間
 	SetDlgItemText( IDC_LONG_RETURN_RANGE_MSEC_EDIT, util::int2str(theApp.m_optionMng.m_longReturnRangeMSec) );
+#ifndef WINCE
+	// Win32 では無効
+	GetDlgItem( IDC_LONG_RETURN_RANGE_MSEC_EDIT )->EnableWindow( FALSE );
+#endif
 
 	// Xcrawl 誤動作防止機能
 	CheckDlgButton( IDC_USE_XCRAWL_CANCELER_CHECK, theApp.m_optionMng.m_bUseXcrawlExtension ? BST_CHECKED : BST_UNCHECKED );
+#ifndef WINCE
+	// Win32 では無効
+	GetDlgItem( IDC_USE_XCRAWL_CANCELER_CHECK )->EnableWindow( FALSE );
+#endif
 
 	return TRUE;
 }
