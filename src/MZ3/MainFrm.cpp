@@ -17,8 +17,6 @@
 #define new DEBUG_NEW
 #endif
 
-const DWORD dwAdornmentFlags = 0; // [終了] ボタン
-
 // CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
@@ -108,7 +106,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		if (!m_wndCommandBar.Create(this) ||
 			!m_wndCommandBar.InsertMenuBar(IDR_MAINFRAME) ||
-			!m_wndCommandBar.AddAdornments(dwAdornmentFlags) ||
+			!m_wndCommandBar.AddAdornments(CMDBAR_OK) ||
 			!m_wndCommandBar.LoadToolBar(id_toolbar)) {
 				MZ3LOGGER_FATAL(L"CommandBar の作成に失敗しました\n");
 				return -1;      // 作成できませんでした。
