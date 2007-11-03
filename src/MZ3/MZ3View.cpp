@@ -2784,8 +2784,6 @@ bool CMZ3View::PopupBodyMenu(void)
 /// トピック一覧の閲覧準備
 bool CMZ3View::PrepareViewBbsList(void)
 {
-	CMixiData& bodyItem = GetSelectedBodyItem();
-
 	// グループにコミュニティ専用項目を追加する。既にあれば取得する。
 	CCategoryItem* pCategoryItem = NULL;
 	for( u_int i=0; i<m_selGroup->categories.size(); i++ ) {
@@ -2805,6 +2803,11 @@ bool CMZ3View::PrepareViewBbsList(void)
 
 	// 初期化
 	
+	CMixiData& bodyItem = GetSelectedBodyItem();
+	if (bodyItem.GetAccessType() == ACCESS_INVALID) {
+		return false;
+	}
+
 	// URL はボディのアイテムからidを引き継ぐ。
 	CString url;
 	url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(bodyItem.GetURL()) );
