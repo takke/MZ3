@@ -26,6 +26,7 @@ public:
 	CString m_strButton2;
 	CString m_strButtonCancel;
 	CString m_strMessage;
+	CString m_strTitle;
 
 // ダイアログ データ
 	enum { IDD = IDD_COMMON_SELECT_DIALOG };
@@ -41,4 +42,8 @@ public:
 	bool SetButtonText(CCommonSelectDlg::BUTTONCODE buttoncode, LPCTSTR szText);
 	bool SetMessage(LPCTSTR szMessage);
 	virtual BOOL OnInitDialog();
+	void SetTitle(LPCTSTR szTitle)
+	{
+		m_strTitle = szTitle;
+	}
 };

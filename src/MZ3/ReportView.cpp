@@ -1152,6 +1152,7 @@ void CReportView::OnLoadUrl(UINT nID)
 		L"%s", url );
 
 	CCommonSelectDlg dlg;
+	dlg.SetTitle( L"オープン方法の選択" );
 	dlg.SetMessage( msg );
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"ブラウザで開く" );
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, MZ3_APP_NAME L"でダウンロード" );
@@ -1287,6 +1288,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 					, strFilename );
 
 				CCommonSelectDlg dlg;
+				dlg.SetTitle( L"オープン方法の選択" );
 				dlg.SetMessage( msg );
 				dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"再ダウンロードする" );
 				dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"ダウンロード済みファイルを開く" );

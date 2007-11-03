@@ -340,6 +340,7 @@ void CForcedDebugDlg::OnOK()
 			L"（再起動後に有効になります）\n" );
 
 		CCommonSelectDlg dlg;
+		dlg.SetTitle( L"絵文字表示モードの選択" );
 		dlg.SetMessage( msg );
 		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"絵文字表示モードにする" );
 		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"従来のモードにする" );
