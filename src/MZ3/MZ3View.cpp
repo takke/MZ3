@@ -1185,6 +1185,13 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 
+	// コミュニティの場合は、トピック一覧を表示する。
+	// （暫定対応）
+	if (data->GetAccessType() == ACCESS_COMMUNITY) {
+		OnViewBbsList();
+		return;
+	}
+
 	AccessProc(data, util::CreateMixiUrl(data->GetURL()));
 }
 
@@ -2784,7 +2791,7 @@ bool CMZ3View::PopupBodyMenu(void)
 /// トピック一覧の閲覧準備
 bool CMZ3View::PrepareViewBbsList(void)
 {
-	// グループにコミュニティ専用項目を追加する。既にあれば取得する。
+	// グループ(タブ)にコミュニティ専用項目を追加する。既にあれば取得する。
 	CCategoryItem* pCategoryItem = NULL;
 	for( u_int i=0; i<m_selGroup->categories.size(); i++ ) {
 		CCategoryItem& category = m_selGroup->categories[i];
