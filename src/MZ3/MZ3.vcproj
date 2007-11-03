@@ -2369,6 +2369,14 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\res\enquete.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\event.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\MZ3.ico"
 				>
 			</File>
@@ -2406,6 +2414,10 @@
 			</File>
 			<File
 				RelativePath=".\res\toolbarQVGA.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\topic.ico"
 				>
 			</File>
 		</Filter>

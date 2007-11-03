@@ -327,6 +327,14 @@ void CMZ3View::OnInitialUpdate()
 		// スタイルの更新
 		m_bodyList.ModifyStyle(0, dwStyle);
 
+		// アイコンリストの作成
+		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 4, 0);
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );	// ダミーアイコン
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
+		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
 		switch( theApp.GetDisplayMode() ) {
@@ -366,6 +374,21 @@ void CMZ3View::OnInitialUpdate()
 	// インターバルタイマー生成
 	UINT result = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
 //	DWORD e = ::GetLastError();
+}
+
+/**
+ * ボディリストのアイコンのインデックスを取得する
+ */
+inline int MyGetBodyListIconIndex( const CMixiData& mixi )
+{
+	int iconIndex = 0;
+	switch (mixi.GetAccessType()) {
+	case ACCESS_BBS:		iconIndex = 1;	break;
+	case ACCESS_EVENT:		iconIndex = 2;	break;
+	case ACCESS_ENQUETE:	iconIndex = 3;	break;
+	default:				iconIndex = 0;	break;	// アイコンなし
+	}
+	return iconIndex;
 }
 
 /**
@@ -1127,14 +1150,33 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		break;
 	}
 
-	// アイテムの追加
+	// アイコンの表示・非表示の制御
+	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
+	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
+	bool bUseIcon = false;
 	INT_PTR count = body.size();
+	for (int i=0; i<count; i++) {
+		int iconIndex = MyGetBodyListIconIndex(body[i]);
+		if (iconIndex > 0) {
+			// アイコンありなので表示
+			bUseIcon = true;
+			break;
+		}
+	}
+	// アイコン表示・非表示設定
+	m_bodyList.MyEnableIcon( bUseIcon );
+
+	// アイテムの追加
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
 
 		// １カラム目
+		// アイコンのインデックスを種別により設定する
+		int iconIndex = MyGetBodyListIconIndex(*data);
+
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
-		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType) );
+		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType), iconIndex );
+
 		// ２カラム目
 		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
 

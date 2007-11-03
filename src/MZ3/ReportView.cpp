@@ -154,6 +154,7 @@ void CReportView::OnInitialUpdate()
 		// スタイルの更新
 		m_list.ModifyStyle(0, dwStyle);
 
+		// アイコンリストの作成
 		m_pimgList.Create(16, 16, ILC_COLOR4, 2, 0);
 		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
 		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_PHOTO_ICON) );
@@ -402,7 +403,6 @@ void CReportView::SetData(const CMixiData& data)
 
 
 	int nItem;
-	int imgNo = 0;
 
 	// ----------------------------------------
 	// コメントの追加
@@ -412,6 +412,8 @@ void CReportView::SetData(const CMixiData& data)
 	for (int i=0; i<count; i++) {
 		CMixiData& cmtData = m_data.GetChild(i);
 
+		// 画像の有無でアイコンのインデックスを変更する
+		int imgNo = 0;
 		if (cmtData.GetImageCount() == 0) {
 			imgNo = 0;
 		}
@@ -430,6 +432,7 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// 親をリストに表示
+	int imgNo = 0;
 	if (m_data.GetImageCount() == 0) {
 		imgNo = 0;
 	}

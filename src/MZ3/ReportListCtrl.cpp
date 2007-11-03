@@ -52,9 +52,6 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 再描画するItemの座標を取得
 	CRect rcItem(lpDrawItemStruct->rcItem);
 
-	// イメージオブジェクト格納アドレス
-	CImageList* pImageList;
-
 	// アイテムのID
 	int nItem = lpDrawItemStruct->itemID;
 
@@ -133,7 +130,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		int nImage = (nStateImageMask>>12) - 1;
 
-		pImageList = this->GetImageList(LVSIL_STATE);
+		CImageList* pImageList = this->GetImageList(LVSIL_STATE);
 		if (pImageList) {
 			pImageList->Draw(pDC, nImage,
 				CPoint(rcItem.left, rcItem.top),
@@ -144,7 +141,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 通常のアイコンとオーバーレイアイコンを描画します。
 	CRect rcIcon;
 	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
-	pImageList = this->GetImageList(LVSIL_SMALL);
+	CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
 
 	if (pImageList != NULL) {
 		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
@@ -163,10 +160,12 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// アイテムのラベルを描きます。
 	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
 
+	//--- 左側カラム
+
 	pszText = szBuff;
 
 	rcLabel = rcItem;
-	rcLabel.left += OFFSET_FIRST;
+	rcLabel.left  += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
 	// 文字色の変更
@@ -189,6 +188,8 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		-1,
 		rcLabel,
 		DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+
+	//--- 右側カラム
 
 	// カラム用のラベルを描画
 	LV_COLUMN lvc;
@@ -220,7 +221,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 
 		rcLabel = rcItem;
-		rcLabel.left += OFFSET_OTHER;
+		rcLabel.left  += OFFSET_OTHER;
 		rcLabel.right -= OFFSET_OTHER;
 
 		pDC->DrawText(pszText,

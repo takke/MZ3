@@ -85,6 +85,12 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// アイテムのラベルの幅を取得
 	CRect rcLabel;
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
+	if (m_bUseIcon==false) {
+		// アイコンなしの場合は、アイコン分だけオフセットをかける
+		if (rcLabel.left > 16) {
+			rcLabel.left -= 16;
+		}
+	}
 
 	// 左の位置を同じにする
 	rcAllLabels.left = rcLabel.left;
@@ -110,15 +116,60 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
+	// 色を設定してアイコンをマスクします。
+	UINT uiFlags = ILD_TRANSPARENT;						// 背景を透明にするフラグ（イメージデータ用）
+	COLORREF clrMaskFg = ::GetSysColor(COLOR_WINDOW);	// 描画する色
+	COLORREF clrMaskBk = ::GetSysColor(COLOR_WINDOW);	// 描画する色
+	if ((lvi.state & LVIS_CUT) == LVIS_CUT) {
+		uiFlags |= ILD_BLEND50;
+	} else {
+		if (bSelected == TRUE) {
+			clrMaskFg = ::GetSysColor(COLOR_HIGHLIGHT);
+			uiFlags |= ILD_BLEND50;
+		}
+	}
+
+	// 状態アイコンを描画します。
+	UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
+	if ((nStateImageMask>>12) > 0) {
+
+		int nImage = (nStateImageMask>>12) - 1;
+
+		CImageList* pImageList = this->GetImageList(LVSIL_STATE);
+		if (pImageList) {
+			pImageList->Draw(pDC, nImage,
+				CPoint(rcItem.left, rcItem.top),
+				ILD_TRANSPARENT);
+		}
+	}
+
+	// 通常のアイコンとオーバーレイアイコンを描画します。
+	CRect rcIcon;
+	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
+	CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
+
+	if (pImageList != NULL) {
+		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
+		if (rcItem.left < rcItem.right - 1) {
+			if (lvi.iImage != 0) {
+				ImageList_DrawEx(
+					pImageList->m_hImageList, lvi.iImage,
+					pDC->m_hDC,
+					rcIcon.left, rcIcon.top, 16, 16,
+					clrMaskBk, clrMaskFg,
+					uiFlags | nOvlImageMask);
+			}
+		}
+	}
+
 	// アイテムのラベルを描きます。
 	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
 
 	//--- 左側カラム
-
 	pszText = szBuff;
 
-	rcLabel = rcItem;
-	rcLabel.left += OFFSET_FIRST;
+//	rcLabel = rcItem;
+	rcLabel.left  += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
 	// 文字色の変更
@@ -269,7 +320,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 
 		rcLabel = rcItem;
-		rcLabel.left += OFFSET_OTHER;
+		rcLabel.left  += OFFSET_OTHER;
 		rcLabel.right -= OFFSET_OTHER;
 
 		pDC->DrawText(pszText,

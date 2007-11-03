@@ -18,15 +18,17 @@ public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
 
 	void SetHeader(LPCTSTR, LPCTSTR);
-	bool	 m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
+	bool	m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
 
 private:
-	BOOL	 m_useColor;
+	BOOL	m_useColor;
+	bool	m_bUseIcon;			///< アイコン利用フラグ
 
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
 public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	void MyEnableIcon( bool bUseIcon ) { m_bUseIcon = bUseIcon; }
 };
 
 
