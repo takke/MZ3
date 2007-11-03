@@ -571,6 +571,11 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
+	if (m_access) {
+		// アクセス中は中止
+		return;
+	}
+
 	m_hotList = &m_categoryList;
 	if (lpnmlv->iItem<0) {
 		return;
