@@ -7,7 +7,6 @@
 #define IDD_OPTIONTAB_PROXY             108
 #define IDD_OPTIONTAB_GETPAGE           112
 #define IDD_WRITEVIEW                   113
-#define IDD_OPTIONTAB_USER              114
 #define IDD_OPTIONTAB_GENERAL           115
 #define IDR_MAINFRAME                   128
 #define IDR_MZ3TYPE                     129
