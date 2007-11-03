@@ -78,6 +78,9 @@ BOOL CChooseFontDlg::OnInitDialog()
 			// 現在のフォント発見。
 			// 選択状態にする。
 			m_FontList.SetItemState( i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED );
+
+			// スクロール
+			m_FontList.EnsureVisible( i, FALSE );
 			break;
 		}
 	}
