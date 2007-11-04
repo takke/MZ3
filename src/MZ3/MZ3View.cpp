@@ -329,7 +329,6 @@ void CMZ3View::OnInitialUpdate()
 
 		// アイコンリストの作成
 		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 4, 0);
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );	// ダミーアイコン
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
@@ -381,12 +380,12 @@ void CMZ3View::OnInitialUpdate()
  */
 inline int MyGetBodyListIconIndex( const CMixiData& mixi )
 {
-	int iconIndex = 0;
+	int iconIndex = -1;
 	switch (mixi.GetAccessType()) {
-	case ACCESS_BBS:		iconIndex = 1;	break;
-	case ACCESS_EVENT:		iconIndex = 2;	break;
-	case ACCESS_ENQUETE:	iconIndex = 3;	break;
-	default:				iconIndex = 0;	break;	// アイコンなし
+	case ACCESS_BBS:		iconIndex = 0;	break;
+	case ACCESS_EVENT:		iconIndex = 1;	break;
+	case ACCESS_ENQUETE:	iconIndex = 2;	break;
+	default:				iconIndex = -1;	break;	// アイコンなし
 	}
 	return iconIndex;
 }
@@ -1157,7 +1156,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		int iconIndex = MyGetBodyListIconIndex(body[i]);
-		if (iconIndex > 0) {
+		if (iconIndex >= 0) {
 			// アイコンありなので表示
 			bUseIcon = true;
 			break;

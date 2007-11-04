@@ -151,7 +151,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (pImageList != NULL) {
 		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
 		if (rcItem.left < rcItem.right - 1) {
-			if (lvi.iImage != 0) {
+			if (lvi.iImage >= 0) {
 				ImageList_DrawEx(
 					pImageList->m_hImageList, lvi.iImage,
 					pDC->m_hDC,
