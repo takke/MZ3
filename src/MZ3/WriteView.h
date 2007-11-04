@@ -56,12 +56,82 @@ public:
 
 
 private:
-	afx_msg void OnEditCut() {  m_bodyEdit.Cut(); };
-	afx_msg void OnEditCopy() { m_bodyEdit.Copy(); };
-	afx_msg void OnEditPaste() { m_bodyEdit.Paste(); };
-	afx_msg void OnSelectAll() { m_bodyEdit.SetSel(0, -1); };
-	afx_msg void OnWriteSendMenu() {  OnBnClickedWriteSendButton(); };
-	afx_msg void OnWriteCancelMenu() {   OnBnClickedWriteCancelButton(); };
+	/// 切り取りイベント
+	afx_msg void OnEditCut() {
+		// フォーカス判定
+		CWnd* wndFocused = GetFocus();
+		if (wndFocused==NULL)
+			return;
+		if (wndFocused->m_hWnd == m_bodyEdit.m_hWnd ) {
+			m_bodyEdit.Cut();
+		}
+		if (wndFocused->m_hWnd == m_titleEdit.m_hWnd ) {
+			m_titleEdit.Cut();
+		}
+	}
+
+	/// コピーイベント
+	afx_msg void OnEditCopy() {
+		// フォーカス判定
+		CWnd* wndFocused = GetFocus();
+		if (wndFocused==NULL)
+			return;
+		if (wndFocused->m_hWnd == m_bodyEdit.m_hWnd ) {
+			m_bodyEdit.Copy();
+		}
+		if (wndFocused->m_hWnd == m_titleEdit.m_hWnd ) {
+			m_titleEdit.Copy();
+		}
+	}
+
+	/// 貼り付けコマンド
+	afx_msg void OnEditPaste() {
+		// フォーカス判定
+		CWnd* wndFocused = GetFocus();
+		if (wndFocused==NULL)
+			return;
+		if (wndFocused->m_hWnd == m_bodyEdit.m_hWnd ) {
+			m_bodyEdit.Paste();
+		}
+		if (wndFocused->m_hWnd == m_titleEdit.m_hWnd ) {
+			m_titleEdit.Paste();
+		}
+	}
+
+	/// 元に戻すイベント
+	afx_msg void OnEditUndo() {
+		// フォーカス判定
+		CWnd* wndFocused = GetFocus();
+		if (wndFocused==NULL)
+			return;
+		if (wndFocused->m_hWnd == m_bodyEdit.m_hWnd ) {
+			m_bodyEdit.Undo();
+		}
+		if (wndFocused->m_hWnd == m_titleEdit.m_hWnd ) {
+			m_titleEdit.Undo();
+		}
+	}
+
+	// 全て選択
+	afx_msg void OnSelectAll() {
+		// フォーカス判定
+		CWnd* wndFocused = GetFocus();
+		if (wndFocused==NULL)
+			return;
+		if (wndFocused->m_hWnd == m_bodyEdit.m_hWnd ) {
+			m_bodyEdit.SetSel(0, -1);
+		}
+		if (wndFocused->m_hWnd == m_titleEdit.m_hWnd ) {
+			m_titleEdit.SetSel(0, -1);
+		}
+	}
+
+	afx_msg void OnWriteSendMenu() {
+		OnBnClickedWriteSendButton();
+	}
+	afx_msg void OnWriteCancelMenu() {
+		OnBnClickedWriteCancelButton();
+	}
 	afx_msg void OnWriteBackMenu();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
