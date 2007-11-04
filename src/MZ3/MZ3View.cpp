@@ -2463,6 +2463,30 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 void CMZ3View::OnViewLog()
 {
 	CMixiData& mixi = GetSelectedBodyItem();
+
+	// レポート画面で開けるタイプのみサポートする
+	switch (mixi.GetAccessType()) {	
+	case ACCESS_DIARY:
+	case ACCESS_BBS:
+	case ACCESS_ENQUETE:
+	case ACCESS_EVENT:
+	case ACCESS_MYDIARY:
+	case ACCESS_MESSAGE:
+	case ACCESS_NEWS:
+		// サポートしている
+		break;
+	default:
+		// 未サポートなので終了する
+		{
+			CString msg = L"この形式のログはサポートしていません : ";
+			msg += util::AccessType2Message(mixi.GetAccessType());
+			MZ3LOGGER_INFO( msg );
+
+			util::MySetInformationText( m_hWnd, msg );
+		}
+		return;
+	}
+
 	CString strLogfilePath = util::MakeLogfilePath( mixi );
 
 	// ファイル存在確認
