@@ -1475,15 +1475,15 @@ public:
 		CMixiData nextLink;
 
 		/**
-		* 方針：
-		* ★ <ul>で5件ずつ並んでいる。
-		*   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
-		*   従って、「5件分のリンク抽出」「5件分の名前抽出」という手順で行う。
-		*
-		* ●iconListが見つかれば、そこから項目開始とみなす。/messageAreaが現れるまで以下を実行する。
-		*   (1) view_community.plが見つかるまでの各行をパースし、所定の形式に一致していれば、URLと画像、コミュ名を取得する。
-		*   (2) 抽出したデータを out_ に追加する。
-		*/
+		 * 方針：
+		 * ★ <ul>で5件ずつ並んでいる。
+		 *   奇数行にリンク＆画像が、偶数行に名前が並んでいる。
+		 *   従って、「5件分のリンク抽出」「5件分の名前抽出」という手順で行う。
+		 *
+		 * ●iconListが見つかれば、そこから項目開始とみなす。/messageAreaが現れるまで以下を実行する。
+		 *   (1) view_community.plが見つかるまでの各行をパースし、所定の形式に一致していれば、URLと画像、コミュ名を取得する。
+		 *   (2) 抽出したデータを out_ に追加する。
+		 */
 		// 項目開始を探す
 		bool bInItems = false;	// 項目開始？
 		int iLine = 160;		// とりあえず読み飛ばす
@@ -1537,11 +1537,11 @@ public:
 
 private:
 	/**
-	* 内容を抽出する
-	*
-	* (1) /messageArea が現れるまでの各行をパースし、のURL、名前を生成する。
-	* (2) mixi_list に追加する。
-	*/
+	 * 内容を抽出する
+	 *
+	 * (1) /messageArea が現れるまでの各行をパースし、のURL、名前を生成する。
+	 * (2) mixi_list に追加する。
+	 */
 	static bool parseTwoTR( CMixiDataList& mixi_list, const CHtmlArray& html, int& iLine )
 	{
 		const int lastLine = html.GetCount();
@@ -2115,7 +2115,7 @@ public:
 			}
 
 			// ●質問内容解析
-			if( util::LineHasStringsNoCase( line, L"<dd>" ) )
+			if( util::LineHasStringsNoCase( line, L"<dd>" ) )	// (C4819回避のダミーコメントです)
 			{
 				//内容解析関数へ、<dd class="enqueteBlock">が見つかったら戻る
 				if( !parseBody( data_, html_, iLine ) )
