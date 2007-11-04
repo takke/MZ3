@@ -16,6 +16,9 @@
 
 #define MASK_COLOR RGB(255,0,255);
 
+// Ver.0.9 形式の操作系を利用する
+bool g_bUseVer09KeyInterface = true;
+
 // CReportView
 
 IMPLEMENT_DYNCREATE(CReportView, CFormView)
@@ -569,13 +572,31 @@ void CReportView::OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+/// 一番上の項目に移動
+BOOL CReportView::CommandMoveToFirstList()
+{
+	util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, false );
+	util::MySetListCtrlItemFocusedAndSelected( m_list, 0, true );
+	m_list.EnsureVisible( 0, FALSE );
+
+	return TRUE;
+}
+
+/// 一番下の項目に移動
+BOOL CReportView::CommandMoveToLastList()
+{
+	util::MySetListCtrlItemFocusedAndSelected( m_list, 0, false );
+	util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, true );
+	m_list.EnsureVisible( m_list.GetItemCount()-1, FALSE );
+
+	return TRUE;
+}
+
 BOOL CReportView::CommandMoveUpList()
 {
 	if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 		// 一番上の項目選択中なので、一番下に移動
-		util::MySetListCtrlItemFocusedAndSelected( m_list, 0, false );
-		util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, true );
-		m_list.EnsureVisible( m_list.GetItemCount()-1, FALSE );
+		return CommandMoveToLastList();
 	} else {
 		// 一番上ではないので、上に移動
 		int idx = m_list.GetSelectedItem();
@@ -594,9 +615,7 @@ BOOL CReportView::CommandMoveDownList()
 {
 	if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下の項目選択中なので、一番上に移動
-		util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, false );
-		util::MySetListCtrlItemFocusedAndSelected( m_list, 0, true );
-		m_list.EnsureVisible( 0, FALSE );
+		return CommandMoveToFirstList();
 	} else {
 		// 一番下ではないので、下に移動
 		int idx = m_list.GetSelectedItem();
@@ -611,7 +630,7 @@ BOOL CReportView::CommandMoveDownList()
 	return TRUE;
 }
 
-BOOL CReportView::CommandScrollUpList()
+BOOL CReportView::CommandScrollUpEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
@@ -633,7 +652,7 @@ BOOL CReportView::CommandScrollUpList()
 	return TRUE;
 }
 
-BOOL CReportView::CommandScrollDownList()
+BOOL CReportView::CommandScrollDownEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
@@ -697,19 +716,21 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		return TRUE;
 
 	case VK_BACK:				// クリアボタン
-#ifndef WINCE
 	case VK_ESCAPE:
-#endif
+		// リストの場合は前画面に戻る
 		if (pMsg->hwnd == m_list.m_hWnd) {
 			if (m_access != FALSE) {
 				// アクセス中は中断処理
 				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
-			}
-			else {
+			} else {
 				OnMenuBack();
 			}
 			return TRUE;
 		}
+
+		// TODO: エディットコントロールにフォーカスがある場合に
+		//       リストにフォーカスを移動したいが、ここではできない。
+		//       エディットコントロールのサブクラス化が必要か？
 		break;
 
 /*	case VK_RETURN:
@@ -735,12 +756,22 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			case VK_UP:
 				if( m_xcrawl.isXcrawlEnabled() ) {
 					// Xcrawl ではスクロール
-					return CommandScrollUpList();
+					return CommandScrollUpEdit();
 				}else{
 					if( m_nKeydownRepeatCount >= 2 ) {
 						// キー長押しによる連続移動中なら、キーUPで移動しない。
 						return TRUE;
 					}
+
+					// スクロール位置判定（スクロール余地があればスクロールする）
+					if (g_bUseVer09KeyInterface) {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos > si.nMin) {
+							return CommandScrollUpEdit();
+						}
+					}
+
 					if( CommandMoveUpList() ) {
 						return TRUE;
 					}
@@ -750,12 +781,22 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			case VK_DOWN:
 				if( m_xcrawl.isXcrawlEnabled() ) {
 					// Xcrawl ではスクロール
-					return CommandScrollDownList();
+					return CommandScrollDownEdit();
 				}else{
 					if( m_nKeydownRepeatCount >= 2 ) {
 						// キー長押しによる連続移動中なら、キーUPで移動しない。
 						return TRUE;
 					}
+
+					// スクロール位置判定（スクロール余地があればスクロールする）
+					if (g_bUseVer09KeyInterface) {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos+si.nPage <= (UINT)si.nMax) {
+							return CommandScrollDownEdit();
+						}
+					}
+
 					if( CommandMoveDownList() ) {
 						return TRUE;
 					}
@@ -793,7 +834,15 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-	//				MZ3LOGGER_ERROR( L"repeat" );
+					// スクロール位置判定（スクロール余地があればスクロールする）
+					if (g_bUseVer09KeyInterface) {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos > si.nMin) {
+							return CommandScrollUpEdit();
+						}
+					}
+//					MZ3LOGGER_ERROR( L"repeat" );
 					return CommandMoveUpList();
 				}
 
@@ -806,7 +855,15 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
-	//				MZ3LOGGER_ERROR( L"repeat" );
+					// スクロール位置判定（スクロール余地があればスクロールする）
+					if (g_bUseVer09KeyInterface) {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos+si.nPage <= (UINT)si.nMax) {
+							return CommandScrollDownEdit();
+						}
+					}
+//					MZ3LOGGER_ERROR( L"repeat" );
 					return CommandMoveDownList();
 				}
 
@@ -814,17 +871,24 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			}
 		}
 	} else {
+		// Xcrawl オプション無効時の処理
 		if (pMsg->hwnd == m_list.m_hWnd) {
 			// リストでのキー押下イベント
 			switch(pMsg->wParam) {
 			case VK_UP:
+				// スクロール位置判定（スクロール余地があればスクロールする）
+				if (g_bUseVer09KeyInterface) {
+					SCROLLINFO si;
+					m_edit.GetScrollInfo( SB_VERT, &si );
+					if (si.nPos > si.nMin) {
+						return CommandScrollUpEdit();
+					}
+				}
+
+				// 項目変更
 				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 					// 一番上の項目選択中なので、一番下に移動
-					util::MySetListCtrlItemFocusedAndSelected( m_list, 0, false );
-					util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, true );
-					m_list.EnsureVisible( m_list.GetItemCount()-1, FALSE );
-
-					return TRUE;
+					return CommandMoveToLastList();
 				} else {
 #ifdef WINCE
 					// デフォルト動作
@@ -835,12 +899,20 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				}
 
 			case VK_DOWN:
+				// スクロール位置判定（スクロール余地があればスクロールする）
+				if (g_bUseVer09KeyInterface) {
+					SCROLLINFO si;
+					m_edit.GetScrollInfo( SB_VERT, &si );
+					if (si.nPos+si.nPage <= (UINT)si.nMax) {
+						return CommandScrollDownEdit();
+					}
+				}
+
+				// 項目変更
 				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 					// 一番下の項目選択中なので、一番上に移動
-					util::MySetListCtrlItemFocusedAndSelected( m_list, m_list.GetItemCount()-1, false );
-					util::MySetListCtrlItemFocusedAndSelected( m_list, 0, true );
-					m_list.EnsureVisible( 0, FALSE );
-
+					CommandMoveToFirstList();
+					
 					return TRUE;
 				} else {
 #ifdef WINCE
@@ -859,10 +931,22 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 		// リストでのキー押下イベント
 		switch(pMsg->wParam) {
 		case VK_RIGHT:
-			return CommandScrollDownList();
+			if (g_bUseVer09KeyInterface) {
+				// 次のコメントに移動
+				return CommandMoveDownList();
+			} else {
+				// 下スクロール
+				return CommandScrollDownEdit();
+			}
 
 		case VK_LEFT:
-			return CommandScrollUpList();
+			if (g_bUseVer09KeyInterface) {
+				// 前のコメントに移動
+				return CommandMoveUpList();
+			} else {
+				// 上スクロール
+				return CommandScrollUpEdit();
+			}
 		}
 	}
 

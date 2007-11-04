@@ -80,8 +80,10 @@ private:
 
 	BOOL CommandMoveUpList();
 	BOOL CommandMoveDownList();
-	BOOL CommandScrollUpList();
-	BOOL CommandScrollDownList();
+	BOOL CommandMoveToFirstList();
+	BOOL CommandMoveToLastList();
+	BOOL CommandScrollUpEdit();
+	BOOL CommandScrollDownEdit();
 
 
 	afx_msg void OnAddBookmark();
