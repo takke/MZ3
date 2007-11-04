@@ -10,6 +10,7 @@
 #include "MZ3View.h"
 #include "UserDlg.h"
 #include "util.h"
+#include "util_gui.h"
 #include "url_encoder.h"
 #include "version.h"
 
@@ -728,17 +729,6 @@ void CMainFrame::OnErrorlogMenu()
  */
 void CMainFrame::OnChangeSkin()
 {
-	RECT rect;
-#ifdef WINCE
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-	GetWindowRect(&rect);
-#endif
-
-	POINT pt;
-	pt.x = rect.left + (rect.right-rect.left) / 2;
-	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-
 	CMenu menu;
 	menu.LoadMenu(IDR_SKIN_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
@@ -772,7 +762,9 @@ void CMainFrame::OnChangeSkin()
 	// ƒ_ƒ~[‚ðíœ
 	pcThisMenu->DeleteMenu( ID_SKIN_DUMMY, MF_BYCOMMAND );
 
-	menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this);
 }
 
 /**

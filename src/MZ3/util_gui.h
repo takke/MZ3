@@ -193,5 +193,35 @@ inline bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& strFolderPat
 #endif
 }
 
+inline POINT GetPopupPos()
+{
+	POINT pt;
+
+#ifdef WINCE
+	// MZ3 : 画面の中心でポップアップする
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	pt.x = rect.left + (rect.right-rect.left) / 2;
+	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	GetCursorPos(&pt);
+#endif
+
+	return pt;
+}
+
+inline int GetPopupFlags()
+{
+#ifdef WINCE
+	// MZ3 : 画面の中心でポップアップする
+	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
+#endif
+
+	return flags;
+}
 
 }

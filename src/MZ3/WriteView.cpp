@@ -685,18 +685,10 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 		case VK_APPS:
 #endif
 			{
-				RECT rect;
-				POINT pt;
+				POINT pt    = util::GetPopupPos();
+				int   flags = util::GetPopupFlags();
 
 				CMenu menu;
-#ifdef WINCE
-				SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-				GetWindowRect(&rect);
-#endif
-
-				pt.x = rect.left + (rect.right-rect.left) / 2;
-				pt.y = rect.top  + (rect.bottom-rect.top) / 2;
 				menu.LoadMenu(IDR_WRITE_MENU);
 				CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -705,10 +697,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 					pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
 				}
 
-				pcThisMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
-					pt.x,
-					pt.y,
-					this);
+				pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 			}
 			break;
 
@@ -881,14 +870,10 @@ CString CWriteView::MyShowDlgToConfirmPostImage( CString selectedFilepath )
  */
 void CWriteView::OnImageButton()
 {
-	POINT pt;
-	RECT rect;
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+
 	CMenu menu;
-
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-
-	pt.x = (rect.right-rect.left) / 2;
-	pt.y = (rect.bottom-rect.top) / 2;
 	menu.LoadMenu( IDR_ATTACH_IMAGE_MENU );
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -915,7 +900,8 @@ void CWriteView::OnImageButton()
 			pSubMenu->ModifyMenu( id_cancel, MF_BYCOMMAND, id_cancel, _T("“Y•t‚ð‚â‚ß‚é") );
 		}
 	}
-	pcThisMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+
+	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 }
 
 /**

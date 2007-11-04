@@ -1834,54 +1834,11 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
+		case ACCESS_PROFILE:
 			// メニュー表示
 			PopupBodyMenu();
 			break;
-		case ACCESS_PROFILE:
-			// プロフィールなら、カテゴリ項目に応じて処理を変更する。（暫定）
-			switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
-			case ACCESS_LIST_INTRO:			// 紹介文
-			case ACCESS_LIST_FAVORITE:		// お気に入り
-			case ACCESS_LIST_FOOTSTEP:		// 足あと
-			case ACCESS_LIST_FRIEND:		// マイミク一覧
-				// 操作をメニューで選択
-				{
-					RECT rect;
-#ifdef WINCE
-					SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-#else
-					GetWindowRect(&rect);
-#endif
 
-					POINT pt;
-					pt.x = rect.left + (rect.right-rect.left) / 2;
-					pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-					CMenu menu;
-					menu.LoadMenu( IDR_PROFILE_ITEM_MENU );
-					CMenu* pSubMenu = menu.GetSubMenu(0);
-
-					ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
-
-					// お気に入り以外では「自己紹介」を削除。
-					if( categoryType != ACCESS_LIST_FAVORITE ) {
-						pSubMenu->DeleteMenu( ID_OPEN_SELFINTRO, MF_BYCOMMAND );
-					}
-
-					// 紹介文以外では「紹介文」を削除
-					if( categoryType != ACCESS_LIST_INTRO ) {
-						pSubMenu->DeleteMenu( ID_OPEN_INTRO, MF_BYCOMMAND );
-					}
-
-					// メニューを開く
-					pSubMenu->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN,
-						pt.x,
-						pt.y,
-						this);
-				}
-
-				break;
-			}
-			break;
 		default:
 			// 特殊な要素以外なので、通信処理開始。
 			AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
@@ -2768,21 +2725,8 @@ void CMZ3View::OnSetNoRead()
 /// ボディリストでの右クリックメニュー
 bool CMZ3View::PopupBodyMenu(void)
 {
-	// 右クリックメニュー表示位置
-	POINT pt;
-#ifdef WINCE
-	// MZ3 : 画面の中心でポップアップする
-	RECT rect;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	pt.x = rect.left + (rect.right-rect.left) / 2;
-	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-	
-	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
-#else
-	// MZ4 : マウスの位置でポップアップする
-	GetCursorPos(&pt);
-	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
-#endif
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	switch( bodyItem.GetAccessType() ) {
@@ -2851,6 +2795,39 @@ bool CMZ3View::PopupBodyMenu(void)
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		}
+		break;
+
+	case ACCESS_PROFILE:
+		// プロフィールなら、カテゴリ項目に応じて処理を変更する。（暫定）
+		switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
+		case ACCESS_LIST_INTRO:			// 紹介文
+		case ACCESS_LIST_FAVORITE:		// お気に入り
+		case ACCESS_LIST_FOOTSTEP:		// 足あと
+		case ACCESS_LIST_FRIEND:		// マイミク一覧
+			// 操作をメニューで選択
+			{
+				CMenu menu;
+				menu.LoadMenu( IDR_PROFILE_ITEM_MENU );
+				CMenu* pSubMenu = menu.GetSubMenu(0);
+
+				ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
+
+				// お気に入り以外では「自己紹介」を削除。
+				if( categoryType != ACCESS_LIST_FAVORITE ) {
+					pSubMenu->DeleteMenu( ID_OPEN_SELFINTRO, MF_BYCOMMAND );
+				}
+
+				// 紹介文以外では「紹介文」を削除
+				if( categoryType != ACCESS_LIST_INTRO ) {
+					pSubMenu->DeleteMenu( ID_OPEN_INTRO, MF_BYCOMMAND );
+				}
+
+				// メニューを開く
+				pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+			}
+
+			break;
 		}
 		break;
 	}
@@ -3490,20 +3467,8 @@ void CMZ3View::OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
  */
 void CMZ3View::PopupCategoryMenu(void)
 {
-	POINT pt;
-#ifdef WINCE
-	// MZ3 : 画面の中心でポップアップする
-	RECT rect;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	pt.x = rect.left + (rect.right-rect.left) / 2;
-	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-	
-	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
-#else
-	// MZ4 : マウスの位置でポップアップする
-	GetCursorPos(&pt);
-	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
-#endif
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
 
 	CMenu menu;
 	menu.LoadMenu(IDR_CATEGORY_MENU);

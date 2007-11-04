@@ -1641,14 +1641,10 @@ void CReportView::OnImageButton()
 		return;
 	}
 
-	POINT pt;
-	RECT rect;
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+
 	CMenu menu;
-
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-
-	pt.x = (rect.right-rect.left) / 2;
-	pt.y = (rect.bottom-rect.top) / 2;
 	menu.LoadMenu(IDR_IMAGE_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -1667,7 +1663,7 @@ void CReportView::OnImageButton()
 	}
 
 	pcThisMenu->DeleteMenu(0, MF_BYPOSITION);
-	menu.GetSubMenu(0)->TrackPopupMenu(TPM_CENTERALIGN | TPM_VCENTERALIGN, pt.x, pt.y, this);
+	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this);
 }
 
 /**
@@ -1812,20 +1808,8 @@ void CReportView::OnOpenBrowserUser()
 
 void CReportView::MyPopupReportMenu(void)
 {
-	POINT pt;
-#ifdef WINCE
-	// MZ3 : 画面の中心でポップアップする
-	RECT rect;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	pt.x = rect.left + (rect.right-rect.left) / 2;
-	pt.y = rect.top  + (rect.bottom-rect.top) / 2;
-	
-	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
-#else
-	// MZ4 : マウスの位置でポップアップする
-	GetCursorPos(&pt);
-	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
-#endif
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
 
 	CMenu menu;
 	menu.LoadMenu(IDR_REPORT_MENU);
