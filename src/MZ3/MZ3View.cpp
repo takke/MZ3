@@ -960,8 +960,10 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 		}else{
 			// 巡回モードでないので、解析してレポート画面を開く
-			MyParseMixiHtml( theApp.m_filepath.temphtml, *data );
-			MyShowReportView( *data );
+			static CMixiData mixi;
+			mixi = *data;
+			MyParseMixiHtml( theApp.m_filepath.temphtml, mixi );
+			MyShowReportView( mixi );
 		}
 
 		break;
@@ -2501,13 +2503,15 @@ void CMZ3View::OnViewLog()
 	}
 
 	// 解析
-	MyParseMixiHtml( strLogfilePath, mixi );
+	static CMixiData s_mixi;
+	s_mixi = mixi;
+	MyParseMixiHtml( strLogfilePath, s_mixi );
 
 	// URL 設定
-	mixi.SetBrowseUri( util::CreateMixiUrl(GetSelectedBodyItem().GetURL()) );
+	s_mixi.SetBrowseUri( util::CreateMixiUrl(s_mixi.GetURL()) );
 
 	// 表示
-	MyShowReportView( mixi );
+	MyShowReportView( s_mixi );
 }
 
 /**
