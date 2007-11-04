@@ -435,7 +435,13 @@ BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// スクロール時の背景画像のずれ防止
 	if (theApp.m_optionMng.IsUseBgImage()) {
-		Invalidate( FALSE );
+		// スクロール位置が変化していたら再描画
+		static int s_lastPos = -1;
+		int pos = GetScrollPos(SB_VERT);
+		if (pos != s_lastPos) {
+			Invalidate( FALSE );
+			s_lastPos = pos;
+		}
 	}
 
 	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
