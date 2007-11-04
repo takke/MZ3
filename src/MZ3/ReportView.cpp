@@ -1255,8 +1255,9 @@ void CReportView::OnLoadUrl(UINT nID)
 		{
 			// 自動ログイン変換
 			CString requestUrl = url;
+
+			// WindowsMobile 版のみ自動ログインURL変換を行う
 #ifdef WINCE
-			// とりあえず WindowsMobile 版のみ自動ログインURL変換を行う
 			if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
 				// mixi モバイル用自動ログインURL変換
 				requestUrl = util::ConvertToMixiMobileAutoLoginUrl( url );
