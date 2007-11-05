@@ -34,15 +34,20 @@ public:
 
 	bool			m_bCruise;				///< 巡回対象かどうかを表すフラグ
 
+	bool			m_bFromLog;				///< ログを取得した値かどうかを表すフラグ
+
 private:
-	CString			m_accessTime;			///< （カテゴリリストとしての）アクセス時刻
+	SYSTEMTIME		m_accessTime;			///< （カテゴリリストとしての）アクセス時刻
 	int				m_idxItemOnList;		///< リストコントロール内のインデックス
 
 public:
 	/// コンストラクタ
 	CCategoryItem() 
 		: selectedBody(0)
-	{}
+		, m_bFromLog(0)
+	{
+		memset( &m_accessTime, 0, sizeof(SYSTEMTIME) );
+	}
 
 	/// 初期化
 	void init( LPCTSTR name,
@@ -74,8 +79,20 @@ public:
 
 	CMixiDataList& GetBodyList()			{ return m_body; };
 
-	void	SetAccessTime(LPCTSTR value)	{ m_accessTime = value; };
-	LPCTSTR GetAccessTime()					{ return m_accessTime; };
+	void	SetAccessTime(const SYSTEMTIME& value)	{ m_accessTime = value; };
+	const SYSTEMTIME& GetAccessTime()				{ return m_accessTime; };
+	CString GetAccessTimeString() {
+		SYSTEMTIME zero;
+		memset( &zero, 0, sizeof(SYSTEMTIME) );
+		if (memcmp(&m_accessTime,&zero, sizeof(SYSTEMTIME))==0) {
+			return L"";
+		}
+		if (m_bFromLog) {
+			return CTime(m_accessTime).Format( L"%m/%d %H:%M:%S log" );
+		} else {
+			return CTime(m_accessTime).Format( L"%m/%d %H:%M:%S" );
+		}
+	}
 
 	void	SetIndexOnList(int value)		{ m_idxItemOnList = value; };
 	int		GetIndexOnList()				{ return m_idxItemOnList; };

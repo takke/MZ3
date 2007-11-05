@@ -888,19 +888,12 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
 
 			// 取得時刻文字列の作成
-			CString timeStr;
-			{
-				SYSTEMTIME localTime;
-				GetLocalTime(&localTime);
-				timeStr.Format( _T("%02d/%02d %02d:%02d:%02d"),
-					localTime.wMonth,
-					localTime.wDay,
-					localTime.wHour,
-					localTime.wMinute,
-					localTime.wSecond);
-			}
-			m_selGroup->getSelectedCategory()->SetAccessTime( timeStr );
-			m_categoryList.SetItemText( m_selGroup->selectedCategory, 1, m_selGroup->getSelectedCategory()->GetAccessTime() );
+			SYSTEMTIME localTime;
+			GetLocalTime(&localTime);
+			m_selGroup->getSelectedCategory()->m_bFromLog = false;
+			m_selGroup->getSelectedCategory()->SetAccessTime( localTime );
+			CString timeStr = m_selGroup->getSelectedCategory()->GetAccessTimeString();
+			m_categoryList.SetItemText( m_selGroup->selectedCategory, 1, timeStr );
 			SetBodyList( body );		// ボディ一覧に表示
 
 			if( aType == ACCESS_LIST_BBS ) {
@@ -2363,7 +2356,7 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 
 	// 選択項目が「未取得」なら、とりあえずファイルから取得する
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-	if( wcscmp( pCategory->GetAccessTime(), L"" ) == 0 ) {
+	if( wcscmp( pCategory->GetAccessTimeString(), L"" ) == 0 ) {
 		MyLoadCategoryLogfile( *pCategory );
 	}
 
@@ -2388,7 +2381,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 	}
 
 	// 更新時刻の取得
-	CString time = status.m_mtime.Format( L"%m/%d %H:%M:%S log" );
+//	CString time = status.m_mtime.Format( L"%m/%d %H:%M:%S log" );
 
 	{
 		CMixiDataList& body = category.GetBodyList();
@@ -2410,8 +2403,11 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 3/3") );
 
 		// 取得時刻文字列の設定
-		category.SetAccessTime( time );
-		m_categoryList.SetItemText( category.GetIndexOnList(), 1, category.GetAccessTime() );
+		SYSTEMTIME st;
+		status.m_mtime.GetAsSystemTime( st );
+		category.SetAccessTime( st );
+		category.m_bFromLog = true;
+		m_categoryList.SetItemText( category.GetIndexOnList(), 1, category.GetAccessTimeString() );
 
 		util::MySetInformationText( m_hWnd, msgHead + _T("完了") );
 	}
@@ -2597,7 +2593,7 @@ void CMZ3View::MyUpdateCategoryListByGroupItem(void)
 		}
 
 		// 取得時刻文字列の設定
-		m_categoryList.SetItemText( i, 1, category.GetAccessTime() );
+		m_categoryList.SetItemText( i, 1, category.GetAccessTimeString() );
 
 		// ItemData にインデックスを与える
 		m_categoryList.SetItemData( i, (DWORD_PTR)i );
