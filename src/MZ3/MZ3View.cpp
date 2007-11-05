@@ -1216,7 +1216,7 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_hotList = &m_bodyList;
 	m_selGroup->getSelectedCategory()->selectedBody = lpnmlv->iItem;
 
-	CMixiData data = m_selGroup->getSelectedCategory()->GetSelectedBody();
+	CMixiData& data = m_selGroup->getSelectedCategory()->GetSelectedBody();
 
 	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
 
