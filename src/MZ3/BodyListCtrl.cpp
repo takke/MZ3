@@ -9,6 +9,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "MixiParserUtil.h"
+#include "MZ3View.h"
 
 static const int OFFSET_FIRST	= 2*2;
 static const int OFFSET_OTHER	= 6*2;
@@ -183,40 +184,58 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 	else {
 		// 非選択状態なので、状態に応じて色を変更する
-		CMixiData* data = (CMixiData*)(lvi.lParam);
+//		CMixiData* data = (CMixiData*)(lvi.lParam);
 
-		COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-		switch (data->GetAccessType()) {
-		case ACCESS_BBS:
-		case ACCESS_EVENT:
-		case ACCESS_ENQUETE:
-			// コミュニティ、イベント、アンケート
-			// 既読数に応じて色づけ。
-			{
-				int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*data);
-				if (lastIndex == -1) {
-					// 全くの未読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-				} else if (lastIndex >= data->GetCommentCount()) {
-					// 既読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-				} else {
-					// 未読分あり：新着記事
-					clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+		if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < pCategory->m_body.size()) {
+			CMixiData* data = &pCategory->m_body[ lvi.lParam ];
+
+			COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+			switch (data->GetAccessType()) {
+			case ACCESS_BBS:
+			case ACCESS_EVENT:
+			case ACCESS_ENQUETE:
+				// コミュニティ、イベント、アンケート
+				// 既読数に応じて色づけ。
+				{
+					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*data);
+					if (lastIndex == -1) {
+						// 全くの未読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+					} else if (lastIndex >= data->GetCommentCount()) {
+						// 既読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					} else {
+						// 未読分あり：新着記事
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+					}
 				}
-			}
-			break;
+				break;
 
-		case ACCESS_DIARY:
-		case ACCESS_MYDIARY:
-			// 日記
-			// 外部ブログは薄く表示
-			if( data->GetURL().Find( L"?url=http" ) != -1 ) {
-				// "?url=http" を含むので外部ブログとみなす
-				clrTextFg = theApp.m_skininfo.clrMainBodyListExternalBlogText;
-			} else {
-				// mixi 日記
-				// 未読なら青、既読なら黒
+			case ACCESS_DIARY:
+			case ACCESS_MYDIARY:
+				// 日記
+				// 外部ブログは薄く表示
+				if( data->GetURL().Find( L"?url=http" ) != -1 ) {
+					// "?url=http" を含むので外部ブログとみなす
+					clrTextFg = theApp.m_skininfo.clrMainBodyListExternalBlogText;
+				} else {
+					// mixi 日記
+					// 未読なら青、既読なら黒
+					if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
+						// ログあり:既読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					}else{
+						// ログなし:未読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+					}
+				}
+				break;
+
+			case ACCESS_NEWS:
+			case ACCESS_MESSAGE:
+				// ニュース
+				// ログがあれば（既読なら）黒、未読なら青
 				if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
 					// ログあり:既読
 					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
@@ -224,64 +243,51 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					// ログなし:未読
 					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
 				}
-			}
-			break;
+				break;
 
-		case ACCESS_NEWS:
-		case ACCESS_MESSAGE:
-			// ニュース
-			// ログがあれば（既読なら）黒、未読なら青
-			if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
-				// ログあり:既読
-				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-			}else{
-				// ログなし:未読
-				clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-			}
-			break;
-
-		case ACCESS_PROFILE:
-			// ユーザプロフィール
-			// マイミクなら青にする。
-			if( data->IsMyMixi() ) {
-				clrTextFg = theApp.m_skininfo.clrMainBodyListFootprintMyMixiText;
-			}else{
-				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-			}
-			break;
-
-		case ACCESS_COMMUNITY:
-			// コミュニティ
-			{
-				// 暫定処置として、トピック一覧のログ存在チェックで色変更を行う。
-
-				// トピック一覧用 mixi オブジェクトを生成する
-				CMixiData mixi = *data;
-				mixi.SetAccessType( ACCESS_LIST_BBS );
-				CString url;
-				url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
-				mixi.SetURL(url);
-
-				// 存在チェック。
-				if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
-					// ログあり:既読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+			case ACCESS_PROFILE:
+				// ユーザプロフィール
+				// マイミクなら青にする。
+				if( data->IsMyMixi() ) {
+					clrTextFg = theApp.m_skininfo.clrMainBodyListFootprintMyMixiText;
 				}else{
-					// ログなし:未読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 				}
+				break;
+
+			case ACCESS_COMMUNITY:
+				// コミュニティ
+				{
+					// 暫定処置として、トピック一覧のログ存在チェックで色変更を行う。
+
+					// トピック一覧用 mixi オブジェクトを生成する
+					CMixiData mixi = *data;
+					mixi.SetAccessType( ACCESS_LIST_BBS );
+					CString url;
+					url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
+					mixi.SetURL(url);
+
+					// 存在チェック。
+					if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
+						// ログあり:既読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					}else{
+						// ログなし:未読
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+					}
+				}
+				break;
+
+			default:
+				// 色づけなし
+				// 黒にする
+				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+				break;
 			}
-			break;
 
-		default:
-			// 色づけなし
-			// 黒にする
-			clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-			break;
+			// 色の設定
+			clrTextSave = pDC->SetTextColor(clrTextFg);
 		}
-
-		// 色の設定
-		clrTextSave = pDC->SetTextColor(clrTextFg);
 	}
 
 	pDC->DrawText(pszText,

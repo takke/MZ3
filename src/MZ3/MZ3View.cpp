@@ -1181,8 +1181,8 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// ２カラム目
 		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
 
-		// ボディの項目の ItemData にも CMixiData を割り当てる。
-		m_bodyList.SetItemData( index, (DWORD_PTR)data );
+		// ボディの項目の ItemData に index を割り当てる。
+		m_bodyList.SetItemData( index, index );
 	}
 
 	m_nochange = FALSE;
@@ -1208,6 +1208,7 @@ void CMZ3View::OnEnSetfocusInfoEdit()
  */
 void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+//	MZ3LOGGER_DEBUG( L"OnNMDblclkBodyList start" );
 	*pResult = 0;
 
 	if (m_access) {
@@ -1221,21 +1222,22 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_hotList = &m_bodyList;
 	m_selGroup->getSelectedCategory()->selectedBody = lpnmlv->iItem;
 
-	CMixiData* data = (CMixiData*)m_bodyList.GetItemData(lpnmlv->iItem);
-	TRACE(_T("http://mixi.jp/%s\n"), data->GetURL());
+	CMixiData data = m_selGroup->getSelectedCategory()->GetSelectedBody();
 
-	if (data->GetAccessType() == ACCESS_LIST_FOOTSTEP) {
+	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
+
+	if (data.GetAccessType() == ACCESS_LIST_FOOTSTEP) {
 		return;
 	}
 
 	// コミュニティの場合は、トピック一覧を表示する。
 	// （暫定対応）
-	if (data->GetAccessType() == ACCESS_COMMUNITY) {
+	if (data.GetAccessType() == ACCESS_COMMUNITY) {
 		OnViewBbsList();
 		return;
 	}
 
-	AccessProc(data, util::CreateMixiUrl(data->GetURL()));
+	AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
 }
 
 /**
