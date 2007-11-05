@@ -604,6 +604,7 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	// カテゴリリスト中の「現在選択されている項目」を更新
+	m_categoryList.Update( m_selGroup->selectedCategory );
 	int idx = (int)m_categoryList.GetItemData(lpnmlv->iItem);
 	if( idx < 0 || idx >= (int)m_selGroup->categories.size() ) {
 		idx = 0;
