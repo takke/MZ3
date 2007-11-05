@@ -15,6 +15,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "MixiParser.h"
+#include "ChooseAccessTypeDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1309,6 +1310,43 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		// 中断
 		if (m_access) {
 			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+		}
+		break;
+
+	case 'D':
+		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
+			WCHAR szFile[MAX_PATH] = L"\0";
+
+			OPENFILENAME ofn;
+			memset( &(ofn), 0, sizeof(ofn) );
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = m_hWnd;
+			ofn.lpstrFile = szFile;
+			ofn.nMaxFile = MAX_PATH; 
+			ofn.lpstrTitle = L"HTMLﾌｧｲﾙを開く...";
+			ofn.lpstrFilter = L"HTMLﾌｧｲﾙ (*.htm;*.html)\0*.htm;*.html\0\0";
+			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
+			ofn.lpstrInitialDir = L"";
+
+			if (GetOpenFileName(&ofn) == IDOK) {
+				CString strLogfilePath = szFile;
+
+				// 解析
+				static CMixiData s_mixi;
+
+				// アクセス種別の選択
+				CChooseAccessTypeDlg dlg;
+				if (dlg.DoModal() == IDOK) {
+					s_mixi.SetAccessType( dlg.m_selectedAccessType );
+					MyParseMixiHtml( strLogfilePath, s_mixi );
+
+					// URL 設定
+					s_mixi.SetBrowseUri( util::CreateMixiUrl(s_mixi.GetURL()) );
+
+					// 表示
+					MyShowReportView( s_mixi );
+				}
+			}
 		}
 		break;
 

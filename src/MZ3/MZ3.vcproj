@@ -1477,10 +1477,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CommonSelectDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\HtmlArray.cpp"
 				>
 			</File>
@@ -2028,7 +2024,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ChooseAccessTypeDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\ChooseFontDlg.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CommonSelectDlg.cpp"
 					>
 				</File>
 				<File
@@ -2120,10 +2124,6 @@
 			>
 			<File
 				RelativePath=".\CategoryItem.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CommonSelectDlg.h"
 				>
 			</File>
 			<File
@@ -2282,7 +2282,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ChooseAccessTypeDlg.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ChooseFontDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CommonSelectDlg.h"
 					>
 				</File>
 				<File

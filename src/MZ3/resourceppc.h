@@ -35,6 +35,7 @@
 #define IDD_USER_DIALOG                 154
 #define IDI_TOPIC_ICON                  157
 #define IDI_EVENT_ICON                  158
+#define IDD_CHOOSE_ACCESS_TYPE_DIALOG   158
 #define IDI_ENQUETE_ICON                159
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
@@ -111,6 +112,7 @@
 #define IDC_TYPE_LIST                   1038
 #define IDC_USE_XCRAWL_CANCELER_CHECK2  1038
 #define IDC_USE_RUN_CONFIRM_DLG_CHECK   1038
+#define IDC_ACCESS_TYPE_LIST            1038
 #define IDC_GROUP_TAB                   1039
 #define IDC_CHANGE_LOG_FOLDER_BUTTON    1040
 #define IDC_PROGRESS_BAR                1041
@@ -327,7 +329,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        158
+#define _APS_NEXT_RESOURCE_VALUE        159
 #define _APS_NEXT_COMMAND_VALUE         32975
 #define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           117

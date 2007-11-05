@@ -2,6 +2,7 @@
 /**
  * mixi関連ユーティリティ
  */
+#include "util_base.h"
 
 /// MZ3 用ユーティリティ
 namespace util
