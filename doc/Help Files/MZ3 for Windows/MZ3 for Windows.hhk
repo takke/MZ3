@@ -233,6 +233,8 @@
 <param name="Local" value="20071015214639295.htm">
 <param name="Name" value="バージョン情報">
 <param name="Local" value="20071015214630138.htm">
+<param name="Name" value="グループ設定ファイルエディタ">
+<param name="Local" value="2007116141659205.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="概要">
@@ -265,6 +267,10 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="バージョン情報">
 <param name="Local" value="20071015214630138.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="グループ設定ファイルエディタ">
+<param name="Local" value="2007116141659205.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="既知のバグ">

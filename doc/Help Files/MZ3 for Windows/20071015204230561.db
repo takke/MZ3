@@ -5,8 +5,9 @@ Context=IDH_HELP10
 [Date]
 <P><FONT face="ＭＳ ゴシック">* 設定画面について</FONT></P>
 <P><FONT face="ＭＳ ゴシック">　MZ4 の設定を行います</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　●ログインタブ</FONT></P>
-<P><FONT face="ＭＳ ゴシック"><A href="Capture/31_設定画面_ログイン.jpg"><IMG height=200 src="Capture/31_設定画面_ログイン.jpg"></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック">　●ログイン</FONT></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/31_設定画面_ログイン.jpg"></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック"><IMG src="Capture/30_ログイン.jpg"></FONT></P>
 <P><FONT face="ＭＳ ゴシック"><BR>　　【メールアドレス】<BR>　　　mixi に登録してあるメールアドレスを記載します<BR>　　【パスワード】<BR>　　　mixi に登録してあるログインパスワードを記載します</FONT></P>
 <P><FONT face="ＭＳ ゴシック">　●一般タブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/32_設定画面_一般.jpg"><IMG height=200 src="Capture/32_設定画面_一般.jpg"></FONT></A></P>
