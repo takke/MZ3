@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CListCtrl)
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CBodyListCtrl::OnLvnItemchanged)
 	ON_WM_VSCROLL()
 	ON_WM_MOUSEWHEEL()
+	ON_WM_NCCALCSIZE()
 END_MESSAGE_MAP()
 
 
@@ -451,4 +452,12 @@ BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	}
 
 	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp)
+{
+	// 水平スクロールバーの非表示
+	this->EnableScrollBarCtrl( SB_HORZ, FALSE );
+
+	CListCtrl::OnNcCalcSize(bCalcValidRects, lpncsp);
 }
