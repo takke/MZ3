@@ -608,4 +608,64 @@ void kfm::toeuc(void)
     myputc(EOF);
 }
 
+/// UTF-8‚©‚çMBCS‚Ö‚Ì•ÏŠ·
+int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output )
+{
+	LPSTR pszUTF8 = NULL;
+	bool bUtf8withBOM = false;
+
+	pszUTF8 = (LPSTR)calloc( input.size(), sizeof(char) );
+	if ( pszUTF8 == NULL ) {
+		return -1;
+	}
+
+	// BOM”»’è
+	if ( (unsigned char)input[0] == 0xEF && (unsigned char)input[1] == 0xBB && (unsigned char)input[2] == 0xBF ) {
+		bUtf8withBOM = true;
+	} else {
+		bUtf8withBOM = false;
+	}
+
+	CStringA strUtf8( bUtf8withBOM ? (LPSTR)&input[0]+3 : (LPSTR)&input[0], bUtf8withBOM ? input.size()-3 : input.size() );
+
+	// UTF-8 ‚©‚ç UCS-2 ‚É•ÏŠ·‚µ‚½•¶Žš—ñ‚Ì’·‚³‚ðŒvŽZ
+	int nUCS2Length = MultiByteToWideChar(CP_UTF8, 0, strUtf8, -1, NULL, 0 );
+	if (nUCS2Length > 0) {
+		wchar_t * pszUCS2 = (wchar_t*)calloc( nUCS2Length, sizeof(wchar_t) );
+		if ( pszUCS2 == NULL ) {
+			free(pszUTF8);
+			return -1;
+		}
+
+		// UTF-8 => UCS-2
+		MultiByteToWideChar(CP_UTF8, 0, strUtf8, -1, pszUCS2, nUCS2Length );
+
+		// UCS-2 ‚©‚ç MBCS ‚É•ÏŠ·‚µ‚½•¶Žš—ñ‚Ì’·‚³‚ðŒvŽZ
+		// (CP-932)
+		LPSTR pszAcp = NULL;
+		int nAcpLength = WideCharToMultiByte(GetACP(), 0, pszUCS2, -1, pszAcp, 0, NULL, NULL);
+		if ( nAcpLength > 0 ) {
+			pszAcp = (LPSTR)calloc( nAcpLength, sizeof(char) );
+			if ( pszAcp == NULL ) {
+				free(pszUTF8);
+				free(pszUCS2);
+				return -1;
+			}
+
+			// UCS-2 => MBCS
+			WideCharToMultiByte(GetACP(), 0, pszUCS2, -1, pszAcp, nAcpLength, NULL, NULL);
+
+			// Œ‹‰Ê‚ð’Ç‰Á
+			output.resize( nAcpLength );
+			memcpy( &output[0], pszAcp, nAcpLength );
+
+			free(pszAcp);
+		}
+		free(pszUCS2);
+	}
+	free(pszUTF8);
+
+	return output.size();
+}
+
 }

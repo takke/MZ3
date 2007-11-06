@@ -66,11 +66,19 @@ private:
 	int					m_nRedirect;			///< リダイレクト回数
 
 public:
+	enum ENCODING {
+		ENCODING_SJIS = 0,
+		ENCODING_EUC  = 1,
+		ENCODING_UTF8 = 2,
+	};
+	ENCODING		m_encodingFrom;			///< 通信取得データのエンコーディング（デフォルトは mixi HTML なので EUC-JP）
+
 	/**
 	 * コンストラクタ
 	 */
 	CInetAccess()
 		: m_hInternet(NULL)
+		, m_encodingFrom(ENCODING_EUC)
 	{
 		Initialize( NULL, NULL );
 	}
@@ -87,7 +95,7 @@ public:
 	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
 	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData );
 
-	void Initialize( HWND hwnd, void* object );
+	void Initialize( HWND hwnd, void* object, ENCODING encoding=ENCODING_EUC );
 
 	bool	IsConnecting()		{ return m_bAccessing; }		///< 通信中？
 	LPCTSTR GetErrorMessage()	{ return m_strErrorMsg; }		///< エラーメッセージの取得

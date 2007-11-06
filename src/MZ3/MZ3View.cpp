@@ -1358,6 +1358,8 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			COpenUrlDlg dlg;
 			if (dlg.DoModal() == IDOK) {
 
+				CInetAccess::ENCODING encoding = (CInetAccess::ENCODING)dlg.m_encoding;
+
 				// アクセス種別の選択
 				CChooseAccessTypeDlg dlg1;
 				if (dlg1.DoModal() == IDOK) {
@@ -1369,7 +1371,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 					s_mixi.SetBrowseUri( dlg.mc_strUrl );
 
 					// 通信開始
-					AccessProc( &s_mixi, s_mixi.GetURL() );
+					AccessProc( &s_mixi, s_mixi.GetURL(), encoding );
 				}
 			}
 		}
@@ -2278,7 +2280,7 @@ bool CMZ3View::DoNewCommentCheck(void)
 /**
  * ネットアクセス
  */
-void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url)
+void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING encoding)
 {
 	if( data != NULL ) {
 		theApp.m_mixi4recv = *data;
@@ -2345,7 +2347,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url)
 	m_access = TRUE;
 	m_abort = FALSE;
 
-	theApp.m_inet.Initialize( m_hWnd, data );
+	theApp.m_inet.Initialize( m_hWnd, data, encoding );
 	theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML );
 }
 

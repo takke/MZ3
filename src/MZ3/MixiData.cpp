@@ -8,32 +8,6 @@
 
 // CMixiData
 
-/**
- * コンストラクタ
- */
-CMixiData::CMixiData()
-	: m_accessType(ACCESS_INVALID) // 初期値
-	, m_authorId(-1)
-	, m_id(-1)
-	, m_commId(-1)
-	, m_commentIndex(-1)
-	, m_commentCount(0)
-	, m_contentType(CONTENT_TYPE_INVALID)
-	, m_ownerId(-1)
-	, m_otherDiary(FALSE)
-	, m_myMixi(false)
-{
-}
-
-/**
- * デストラクタ
- */
-CMixiData::~CMixiData()
-{
-	ClearChildren();
-	m_imageArray.clear();
-	m_MovieArray.clear();
-}
 
 
 // CMixiData メンバ関数

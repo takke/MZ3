@@ -182,7 +182,7 @@ bool CInetAccess::Open()
 /**
  * 通信の初期化処理
  */
-void CInetAccess::Initialize( HWND hwnd, void* object )
+void CInetAccess::Initialize( HWND hwnd, void* object, ENCODING encoding/*=ENCODING_EUC*/ )
 {
 	m_bAccessing	= false;
 	m_hConnection	= NULL;
@@ -191,6 +191,7 @@ void CInetAccess::Initialize( HWND hwnd, void* object )
 	m_hwnd			= hwnd;
 	m_object		= object;
 	m_nRedirect		= 0;
+	m_encodingFrom  = encoding;
 }
 
 /**
@@ -901,11 +902,28 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 		// 文字コード変換(SJISに変換)
 		kfm::kf_buf_type out_buf;
-		{
-			out_buf.reserve( recv_buffer.size() );
-			kfm::kfm k( recv_buffer, out_buf );
-			k.set_default_input_code( kfm::kfm::EUC );
-			k.tosjis();
+
+
+		switch (m_encodingFrom) {
+		case ENCODING_EUC:
+			{
+				out_buf.reserve( recv_buffer.size() );
+				kfm::kfm k( recv_buffer, out_buf );
+				k.set_default_input_code( kfm::kfm::EUC );
+				k.tosjis();
+			}
+			break;
+
+		case ENCODING_UTF8:
+			{
+				kfm::utf8_to_mbcs( recv_buffer, out_buf );
+			}
+			break;
+
+		case ENCODING_SJIS:
+			// 無変換
+			out_buf = recv_buffer;
+			break;
 		}
 
 //		sw.stop();
@@ -923,7 +941,9 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 				return WM_MZ3_GET_ERROR;
 			}
 			
-			fwrite( &out_buf[0], out_buf.size(), 1, fp_out );
+			if (out_buf.size()>0) {
+				fwrite( &out_buf[0], out_buf.size(), 1, fp_out );
+			}
 			fclose(fp_out);
 		}
 //		sw.stop();

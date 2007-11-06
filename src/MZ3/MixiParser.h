@@ -4170,9 +4170,13 @@ public:
 		mixi.AddBody( msg );
 
 		for( int iLine=0; iLine<count; iLine++ ) {
-			const CString& target = html_.GetAt(iLine);
+			CString target = html_.GetAt(iLine);
+
+			target.Replace( L"\r", L"" );
+			target.Replace( L"\n", L"" );
 
 			mixi.AddBody( target );
+			mixi.AddBody( L"\r\n" );
 		}
 
 		MZ3LOGGER_DEBUG( L"PlainTextParser.parse() finished." );

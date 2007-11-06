@@ -69,7 +69,7 @@ public:
 private:
 	void InsertInitialData();
 
-	void AccessProc(CMixiData* data, LPCTSTR url_);
+	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
 
 	// ÉfÅ[É^çÌèú
 	void SetBodyList( CMixiDataList& body );

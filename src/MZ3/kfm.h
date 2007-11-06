@@ -133,4 +133,8 @@ private:
 	void myputc(int c);
 };
 
+/// UTF-8‚©‚çMBCS‚Ö‚Ì•ÏŠ·
+int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output );
+
+
 }

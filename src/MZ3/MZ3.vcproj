@@ -1497,10 +1497,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpenUrlDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SimpleLogger.cpp"
 				>
 			</File>
@@ -2056,6 +2052,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OpenUrlDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionSheet.cpp"
 					>
 				</File>
@@ -2156,10 +2156,6 @@
 			</File>
 			<File
 				RelativePath=".\Mz3GroupData.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpenUrlDlg.h"
 				>
 			</File>
 			<File
@@ -2315,6 +2311,10 @@
 				</File>
 				<File
 					RelativePath=".\MZ3View.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OpenUrlDlg.h"
 					>
 				</File>
 				<File

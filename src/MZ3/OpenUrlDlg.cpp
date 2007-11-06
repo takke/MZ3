@@ -25,6 +25,7 @@ void COpenUrlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_URL_EDIT, mc_strUrl);
+	DDX_Control(pDX, IDC_ENCODING_COMBO, mc_comboEncoding);
 }
 
 
@@ -33,3 +34,30 @@ END_MESSAGE_MAP()
 
 
 // COpenUrlDlg メッセージ ハンドラ
+
+BOOL COpenUrlDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  ここに初期化を追加してください
+	int idx = 0;
+	idx = mc_comboEncoding.InsertString( idx, L"UTF-8" );
+	mc_comboEncoding.SetItemData( idx++, CInetAccess::ENCODING_UTF8 );
+	idx = mc_comboEncoding.InsertString( idx, L"EUC-JP" );
+	mc_comboEncoding.SetItemData( idx++, CInetAccess::ENCODING_EUC );
+	idx = mc_comboEncoding.InsertString( idx, L"ShiftJIS" );
+	mc_comboEncoding.SetItemData( idx++, CInetAccess::ENCODING_SJIS );
+
+	mc_comboEncoding.SetCurSel(0);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
+}
+
+void COpenUrlDlg::OnOK()
+{
+	// TODO: ここに特定なコードを追加するか、もしくは基本クラスを呼び出してください。
+	m_encoding = mc_comboEncoding.GetItemData( mc_comboEncoding.GetCurSel() );
+
+	CDialog::OnOK();
+}

@@ -40,6 +40,7 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	ACCESS_TYPE accessTypeList[] = { 
+		ACCESS_PLAIN,
 		ACCESS_DIARY, 
 		ACCESS_BBS, 
 		ACCESS_ENQUETE, 
@@ -47,7 +48,6 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 		ACCESS_MYDIARY, 
 		ACCESS_MESSAGE, 
 		ACCESS_NEWS, 
-		ACCESS_PLAIN,
 		ACCESS_INVALID 
 	};
 

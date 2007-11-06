@@ -15,11 +15,11 @@ class CMixiData
 {
 protected:
 	ACCESS_TYPE		m_accessType;			///< アクセス種別（というよりもこのオブジェクトの種別）
-	CString			m_date;
-	CString			m_name;
+	CString			m_date;					///< 日付時刻
+	CString			m_name;					///< 名前
 	CString			m_author;				///< 投稿者名
 	int				m_authorId;				///< 投稿者のID（オーナーIDに設定される場合もある）
-	CString			m_title;
+	CString			m_title;				///< タイトル
 	CString			m_url;					///< URL
 	CString			m_postAddress;			///< ＰＯＳＴ用のアドレス
 	int				m_id;					///< 記事ID
@@ -43,6 +43,7 @@ protected:
 	bool			m_myMixi;				///< マイミクフラグ（足あとからのマイミク抽出時のみ対応）
 
 public:
+
 	/// リンクデータ
 	class Link {
 	public:
@@ -57,8 +58,32 @@ public:
 										///< 「全てを表示」「1」「2」...
 
 public:
-	CMixiData();
-	virtual ~CMixiData();
+	/**
+	 * コンストラクタ
+	 */
+	CMixiData()
+		: m_accessType(ACCESS_INVALID) // 初期値
+		, m_authorId(-1)
+		, m_id(-1)
+		, m_commId(-1)
+		, m_commentIndex(-1)
+		, m_commentCount(0)
+		, m_contentType(CONTENT_TYPE_INVALID)
+		, m_ownerId(-1)
+		, m_otherDiary(FALSE)
+		, m_myMixi(false)
+	{
+	}
+
+	/**
+	 * デストラクタ
+	 */
+	virtual ~CMixiData()
+	{
+		ClearChildren();
+		m_imageArray.clear();
+		m_MovieArray.clear();
+	}
 
 public:
 
