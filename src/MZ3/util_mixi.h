@@ -97,6 +97,8 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_DOWNLOAD:			text = L"ダウンロード";			break;
 	case ACCESS_PROFILE:			text = L"プロフィール";			break;
 	case ACCESS_COMMUNITY:			text = L"コミュニティ";			break;
+	case ACCESS_PLAIN:				text = L"汎用URL";				break;
+
 	case ACCESS_LIST_INTRO:			text = L"紹介文";				break;
 
 	case ACCESS_LIST_DIARY:			text = L"日記一覧";				break;

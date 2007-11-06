@@ -4149,6 +4149,40 @@ public:
 
 
 /**
+ * [content] 汎用URL 用パーサ
+ * 【デバッグ用】
+ */
+class PlainTextParser : public MixiContentParser
+{
+public:
+	static bool parse( CMixiData& mixi, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"PlainTextParser.parse() start." );
+
+		mixi.ClearAllList();
+		INT_PTR count = html_.GetCount();
+
+		int iLine = 0;
+		mixi.SetAuthor( MZ3_APP_NAME );
+
+		CString msg;
+		msg.Format( L"URL [%s] has %d line(s).\r\n\r\n", mixi.GetURL(), count );
+		mixi.AddBody( msg );
+
+		for( int iLine=0; iLine<count; iLine++ ) {
+			const CString& target = html_.GetAt(iLine);
+
+			mixi.AddBody( target );
+		}
+
+		MZ3LOGGER_DEBUG( L"PlainTextParser.parse() finished." );
+		return true;
+	}
+
+};
+
+
+/**
  * 画像ダウンロードCGI 用パーサ
  *
  * show_diary_picture.pl
@@ -4221,6 +4255,7 @@ inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& h
 	case ACCESS_NEWS:		mixi::ViewNewsParser::parse( mixi, html );		break;
 	case ACCESS_HELP:		mixi::HelpParser::parse( mixi, html );			break;
 	case ACCESS_ERRORLOG:	mixi::ErrorlogParser::parse( mixi, html );		break;
+	case ACCESS_PLAIN:		mixi::PlainTextParser::parse( mixi, html );		break;
 	}
 }
 

@@ -16,6 +16,7 @@
 #include "util_gui.h"
 #include "MixiParser.h"
 #include "ChooseAccessTypeDlg.h"
+#include "OpenUrlDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -936,6 +937,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
+	case ACCESS_PLAIN:
 		// --------------------------------------------------
 		// ボディ項目の取得
 		// --------------------------------------------------
@@ -1314,6 +1316,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		break;
 
 	case 'D':
+		// Ctrl+Alt+D
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
 			WCHAR szFile[MAX_PATH] = L"\0";
 
@@ -1331,12 +1334,11 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			if (GetOpenFileName(&ofn) == IDOK) {
 				CString strLogfilePath = szFile;
 
-				// 解析
-				static CMixiData s_mixi;
-
 				// アクセス種別の選択
 				CChooseAccessTypeDlg dlg;
 				if (dlg.DoModal() == IDOK) {
+					// 解析
+					static CMixiData s_mixi;
 					s_mixi.SetAccessType( dlg.m_selectedAccessType );
 					MyParseMixiHtml( strLogfilePath, s_mixi );
 
@@ -1345,6 +1347,29 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 
 					// 表示
 					MyShowReportView( s_mixi );
+				}
+			}
+		}
+		break;
+
+	case 'U':
+		// Ctrl+Alt+U
+		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
+			COpenUrlDlg dlg;
+			if (dlg.DoModal() == IDOK) {
+
+				// アクセス種別の選択
+				CChooseAccessTypeDlg dlg1;
+				if (dlg1.DoModal() == IDOK) {
+					static CMixiData s_mixi;
+					s_mixi.SetAccessType( dlg1.m_selectedAccessType );
+
+					// URL 設定
+					s_mixi.SetURL( dlg.mc_strUrl );
+					s_mixi.SetBrowseUri( dlg.mc_strUrl );
+
+					// 通信開始
+					AccessProc( &s_mixi, s_mixi.GetURL() );
 				}
 			}
 		}
