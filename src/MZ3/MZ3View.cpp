@@ -2182,8 +2182,20 @@ void CMZ3View::OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// ブラウザボタン
 	// 足あとの場合は有効に。
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, 
-		(GetSelectedBodyItem().GetAccessType() == ACCESS_LIST_FOOTSTEP) );
+	if (m_selGroup!=NULL && m_selGroup->getSelectedCategory()!= NULL) {
+		switch (m_selGroup->getSelectedCategory()->m_mixi.GetAccessType()) {
+			case ACCESS_LIST_FOOTSTEP:
+			case ACCESS_LIST_FRIEND:
+				theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
+				break;
+
+			default:
+				theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
+				break;
+		}
+	} else {
+		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
+	}
 
 	*pResult = 0;
 }
@@ -2337,6 +2349,16 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		referer = _T("http://mixi.jp/") + data->GetURL();
 		referer.Replace(_T("view_enquete"), _T("reply_enquete"));
 	}
+
+	// 【API 用】
+	// URL 内のID置換
+	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
+
+	// encoding 指定
+	if (data->GetAccessType() == ACCESS_LIST_FOOTSTEP) {
+		encoding = CInetAccess::ENCODING_UTF8;
+	}
+
 
 	data->SetBrowseUri(uri);
 

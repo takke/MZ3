@@ -64,8 +64,8 @@ enum ACCESS_TYPE {
 	ACCESS_ADDDIARY,			///< 日記投稿
 	ACCESS_IMAGE,				///< 画像
 	ACCESS_MOVIE,				///< 動画
-	ACCESS_DOWNLOAD,			///< ダウンロード
-	ACCESS_PLAIN,				///< 単純なテキストデータ
+	ACCESS_DOWNLOAD,			///< 汎用ダウンロード
+	ACCESS_PLAIN,				///< 汎用テキストデータ
 
 	//--- GROUP 系：グループタブの項目。
 	ACCESS_GROUP_MYDIARY,		///< 日記 グループ

@@ -282,6 +282,12 @@ public:
 				fclose( fp );
 				return true;
 			}
+
+			// API 対応（仮実装）
+			if (i==0 && util::LineHasStringsNoCase( buf, L"WSSEによる認証が必要です" )) {
+				fclose( fp );
+				return true;
+			}
 		}
 		fclose(fp);
 
@@ -3521,6 +3527,94 @@ public:
 
 
 
+/**
+ * [list] 足あとAPI 用パーサ
+ * 【足あと】
+ * http://mixi.jp/atom/tracks/r=2/member_id=
+ *
+ * とりあえず力業でパースしておく。
+ * DOM で書き直すこと。
+ */
+class TrackParser : public MixiListParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"TrackParser.parse() start." );
+
+		INT_PTR count = html_.GetCount();
+		for (int i=0; i<count; i++) {
+
+			const CString& line = html_.GetAt(i);
+
+			if (line.Find(L"<entry>") != -1) {
+
+				// オブジェクト生成
+				CMixiData data;
+				data.SetAccessType( ACCESS_PROFILE );
+
+				i++;
+				for (; i<count; i++) {
+					const CString& line = html_.GetAt(i);
+					if (line.Find(L"</entry>") != -1) {
+						break;
+					}
+
+					if (line.Find(L"<link") != -1) {
+						// URL
+						CString url;
+						if (util::GetBetweenSubString( line, L"href=\"", L"\"", url )>0) {
+							data.SetURL( url );
+							data.SetBrowseUri( L"http://mixi.jp/" + url );
+						}
+					}
+
+					if (line.Find(L"<title>") != -1) {
+						CString name;
+						if (util::GetBetweenSubString( line, L">", L"<", name )>0) {
+							data.SetName( name );
+						}
+					}
+
+					// 関係
+					if (line.Find(L"<tracks:relation>") != -1) {
+						CString relation;
+						if (util::GetBetweenSubString( line, L">", L"<", relation )>0) {
+							if (relation==L"friend") {
+								data.SetMyMixi( true );
+							} else {
+								data.SetMyMixi( false );
+							}
+						}
+					}
+
+					// Image
+					if (line.Find(L"<tracks:image>") != -1) {
+						CString image;
+						if (util::GetBetweenSubString( line, L">", L"<", image )>0) {
+							data.AddImage( image );
+						}
+					}
+
+					// <updated>2007-11-07T08:53:51Z</updated> 
+					if (line.Find(L"<updated>") != -1) {
+						CString date;
+						if (util::GetBetweenSubString( line, L">", L"<", date )>0) {
+							ParserUtil::ParseDate( date, data );
+						}
+					}
+				}
+				out_.push_back( data );
+			}
+		}
+
+		MZ3LOGGER_DEBUG( L"TrackParser.parse() finished." );
+		return true;
+	}
+};
+
+
+
 
 
 
@@ -4232,7 +4326,8 @@ inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArra
 	case ACCESS_LIST_COMMENT:			mixi::ListCommentParser::parse( body, html );			break;
 	case ACCESS_LIST_NEW_BBS:			mixi::NewBbsParser::parse( body, html );				break;
 	case ACCESS_LIST_MYDIARY:			mixi::ListDiaryParser::parse( body, html );				break;
-	case ACCESS_LIST_FOOTSTEP:			mixi::ShowLogParser::parse( body, html );				break;
+//	case ACCESS_LIST_FOOTSTEP:			mixi::ShowLogParser::parse( body, html );				break;
+	case ACCESS_LIST_FOOTSTEP:			mixi::TrackParser::parse( body, html );					break;
 	case ACCESS_LIST_MESSAGE_IN:		mixi::ListMessageParser::parse( body, html );			break;
 	case ACCESS_LIST_MESSAGE_OUT:		mixi::ListMessageParser::parse( body, html );			break;
 	case ACCESS_LIST_NEWS:				mixi::ListNewsCategoryParser::parse( body, html );		break;

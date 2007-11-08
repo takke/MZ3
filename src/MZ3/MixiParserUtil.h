@@ -143,27 +143,55 @@ public:
 	 */
 	static void ParseDate(LPCTSTR line, CMixiData& mixi)
 	{
-		// 正規表現のコンパイル
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"([0-9]{2,4})?年?([0-9]{1,2}?)月([0-9]{1,2})日[^0-9]*([0-9]{1,2})?:?時?([0-9]{2})?" ) ) {
-			return;
-		}
-		// 検索
-		if( !reg.exec(line) || reg.results.size() != 6 ) {
-			CString msg = L"文字列内に日付・時刻が見つかりません : [";
-			msg += line;
-			msg += L"]";
-			MZ3LOGGER_DEBUG( msg );
-			return;
+		// 汎用 形式
+		{
+			// 正規表現のコンパイル
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"([0-9]{2,4})?年?([0-9]{1,2}?)月([0-9]{1,2})日[^0-9]*([0-9]{1,2})?:?時?([0-9]{2})?" ) ) {
+				return;
+			}
+			// 検索
+			if( reg.exec(line) && reg.results.size() == 6 ) {
+				// 抽出
+				int year   = _wtoi( reg.results[1].str.c_str() );
+				int month  = _wtoi( reg.results[2].str.c_str() );
+				int day    = _wtoi( reg.results[3].str.c_str() );
+				int hour   = _wtoi( reg.results[4].str.c_str() );
+				int minute = _wtoi( reg.results[5].str.c_str() );
+				mixi.SetDate(year, month, day, hour, minute);
+				return;
+			}
 		}
 
-		// 抽出
-		int year   = _wtoi( reg.results[1].str.c_str() );
-		int month  = _wtoi( reg.results[2].str.c_str() );
-		int day    = _wtoi( reg.results[3].str.c_str() );
-		int hour   = _wtoi( reg.results[4].str.c_str() );
-		int minute = _wtoi( reg.results[5].str.c_str() );
-		mixi.SetDate(year, month, day, hour, minute);
+		// RSS 形式
+		{
+			// 正規表現のコンパイル
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z" ) ) {
+				return;
+			}
+			// 検索
+			if( reg.exec(line) && reg.results.size() == 7 ) {
+				// 抽出
+				int year   = _wtoi( reg.results[1].str.c_str() );
+				int month  = _wtoi( reg.results[2].str.c_str() );
+				int day    = _wtoi( reg.results[3].str.c_str() );
+				int hour   = _wtoi( reg.results[4].str.c_str() );
+				int minute = _wtoi( reg.results[5].str.c_str() );
+
+				CTime t(year, month, day, hour, minute, 0);
+				t += CTimeSpan(0, 9, 0, 0);
+
+				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+				return;
+			}
+		}
+
+		CString msg = L"文字列内に日付・時刻が見つかりません : [";
+		msg += line;
+		msg += L"]";
+		MZ3LOGGER_DEBUG( msg );
+		return;
 	}
 
 	/**

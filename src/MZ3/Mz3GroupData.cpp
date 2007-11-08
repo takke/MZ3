@@ -194,7 +194,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 
 	case ACCESS_LIST_FOOTSTEP:
 		// 足あと
-		default_category_url = L"show_log.pl";
+		default_category_url = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		break;
@@ -230,7 +230,13 @@ bool Mz3GroupData::appendCategoryByIniData(
 	// URL が指定されていればその URL を用いる。
 	CString url = default_category_url;
 	if( category_url!=NULL && strlen(category_url) > 0 ) {
-		url = util::my_mbstowcs(category_url).c_str();
+		if (category_type == ACCESS_LIST_FOOTSTEP &&
+			strcmp(category_url, "show_log.pl")==0)
+		{
+			// 旧あしあとURLはAPI用URLに置換
+		} else {
+			url = util::my_mbstowcs(category_url).c_str();
+		}
 	}
 	static CCategoryItem item;
 	item.init( 

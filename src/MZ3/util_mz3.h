@@ -71,7 +71,7 @@ inline CString MakeLogfilePath( const CMixiData& data )
 
 	case ACCESS_LIST_MESSAGE_IN:	return theApp.m_filepath.logFolder + L"\\list_message_in.html";
 	case ACCESS_LIST_MESSAGE_OUT:	return theApp.m_filepath.logFolder + L"\\list_message_out.html";
-	case ACCESS_LIST_FOOTSTEP:		return theApp.m_filepath.logFolder + L"\\show_log.html";
+	case ACCESS_LIST_FOOTSTEP:		return theApp.m_filepath.logFolder + L"\\tracks.xml";
 	case ACCESS_LIST_MYDIARY:		return theApp.m_filepath.logFolder + L"\\list_diary.html";
 	case ACCESS_LIST_CALENDAR:		return theApp.m_filepath.logFolder + L"\\show_calendar.html";  //icchu’Ç‰Á
 	case ACCESS_LIST_NEWS:

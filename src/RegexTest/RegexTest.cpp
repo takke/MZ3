@@ -4,10 +4,8 @@
 #include "stdafx.h"
 #include "../MZ3/MyRegex.h"
 
-int _tmain(int argc, _TCHAR* argv[])
+int test_date()
 {
-	setlocale( LC_ALL, "Japanese" ); 
-
 	LPCTSTR target_list[] = {
 		L"<span class=\"date\">2007年7月05日&nbsp;1:55</span></dt>",
 		L"<span class=\"date\">7月05日&nbsp;1:55</span></dt>",
@@ -65,6 +63,46 @@ int _tmain(int argc, _TCHAR* argv[])
 	*/
 	}
 	wprintf( L"---end---\n" );
+
+	return 1;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	setlocale( LC_ALL, "Japanese" ); 
+
+//	test_date();
+
+	std::wstring target = L"2007-11-07T08:00:40Z";
+	std::wstring pattern = L"";
+	pattern = L"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z";
+
+	// 正規表現のコンパイル（一回のみ）
+	static MyRegex reg;
+	if( !reg.isCompiled() ) {
+		if(! reg.compile( pattern.c_str() ) ) {
+			// コンパイル失敗なのでそのまま終了。
+			wprintf( L"cannot compile...\n" );
+			return 0;
+		}
+	}
+	wprintf( L"compile, ok.\n" );
+
+	// 探索
+	if( reg.exec(target.c_str()) == false ) {
+		// 未発見。
+		wprintf( L"not found...\n" );
+	}else{
+		wprintf( L"found : %d\n", reg.results.size() );
+		for( u_int i=0; i<reg.results.size(); i++ ) {
+			MyRegex::Result& result = reg.results[i];
+			wprintf( L"+ %2d\n", i );
+			wprintf( L"  start[%d]\n", result.start );
+			wprintf( L"  end  [%d]\n", result.end );
+			wprintf( L"  str  [%s]\n", result.str.c_str() );
+		}
+	}
+
 
 	return 0;
 }
