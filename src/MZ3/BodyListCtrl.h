@@ -30,7 +30,9 @@ public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void MyEnableIcon( bool bUseIcon ) { m_bUseIcon = bUseIcon; }
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+#ifndef WINCE
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
+#endif
 };
 
 
