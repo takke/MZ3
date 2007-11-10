@@ -61,6 +61,36 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 }
 
 /**
+ * 指定されたビットマップ hBitmap を hdc に描画する
+ */
+inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int tox, int toy, int tow, int toh )
+{
+	if( hBitmap == NULL ) {
+		return false;
+	}
+
+	if (w==tow && h==toh) {
+		return DrawBitmap( hdc, hBitmap, x, y, w, h, tox, toy );
+	}
+
+	BITMAP	bmp;
+	GetObject( hBitmap, sizeof(bmp), &bmp );
+
+	HDC hdc1 = CreateCompatibleDC(NULL);
+	HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdc1,hBitmap);
+
+	// 転送
+//	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
+	SetStretchBltMode( hdc, HALFTONE );
+	StretchBlt( hdc, tox, toy, tow, toh, hdc1, x, y, w, h, SRCCOPY );
+
+	SelectObject( hdc1, hBitmapOld );
+
+	DeleteDC( hdc1 );
+	return true;
+}
+
+/**
  * 指定されたIDのウィンドウを移動する
  */
 inline void MoveDlgItemWindow( CWnd* pParent, int idc, int x, int y, int nWidth, int nHeight )

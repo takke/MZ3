@@ -145,10 +145,10 @@ public:
 
 	void	AddImage(LPCTSTR str)		{ m_imageArray.push_back(str); }
 	void	AddMovie(LPCTSTR str)		{ m_MovieArray.push_back(str); }
-	int		GetImageCount()				{ return (int)m_imageArray.size(); }
-	int		GetMovieCount()				{ return (int)m_MovieArray.size(); }
-	LPCTSTR GetImage(int index)			{ return m_imageArray[index]; }
-	LPCTSTR GetMovie(int index)			{ return m_MovieArray[index]; }
+	int		GetImageCount()	const		{ return (int)m_imageArray.size(); }
+	int		GetMovieCount()	const		{ return (int)m_MovieArray.size(); }
+	LPCTSTR GetImage(int index) const	{ return m_imageArray[index]; }
+	LPCTSTR GetMovie(int index)	const	{ return m_MovieArray[index]; }
 	void	ClearImage();
 	void	ClearMovie();
 

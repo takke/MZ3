@@ -13,6 +13,7 @@
 #include "XcrawlCanceler.h"
 
 class CMZ3Doc;
+class CMiniImageDialog;
 
 /**
  * MZ3 のメインビュー
@@ -59,6 +60,7 @@ public:
 	afx_msg void OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetEndBinary(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
@@ -86,6 +88,8 @@ public:
 
 	XcrawlCanceler		m_xcrawl;		///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
+
+	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
 private:
 
@@ -303,6 +307,7 @@ protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 public:
 	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	void MoveMiniImageDlg(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

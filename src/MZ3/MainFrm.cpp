@@ -62,6 +62,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
 	ON_WM_ACTIVATE()
 	ON_WM_DESTROY()
+	ON_WM_MOVE()
 END_MESSAGE_MAP()
 
 
@@ -1000,4 +1001,13 @@ void CMainFrame::MySetTitle(void)
 		SetWindowText(title);
 	}
 #endif
+}
+
+void CMainFrame::OnMove(int x, int y)
+{
+	CFrameWnd::OnMove(x, y);
+
+	if (theApp.m_pMainView) {
+		theApp.m_pMainView->MoveMiniImageDlg();
+	}
 }

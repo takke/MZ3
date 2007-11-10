@@ -187,10 +187,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 	else {
 		// 非選択状態なので、状態に応じて色を変更する
-//		CMixiData* data = (CMixiData*)(lvi.lParam);
-
 		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-		if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < pCategory->m_body.size()) {
+		if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < (int)pCategory->m_body.size()) {
 			CMixiData* data = &pCategory->m_body[ lvi.lParam ];
 
 			COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;

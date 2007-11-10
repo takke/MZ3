@@ -39,6 +39,38 @@ inline void MySetInformationText( HWND hWnd, LPCTSTR szMessage )
 	::SendMessage( hWnd, WM_MZ3_ACCESS_INFORMATION, NULL, (LPARAM)&text );
 }
 
+inline CString MakeImageLogfilePathFromUrl( const CString& url )
+{
+	int idx = url.ReverseFind( '/' );
+	if (idx >= 0) {
+		CString filename = url.Mid( idx+1 );
+		if (!filename.IsEmpty()) {
+			return theApp.m_filepath.imageFolder + L"\\" + filename;
+		}
+	}
+	return L"";
+}
+
+/**
+ * CMixiData に対応する画像ファイルのパスを生成する
+ */
+inline CString MakeImageLogfilePath( const CMixiData& data )
+{
+	// アクセス種別に応じてパスを生成する
+	switch( data.GetAccessType() ) {
+	case ACCESS_PROFILE:
+		if (data.GetImageCount()>0) {
+			CString path = MakeImageLogfilePathFromUrl( data.GetImage(0) );
+			if (!path.IsEmpty()) {
+				return path;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	return L"";
+}
 
 /**
  * CMixiData に対応するログファイルのパスを生成する

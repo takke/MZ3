@@ -94,6 +94,7 @@ protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 public:
 	void MySetTitle(void);
+	afx_msg void OnMove(int x, int y);
 };
 
 

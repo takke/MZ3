@@ -17,6 +17,9 @@
 #include "MixiParser.h"
 #include "ChooseAccessTypeDlg.h"
 #include "OpenUrlDlg.h"
+#include "MiniImageDialog.h"
+
+#define W_ICON_REGION	50
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -169,6 +172,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_GROUP_TAB, &CMZ3View::OnTcnSelchangeGroupTab)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CMZ3View::OnHdnEndtrackHeaderList)
 	ON_MESSAGE(WM_MZ3_GET_END, OnGetEnd)
+	ON_MESSAGE(WM_MZ3_GET_END_BINARY, OnGetEndBinary)
     ON_MESSAGE(WM_MZ3_GET_ERROR, OnGetError)
     ON_MESSAGE(WM_MZ3_GET_ABORT, OnGetAbort)
     ON_MESSAGE(WM_MZ3_ABORT, OnAbort)
@@ -209,6 +213,8 @@ CMZ3View::CMZ3View()
 	, m_nKeydownRepeatCount( 0 )
 {
 	m_preCategory = 0;
+	m_selGroup = NULL;
+	m_pMiniImageDlg = NULL;
 
 	m_hotList = NULL;
 
@@ -330,7 +336,7 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 4, 0);
+		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
@@ -368,6 +374,10 @@ void CMZ3View::OnInitialUpdate()
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
 	m_categoryList.SetFocus();
+
+	// 子画面
+	m_pMiniImageDlg = new CMiniImageDialog( this );
+	m_pMiniImageDlg->ShowWindow( SW_HIDE );
 
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
@@ -572,11 +582,15 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	int y = 0;
 	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
 	y += hGroup;
+
 	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
 	y += hCategory;
 	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
 	y += hBody;
+
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
+
+	MoveMiniImageDlg();
 
 	// プログレスバーは別途配置
 	// サイズは hInfo の 2/3 とする
@@ -675,6 +689,57 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_infoEdit.SetWindowText(_T(""));
 
 	*pResult = 0;
+}
+
+/**
+ * アクセス終了通知受信(binary)
+ */
+LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
+{
+	MZ3LOGGER_DEBUG(_T("OnGetEndBinary start"));
+
+	if (m_abort) {
+		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
+		return LRESULT();
+	}
+
+	if (lParam == NULL) {
+		// データがＮＵＬＬの場合
+		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
+		MZ3LOGGER_ERROR( msg );
+		util::MySetInformationText( m_hWnd, msg );
+		return LRESULT();
+	}
+
+	CMixiData* data = (CMixiData*)lParam;
+	ACCESS_TYPE aType = data->GetAccessType();
+
+	switch (aType) {
+	case ACCESS_IMAGE:
+		{
+			// コピー
+			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_inet.GetURL() );
+			CopyFile( theApp.m_filepath.temphtml, path, FALSE/*bFailIfExists, 上書き*/ );
+
+			// 描画
+			if (m_pMiniImageDlg!=NULL) {
+				m_pMiniImageDlg->DrawImageFile( path );
+			}
+		}
+		break;
+	}
+
+	// 通信完了（フラグを下げる）
+	m_access = FALSE;
+
+	// プログレスバーを非表示
+	mc_progressBar.ShowWindow( SW_HIDE );
+
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+
+	MZ3LOGGER_DEBUG(_T("OnGetEndBinary end"));
+
+	return TRUE;
 }
 
 /**
@@ -1182,6 +1247,21 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetItemData( index, index );
 	}
 
+	// mini画像画面制御
+	// プロフィールでかつ画像があれば描画
+	bool bDrawMiniImage = false;
+	pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory!=NULL) {
+		const CMixiData& data = pCategory->GetSelectedBody();
+
+		if (data.GetAccessType() == ACCESS_PROFILE && data.GetImageCount()>0) {
+			bDrawMiniImage = true;
+		}
+	}
+	if (m_pMiniImageDlg) {
+		m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
+	}
+
 	m_nochange = FALSE;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
@@ -1258,6 +1338,40 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 //	m_infoEdit.SetWindowText( GetSelectedBodyItem().GetTitle() );
 	m_infoEdit.SetWindowText( 
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
+
+	// mini画像が未ロードであれば取得する
+	CMixiData& mixi = m_selGroup->getSelectedCategory()->GetSelectedBody();
+	CString miniImagePath = util::MakeImageLogfilePath( mixi );
+	if (!miniImagePath.IsEmpty()) {
+		if (!util::ExistFile(miniImagePath)) {
+			if(! m_access ) {
+				// アクセス中は禁止
+				// 取得
+				static CMixiData s_data;
+				CMixiData dummy;
+				s_data = dummy;
+				s_data.SetAccessType( ACCESS_IMAGE );
+
+				CString url = mixi.GetImage(0);
+
+				// 中止ボタンを使用可にする
+				theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+
+				// アクセス種別を設定
+				theApp.m_accessType = s_data.GetAccessType();
+
+				// アクセス開始
+				m_access = TRUE;
+				m_abort = FALSE;
+
+				theApp.m_inet.Initialize( m_hWnd, &s_data );
+				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
+			}
+		} else {
+			// すでに存在するので描画
+			m_pMiniImageDlg->DrawImageFile( miniImagePath );
+		}
+	}
 
 	*pResult = 0;
 }
@@ -3745,4 +3859,29 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+void CMZ3View::MoveMiniImageDlg(void)
+{
+	if (m_pMiniImageDlg != NULL) {
+		CWnd* pBody = GetDlgItem( IDC_BODY_LIST );
+		if (pBody != NULL ) {
+			CRect rectBodyList;
+			m_bodyList.GetWindowRect( &rectBodyList );
+
+//			CRect rect( origin.x, origin.y, origin.x + cx, origin.y + hBody );
+//			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
+			CRect rect = rectBodyList;
+
+			int w = 50;
+			int h = 50;
+
+			int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
+			int x = rect.right-w-wScrollBar;
+//			int x = rect.right-w;
+//			int y = rect.bottom-h;
+			int y = rect.top;
+			m_pMiniImageDlg->MoveWindow( x, y, w, h );
+		}
+	}
 }
