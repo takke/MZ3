@@ -49,20 +49,16 @@ void CMiniImageDialog::DrawImageFile(LPCTSTR szImageFile)
 	Invalidate();
 }
 
-CSize makeAspectFixedMag( int w0, int h0, int w1, int h1 )
+/// ƒAƒXƒyƒNƒg”äŒÅ’è‚ÅŠg‘åEk¬
+CSize makeAspectFixedFitSize( int w0, int h0, int w1, int h1 )
 {
 	if (w0==0 || h0==0 || w1==0 || h1==0) {
 		return CSize();
 	}
 
-	CSize size;
-
-	// c•ûŒü‚ÌŠg‘åEk¬
-	double dHeight = h1/(double)h0;
-	double dWidth  = w1/(double)w0;
-
-	int w = (int)(dHeight * w0);
-	int h = (int)(dWidth  * h0);
+	// c,‰¡Šî€‚ÅŠg‘åEk¬
+	int w = (int)(h1/(double)h0 * w0);
+	int h = (int)(w1/(double)w0 * h0);
 
 	if (w>w1) {
 		return CSize(w1, h);
@@ -86,9 +82,9 @@ void CMiniImageDialog::OnPaint()
 		int h = rectClient.Height();
 		CSize sizeSrc  = m_image.getBitmapSize();
 
-		CSize sizeDest = makeAspectFixedMag( sizeSrc.cx, sizeSrc.cy, w, h );
+		CSize sizeDest = makeAspectFixedFitSize( sizeSrc.cx, sizeSrc.cy, w, h );
 
-		// ‰E‰ºŠñ‚¹‚Å•`‰æ‚·‚é
+		// ƒZƒ“ƒ^ƒŠƒ“ƒO•`‰æ
 		x = (w - sizeDest.cx)/2;
 		y = (h - sizeDest.cy)/2;
 

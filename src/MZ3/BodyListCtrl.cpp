@@ -428,10 +428,13 @@ void CBodyListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// ƒXƒNƒ[ƒ‹Žž‚Ì”wŒi‰æ‘œ‚Ì‚¸‚ê–hŽ~
 	if (theApp.m_optionMng.IsUseBgImage()) {
+		// ƒXƒNƒ[ƒ‹ˆÊ’u‚ª•Ï‰»‚µ‚Ä‚¢‚½‚çÄ•`‰æ
 		static int s_nLastPos = nPos;
 		if( s_nLastPos != nPos ) {
 			Invalidate( FALSE );
 			s_nLastPos = nPos;
+
+			theApp.m_pMainView->MoveMiniImageDlg();
 		}
 	}
 
@@ -443,11 +446,13 @@ BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	// ƒXƒNƒ[ƒ‹Žž‚Ì”wŒi‰æ‘œ‚Ì‚¸‚ê–hŽ~
 	if (theApp.m_optionMng.IsUseBgImage()) {
 		// ƒXƒNƒ[ƒ‹ˆÊ’u‚ª•Ï‰»‚µ‚Ä‚¢‚½‚çÄ•`‰æ
-		static int s_lastPos = -1;
 		int pos = GetScrollPos(SB_VERT);
+		static int s_lastPos = pos;
 		if (pos != s_lastPos) {
 			Invalidate( FALSE );
 			s_lastPos = pos;
+
+			theApp.m_pMainView->MoveMiniImageDlg();
 		}
 	}
 

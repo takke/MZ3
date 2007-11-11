@@ -3723,6 +3723,13 @@ private:
 				// URL \’z•Ý’è
 				url.Insert( 0, L"http://mixi.jp/" );
 				mixi.SetBrowseUri( url );
+
+				// ‚³‚ç‚É‰æ‘œ‚à‚ ‚ê‚Î’Šo
+				CString image_url;
+				if (util::GetBetweenSubString( line, L"src=\"", L"\"", image_url ) >= 0 ) {
+					mixi.AddImage( image_url );
+				}
+
 				break;
 			}
 		}

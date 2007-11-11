@@ -59,6 +59,7 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 	// アクセス種別に応じてパスを生成する
 	switch( data.GetAccessType() ) {
 	case ACCESS_PROFILE:
+	case ACCESS_COMMUNITY:
 		if (data.GetImageCount()>0) {
 			CString path = MakeImageLogfilePathFromUrl( data.GetImage(0) );
 			if (!path.IsEmpty()) {

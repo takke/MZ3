@@ -19,8 +19,6 @@
 #include "OpenUrlDlg.h"
 #include "MiniImageDialog.h"
 
-#define W_ICON_REGION	50
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -1247,21 +1245,6 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetItemData( index, index );
 	}
 
-	// mini画像画面制御
-	// プロフィールでかつ画像があれば描画
-	bool bDrawMiniImage = false;
-	pCategory = m_selGroup->getSelectedCategory();
-	if (pCategory!=NULL) {
-		const CMixiData& data = pCategory->GetSelectedBody();
-
-		if (data.GetAccessType() == ACCESS_PROFILE && data.GetImageCount()>0) {
-			bDrawMiniImage = true;
-		}
-	}
-	if (m_pMiniImageDlg) {
-		m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
-	}
-
 	m_nochange = FALSE;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
@@ -1372,6 +1355,8 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			m_pMiniImageDlg->DrawImageFile( miniImagePath );
 		}
 	}
+
+	MoveMiniImageDlg();
 
 	*pResult = 0;
 }
@@ -2208,6 +2193,7 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 			if (theApp.m_optionMng.IsUseBgImage()) {
 				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 				m_bodyList.UpdateWindow();
+				MoveMiniImageDlg();
 			}
 		}
 		return TRUE;
@@ -2235,6 +2221,7 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 			if (theApp.m_optionMng.IsUseBgImage()) {
 				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 				m_bodyList.UpdateWindow();
+				MoveMiniImageDlg();
 			}
 		}
 		return TRUE;
@@ -3863,25 +3850,63 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CMZ3View::MoveMiniImageDlg(void)
 {
-	if (m_pMiniImageDlg != NULL) {
-		CWnd* pBody = GetDlgItem( IDC_BODY_LIST );
-		if (pBody != NULL ) {
-			CRect rectBodyList;
-			m_bodyList.GetWindowRect( &rectBodyList );
+	if (m_pMiniImageDlg == NULL) {
+		return;
+	}
 
-//			CRect rect( origin.x, origin.y, origin.x + cx, origin.y + hBody );
-//			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
-			CRect rect = rectBodyList;
+	// mini画像画面制御
+	// プロフィール or コミュニティで、
+	// かつ画像があれば表示
+	bool bDrawMiniImage = false;
+	if (m_selGroup!=NULL) {
+		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+		if (pCategory!=NULL) {
+			const CMixiData& data = pCategory->GetSelectedBody();
 
-			int w = 50;
-			int h = 50;
-
-			int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
-			int x = rect.right-w-wScrollBar;
-//			int x = rect.right-w;
-//			int y = rect.bottom-h;
-			int y = rect.top;
-			m_pMiniImageDlg->MoveWindow( x, y, w, h );
+			CString path = util::MakeImageLogfilePath( data );
+			if (!path.IsEmpty() ) {
+				bDrawMiniImage = true;
+			}
 		}
 	}
+	m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
+
+	CWnd* pBody = GetDlgItem( IDC_BODY_LIST );
+	if (pBody != NULL ) {
+		if (m_selGroup != NULL && m_selGroup->getSelectedCategory() != NULL) {
+			int idx = m_selGroup->getSelectedCategory()->selectedBody;
+		
+			CRect rectBodyList; 
+			m_bodyList.GetWindowRect( &rectBodyList );
+
+			CRect rect;
+			m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
+
+			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
+
+			const int w = 50;
+			const int h = 50;
+
+			// とりあえず行の直下に描画。
+			// ボディリストからはみ出す場合は上側に描画。
+//			int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
+//			int x = rect.right-w-wScrollBar;
+//			int x = rect.right-w;
+			int x = rect.left+32;
+//			int y = rect.bottom-h;
+//			int y = rect.top;
+			int y = rect.bottom;
+			if (y+h > rectBodyList.bottom) {
+				y = rect.top - h;
+			}
+
+			// それでもはみだす場合（スクロール時など）は非表示
+			if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
+				m_pMiniImageDlg->ShowWindow( SW_HIDE );
+			} else {
+				m_pMiniImageDlg->MoveWindow( x, y, w, h );
+			}
+		}
+	}
+
 }
