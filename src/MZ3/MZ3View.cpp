@@ -177,6 +177,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
     ON_MESSAGE(WM_MZ3_ACCESS_INFORMATION, OnAccessInformation)
 	ON_MESSAGE(WM_MZ3_ACCESS_LOADED, OnAccessLoaded)
     ON_MESSAGE(WM_MZ3_CHANGE_VIEW, OnChangeView)
+	ON_MESSAGE(WM_MZ3_HIDE_VIEW, OnHideView)
 	ON_COMMAND(ID_WRITE_DIARY, &CMZ3View::OnWriteDiary)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
 	ON_COMMAND(ID_OPEN_BROWSER, &CMZ3View::OnOpenBrowser)
@@ -374,8 +375,10 @@ void CMZ3View::OnInitialUpdate()
 	m_categoryList.SetFocus();
 
 	// 子画面
+#ifndef WINCE
 	m_pMiniImageDlg = new CMiniImageDialog( this );
 	m_pMiniImageDlg->ShowWindow( SW_HIDE );
+#endif
 
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
@@ -1356,7 +1359,9 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 				}
 			} else {
 				// すでに存在するので描画
-				m_pMiniImageDlg->DrawImageFile( miniImagePath );
+				if (m_pMiniImageDlg!=NULL) {
+					m_pMiniImageDlg->DrawImageFile( miniImagePath );
+				}
 			}
 		}
 	}
@@ -1587,6 +1592,9 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 		(m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY));
 
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
+
+	// mini画像ウィンドウの復帰
+	MoveMiniImageDlg();
 
 	return LRESULT();
 }
@@ -3854,6 +3862,9 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+/**
+ * mini画像ウィンドウの移動（および消去）
+ */
 void CMZ3View::MoveMiniImageDlg(void)
 {
 	if (m_pMiniImageDlg == NULL) {
@@ -3920,5 +3931,14 @@ void CMZ3View::MoveMiniImageDlg(void)
 			}
 		}
 	}
+}
 
+LRESULT CMZ3View::OnHideView(WPARAM wParam, LPARAM lParam)
+{
+	// 画像ウィンドウの消去
+	if (m_pMiniImageDlg != NULL) {
+		m_pMiniImageDlg->ShowWindow( SW_HIDE );
+	}
+
+	return TRUE;
 }

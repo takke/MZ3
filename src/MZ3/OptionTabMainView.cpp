@@ -37,7 +37,12 @@ BOOL COptionTabMainView::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	// ユーザやコミュニティの画像
+#ifdef WINCE
+	// 無効
+	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
+#else
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+#endif
 
 	// トピック等のアイコン表示
 	CheckDlgButton( IDC_SHOW_ICON_CHECK, theApp.m_optionMng.m_bShowMainViewIcon ? BST_CHECKED : BST_UNCHECKED );

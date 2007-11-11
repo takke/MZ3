@@ -89,9 +89,8 @@ public:
 	XcrawlCanceler		m_xcrawl;		///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 
-	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
-
 private:
+	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
 	BOOL			m_access;			///< アクセス中フラグ
 
@@ -308,6 +307,7 @@ protected:
 public:
 	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	void MoveMiniImageDlg(void);
+	afx_msg LRESULT OnHideView(WPARAM wParam, LPARAM lParam);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

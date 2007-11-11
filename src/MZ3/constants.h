@@ -44,6 +44,8 @@
 #define WM_MZ3_ABORT				WM_APP + 26
 /// 画面再構成
 #define WM_MZ3_FIT					WM_APP + 40
+/// ビュー非表示
+#define WM_MZ3_HIDE_VIEW			WM_APP + 41
 
 /**
  * アクセスタイプ

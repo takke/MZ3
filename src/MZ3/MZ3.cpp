@@ -395,8 +395,9 @@ void CMZ3App::ChangeView( CView* pNewView )
 	UINT temp = ::GetWindowLong( pActiveView->m_hWnd, GWL_ID );
 	::SetWindowLong( pActiveView->m_hWnd, GWL_ID, ::GetWindowLong(pNewView->m_hWnd, GWL_ID) );
 	::SetWindowLong( pNewView->m_hWnd, GWL_ID, temp );
-
 	pActiveView->ShowWindow( SW_HIDE );
+	::SendMessage( pActiveView->m_hWnd, WM_MZ3_HIDE_VIEW, NULL, NULL );
+	
 	pNewView->ShowWindow( SW_SHOW );
 	((CFrameWnd*)m_pMainWnd)->SetActiveView( pNewView );
 	((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
