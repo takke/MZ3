@@ -86,6 +86,10 @@ public:
 	int				m_lastTopPageTabIndex;		///< 前回終了時のタブのインデックス
 	int				m_lastTopPageCategoryIndex;	///< 前回終了時のカテゴリのインデックス
 
+	//--- メイン画面
+	bool			m_bShowMainViewIcon;		///< トピック等にアイコンを表示する？
+	bool			m_bShowMainViewMiniImage;	///< ユーザやコミュニティの画像を表示する？
+
 private:
 	int				m_recvBufSize;				///< 受信バッファサイズ
 
@@ -139,6 +143,12 @@ public:
 		, m_bEnableIntervalCheck( false )
 		, m_lastTopPageTabIndex( 0 )
 		, m_lastTopPageCategoryIndex( 0 )
+		, m_bShowMainViewIcon( true )
+#ifdef WINCE
+		, m_bShowMainViewMiniImage( false )
+#else
+		, m_bShowMainViewMiniImage( true )
+#endif
 	{
 	}
 

@@ -135,34 +135,36 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 状態アイコンを描画します。
-	UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
-	if ((nStateImageMask>>12) > 0) {
+	if (m_bUseIcon) {
+		UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
+		if ((nStateImageMask>>12) > 0) {
 
-		int nImage = (nStateImageMask>>12) - 1;
+			int nImage = (nStateImageMask>>12) - 1;
 
-		CImageList* pImageList = this->GetImageList(LVSIL_STATE);
-		if (pImageList) {
-			pImageList->Draw(pDC, nImage,
-				CPoint(rcItem.left, rcItem.top),
-				ILD_TRANSPARENT);
+			CImageList* pImageList = this->GetImageList(LVSIL_STATE);
+			if (pImageList) {
+				pImageList->Draw(pDC, nImage,
+					CPoint(rcItem.left, rcItem.top),
+					ILD_TRANSPARENT);
+			}
 		}
-	}
 
-	// 通常のアイコンとオーバーレイアイコンを描画します。
-	CRect rcIcon;
-	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
-	CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
+		// 通常のアイコンとオーバーレイアイコンを描画します。
+		CRect rcIcon;
+		this->GetItemRect(nItem, rcIcon, LVIR_ICON);
+		CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
 
-	if (pImageList != NULL) {
-		UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
-		if (rcItem.left < rcItem.right - 1) {
-			if (lvi.iImage >= 0) {
-				ImageList_DrawEx(
-					pImageList->m_hImageList, lvi.iImage,
-					pDC->m_hDC,
-					rcIcon.left, rcIcon.top, 16, 16,
-					clrMaskBk, clrMaskFg,
-					uiFlags | nOvlImageMask);
+		if (pImageList != NULL) {
+			UINT nOvlImageMask = lvi.state & LVIS_OVERLAYMASK;
+			if (rcItem.left < rcItem.right - 1) {
+				if (lvi.iImage >= 0) {
+					ImageList_DrawEx(
+						pImageList->m_hImageList, lvi.iImage,
+						pDC->m_hDC,
+						rcIcon.left, rcIcon.top, 16, 16,
+						clrMaskBk, clrMaskFg,
+						uiFlags | nOvlImageMask);
+				}
 			}
 		}
 	}

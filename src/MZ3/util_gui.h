@@ -3,6 +3,8 @@
  * GUI 関連ユーティリティ
  */
 
+#include "util_base.h"
+
 /// ユーティリティ
 namespace util
 {
@@ -81,7 +83,11 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 
 	// 転送
 //	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
+#ifdef WINCE
+	SetStretchBltMode( hdc, COLORONCOLOR );
+#else
 	SetStretchBltMode( hdc, HALFTONE );
+#endif
 	StretchBlt( hdc, tox, toy, tow, toh, hdc1, x, y, w, h, SRCCOPY );
 
 	SelectObject( hdc1, hBitmapOld );

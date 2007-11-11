@@ -1481,10 +1481,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MiniImageDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MixiData.cpp"
 				>
 			</File>
@@ -2052,6 +2048,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\MiniImageDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\MZ3View.cpp"
 					>
 				</File>
@@ -2077,6 +2077,10 @@
 				</File>
 				<File
 					RelativePath=".\OptionTabLog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabMainView.cpp"
 					>
 				</File>
 				<File
@@ -2144,10 +2148,6 @@
 			</File>
 			<File
 				RelativePath=".\HtmlArray.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MiniImageDialog.h"
 				>
 			</File>
 			<File
@@ -2318,6 +2318,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\MiniImageDialog.h"
+					>
+				</File>
+				<File
 					RelativePath=".\MZ3View.h"
 					>
 				</File>
@@ -2343,6 +2347,10 @@
 				</File>
 				<File
 					RelativePath=".\OptionTabLog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabMainView.h"
 					>
 				</File>
 				<File

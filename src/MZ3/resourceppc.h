@@ -54,6 +54,7 @@
 #define IDC_STATIC_6                    206
 #define IDD_OPTIONTAB_DISPLAY           206
 #define IDC_STATIC_7                    207
+#define IDD_OPTIONTAB_MAIN_VIEW         207
 #define IDC_STATIC_8                    208
 #define IDC_STATIC_9                    209
 #define IDC_STATIC_10                   210
@@ -118,7 +119,9 @@
 #define IDC_USE_RUN_CONFIRM_DLG_CHECK   1038
 #define IDC_ACCESS_TYPE_LIST            1038
 #define IDC_GROUP_TAB                   1039
+#define IDC_SHOW_MINI_IMAGE_DLG_CHECK   1039
 #define IDC_CHANGE_LOG_FOLDER_BUTTON    1040
+#define IDC_SHOW_ICON_CHECK             1040
 #define IDC_PROGRESS_BAR                1041
 #define IDC_RECV_BUF_COMBO              1042
 #define IDC_RESET_TOTAL_RECV_BYTES_BUTTON 1044

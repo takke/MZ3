@@ -325,6 +325,25 @@ void Option::Load()
 		}
 	}
 
+	//--- メイン画面
+	if (inifile.SectionExists("MainView") != FALSE) {
+		// トピック等にアイコンを表示する？
+		std::string s = inifile.GetValue("ShowMainViewIcon", "MainView");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bShowMainViewIcon = atoi( s.c_str() ) != 0;
+		}
+
+		// ユーザやコミュニティの画像を表示する？
+		s = inifile.GetValue("ShowMainViewMiniImage", "MainView");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bShowMainViewMiniImage = atoi( s.c_str() ) != 0;
+		}
+	}
+
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
 }
 
@@ -449,6 +468,13 @@ void Option::Save()
 
 	// User-Agent
 	inifile.SetValue( L"UserAgent", m_strUserAgent, "Net" );
+
+	//--- メイン画面
+	// トピック等にアイコンを表示する？
+	inifile.SetValue( "ShowMainViewIcon", (LPCSTR)util::int2str_a(m_bShowMainViewIcon ? 1 : 0), "MainView");
+
+	// ユーザやコミュニティの画像を表示する？
+	inifile.SetValue( "ShowMainViewMiniImage", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImage ? 1 : 0), "MainView");
 
 	// Save
 	inifile.Save( theApp.m_filepath.inifile, false );

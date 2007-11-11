@@ -5,6 +5,7 @@
 #include "OptionTabGeneral.h"
 #include "OptionTabUI.h"
 #include "OptionTabDisplay.h"
+#include "OptionTabMainView.h"
 #include "OptionTabReport.h"
 #include "OptionTabLog.h"
 
@@ -28,6 +29,7 @@ private:
 	COptionTabGeneral	m_tabGeneral;	///< 一般タブ
 	COptionTabDisplay	m_tabDisplay;	///< 表示タブ
 	COptionTabUI		m_tabUi;		///< 操作タブ
+	COptionTabMainView	m_tabMainView;	///< メイン画面タブ
 	COptionTabReport	m_tabReport;	///< レポート画面タブ
 	COptionTabGetPage	m_tabGet;		///< 取得タブ
 	COptionTabLog		m_tabLog;		///< ログタブ

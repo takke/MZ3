@@ -1216,14 +1216,17 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
 	bool bUseIcon = false;
 	INT_PTR count = body.size();
-	for (int i=0; i<count; i++) {
-		int iconIndex = MyGetBodyListIconIndex(body[i]);
-		if (iconIndex >= 0) {
-			// アイコンありなので表示
-			bUseIcon = true;
-			break;
+	if (theApp.m_optionMng.m_bShowMainViewIcon) {
+		for (int i=0; i<count; i++) {
+			int iconIndex = MyGetBodyListIconIndex(body[i]);
+			if (iconIndex >= 0) {
+				// アイコンありなので表示
+				bUseIcon = true;
+				break;
+			}
 		}
 	}
+
 	// アイコン表示・非表示設定
 	m_bodyList.MyEnableIcon( bUseIcon );
 
@@ -1323,39 +1326,42 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
 
 	// mini画像が未ロードであれば取得する
-	CMixiData& mixi = m_selGroup->getSelectedCategory()->GetSelectedBody();
-	CString miniImagePath = util::MakeImageLogfilePath( mixi );
-	if (!miniImagePath.IsEmpty()) {
-		if (!util::ExistFile(miniImagePath)) {
-			if(! m_access ) {
-				// アクセス中は禁止
-				// 取得
-				static CMixiData s_data;
-				CMixiData dummy;
-				s_data = dummy;
-				s_data.SetAccessType( ACCESS_IMAGE );
+	if (theApp.m_optionMng.m_bShowMainViewMiniImage) {
+		CMixiData& mixi = m_selGroup->getSelectedCategory()->GetSelectedBody();
+		CString miniImagePath = util::MakeImageLogfilePath( mixi );
+		if (!miniImagePath.IsEmpty()) {
+			if (!util::ExistFile(miniImagePath)) {
+				if(! m_access ) {
+					// アクセス中は禁止
+					// 取得
+					static CMixiData s_data;
+					CMixiData dummy;
+					s_data = dummy;
+					s_data.SetAccessType( ACCESS_IMAGE );
 
-				CString url = mixi.GetImage(0);
+					CString url = mixi.GetImage(0);
 
-				// 中止ボタンを使用可にする
-				theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+					// 中止ボタンを使用可にする
+					theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
 
-				// アクセス種別を設定
-				theApp.m_accessType = s_data.GetAccessType();
+					// アクセス種別を設定
+					theApp.m_accessType = s_data.GetAccessType();
 
-				// アクセス開始
-				m_access = TRUE;
-				m_abort = FALSE;
+					// アクセス開始
+					m_access = TRUE;
+					m_abort = FALSE;
 
-				theApp.m_inet.Initialize( m_hWnd, &s_data );
-				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
+					theApp.m_inet.Initialize( m_hWnd, &s_data );
+					theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
+				}
+			} else {
+				// すでに存在するので描画
+				m_pMiniImageDlg->DrawImageFile( miniImagePath );
 			}
-		} else {
-			// すでに存在するので描画
-			m_pMiniImageDlg->DrawImageFile( miniImagePath );
 		}
 	}
 
+	// 画像位置変更
 	MoveMiniImageDlg();
 
 	*pResult = 0;
@@ -3851,6 +3857,12 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 void CMZ3View::MoveMiniImageDlg(void)
 {
 	if (m_pMiniImageDlg == NULL) {
+		return;
+	}
+
+	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
+		// オプションがOffなので、常に非表示
+		m_pMiniImageDlg->ShowWindow( SW_HIDE );
 		return;
 	}
 
