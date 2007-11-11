@@ -3369,6 +3369,13 @@ private:
 			return false;
 		}
 
+		// ‰æ‘œ’Šo
+		const CString& line = html.GetAt( iLine );
+		CString image_url;
+		if (util::GetBetweenSubString( line, L"src=\"", L"\"", image_url ) >= 0 ) {
+			mixi.AddImage( image_url );
+		}
+
 		const CString& line2 = html.GetAt( ++iLine );
 
 		// URL ’Šo
