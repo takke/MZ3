@@ -15,7 +15,7 @@ Language=0x0411 Japanese
 Title=MZ4 - MZ3 for Windows -
 
 [WINDOWS]
-defwnd="MZ4 - MZ3 for Windows -","MZ3 for Windows.hhc","MZ3 for Windows.hhk","2007101519554875.htm",,,,,,0x21720,200,0x10180E,[380,211,944,656],,0x0,,,,,0
+defwnd="MZ4 - MZ3 for Windows -","MZ3 for Windows.hhc","MZ3 for Windows.hhk","2007101519554875.htm",,,,,,0x21720,200,0x10180E,[380,211,1231,722],,0x0,,,,,0
 
 [FILES]
 2007102393625771.htm
