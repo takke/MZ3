@@ -484,18 +484,8 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 			if (idx>=0) {
 				TRACE( L" idx=%d\n", idx );
 
-				// mini画像が未ロードであれば取得する
-				if (theApp.m_pMainView->m_selGroup != NULL &&
-					theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL) 
-				{
-					const CMixiDataList& bodies = theApp.m_pMainView->m_selGroup->getSelectedCategory()->m_body;
-					if (0<=idx && idx<bodies.size()) {
-						theApp.m_pMainView->MyLoadMiniImage( bodies[idx] );
-					}
-				}
-
 				// 画像位置変更
-				theApp.m_pMainView->MoveMiniImageDlg( idx );
+				theApp.m_pMainView->MoveMiniImageDlg( idx, point.x );
 			}
 		}
 	}

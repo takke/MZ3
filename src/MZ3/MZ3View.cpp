@@ -1328,9 +1328,6 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_infoEdit.SetWindowText( 
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
 
-	// mini画像が未ロードであれば取得する
-	MyLoadMiniImage( m_selGroup->getSelectedCategory()->GetSelectedBody() );
-
 	// 画像位置変更
 	MoveMiniImageDlg();
 
@@ -3830,7 +3827,7 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 /**
  * mini画像ウィンドウの移動（および消去）
  */
-void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/)
+void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/)
 {
 	if (m_pMiniImageDlg == NULL) {
 		return;
@@ -3843,16 +3840,19 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/)
 	}
 
 	// mini画像画面制御
-	// プロフィール or コミュニティで、
-	// かつ画像があれば表示
 	bool bDrawMiniImage = false;
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
+			// mini画像が未ロードであれば取得する
 			if (idxBody<0 || idxBody>=pCategory->m_body.size()) {
 				idxBody = pCategory->selectedBody;
 			}
 			const CMixiData& data = pCategory->m_body[ idxBody ];
+			MyLoadMiniImage( data );
+
+			// プロフィール or コミュニティで、
+			// かつ画像があれば表示
 
 			CString path = util::MakeImageLogfilePath( data );
 			if (!path.IsEmpty() ) {
@@ -3883,6 +3883,9 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/)
 //		int x = rect.right-w-wScrollBar;
 //		int x = rect.right-w;
 		int x = rect.left+32;
+		if (pointx>=0) {
+			x = rect.left +pointx +5;	// +d = margin
+		}
 //		int y = rect.bottom-h;
 //		int y = rect.top;
 		int y = rect.bottom;

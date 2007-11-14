@@ -46,7 +46,7 @@ void CMiniImageDialog::DrawImageFile(LPCTSTR szImageFile)
 //	MessageBox( szImageFile );
 	m_image.load( szImageFile );
 
-	Invalidate();
+	Invalidate( FALSE );
 }
 
 /// アスペクト比固定で拡大・縮小

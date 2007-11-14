@@ -306,7 +306,7 @@ protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 public:
 	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-	void MoveMiniImageDlg(int idxBody=-1);
+	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1);
 	afx_msg LRESULT OnHideView(WPARAM wParam, LPARAM lParam);
 	bool MyLoadMiniImage(const CMixiData& mixi);
 };
