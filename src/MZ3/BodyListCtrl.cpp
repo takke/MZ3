@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CListCtrl)
 	ON_WM_MOUSEWHEEL()
 #ifndef WINCE
 	ON_WM_NCCALCSIZE()
+	ON_WM_MOUSEMOVE()
 #endif
 END_MESSAGE_MAP()
 
@@ -468,5 +469,36 @@ void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp
 	this->EnableScrollBarCtrl( SB_HORZ, FALSE );
 
 	CListCtrl::OnNcCalcSize(bCalcValidRects, lpncsp);
+}
+#endif
+
+#ifndef WINCE
+void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
+	if (theApp.m_optionMng.m_bShowMainViewMiniImage) {
+		// とりあえずmini画像画面を移動
+		if (theApp.m_pMainView->m_pMiniImageDlg != NULL) {
+
+			int idx = HitTest(point);
+			if (idx>=0) {
+				TRACE( L" idx=%d\n", idx );
+
+				// mini画像が未ロードであれば取得する
+				if (theApp.m_pMainView->m_selGroup != NULL &&
+					theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL) 
+				{
+					const CMixiDataList& bodies = theApp.m_pMainView->m_selGroup->getSelectedCategory()->m_body;
+					if (0<=idx && idx<bodies.size()) {
+						theApp.m_pMainView->MyLoadMiniImage( bodies[idx] );
+					}
+				}
+
+				// 画像位置変更
+				theApp.m_pMainView->MoveMiniImageDlg( idx );
+			}
+		}
+	}
+	CListCtrl::OnMouseMove(nFlags, point);
 }
 #endif

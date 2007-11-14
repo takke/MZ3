@@ -1329,42 +1329,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
 
 	// mini画像が未ロードであれば取得する
-	if (theApp.m_optionMng.m_bShowMainViewMiniImage) {
-		CMixiData& mixi = m_selGroup->getSelectedCategory()->GetSelectedBody();
-		CString miniImagePath = util::MakeImageLogfilePath( mixi );
-		if (!miniImagePath.IsEmpty()) {
-			if (!util::ExistFile(miniImagePath)) {
-				if(! m_access ) {
-					// アクセス中は禁止
-					// 取得
-					static CMixiData s_data;
-					CMixiData dummy;
-					s_data = dummy;
-					s_data.SetAccessType( ACCESS_IMAGE );
-
-					CString url = mixi.GetImage(0);
-
-					// 中止ボタンを使用可にする
-					theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-
-					// アクセス種別を設定
-					theApp.m_accessType = s_data.GetAccessType();
-
-					// アクセス開始
-					m_access = TRUE;
-					m_abort = FALSE;
-
-					theApp.m_inet.Initialize( m_hWnd, &s_data );
-					theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
-				}
-			} else {
-				// すでに存在するので描画
-				if (m_pMiniImageDlg!=NULL) {
-					m_pMiniImageDlg->DrawImageFile( miniImagePath );
-				}
-			}
-		}
-	}
+	MyLoadMiniImage( m_selGroup->getSelectedCategory()->GetSelectedBody() );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
@@ -3865,7 +3830,7 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 /**
  * mini画像ウィンドウの移動（および消去）
  */
-void CMZ3View::MoveMiniImageDlg(void)
+void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/)
 {
 	if (m_pMiniImageDlg == NULL) {
 		return;
@@ -3884,7 +3849,10 @@ void CMZ3View::MoveMiniImageDlg(void)
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
-			const CMixiData& data = pCategory->GetSelectedBody();
+			if (idxBody<0 || idxBody>=pCategory->m_body.size()) {
+				idxBody = pCategory->selectedBody;
+			}
+			const CMixiData& data = pCategory->m_body[ idxBody ];
 
 			CString path = util::MakeImageLogfilePath( data );
 			if (!path.IsEmpty() ) {
@@ -3894,41 +3862,39 @@ void CMZ3View::MoveMiniImageDlg(void)
 	}
 	m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
 
-	CWnd* pBody = GetDlgItem( IDC_BODY_LIST );
-	if (pBody != NULL ) {
-		if (m_selGroup != NULL && m_selGroup->getSelectedCategory() != NULL) {
-			int idx = m_selGroup->getSelectedCategory()->selectedBody;
-		
-			CRect rectBodyList; 
-			m_bodyList.GetWindowRect( &rectBodyList );
+	if (bDrawMiniImage) {
+		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+		int idx = idxBody;
+	
+		CRect rectBodyList; 
+		m_bodyList.GetWindowRect( &rectBodyList );
 
-			CRect rect;
-			m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
+		CRect rect;
+		m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
 
-			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
+		rect.OffsetRect( rectBodyList.left, rectBodyList.top );
 
-			const int w = 50;
-			const int h = 50;
+		const int w = 50;
+		const int h = 50;
 
-			// とりあえず行の直下に描画。
-			// ボディリストからはみ出す場合は上側に描画。
-//			int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
-//			int x = rect.right-w-wScrollBar;
-//			int x = rect.right-w;
-			int x = rect.left+32;
-//			int y = rect.bottom-h;
-//			int y = rect.top;
-			int y = rect.bottom;
-			if (y+h > rectBodyList.bottom) {
-				y = rect.top - h;
-			}
+		// とりあえず行の直下に描画。
+		// ボディリストからはみ出す場合は上側に描画。
+//		int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
+//		int x = rect.right-w-wScrollBar;
+//		int x = rect.right-w;
+		int x = rect.left+32;
+//		int y = rect.bottom-h;
+//		int y = rect.top;
+		int y = rect.bottom;
+		if (y+h > rectBodyList.bottom) {
+			y = rect.top - h;
+		}
 
-			// それでもはみだす場合（スクロール時など）は非表示
-			if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
-				m_pMiniImageDlg->ShowWindow( SW_HIDE );
-			} else {
-				m_pMiniImageDlg->MoveWindow( x, y, w, h );
-			}
+		// それでもはみだす場合（スクロール時など）は非表示
+		if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
+			m_pMiniImageDlg->ShowWindow( SW_HIDE );
+		} else {
+			m_pMiniImageDlg->MoveWindow( x, y, w, h );
 		}
 	}
 }
@@ -3941,4 +3907,47 @@ LRESULT CMZ3View::OnHideView(WPARAM wParam, LPARAM lParam)
 	}
 
 	return TRUE;
+}
+
+bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
+{
+	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
+		return false;
+	}
+
+	CString miniImagePath = util::MakeImageLogfilePath( mixi );
+	if (!miniImagePath.IsEmpty()) {
+		if (!util::ExistFile(miniImagePath)) {
+			if(! m_access ) {
+				// アクセス中は禁止
+				// 取得
+				static CMixiData s_data;
+				CMixiData dummy;
+				s_data = dummy;
+				s_data.SetAccessType( ACCESS_IMAGE );
+
+				CString url = mixi.GetImage(0);
+
+				// 中止ボタンを使用可にする
+				theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+
+				// アクセス種別を設定
+				theApp.m_accessType = s_data.GetAccessType();
+
+				// アクセス開始
+				m_access = TRUE;
+				m_abort = FALSE;
+
+				theApp.m_inet.Initialize( m_hWnd, &s_data );
+				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
+			}
+		} else {
+			// すでに存在するので描画
+			if (m_pMiniImageDlg!=NULL) {
+				m_pMiniImageDlg->DrawImageFile( miniImagePath );
+			}
+		}
+	}
+
+	return true;
 }
