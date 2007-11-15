@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "kfm_buffer.h"
 
 /// In Memory Kanji-Filter
 namespace kfm {
@@ -12,64 +13,6 @@ namespace kfm {
 #define MAXMIMELEN      512
 
 typedef std::vector<unsigned char> kf_buf_type;
-
-/**
- * getc と同じ動作を vector に対して行うラッパー
- */
-class kf_buf_reader
-{
-private:
-	const kf_buf_type& buf_;	///< vector のバッファ
-	size_t len_readed;			///< 読み込み済みサイズ
-
-public:
-	/// Constructor
-	kf_buf_reader( const kf_buf_type& buf )
-		: buf_(buf), len_readed(0)
-	{
-	}
-	
-	/**
-	 * get_char
-	 *
-	 * 末尾の場合は EOF を返す
-	 */
-	int get_char()
-	{
-		if( len_readed < buf_.size() ) {
-			int c = buf_[len_readed];
-			len_readed ++;
-			return c;
-		}else{
-			return EOF;
-		}
-	}
-};
-
-/**
- * putc と同じ動作を vector に対して行うラッパー
- */
-class kf_buf_writer
-{
-private:
-	kf_buf_type& buf_;			///< vector のバッファ
-
-public:
-	/// Constructor
-	kf_buf_writer( kf_buf_type& buf )
-		: buf_(buf)
-	{
-	}
-	
-	/**
-	 * put_char
-	 */
-	int put_char( int c )
-	{
-		buf_.push_back( c );
-		return c;
-	}
-};
 
 /**
  * In Memory Kanji-Filter
@@ -88,8 +31,8 @@ private:
 	CODE_TYPE default_icode;
 	CODE_TYPE ocode;
 
-	kf_buf_reader	inbuf;
-	kf_buf_writer	outbuf;
+	kf_buf_reader<unsigned char>	inbuf;
+	kf_buf_writer<unsigned char>	outbuf;
 public:
 	kfm( const kf_buf_type& buf_in, kf_buf_type& buf_out )
 		: inbuf(buf_in)
