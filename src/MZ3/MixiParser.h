@@ -3,6 +3,7 @@
 #include "MyRegex.h"
 #include "HtmlArray.h"
 #include "MixiParserUtil.h"
+#include "xml2stl.h"
 
 /// mixi 用HTMLパーサ
 namespace mixi {
@@ -3538,9 +3539,6 @@ public:
  * [list] 足あとAPI 用パーサ
  * 【足あと】
  * http://mixi.jp/atom/tracks/r=2/member_id=
- *
- * とりあえず力業でパースしておく。
- * DOM で書き直すこと。
  */
 class TrackParser : public MixiListParser
 {
@@ -3549,70 +3547,74 @@ public:
 	{
 		MZ3LOGGER_DEBUG( L"TrackParser.parse() start." );
 
+		// html_ の文字列化
+		std::vector<TCHAR> text;
+		text.reserve( 10*1024 );	// バッファ予約
 		INT_PTR count = html_.GetCount();
 		for (int i=0; i<count; i++) {
-
 			const CString& line = html_.GetAt(i);
-
-			if (line.Find(L"<entry>") != -1) {
-
-				// オブジェクト生成
-				CMixiData data;
-				data.SetAccessType( ACCESS_PROFILE );
-
-				i++;
-				for (; i<count; i++) {
-					const CString& line = html_.GetAt(i);
-					if (line.Find(L"</entry>") != -1) {
-						break;
-					}
-
-					if (line.Find(L"<link") != -1) {
-						// URL
-						CString url;
-						if (util::GetBetweenSubString( line, L"href=\"", L"\"", url )>0) {
-							data.SetURL( url );
-							data.SetBrowseUri( L"http://mixi.jp/" + url );
-						}
-					}
-
-					if (line.Find(L"<title>") != -1) {
-						CString name;
-						if (util::GetBetweenSubString( line, L">", L"<", name )>0) {
-							data.SetName( name );
-						}
-					}
-
-					// 関係
-					if (line.Find(L"<tracks:relation>") != -1) {
-						CString relation;
-						if (util::GetBetweenSubString( line, L">", L"<", relation )>0) {
-							if (relation==L"friend") {
-								data.SetMyMixi( true );
-							} else {
-								data.SetMyMixi( false );
-							}
-						}
-					}
-
-					// Image
-					if (line.Find(L"<tracks:image>") != -1) {
-						CString image;
-						if (util::GetBetweenSubString( line, L">", L"<", image )>0) {
-							data.AddImage( image );
-						}
-					}
-
-					// <updated>2007-11-07T08:53:51Z</updated> 
-					if (line.Find(L"<updated>") != -1) {
-						CString date;
-						if (util::GetBetweenSubString( line, L">", L"<", date )>0) {
-							ParserUtil::ParseDate( date, data );
-						}
-					}
-				}
-				out_.push_back( data );
+			size_t size = text.size();
+			int new_size = wcslen(line);
+			if (new_size>0) {
+				text.resize( size+new_size );
+				wcsncpy( &text[size], (LPCTSTR)line, new_size );
 			}
+		}
+
+		// XML 解析
+		xml2stl::Container root;
+		if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+			MZ3LOGGER_ERROR( L"XML 解析失敗" );
+			return false;
+		}
+
+		// entry に対する処理
+		try {
+			const xml2stl::Node& feed = root.getNode( L"feed" );
+			size_t nChildren = feed.getChildrenCount();
+			for (size_t i=0; i<nChildren; i++) {
+				const xml2stl::Node& node = feed.getNode(i);
+				if (node.getName() != L"entry") {
+					continue;
+				}
+				try {
+					const xml2stl::Node& entry = node;
+					// オブジェクト生成
+					CMixiData data;
+					data.SetAccessType( ACCESS_PROFILE );
+
+					// URL : entry/link/@href
+					CString url = entry.getNode( L"link" ).getProperty( L"href" ).c_str();
+					data.SetURL( url );
+					data.SetBrowseUri( url );
+
+					// name : entry/author/name
+					const xml2stl::Node& author = entry.getNode( L"author" );
+					data.SetName( author.getNode( L"name" ).getText().c_str() );
+
+					// 関係 : entry/author/tracks:relation
+					const std::wstring& relation = author.getNode( L"tracks:relation" ).getText();
+					if (relation==L"friend") {
+						data.SetMyMixi( true );
+					} else {
+						data.SetMyMixi( false );
+					}
+
+					// Image : entry/author/tracks:image
+					data.AddImage( author.getNode( L"tracks:image" ).getText().c_str() );
+
+					// updated : entry/updated
+					ParserUtil::ParseDate( entry.getNode( L"updated" ).getText().c_str(), data );
+	
+					// 完成したので追加する
+					out_.push_back( data );
+				} catch (...) {
+					MZ3LOGGER_ERROR( L"some node or property not found..." );
+					break;
+				}
+			}
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"feed not found..." );
 		}
 
 		MZ3LOGGER_DEBUG( L"TrackParser.parse() finished." );

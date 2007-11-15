@@ -6,7 +6,7 @@
  *
  * TODO:
  *   - entity decoding.
- *   - supports input string.
+ *   - supports XPath subset, like "feed/entry/link/@href"
  */
 #include <stdio.h>
 #include <string>
@@ -43,6 +43,9 @@ public:
     XML2STL_STRING text;
 };
 
+typedef std::vector<Property>	PropertyList;
+typedef std::vector<Node>		NodeList;
+
 class Container
 {
 private:
@@ -50,8 +53,8 @@ private:
     XML2STL_STRING  name;
     XML2STL_STRING  text;
 
-    std::vector<Property> properties;
-    std::vector<Node>     children;
+    PropertyList	properties;
+    NodeList		children;
 
 public:
     Container() : type(XML2STL_TYPE_ROOTNODE) 
@@ -69,11 +72,11 @@ public:
 		return text;
 	}
 
-	const std::vector<Node>& getChildren() const {
+	const NodeList& getChildren() const {
 		return children;
 	}
 
-	const std::vector<Property>& getProperties() const {
+	const PropertyList& getProperties() const {
 		return properties;
 	}
 
@@ -114,10 +117,24 @@ public:
 		return properties[ index ];
 	}
 
+	const XML2STL_STRING& getProperty( const XML2STL_STRING& name ) const
+	{
+		size_t n = properties.size();
+		for (size_t i=0; i<n; i++) {
+			if (properties[i].name == name) {
+				return properties[i].text;
+			}
+		}
+        throw NodeNotFoundException();
+		// TODO: use another exception.
+		// TODO: set requested "name".
+	}
+
 	const Node& getNode( size_t index ) const
 	{
 		if (index >= children.size()) {
 	        throw NodeNotFoundException();
+			// TODO: set requested info.
 		}
 		return children[ index ];
 	}
@@ -136,6 +153,7 @@ public:
             }
         }
         throw NodeNotFoundException();
+		// TODO: set requested info.
     }
 
 	void setText( const XML2STL_STRING& text )
@@ -144,14 +162,14 @@ public:
 	}
 };
 
-void dump_nest( FILE* fp, int nest_level )
+inline void dump_nest( FILE* fp, int nest_level )
 {
     for (int i=0; i<nest_level*2; i++) {
         fputc( ' ', fp );
     }
 }
 
-void dump_container( const Container& c, FILE* fp, int nest_level=0 )
+inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
 {
     switch (c.getType()) {
         case XML2STL_TYPE_ROOTNODE:
