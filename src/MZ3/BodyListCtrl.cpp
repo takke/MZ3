@@ -485,7 +485,7 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 				TRACE( L" idx=%d\n", idx );
 
 				// ‰æ‘œˆÊ’u•ÏX
-				theApp.m_pMainView->MoveMiniImageDlg( idx, point.x );
+				theApp.m_pMainView->MoveMiniImageDlg( idx, point.x, point.y );
 			}
 		}
 	}

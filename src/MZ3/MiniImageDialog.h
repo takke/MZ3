@@ -12,6 +12,7 @@ public:
 	CMiniImageDialog(CWnd* pParent = NULL);   // 標準コンストラクタ
 	virtual ~CMiniImageDialog();
 	CMZ3BackgroundImage	m_image;	///< ビットマップ
+	CString m_szLastImageFile;
 
 // ダイアログ データ
 	enum { IDD = IDD_MINI_IMAGE_DIALOG };
@@ -24,4 +25,6 @@ protected:
 public:
 	void DrawImageFile(LPCTSTR szImageFile);
 	afx_msg void OnPaint();
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };

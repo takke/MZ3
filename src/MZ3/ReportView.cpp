@@ -389,12 +389,11 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// É^ÉCÉgÉãÇÃê›íË
-	int index;
 	CString title = m_data.GetTitle();
-	index = title.ReverseFind(_T('('));
-	if (index != -1) {
-		title = title.Left(index);
-	}
+//	int index = title.ReverseFind(_T('('));
+//	if (index != -1) {
+//		title = title.Left(index);
+//	}
 	if (m_data.GetAccessType() != ACCESS_MYDIARY &&
 		m_data.GetAccessType() != ACCESS_MESSAGE) 
 	{

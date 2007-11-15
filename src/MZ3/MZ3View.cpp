@@ -199,6 +199,12 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
     ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
 	ON_NOTIFY(NM_CLICK, IDC_GROUP_TAB, &CMZ3View::OnNMClickGroupTab)
+	ON_COMMAND(ID_ACCELERATOR_FONT_MAGNIFY, &CMZ3View::OnAcceleratorFontMagnify)
+	ON_COMMAND(ID_ACCELERATOR_FONT_SHRINK, &CMZ3View::OnAcceleratorFontShrink)
+	ON_COMMAND(ID_ACCELERATOR_CONTEXT_MENU, &CMZ3View::OnAcceleratorContextMenu)
+	ON_COMMAND(ID_ACCELERATOR_NEXT_TAB, &CMZ3View::OnAcceleratorNextTab)
+	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -378,6 +384,19 @@ void CMZ3View::OnInitialUpdate()
 #ifndef WINCE
 	m_pMiniImageDlg = new CMiniImageDialog( this );
 	m_pMiniImageDlg->ShowWindow( SW_HIDE );
+
+	// 半透明処理
+	::SetWindowLong( m_pMiniImageDlg->m_hWnd, GWL_EXSTYLE, GetWindowLong(m_pMiniImageDlg->m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+	
+	typedef BOOL (WINAPI *PROCSETLAYEREDWINDOW)(HWND, COLORREF, BYTE, DWORD);
+	PROCSETLAYEREDWINDOW pProcSetLayeredWindowAttributes;
+	pProcSetLayeredWindowAttributes = 
+		(PROCSETLAYEREDWINDOW)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetLayeredWindowAttributes");
+
+	int n = 100-10;
+	if (pProcSetLayeredWindowAttributes!=NULL) {
+		pProcSetLayeredWindowAttributes(m_pMiniImageDlg->m_hWnd, 0, 255*n/100, LWA_ALPHA);
+	}
 #endif
 
 	// 初期化スレッド開始
@@ -1365,17 +1384,13 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
 #endif
 		break;
+#ifdef WINCE
 	case VK_F2:
+#endif
 #ifndef WINCE
 	case VK_APPS:
 #endif
-		if( GetFocus() == &m_bodyList ) {
-			// ボディリストでの右クリックメニュー
-			PopupBodyMenu();
-		}else{
-			// カテゴリリストでの右クリック
-			PopupCategoryMenu();
-		}
+		OnAcceleratorContextMenu();
 		return TRUE;
 	case VK_BACK:
 #ifndef WINCE
@@ -3827,7 +3842,7 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 /**
  * mini画像ウィンドウの移動（および消去）
  */
-void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/)
+void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int pointy/*=-1*/)
 {
 	if (m_pMiniImageDlg == NULL) {
 		return;
@@ -3848,15 +3863,17 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/)
 			if (idxBody<0 || idxBody>=pCategory->m_body.size()) {
 				idxBody = pCategory->selectedBody;
 			}
-			const CMixiData& data = pCategory->m_body[ idxBody ];
-			MyLoadMiniImage( data );
+			if (!pCategory->m_body.empty()) {
+				const CMixiData& data = pCategory->m_body[ idxBody ];
+				MyLoadMiniImage( data );
 
-			// プロフィール or コミュニティで、
-			// かつ画像があれば表示
+				// プロフィール or コミュニティで、
+				// かつ画像があれば表示
 
-			CString path = util::MakeImageLogfilePath( data );
-			if (!path.IsEmpty() ) {
-				bDrawMiniImage = true;
+				CString path = util::MakeImageLogfilePath( data );
+				if (!path.IsEmpty() ) {
+					bDrawMiniImage = true;
+				}
 			}
 		}
 	}
@@ -3874,23 +3891,36 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/)
 
 		rect.OffsetRect( rectBodyList.left, rectBodyList.top );
 
-		const int w = 50;
-		const int h = 50;
+		// TODO: オプションで指定できるようにするといいね
+		const int w = 75;
+		const int h = 75;
 
 		// とりあえず行の直下に描画。
-		// ボディリストからはみ出す場合は上側に描画。
-//		int wScrollBar = GetSystemMetrics( SM_CXVSCROLL );
-//		int x = rect.right-w-wScrollBar;
-//		int x = rect.right-w;
-		int x = rect.left+32;
+		int delta = 5;
+		int x = 0;
 		if (pointx>=0) {
-			x = rect.left +pointx +5;	// +d = margin
+			x = rectBodyList.left +pointx +delta;
+			if (x+w > rectBodyList.right) {
+				// ボディリストからはみ出すので左側に描画。
+				x = x -w -delta -delta;
+			}
+		} else {
+			x = rect.left+32;
 		}
-//		int y = rect.bottom-h;
-//		int y = rect.top;
-		int y = rect.bottom;
-		if (y+h > rectBodyList.bottom) {
-			y = rect.top - h;
+
+		int y = 0;
+		if (pointy>=0) {
+			y = rectBodyList.top +pointy +delta;
+			if (y+h > rectBodyList.bottom) {
+				// ボディリストからはみ出すので上側に描画。
+				y = rectBodyList.top +pointy -h -delta;
+			}
+		} else {
+			y = rect.bottom;
+			if (y+h > rectBodyList.bottom) {
+				// ボディリストからはみ出すので上側に描画。
+				y = rect.top -h;
+			}
 		}
 
 		// それでもはみだす場合（スクロール時など）は非表示
@@ -3953,4 +3983,80 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 	}
 
 	return true;
+}
+
+/**
+ * フォント拡大
+ */
+void CMZ3View::OnAcceleratorFontMagnify()
+{
+	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight+1 );
+
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
+}
+
+/**
+ * フォント縮小
+ */
+void CMZ3View::OnAcceleratorFontShrink()
+{
+	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight-1 );
+
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
+}
+
+/**
+ * コンテキストメニュー表示
+ */
+void CMZ3View::OnAcceleratorContextMenu()
+{
+	if( GetFocus() == &m_bodyList ) {
+		// ボディリストでの右クリックメニュー
+		PopupBodyMenu();
+	}else{
+		// カテゴリリストでの右クリック
+		PopupCategoryMenu();
+	}
+}
+
+/**
+ * 次のタブ
+ */
+void CMZ3View::OnAcceleratorNextTab()
+{
+	CommandSelectGroupTabNextItem();
+}
+
+/**
+ * 前のタブ
+ */
+void CMZ3View::OnAcceleratorPrevTab()
+{
+	CommandSelectGroupTabBeforeItem();
+}
+
+/**
+ * ホイール
+ */
+BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	if (nFlags & MK_CONTROL) {
+		// Ctrl+ホイールで拡大・縮小
+		// 高解像度ホイール対応のため、delta 値を累積する。
+		static int delta = 0;
+		delta += zDelta;
+
+		if (delta>WHEEL_DELTA) {
+			OnAcceleratorFontMagnify();
+			delta = 0;
+		} else if (delta<-WHEEL_DELTA) {
+			OnAcceleratorFontShrink();
+			delta = 0;
+		}
+		return TRUE;
+	}
+
+	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
 }

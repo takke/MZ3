@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
+#include "MZ3View.h"
 #include "MiniImageDialog.h"
 #include "util_gui.h"
 
@@ -30,6 +31,8 @@ void CMiniImageDialog::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMiniImageDialog, CDialog)
 	ON_WM_PAINT()
+	ON_WM_MOUSEMOVE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -43,10 +46,14 @@ void CMiniImageDialog::PostNcDestroy()
 
 void CMiniImageDialog::DrawImageFile(LPCTSTR szImageFile)
 {
-//	MessageBox( szImageFile );
-	m_image.load( szImageFile );
-
-	Invalidate( FALSE );
+	// ファイル名が変化していればロードする
+	// （リロード・ちらつき対策）
+	if (szImageFile != m_szLastImageFile) {
+		if (m_image.load( szImageFile )) {
+			m_szLastImageFile = szImageFile;
+			Invalidate( TRUE );
+		}
+	}
 }
 
 /// アスペクト比固定で拡大・縮小
@@ -75,6 +82,10 @@ void CMiniImageDialog::OnPaint()
 		CRect rectClient;
 		this->GetClientRect( &rectClient );
 
+		// とりあえず塗りつぶす
+		COLORREF bgColor = RGB(255,255,255);
+		dc.FillSolidRect( rectClient, bgColor );
+
 		// アスペクト比固定で拡大・縮小
 		int x = rectClient.left;
 		int y = rectClient.top;
@@ -88,6 +99,26 @@ void CMiniImageDialog::OnPaint()
 		x = (w - sizeDest.cx)/2;
 		y = (h - sizeDest.cy)/2;
 
+#ifdef WINCE
 		util::DrawBitmap( dc.GetSafeHdc(), m_image.getHandle(), 0, 0, sizeSrc.cx, sizeSrc.cy, x, y, sizeDest.cx, sizeDest.cy );
+#else
+		m_image.m_gdiPlusImage.BitBlt( dc.GetSafeHdc(), x, y, sizeDest.cx, sizeDest.cy, 0, 0 );
+#endif
 	}
+}
+
+void CMiniImageDialog::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// BodyList に WM_MOUSEMOVE を投げる
+	ClientToScreen( &point );
+
+	::ScreenToClient( theApp.m_pMainView->m_bodyList.m_hWnd, &point );
+	::PostMessage( theApp.m_pMainView->m_bodyList.m_hWnd, WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y) );
+
+//	CDialog::OnMouseMove(nFlags, point);
+}
+
+BOOL CMiniImageDialog::OnEraseBkgnd(CDC* pDC)
+{
+	return FALSE;
 }

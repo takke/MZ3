@@ -306,9 +306,15 @@ protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 public:
 	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1);
+	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1, int pointy=-1);
 	afx_msg LRESULT OnHideView(WPARAM wParam, LPARAM lParam);
 	bool MyLoadMiniImage(const CMixiData& mixi);
+	afx_msg void OnAcceleratorFontMagnify();
+	afx_msg void OnAcceleratorFontShrink();
+	afx_msg void OnAcceleratorContextMenu();
+	afx_msg void OnAcceleratorNextTab();
+	afx_msg void OnAcceleratorPrevTab();
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
