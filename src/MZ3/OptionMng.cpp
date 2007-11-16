@@ -342,6 +342,14 @@ void Option::Load()
 		}else{
 			m_bShowMainViewMiniImage = atoi( s.c_str() ) != 0;
 		}
+
+		// mini画面サイズ
+		s = inifile.GetValue("MainViewMiniImageSize", "MainView");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_nMainViewMiniImageSize = normalizeRange( atoi( s.c_str() ), 25, 200 );
+		}
 	}
 
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
@@ -475,6 +483,9 @@ void Option::Save()
 
 	// ユーザやコミュニティの画像を表示する？
 	inifile.SetValue( "ShowMainViewMiniImage", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImage ? 1 : 0), "MainView");
+
+	// mini画面サイズ
+	inifile.SetValue( "MainViewMiniImageSize", (LPCSTR)util::int2str_a(m_nMainViewMiniImageSize), "MainView");
 
 	// Save
 	inifile.Save( theApp.m_filepath.inifile, false );

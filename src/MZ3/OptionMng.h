@@ -89,6 +89,7 @@ public:
 	//--- メイン画面
 	bool			m_bShowMainViewIcon;		///< トピック等にアイコンを表示する？
 	bool			m_bShowMainViewMiniImage;	///< ユーザやコミュニティの画像を表示する？
+	int				m_nMainViewMiniImageSize;	///< mini画面サイズ
 
 private:
 	int				m_recvBufSize;				///< 受信バッファサイズ
@@ -149,6 +150,7 @@ public:
 #else
 		, m_bShowMainViewMiniImage( true )
 #endif
+		, m_nMainViewMiniImageSize( 50 )
 	{
 	}
 

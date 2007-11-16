@@ -99,11 +99,7 @@ void CMiniImageDialog::OnPaint()
 		x = (w - sizeDest.cx)/2;
 		y = (h - sizeDest.cy)/2;
 
-#ifdef WINCE
 		util::DrawBitmap( dc.GetSafeHdc(), m_image.getHandle(), 0, 0, sizeSrc.cx, sizeSrc.cy, x, y, sizeDest.cx, sizeDest.cy );
-#else
-		m_image.m_gdiPlusImage.BitBlt( dc.GetSafeHdc(), x, y, sizeDest.cx, sizeDest.cy, 0, 0 );
-#endif
 	}
 }
 

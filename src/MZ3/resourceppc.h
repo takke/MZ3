@@ -137,6 +137,7 @@
 #define IDC_SELECT2_BUTTON              1053
 #define IDC_MESSAGE_STATIC              1054
 #define IDC_ENCODING_COMBO              1057
+#define IDC_MINI_IMAGE_SIZE_COMBO       1059
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -344,7 +345,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         32986
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

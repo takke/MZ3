@@ -21,4 +21,5 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
+	CComboBox mc_comboMiniImageSize;
 };

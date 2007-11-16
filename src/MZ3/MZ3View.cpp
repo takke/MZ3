@@ -3892,8 +3892,8 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 		rect.OffsetRect( rectBodyList.left, rectBodyList.top );
 
 		// TODO: オプションで指定できるようにするといいね
-		const int w = 75;
-		const int h = 75;
+		const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
+		const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
 
 		// とりあえず行の直下に描画。
 		int delta = 5;
