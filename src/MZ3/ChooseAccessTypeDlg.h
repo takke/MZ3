@@ -1,6 +1,4 @@
 #pragma once
-#include "c:\program files\microsoft visual studio 8\vc\atlmfc\include\afxwin.h"
-
 
 // CChooseAccessTypeDlg ダイアログ
 
