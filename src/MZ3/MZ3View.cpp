@@ -3860,7 +3860,7 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
 			// mini‰æ‘œ‚ª–¢ƒ[ƒh‚Å‚ ‚ê‚Îæ“¾‚·‚é
-			if (idxBody<0 || idxBody>=pCategory->m_body.size()) {
+			if (idxBody<0 || idxBody>=(int)pCategory->m_body.size()) {
 				idxBody = pCategory->selectedBody;
 			}
 			if (!pCategory->m_body.empty()) {
