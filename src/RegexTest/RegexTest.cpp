@@ -80,15 +80,15 @@ int test_xml2stl()
 		xml2stl::SimpleXmlParser::loadFromFile( root, L"C:\\Users\\takke\\Desktop\\MZ4.0.9.0.0bXX\\log\\tracks.xml" );
 
 		// dump
-	//	dump_container( root, stdout );
+		dump_container( root, stdout );
 
 		try {
 			const Node& feed = root.getNode( _T("feed") );
 			size_t n = feed.getChildrenCount();
 			for( size_t i=0; i<n; i++ ) {
 				wprintf( _T("  entry[%d] = %s\n"), 
-					i, 
-					feed.getNode( _T("entry"), i ).getNode( _T("title") ).getText().c_str() );
+					(int)i, 
+					feed.getNode( _T("entry"), (int)i ).getNode( _T("title") ).getText().c_str() );
 			}
 		} catch( NodeNotFoundException& ) {
 			wprintf( _T("node not found...\n") );
