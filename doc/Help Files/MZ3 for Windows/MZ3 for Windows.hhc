@@ -70,12 +70,12 @@
 <param name="Local" value="2007101520254759.htm">
 </object>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="キー操作について">
+<param name="Name" value="キー操作全般">
 <param name="ImageNumber" value="9">
 <param name="Local" value="200710152144713.htm">
 </object>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="F2 キー">
+<param name="Name" value="F10 / コンテキストキー">
 <param name="ImageNumber" value="9">
 <param name="Local" value="2007101521525162.htm">
 </object>
@@ -88,6 +88,11 @@
 <param name="Name" value="Esc / BackSpace">
 <param name="ImageNumber" value="9">
 <param name="Local" value="200710181218241.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="その他">
+<param name="ImageNumber" value="9">
+<param name="Local" value="2007111695941243.htm">
 </object>
 </UL>
 <LI><OBJECT type="text/sitemap">
