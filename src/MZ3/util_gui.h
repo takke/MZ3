@@ -260,4 +260,22 @@ inline int GetPopupFlags()
 	return flags;
 }
 
+/// ƒAƒXƒyƒNƒg”äŒÅ’è‚ÅŠg‘åEk¬
+inline CSize makeAspectFixedFitSize( int w0, int h0, int w1, int h1 )
+{
+	if (w0==0 || h0==0 || w1==0 || h1==0) {
+		return CSize();
+	}
+
+	// c,‰¡Šî€‚ÅŠg‘åEk¬
+	int w = (int)(h1/(double)h0 * w0);
+	int h = (int)(w1/(double)w0 * h0);
+
+	if (w>w1) {
+		return CSize(w1, h);
+	} else {
+		return CSize(w, h1);
+	}
+}
+
 }

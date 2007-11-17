@@ -193,7 +193,8 @@ private:
 	CListCtrl*		m_hotList;			///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 	CPostData*		m_postData;
 
-	CImageList		m_iconImageList;	///< アイコン用画像リスト
+	CImageList		m_iconImageList;			///< アイコン用画像リスト
+	CImageList		m_iconExtendedImageList;	///< アイコン用画像リスト（動的生成）
 
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;

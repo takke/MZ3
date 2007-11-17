@@ -411,7 +411,7 @@ void CMZ3View::OnInitialUpdate()
 /**
  * ボディリストのアイコンのインデックスを取得する
  */
-inline int MyGetBodyListIconIndex( const CMixiData& mixi )
+inline int MyGetBodyListDefaultIconIndex( const CMixiData& mixi )
 {
 	int iconIndex = -1;
 	switch (mixi.GetAccessType()) {
@@ -1237,21 +1237,74 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	// アイコンの表示・非表示の制御
 	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
 	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
-	bool bUseIcon = false;
+	bool bUseDefaultIcon = false;
 	INT_PTR count = body.size();
 	if (theApp.m_optionMng.m_bShowMainViewIcon) {
 		for (int i=0; i<count; i++) {
-			int iconIndex = MyGetBodyListIconIndex(body[i]);
+			int iconIndex = MyGetBodyListDefaultIconIndex(body[i]);
 			if (iconIndex >= 0) {
 				// アイコンありなので表示
-				bUseIcon = true;
+				bUseDefaultIcon = true;
 				break;
 			}
 		}
 	}
 
+	// ユーザやコミュニティの画像をアイコン化して表示する
+	bool bUseExtendedIcon = false;
+#ifndef WINCE
+	if (theApp.m_optionMng.m_bShowMainViewIcon && !bUseDefaultIcon) {
+		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
+		m_iconExtendedImageList.DeleteImageList();
+		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+		for (int i=0; i<count; i++) {
+			const CMixiData& mixi = body[i];
+			// dummy icon
+			CImage image;
+			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+			image.Load( miniImagePath );
+			if (!image.IsNull()) {
+
+				// 16x16 にリサイズする。
+				CImage resizedImage;
+				{
+					int w = 16;
+					int h = 16;
+					resizedImage.Create( w, h, 32, 0 );
+					HDC hdc = resizedImage.GetDC();
+					// 白で塗りつぶす
+					::FillRect( hdc, CRect(0, 0, w, h), (HBRUSH)GetStockObject(WHITE_BRUSH));
+					::SetStretchBltMode( hdc, HALFTONE );
+					// アスペクト比固定でリサイズ
+					CSize sizeDest = util::makeAspectFixedFitSize( image.GetWidth(), image.GetHeight(), w, h );
+					// リサイズしたサイズで描画
+					int x = (w - sizeDest.cx)/2;
+					int y = (h - sizeDest.cy)/2;
+					image.StretchBlt( hdc, x, y, sizeDest.cx, sizeDest.cy );
+					resizedImage.ReleaseDC();
+				}
+
+				// ビットマップの追加
+				CBitmap bm;
+				bm.Attach( resizedImage );
+				m_iconExtendedImageList.Add( &bm, RGB(255,255,255) );
+
+				bUseExtendedIcon = true;
+			} else {
+				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
+			}
+		}
+	}
+#endif
+
 	// アイコン表示・非表示設定
-	m_bodyList.MyEnableIcon( bUseIcon );
+	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
+	if (bUseDefaultIcon) {
+		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+	}
+	if (bUseExtendedIcon) {
+		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
+	}
 
 	// アイテムの追加
 	for (int i=0; i<count; i++) {
@@ -1259,7 +1312,13 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 		// １カラム目
 		// アイコンのインデックスを種別により設定する
-		int iconIndex = MyGetBodyListIconIndex(*data);
+		int iconIndex = -1;
+		if (bUseDefaultIcon ) {
+			iconIndex = MyGetBodyListDefaultIconIndex(*data);
+		}
+		if (bUseExtendedIcon) {
+			iconIndex = i;
+		}
 
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
 		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType), iconIndex );
