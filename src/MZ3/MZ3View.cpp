@@ -205,6 +205,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_NEXT_TAB, &CMZ3View::OnAcceleratorNextTab)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
 	ON_WM_MOUSEWHEEL()
+	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -2895,6 +2896,20 @@ void CMZ3View::OnSetNoRead()
 
 	// ログファイル削除
 	DeleteFile( util::MakeLogfilePath(mixi) );
+
+	// ビューを更新
+	m_bodyList.Update( m_selGroup->getSelectedCategory()->selectedBody );
+}
+
+
+/// 既読にする
+void CMZ3View::OnSetRead()
+{
+	CMixiData& mixi = GetSelectedBodyItem();
+
+	// ログINIファイルの項目を変更
+	CString logId = util::GetLogIdString( mixi );
+	theApp.m_logfile.SetValue(util::my_wcstombs((LPCTSTR)logId), (const char*)util::int2str_a(mixi.GetCommentCount()), "Log");
 
 	// ビューを更新
 	m_bodyList.Update( m_selGroup->getSelectedCategory()->selectedBody );

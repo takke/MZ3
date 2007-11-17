@@ -149,6 +149,7 @@ BEGIN
         MENUITEM "最新の２０件を読む",                   ID_GET_LAST10
         MENUITEM SEPARATOR
         MENUITEM "未読にする",                       IDM_SET_NO_READ
+        MENUITEM "既読にする",                       IDM_SET_READ
     END
     POPUP "コミュニティ用メニュー"
     BEGIN
