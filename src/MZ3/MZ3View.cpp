@@ -1194,6 +1194,8 @@ LRESULT CMZ3View::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
  */
 void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon)
 {
+	util::MySetInformationText( m_hWnd, L"アイコンリストを作成しています..." );
+
 	// アイコンの表示・非表示の制御
 	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
 	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
@@ -1247,6 +1249,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 	if (bUseExtendedIcon) {
 		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
 	}
+
+	util::MySetInformationText( m_hWnd, L"アイコンリストの作成完了" );
 }
 
 /**
