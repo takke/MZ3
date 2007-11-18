@@ -746,6 +746,16 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 			if (m_pMiniImageDlg!=NULL) {
 				m_pMiniImageDlg->DrawImageFile( path );
 			}
+
+			// アイコン差し替え
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			if (pCategory!=NULL) {
+				int idx = pCategory->selectedBody;
+				// CImageList::Replace が効かないで、リロードしてしまう。
+				bool bUseDefaultIcon = false;
+				bool bUseExtendedIcon = false;
+				SetBodyImageList( pCategory->GetBodyList(), bUseDefaultIcon, bUseExtendedIcon );
+			}
 		}
 		break;
 	}
@@ -1180,6 +1190,66 @@ LRESULT CMZ3View::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
 }
 
 /**
+ * ボディのイメージリストを作成
+ */
+void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon)
+{
+	// アイコンの表示・非表示の制御
+	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
+	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
+	INT_PTR count = body.size();
+	if (theApp.m_optionMng.m_bShowMainViewIcon) {
+		for (int i=0; i<count; i++) {
+			int iconIndex = MyGetBodyListDefaultIconIndex(body[i]);
+			if (iconIndex >= 0) {
+				// アイコンありなので表示
+				bUseDefaultIcon = true;
+				break;
+			}
+		}
+	}
+
+	// ユーザやコミュニティの画像をアイコン化して表示する
+	if (theApp.m_optionMng.m_bShowMainViewIcon && !bUseDefaultIcon) {
+		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
+		m_iconExtendedImageList.DeleteImageList();
+		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+		for (int i=0; i<count; i++) {
+			const CMixiData& mixi = body[i];
+			// icon
+			CMZ3BackgroundImage image(L"");
+			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+			image.load( miniImagePath );
+			if (image.isEnableImage()) {
+
+				// 16x16 にリサイズする。
+				CMZ3BackgroundImage resizedImage(L"");
+				util::MakeResizedImage( this, resizedImage, image );
+
+				// ビットマップの追加
+				CBitmap bm;
+				bm.Attach( resizedImage.getHandle() );
+				m_iconExtendedImageList.Add( &bm, (CBitmap*) NULL );
+
+				bUseExtendedIcon = true;
+			} else {
+				// dummy icon
+				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
+			}
+		}
+	}
+
+	// アイコン表示・非表示設定
+	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
+	if (bUseDefaultIcon) {
+		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+	}
+	if (bUseExtendedIcon) {
+		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
+	}
+}
+
+/**
  * ボディにデータを設定
  */
 void CMZ3View::SetBodyList( CMixiDataList& body )
@@ -1234,79 +1304,13 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		break;
 	}
 
-	// アイコンの表示・非表示の制御
-	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
-	//       (2) 全アイテムを走査し、アイコンが必要な項目があればアイコン表示、なければ非表示。
+	// アイコン用ImageListの設定
 	bool bUseDefaultIcon = false;
-	INT_PTR count = body.size();
-	if (theApp.m_optionMng.m_bShowMainViewIcon) {
-		for (int i=0; i<count; i++) {
-			int iconIndex = MyGetBodyListDefaultIconIndex(body[i]);
-			if (iconIndex >= 0) {
-				// アイコンありなので表示
-				bUseDefaultIcon = true;
-				break;
-			}
-		}
-	}
-
-	// ユーザやコミュニティの画像をアイコン化して表示する
 	bool bUseExtendedIcon = false;
-#ifndef WINCE
-	if (theApp.m_optionMng.m_bShowMainViewIcon && !bUseDefaultIcon) {
-		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
-		m_iconExtendedImageList.DeleteImageList();
-		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
-		for (int i=0; i<count; i++) {
-			const CMixiData& mixi = body[i];
-			// dummy icon
-			CImage image;
-			CString miniImagePath = util::MakeImageLogfilePath( mixi );
-			image.Load( miniImagePath );
-			if (!image.IsNull()) {
-
-				// 16x16 にリサイズする。
-				CImage resizedImage;
-				{
-					int w = 16;
-					int h = 16;
-					resizedImage.Create( w, h, 32, 0 );
-					HDC hdc = resizedImage.GetDC();
-					// 白で塗りつぶす
-					::FillRect( hdc, CRect(0, 0, w, h), (HBRUSH)GetStockObject(WHITE_BRUSH));
-					::SetStretchBltMode( hdc, HALFTONE );
-					// アスペクト比固定でリサイズ
-					CSize sizeDest = util::makeAspectFixedFitSize( image.GetWidth(), image.GetHeight(), w, h );
-					// リサイズしたサイズで描画
-					int x = (w - sizeDest.cx)/2;
-					int y = (h - sizeDest.cy)/2;
-					image.StretchBlt( hdc, x, y, sizeDest.cx, sizeDest.cy );
-					resizedImage.ReleaseDC();
-				}
-
-				// ビットマップの追加
-				CBitmap bm;
-				bm.Attach( resizedImage );
-				m_iconExtendedImageList.Add( &bm, RGB(255,255,255) );
-
-				bUseExtendedIcon = true;
-			} else {
-				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
-			}
-		}
-	}
-#endif
-
-	// アイコン表示・非表示設定
-	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
-	if (bUseDefaultIcon) {
-		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
-	}
-	if (bUseExtendedIcon) {
-		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
-	}
+	SetBodyImageList( body, bUseDefaultIcon, bUseExtendedIcon );
 
 	// アイテムの追加
+	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
 

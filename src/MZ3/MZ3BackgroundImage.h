@@ -51,7 +51,14 @@ public:
 		}
 		m_hBitmap = loadBitmap( szFilepath );
 
-		return true;
+		return isEnableImage();
+	}
+
+	bool create( HDC hdc, int w, int h, int depth )
+	{
+		m_hBitmap = ::CreateCompatibleBitmap( hdc, w, h );
+
+		return isEnableImage();
 	}
 
 private:

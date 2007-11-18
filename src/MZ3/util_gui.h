@@ -4,6 +4,7 @@
  */
 
 #include "util_base.h"
+#include "MZ3BackgroundImage.h"
 
 /// ユーティリティ
 namespace util
@@ -276,6 +277,41 @@ inline CSize makeAspectFixedFitSize( int w0, int h0, int w1, int h1 )
 	} else {
 		return CSize(w, h1);
 	}
+}
+
+inline void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ3BackgroundImage& image, int w=16, int h=16 )
+{
+	HWND hwnd = pWnd->GetSafeHwnd();
+
+	HDC hdcDisp = ::GetDC( hwnd );
+	resizedImage.create( hdcDisp, w, h, 32 );
+	::ReleaseDC( hwnd, hdcDisp );
+
+	// メモリDCの生成
+	HDC hdcFrom = CreateCompatibleDC(NULL);
+	HDC hdcDest = CreateCompatibleDC(NULL);
+
+	SelectObject( hdcFrom, image.getHandle() );
+	SelectObject( hdcDest, resizedImage.getHandle() );
+
+	// 白で塗りつぶす
+	::FillRect( hdcDest, CRect(0, 0, w, h), (HBRUSH)GetStockObject(WHITE_BRUSH));
+#ifdef WINCE
+	::SetStretchBltMode( hdcDest, COLORONCOLOR );
+#else
+	::SetStretchBltMode( hdcDest, HALFTONE );
+#endif
+	// アスペクト比固定でリサイズ
+	CSize size = image.getBitmapSize();
+	CSize sizeDest = util::makeAspectFixedFitSize( size.cx, size.cy, w, h );
+	// リサイズしたサイズで描画
+	int x = (w - sizeDest.cx)/2;
+	int y = (h - sizeDest.cy)/2;
+	::StretchBlt( hdcDest, x, y, sizeDest.cx, sizeDest.cy, hdcFrom, 0, 0, size.cx, size.cy, SRCCOPY );
+
+	// メモリDCの解放
+	::DeleteDC( hdcDest );
+	::DeleteDC( hdcFrom );
 }
 
 }

@@ -39,12 +39,14 @@ BOOL COptionTabMainView::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	// ユーザやコミュニティの画像
+	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+
+	// WINCE ではカーソル位置に表示しない
 #ifdef WINCE
 	// 無効
-	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
+//	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
 	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 #else
-	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ? BST_CHECKED : BST_UNCHECKED );
 #endif
 
@@ -97,9 +99,12 @@ void COptionTabMainView::OnOK()
 
 void COptionTabMainView::OnBnClickedShowMiniImageDlgCheck()
 {
+// WINCE ではカーソル位置に表示しない
+#ifndef WINCE
 	bool bChecked = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED);
 
 	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( bChecked ? TRUE : FALSE );
 	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( bChecked ? TRUE : FALSE );
 	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( bChecked ? TRUE : FALSE );
+#endif
 }
