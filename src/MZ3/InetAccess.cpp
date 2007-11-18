@@ -488,7 +488,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 	// タイムアウト値を30秒に設定
 	int timeout = 30000;
-	::InternetSetOption(m_hConnection, INTERNET_OPTION_RECEIVE_TIMEOUT, (LPVOID)timeout, sizeof(timeout));
+	::InternetSetOption(m_hConnection, INTERNET_OPTION_CONNECT_TIMEOUT, (LPVOID)timeout, sizeof(timeout));
 
 	// プロクシ設定がONの場合、IDとパスワードをセット
 	if (theApp.m_optionMng.IsUseProxy() ) {
@@ -936,7 +936,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		{
 			FILE* fp_out = _wfopen( theApp.m_filepath.temphtml, _T("wb"));
 			if( fp_out == NULL ) {
-				m_strErrorMsg = L"ファイルの出力に失敗しました";
+				m_strErrorMsg = L"ファイルの出力に失敗しました [" + theApp.m_filepath.temphtml + L"]";
 				MZ3LOGGER_ERROR( m_strErrorMsg );
 				return WM_MZ3_GET_ERROR;
 			}
