@@ -56,7 +56,8 @@ BOOL COptionTabMainView::OnInitDialog()
 	// mini‰æ–ÊƒTƒCƒY
 #ifdef WINCE
 	// –³Œø
-	mc_comboMiniImageSize.EnableWindow( FALSE );
+	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
+	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
 #else
 	int sizes[] = { 25, 50, 75, 100, 125, 150, -1 };
 	for (int i=0; sizes[i] != -1; i++) {
