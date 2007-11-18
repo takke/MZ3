@@ -528,14 +528,14 @@ void CMZ3App::ShowMixiData( CMixiData* data )
 /// ログ関連は除く。
 void CMZ3App::FilePath::init()
 {
-	TCHAR temppath[256];
-	::GetTempPath(256, temppath);
-
 	// MZ3 本体のログファイル
 	mz3logfile.Format( L"%s\\mz3log.txt", theApp.GetAppDirPath() );
 
 	// HTML 用一時ファイル(SJIS)
-	temphtml.Format( _T("%s\\mz3s.dat"), temppath );
+//	TCHAR temppath[256];
+//	::GetTempPath(256, temppath);
+//	temphtml.Format( _T("%s\\mz3s.dat"), temppath );
+	temphtml.Format( _T("%s\\mz3s.dat"), theApp.GetAppDirPath() );
 
 	// オプション用INIファイルのパス
 	inifile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("mz3.ini"));
