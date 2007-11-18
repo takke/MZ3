@@ -7,8 +7,8 @@
 #define WIDEN(x) WIDEN2(x)
 #define __WFILE__ WIDEN(__FILE__)
 
-#define SIMPLELOGGER_FATAL(target,msg)	(target).fatal( msg, __WFILE__, __LINE__ )
-#define SIMPLELOGGER_ERROR(target,msg)	(target).error( msg, __WFILE__, __LINE__ )
+#define SIMPLELOGGER_FATAL(target,msg)	(target).fatal( msg, __WFILE__, __LINE__ ); (target).flush()
+#define SIMPLELOGGER_ERROR(target,msg)	(target).error( msg, __WFILE__, __LINE__ ); (target).flush()
 #define SIMPLELOGGER_INFO(target,msg)	(target).info ( msg, __WFILE__, __LINE__ )
 #define SIMPLELOGGER_DEBUG(target,msg)	(target).debug( msg, __WFILE__, __LINE__ )
 #define SIMPLELOGGER_TRACE(target,msg)	(target).trace( msg, __WFILE__, __LINE__ )
