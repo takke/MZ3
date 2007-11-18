@@ -1210,7 +1210,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 	}
 
 	// ユーザやコミュニティの画像をアイコン化して表示する
-	if (theApp.m_optionMng.m_bShowMainViewIcon && !bUseDefaultIcon) {
+	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
 		m_iconExtendedImageList.DeleteImageList();
 		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
@@ -3927,13 +3927,11 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
  */
 void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int pointy/*=-1*/)
 {
-	if (m_pMiniImageDlg == NULL) {
-		return;
-	}
-
 	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
 		// オプションがOffなので、常に非表示
-		m_pMiniImageDlg->ShowWindow( SW_HIDE );
+		if (m_pMiniImageDlg != NULL) {
+			m_pMiniImageDlg->ShowWindow( SW_HIDE );
+		}
 		return;
 	}
 
@@ -3960,57 +3958,60 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 			}
 		}
 	}
-	m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
 
-	if (bDrawMiniImage) {
-		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-		int idx = idxBody;
-	
-		CRect rectBodyList; 
-		m_bodyList.GetWindowRect( &rectBodyList );
+	if (m_pMiniImageDlg != NULL) {
+		m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
 
-		CRect rect;
-		m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
+		if (bDrawMiniImage) {
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			int idx = idxBody;
+		
+			CRect rectBodyList; 
+			m_bodyList.GetWindowRect( &rectBodyList );
 
-		rect.OffsetRect( rectBodyList.left, rectBodyList.top );
+			CRect rect;
+			m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
 
-		// TODO: オプションで指定できるようにするといいね
-		const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
-		const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
+			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
 
-		// とりあえず行の直下に描画。
-		int delta = 5;
-		int x = 0;
-		if (pointx>=0) {
-			x = rectBodyList.left +pointx +delta;
-			if (x+w > rectBodyList.right) {
-				// ボディリストからはみ出すので左側に描画。
-				x = x -w -delta -delta;
+			// オプションで指定
+			const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
+			const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
+
+			// とりあえず行の直下に描画。
+			int delta = 5;
+			int x = 0;
+			if (pointx>=0) {
+				x = rectBodyList.left +pointx +delta;
+				if (x+w > rectBodyList.right) {
+					// ボディリストからはみ出すので左側に描画。
+					x = x -w -delta -delta;
+				}
+			} else {
+				x = rect.left+32;
 			}
-		} else {
-			x = rect.left+32;
-		}
 
-		int y = 0;
-		if (pointy>=0) {
-			y = rectBodyList.top +pointy +delta;
-			if (y+h > rectBodyList.bottom) {
-				// ボディリストからはみ出すので上側に描画。
-				y = rectBodyList.top +pointy -h -delta;
+			int y = 0;
+			if (pointy>=0) {
+				y = rectBodyList.top +pointy +delta;
+				if (y+h > rectBodyList.bottom) {
+					// ボディリストからはみ出すので上側に描画。
+					y = rectBodyList.top +pointy -h -delta;
+				}
+			} else {
+				y = rect.bottom;
+				if (y+h > rectBodyList.bottom) {
+					// ボディリストからはみ出すので上側に描画。
+					y = rect.top -h;
+				}
 			}
-		} else {
-			y = rect.bottom;
-			if (y+h > rectBodyList.bottom) {
-				// ボディリストからはみ出すので上側に描画。
-				y = rect.top -h;
-			}
-		}
 
-		// それでもはみだす場合（スクロール時など）は非表示
-		if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
-			m_pMiniImageDlg->ShowWindow( SW_HIDE );
-		} else {
-			m_pMiniImageDlg->MoveWindow( x, y, w, h );
+			// それでもはみだす場合（スクロール時など）は非表示
+			if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
+				m_pMiniImageDlg->ShowWindow( SW_HIDE );
+			} else {
+				m_pMiniImageDlg->MoveWindow( x, y, w, h );
+			}
 		}
 	}
 }
