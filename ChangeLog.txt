@@ -1,9 +1,19 @@
 $Id$
 
 * todo
-- Ctrl+'+', Ctrl+'-' で文字サイズを変更できるように。
 
 * MZ3.i/MZ4 Ver.0.9 series
+
+** MZ3.i/MZ4 Ver.0.9.0.0 Beta7	(2007.11.17)
+- ユーザやコミュニティの画像をメイン画面でアイコン表示するようにした。
+- [MZ4] マウスオーバーで表示するかどうかをオプションで選べるようにした。
+- [MZ4] gdiplus.dll を同梱するようにした。
+- 「既読にする」メニューを追加。
+- mz3s.dat をインストール先に作成するようにした。
+- その他
+
+http://www.mz3.jp/bin/MZ3.0.9.0.0b7.CAB (WindowsMobile版)
+http://www.mz3.jp/bin/MZ4.0.9.0.0b7.lzh (Windows版)
 
 ** MZ3.i/MZ4 Ver.0.9.0.0 Beta6	(2007.11.16)
 - Ctrl+'+' および Ctrl+W でフォント拡大、Ctrl+'-' および Ctrl+S でフォント縮小するようにした。
@@ -14,9 +24,6 @@ $Id$
 - [MZ4] メイン画面の画像表示を少し透過するようにした。
 - [MZ4] メイン画面の画像表示画面のサイズをオプションで変更できるようにした。
 - その他
-
-http://www.mz3.jp/bin/MZ3.0.9.0.0b6.CAB (WindowsMobile版)
-http://www.mz3.jp/bin/MZ4.0.9.0.0b6.lzh (Windows版)
 
 ** MZ3.i/MZ4 Ver.0.9.0.0 Beta5	(2007.11.11)
 - 足あとを mixi API で取得するように修正（10件まで）。

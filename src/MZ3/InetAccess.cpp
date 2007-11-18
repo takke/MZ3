@@ -903,7 +903,6 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		// ï∂éöÉRÅ[Éhïœä∑(SJISÇ…ïœä∑)
 		kfm::kf_buf_type out_buf;
 
-
 		switch (m_encodingFrom) {
 		case ENCODING_EUC:
 			{
@@ -921,6 +920,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			break;
 
 		case ENCODING_SJIS:
+		default:
 			// ñ≥ïœä∑
 			out_buf = recv_buffer;
 			break;
