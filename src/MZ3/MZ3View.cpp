@@ -4119,15 +4119,19 @@ BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	if (nFlags & MK_CONTROL) {
 		// Ctrl+ホイールで拡大・縮小
 		// 高解像度ホイール対応のため、delta 値を累積する。
-		static int delta = 0;
-		delta += zDelta;
+		static int s_delta = 0;
+		// 方向が逆になったらキャンセル
+		if ((s_delta>0 && zDelta<0) || (s_delta<0 && zDelta>0)) {
+			s_delta = 0;
+		}
+		s_delta += zDelta;
 
-		if (delta>WHEEL_DELTA) {
+		if (s_delta>WHEEL_DELTA) {
 			OnAcceleratorFontMagnify();
-			delta = 0;
-		} else if (delta<-WHEEL_DELTA) {
+			s_delta -= WHEEL_DELTA;
+		} else if (s_delta<-WHEEL_DELTA) {
 			OnAcceleratorFontShrink();
-			delta = 0;
+			s_delta += WHEEL_DELTA;
 		}
 		return TRUE;
 	}
