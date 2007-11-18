@@ -123,6 +123,7 @@
 #define IDC_CHANGE_LOG_FOLDER_BUTTON    1040
 #define IDC_SHOW_ICON_CHECK             1040
 #define IDC_PROGRESS_BAR                1041
+#define IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK 1041
 #define IDC_RECV_BUF_COMBO              1042
 #define IDC_RESET_TOTAL_RECV_BYTES_BUTTON 1044
 #define IDC_RESET_TAB_BUTTON            1046
@@ -138,6 +139,7 @@
 #define IDC_MESSAGE_STATIC              1054
 #define IDC_ENCODING_COMBO              1057
 #define IDC_MINI_IMAGE_SIZE_COMBO       1059
+#define IDC_SIZE_STATIC                 1060
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -346,7 +348,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         32988
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

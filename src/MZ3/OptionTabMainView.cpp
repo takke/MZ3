@@ -28,6 +28,7 @@ void COptionTabMainView::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(COptionTabMainView, CPropertyPage)
+	ON_BN_CLICKED(IDC_SHOW_MINI_IMAGE_DLG_CHECK, &COptionTabMainView::OnBnClickedShowMiniImageDlgCheck)
 END_MESSAGE_MAP()
 
 
@@ -41,8 +42,10 @@ BOOL COptionTabMainView::OnInitDialog()
 #ifdef WINCE
 	// 無効
 	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
+	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 #else
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ? BST_CHECKED : BST_UNCHECKED );
 #endif
 
 	// トピック等のアイコン表示
@@ -67,6 +70,8 @@ BOOL COptionTabMainView::OnInitDialog()
 	if (mc_comboMiniImageSize.GetCurSel() < 0) {
 		mc_comboMiniImageSize.SetCurSel( 0 );
 	}
+	// 有効・無効
+	OnBnClickedShowMiniImageDlgCheck();
 #endif
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -77,6 +82,7 @@ void COptionTabMainView::OnOK()
 {
 	// ユーザやコミュニティの画像
 	theApp.m_optionMng.m_bShowMainViewMiniImage = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED;
+	theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK ) == BST_CHECKED;
 
 	// トピック等のアイコン表示
 	theApp.m_optionMng.m_bShowMainViewIcon = IsDlgButtonChecked( IDC_SHOW_ICON_CHECK ) == BST_CHECKED;
@@ -87,4 +93,13 @@ void COptionTabMainView::OnOK()
 #endif
 
 	CPropertyPage::OnOK();
+}
+
+void COptionTabMainView::OnBnClickedShowMiniImageDlgCheck()
+{
+	bool bChecked = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED);
+
+	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( bChecked ? TRUE : FALSE );
+	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( bChecked ? TRUE : FALSE );
+	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( bChecked ? TRUE : FALSE );
 }

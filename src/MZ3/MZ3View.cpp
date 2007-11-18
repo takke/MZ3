@@ -1330,6 +1330,11 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetItemData( index, index );
 	}
 
+	// アイテムが0件の場合は、mini画像画面を非表示にする
+	if (m_bodyList.GetItemCount()==0) {
+		MoveMiniImageDlg();
+	}
+
 	m_nochange = FALSE;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 

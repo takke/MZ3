@@ -476,17 +476,16 @@ void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp
 void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
 	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
-	if (theApp.m_optionMng.m_bShowMainViewMiniImage) {
-		// とりあえずmini画像画面を移動
-		if (theApp.m_pMainView->m_pMiniImageDlg != NULL) {
+	// オプションがOnならmini画像画面を移動
+	if (theApp.m_optionMng.m_bShowMainViewMiniImage &&
+		theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ) 
+	{
+		int idx = HitTest(point);
+		if (idx>=0) {
+			TRACE( L" idx=%d\n", idx );
 
-			int idx = HitTest(point);
-			if (idx>=0) {
-				TRACE( L" idx=%d\n", idx );
-
-				// 画像位置変更
-				theApp.m_pMainView->MoveMiniImageDlg( idx, point.x, point.y );
-			}
+			// 画像位置変更
+			theApp.m_pMainView->MoveMiniImageDlg( idx, point.x, point.y );
 		}
 	}
 	CListCtrl::OnMouseMove(nFlags, point);

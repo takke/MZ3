@@ -89,6 +89,7 @@ public:
 	//--- メイン画面
 	bool			m_bShowMainViewIcon;		///< トピック等にアイコンを表示する？
 	bool			m_bShowMainViewMiniImage;	///< ユーザやコミュニティの画像を表示する？
+	bool			m_bShowMainViewMiniImageOnMouseOver;	///< マウスオーバーで表示する？
 	int				m_nMainViewMiniImageSize;	///< mini画面サイズ
 
 private:
@@ -147,8 +148,10 @@ public:
 		, m_bShowMainViewIcon( true )
 #ifdef WINCE
 		, m_bShowMainViewMiniImage( false )
+		, m_bShowMainViewMiniImageOnMouseOver( false )
 #else
 		, m_bShowMainViewMiniImage( true )
+		, m_bShowMainViewMiniImageOnMouseOver( true )
 #endif
 		, m_nMainViewMiniImageSize( 50 )
 	{
