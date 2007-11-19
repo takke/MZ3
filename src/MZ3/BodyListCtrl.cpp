@@ -478,6 +478,7 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
 	// ƒIƒvƒVƒ‡ƒ“‚ªOn‚È‚çmini‰æ‘œ‰æ–Ê‚ðˆÚ“®
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage &&
+		theApp.m_optionMng.m_bShowMainViewMiniImageDlg &&
 		theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ) 
 	{
 		int idx = HitTest(point);

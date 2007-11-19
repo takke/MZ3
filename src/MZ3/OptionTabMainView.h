@@ -23,4 +23,6 @@ public:
 	virtual void OnOK();
 	CComboBox mc_comboMiniImageSize;
 	afx_msg void OnBnClickedShowMiniImageDlgCheck();
+	afx_msg void OnBnClickedShowMiniImageCheck();
+	void UpdateControlItemStatus(void);
 };

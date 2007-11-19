@@ -29,6 +29,7 @@ void COptionTabMainView::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(COptionTabMainView, CPropertyPage)
 	ON_BN_CLICKED(IDC_SHOW_MINI_IMAGE_DLG_CHECK, &COptionTabMainView::OnBnClickedShowMiniImageDlgCheck)
+	ON_BN_CLICKED(IDC_SHOW_MINI_IMAGE_CHECK, &COptionTabMainView::OnBnClickedShowMiniImageCheck)
 END_MESSAGE_MAP()
 
 
@@ -39,13 +40,14 @@ BOOL COptionTabMainView::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	// ユーザやコミュニティの画像
-	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+	CheckDlgButton( IDC_SHOW_MINI_IMAGE_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+
+	// 別画面に表示
+	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImageDlg ? BST_CHECKED : BST_UNCHECKED );
 
 	// WINCE ではカーソル位置に表示しない
 #ifdef WINCE
 	// 無効
-//	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
-	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 #else
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ? BST_CHECKED : BST_UNCHECKED );
 #endif
@@ -56,8 +58,6 @@ BOOL COptionTabMainView::OnInitDialog()
 	// mini画面サイズ
 #ifdef WINCE
 	// 無効
-	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
-	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
 #else
 	int sizes[] = { 25, 50, 75, 100, 125, 150, -1 };
 	for (int i=0; sizes[i] != -1; i++) {
@@ -77,6 +77,8 @@ BOOL COptionTabMainView::OnInitDialog()
 	OnBnClickedShowMiniImageDlgCheck();
 #endif
 
+	UpdateControlItemStatus();
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -84,7 +86,8 @@ BOOL COptionTabMainView::OnInitDialog()
 void COptionTabMainView::OnOK()
 {
 	// ユーザやコミュニティの画像
-	theApp.m_optionMng.m_bShowMainViewMiniImage = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED;
+	theApp.m_optionMng.m_bShowMainViewMiniImage = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_CHECK ) == BST_CHECKED;
+	theApp.m_optionMng.m_bShowMainViewMiniImageDlg = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED;
 	theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK ) == BST_CHECKED;
 
 	// トピック等のアイコン表示
@@ -100,12 +103,46 @@ void COptionTabMainView::OnOK()
 
 void COptionTabMainView::OnBnClickedShowMiniImageDlgCheck()
 {
-// WINCE ではカーソル位置に表示しない
-#ifndef WINCE
-	bool bChecked = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED);
+	UpdateControlItemStatus();
+}
 
-	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( bChecked ? TRUE : FALSE );
-	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( bChecked ? TRUE : FALSE );
-	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( bChecked ? TRUE : FALSE );
+void COptionTabMainView::OnBnClickedShowMiniImageCheck()
+{
+	UpdateControlItemStatus();
+}
+
+void COptionTabMainView::UpdateControlItemStatus(void)
+{
+#ifdef WINCE
+	// WINCE なら無効
+	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
+	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
+	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
+	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
+#else
+	BOOL bImageCheck = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_CHECK ) == BST_CHECKED) ? TRUE : FALSE;
+	BOOL bImageDlgCheck = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED) ? TRUE : FALSE;
+
+	if (bImageCheck) {
+		if (bImageDlgCheck) {
+			// 全て有効
+			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( TRUE );
+			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( TRUE );
+			GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( TRUE );
+			GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( TRUE );
+		} else {
+			// カーソル位置とコンボボックス関連は無効
+			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( TRUE );
+			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
+			GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
+			GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
+		}
+	} else {
+		// 全て無効
+		GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( FALSE );
+		GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
+		GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
+		GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
+	}
 #endif
 }

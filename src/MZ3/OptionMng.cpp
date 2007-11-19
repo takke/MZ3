@@ -343,6 +343,14 @@ void Option::Load()
 			m_bShowMainViewMiniImage = atoi( s.c_str() ) != 0;
 		}
 
+		// 別画面で表示する？
+		s = inifile.GetValue("ShowMainViewMiniImageDlg", "MainView");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bShowMainViewMiniImageDlg = atoi( s.c_str() ) != 0;
+		}
+
 		// マウスオーバーで表示する？
 		s = inifile.GetValue("ShowMainViewMiniImageOnMouseOver", "MainView");
 		if( s.empty() ) {
@@ -491,6 +499,9 @@ void Option::Save()
 
 	// ユーザやコミュニティの画像を表示する？
 	inifile.SetValue( "ShowMainViewMiniImage", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImage ? 1 : 0), "MainView");
+	
+	// 別画面で表示する？
+	inifile.SetValue( "ShowMainViewMiniImageDlg", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImageDlg ? 1 : 0), "MainView");
 	
 	// マウスオーバーで表示する？
 	inifile.SetValue( "ShowMainViewMiniImageOnMouseOver", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImageOnMouseOver ? 1 : 0), "MainView");

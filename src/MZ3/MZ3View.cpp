@@ -3932,7 +3932,9 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
  */
 void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int pointy/*=-1*/)
 {
-	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
+	if (!theApp.m_optionMng.m_bShowMainViewMiniImage ||
+		!theApp.m_optionMng.m_bShowMainViewMiniImageDlg)
+	{
 		// オプションがOffなので、常に非表示
 		if (m_pMiniImageDlg != NULL) {
 			m_pMiniImageDlg->ShowWindow( SW_HIDE );
