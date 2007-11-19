@@ -206,6 +206,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
 	ON_WM_MOUSEWHEEL()
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
+	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -4151,4 +4152,20 @@ BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	}
 
 	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+/**
+ * リロード (F5)
+ */
+void CMZ3View::OnAcceleratorReload()
+{
+	if (m_access) {
+		// アクセス中は再アクセス不可
+		return;
+	}
+
+	// アクセス開始
+	if (!RetrieveCategoryItem()) {
+		return;
+	}
 }

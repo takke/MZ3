@@ -317,6 +317,7 @@ public:
 	afx_msg void OnAcceleratorPrevTab();
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnSetRead();
+	afx_msg void OnAcceleratorReload();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
