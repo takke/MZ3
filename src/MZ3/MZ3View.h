@@ -195,6 +195,8 @@ private:
 
 	CImageList		m_iconImageList;			///< アイコン用画像リスト
 	CImageList		m_iconExtendedImageList;	///< アイコン用画像リスト（動的生成）
+	CStringArray	m_extendeImageListMap;		///< m_iconExtendedImageList のインデックスに
+												///< どのファイルが格納されているかを示す疑似マップ
 
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;

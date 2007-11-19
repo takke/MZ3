@@ -348,6 +348,8 @@ void CMZ3View::OnInitialUpdate()
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
 		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+		m_extendeImageListMap.RemoveAll();
 
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
@@ -752,7 +754,8 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			if (pCategory!=NULL) {
 				int idx = pCategory->selectedBody;
-				// CImageList::Replace が効かないで、リロードしてしまう。
+
+				// CImageList::Replace が効かないので、リロードしてしまう。
 				bool bUseDefaultIcon = false;
 				bool bUseExtendedIcon = false;
 				SetBodyImageList( pCategory->GetBodyList(), bUseDefaultIcon, bUseExtendedIcon );
@@ -1195,7 +1198,7 @@ LRESULT CMZ3View::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
  */
 void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon)
 {
-	util::MySetInformationText( m_hWnd, L"アイコンリストを作成しています..." );
+	util::MySetInformationText( m_hWnd, L"アイコン作成中..." );
 
 	// アイコンの表示・非表示の制御
 	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
@@ -1215,16 +1218,33 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 	// ユーザやコミュニティの画像をアイコン化して表示する
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
-		m_iconExtendedImageList.DeleteImageList();
-		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+//		m_iconExtendedImageList.DeleteImageList();
+//		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+
 		for (int i=0; i<count; i++) {
 			const CMixiData& mixi = body[i];
 			// icon
 			CMZ3BackgroundImage image(L"");
 			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+
+			// ロード済みか判定
+			bool bLoaded = false;
+			for (int i=0; i<m_extendeImageListMap.GetCount(); i++) {
+				if (m_extendeImageListMap[i] == miniImagePath) {
+					bLoaded = true;
+					break;
+				}
+			}
+
+			if (bLoaded) {
+				// ロード済みなのでロード不要
+				bUseExtendedIcon = true;
+				continue;
+			}
+
+			// 未ロードなのでロード
 			image.load( miniImagePath );
 			if (image.isEnableImage()) {
-
 				// 16x16 にリサイズする。
 				CMZ3BackgroundImage resizedImage(L"");
 				util::MakeResizedImage( this, resizedImage, image );
@@ -1233,11 +1253,14 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 				CBitmap bm;
 				bm.Attach( resizedImage.getHandle() );
 				m_iconExtendedImageList.Add( &bm, (CBitmap*) NULL );
+				m_extendeImageListMap.Add( miniImagePath );
 
 				bUseExtendedIcon = true;
 			} else {
+				// ロードエラー
+				// TODO: ダウンロード対象ファイルリストに追加すること
 				// dummy icon
-				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
+//				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
 			}
 		}
 	}
@@ -1251,7 +1274,39 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
 	}
 
-	util::MySetInformationText( m_hWnd, L"アイコンリストの作成完了" );
+	// アイコンの設定
+	int itemCount = m_bodyList.GetItemCount();
+	for (int i=0; i<itemCount; i++) {
+		const CMixiData& mixi = body[i];
+
+		// アイコンのインデックスを種別により設定する
+		int iconIndex = -1;
+		if (bUseDefaultIcon ) {
+			iconIndex = MyGetBodyListDefaultIconIndex(mixi);
+		}
+		if (bUseExtendedIcon) {
+			// ファイルパスからインデックスを解決する
+			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+
+			// インデックス探索
+			for (int i=0; i<m_extendeImageListMap.GetCount(); i++) {
+				if (m_extendeImageListMap[i] == miniImagePath) {
+					iconIndex = i;
+					break;
+				}
+			}
+		}
+
+		// アイコンのインデックスを設定
+		LVITEM lvitem;
+		lvitem.iItem = i; 
+		lvitem.mask = LVIF_IMAGE;
+		lvitem.iSubItem = 0;
+		lvitem.iImage   = iconIndex;// イメージ変更
+		m_bodyList.SetItem( &lvitem );
+	}
+
+	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
 }
 
 /**
@@ -1309,28 +1364,14 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		break;
 	}
 
-	// アイコン用ImageListの設定
-	bool bUseDefaultIcon = false;
-	bool bUseExtendedIcon = false;
-	SetBodyImageList( body, bUseDefaultIcon, bUseExtendedIcon );
-
 	// アイテムの追加
 	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
 
 		// １カラム目
-		// アイコンのインデックスを種別により設定する
-		int iconIndex = -1;
-		if (bUseDefaultIcon ) {
-			iconIndex = MyGetBodyListDefaultIconIndex(*data);
-		}
-		if (bUseExtendedIcon) {
-			iconIndex = i;
-		}
-
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
-		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType), iconIndex );
+		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType) );
 
 		// ２カラム目
 		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
@@ -1338,6 +1379,11 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
 	}
+
+	// アイコン用ImageListの設定
+	bool bUseDefaultIcon = false;
+	bool bUseExtendedIcon = false;
+	SetBodyImageList( body, bUseDefaultIcon, bUseExtendedIcon );
 
 	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
@@ -3932,13 +3978,7 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
  */
 void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int pointy/*=-1*/)
 {
-	if (!theApp.m_optionMng.m_bShowMainViewMiniImage ||
-		!theApp.m_optionMng.m_bShowMainViewMiniImageDlg)
-	{
-		// オプションがOffなので、常に非表示
-		if (m_pMiniImageDlg != NULL) {
-			m_pMiniImageDlg->ShowWindow( SW_HIDE );
-		}
+	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
 		return;
 	}
 
@@ -3967,57 +4007,62 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 	}
 
 	if (m_pMiniImageDlg != NULL) {
-		m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
+		if (!theApp.m_optionMng.m_bShowMainViewMiniImageDlg) {
+			// オプションがOffなので、常に非表示
+			m_pMiniImageDlg->ShowWindow( SW_HIDE );
+		} else {
+			m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
 
-		if (bDrawMiniImage) {
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-			int idx = idxBody;
-		
-			CRect rectBodyList; 
-			m_bodyList.GetWindowRect( &rectBodyList );
+			if (bDrawMiniImage) {
+				CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+				int idx = idxBody;
+			
+				CRect rectBodyList; 
+				m_bodyList.GetWindowRect( &rectBodyList );
 
-			CRect rect;
-			m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
+				CRect rect;
+				m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
 
-			rect.OffsetRect( rectBodyList.left, rectBodyList.top );
+				rect.OffsetRect( rectBodyList.left, rectBodyList.top );
 
-			// オプションで指定
-			const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
-			const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
+				// オプションで指定
+				const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
+				const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
 
-			// とりあえず行の直下に描画。
-			int delta = 5;
-			int x = 0;
-			if (pointx>=0) {
-				x = rectBodyList.left +pointx +delta;
-				if (x+w > rectBodyList.right) {
-					// ボディリストからはみ出すので左側に描画。
-					x = x -w -delta -delta;
+				// とりあえず行の直下に描画。
+				int delta = 5;
+				int x = 0;
+				if (pointx>=0) {
+					x = rectBodyList.left +pointx +delta;
+					if (x+w > rectBodyList.right) {
+						// ボディリストからはみ出すので左側に描画。
+						x = x -w -delta -delta;
+					}
+				} else {
+					x = rect.left+32;
 				}
-			} else {
-				x = rect.left+32;
-			}
 
-			int y = 0;
-			if (pointy>=0) {
-				y = rectBodyList.top +pointy +delta;
-				if (y+h > rectBodyList.bottom) {
-					// ボディリストからはみ出すので上側に描画。
-					y = rectBodyList.top +pointy -h -delta;
+				int y = 0;
+				if (pointy>=0) {
+					y = rectBodyList.top +pointy +delta;
+					if (y+h > rectBodyList.bottom) {
+						// ボディリストからはみ出すので上側に描画。
+						y = rectBodyList.top +pointy -h -delta;
+					}
+				} else {
+					y = rect.bottom;
+					if (y+h > rectBodyList.bottom) {
+						// ボディリストからはみ出すので上側に描画。
+						y = rect.top -h;
+					}
 				}
-			} else {
-				y = rect.bottom;
-				if (y+h > rectBodyList.bottom) {
-					// ボディリストからはみ出すので上側に描画。
-					y = rect.top -h;
-				}
-			}
 
-			// それでもはみだす場合（スクロール時など）は非表示
-			if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
-				m_pMiniImageDlg->ShowWindow( SW_HIDE );
-			} else {
-				m_pMiniImageDlg->MoveWindow( x, y, w, h );
+				// それでもはみだす場合（スクロール時など）は非表示
+				if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
+					m_pMiniImageDlg->ShowWindow( SW_HIDE );
+				} else {
+					m_pMiniImageDlg->MoveWindow( x, y, w, h );
+				}
 			}
 		}
 	}
