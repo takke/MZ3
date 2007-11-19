@@ -1195,6 +1195,8 @@ LRESULT CMZ3View::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
 
 /**
  * ボディのイメージリストを作成
+ *
+ * ボディリストは作成済みであること。
  */
 void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon)
 {
@@ -1218,9 +1220,6 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, boo
 	// ユーザやコミュニティの画像をアイコン化して表示する
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
-//		m_iconExtendedImageList.DeleteImageList();
-//		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
-
 		for (int i=0; i<count; i++) {
 			const CMixiData& mixi = body[i];
 			// icon
@@ -1371,7 +1370,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 		// １カラム目
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
-		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType) );
+		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType), -1 );
 
 		// ２カラム目
 		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
@@ -1379,6 +1378,13 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
 	}
+
+	m_nochange = FALSE;
+	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+
+	m_bodyList.SetRedraw(TRUE);
+	m_bodyList.m_bStopDraw = false;
+	m_bodyList.Invalidate( FALSE );
 
 	// アイコン用ImageListの設定
 	bool bUseDefaultIcon = false;
@@ -1389,13 +1395,6 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	if (m_bodyList.GetItemCount()==0) {
 		MoveMiniImageDlg();
 	}
-
-	m_nochange = FALSE;
-	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-
-	m_bodyList.SetRedraw(TRUE);
-	m_bodyList.m_bStopDraw = false;
-	m_bodyList.Invalidate( FALSE );
 }
 
 /**
