@@ -34,4 +34,7 @@ private:
 	COptionTabGetPage	m_tabGet;		///< 取得タブ
 	COptionTabLog		m_tabLog;		///< ログタブ
 	COptionTabProxy		m_tabProxy;		///< PROXYタブ
+public:
+	afx_msg void OnDestroy();
+	int m_iLastPage;
 };

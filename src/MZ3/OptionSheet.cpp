@@ -17,6 +17,7 @@ COptionSheet::COptionSheet(UINT nIDCaption, CWnd* pParentWnd, UINT iSelectPage)
 
 COptionSheet::COptionSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
 	:CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+	,m_iLastPage(1)
 {
 
 }
@@ -27,6 +28,7 @@ COptionSheet::~COptionSheet()
 
 
 BEGIN_MESSAGE_MAP(COptionSheet, CPropertySheet)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -42,4 +44,11 @@ void COptionSheet::SetPage()
 	AddPage( &m_tabGet );		// 取得タブ
 	AddPage( &m_tabLog );		// ログタブ
 	AddPage( &m_tabProxy );		// プロキシタブ
+}
+
+void COptionSheet::OnDestroy()
+{
+	CPropertySheet::OnDestroy();
+
+	m_iLastPage = GetActiveIndex();
 }

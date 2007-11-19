@@ -427,15 +427,32 @@ void CMainFrame::OnSettingGeneral()
 			L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
 			L"お手数ですが、mz3.ini を直接編集してください" );
 	} else {
+		static int s_iLastActivePage = 1;
+
 		COptionSheet cPropSht( _T("オプション"));
+		
+		// ページ生成
 		cPropSht.SetPage();
-		cPropSht.SetActivePage(1);
+
+		// アクティブページの設定
+		if (s_iLastActivePage < 0 || s_iLastActivePage >= cPropSht.GetPageCount()) {
+			s_iLastActivePage = 1;	// 初期化
+		}
+		cPropSht.SetActivePage(s_iLastActivePage);
 		if (cPropSht.DoModal() == IDOK) {
+
+			// iniファイルの保存
 			theApp.m_optionMng.Save();
 
 			// フォントのリセット
 			ChangeAllViewFont();
+
+			// メイン画面のリロード
+			theApp.m_pMainView->OnSelchangedGroupTab();
 		}
+
+		// アクティブページのインデックスを保存しておく
+		s_iLastActivePage = cPropSht.m_iLastPage;
 	}
 }
 
