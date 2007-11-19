@@ -74,7 +74,7 @@ private:
 	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
 
 	void SetBodyList( CMixiDataList& body );
-	void SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon );
+	void SetBodyImageList( CMixiDataList& body );
 
 	void OnUpdateWriteButton(CCmdUI*);
 	afx_msg void OnWriteButton();

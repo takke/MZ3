@@ -756,9 +756,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 				int idx = pCategory->selectedBody;
 
 				// CImageList::Replace が効かないので、リロードしてしまう。
-				bool bUseDefaultIcon = false;
-				bool bUseExtendedIcon = false;
-				SetBodyImageList( pCategory->GetBodyList(), bUseDefaultIcon, bUseExtendedIcon );
+				SetBodyImageList( pCategory->GetBodyList() );
 			}
 		}
 		break;
@@ -1198,9 +1196,12 @@ LRESULT CMZ3View::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
  *
  * ボディリストは作成済みであること。
  */
-void CMZ3View::SetBodyImageList( CMixiDataList& body, bool& bUseDefaultIcon, bool& bUseExtendedIcon)
+void CMZ3View::SetBodyImageList( CMixiDataList& body )
 {
 	util::MySetInformationText( m_hWnd, L"アイコン作成中..." );
+
+	bool bUseDefaultIcon = false;
+	bool bUseExtendedIcon = false;
 
 	// アイコンの表示・非表示の制御
 	// 方針：(1) オプション値により非表示になっていればアイコン非表示。
@@ -1364,6 +1365,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	}
 
 	// アイテムの追加
+	m_bodyList.MyEnableIcon( false );	// まずアイコンはオフにして生成
 	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
@@ -1387,9 +1389,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	m_bodyList.Invalidate( FALSE );
 
 	// アイコン用ImageListの設定
-	bool bUseDefaultIcon = false;
-	bool bUseExtendedIcon = false;
-	SetBodyImageList( body, bUseDefaultIcon, bUseExtendedIcon );
+	SetBodyImageList( body );
 
 	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
