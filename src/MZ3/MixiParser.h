@@ -1498,6 +1498,11 @@ public:
 			const CString& line = html_.GetAt(iLine);
 
 			if( !bInItems ) {
+				// 「次を表示」、「前を表示」のリンクを抽出する
+				if( parseNextBackLink( nextLink, backLink, line ) ) {
+					// 抽出できたら終了せず。
+				}
+
 				// 項目開始？
 				if( util::LineHasStringsNoCase( line, L"iconList") ) {
 					bInItems = true;
@@ -1516,17 +1521,6 @@ public:
 				if( util::LineHasStringsNoCase( line, L"pageNavigation" ) ) {
 					break;
 				}
-			}
-		}
-
-		// pageNavigationが見つかったので、その後の行から次、前のリンクを抽出
-		for( ; iLine<count; iLine++ ) {
-			const CString& str = html_.GetAt(iLine-10);
-
-			// 「次を表示」、「前を表示」のリンクを抽出する
-			if( parseNextBackLink( nextLink, backLink, str ) ) {
-				// 抽出できたら終了タグ
-				break;
 			}
 		}
 
