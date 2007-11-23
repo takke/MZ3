@@ -177,6 +177,7 @@ public:
 	afx_msg void OnPreviewAttachedPhoto1();
 	afx_msg void OnPreviewAttachedPhoto2();
 	afx_msg void OnPreviewAttachedPhoto3();
+	afx_msg void OnInsertEmoji(UINT nID);
 
 private:
 	bool DumpToTemporaryDraftFile();

@@ -205,6 +205,10 @@ BEGIN
             MENUITEM "Ø‚èŽæ‚è",                        ID_EDIT_CUT
             MENUITEM "“\‚è•t‚¯",                        ID_EDIT_PASTE
         END
+        POPUP "ŠG•¶Žš‚ð‘}“ü‚·‚é"
+        BEGIN
+            MENUITEM "dummy",                       IDM_INSERT_EMOJI_BEGIN
+        END
         MENUITEM SEPARATOR
         MENUITEM "ŽÊ^‚ð“Y•t‚·‚é",                     ID_ATTACH_PHOTO
         MENUITEM "‘‚«ž‚Ý",                        ID_WRITE_SEND_MENU

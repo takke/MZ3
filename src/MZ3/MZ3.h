@@ -36,6 +36,19 @@ enum ScreenResolution {
 	SR_VGA,				///< 640x480
 };
 
+/// 絵文字マップ
+class EmojiMap {
+public:
+	CString code;
+	CString url;
+	CString text;
+
+	EmojiMap( LPCTSTR code_, LPCTSTR url_, LPCTSTR text_ )
+		: code(code_), url(url_), text(text_)
+	{
+	}
+};
+
 class CWriteView;
 class CMZ3View;
 class CReportView;
@@ -59,6 +72,7 @@ public:
 		CString		helpfile;		///< Readme.txt のパス
 		CString		historyfile;	///< ChangeLog.txt のパス
 		CString		tempdraftfile;	///< 書き込み失敗時の下書きファイル
+		CString		emojifile;		///< 絵文字定義ファイル
 
 		CString		skinFolder;		///< スキン用フォルダのパス
 
@@ -133,6 +147,9 @@ public:
 	//--- mixi データ
 
 	Mz3GroupData		m_root;					///< mixi 用データのルート要素
+
+	//--- 絵文字マップ
+	std::vector<EmojiMap> m_emoji;				///< mixi 絵文字マップ
 
 	//--- 通信系
 	CMixiData			m_mixiBeforeRelogin;	///< 再ログイン前の mixi オブジェクト

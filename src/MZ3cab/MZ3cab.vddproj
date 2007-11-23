@@ -14,6 +14,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_001B4F1E8F114E5BB23AA9AE893005CC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -176,6 +182,24 @@
     {
         "File"
         {
+            "{BA458234-9B71-4F46-8107-E91156377184}:_001B4F1E8F114E5BB23AA9AE893005CC"
+            {
+            "SourcePath" = "8:..\\..\\dist\\emoji.ini"
+            "TargetName" = "8:emoji.ini"
+            "Tag" = "8:"
+            "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
             {
             "SourcePath" = "8:skin\\default\\body.jpg"

@@ -81,6 +81,7 @@ BEGIN_MESSAGE_MAP(CWriteView, CFormView)
 	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO1, &CWriteView::OnPreviewAttachedPhoto1)
 	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO2, &CWriteView::OnPreviewAttachedPhoto2)
 	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO3, &CWriteView::OnPreviewAttachedPhoto3)
+	ON_COMMAND_RANGE(IDM_INSERT_EMOJI_BEGIN, IDM_INSERT_EMOJI_BEGIN+1000, &CWriteView::OnInsertEmoji)
 END_MESSAGE_MAP()
 
 
@@ -681,6 +682,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 			break;
 
 		case VK_F2:
+		case VK_F10:
 #ifndef WINCE
 		case VK_APPS:
 #endif
@@ -695,6 +697,18 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				// 写真添付ができない画面では「写真を添付する」メニューを消す
 				if( !IsEnableAttachImageMode() ) {
 					pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
+				}
+
+				// 絵文字メニュー
+				{
+					// ダミーを削除
+					CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
+					emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
+
+					// とりあえず全部追加
+					for (size_t i=0; i<theApp.m_emoji.size(); i++) {
+						emojiMenu->AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
+					}
 				}
 
 				pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -1215,4 +1229,17 @@ void CWriteView::StartConfirmPost( CString wmsg )
 		refUrl, 
 		CInetAccess::FILE_HTML, 
 		m_postData );
+}
+
+/// 絵文字挿入
+void CWriteView::OnInsertEmoji(UINT nID)
+{
+	int emojiIndex = nID - IDM_INSERT_EMOJI_BEGIN;
+	// index check
+	if (emojiIndex < 0 || emojiIndex >= theApp.m_emoji.size()) {
+		return;
+	}
+
+	// 現在のカーソル位置に挿入（または選択範囲の置換）
+	m_bodyEdit.ReplaceSel( theApp.m_emoji[ emojiIndex ].code, /*bCanUndo=*/TRUE );
 }

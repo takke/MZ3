@@ -338,6 +338,8 @@
 #define ID_ACCELERATOR_CONTEXT_MENU     32984
 #define IDM_SET_READ                    32987
 #define ID_ACCELERATOR_RELOAD           32988
+#define IDM_INSERT_EMOJI_BEGIN          32994
+#define IDM_INSERT_EMOJI_END            33994
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -349,7 +351,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
-#define _APS_NEXT_COMMAND_VALUE         32990
+#define _APS_NEXT_COMMAND_VALUE         33995
 #define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

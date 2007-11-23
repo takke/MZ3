@@ -201,6 +201,7 @@ public:
 	bool   RecordExists(string KeyName, string SectionName);
 
 	vector<string> GetSectionNames();
+	vector<Record> GetSection(string SectionName);
 	bool SectionExists(string SectionName);
 
 	bool DeleteRecord(string KeyName, string SectionName);

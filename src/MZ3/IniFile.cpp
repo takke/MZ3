@@ -607,6 +607,21 @@ vector<string> IniFile::GetSectionNames()
 	return data;															// Return the data
 }
 
+vector<Record> IniFile::GetSection(string SectionName)
+{
+	vector<Record> data;													// Holds the return data
+	vector<Record> content;													// Holds the current record													// Holds the current record
+
+	for (int i=0;i<(int)contents_.size();i++)								// Loop through the content
+	{
+		if((contents_[i].Section == SectionName) &&							// If this is the section name we want
+			(contents_[i].Key != ""))										// but not the section name itself
+			data.push_back(contents_[i]);									// Add the record to the return data
+	}
+	
+	return data;															// Return the data
+}
+
 bool IniFile::DeleteRecord(string KeyName, string SectionName)
 {
 	vector<Record>::iterator iter = std::find_if(contents_.begin(), 

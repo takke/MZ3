@@ -167,6 +167,32 @@ BOOL CMZ3App::InitInstance()
 		m_root.initForTopPage();
 	}
 
+	// 絵文字定義ファイルのロード
+	{
+		inifile::IniFile emojifile;
+		if (emojifile.Load( m_filepath.emojifile )) {
+			LPCSTR szSection = "mixi";
+			int start = atoi(emojifile.GetValue( "start", szSection ).c_str());
+			int end   = atoi(emojifile.GetValue( "end", szSection ).c_str());
+			for (int i=start; i<=end; i++) {
+				std::string s = emojifile.GetValue( (LPCSTR)util::int2str_a(i), szSection );
+				if (!s.empty()) {
+					std::vector<std::string> values;
+					if (!util::split_by_comma( values, s ) || values.size() < 3) {
+						// ロードエラー
+						CString msg;
+						msg.Format( L"load emojifile error, id at %d", i );
+						MZ3LOGGER_ERROR( msg );
+					}
+					m_emoji.push_back( 
+						EmojiMap(util::my_mbstowcs(values[0]).c_str(), 
+								 util::my_mbstowcs(values[1]).c_str(), 
+								 util::my_mbstowcs(values[2]).c_str()) );
+				}
+			}
+		}
+	}
+
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 #ifdef WINCE
@@ -554,6 +580,9 @@ void CMZ3App::FilePath::init()
 
 	// temp_draftfile.txt のパス
 	tempdraftfile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("temp_draftfile.txt"));
+
+	// 絵文字定義ファイル のパス
+	emojifile.Format(_T("%s\\%s"), theApp.GetAppDirPath(), _T("emoji.ini"));
 
 	// スキンフォルダのパス
 	skinFolder.Format( L"%s\\skin", theApp.GetAppDirPath() );
