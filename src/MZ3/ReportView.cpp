@@ -35,7 +35,6 @@ CReportView::CReportView()
 	, m_nKeydownRepeatCount(0)
 	, m_hwndHtml(NULL)
 {
-	m_whiteBr = CreateSolidBrush(RGB(255, 255, 255));
 	m_imageState = FALSE;
 	m_posHtmlScroll = 0;
 	m_posHtmlScrollMax = 0;
@@ -323,17 +322,17 @@ HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	}
 
 	switch (nCtlColor) {
-  case CTLCOLOR_STATIC:
-	  pDC->SetBkMode(TRANSPARENT);
-	  return (HBRUSH)m_whiteBr;
-	  break;
+	case CTLCOLOR_STATIC:
+		pDC->SetBkMode(TRANSPARENT);
+		return (HBRUSH)GetStockObject(WHITE_BRUSH);
+		break;
 
-  default:
-	  pDC->SetBkMode(TRANSPARENT);
-	  break;
+	default:
+		pDC->SetBkMode(TRANSPARENT);
+		break;
 	}
 
-	return m_whiteBr;
+	return (HBRUSH)GetStockObject(WHITE_BRUSH);
 }
 
 /**
@@ -1492,19 +1491,19 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 		case ACCESS_IMAGE:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.imageFolder, 
-				url.Mid( url.ReverseFind( '/' )+1 ) );
+				util::ExtractFilenameFromUrl( url, L"_mz3_noname.png" ) );
 			break;
 
 		case ACCESS_MOVIE:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.downloadFolder, 
-				url.Mid( url.ReverseFind( '/' )+1 ) );
+				util::ExtractFilenameFromUrl( url, L"_mz3_noname.flv" ) );
 			break;
 
 		default:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.downloadFolder, 
-				url.Mid( url.ReverseFind( '/' )+1 ) );
+				util::ExtractFilenameFromUrl( url, L"_mz3_noname.dat" ) );
 			break;
 		}
 

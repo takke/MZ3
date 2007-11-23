@@ -37,8 +37,6 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
-	HBRUSH m_whiteBr;
-
 	void SetData(const CMixiData& data);
 	void EndProc();
 	void SaveIndex();
@@ -112,7 +110,6 @@ private:
 
 
 	CProgressCtrl mc_progressBar;
-	CHtmlArray* m_htmlarray;
 	BOOL m_abort;
 
 	int m_scrollLine;
