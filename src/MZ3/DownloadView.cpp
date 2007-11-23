@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(CDownloadView, CFormView)
 	ON_MESSAGE(WM_MZ3_GET_ERROR, OnGetError)
 	ON_MESSAGE(WM_MZ3_GET_ABORT, OnGetAbort)
 	ON_MESSAGE(WM_MZ3_ABORT, OnAbort)
+	ON_MESSAGE(WM_MZ3_ACCESS_LOADED, OnAccessLoaded)
 END_MESSAGE_MAP()
 
 
@@ -470,6 +471,27 @@ LRESULT CDownloadView::OnAbort(WPARAM wParam, LPARAM lParam)
 }
 
 /**
+ * 受信サイズ通知
+ */
+LRESULT CDownloadView::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
+{
+	if( dwLength == 0 ) {
+		// 総サイズが不明なので、仮に N KB とみなす
+		dwLength = 40 * 1024;
+	}
+
+	// 受信サイズと総サイズが同一なら、受信完了とみなす
+	if( dwLoaded == dwLength ) {
+	}
+
+	// [0,1000] で受信サイズ通知
+	int pos = (int)(dwLoaded * 1000.0 / dwLength);
+	mc_progressBar.SetPos( pos );
+
+	return TRUE;
+}
+
+/**
  * ダウンロード開始処理
  */
 bool CDownloadView::DoDownloadSelectedItem(void)
@@ -488,6 +510,7 @@ bool CDownloadView::DoDownloadSelectedItem(void)
 
 	m_access = TRUE;
 	MyUpdateControls();
+	mc_progressBar.SetPos( 0 );
 
 	// 取得開始
 	theApp.m_inet.Initialize( m_hWnd, NULL );
@@ -496,3 +519,4 @@ bool CDownloadView::DoDownloadSelectedItem(void)
 
 	return true;
 }
+

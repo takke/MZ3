@@ -77,6 +77,7 @@ public:
 	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
+	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 	bool DoDownloadSelectedItem(void);
 };
 
