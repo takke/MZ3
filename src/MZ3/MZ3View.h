@@ -183,7 +183,6 @@ private:
 	BOOL			m_nochange;
 	BOOL			m_abort;			///< 中断フラグ
 	bool			m_checkNewComment;	///< 新着コメント＆メッセージチェック中？
-	BOOL			m_login;
 
 public:
 	CGroupItem*		m_selGroup;			///< 現在選択されているグループタブ項目

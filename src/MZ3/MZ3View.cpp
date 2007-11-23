@@ -218,6 +218,7 @@ CMZ3View::CMZ3View()
 	: CFormView(CMZ3View::IDD)
 	, m_dwLastReturn( 0 )
 	, m_nKeydownRepeatCount( 0 )
+	, m_checkNewComment( false )
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -269,7 +270,6 @@ void CMZ3View::OnInitialUpdate()
 	// インターネット回線を開く
 //	theApp.m_inet.Open();
 
-	m_login = FALSE;
 	m_access = FALSE;
 
 	// プログレスバー初期化
@@ -849,7 +849,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			if( mixi::HomeParser::IsLoginSucceeded(html) ) {
 				// ログイン成功
-				m_login = TRUE;
 				if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 					// オーナーＩＤを取得する
 					data->SetAccessType(ACCESS_MAIN); // アクセス種別を設定
@@ -915,7 +914,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				}
 				util::MySetInformationText( m_hWnd, msg );
 
-				m_checkNewComment = FALSE;
+				m_checkNewComment = false;
 
 				theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
