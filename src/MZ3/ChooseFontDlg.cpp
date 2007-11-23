@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
+#include "util_gui.h"
 #include "ChooseFontDlg.h"
 
 
@@ -111,8 +112,7 @@ void CChooseFontDlg::OnNMReturnFontList(NMHDR *pNMHDR, LRESULT *pResult)
 void CChooseFontDlg::OnOK()
 {
 	// 選択されているフォントを保存し、終了。
-	POSITION pos = m_FontList.GetFirstSelectedItemPosition();
-	int idx = m_FontList.GetNextSelectedItem( pos );
+	int idx = util::MyGetListCtrlSelectedItemIndex( m_FontList );
 	if( idx < 0 ) {
 		m_strSelectedFont = L"";
 	}else{

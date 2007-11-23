@@ -73,7 +73,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
     ON_COMMAND(ID_IMAGE_BUTTON, OnImageButton)
 	ON_COMMAND(IDM_RELOAD_PAGE, OnReloadPage)
     ON_MESSAGE(WM_MZ3_GET_END, OnGetEnd)
-    ON_MESSAGE(WM_MZ3_GET_END_BINARY, OnGetImageEnd)
+    ON_MESSAGE(WM_MZ3_GET_END_BINARY, OnGetEndBinary)
     ON_MESSAGE(WM_MZ3_GET_ERROR, OnGetError)
     ON_MESSAGE(WM_MZ3_GET_ABORT, OnGetAbort)
     ON_MESSAGE(WM_MZ3_ABORT, OnAbort)
@@ -1305,7 +1305,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
-		return LRESULT();
+		return TRUE;
 	}
 
 	bool bRetry = false;
@@ -1455,17 +1455,17 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		m_infoEdit.ShowWindow(SW_HIDE);
 	}
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
- * アクセス終了通知受信(Image)
+ * アクセス終了通知受信(Binary)
  */
-LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
+LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 {
 	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, NULL);
-		return LRESULT();
+		return TRUE;
 	}
 
 	m_access = FALSE;
@@ -1519,7 +1519,7 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 			L"ファイル %s を開きますか？", strFilepath );
 
 		if( MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 ) != IDYES ) {
-			return LRESULT();
+			return TRUE;
 		}
 	}
 
@@ -1535,7 +1535,7 @@ LRESULT CReportView::OnGetImageEnd(WPARAM wParam, LPARAM lParam)
 	sei.nShow        = SW_NORMAL;
 	ShellExecuteEx(&sei);
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1561,7 +1561,7 @@ LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 	m_access = FALSE;
 	m_infoEdit.ShowWindow(SW_HIDE);
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1589,17 +1589,17 @@ LRESULT CReportView::OnGetAbort(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
- * 中断処理
+ * 中断ボタン押下時の処理
  */
 LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
 {
 	// 通信中でないならすぐに終了する
 	if( !theApp.m_inet.IsConnecting() ) {
-		return LRESULT();
+		return TRUE;
 	}
 	theApp.m_inet.Abort();
 	m_abort = TRUE;
@@ -1618,7 +1618,7 @@ LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
 	m_infoEdit.ShowWindow(SW_HIDE);
 
 	m_access = FALSE;
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1626,8 +1626,8 @@ LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
  */
 LRESULT CReportView::OnAccessInformation(WPARAM wParam, LPARAM lParam)
 {
-  m_infoEdit.SetWindowText(*(CString*)lParam);
-  return LRESULT();
+	m_infoEdit.SetWindowText(*(CString*)lParam);
+	return TRUE;
 }
 
 /**
@@ -1729,7 +1729,7 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 //	}
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1745,7 +1745,7 @@ LRESULT CReportView::OnChangeView(WPARAM wParam, LPARAM lParam)
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE );
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1768,7 +1768,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 	theApp.m_accessType = m_data.GetAccessType();
 	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**

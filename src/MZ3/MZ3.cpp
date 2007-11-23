@@ -8,6 +8,7 @@
 #include "MZ3View.h"
 #include "ReportView.h"
 #include "WriteView.h"
+#include "DownloadView.h"
 #include "AboutDlg.h"
 #include "util.h"
 #include "DebugDlg.h"
@@ -167,32 +168,6 @@ BOOL CMZ3App::InitInstance()
 		m_root.initForTopPage();
 	}
 
-	// 絵文字定義ファイルのロード
-	{
-		inifile::IniFile emojifile;
-		if (emojifile.Load( m_filepath.emojifile )) {
-			LPCSTR szSection = "mixi";
-			int start = atoi(emojifile.GetValue( "start", szSection ).c_str());
-			int end   = atoi(emojifile.GetValue( "end", szSection ).c_str());
-			for (int i=start; i<=end; i++) {
-				std::string s = emojifile.GetValue( (LPCSTR)util::int2str_a(i), szSection );
-				if (!s.empty()) {
-					std::vector<std::string> values;
-					if (!util::split_by_comma( values, s ) || values.size() < 3) {
-						// ロードエラー
-						CString msg;
-						msg.Format( L"load emojifile error, id at %d", i );
-						MZ3LOGGER_ERROR( msg );
-					}
-					m_emoji.push_back( 
-						EmojiMap(util::my_mbstowcs(values[0]).c_str(), 
-								 util::my_mbstowcs(values[1]).c_str(), 
-								 util::my_mbstowcs(values[2]).c_str()) );
-				}
-			}
-		}
-	}
-
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 #ifdef WINCE
@@ -230,6 +205,7 @@ BOOL CMZ3App::InitInstance()
 	m_pMainView		= (CMZ3View*)((CFrameWnd*)m_pMainWnd)->GetActiveView();
 	m_pReportView	= new CReportView;
 	m_pWriteView	= new CWriteView;
+	m_pDownloadView	= new CDownloadView;
 
 	// ビューの初期化
 	INT viewID = AFX_IDW_PANE_FIRST + 1;
@@ -245,6 +221,11 @@ BOOL CMZ3App::InitInstance()
 	((CView*)m_pWriteView)->Create(NULL, MZ3_APP_NAME _T(" WriteView"), WS_CHILD, rect,
 		m_pMainWnd, viewID, &newContext);
 	m_pWriteView->OnInitialUpdate();
+
+	// ダウンロードビューの初期化
+	((CView*)m_pDownloadView)->Create(NULL, MZ3_APP_NAME _T(" DownloadView"), WS_CHILD, rect,
+		m_pMainWnd, viewID, &newContext);
+	m_pDownloadView->OnInitialUpdate();
 
 	// メイン ウィンドウが初期化されたので、表示と更新を行う
 	m_pMainWnd->ShowWindow( SW_SHOW );
@@ -291,6 +272,50 @@ BOOL CMZ3App::InitInstance()
 	if( m_bSmartphone ) {
 		// Smartphone/Standard だと初期描画されないっぽいので、ここで再描画しておく
 		((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
+	}
+
+	// 絵文字定義ファイルのロード
+	{
+		inifile::IniFile emojifile;
+		if (emojifile.Load( m_filepath.emojifile )) {
+			LPCSTR szSection = "mixi";
+			int start = atoi(emojifile.GetValue( "start", szSection ).c_str());
+			int end   = atoi(emojifile.GetValue( "end", szSection ).c_str());
+			for (int i=start; i<=end; i++) {
+				std::string s = emojifile.GetValue( (LPCSTR)util::int2str_a(i), szSection );
+				if (!s.empty()) {
+					std::vector<std::string> values;
+					if (!util::split_by_comma( values, s ) || values.size() < 3) {
+						// ロードエラー
+						CString msg;
+						msg.Format( L"load emojifile error, id at %d", i );
+						MZ3LOGGER_ERROR( msg );
+					}
+					m_emoji.push_back( 
+						EmojiMap(util::my_mbstowcs(values[0]).c_str(), 
+								 util::my_mbstowcs(values[1]).c_str(), 
+								 util::my_mbstowcs(values[2]).c_str()) );
+				}
+			}
+		}
+	}
+	// 未ダウンロードファイルがあればダウンロードマネージャ起動
+	bool bHasNoDownloadedEmojiFile = false;
+	for (size_t i=0; i<m_emoji.size(); i++) {
+		EmojiMap& emoji = m_emoji[i];
+		CString path = util::MakeImageLogfilePathFromUrl( emoji.url );
+		if (!util::ExistFile(path)) {
+			DownloadItem item( emoji.url, emoji.text, path, true );
+			m_pDownloadView->m_items.push_back( item );
+			bHasNoDownloadedEmojiFile = true;
+		}
+	}
+	if (bHasNoDownloadedEmojiFile) {
+		CString msg;
+		msg += "絵文字ファイルをダウンロードしますか？";
+		if (MessageBox( m_pMainView->GetSafeHwnd(), msg, MZ3_APP_NAME, MB_YESNO ) == IDYES) {
+			ChangeView( m_pDownloadView );
+		}
 	}
 
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 初期化完了" );
@@ -416,19 +441,26 @@ void CMZ3App::OnAppAbout()
  */
 void CMZ3App::ChangeView( CView* pNewView )
 {
-	// 現在のビュー
+	// 現在のビューのウィンドウIDの変更
 	CView* pActiveView = ((CFrameWnd*)m_pMainWnd)->GetActiveView();
-	UINT temp = ::GetWindowLong( pActiveView->m_hWnd, GWL_ID );
+	UINT tempId = ::GetWindowLong( pActiveView->m_hWnd, GWL_ID );
 	::SetWindowLong( pActiveView->m_hWnd, GWL_ID, ::GetWindowLong(pNewView->m_hWnd, GWL_ID) );
-	::SetWindowLong( pNewView->m_hWnd, GWL_ID, temp );
+	::SetWindowLong( pNewView->m_hWnd,    GWL_ID, tempId );
+
+	//--- 現在のビュー
+	// 非表示化
 	pActiveView->ShowWindow( SW_HIDE );
+
+	// MZ3 非表示完了通知
 	::SendMessage( pActiveView->m_hWnd, WM_MZ3_HIDE_VIEW, NULL, NULL );
-	
+
+	//--- 切り替え先ビュー
 	pNewView->ShowWindow( SW_SHOW );
 	((CFrameWnd*)m_pMainWnd)->SetActiveView( pNewView );
 	((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
 	m_pMainWnd->UpdateWindow();
 
+	// MZ3 切り替え完了通知
 	::SendMessage( pNewView->m_hWnd, WM_MZ3_FIT, NULL, NULL );
 }
 

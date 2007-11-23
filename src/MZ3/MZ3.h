@@ -49,9 +49,10 @@ public:
 	}
 };
 
-class CWriteView;
 class CMZ3View;
 class CReportView;
+class CWriteView;
+class CDownloadView;
 class CMZ3BackgroundImage;
 
 // CMZ3App:
@@ -126,6 +127,7 @@ public:
 	CMZ3View*			m_pMainView;			///< メインビュー
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
+	CDownloadView*		m_pDownloadView;		///< ダウンロードビュー
 
 	CMZ3SkinInfo		m_skininfo;				///< スキン情報
 

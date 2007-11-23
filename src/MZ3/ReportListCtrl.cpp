@@ -251,11 +251,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
  */
 int CReportListCtrl::GetSelectedItem(void)
 {
-	POSITION pos = GetFirstSelectedItemPosition();
-	if( pos == NULL ) {
-		return -1;
-	}
-	int idx = GetNextSelectedItem( pos );
+	int idx = util::MyGetListCtrlSelectedItemIndex( *this );
 	if( GetItemCount() == 0 || idx < 0 ) {
 		return -1;
 	}

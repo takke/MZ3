@@ -39,14 +39,20 @@ inline void MySetInformationText( HWND hWnd, LPCTSTR szMessage )
 	::SendMessage( hWnd, WM_MZ3_ACCESS_INFORMATION, NULL, (LPARAM)&text );
 }
 
-inline CString MakeImageLogfilePathFromUrl( const CString& url )
+inline CString ExtractFilenameFromUrl( const CString& url, const CString& strDefault )
 {
 	int idx = url.ReverseFind( '/' );
 	if (idx >= 0) {
-		CString filename = url.Mid( idx+1 );
-		if (!filename.IsEmpty()) {
-			return theApp.m_filepath.imageFolder + L"\\" + filename;
-		}
+		return url.Mid( idx+1 );
+	}
+	return strDefault;
+}
+
+inline CString MakeImageLogfilePathFromUrl( const CString& url )
+{
+	CString filename = ExtractFilenameFromUrl( url, L"" );
+	if (!filename.IsEmpty()) {
+		return theApp.m_filepath.imageFolder + L"\\" + filename;
 	}
 	return L"";
 }

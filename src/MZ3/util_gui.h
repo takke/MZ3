@@ -128,6 +128,36 @@ inline void MySetListCtrlItemFocusedAndSelected( CListCtrl& listCtrl, int idx, b
 }
 
 /**
+ * リストコントロールの最初の選択アイテムのインデックスを取得する
+ *
+ * @return インデックス（未発見時は -1）
+ */
+inline int MyGetListCtrlSelectedItemIndex( CListCtrl& listCtrl )
+{
+	POSITION pos = listCtrl.GetFirstSelectedItemPosition();
+	if (pos==NULL) {
+		return -1;
+	}
+	int idx = listCtrl.GetNextSelectedItem( pos );
+	return idx;
+}
+
+/**
+ * リストコントロールのアイテムのイメージインデックスを変更する
+ */
+inline bool MySetListCtrlItemImageIndex( CListCtrl& listCtrl, int itemIndex, int subItemIndex, int imageIndex )
+{
+	LVITEM lvitem;
+	lvitem.mask = LVIF_IMAGE;
+	lvitem.iItem = itemIndex;
+	lvitem.iSubItem = subItemIndex;
+	lvitem.iImage   = imageIndex;	// イメージ変更
+	listCtrl.SetItem( &lvitem );
+
+	return true;
+}
+
+/**
  * リストコントロール内で指定されたインデックスが表示状態にあるかどうかを返す。
  */
 inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )

@@ -724,7 +724,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 
 	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
-		return LRESULT();
+		return TRUE;
 	}
 
 	if (lParam == NULL) {
@@ -732,7 +732,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
 		MZ3LOGGER_ERROR( msg );
 		util::MySetInformationText( m_hWnd, msg );
-		return LRESULT();
+		return TRUE;
 	}
 
 	CMixiData* data = (CMixiData*)lParam;
@@ -788,7 +788,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
-		return LRESULT();
+		return TRUE;
 	}
 
 	if (lParam == NULL) {
@@ -796,7 +796,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
 		MZ3LOGGER_ERROR( msg );
 		util::MySetInformationText( m_hWnd, msg );
-		return LRESULT();
+		return TRUE;
 	}
 
 	CMixiData* data = (CMixiData*)lParam;
@@ -823,7 +823,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			data->SetAccessType( ACCESS_LOGIN );
 			AccessProc( data, data->GetURL() );
 
-			return LRESULT();
+			return TRUE;
 		}
 	}
 
@@ -860,7 +860,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 					*data = theApp.m_mixiBeforeRelogin;
 					AccessProc(data, util::CreateMixiUrl(data->GetURL()));
 				}
-				return LRESULT();
+				return TRUE;
 			} else {
 				// ログイン失敗
 				LPCTSTR emsg = _T("ログイン出来ませんでした");
@@ -875,7 +875,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				// プログレスバーを非表示
 				mc_progressBar.ShowWindow( SW_HIDE );
 				util::MySetInformationText( m_hWnd, emsg );
-				return LRESULT();
+				return TRUE;
 			}
 			break;
 		}
@@ -928,7 +928,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 				AccessProc(data, util::CreateMixiUrl(data->GetURL()));
 
-				return LRESULT();
+				return TRUE;
 			}
 		}
 
@@ -1076,7 +1076,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1110,7 +1110,7 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	// プログレスバーを非表示
 	mc_progressBar.ShowWindow( SW_HIDE );
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1124,11 +1124,11 @@ LRESULT CMZ3View::OnGetAbort(WPARAM wParam, LPARAM lParam)
 	m_abort = FALSE;
 	m_cruise.stop();
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
- * 中断処理
+ * 中断ボタン押下時の処理
  */
 LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 {
@@ -1152,7 +1152,7 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	util::MySetInformationText( m_hWnd, msg );
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1161,7 +1161,7 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 LRESULT CMZ3View::OnAccessInformation(WPARAM wParam, LPARAM lParam)
 {
 	m_infoEdit.SetWindowText( *(CString*)lParam );
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -1298,12 +1298,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		}
 
 		// アイコンのインデックスを設定
-		LVITEM lvitem;
-		lvitem.iItem = i; 
-		lvitem.mask = LVIF_IMAGE;
-		lvitem.iSubItem = 0;
-		lvitem.iImage   = iconIndex;// イメージ変更
-		m_bodyList.SetItem( &lvitem );
+		util::MySetListCtrlItemImageIndex( m_bodyList, i, 0, iconIndex );
 	}
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
@@ -1692,7 +1687,7 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 	// mini画像ウィンドウの復帰
 	MoveMiniImageDlg();
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**

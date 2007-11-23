@@ -40,6 +40,7 @@
 #define IDD_OPEN_URL_DIALOG             159
 #define IDD_DIALOG1                     160
 #define IDD_MINI_IMAGE_DIALOG           160
+#define IDI_DOWNLOADED_ICON             160
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -56,6 +57,7 @@
 #define IDC_STATIC_7                    207
 #define IDD_OPTIONTAB_MAIN_VIEW         207
 #define IDC_STATIC_8                    208
+#define IDD_DOWNLOADVIEW                208
 #define IDC_STATIC_9                    209
 #define IDC_STATIC_10                   210
 #define IDC_STATIC_11                   211
@@ -109,6 +111,7 @@
 #define IDC_SAVE_LOG_CHECK              1035
 #define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
+#define IDC_CONTINUE_CHECK              1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_DEBUG_MODE_CHECK            1036
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
@@ -141,6 +144,11 @@
 #define IDC_ENCODING_COMBO              1057
 #define IDC_MINI_IMAGE_SIZE_COMBO       1059
 #define IDC_SIZE_STATIC                 1060
+#define IDC_ITEM_LIST                   1061
+#define IDC_START_BUTTON                1062
+#define IDC_START_STOP_BUTTON           1062
+#define IDC_STOP_BUTTON                 1063
+#define IDC_EXIT_BUTTON                 1063
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -340,6 +348,7 @@
 #define ID_ACCELERATOR_RELOAD           32988
 #define IDM_INSERT_EMOJI_BEGIN          32994
 #define IDM_INSERT_EMOJI_END            33994
+#define ID_DOWNLOAD_MANAGER_VIEW        33996
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -351,8 +360,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
-#define _APS_NEXT_COMMAND_VALUE         33995
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_COMMAND_VALUE         33998
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

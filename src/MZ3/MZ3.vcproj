@@ -1105,7 +1105,7 @@
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -1131,7 +1131,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="1"
-				WholeProgramOptimization="true"
+				WholeProgramOptimization="false"
 				PreprocessorDefinitions="NDEBUG;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -1155,11 +1155,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\MZ4.exe"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				GenerateDebugInformation="false"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="0"
 				EntryPointSymbol="wWinMainCRTStartup"
 				TargetMachine="0"
 			/>
@@ -2040,6 +2040,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DownloadView.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\ForcedDebugDlg.cpp"
 					>
 				</File>
@@ -2318,6 +2322,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DownloadView.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ForcedDebugDlg.h"
 					>
 				</File>
@@ -2412,6 +2420,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\res\downloaded.ico"
+				>
+			</File>
 			<File
 				RelativePath=".\res\enquete.ico"
 				>

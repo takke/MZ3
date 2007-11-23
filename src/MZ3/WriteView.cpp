@@ -298,7 +298,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 {
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
-		return LRESULT();
+		return TRUE;
 	}
 
 	// ログアウトチェック
@@ -311,7 +311,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
 		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
 
-		return LRESULT();
+		return TRUE;
 	}
 
 	// 確認画面判定
@@ -342,7 +342,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 	// 書き込み開始
 	StartEntryPost();
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -500,7 +500,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		}
 		else {
 			// 中断が押されていた場合は上に返す
-			return LRESULT();
+			return TRUE;
 		}
 
 		((CEdit*)GetDlgItem(IDC_WRITE_TITLE_EDIT))->SetWindowText(L"");
@@ -557,7 +557,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	return LRESULT();
+	return TRUE;
 }
 
 /**
@@ -603,9 +603,12 @@ LRESULT CWriteView::OnPostAbort(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	return LRESULT();
+	return TRUE;
 }
 
+/**
+ * 中断ボタン押下時の処理
+ */
 LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 {
 	if( theApp.m_inet.IsConnecting() ) {
@@ -637,7 +640,7 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 	// 本文領域にフォーカスを戻す。
 	m_bodyEdit.SetFocus();
 
-	return LRESULT();
+	return TRUE;
 }
 
 // -----------------------------------------------------------------------------
@@ -646,7 +649,7 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 LRESULT CWriteView::OnAccessInformation(WPARAM wParam, LPARAM lParam)
 {
   m_infoEdit.SetWindowText(*(CString*)lParam);
-  return LRESULT();
+  return TRUE;
 }
 
 BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
@@ -766,7 +769,7 @@ LRESULT CWriteView::OnFit(WPARAM wParam, LPARAM lParam)
 		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 	}
 
-	return LRESULT();
+	return TRUE;
 }
 
 LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
@@ -778,7 +781,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
-		return LRESULT();
+		return TRUE;
 	}
 
 	switch( ((CMixiData*)lParam)->GetAccessType() ) {
@@ -794,7 +797,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
 				theApp.m_accessType = ACCESS_MAIN;
 				theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
-				return LRESULT();
+				return TRUE;
 			}
 		} else {
 			// ログイン失敗
@@ -803,7 +806,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONERROR);
 
 			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
-			return LRESULT();
+			return TRUE;
 		}
 		break;
 
@@ -827,7 +830,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			DumpToTemporaryDraftFile();
 
 			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
-			return LRESULT();
+			return TRUE;
 		}
 		break;
 	}
@@ -838,7 +841,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// POST 処理を続行
 	StartConfirmPost( msg );
 
-	return LRESULT();
+	return TRUE;
 }
 
 void CWriteView::OnSetFocus(CWnd* pOldWnd)
@@ -1251,7 +1254,7 @@ void CWriteView::OnInsertEmoji(UINT nID)
 {
 	int emojiIndex = nID - IDM_INSERT_EMOJI_BEGIN;
 	// index check
-	if (emojiIndex < 0 || emojiIndex >= theApp.m_emoji.size()) {
+	if (emojiIndex < 0 || emojiIndex >= (int)theApp.m_emoji.size()) {
 		return;
 	}
 

@@ -96,7 +96,7 @@ private:
 	afx_msg void OnReloadPage();
 	afx_msg void OnLoadUrl(UINT);
 	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
-	afx_msg LRESULT OnGetImageEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetEndBinary(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnChangeView(WPARAM, LPARAM);

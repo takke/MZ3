@@ -7,6 +7,7 @@
 #include "OptionSheet.h"
 #include "ReportView.h"
 #include "WriteView.h"
+#include "DownloadView.h"
 #include "MZ3View.h"
 #include "UserDlg.h"
 #include "util.h"
@@ -63,6 +64,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_ACTIVATE()
 	ON_WM_DESTROY()
 	ON_WM_MOVE()
+	ON_COMMAND(ID_DOWNLOAD_MANAGER_VIEW, &CMainFrame::OnDownloadManagerView)
 END_MESSAGE_MAP()
 
 
@@ -280,6 +282,17 @@ void CMainFrame::OnBackButton()
 		}
 		return;
 	}
+
+	if (pActiveView == theApp.m_pDownloadView) {
+		// ダウンロードビュー → メインビュー
+		theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
+		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
+
+		// 戻る
+		theApp.ChangeView(theApp.m_pMainView);
+		return;
+	}
+
 
 	//--- メインビュー
 	// 戻り先はないが、とりあえず変更イベントを送っておく
@@ -1027,4 +1040,12 @@ void CMainFrame::OnMove(int x, int y)
 	if (theApp.m_pMainView) {
 		theApp.m_pMainView->MoveMiniImageDlg();
 	}
+}
+
+void CMainFrame::OnDownloadManagerView()
+{
+	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
+	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+
+	theApp.ChangeView(theApp.m_pDownloadView);
 }

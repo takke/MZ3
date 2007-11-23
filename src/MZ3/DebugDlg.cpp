@@ -5,6 +5,7 @@
 #include "MZ3.h"
 #include "DebugDlg.h"
 #include "util.h"
+#include "util_gui.h"
 #include "MixiParserUtil.h"
 
 // CDebugDlg ダイアログ
@@ -199,8 +200,7 @@ void CDebugDlg::OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
 	if (pLVKeyDow->wVKey == VK_RETURN) {
-		POSITION pos = m_List.GetFirstSelectedItemPosition();
-		int idx = m_List.GetNextSelectedItem( pos );
+		int idx = util::MyGetListCtrlSelectedItemIndex( m_List );
 		if( idx < 0 ) {
 			return;
 		}
