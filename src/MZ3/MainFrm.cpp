@@ -173,7 +173,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 256 色ビットマップを割り当て
 	int nBtnCnt = 8;	//ボタンの数
 	static CImageList m_ImageList;
-	m_ImageList.Create( nToolbarWidth, nToolbarHeight, ILC_COLOR32, nBtnCnt, 1 );
+	m_ImageList.Create( nToolbarWidth, nToolbarHeight, ILC_COLOR32 | ILC_MASK, nBtnCnt, 1 );
 	m_ImageList.Add(&bm, (CBitmap*)NULL);
 	m_wndToolBar.GetToolBarCtrl().SetImageList(&m_ImageList);
 

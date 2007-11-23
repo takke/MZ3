@@ -157,7 +157,7 @@ void CReportView::OnInitialUpdate()
 		m_list.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_pimgList.Create(16, 16, ILC_COLOR4, 2, 0);
+		m_pimgList.Create(16, 16, ILC_COLOR4 | ILC_MASK, 2, 0);
 		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
 		m_pimgList.Add( AfxGetApp()->LoadIcon(IDI_PHOTO_ICON) );
 		m_list.SetImageList(&m_pimgList, LVSIL_SMALL);

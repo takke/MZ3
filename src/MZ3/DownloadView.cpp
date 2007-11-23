@@ -105,7 +105,7 @@ void CDownloadView::OnInitialUpdate()
 		m_list.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_imageList.Create(16, 16, ILC_COLOR4, 2, 0);
+		m_imageList.Create(16, 16, ILC_COLOR4 | ILC_MASK, 2, 0);
 		m_imageList.Add( AfxGetApp()->LoadIcon(IDI_DOWNLOADED_ICON) );
 		m_list.SetImageList(&m_imageList, LVSIL_SMALL);
 
