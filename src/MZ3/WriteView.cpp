@@ -705,9 +705,24 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 					CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
 					emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
 
-					// ‚Æ‚è‚ ‚¦‚¸‘S•”’Ç‰Á
-					for (size_t i=0; i<theApp.m_emoji.size(); i++) {
-						emojiMenu->AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
+					// NŒÂ‚¸‚Âƒƒjƒ…[‚É‚µ‚Ä’Ç‰Á
+					const int MENU_SPLIT_COUNT = 20;
+					if (!theApp.m_emoji.empty()) {
+						CMenu emojiSubMenu;
+						emojiSubMenu.CreatePopupMenu();
+						int nSubMenu = 1;
+
+						for (size_t i=0; i<theApp.m_emoji.size(); i++) {
+							if (i%MENU_SPLIT_COUNT == 0 && emojiSubMenu.GetMenuItemCount()>0) {
+								emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
+								nSubMenu++;
+								emojiSubMenu.CreatePopupMenu();
+							}
+							emojiSubMenu.AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
+						}
+						if (emojiSubMenu.GetMenuItemCount() > 0) {
+							emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
+						}
 					}
 				}
 
