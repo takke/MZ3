@@ -33,6 +33,11 @@ void Login::Read()
 	// IDとパスワードを取得
 	// ----------------------------------------
 
+	// 初期値設定
+	m_loginMail = _T("");
+	m_loginPwd = _T("");
+	m_ownerId = _T("");
+
 	// 実行ファイルのパスからデータファイル名を作成
 	CString fileName = theApp.GetAppDirPath() + _T("\\user.dat");
 
@@ -49,23 +54,11 @@ void Login::Read()
 
 		m_loginMail = Read(fp);
 		m_loginPwd  = Read(fp);
-		m_ownerId   = Read(fp);
 
-		TRACE(_T("Mail = %s\n"), m_loginMail);
-		TRACE(_T("Password = %s\n"), m_loginPwd);
-		TRACE(_T("OwnerId = %s\n"), m_ownerId);
+//		TRACE(_T("Mail = %s\n"), m_loginMail);
+//		TRACE(_T("Password = %s\n"), m_loginPwd);
 
-		if (m_ownerId == _T("ERROR")) {
-			m_ownerId = _T("");
-		}
 		fclose(fp);
-
-	}
-	else {
-		// ファイルが存在しないので初期値を設定
-		m_loginMail = _T("");
-		m_loginPwd = _T("");
-		m_ownerId = _T("");
 	}
 }
 
@@ -83,9 +76,6 @@ void Login::Write()
 	if (m_loginMail.GetLength() == 0 && m_loginPwd.GetLength() == 0) {
 		return;
 	}
-	if (m_ownerId.GetLength() == 0) {
-		m_ownerId = _T("");
-	}
 
 	FILE* fp = _wfopen(fileName, _T("wb"));
 	if (fp == NULL) {
@@ -94,7 +84,6 @@ void Login::Write()
 
 	Write(fp, m_loginMail);
 	Write(fp, m_loginPwd);
-	Write(fp, m_ownerId);
 
 	fclose(fp);
 }
