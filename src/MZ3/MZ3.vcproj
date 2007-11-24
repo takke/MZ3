@@ -2290,6 +2290,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\MixiUrlParser.h"
+					>
+				</File>
+				<File
 					RelativePath=".\PostData.h"
 					>
 				</File>

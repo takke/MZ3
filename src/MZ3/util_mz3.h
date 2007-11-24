@@ -304,6 +304,13 @@ inline CString MakeLogfilePath( const CMixiData& data )
 			return path;
 		}
 
+	case ACCESS_PROFILE:
+		{
+			// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
+			int id = mixi::MixiUrlParser::GetID( data.GetURL() );
+			return util::FormatString( L"%s\\%d.html", theApp.m_filepath.profileFolder, id );
+		}
+
 	case ACCESS_MESSAGE:
 		{
 			CString comm_id, id;

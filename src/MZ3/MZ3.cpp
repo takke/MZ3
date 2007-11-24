@@ -658,6 +658,10 @@ void CMZ3App::FilePath::init_logpath()
 	eventFolder.Format(_T("%s\\event"), logFolder );
 	CreateDirectory( eventFolder, NULL/*always null*/ );
 
+	// プロフィールのログ用フォルダのパス
+	profileFolder.Format(_T("%s\\profile"), logFolder );
+	CreateDirectory( profileFolder, NULL/*always null*/ );
+
 	// メッセージのログ用フォルダのパス
 	messageFolder.Format(_T("%s\\message"), logFolder );
 	CreateDirectory( messageFolder, NULL/*always null*/ );

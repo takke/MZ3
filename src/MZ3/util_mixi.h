@@ -3,6 +3,7 @@
  * mixi関連ユーティリティ
  */
 #include "util_base.h"
+#include "MixiUrlParser.h"
 
 /// MZ3 用ユーティリティ
 namespace util
@@ -52,12 +53,7 @@ inline CString GetLogIdString( const CMixiData& mixi )
 	switch (mixi.GetAccessType()) {
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
-		{
-			CString id;
-			if (util::GetBetweenSubString( mixi.GetURL(), L"id=", L"&", id ) >= 0) {
-				logId.Format(_T("d%s"), id);
-			}
-		}
+		logId.Format(_T("d%d"), mixi::MixiUrlParser::GetID( mixi.GetURL() ) );
 		break;
 	case ACCESS_BBS:
 		logId.Format(_T("b%d"), mixi.GetID());
@@ -67,6 +63,9 @@ inline CString GetLogIdString( const CMixiData& mixi )
 		break;
 	case ACCESS_ENQUETE:
 		logId.Format(_T("e%d"), mixi.GetID());
+		break;
+	case ACCESS_PROFILE:
+		logId.Format(_T("p%d"), mixi.GetID());
 		break;
 
 	default:

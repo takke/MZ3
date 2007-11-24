@@ -235,6 +235,7 @@ IDR_PROFILE_ITEM_MENU MENU
 BEGIN
     POPUP "プロフィール項目"
     BEGIN
+        MENUITEM "ログを開く",                       ID_VIEW_LOG
         MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
         MENUITEM "自己紹介を簡易表示...",                ID_OPEN_SELFINTRO
         MENUITEM "紹介文を簡易表示...",                 ID_OPEN_INTRO
@@ -673,12 +674,12 @@ CAPTION "メイン画面"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL         "トピック等にアイコンを表示する",IDC_SHOW_ICON_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,106,10
+    CONTROL         "ユーザやコミュニティの画像を表示する",IDC_SHOW_MINI_IMAGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,24,129,10
     CONTROL         "別画面で拡大表示する",IDC_SHOW_MINI_IMAGE_DLG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,41,83,10
     CONTROL         "カーソル位置に表示する",IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,60,87,10
     LTEXT           "サイズ：",IDC_SIZE_STATIC,16,79,24,8
     COMBOBOX        IDC_MINI_IMAGE_SIZE_COMBO,48,76,48,56,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "ユーザやコミュニティの画像を表示する",IDC_SHOW_MINI_IMAGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,24,129,10
 END
 
 IDD_DOWNLOADVIEW DIALOGEX 0, 0, 87, 98

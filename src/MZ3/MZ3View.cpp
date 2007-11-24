@@ -1035,6 +1035,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
 	case ACCESS_PLAIN:
+	case ACCESS_PROFILE:
 		// --------------------------------------------------
 		// ボディ項目の取得
 		// --------------------------------------------------
@@ -1389,6 +1390,8 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	if (m_bodyList.GetItemCount()==0) {
 		MoveMiniImageDlg();
 	}
+
+	util::MySetInformationText( m_hWnd, L"完了" );
 }
 
 /**
@@ -2098,7 +2101,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
-		case ACCESS_PROFILE:
 			// メニュー表示
 			PopupBodyMenu();
 			break;
@@ -2720,6 +2722,7 @@ void CMZ3View::OnViewLog()
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_PROFILE:
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
@@ -3126,6 +3129,13 @@ bool CMZ3View::PopupBodyMenu(void)
 				// 紹介文以外では「紹介文」を削除
 				if( categoryType != ACCESS_LIST_INTRO ) {
 					pSubMenu->DeleteMenu( ID_OPEN_INTRO, MF_BYCOMMAND );
+				}
+
+				// ログの有無チェック
+				if( util::ExistFile( util::MakeLogfilePath(bodyItem) ) ) {
+					pSubMenu->EnableMenuItem( ID_VIEW_LOG, MF_ENABLED | MF_BYCOMMAND );
+				}else{
+					pSubMenu->EnableMenuItem( ID_VIEW_LOG, MF_GRAYED | MF_BYCOMMAND );
 				}
 
 				// メニューを開く

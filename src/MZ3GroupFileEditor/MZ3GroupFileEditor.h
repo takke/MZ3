@@ -10,6 +10,9 @@
 #include "resource.h"		// メイン シンボル
 #include "../MZ3/Mz3GroupData.h"
 
+// NOP
+#define MZ3LOGGER_ERROR(msg) ;
+
 // CMZ3GroupFileEditorApp:
 // このクラスの実装については、MZ3GroupFileEditor.cpp を参照してください。
 //

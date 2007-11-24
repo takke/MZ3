@@ -140,7 +140,7 @@ public:
 	afx_msg void OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
-	bool MyLoadMixiViewPage( const CMixiData::Link& link );
+	bool MyLoadMixiViewPage( const CMixiData::Link link );
 };
 
 

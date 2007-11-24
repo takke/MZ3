@@ -86,6 +86,7 @@ public:
 		CString		bbsFolder;		///< コミュニティ書き込みのログ用フォルダのパス
 		CString		enqueteFolder;	///< アンケートのログ用フォルダのパス
 		CString		eventFolder;	///< イベントのログ用フォルダのパス
+		CString		profileFolder;	///< プロフィールのログ用フォルダのパス
 		CString		messageFolder;	///< メッセージのログ用フォルダのパス
 		CString		newsFolder;		///< ニュースのログ用フォルダのパス
 

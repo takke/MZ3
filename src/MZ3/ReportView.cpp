@@ -356,13 +356,9 @@ void CReportView::SetData(const CMixiData& data)
 	TRACE(_T("Address = %s\n"), m_data.GetURL());
 
 	// URIを分解
-
 	if (m_data.GetID() == -1) {
 		// ここでＩＤを作る
-		CString id;
-		if (util::GetBetweenSubString( m_data.GetURL(), L"id=", L"&", id ) >= 0) {
-			m_data.SetID(_wtoi(id));
-		}
+		m_data.SetID( mixi::MixiUrlParser::GetID(m_data.GetURL()) );
 	}
 
 	CString logId = util::GetLogIdString( m_data );
@@ -393,17 +389,19 @@ void CReportView::SetData(const CMixiData& data)
 //	if (index != -1) {
 //		title = title.Left(index);
 //	}
-	if (m_data.GetAccessType() != ACCESS_MYDIARY &&
-		m_data.GetAccessType() != ACCESS_MESSAGE) 
-	{
+	switch (m_data.GetAccessType()) {
+	case ACCESS_MYDIARY:
+	case ACCESS_MESSAGE:
+	case ACCESS_PROFILE:
+		break;
+	default:
 		if( !m_data.GetName().IsEmpty() ) {
 			title.AppendFormat( _T("(%s)"), (LPCTSTR)m_data.GetName() );
 		}
+		break;
 	}
 	m_titleEdit.SetWindowText( title );
 
-
-	int nItem;
 
 	// ----------------------------------------
 	// コメントの追加
@@ -414,14 +412,8 @@ void CReportView::SetData(const CMixiData& data)
 		CMixiData& cmtData = m_data.GetChild(i);
 
 		// 画像の有無でアイコンのインデックスを変更する
-		int imgNo = 0;
-		if (cmtData.GetImageCount() == 0) {
-			imgNo = 0;
-		}
-		else {
-			imgNo = 1;
-		}
-		nItem = m_list.InsertItem(i+1, util::int2str(cmtData.GetCommentIndex()), imgNo);
+		int imgIndex = (cmtData.GetImageCount() == 0) ? 0 : 1;
+		int nItem = m_list.InsertItem(i+1, util::int2str(cmtData.GetCommentIndex()), imgIndex);
 
 		if (cmtData.GetCommentIndex() == m_lastIndex) {
 			focusItem = nItem + 1;
@@ -433,23 +425,18 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// 親をリストに表示
-	int imgNo = 0;
-	if (m_data.GetImageCount() == 0) {
-		imgNo = 0;
+	{
+		int imageIndex = (m_data.GetImageCount() == 0) ? 0 : 1;
+		int nItem = m_list.InsertItem(0, _T("-"), imageIndex);
+		m_list.SetItem(nItem, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
+		m_list.SetItemData(0, (DWORD_PTR)&m_data);
 	}
-	else {
-		imgNo = 1;
-	}
-	nItem = m_list.InsertItem(0, _T("-"), imgNo);
-	m_list.SetItem(nItem, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
-	m_list.SetItemData(0, (DWORD_PTR)&m_data);
 
 	m_nochange = FALSE;
 
 	if (count == 0) {
 		m_lastIndex = 0;
-	}
-	else {
+	} else {
 		// 先頭のデータを取得
 		CMixiData& cmtData = m_data.GetChild(0);
 		if (cmtData.GetCommentIndex() > m_lastIndex && m_lastIndex != 0) {
@@ -1115,7 +1102,7 @@ void CReportView::OnLoadPageLink(UINT nID)
 	MyLoadMixiViewPage( m_data.m_linkPage[idx] );
 }
 
-bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
+bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 {
 	if (m_access) {
 		return false;
@@ -1128,6 +1115,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link& link )
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_PROFILE:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
 
@@ -1896,6 +1884,16 @@ void CReportView::MyPopupReportMenu(void)
 				pcThisMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
 			}
 		}
+	}
+
+	// ブラウザで開く(このページ)：URLがなければ無効
+	if (m_currentData->GetURL().IsEmpty()) {
+		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER, MF_BYCOMMAND);
+	}
+
+	// ブラウザで開く(ユーザページ)：IDがなければ無効
+	if (m_currentData->GetID()<=0) {
+		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER_USER, MF_BYCOMMAND);
 	}
 
 	// メニューのポップアップ

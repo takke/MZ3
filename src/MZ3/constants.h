@@ -61,7 +61,7 @@ enum ACCESS_TYPE {
 	ACCESS_MYDIARY,				///< 自分の日記内容(view_diary.pl)
 	ACCESS_MESSAGE,				///< メッセージ(view_message.pl)
 	ACCESS_NEWS,				///< ニュース内容(view_news.pl)
-	ACCESS_PROFILE,				///< 個人ページ(show_friend.pl) （v0.6.2 現在、ただのURLリンク）
+	ACCESS_PROFILE,				///< 個人ページ(show_friend.pl)
 	ACCESS_COMMUNITY,			///< コミュニティページ(view_community.pl)
 	ACCESS_ADDDIARY,			///< 日記投稿
 	ACCESS_IMAGE,				///< 画像
