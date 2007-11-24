@@ -2719,7 +2719,170 @@ private:
 		return retIndex;
 	}
 
-};	 
+};
+
+
+/**
+ * [content] show_friend.pl 用パーサ
+ * 【プロフィール】
+ * http://mixi.jp/show_friend.pl
+ */
+class ShowFriendParser : public MixiContentParser
+{
+public:
+	static bool parse( CMixiData& mixi, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"ShowFriendParser.parse() start." );
+
+		mixi.ClearAllList();
+		mixi.ClearChildren();
+		mixi.SetName( L"" );
+		mixi.SetDate( L"" );
+
+		// html_ の文字列化
+		std::vector<TCHAR> text;
+		text.reserve( 10*1024 );	// バッファ予約
+		INT_PTR count = html_.GetCount();
+		for (int i=0; i<count; i++) {
+			const CString& line = html_.GetAt(i);
+			size_t size = text.size();
+			int new_size = wcslen(line);
+			if (new_size>0) {
+				text.resize( size+new_size );
+				wcsncpy( &text[size], (LPCTSTR)line, new_size );
+			}
+		}
+
+		// XML 解析
+		xml2stl::Container root;
+		if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+			MZ3LOGGER_ERROR( L"XML 解析失敗" );
+			return false;
+		}
+
+		// 名前
+		// /html/body/div[2]/div/div/div/div/h3
+		try {
+			const xml2stl::Node& h3 = root.getNode( L"html" )
+										  .getNode( L"body" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"div" )
+										  .getNode( L"div" )
+										  .getNode( L"div" )
+										  .getNode( L"div" )
+										  .getNode( L"h3" );
+			mixi.SetName( h3.getText().c_str () );
+			mixi.SetTitle( h3.getText().c_str () );
+			mixi.SetAuthor( h3.getText().c_str () );
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"h3 not found..." );
+		}
+
+		// プロフィールを全て取得し、本文に設定する。
+		// /html/body/div[2]/div/div[2]/div[2]/ul
+		try {
+			const xml2stl::Node& ul = root.getNode( L"html" )
+										  .getNode( L"body" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"div" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"div", 1 )
+										  .getNode( L"ul" );
+
+			// とりあえず改行
+			mixi.AddBody(_T("\r\n"));
+
+			// 各liを追加していく
+			int nChildren = ul.getChildrenCount();
+			for (int i=0; i<nChildren; i++) {
+				const xml2stl::Node& li = ul.getNode(i);
+				if (li.getName()!=L"li")
+					continue;
+
+				const xml2stl::Node& dl = li.getNode( L"dl" );
+
+				// 項目の名称
+				CString target = util::FormatString( L"■ %s\r\n", dl.getNode(L"dt").getText().c_str() );
+				target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+				mixi.AddBody( target );
+
+				// 項目の内容
+				target = dl.getNode(L"dd").getText().c_str();
+				target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+				mixi.AddBody( target );
+				mixi.AddBody(_T("\r\n"));
+				mixi.AddBody(_T("\r\n"));
+			}
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"(プロフィール本文) not found..." );
+		}
+
+		// 最新の日記取得
+		// /html/body/div[2]/div/div[2]/div[3]/div/div[2]/dl
+		try {
+			const xml2stl::Node& dl = root.getNode( L"html" )
+										  .getNode( L"body" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"div" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"div", 2 )
+										  .getNode( L"div" )
+										  .getNode( L"div", 1 )
+										  .getNode( L"dl" );
+
+			// dt/span, dd/a が交互に出現する。
+			int n = dl.getChildrenCount();
+
+			CMixiData diaryItem;
+			CMixiData::Link link( L"", L"" );
+
+			// とりあえず改行
+			diaryItem.AddBody(_T("\r\n"));
+
+			for (int i=0; i<n; i++) {
+				const xml2stl::Node& node = dl.getNode(i);
+				if (node.getName() == L"dt") {
+					LPCTSTR date = node.getNode(L"span").getText().c_str();
+					
+					// リンク名設定
+					link.text += date;
+
+					// 本文設定
+					diaryItem.AddBody( util::FormatString(L"■ %s", date ) );
+				}
+				if (node.getName() == L"dd") {
+					const xml2stl::Node& a = node.getNode(L"a");
+
+					// リンク名設定
+					link.text += L" : ";
+					link.text += a.getText().c_str();
+
+					// URL, IDを設定
+					link.url = a.getProperty( L"href" ).c_str();
+					diaryItem.m_linkList.push_back(link);
+
+					// 本文に追加
+					diaryItem.AddBody( util::FormatString(L" : %s\r\n", a.getText().c_str()) );
+					diaryItem.AddBody( util::FormatString(L" (%s)\r\n\r\n", link.url) );
+
+					// 初期化
+					link = CMixiData::Link( L"", L"" );
+				}
+			}
+			// 登録
+			diaryItem.SetCommentIndex( 1 );
+			diaryItem.SetAuthor( L"最新の日記" );
+			mixi.AddChild( diaryItem );
+
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"(最新の日記) not found..." );
+		}
+
+		MZ3LOGGER_DEBUG( L"ShowFriendParser.parse() finished." );
+		return true;
+	}
+
+};
 
 
 //■■■ニュース■■■
@@ -4359,6 +4522,7 @@ inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& h
 	case ACCESS_BBS:		mixi::ViewBbsParser::parse( mixi, html );		break;
 	case ACCESS_ENQUETE:	mixi::ViewEnqueteParser::parse( mixi, html );	break;
 	case ACCESS_EVENT:		mixi::ViewEventParser::parse( mixi, html );		break;
+	case ACCESS_PROFILE:	mixi::ShowFriendParser::parse( mixi, html );	break;
 	case ACCESS_MYDIARY:	mixi::ViewDiaryParser::parse( mixi, html );		break;
 	case ACCESS_MESSAGE:	mixi::ViewMessageParser::parse( mixi, html );	break;
 	case ACCESS_NEWS:		mixi::ViewNewsParser::parse( mixi, html );		break;

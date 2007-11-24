@@ -317,9 +317,55 @@ private:
 		PARSE_STATE_IN_NODE_NAME,
 	};
 
+	static bool parse_until_target( Container& node, kfm::kf_buf_reader<TCHAR>& reader, const xml2stl::XML2STL_STRING& target )
+	{
+		xml2stl::XML2STL_STRING node_text;
+		xml2stl::XML2STL_STRING temp;
+		while(! reader.is_eof() ) {
+			wint_t c = reader.get_char();
+
+			if (temp.empty()) {
+				if (c=='<') {
+					temp.push_back(c);
+				} else {
+					node_text.push_back( c );
+				}
+			} else {
+				temp.push_back( c );
+
+				if (target.compare( 0, temp.size(), temp ) == 0) {
+					if (temp.size() == target.size()) {
+						// 完了。
+						node.setText( node_text );
+						return true;
+					} else {
+						// 継続
+					}
+				} else {
+					// 不一致。
+					node_text += temp;
+					temp = L"";
+				}
+			}
+		}
+
+		return true;
+	}
+
 	static bool parse_node( Container& node, kfm::kf_buf_reader<TCHAR>& reader )
 	{
 		PARSE_STATE state = PARSE_STATE_SEARCHING;
+
+		if (node.getName()==L"script") {
+			// script タグ専用解析。
+			// "</script>" まで読み飛ばす
+			return parse_until_target( node, reader, L"</script>" );
+		}
+		if (node.getName()==L"style") {
+			// style タグ専用解析。
+			// "</style>" まで読み飛ばす
+			return parse_until_target( node, reader, L"</style>" );
+		}
 
 		xml2stl::XML2STL_STRING node_name;
 		xml2stl::XML2STL_STRING node_text;
@@ -360,7 +406,7 @@ private:
 							parse_node( newNode, reader );
 						}
 						state = PARSE_STATE_SEARCHING;
-						node_text = L"";
+//						node_text = L"";
 					}
 					break;
 				case '>':
@@ -369,7 +415,7 @@ private:
 						Node& newNode = node.addNode(node_name);
 						parse_node( newNode, reader );
 						state = PARSE_STATE_SEARCHING;
-						node_text = L"";
+//						node_text = L"";
 					}
 					break;
 				case '/':
@@ -377,7 +423,7 @@ private:
 						// NODE END, like <xxx/>
 						node.addNode(node_name);
 						state = PARSE_STATE_SEARCHING;
-						node_text = L"";
+//						node_text = L"";
 					} else {
 						// </xxx> 状態。
 						// '>' が現れるまでパースし、TEXT を設定して終了。
@@ -385,14 +431,32 @@ private:
 							wint_t c = reader.get_char();
 							if (c=='>') {
 								// 子要素があればTEXTを設定しない。
-								if (!node.hasChildren()) {
+//								if (!node.hasChildren()) {
 									node.setText(node_text);
-								}
+//								}
 								// 必要であれば、node.name とこれまでのc値との文字列比較を行うこと。
 								return true;
 							}
 						}
 						return false;
+					}
+					break;
+				case '!':
+					// 1文字目であれば、DTD 宣言とみなし、読み飛ばす。
+					if (node_name.size()==0) {
+						// DTD 宣言。
+						// '>' が現れるまでパースし、継続。
+						while( !reader.is_eof() ) {
+							wint_t c = reader.get_char();
+							if (c=='>') {
+								state = PARSE_STATE_SEARCHING;
+								node_name = L"";
+								node_text = L"";
+								break;
+							}
+						}
+					} else {
+						// エラー
 					}
 					break;
 				default:
