@@ -2831,10 +2831,25 @@ public:
 				mixi.AddBody( target );
 				mixi.AddBody(_T("\r\n"));
 				mixi.AddBody(_T("\r\n"));
+
+				// リンクがあれば追加する。
+				try {
+					int nSubItem = dl.getChildrenCount();
+					for (int j=0; j<nSubItem; j++) {
+						const xml2stl::Node& a = dl.getNode(j);
+						if (a.getName()==L"a") {
+							mixi.m_linkList.push_back( CMixiData::Link( a.getText().c_str(), a.getProperty(L"href").c_str() ) );
+						}
+					}
+				} catch (...) {
+					MZ3LOGGER_ERROR( L"(プロフィール本文, link) not found..." );
+				}
 			}
 		} catch (...) {
 			MZ3LOGGER_ERROR( L"(プロフィール本文) not found..." );
 		}
+
+		int nChildItemNumber = 1;
 
 		// 最新の日記取得
 		// /html/body/div[2]/div/div[2]/div[3]/div/div[2]/dl
@@ -2889,12 +2904,74 @@ public:
 				}
 			}
 			// 登録
-			diaryItem.SetCommentIndex( 1 );
+			diaryItem.SetCommentIndex( nChildItemNumber++ );
 			diaryItem.SetAuthor( L"最新の日記" );
 			mixi.AddChild( diaryItem );
 
 		} catch (...) {
 			MZ3LOGGER_ERROR( L"(最新の日記) not found..." );
+		}
+
+		// 紹介文の取得
+		// /html/body/div[2]/div/div[2]/div[4]/div[2]
+		try {
+			const xml2stl::Node& div = root.getNode( L"html" )
+										   .getNode( L"body" )
+										   .getNode( L"div", 1 )
+										   .getNode( L"div" )
+										   .getNode( L"div", 1 )
+										   .getNode( L"div", 3 )
+										   .getNode( L"div", 1 );
+
+			// dl が続く。
+			int n = div.getChildrenCount();
+			for (int i=0; i<n; i++) {
+				const xml2stl::Node& dl = div.getNode(i);
+				if (dl.getName() != L"dl") {
+					continue;
+				}
+
+				CMixiData introItem;
+				introItem.AddBody( L"\r\n" );
+				
+				// dt/a[2] : 名前
+				// dt/a[1]/img/@src : 画像
+				const xml2stl::Node& dt = dl.getNode(L"dt");
+				LPCTSTR name = dt.getNode( L"a", 1 ).getText().c_str();
+				LPCTSTR url  = dt.getNode( L"a", 1 ).getProperty(L"href").c_str();
+
+				// dd/p[1] : 関係
+				// dd/p[2] : 紹介文
+				// または
+				// dd/p[1] : 紹介文
+				const xml2stl::Node& dd = dl.getNode(L"dd");
+				if (dd.getChildrenCount()==1) {
+					CString intro = dd.getNode( L"p", 0 ).getText().c_str();
+
+					intro.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+					introItem.AddBody( intro );
+				} else {
+					CString relation = dd.getNode( L"p", 0 ).getText().c_str();
+					CString intro = dd.getNode( L"p", 1 ).getText().c_str();
+
+					relation.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+					introItem.AddBody( relation );
+
+					introItem.AddBody( L"\r\n" );
+					intro.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
+					introItem.AddBody( intro );
+				}
+
+				// 登録
+				introItem.SetCommentIndex( nChildItemNumber++ );
+				introItem.SetAuthor( util::FormatString( L"紹介文(%s)", name ) );
+				introItem.SetAuthorID( mixi::MixiUrlParser::GetID(url) );
+				introItem.SetURL( url );
+				introItem.SetAccessType( ACCESS_PROFILE );
+				mixi.AddChild( introItem );
+			}
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"(紹介文) not found..." );
 		}
 
 		MZ3LOGGER_DEBUG( L"ShowFriendParser.parse() finished." );

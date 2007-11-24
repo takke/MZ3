@@ -107,9 +107,9 @@ public:
 	void SetAuthor(CString author);
 	CString GetAuthor() const			{ return m_author; }
 
-	void SetAuthorID(CString authorId) {
+	void SetAuthorID(int authorId) {
 		// êîílïœä∑
-		m_authorId = _wtoi(authorId);
+		m_authorId = authorId;
 	}
 	int GetAuthorID()					{ return m_authorId; }
 

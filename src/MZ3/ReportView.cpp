@@ -413,13 +413,20 @@ void CReportView::SetData(const CMixiData& data)
 
 		// 画像の有無でアイコンのインデックスを変更する
 		int imgIndex = (cmtData.GetImageCount() == 0) ? 0 : 1;
-		int nItem = m_list.InsertItem(i+1, util::int2str(cmtData.GetCommentIndex()), imgIndex);
+		CString strIndex;
+		if (cmtData.GetCommentIndex()>=0) {
+			// 未指定の場合は空白とする。
+			strIndex = util::int2str(cmtData.GetCommentIndex());
+		}
+		int nItem = m_list.InsertItem(i+1, strIndex, imgIndex);
 
 		if (cmtData.GetCommentIndex() == m_lastIndex) {
 			focusItem = nItem + 1;
 		}
 
+		// Author 列
 		m_list.SetItem(nItem, 1, LVIF_TEXT | LVIF_IMAGE, cmtData.GetAuthor(), 0, 0, 0, 0);
+		// Date 列
 		m_list.SetItem(nItem, 2, LVIF_TEXT, cmtData.GetDate(), 0, 0, 0, 0);
 		m_list.SetItemData(nItem, (DWORD_PTR)&cmtData);
 	}
@@ -1892,7 +1899,11 @@ void CReportView::MyPopupReportMenu(void)
 	}
 
 	// ブラウザで開く(ユーザページ)：IDがなければ無効
-	if (m_currentData->GetID()<=0) {
+	int nUserId = m_currentData->GetAuthorID();
+	if( nUserId < 0 ) {
+		nUserId = m_currentData->GetOwnerID();
+	}
+	if (nUserId<=0) {
 		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER_USER, MF_BYCOMMAND);
 	}
 
