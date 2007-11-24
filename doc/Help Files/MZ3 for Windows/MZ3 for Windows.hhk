@@ -178,6 +178,8 @@
 <param name="Local" value="2007101911119379.htm">
 <param name="Name" value="マウスを使用してスクロールすると残像が残る">
 <param name="Local" value="2007101911133503.htm">
+<param name="Name" value="足あとが10件しか表示されない">
+<param name="Local" value="2007112120584640.htm">
 <param name="Name" value="なんかおかしい">
 <param name="Local" value="20071015213024886.htm">
 </OBJECT>
@@ -216,6 +218,10 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="マウスを使用してスクロールすると残像が残る">
 <param name="Local" value="2007101911133503.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="足あとが10件しか表示されない">
+<param name="Local" value="2007112120584640.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="なんかおかしい">
