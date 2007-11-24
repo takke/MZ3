@@ -2116,6 +2116,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\WriteEdit.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\WriteView.cpp"
 					>
 				</File>
@@ -2395,6 +2399,10 @@
 				</File>
 				<File
 					RelativePath=".\UserDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\WriteEdit.h"
 					>
 				</File>
 				<File

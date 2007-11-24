@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PostData.h"
+#include "WriteEdit.h"
 #include "afxwin.h"
 #include "InetAccess.h"
 
@@ -150,7 +151,7 @@ public:
 	CEdit m_infoEdit;			///< 通知エディット
 	CButton m_sendButton;		///< 書き込みボタン
 	CButton m_cancelButton;		///< キャンセルボタン
-	CEdit m_bodyEdit;			///< 本文エディット
+	CWriteEdit m_bodyEdit;		///< 本文エディット
 	CEdit m_titleEdit;			///< タイトルエディット
 
 private:
@@ -181,6 +182,8 @@ public:
 
 private:
 	bool DumpToTemporaryDraftFile();
+public:
+	void PopupWriteBodyMenu(void);
 };
 
 

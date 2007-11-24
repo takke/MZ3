@@ -648,8 +648,8 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 // -----------------------------------------------------------------------------
 LRESULT CWriteView::OnAccessInformation(WPARAM wParam, LPARAM lParam)
 {
-  m_infoEdit.SetWindowText(*(CString*)lParam);
-  return TRUE;
+	m_infoEdit.SetWindowText(*(CString*)lParam);
+	return TRUE;
 }
 
 BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
@@ -689,48 +689,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 #ifndef WINCE
 		case VK_APPS:
 #endif
-			{
-				POINT pt    = util::GetPopupPos();
-				int   flags = util::GetPopupFlags();
-
-				CMenu menu;
-				menu.LoadMenu(IDR_WRITE_MENU);
-				CMenu* pcThisMenu = menu.GetSubMenu(0);
-
-				// 写真添付ができない画面では「写真を添付する」メニューを消す
-				if( !IsEnableAttachImageMode() ) {
-					pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
-				}
-
-				// 絵文字メニュー
-				{
-					// ダミーを削除
-					CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
-					emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
-
-					// N個ずつメニューにして追加
-					const int MENU_SPLIT_COUNT = 20;
-					if (!theApp.m_emoji.empty()) {
-						CMenu emojiSubMenu;
-						emojiSubMenu.CreatePopupMenu();
-						int nSubMenu = 1;
-
-						for (size_t i=0; i<theApp.m_emoji.size(); i++) {
-							if (i%MENU_SPLIT_COUNT == 0 && emojiSubMenu.GetMenuItemCount()>0) {
-								emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
-								nSubMenu++;
-								emojiSubMenu.CreatePopupMenu();
-							}
-							emojiSubMenu.AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
-						}
-						if (emojiSubMenu.GetMenuItemCount() > 0) {
-							emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
-						}
-					}
-				}
-
-				pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
-			}
+			PopupWriteBodyMenu();
 			break;
 
 		case VK_BACK:
@@ -1260,4 +1219,50 @@ void CWriteView::OnInsertEmoji(UINT nID)
 
 	// 現在のカーソル位置に挿入（または選択範囲の置換）
 	m_bodyEdit.ReplaceSel( theApp.m_emoji[ emojiIndex ].code, /*bCanUndo=*/TRUE );
+}
+
+
+void CWriteView::PopupWriteBodyMenu(void)
+{
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+
+	CMenu menu;
+	menu.LoadMenu(IDR_WRITE_MENU);
+	CMenu* pcThisMenu = menu.GetSubMenu(0);
+
+	// 写真添付ができない画面では「写真を添付する」メニューを消す
+	if( !IsEnableAttachImageMode() ) {
+		pcThisMenu->EnableMenuItem( ID_ATTACH_PHOTO, MF_GRAYED | MF_BYCOMMAND );
+	}
+
+	// 絵文字メニュー
+	{
+		// ダミーを削除
+		CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
+		emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
+
+		// N個ずつメニューにして追加
+		const int MENU_SPLIT_COUNT = 20;
+		if (!theApp.m_emoji.empty()) {
+			CMenu emojiSubMenu;
+			emojiSubMenu.CreatePopupMenu();
+			int nSubMenu = 1;
+
+			for (size_t i=0; i<theApp.m_emoji.size(); i++) {
+				if (i%MENU_SPLIT_COUNT == 0 && emojiSubMenu.GetMenuItemCount()>0) {
+					emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
+					nSubMenu++;
+					emojiSubMenu.Detach();
+					emojiSubMenu.CreatePopupMenu();
+				}
+				emojiSubMenu.AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
+			}
+			if (emojiSubMenu.GetMenuItemCount() > 0) {
+				emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
+			}
+		}
+	}
+
+	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 }
