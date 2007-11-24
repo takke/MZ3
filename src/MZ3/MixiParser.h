@@ -2826,7 +2826,8 @@ public:
 				mixi.AddBody( target );
 
 				// 項目の内容
-				target = dl.getNode(L"dd").getText().c_str();
+				const xml2stl::Node& dd = dl.getNode( L"dd" );
+				target = dd.getText().c_str();
 				target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
 				mixi.AddBody( target );
 				mixi.AddBody(_T("\r\n"));
@@ -2834,9 +2835,9 @@ public:
 
 				// リンクがあれば追加する。
 				try {
-					int nSubItem = dl.getChildrenCount();
+					int nSubItem = dd.getChildrenCount();
 					for (int j=0; j<nSubItem; j++) {
-						const xml2stl::Node& a = dl.getNode(j);
+						const xml2stl::Node& a = dd.getNode(j);
 						if (a.getName()==L"a") {
 							mixi.m_linkList.push_back( CMixiData::Link( a.getText().c_str(), a.getProperty(L"href").c_str() ) );
 						}
