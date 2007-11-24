@@ -2778,6 +2778,25 @@ public:
 			MZ3LOGGER_ERROR( L"h3 not found..." );
 		}
 
+		// ユーザ画像
+		// /html/body/div[2]/div/div/div/div/img
+		try {
+			const xml2stl::Node& img = root.getNode( L"html" )
+										   .getNode( L"body" )
+										   .getNode( L"div", 1 )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"img" );
+			LPCTSTR url = img.getProperty( L"src" ).c_str();
+			mixi.m_linkList.push_back( CMixiData::Link( url, L"ユーザ画像" ) );
+
+			MZ3LOGGER_DEBUG( util::FormatString( L"user image : [%s]", url ) );
+		} catch (...) {
+			MZ3LOGGER_ERROR( L"img not found..." );
+		}
+
 		// プロフィールを全て取得し、本文に設定する。
 		// /html/body/div[2]/div/div[2]/div[2]/ul
 		try {
