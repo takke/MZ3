@@ -290,6 +290,18 @@ inline bool LineHasStringsNoCase(
 	return true;
 }
 
+inline CString FormatString(LPCTSTR szFormat, ...)
+{
+	CString str;
+
+	va_list args;
+	va_start(args, szFormat);
+	str.FormatV(szFormat, args);
+	va_end(args);
+
+	return str;
+}
+
 /**
  * ストップウォッチ
  *

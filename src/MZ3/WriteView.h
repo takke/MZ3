@@ -41,8 +41,13 @@ public:
 	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
 	afx_msg LRESULT OnFit(WPARAM, LPARAM);
 
-	BOOL IsSendEnd() { return m_sendEnd; };
-	void SetSendEnd(BOOL flag) { m_sendEnd = flag; };
+	BOOL IsSendEnd() { return m_sendEnd; }
+	void SetSendEnd(BOOL flag) { m_sendEnd = flag; }
+
+	CImageList		m_menuImageList;		///< ポップアップメニュー用画像リスト
+	CStringArray	m_menuImageListMap;		///< m_menuImageList のインデックスに
+											///< どのファイルが格納されているかを示す疑似マップ
+
 
 	/// メインビュー（MZ3View）から起動した書き込み画面かどうかを返す
 	bool IsWriteFromMainView() {

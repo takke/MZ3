@@ -6,6 +6,7 @@
 #include "WriteView.h"
 #include "ReportView.h"
 #include "MZ3View.h"
+#include "WMMenu.h"
 #include "kfm.h"
 #include "HtmlArray.h"
 #include "MainFrm.h"
@@ -124,6 +125,10 @@ void CWriteView::OnInitialUpdate()
 		// 通知領域
 		m_infoEdit.SetFont( &theApp.m_font );
 	}
+
+	// 絵文字アイコンロード
+	m_menuImageList.Create(16, 16, ILC_COLOR24, 0, 4);
+	m_menuImageListMap.RemoveAll();
 }
 
 void CWriteView::OnSize(UINT nType, int cx, int cy)
@@ -180,7 +185,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 	else if (title.GetLength() == 0) {
 		::MessageBox(m_hWnd, L"タイトルを入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
-  }
+	}
 	else if (msg.GetLength() == 0) {
 		::MessageBox(m_hWnd, L"本文を入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
@@ -714,10 +719,8 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 // -----------------------------------------------------------------------------
 void CWriteView::OnWriteBackMenu()
 {
-	::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
-
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->OnBackButton();
 }
 
 LRESULT CWriteView::OnFit(WPARAM wParam, LPARAM lParam)
@@ -1227,8 +1230,8 @@ void CWriteView::PopupWriteBodyMenu(void)
 	POINT pt    = util::GetPopupPos();
 	int   flags = util::GetPopupFlags();
 
-	CMenu menu;
-	menu.LoadMenu(IDR_WRITE_MENU);
+	CWMMenu menu( &m_menuImageList );
+	menu.LoadMenu( IDR_WRITE_MENU );
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
 	// 写真添付ができない画面では「写真を添付する」メニューを消す
@@ -1237,32 +1240,92 @@ void CWriteView::PopupWriteBodyMenu(void)
 	}
 
 	// 絵文字メニュー
-	{
-		// ダミーを削除
-		CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
-		emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
+	const int SUBMENU_MAX = 20;
+	int iSubMenu = 0;
+	CWMMenu emojiSubMenu[SUBMENU_MAX] = {
+		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
+		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
+		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
+		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
+	};
 
-		// N個ずつメニューにして追加
-		const int MENU_SPLIT_COUNT = 20;
-		if (!theApp.m_emoji.empty()) {
-			CMenu emojiSubMenu;
-			emojiSubMenu.CreatePopupMenu();
-			int nSubMenu = 1;
+	std::vector<WMMENUBITMAP> menuBitmapArray;
+	// ダミーを削除
+	CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
+	emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
 
-			for (size_t i=0; i<theApp.m_emoji.size(); i++) {
-				if (i%MENU_SPLIT_COUNT == 0 && emojiSubMenu.GetMenuItemCount()>0) {
-					emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
-					nSubMenu++;
-					emojiSubMenu.Detach();
-					emojiSubMenu.CreatePopupMenu();
+	// N個ずつメニューにして追加
+	const int MENU_SPLIT_COUNT = 20;
+	if (!theApp.m_emoji.empty()) {
+		emojiSubMenu[iSubMenu].CreatePopupMenu();
+
+		for (size_t i=0; i<theApp.m_emoji.size(); i++) {
+			if (i%MENU_SPLIT_COUNT == 0 && 
+				emojiSubMenu[iSubMenu].GetMenuItemCount()>0 && 
+				iSubMenu<SUBMENU_MAX-1)
+			{
+				// 親に追加
+				emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu[iSubMenu].m_hMenu, util::FormatString(L"%d", iSubMenu+1) );
+				iSubMenu++;
+				emojiSubMenu[iSubMenu].CreatePopupMenu();
+			}
+
+			// テキスト設定
+			int idItem = IDM_INSERT_EMOJI_BEGIN+i;
+			emojiSubMenu[iSubMenu].AppendMenu( MF_STRING, idItem, theApp.m_emoji[i].text );
+
+			// 絵文字ロード
+			// とりあえず Win32 限定
+			// （アドエスでなぜか ToOwnerDraw 内で落ちるため・・・）
+#ifndef WINCE
+			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_emoji[i].url );
+
+			// ロード済みか判定
+			int imageIndex = -1;
+			for (int i=0; i<m_menuImageListMap.GetCount(); i++) {
+				if (m_menuImageListMap[i] == path) {
+					// インデックス設定
+					imageIndex = i;
+					break;
 				}
-				emojiSubMenu.AppendMenu( MF_STRING, IDM_INSERT_EMOJI_BEGIN+i, theApp.m_emoji[i].text );
 			}
-			if (emojiSubMenu.GetMenuItemCount() > 0) {
-				emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu.m_hMenu, util::int2str(nSubMenu) );
+			if (imageIndex<0) {
+				// 未ロードなのでロード
+				CMZ3BackgroundImage image(L"");
+				image.load( path );
+				if (image.isEnableImage()) {
+					// 16x16 にリサイズする。
+					CMZ3BackgroundImage resizedImage(L"");
+					util::MakeResizedImage( this, resizedImage, image, 16, 16 );
+
+					// ビットマップの追加
+					CBitmap bm;
+					bm.Attach( resizedImage.getHandle() );
+					m_menuImageList.Add( &bm, (CBitmap*) NULL );
+					m_menuImageListMap.Add( path );
+
+					// インデックス設定
+					imageIndex = m_menuImageList.GetImageCount() -1;
+				}
 			}
+			if (imageIndex>=0) {
+				// メニュー用ビットマップリソースに追加
+				WMMENUBITMAP menuBmp = { idItem, imageIndex };
+				menuBitmapArray.push_back(menuBmp);
+			}
+#endif
+		}
+		if (emojiSubMenu[iSubMenu].GetMenuItemCount() > 0) {
+			// 親に追加
+			emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu[iSubMenu].m_hMenu, util::FormatString(L"%d", iSubMenu+1) );
 		}
 	}
 
+	// オーナードロー準備（ビットマップの設定）
+	if (!menuBitmapArray.empty() ) {
+		menu.PrepareOwnerDraw( &menuBitmapArray[0], menuBitmapArray.size() );
+	}
+
+	// メニュー表示
 	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 }

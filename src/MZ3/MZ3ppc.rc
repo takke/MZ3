@@ -200,7 +200,7 @@ END
 
 IDR_WRITE_MENU MENU 
 BEGIN
-    POPUP "ï“èW"
+    POPUP "WriteMenu"
     BEGIN
         POPUP "ï“èW"
         BEGIN

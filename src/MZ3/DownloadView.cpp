@@ -166,7 +166,7 @@ void CDownloadView::OnSize(UINT nType, int cx, int cy)
 	y += hList;
 
 	int x = 0;
-	int w = 50;
+	int w = 80;
 	util::MoveDlgItemWindow( this, IDC_START_STOP_BUTTON, x, y, w,  hButton );
 	x += w;
 	util::MoveDlgItemWindow( this, IDC_EXIT_BUTTON,       x, y, w,  hButton );
@@ -245,7 +245,7 @@ void CDownloadView::MyUpdateControls(void)
 
 		// 非アクセス中なので、未ダウンロードファイルがあれば開始可能。
 		bool bHasNoFinishedItem = false;
-		for (int i=0; i<m_items.size(); i++) {
+		for (int i=0; i<(int)m_items.size(); i++) {
 			if (!m_items[i].bFinished) {
 				bHasNoFinishedItem = true;
 				break;
@@ -376,7 +376,7 @@ LRESULT CDownloadView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	// 「連続」チェック済みで、次のアイテムがあれば継続。
 	if (IsDlgButtonChecked(IDC_CONTINUE_CHECK) == BST_CHECKED) {
 		// 次の未ダウンロードアイテムを探索
-		for (int i=m_targetItemIndex+1; i<m_items.size(); i++) {
+		for (int i=m_targetItemIndex+1; i<(int)m_items.size(); i++) {
 			if (!m_items[i].bFinished) {
 				// 発見。選択状態を変更し、再ダウンロード開始。
 				util::MySetListCtrlItemFocusedAndSelected( m_list, m_targetItemIndex, false );	// 非選択
@@ -496,7 +496,7 @@ LRESULT CDownloadView::OnAccessLoaded(WPARAM dwLoaded, LPARAM dwLength)
  */
 bool CDownloadView::DoDownloadSelectedItem(void)
 {
-	if (m_targetItemIndex<0 || m_targetItemIndex >= m_items.size()) {
+	if (m_targetItemIndex<0 || m_targetItemIndex >= (int)m_items.size()) {
 		MZ3LOGGER_FATAL( L"インデックス不正" );
 		return false;
 	}
