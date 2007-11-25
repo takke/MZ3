@@ -485,7 +485,6 @@ void CReportView::ShowCommentData(CMixiData* data)
 		m_posHtmlScrollMax = n;
 
 		CString str;
-
 		str.AppendFormat( L"<a name='mz3line0'><span style='color: blue;'>%s %s</span></a><br />", 
 				data->GetAuthor(), data->GetDate() );
 

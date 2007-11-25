@@ -3113,6 +3113,7 @@ bool CMZ3View::PopupBodyMenu(void)
 		case ACCESS_LIST_FAVORITE:		// お気に入り
 		case ACCESS_LIST_FOOTSTEP:		// 足あと
 		case ACCESS_LIST_FRIEND:		// マイミク一覧
+		case ACCESS_LIST_CALENDAR:		// カレンダー
 			// 操作をメニューで選択
 			{
 				CMenu menu;

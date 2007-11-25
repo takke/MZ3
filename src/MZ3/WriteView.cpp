@@ -1151,16 +1151,14 @@ void CWriteView::StartConfirmPost( CString wmsg )
 
 			// m_data から id を取得する
 			// http://mixi.jp/show_friend.pl?id=xxx
-			CString id;
-			if( util::GetAfterSubString( m_data->GetURL(), L"id=", id ) < 0 ) {
+			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
+			if( id <= 0 ) {
 				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
 				return;
 			}
 
 			// URL 生成
-			url = L"http://mixi.jp/send_message.pl?id=";
-			url.Append( id );
-
+			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d", id );
 			m_postData->SetConfirmUri(url);
 		}
 

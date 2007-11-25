@@ -4183,9 +4183,9 @@ public:
 					util::GetBetweenSubString( after, L">", L"</a>", title );
 					
 					title = L"【誕生日】" + title;
-					//飛ばし先のプロフィールがまだ未実装のため保留
-					//util::GetBetweenSubString( target, L"<a href=", L">", url );
-					
+					//飛ばし先のプロフィールURLを抽出
+					util::GetBetweenSubString( target, L"<a href=", L">", url );
+					data.SetURL( url );
 					data.SetAccessType( ACCESS_PROFILE );
 					findFlag3 = TRUE;
 				}
