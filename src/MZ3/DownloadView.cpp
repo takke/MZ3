@@ -397,6 +397,9 @@ LRESULT CDownloadView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 
 	util::MySetInformationText( m_hWnd, L"ダウンロードが完了しました" );
 
+	// 終了ボタンにフォーカスを移動する
+	GetDlgItem( IDC_EXIT_BUTTON )->SetFocus();
+
 	return TRUE;
 }
 
@@ -538,4 +541,52 @@ bool CDownloadView::AppendDownloadItem(const DownloadItem& item)
 	// 未登録なので追加
 	m_items.push_back( item );
 	return true;
+}
+
+BOOL CDownloadView::OnKeyUp(MSG* pMsg)
+{
+	switch (pMsg->wParam) {
+	case VK_F1:
+#ifdef WINCE
+		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+			// メインメニューのポップアップ
+			RECT rect;
+			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+
+			CMenu menu;
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			if( theApp.m_bPocketPC ) {
+				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
+			} else {
+				menu.LoadMenu(IDR_MAINFRAME);
+			}
+
+			menu.GetSubMenu(0)->TrackPopupMenu(flags,
+				rect.left,
+				rect.bottom,
+				pMainFrame );
+			menu.Detach();
+			return TRUE;
+		}
+#else
+		// ヘルプ表示
+		util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
+#endif
+		break;
+	}
+
+	return FALSE;
+}
+
+BOOL CDownloadView::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYUP) {
+		BOOL r = OnKeyUp(pMsg);
+		if( r ) {
+			return TRUE;
+		}
+	}
+
+	return CFormView::PreTranslateMessage(pMsg);
 }

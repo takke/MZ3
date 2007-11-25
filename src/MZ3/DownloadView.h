@@ -80,6 +80,8 @@ public:
 	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 	bool DoDownloadSelectedItem(void);
 	bool AppendDownloadItem(const DownloadItem& item);
+	BOOL OnKeyUp(MSG* pMsg);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 
