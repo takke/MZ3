@@ -27,6 +27,7 @@ enum XML2STL_TYPE
 {
     XML2STL_TYPE_ROOTNODE,  ///< ROOT
     XML2STL_TYPE_NODE,      ///< NODE
+    XML2STL_TYPE_TEXT,      ///< TEXT
 };
 
 class Container;
@@ -49,26 +50,68 @@ typedef std::vector<Node>		NodeList;
 class Container
 {
 private:
-    XML2STL_TYPE type;
-    XML2STL_STRING  name;
-    XML2STL_STRING  text;
+	XML2STL_TYPE type;
+	XML2STL_STRING  name_or_text;	///< NODE ならノード名、TEXT なら文字列
 
-    PropertyList	properties;
-    NodeList		children;
+	PropertyList	properties;
+	NodeList		children;
 
 public:
-    Container() : type(XML2STL_TYPE_ROOTNODE) 
-    {}
+	Container() : type(XML2STL_TYPE_ROOTNODE) 
+	{}
 
 	XML2STL_TYPE getType() const {
 		return type;
 	}
 
 	const XML2STL_STRING& getName() const {
-		return name;
+		return name_or_text;
 	}
 
-	const XML2STL_STRING& getText() const {
+	const XML2STL_STRING getText1() const {
+		return name_or_text;
+	}
+
+	const XML2STL_STRING getTextAll() const {
+		// 下位の全ノードを重ねてテキスト化して返す
+		size_t n = children.size();
+		XML2STL_STRING  text;
+		for (size_t i=0; i<n; i++) {
+			const Node& targetNode = children[i];
+			switch (targetNode.type) {
+			case XML2STL_TYPE_NODE:
+				// プロパティと下位ノードを TEXT 化
+				text += L"<";
+				text += targetNode.name_or_text;
+				// プロパティを TEXT 化
+				{
+					size_t n_property=targetNode.properties.size();
+					for (size_t j=0; j<n_property; j++) {
+						const Property& prop = targetNode.getProperty(j);
+						text += L" ";
+						text += prop.name;
+						text += L"=\"";
+						text += prop.text;
+						text += L"\"";
+					}
+				}
+
+				if (targetNode.children.empty()) {
+					text += L" />";
+				} else {
+					text += L">";
+					// 下位ノード
+					text += targetNode.getTextAll();
+					text += L"</";
+					text += targetNode.name_or_text;
+					text += L">";
+				}
+				break;
+			case XML2STL_TYPE_TEXT:
+				text += targetNode.name_or_text;
+				break;
+			}
+		}
 		return text;
 	}
 
@@ -89,28 +132,38 @@ public:
 		return children.empty() ? false : true;
 	}
 
-	Node& addNode( const XML2STL_STRING& name, const XML2STL_STRING& text=_T("") )
-    {
-        Node node;
-        node.name = name;
-        node.text = text;
-        node.type = XML2STL_TYPE_NODE;
+	Node& addNode( const XML2STL_STRING& name )
+	{
+		Node node;
+		node.name_or_text = name;
+		node.type = XML2STL_TYPE_NODE;
 
-        children.push_back( node );
+		children.push_back( node );
 
-        return children[ children.size()-1 ];
-    }
+		return children[ children.size()-1 ];
+	}
 
-    Property& addProperty( const XML2STL_STRING& name, const XML2STL_STRING& text )
-    {
-        Property prop;
-        prop.name = name;
-        prop.text = text;
+	Node& addText( const XML2STL_STRING& text=_T("") )
+	{
+		Node node;
+		node.name_or_text = text;
+		node.type = XML2STL_TYPE_TEXT;
 
-        properties.push_back( prop );
+		children.push_back( node );
 
-        return properties[ properties.size()-1 ];
-    }
+		return children[ children.size()-1 ];
+	}
+
+	Property& addProperty( const XML2STL_STRING& name, const XML2STL_STRING& text )
+	{
+		Property prop;
+		prop.name = name;
+		prop.text = text;
+
+		properties.push_back( prop );
+
+		return properties[ properties.size()-1 ];
+	}
 
 	const Property& getProperty( size_t index ) const
 	{
@@ -125,7 +178,7 @@ public:
 				return properties[i].text;
 			}
 		}
-        throw NodeNotFoundException();
+		throw NodeNotFoundException();
 		// TODO: use another exception.
 		// TODO: set requested "name".
 	}
@@ -133,33 +186,35 @@ public:
 	const Node& getNode( size_t index ) const
 	{
 		if (index >= children.size()) {
-	        throw NodeNotFoundException();
+			throw NodeNotFoundException();
 			// TODO: set requested info.
 		}
 		return children[ index ];
 	}
 
-    const Node& getNode( const XML2STL_STRING& name, int index=0 ) const
-    {
-        int nFound = 0;
-		size_t n = children.size();
-        for (size_t i=0; i<n; i++) {
-            if (children[i].name == name) {
-                if (nFound==index) {
-                    return children[i];
-                } else {
-                    nFound ++;
-                }
-            }
-        }
-        throw NodeNotFoundException();
-		// TODO: set requested info.
-    }
-
-	void setText( const XML2STL_STRING& text )
+	const Node& getNode( const XML2STL_STRING& name, int index=0 ) const
 	{
-		this->text = text;
+		int nFound = 0;
+		size_t n = children.size();
+		for (size_t i=0; i<n; i++) {
+			if (children[i].type == XML2STL_TYPE_NODE &&
+				children[i].name_or_text == name) 
+			{
+				if (nFound==index) {
+					return children[i];
+				} else {
+					nFound ++;
+				}
+			}
+		}
+		throw NodeNotFoundException();
+		// TODO: set requested info.
 	}
+
+//	void setText( const XML2STL_STRING& text )
+//	{
+//		this->name_or_text = text;
+//	}
 };
 
 inline void dump_nest( FILE* fp, int nest_level )
@@ -180,6 +235,10 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
             dump_nest( fp, nest_level );
             fwprintf( fp, _T("+[%s]\n"), c.getName().c_str() );
             break;
+		case XML2STL_TYPE_TEXT:
+            dump_nest( fp, nest_level );
+			fwprintf( fp, _T("=[%s]\n"), c.getText1().c_str() );
+            return;
         default:
             break;
     }
@@ -203,10 +262,10 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
     }
 
     // 本来は children が non-empty なら text 無効
-    if (!c.getText().empty()) {
-        dump_nest( fp, nest_level );
-        fwprintf( fp, _T("  => [%s]\n"), c.getText().c_str() );
-    }
+//	if (!c.getText().empty()) {
+//		dump_nest( fp, nest_level );
+//		fwprintf( fp, _T("  => [%s]\n"), c.getText().c_str() );
+//	}
 }
 
 class SimpleXmlParser
@@ -347,7 +406,7 @@ private:
 				if (target.compare( 0, temp.size(), temp ) == 0) {
 					if (temp.size() == target.size()) {
 						// 完了。
-						node.setText( node_text );
+						node.addText( node_text );
 						return true;
 					} else {
 						// 継続
@@ -366,6 +425,13 @@ private:
 	bool parse_node( Container& node, kfm::kf_buf_reader<TCHAR>& reader )
 	{
 		PARSE_STATE state = PARSE_STATE_SEARCHING;
+
+		// lazy モードの場合は、いくつかのタグを HTML 風に解析するため、下位解析をキャンセルする。
+		if (m_bLazyParseMode) {
+			if (node.getName()==L"img") {
+				return true;
+			}
+		}
 
 		if (node.getName()==L"script") {
 			// script タグ専用解析。
@@ -390,6 +456,11 @@ private:
 				case '<':
 					// NODE START
 					state = PARSE_STATE_IN_NODE_NAME;
+					// テキストがあれば登録する。
+					if (!node_text.empty()) {
+						node.addText( node_text );
+						node_text = L"";
+					}
 					node_name = L"";
 					break;
 				default:
@@ -414,17 +485,7 @@ private:
 						bool r = parse_properties( newNode, reader );
 						if (r) {
 							// "/>" で終わらなかったので、次ノード解析
-
-							// ただし、lazy モードの場合は、いくつかのタグを HTML 風に解析する
-							bool bEndTag = false;
-							if (m_bLazyParseMode) {
-								if (newNode.getName()==L"img") {
-									bEndTag = true;
-								}
-							}
-							if (!bEndTag) {
-								parse_node( newNode, reader );
-							}
+							parse_node( newNode, reader );
 						}
 						state = PARSE_STATE_SEARCHING;
 //						node_text = L"";
@@ -434,6 +495,8 @@ private:
 					// NODE END
 					{
 						Node& newNode = node.addNode(node_name);
+
+						// 次ノード解析
 						parse_node( newNode, reader );
 						state = PARSE_STATE_SEARCHING;
 //						node_text = L"";
@@ -453,10 +516,14 @@ private:
 							if (c=='>') {
 								// 子要素があればTEXTを設定しない。
 								if (m_bLazyParseMode) {
-									node.setText(node_text);
+									if (!node_text.empty()) {
+										node.addText(node_text);
+									}
 								} else {
 									if (!node.hasChildren()) {
-										node.setText(node_text);
+										if (!node_text.empty()) {
+											node.addText(node_text);
+										}
 									}
 								}
 

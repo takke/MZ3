@@ -153,6 +153,7 @@ public:
 	 */
 	static void UnEscapeHtmlElement(CString& line)
 	{
+		// 改行コードの除去
 		while( line.Replace(_T("\n"), _T("")) ) ;
 
 		// table タグの除去
@@ -217,7 +218,7 @@ public:
 		// br タグの置換
 		{
 			static MyRegex reg;
-			if( !util::CompileRegex( reg, L"<br[^>]*>" ) ) {
+			if( !util::CompileRegex( reg, L"<br[^>]*?>" ) ) {
 				return;
 			}
 			if( line.Find( L"<br" ) != -1 ) 
@@ -736,6 +737,7 @@ public:
 
 		// <wbr/> タグの除去
 		while( str.Replace(_T("<wbr/>"), _T("")) );
+		while( str.Replace(_T("<wbr />"), _T("")) );
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;

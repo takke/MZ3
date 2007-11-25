@@ -2771,9 +2771,10 @@ public:
 										  .getNode( L"div" )
 										  .getNode( L"div" )
 										  .getNode( L"h3" );
-			mixi.SetName( h3.getText().c_str () );
-			mixi.SetTitle( h3.getText().c_str () );
-			mixi.SetAuthor( h3.getText().c_str () );
+			CString name = h3.getTextAll().c_str();
+			mixi.SetName( name );
+			mixi.SetTitle( name );
+			mixi.SetAuthor( name );
 		} catch (...) {
 			MZ3LOGGER_ERROR( L"h3 not found..." );
 		}
@@ -2821,30 +2822,16 @@ public:
 				const xml2stl::Node& dl = li.getNode( L"dl" );
 
 				// 項目の名称
-				CString target = util::FormatString( L"■ %s\r\n", dl.getNode(L"dt").getText().c_str() );
-				target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
-				mixi.AddBody( target );
+				CString target = util::FormatString( L"■ %s", dl.getNode(L"dt").getTextAll().c_str() );
+				ParserUtil::AddBodyWithExtract( mixi, target );
+				mixi.AddBody(_T("\r\n"));
 
 				// 項目の内容
 				const xml2stl::Node& dd = dl.getNode( L"dd" );
-				target = dd.getText().c_str();
-				target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
-				mixi.AddBody( target );
+				target = dd.getTextAll().c_str();
+				ParserUtil::AddBodyWithExtract( mixi, target );
 				mixi.AddBody(_T("\r\n"));
 				mixi.AddBody(_T("\r\n"));
-
-				// リンクがあれば追加する。
-				try {
-					int nSubItem = dd.getChildrenCount();
-					for (int j=0; j<nSubItem; j++) {
-						const xml2stl::Node& a = dd.getNode(j);
-						if (a.getName()==L"a") {
-							mixi.m_linkList.push_back( CMixiData::Link( a.getText().c_str(), a.getProperty(L"href").c_str() ) );
-						}
-					}
-				} catch (...) {
-					MZ3LOGGER_ERROR( L"(プロフィール本文, link) not found..." );
-				}
 			}
 		} catch (...) {
 			MZ3LOGGER_ERROR( L"(プロフィール本文) not found..." );
@@ -2877,7 +2864,7 @@ public:
 			for (int i=0; i<n; i++) {
 				const xml2stl::Node& node = dl.getNode(i);
 				if (node.getName() == L"dt") {
-					LPCTSTR date = node.getNode(L"span").getText().c_str();
+					CString date = node.getNode(L"span").getTextAll().c_str();
 					
 					// リンク名設定
 					link.text += date;
@@ -2890,15 +2877,18 @@ public:
 
 					// リンク名設定
 					link.text += L" : ";
-					link.text += a.getText().c_str();
+					link.text += a.getTextAll().c_str();
 
 					// URL, IDを設定
 					link.url = a.getProperty( L"href" ).c_str();
 					diaryItem.m_linkList.push_back(link);
 
 					// 本文に追加
-					diaryItem.AddBody( util::FormatString(L" : %s\r\n", a.getText().c_str()) );
-					diaryItem.AddBody( util::FormatString(L" (%s)\r\n\r\n", link.url) );
+					ParserUtil::AddBodyWithExtract( diaryItem, util::FormatString(L" : %s", a.getTextAll().c_str()) );
+					diaryItem.AddBody( L"\r\n" );
+					ParserUtil::AddBodyWithExtract( diaryItem, util::FormatString(L" (%s)", link.url) );
+					diaryItem.AddBody( L"\r\n" );
+					diaryItem.AddBody( L"\r\n" );
 
 					// 初期化
 					link = CMixiData::Link( L"", L"" );
@@ -2938,8 +2928,8 @@ public:
 				// dt/a[2] : 名前
 				// dt/a[1]/img/@src : 画像
 				const xml2stl::Node& dt = dl.getNode(L"dt");
-				LPCTSTR name = dt.getNode( L"a", 1 ).getText().c_str();
-				LPCTSTR url  = dt.getNode( L"a", 1 ).getProperty(L"href").c_str();
+				CString name = dt.getNode( L"a", 1 ).getTextAll().c_str();
+				CString url  = dt.getNode( L"a", 1 ).getProperty(L"href").c_str();
 
 				// dd/p[1] : 関係
 				// dd/p[2] : 紹介文
@@ -2947,20 +2937,16 @@ public:
 				// dd/p[1] : 紹介文
 				const xml2stl::Node& dd = dl.getNode(L"dd");
 				if (dd.getChildrenCount()==1) {
-					CString intro = dd.getNode( L"p", 0 ).getText().c_str();
+					CString intro = dd.getNode( L"p", 0 ).getTextAll().c_str();
 
-					intro.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
-					introItem.AddBody( intro );
+					ParserUtil::AddBodyWithExtract( introItem, intro );
 				} else {
-					CString relation = dd.getNode( L"p", 0 ).getText().c_str();
-					CString intro = dd.getNode( L"p", 1 ).getText().c_str();
+					CString relation = dd.getNode( L"p", 0 ).getTextAll().c_str();
+					CString intro = dd.getNode( L"p", 1 ).getTextAll().c_str();
 
-					relation.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
-					introItem.AddBody( relation );
-
+					ParserUtil::AddBodyWithExtract( introItem, relation );
 					introItem.AddBody( L"\r\n" );
-					intro.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
-					introItem.AddBody( intro );
+					ParserUtil::AddBodyWithExtract( introItem, intro );
 				}
 
 				// 登録
@@ -3844,10 +3830,10 @@ public:
 
 					// name : entry/author/name
 					const xml2stl::Node& author = entry.getNode( L"author" );
-					data.SetName( author.getNode( L"name" ).getText().c_str() );
+					data.SetName( author.getNode( L"name" ).getTextAll().c_str() );
 
 					// 関係 : entry/author/tracks:relation
-					const std::wstring& relation = author.getNode( L"tracks:relation" ).getText();
+					const std::wstring& relation = author.getNode( L"tracks:relation" ).getTextAll();
 					if (relation==L"friend") {
 						data.SetMyMixi( true );
 					} else {
@@ -3855,10 +3841,10 @@ public:
 					}
 
 					// Image : entry/author/tracks:image
-					data.AddImage( author.getNode( L"tracks:image" ).getText().c_str() );
+					data.AddImage( author.getNode( L"tracks:image" ).getTextAll().c_str() );
 
 					// updated : entry/updated
-					ParserUtil::ParseDate( entry.getNode( L"updated" ).getText().c_str(), data );
+					ParserUtil::ParseDate( entry.getNode( L"updated" ).getTextAll().c_str(), data );
 	
 					// 完成したので追加する
 					out_.push_back( data );
