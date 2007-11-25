@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "ReportView.h"
+#include "DownloadView.h"
 #include "MainFrm.h"
 #include "IniFile.h"
 #include "WriteView.h"
@@ -497,6 +498,9 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 		str += _T("<br />");		// 最後に１行入れて見やすくする
 
+		// 絵文字用フィルタ
+		ViewFilter::ReplaceEmojiCodeToInlineImageTags( str, theApp.m_emoji );
+
 		SetHtmlText(str);
 	} else {
 		CString str = _T("");
@@ -764,10 +768,16 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos > si.nMin) {
-							return CommandScrollUpEdit();
+						if (theApp.m_optionMng.m_bRenderByIE) {
+							if (m_posHtmlScroll > 0) {
+								return CommandScrollUpEdit();
+							}
+						} else {
+							SCROLLINFO si;
+							m_edit.GetScrollInfo( SB_VERT, &si );
+							if (si.nPos > si.nMin) {
+								return CommandScrollUpEdit();
+							}
 						}
 					}
 
@@ -789,10 +799,16 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos+si.nPage <= (UINT)si.nMax) {
-							return CommandScrollDownEdit();
+						if (theApp.m_optionMng.m_bRenderByIE) {
+							if (m_posHtmlScroll < m_posHtmlScrollMax) {
+								return CommandScrollDownEdit();
+							}
+						} else {
+							SCROLLINFO si;
+							m_edit.GetScrollInfo( SB_VERT, &si );
+							if (si.nPos+si.nPage <= (UINT)si.nMax) {
+								return CommandScrollDownEdit();
+							}
 						}
 					}
 
@@ -835,10 +851,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos > si.nMin) {
-							return CommandScrollUpEdit();
+						if (theApp.m_optionMng.m_bRenderByIE) {
+							if (m_posHtmlScroll > 0) {
+								return CommandScrollUpEdit();
+							}
+						} else {
+							SCROLLINFO si;
+							m_edit.GetScrollInfo( SB_VERT, &si );
+							if (si.nPos > si.nMin) {
+								return CommandScrollUpEdit();
+							}
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -856,10 +878,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos+si.nPage <= (UINT)si.nMax) {
-							return CommandScrollDownEdit();
+						if (theApp.m_optionMng.m_bRenderByIE) {
+							if (m_posHtmlScroll < m_posHtmlScrollMax) {
+								return CommandScrollDownEdit();
+							}
+						} else {
+							SCROLLINFO si;
+							m_edit.GetScrollInfo( SB_VERT, &si );
+							if (si.nPos+si.nPage <= (UINT)si.nMax) {
+								return CommandScrollDownEdit();
+							}
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -877,10 +905,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			case VK_UP:
 				// スクロール位置判定（スクロール余地があればスクロールする）
 				if (g_bUseVer09KeyInterface) {
-					SCROLLINFO si;
-					m_edit.GetScrollInfo( SB_VERT, &si );
-					if (si.nPos > si.nMin) {
-						return CommandScrollUpEdit();
+					if (theApp.m_optionMng.m_bRenderByIE) {
+						if (m_posHtmlScroll > 0) {
+							return CommandScrollUpEdit();
+						}
+					} else {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos > si.nMin) {
+							return CommandScrollUpEdit();
+						}
 					}
 				}
 
@@ -900,10 +934,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			case VK_DOWN:
 				// スクロール位置判定（スクロール余地があればスクロールする）
 				if (g_bUseVer09KeyInterface) {
-					SCROLLINFO si;
-					m_edit.GetScrollInfo( SB_VERT, &si );
-					if (si.nPos+si.nPage <= (UINT)si.nMax) {
-						return CommandScrollDownEdit();
+					if (theApp.m_optionMng.m_bRenderByIE) {
+						if (m_posHtmlScroll < m_posHtmlScrollMax) {
+							return CommandScrollDownEdit();
+						}
+					} else {
+						SCROLLINFO si;
+						m_edit.GetScrollInfo( SB_VERT, &si );
+						if (si.nPos+si.nPage <= (UINT)si.nMax) {
+							return CommandScrollDownEdit();
+						}
 					}
 				}
 
@@ -2155,72 +2195,38 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie) 
 {
 #ifdef WINCE
-	// TODO 絵文字のローカルキャッシュ化、またはキュー化＆HTML再ロードの仕組みを実装すること。
-	CFile file;
-	LPCTSTR szCacheFile = theApp.m_filepath.temphtml;
+	// TODO HTML再ロードの仕組みを実装すること。
 
-	if(file.Open(szCacheFile,CFile::modeCreate + CFile::modeWrite)) 
-	{ 
-		//Setup the internet connect for html file download 
-		HINTERNET hInternetImage = NULL; 
-		DWORD dwRead = 0; 
-		char cBuffer[4096]="\0"; 
-		//WINCE all transfers are binary 
-		//It is transfer and save onto a file on pda 
-		hInternetImage = InternetOpenUrl(theApp.m_inet.m_hInternet, szTarget, 
-			NULL, 0, 
-			INTERNET_FLAG_EXISTING_CONNECT, 
-			0); 
-		if (!hInternetImage) 
-		{ 
-			CString msg;
-			msg.Format( 
-				L"Can't Open URL! Check URL or connection.\n\n"
-				L" URL : [%s]", szTarget );
-			MZ3LOGGER_ERROR(msg); 
-			InternetCloseHandle(hInternetImage); 
-			return FALSE; 
-		} 
+	// ローカルキャッシュから取得する
+	bool bLoaded = false;
+	CString localpath = util::MakeImageLogfilePathFromUrl( szTarget );
+	if (util::ExistFile(localpath)) {
+		// 画像ロード
 
-		//Loop to read file 
-		while (InternetReadFile(hInternetImage, &cBuffer, 4096, &dwRead)) 
-		{ 
-			file.Write(&cBuffer,4096); 
-			if(dwRead ==0) 
-				break; 
-			memset(&cBuffer,0,4096); 
-		} 
-		InternetCloseHandle(hInternetImage); 
-		file.Close(); 
+		// this is to read the image file from the pda and send to the 
+		// DTM_SETIMAGE for display 
+		// Problems occured here, when it send to DTM_SETIMAGE, it display on 
+		// the screen for a while and disappear 
+		HBITMAP hBitmap = SHLoadImageFile( localpath );
+		if( hBitmap ) {
+			BITMAP bmp;
+			GetObject(hBitmap, sizeof(BITMAP), &bmp);
+			INLINEIMAGEINFO imgInfo;
+			imgInfo.dwCookie    = dwCookie;
+			imgInfo.iOrigHeight = bmp.bmHeight;
+			imgInfo.iOrigWidth  = bmp.bmWidth;
+			imgInfo.hbm         = hBitmap;
+			imgInfo.bOwnBitmap  = TRUE;				// HTML コントロールにBITMAPを破棄させる
+			::SendMessage( m_hwndHtml, DTM_SETIMAGE, 0, (LPARAM)&imgInfo ); 
+			return TRUE;
+		}
+	}
 
-	} //end of CFile:Open 
-	else 
-	{
-		MZ3LOGGER_ERROR(_T("File error"));
-		return FALSE;
-	} 
-
-	// this is to read the image file from the pda and send to the 
-	// DTM_SETIMAGE for display 
-	// Problems occured here, when it send to DTM_SETIMAGE, it display on 
-	// the screen for a while and disappear 
-	INLINEIMAGEINFO imgInfo; 
-	HBITMAP hBitmap = SHLoadImageFile( szCacheFile );
-	if( hBitmap ) {
-		BITMAP bmp;
-		GetObject(hBitmap, sizeof(BITMAP), &bmp);
-		imgInfo.dwCookie    = dwCookie; 
-		imgInfo.iOrigHeight = bmp.bmHeight;
-		imgInfo.iOrigWidth  = bmp.bmWidth;
-		imgInfo.hbm         = hBitmap;
-		imgInfo.bOwnBitmap  = TRUE;				// HTML コントロールにBITMAPを破棄させる
-		::SendMessage( m_hwndHtml, DTM_SETIMAGE, 0, (LPARAM)&imgInfo ); 
-	} 
-	else 
-	{ 
-		MZ3LOGGER_ERROR(_T("Load Not Ok"));
-		::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
-	} 
+	// ロードできなかったため、キューに登録する
+	MZ3LOGGER_INFO( util::FormatString(_T("Load Not Ok, request queue. URL[%s]"), szTarget ) );
+	DownloadItem item( szTarget, L"inline image", localpath, true );
+	theApp.m_pDownloadView->AppendDownloadItem( item );
+	::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
 #endif
 	return TRUE; 
 }
