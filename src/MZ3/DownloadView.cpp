@@ -520,3 +520,22 @@ bool CDownloadView::DoDownloadSelectedItem(void)
 	return true;
 }
 
+/**
+ * ƒ_ƒEƒ“ƒ[ƒh€–Ú‚ğ’Ç‰Á‚·‚é
+ */
+bool CDownloadView::AppendDownloadItem(const DownloadItem& item)
+{
+	// –¢“o˜^‚©Šm”F
+	for (size_t i=0; i<m_items.size(); i++) {
+		if (m_items[i].url == item.url &&
+			m_items[i].localpath == item.localpath)
+		{
+			// “o˜^Ï‚İ
+			return false;
+		}
+	}
+
+	// –¢“o˜^‚È‚Ì‚Å’Ç‰Á
+	m_items.push_back( item );
+	return true;
+}

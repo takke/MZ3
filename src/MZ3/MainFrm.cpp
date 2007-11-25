@@ -290,6 +290,10 @@ void CMainFrame::OnBackButton()
 
 		// 戻る
 		theApp.ChangeView(theApp.m_pMainView);
+
+		// メイン画面のリロード(アイコンリロードの可能性があるため)
+		theApp.m_pMainView->OnSelchangedGroupTab();
+
 		return;
 	}
 

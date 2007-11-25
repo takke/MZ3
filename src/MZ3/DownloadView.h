@@ -79,6 +79,7 @@ public:
 	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 	bool DoDownloadSelectedItem(void);
+	bool AppendDownloadItem(const DownloadItem& item);
 };
 
 

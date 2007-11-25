@@ -299,14 +299,14 @@ BOOL CMZ3App::InitInstance()
 			}
 		}
 	}
-	// 未ダウンロードファイルがあればダウンロードマネージャ起動
+	// 未ダウンロードファイルがあればダウンロードマネージャに登録、起動
 	bool bHasNoDownloadedEmojiFile = false;
 	for (size_t i=0; i<m_emoji.size(); i++) {
 		EmojiMap& emoji = m_emoji[i];
 		CString path = util::MakeImageLogfilePathFromUrl( emoji.url );
 		if (!util::ExistFile(path)) {
 			DownloadItem item( emoji.url, emoji.text, path, true );
-			m_pDownloadView->m_items.push_back( item );
+			m_pDownloadView->AppendDownloadItem( item );
 			bHasNoDownloadedEmojiFile = true;
 		}
 	}

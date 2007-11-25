@@ -10,6 +10,7 @@
 #include "CategoryItem.h"
 #include "HtmlArray.h"
 #include "ReportView.h"
+#include "DownloadView.h"
 #include "MainFrm.h"
 #include "WriteView.h"
 #include "util.h"
@@ -1258,9 +1259,12 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 				bUseExtendedIcon = true;
 			} else {
 				// ロードエラー
-				// TODO: ダウンロード対象ファイルリストに追加すること
-				// dummy icon
-//				m_iconExtendedImageList.Add( AfxGetApp()->LoadIcon(IDI_NO_PHOTO_ICON) );
+				// ダウンロードマネージャに登録する
+				if (mixi.GetImageCount()>0) {
+					CString url = mixi.GetImage(0);
+					DownloadItem item( url, L"絵文字", miniImagePath, true );
+					theApp.m_pDownloadView->AppendDownloadItem( item );
+				}
 			}
 		}
 	}
@@ -4087,6 +4091,11 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
 		return false;
 	}
+
+	// WINCE では無効。
+#ifdef WINCE
+	return false;
+#endif
 
 	CString miniImagePath = util::MakeImageLogfilePath( mixi );
 	if (!miniImagePath.IsEmpty()) {
