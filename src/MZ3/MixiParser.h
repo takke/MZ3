@@ -2935,7 +2935,8 @@ public:
 				// dd/p class=userInput : �Љ
 				CString intro, relation;
 				const xml2stl::Node& dd = dl.getNode(L"dd");
-				for (int j=0; j<dd.getChildrenCount(); j++) {
+				size_t n_dd_children = dd.getChildrenCount();
+				for (size_t j=0; j<n_dd_children; j++) {
 					const xml2stl::Node& dd_sub = dd.getNode(j);
 					if (dd_sub.isNode() && dd_sub.getName() == L"p") {
 						CString className = dd_sub.getProperty(L"class").c_str();

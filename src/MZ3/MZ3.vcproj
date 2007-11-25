@@ -2278,6 +2278,10 @@
 				Name="mixi"
 				>
 				<File
+					RelativePath=".\EmojiMap.h"
+					>
+				</File>
+				<File
 					RelativePath=".\MixiData.h"
 					>
 				</File>
@@ -2299,6 +2303,10 @@
 				</File>
 				<File
 					RelativePath=".\PostDataGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ViewFilter.h"
 					>
 				</File>
 			</Filter>

@@ -18,6 +18,7 @@
 #include "SimpleLogger.h"
 #include "MZ3BackgroundImage.h"
 #include "MZ3SkinInfo.h"
+#include "EmojiMap.h"
 
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
@@ -34,19 +35,6 @@ enum ScreenResolution {
 	SR_QVGA,			///< 320x240
 	SR_SQUARE240,		///< 240x240
 	SR_VGA,				///< 640x480
-};
-
-/// 絵文字マップ
-class EmojiMap {
-public:
-	CString code;
-	CString url;
-	CString text;
-
-	EmojiMap( LPCTSTR code_, LPCTSTR url_, LPCTSTR text_ )
-		: code(code_), url(url_), text(text_)
-	{
-	}
 };
 
 class CMZ3View;
@@ -152,7 +140,7 @@ public:
 	Mz3GroupData		m_root;					///< mixi 用データのルート要素
 
 	//--- 絵文字マップ
-	std::vector<EmojiMap> m_emoji;				///< mixi 絵文字マップ
+	EmojiMapList		m_emoji;				///< mixi 絵文字マップ
 
 	//--- 通信系
 	CMixiData			m_mixiBeforeRelogin;	///< 再ログイン前の mixi オブジェクト

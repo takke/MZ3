@@ -3,7 +3,6 @@
 #include "MyRegex.h"
 #include "HtmlArray.h"
 #include "util_base.h"
-//#include "MixiUrlParser.h"
 
 /// mixi 用HTMLパーサ
 namespace mixi {
@@ -315,7 +314,7 @@ public:
 		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
 #define LINE_HAS_EMOJI_LINK(str)	util::LineHasStringsNoCase( str, L"<img", L"alt=", L"class=\"emoji\"", L">" )
 		if( LINE_HAS_EMOJI_LINK(str) ) {
-			ReplaceEmojiImageToText( str );
+			ReplaceEmojiImageToCode( str );
 		}
 
 		// その他の画像リンクの変換
@@ -392,14 +391,10 @@ private:
 	/**
 	 * 絵文字画像リンクの変換。
 	 *
-	 * とりあえず alt 文字列に置換する。
+	 * [m:xxx] 文字列に置換する。
 	 */
-	static void ReplaceEmojiImageToText( CString& line )
+	static void ReplaceEmojiImageToCode( CString& line )
 	{
-		if (theApp.m_optionMng.m_bRenderByIE) {
-			return;
-		}
-
 		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
 		// のようなリンクを
 		// "((喫煙))" に変換する
@@ -411,10 +406,10 @@ private:
 		}
 
 		// ((喫煙)) に変換する
-		reg.replaceAll( line, L"(({2}))" );
+//		reg.replaceAll( line, L"(({2}))" );
 
-		// [m:xx] 形式に置換する場合は下記の replaceAll とする。
-//		if( reg.replaceAll( line, L"[m:{1}]" ) ) {
+		// [m:xx] 形式に置換する
+		reg.replaceAll( line, L"[m:{1}]" );
 	}
 
 	/**

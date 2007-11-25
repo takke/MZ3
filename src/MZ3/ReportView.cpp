@@ -12,6 +12,7 @@
 #include "util_gui.h"
 #include "QuoteDlg.h"
 #include "MixiParser.h"
+#include "ViewFilter.h"
 #include "CommonSelectDlg.h"
 
 #define MASK_COLOR RGB(255,0,255);
@@ -511,6 +512,10 @@ void CReportView::ShowCommentData(CMixiData* data)
 		}
 
 		str += _T("\r\n");			// 最後に１行入れて見やすくする
+
+		// 絵文字用フィルタ
+		ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
+
 		m_edit.SetWindowText(str);
 
 		// Win32 の場合は再描画
