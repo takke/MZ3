@@ -99,6 +99,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
 	ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
 	ON_NOTIFY(NM_RCLICK, IDC_REPORT_LIST, &CReportView::OnNMRclickReportList)
+	ON_COMMAND(ID_OPEN_PROFILE, &CReportView::OnOpenProfile)
 END_MESSAGE_MAP()
 
 
@@ -340,11 +341,11 @@ HBRUSH CReportView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
  */
 void CReportView::SetData(const CMixiData& data)
 {
+	// 初期化処理
+	m_data = data;
 	m_access = FALSE;
 	m_nochange = TRUE;
 	m_lastIndex = 0;
-
-	m_data = data;
 
 	m_list.DeleteAllItems();
 	m_list.SetRedraw(FALSE);
@@ -355,14 +356,11 @@ void CReportView::SetData(const CMixiData& data)
 	// どこまでデータを取得したかを設定する
 	TRACE(_T("Address = %s\n"), m_data.GetURL());
 
-	// URIを分解
+	// ID を設定しておく
 	if (m_data.GetID() == -1) {
 		// ここでＩＤを作る
 		m_data.SetID( mixi::MixiUrlParser::GetID(m_data.GetURL()) );
 	}
-
-	CString logId = util::GetLogIdString( m_data );
-	m_idKey = util::my_wcstombs((LPCTSTR)logId);
 
 	// 既読位置の変更
 	m_lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(m_data);
@@ -372,23 +370,16 @@ void CReportView::SetData(const CMixiData& data)
 		m_lastIndex++;
 	}
 
-
-	int focusItem = 0;
 	INT_PTR count = m_data.GetChildrenSize();
-
 	if (count != 0 && m_lastIndex != 0) {
-		CMixiData& cmtData = m_data.GetChild( count-1 );
-		if (cmtData.GetCommentIndex() <= m_lastIndex && m_lastIndex != 0) {
-			m_lastIndex = cmtData.GetCommentIndex();
+		CMixiData& subItem = m_data.GetChild( count-1 );
+		if (m_lastIndex >= subItem.GetCommentIndex()) {
+			m_lastIndex = subItem.GetCommentIndex();
 		}
 	}
 
 	// タイトルの設定
 	CString title = m_data.GetTitle();
-//	int index = title.ReverseFind(_T('('));
-//	if (index != -1) {
-//		title = title.Left(index);
-//	}
 	switch (m_data.GetAccessType()) {
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
@@ -408,34 +399,42 @@ void CReportView::SetData(const CMixiData& data)
 	// ----------------------------------------
 	TRACE(_T("コメント数 = [%d]\n"), count);
 
+	int focusItem = 0;
 	for (int i=0; i<count; i++) {
-		CMixiData& cmtData = m_data.GetChild(i);
+		CMixiData& subItem = m_data.GetChild(i);
 
 		// 画像の有無でアイコンのインデックスを変更する
-		int imgIndex = (cmtData.GetImageCount() == 0) ? 0 : 1;
+		int imageIndex = (subItem.GetImageCount() == 0) ? 0 : 1;
 		CString strIndex;
-		if (cmtData.GetCommentIndex()>=0) {
+		if (subItem.GetCommentIndex()>=0) {
 			// 未指定の場合は空白とする。
-			strIndex = util::int2str(cmtData.GetCommentIndex());
+			strIndex = util::int2str(subItem.GetCommentIndex());
 		}
-		int nItem = m_list.InsertItem(i+1, strIndex, imgIndex);
+		int idx = m_list.InsertItem(i+1, strIndex, imageIndex);
 
-		if (cmtData.GetCommentIndex() == m_lastIndex) {
-			focusItem = nItem + 1;
+		if (subItem.GetCommentIndex() == m_lastIndex) {
+			// この次の項目を選択項目とする
+			focusItem = idx + 1;
 		}
 
 		// Author 列
-		m_list.SetItem(nItem, 1, LVIF_TEXT | LVIF_IMAGE, cmtData.GetAuthor(), 0, 0, 0, 0);
+		m_list.SetItem(idx, 1, LVIF_TEXT | LVIF_IMAGE, subItem.GetAuthor(), 0, 0, 0, 0);
 		// Date 列
-		m_list.SetItem(nItem, 2, LVIF_TEXT, cmtData.GetDate(), 0, 0, 0, 0);
-		m_list.SetItemData(nItem, (DWORD_PTR)&cmtData);
+		m_list.SetItem(idx, 2, LVIF_TEXT, subItem.GetDate(), 0, 0, 0, 0);
+		// ItemData に CMixiData* を与える
+		m_list.SetItemData(idx, (DWORD_PTR)&subItem);
 	}
 
 	// 親をリストに表示
 	{
+		// 画像の有無でアイコンのインデックスを変更する
 		int imageIndex = (m_data.GetImageCount() == 0) ? 0 : 1;
-		int nItem = m_list.InsertItem(0, _T("-"), imageIndex);
-		m_list.SetItem(nItem, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
+		int idx = m_list.InsertItem(0, _T("-"), imageIndex);
+		// Author 列
+		m_list.SetItem(idx, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
+		// Date 列 : 先頭項目には初期版から表示していない。必要であれば、下記をコメントアウトすること。
+//		m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetDate(), 0, 0, 0, 0);
+		// ItemData に CMixiData* を与える
 		m_list.SetItemData(0, (DWORD_PTR)&m_data);
 	}
 
@@ -444,20 +443,24 @@ void CReportView::SetData(const CMixiData& data)
 	if (count == 0) {
 		m_lastIndex = 0;
 	} else {
-		// 先頭のデータを取得
-		CMixiData& cmtData = m_data.GetChild(0);
-		if (cmtData.GetCommentIndex() > m_lastIndex && m_lastIndex != 0) {
-			m_lastIndex = cmtData.GetCommentIndex();
+		// 選択状態の正規化
+		CMixiData& subItem = m_data.GetChild(0);
+		if (subItem.GetCommentIndex() > m_lastIndex && m_lastIndex != 0) {
+			// 先頭のデータを取得
+			m_lastIndex = subItem.GetCommentIndex();
 			focusItem = 1;
 		}
 	}
 
+	// プロフィール表示の場合は常に先頭項目を選択
+	if (m_data.GetAccessType() == ACCESS_PROFILE) {
+		focusItem = 0;
+	}
+
 	//--- UI 関連
 	m_list.SetRedraw(TRUE);
-
 	m_list.SetFocus();
 	m_list.SetItemState( focusItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
-
 	m_list.EnsureVisible( focusItem, FALSE );
 }
 
@@ -990,11 +993,11 @@ void CReportView::EndProc()
 /**
  * インデックス保存
  *
- * m_lastIndex を m_idKey に保存
+ * m_lastIndex を保存
  */
 void CReportView::SaveIndex()
 {
-	theApp.m_logfile.SetValue(m_idKey, (const char*)util::int2str_a(m_lastIndex), "Log");
+	theApp.m_logfile.SetValue(util::GetLogIdString( m_data ), (LPCTSTR)util::int2str(m_lastIndex), "Log");
 }
 
 /**
@@ -1109,6 +1112,9 @@ void CReportView::OnLoadPageLink(UINT nID)
 	MyLoadMixiViewPage( m_data.m_linkPage[idx] );
 }
 
+/**
+ * mixi 内リンクページを開く
+ */
 bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 {
 	if (m_access) {
@@ -1799,6 +1805,34 @@ void CReportView::OnOpenBrowserUser()
 	util::OpenBrowserForUser( url, strUserName );
 }
 
+
+/**
+ * プロフィールページを開く
+ */
+void CReportView::OnOpenProfile()
+{
+	// 選択アイテムの取得
+	int idx = m_list.GetSelectedItem();
+	if( idx < 0 ) {
+		return;
+	}
+	CMixiData* data = (CMixiData*)m_list.GetItemData(idx);
+
+	// URLの生成
+	int nUserId = data->GetAuthorID();
+	if( nUserId < 0 ) {
+		nUserId = data->GetOwnerID();
+	}
+	CString url;
+	url.Format( L"http://mixi.jp/show_friend.pl?id=%d", nUserId );
+
+	// 開く
+	MyLoadMixiViewPage( CMixiData::Link( url, data->GetAuthor() ) );
+}
+
+/**
+ * メニュー生成
+ */
 void CReportView::MyPopupReportMenu(void)
 {
 	POINT pt    = util::GetPopupPos();
@@ -1834,7 +1868,7 @@ void CReportView::MyPopupReportMenu(void)
 		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
 	}
 
-	// 「次へ」無効化
+	// 「進む」無効化
 	int idxPage = 4;		// 「ページ」メニュー（次へが有効の場合は-1となる）
 	if( theApp.m_pWriteView->m_sendEnd ) {
 		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
@@ -1898,13 +1932,15 @@ void CReportView::MyPopupReportMenu(void)
 		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER, MF_BYCOMMAND);
 	}
 
-	// ブラウザで開く(ユーザページ)：IDがなければ無効
+	// ブラウザで開く(ユーザページ)
+	// プロフィールページを開く：IDがなければ無効
 	int nUserId = m_currentData->GetAuthorID();
 	if( nUserId < 0 ) {
 		nUserId = m_currentData->GetOwnerID();
 	}
 	if (nUserId<=0) {
 		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER_USER, MF_BYCOMMAND);
+		pcThisMenu->RemoveMenu(ID_OPEN_PROFILE, MF_BYCOMMAND);
 	}
 
 	// メニューのポップアップ

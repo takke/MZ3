@@ -182,6 +182,7 @@ BEGIN
         END
         MENUITEM "ブラウザで開く（このページ）...",           ID_OPEN_BROWSER
         MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
+        MENUITEM "プロフィールページを開く",                ID_OPEN_PROFILE
         POPUP "画面レイアウト"
         BEGIN
             MENUITEM "↑リストを狭くする",                   IDM_LAYOUT_REPORTLIST_MAKE_NARROW

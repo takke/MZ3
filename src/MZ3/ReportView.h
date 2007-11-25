@@ -63,12 +63,11 @@ private:
 	CMixiData*	m_currentData;
 	CImageList  m_pimgList;
 
-	BOOL m_nochange;
-	BOOL m_access;
+	BOOL		m_nochange;
+	BOOL		m_access;
 
-	std::string m_idKey;
-	int m_lastIndex;
-	BOOL m_imageState;
+	int			m_lastIndex;
+	BOOL		m_imageState;
 
 	afx_msg void OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnKeydownReportList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -141,6 +140,8 @@ public:
 
 private:
 	bool MyLoadMixiViewPage( const CMixiData::Link link );
+public:
+	afx_msg void OnOpenProfile();
 };
 
 
