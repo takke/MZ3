@@ -77,33 +77,16 @@ int test_xml2stl()
 	{
 		Container root;
 
-		xml2stl::SimpleXmlParser::loadFromFile( root, L"C:\\Users\\takke\\Desktop\\temp\\show_friend1.html" );
+		xml2stl::SimpleXmlParser::loadFromFile( root, L"C:\\Users\\takke\\Desktop\\temp\\show_friend2.html" );
 
 		// dump
 //		dump_container( root, stdout );
 
 		try {
-			const xml2stl::Node& dl = root.getNode( L"html" )
-										  .getNode( L"body" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div", 2 )
-										  .getNode( L"div" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"dl" );
-			dump_container( dl, stdout );
+			const xml2stl::Node& x  = root.getNode( L"dd" );
+			dump_container( x, stdout );
+			wprintf( L"%s\n", x.getTextAll().c_str() );
 			return 1;
-
-			const xml2stl::Node& h3 = root.getNode( L"html" )
-										  .getNode( L"body" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div" )
-										  .getNode( L"div" )
-										  .getNode( L"div" )
-										  .getNode( L"div" )
-										  .getNode( L"h3" );
-			dump_container( h3, stdout );
 
 			const xml2stl::Node& ul = root.getNode( L"html" )
 										  .getNode( L"body" )
@@ -112,22 +95,23 @@ int test_xml2stl()
 										  .getNode( L"div", 1 )
 										  .getNode( L"div", 1 )
 										  .getNode( L"ul" );
-			dump_container( ul, stdout );
+//			dump_container( ul, stdout );
+			wprintf( L"%s\n", ul.getTextAll().c_str() );
 
-			const Node& feed = root.getNode( _T("feed") );
+/*			const Node& feed = root.getNode( _T("feed") );
 			size_t n = feed.getChildrenCount();
 			for( size_t i=0; i<n; i++ ) {
 				wprintf( _T("  entry[%d] = %s\n"), 
 					(int)i, 
 					feed.getNode( _T("entry"), (int)i ).getNode( _T("title") ).getText().c_str() );
 			}
-		} catch( NodeNotFoundException& ) {
+*/		} catch( NodeNotFoundException& ) {
 			wprintf( _T("node not found...\n") );
 		}
 //		getchar();
 		wprintf( _T("--end--\n") );
 	}
-	getchar();
+//	getchar();
 	return 0;
 }
 

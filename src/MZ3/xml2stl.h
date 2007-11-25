@@ -50,7 +50,7 @@ typedef std::vector<Node>		NodeList;
 class Container
 {
 private:
-	XML2STL_TYPE type;
+	XML2STL_TYPE	type;
 	XML2STL_STRING  name_or_text;	///< NODE ならノード名、TEXT なら文字列
 
 	PropertyList	properties;
@@ -64,12 +64,27 @@ public:
 		return type;
 	}
 
+	/**
+	 * ノード名の取得
+	 */
 	const XML2STL_STRING& getName() const {
-		return name_or_text;
+		if (isNode()) {
+			return name_or_text;
+		} else {
+			// NODE以外なので取得禁止
+			static XML2STL_STRING empty_text = L"";
+			return empty_text;
+		}
 	}
 
 	const XML2STL_STRING getText1() const {
-		return name_or_text;
+		if (isText()) {
+			return name_or_text;
+		} else {
+			// TEXT以外なので取得禁止
+			static XML2STL_STRING empty_text = L"";
+			return empty_text;
+		}
 	}
 
 	const XML2STL_STRING getTextAll() const {
@@ -100,7 +115,7 @@ public:
 					text += L" />";
 				} else {
 					text += L">";
-					// 下位ノード
+					// 下位ノード(再帰)
 					text += targetNode.getTextAll();
 					text += L"</";
 					text += targetNode.name_or_text;
@@ -132,10 +147,8 @@ public:
 		return children.empty() ? false : true;
 	}
 
-	bool isNode() const
-	{
-		return type == XML2STL_TYPE_NODE;
-	}
+	bool isNode() const	{ return type == XML2STL_TYPE_NODE; }
+	bool isText() const	{ return type == XML2STL_TYPE_TEXT; }
 
 	Node& addNode( const XML2STL_STRING& name )
 	{
@@ -265,12 +278,6 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
             dump_container( c.getNode(i), fp, nest_level+1 );
         }
     }
-
-    // 本来は children が non-empty なら text 無効
-//	if (!c.getText().empty()) {
-//		dump_nest( fp, nest_level );
-//		fwprintf( fp, _T("  => [%s]\n"), c.getText().c_str() );
-//	}
 }
 
 class SimpleXmlParser
