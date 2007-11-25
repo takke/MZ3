@@ -2931,31 +2931,37 @@ public:
 				CString name = dt.getNode( L"a", 1 ).getTextAll().c_str();
 				CString url  = dt.getNode( L"a", 1 ).getProperty(L"href").c_str();
 
-				// dd/p[1] : ä÷åW
-				// dd/p[2] : è–âÓï∂
-				// Ç‹ÇΩÇÕ
-				// dd/p[1] : è–âÓï∂
+				// dd/p class=relation  : ä÷åW
+				// dd/p class=userInput : è–âÓï∂
+				CString intro, relation;
 				const xml2stl::Node& dd = dl.getNode(L"dd");
-				if (dd.getChildrenCount()==1) {
-					CString intro = dd.getNode( L"p", 0 ).getTextAll().c_str();
-
-					ParserUtil::AddBodyWithExtract( introItem, intro );
-				} else {
-					CString relation = dd.getNode( L"p", 0 ).getTextAll().c_str();
-					CString intro = dd.getNode( L"p", 1 ).getTextAll().c_str();
-
-					ParserUtil::AddBodyWithExtract( introItem, relation );
-					introItem.AddBody( L"\r\n" );
-					ParserUtil::AddBodyWithExtract( introItem, intro );
+				for (int j=0; j<dd.getChildrenCount(); j++) {
+					const xml2stl::Node& dd_sub = dd.getNode(j);
+					if (dd_sub.isNode() && dd_sub.getName() == L"p") {
+						CString className = dd_sub.getProperty(L"class").c_str();
+						if (className==L"relation") {
+							relation = dd_sub.getTextAll().c_str();
+						} else if (className==L"userInput") {
+							intro    = dd_sub.getTextAll().c_str();
+						}
+					}
 				}
 
-				// ìoò^
-				introItem.SetCommentIndex( nChildItemNumber++ );
-				introItem.SetAuthor( util::FormatString( L"è–âÓï∂(%s)", name ) );
-				introItem.SetAuthorID( mixi::MixiUrlParser::GetID(url) );
-				introItem.SetURL( url );
-				introItem.SetAccessType( ACCESS_PROFILE );
-				mixi.AddChild( introItem );
+				if (!relation.IsEmpty()) {
+					ParserUtil::AddBodyWithExtract( introItem, relation );
+					introItem.AddBody( L"\r\n" );
+				}
+				if (!intro.IsEmpty()) {
+					ParserUtil::AddBodyWithExtract( introItem, intro );
+
+					// ìoò^
+					introItem.SetCommentIndex( nChildItemNumber++ );
+					introItem.SetAuthor( util::FormatString( L"è–âÓï∂(%s)", name ) );
+					introItem.SetAuthorID( mixi::MixiUrlParser::GetID(url) );
+					introItem.SetURL( url );
+					introItem.SetAccessType( ACCESS_PROFILE );
+					mixi.AddChild( introItem );
+				}
 			}
 		} catch (...) {
 			MZ3LOGGER_ERROR( L"(è–âÓï∂) not found..." );

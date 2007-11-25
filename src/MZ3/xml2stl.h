@@ -132,6 +132,11 @@ public:
 		return children.empty() ? false : true;
 	}
 
+	bool isNode() const
+	{
+		return type == XML2STL_TYPE_NODE;
+	}
+
 	Node& addNode( const XML2STL_STRING& name )
 	{
 		Node node;
