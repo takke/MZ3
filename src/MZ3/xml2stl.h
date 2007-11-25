@@ -211,8 +211,17 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
 
 class SimpleXmlParser
 {
+private:
+	bool m_bLazyParseMode;		///< img タグ等を閉じなくてもOKにする
+
 public:
-	static bool loadFromFile( Container& root, LPCTSTR filename )
+
+	SimpleXmlParser( bool bLazyParseMode ) 
+		: m_bLazyParseMode( bLazyParseMode )
+	{
+	}
+
+	static bool loadFromFile( Container& root, LPCTSTR filename, bool bLazyParseMode=true )
 	{
 		FILE* fp = NULL;
 
@@ -227,17 +236,19 @@ public:
 		}
 		fclose( fp );
 
-		return loadFromText( root, buffer );
+		return loadFromText( root, buffer, bLazyParseMode );
 	}
 
-	static bool loadFromText( Container& root, const std::vector<TCHAR>& text )
+	static bool loadFromText( Container& root, const std::vector<TCHAR>& text, bool bLazyParseMode=true )
 	{
 		kfm::kf_buf_reader<TCHAR> reader( text );
-		return parse_node( root, reader );
+
+		SimpleXmlParser parser( bLazyParseMode );
+		return parser.parse_node( root, reader );
 	}
 
 private:
-	static bool parse_properties( Node& node, kfm::kf_buf_reader<TCHAR>& reader )
+	bool parse_properties( Node& node, kfm::kf_buf_reader<TCHAR>& reader )
 	{
 		while( !reader.is_eof() ) {
 			wint_t c = reader.get_char();
@@ -317,7 +328,7 @@ private:
 		PARSE_STATE_IN_NODE_NAME,
 	};
 
-	static bool parse_until_target( Container& node, kfm::kf_buf_reader<TCHAR>& reader, const xml2stl::XML2STL_STRING& target )
+	bool parse_until_target( Container& node, kfm::kf_buf_reader<TCHAR>& reader, const xml2stl::XML2STL_STRING& target )
 	{
 		xml2stl::XML2STL_STRING node_text;
 		xml2stl::XML2STL_STRING temp;
@@ -352,7 +363,7 @@ private:
 		return true;
 	}
 
-	static bool parse_node( Container& node, kfm::kf_buf_reader<TCHAR>& reader )
+	bool parse_node( Container& node, kfm::kf_buf_reader<TCHAR>& reader )
 	{
 		PARSE_STATE state = PARSE_STATE_SEARCHING;
 
@@ -403,7 +414,17 @@ private:
 						bool r = parse_properties( newNode, reader );
 						if (r) {
 							// "/>" で終わらなかったので、次ノード解析
-							parse_node( newNode, reader );
+
+							// ただし、lazy モードの場合は、いくつかのタグを HTML 風に解析する
+							bool bEndTag = false;
+							if (m_bLazyParseMode) {
+								if (newNode.getName()==L"img") {
+									bEndTag = true;
+								}
+							}
+							if (!bEndTag) {
+								parse_node( newNode, reader );
+							}
 						}
 						state = PARSE_STATE_SEARCHING;
 //						node_text = L"";
@@ -431,9 +452,14 @@ private:
 							wint_t c = reader.get_char();
 							if (c=='>') {
 								// 子要素があればTEXTを設定しない。
-//								if (!node.hasChildren()) {
+								if (m_bLazyParseMode) {
 									node.setText(node_text);
-//								}
+								} else {
+									if (!node.hasChildren()) {
+										node.setText(node_text);
+									}
+								}
+
 								// 必要であれば、node.name とこれまでのc値との文字列比較を行うこと。
 								return true;
 							}
