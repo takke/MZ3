@@ -1676,7 +1676,7 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 {
 	m_hotList->SetFocus();
-	util::MySetListCtrlItemFocusedAndSelected( *m_hotList, m_selGroup->getSelectedCategory()->selectedBody, true );
+	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, true );
 	theApp.ChangeView(theApp.m_pMainView);
 
 	// ƒAƒCƒeƒ€‚Ì§Œä
