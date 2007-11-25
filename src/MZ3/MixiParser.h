@@ -2775,8 +2775,8 @@ public:
 			mixi.SetName( name );
 			mixi.SetTitle( name );
 			mixi.SetAuthor( name );
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"h3 not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"h3 not found... : %s", e.getMessage().c_str()) );
 		}
 
 		// ユーザ画像
@@ -2794,19 +2794,19 @@ public:
 			mixi.m_linkList.push_back( CMixiData::Link( url, L"ユーザ画像" ) );
 
 			MZ3LOGGER_DEBUG( util::FormatString( L"user image : [%s]", url ) );
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"img not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"img not found... : %s", e.getMessage().c_str()) );
 		}
 
 		// プロフィールを全て取得し、本文に設定する。
-		// /html/body/div[2]/div/div[2]/div[2]/ul
+		// /html/body/div[2]/div/div#bodyContents/div#profile/ul
 		try {
 			const xml2stl::Node& ul = root.getNode( L"html" )
 										  .getNode( L"body" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div", 1 )
+										  .getNode( L"div", xml2stl::Property(L"id", L"bodyArea") )
+										  .getNode( L"div", xml2stl::Property(L"id", L"bodyMainArea") )
+										  .getNode( L"div", xml2stl::Property(L"id", L"bodyContents") )
+										  .getNode( L"div", xml2stl::Property(L"id", L"profile") )
 										  .getNode( L"ul" );
 
 			// とりあえず改行
@@ -2833,8 +2833,8 @@ public:
 				mixi.AddBody(_T("\r\n"));
 				mixi.AddBody(_T("\r\n"));
 			}
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"(プロフィール本文) not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"(プロフィール本文) not found... : %s", e.getMessage().c_str()) );
 		}
 
 		int nChildItemNumber = 1;
@@ -2844,12 +2844,12 @@ public:
 		try {
 			const xml2stl::Node& dl = root.getNode( L"html" )
 										  .getNode( L"body" )
-										  .getNode( L"div", 1 )
+										  .getNode( L"div", xml2stl::Property(L"id", L"bodyArea") )
 										  .getNode( L"div" )
-										  .getNode( L"div", 1 )
-										  .getNode( L"div", 2 )
-										  .getNode( L"div" )
-										  .getNode( L"div", 1 )
+										  .getNode( L"div", xml2stl::Property(L"id", L"bodyContents") )
+										  .getNode( L"div", xml2stl::Property(L"id", L"mymixiUpdate") )
+										  .getNode( L"div", xml2stl::Property(L"id", L"newFriendDiary") )
+										  .getNode( L"div", xml2stl::Property(L"class", L"contents") )
 										  .getNode( L"dl" );
 
 			// dt/span, dd/a が交互に出現する。
@@ -2899,8 +2899,8 @@ public:
 			diaryItem.SetAuthor( L"最新の日記" );
 			mixi.AddChild( diaryItem );
 
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"(最新の日記) not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"(最新の日記) not found... : %s", e.getMessage().c_str()) );
 		}
 
 		// 紹介文の取得
@@ -2908,11 +2908,11 @@ public:
 		try {
 			const xml2stl::Node& div = root.getNode( L"html" )
 										   .getNode( L"body" )
-										   .getNode( L"div", 1 )
+										   .getNode( L"div", xml2stl::Property(L"id", L"bodyArea") )
 										   .getNode( L"div" )
-										   .getNode( L"div", 1 )
-										   .getNode( L"div", 3 )
-										   .getNode( L"div", 1 );
+										   .getNode( L"div", xml2stl::Property(L"id", L"bodyContents") )
+										   .getNode( L"div", xml2stl::Property(L"id", L"intro") )
+										   .getNode( L"div", xml2stl::Property(L"class", L"contents") );
 
 			// dl が続く。
 			int n = div.getChildrenCount();
@@ -2963,8 +2963,8 @@ public:
 					mixi.AddChild( introItem );
 				}
 			}
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"(紹介文) not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"(紹介文) not found... : %s", e.getMessage().c_str()) );
 		}
 
 		MZ3LOGGER_DEBUG( L"ShowFriendParser.parse() finished." );
@@ -3854,13 +3854,13 @@ public:
 	
 					// 完成したので追加する
 					out_.push_back( data );
-				} catch (...) {
-					MZ3LOGGER_ERROR( L"some node or property not found..." );
+				} catch (xml2stl::NodeNotFoundException& e) {
+					MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
 					break;
 				}
 			}
-		} catch (...) {
-			MZ3LOGGER_ERROR( L"feed not found..." );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"feed not found... : %s", e.getMessage().c_str()) );
 		}
 
 		MZ3LOGGER_DEBUG( L"TrackParser.parse() finished." );

@@ -10,6 +10,7 @@
  */
 #include <stdio.h>
 #include <string>
+#include <sstream>
 #include <vector>
 #include "kfm_buffer.h"
 
@@ -35,6 +36,18 @@ typedef Container Node;
 
 class NodeNotFoundException
 {
+	XML2STL_STRING message;
+
+public:
+	NodeNotFoundException( const XML2STL_STRING& message_ )
+		: message(message_)
+	{
+	}
+
+	const XML2STL_STRING& getMessage() const 
+	{
+		return message;
+	}
 };
 
 class Property
@@ -42,6 +55,13 @@ class Property
 public:
     XML2STL_STRING name;
     XML2STL_STRING text;
+
+	Property()
+	{}
+
+	Property(const XML2STL_STRING& name_, const XML2STL_STRING& text_)
+		: name(name_), text(text_)
+	{}
 };
 
 typedef std::vector<Property>	PropertyList;
@@ -196,16 +216,19 @@ public:
 				return properties[i].text;
 			}
 		}
-		throw NodeNotFoundException();
+
+		std::wostringstream stream;
+		stream << L"property not found... name[" << name << L"]";
+		throw NodeNotFoundException(stream.str());
 		// TODO: use another exception.
-		// TODO: set requested "name".
 	}
 
 	const Node& getNode( size_t index ) const
 	{
 		if (index >= children.size()) {
-			throw NodeNotFoundException();
-			// TODO: set requested info.
+			std::wostringstream stream;
+			stream << L"node not found... index[" << index << L"]";
+			throw NodeNotFoundException(stream.str());
 		}
 		return children[ index ];
 	}
@@ -225,8 +248,31 @@ public:
 				}
 			}
 		}
-		throw NodeNotFoundException();
-		// TODO: set requested info.
+
+		std::wostringstream stream;
+		stream << L"node not found... name[" << name << L"], index[" << index << L"]";
+		throw NodeNotFoundException(stream.str());
+	}
+
+	const Node& getNode( const XML2STL_STRING& name, const Property& prop ) const
+	{
+		size_t n = children.size();
+		for (size_t i=0; i<n; i++) {
+			if (children[i].type == XML2STL_TYPE_NODE &&
+				children[i].name_or_text == name) 
+			{
+				try {
+					if (children[i].getProperty(prop.name) == prop.text) {
+						return children[i];
+					}
+				} catch( NodeNotFoundException& ) {
+					// not found, ok.
+				}
+			}
+		}
+		std::wostringstream stream;
+		stream << L"node not found... name[" << name << L"], property[" << prop.name + L"=" << prop.text << L"]";
+		throw NodeNotFoundException(stream.str());
 	}
 
 //	void setText( const XML2STL_STRING& text )
