@@ -369,13 +369,13 @@ void CReportView::SetData(const CMixiData& data)
 	if (m_lastIndex == -1) {
 		m_lastIndex = 0;
 	} else {
-		m_lastIndex++;
+		m_lastIndex ++;
 	}
 
 	INT_PTR count = m_data.GetChildrenSize();
-	if (count != 0 && m_lastIndex != 0) {
+	if (count > 0 && m_lastIndex > 0) {
 		CMixiData& subItem = m_data.GetChild( count-1 );
-		if (m_lastIndex >= subItem.GetCommentIndex()) {
+		if (m_lastIndex > subItem.GetCommentIndex()) {
 			m_lastIndex = subItem.GetCommentIndex();
 		}
 	}
@@ -443,13 +443,16 @@ void CReportView::SetData(const CMixiData& data)
 	m_nochange = FALSE;
 
 	if (count == 0) {
+		// コメントがないため、親要素を既読位置とする。
 		m_lastIndex = 0;
 	} else {
 		// 選択状態の正規化
-		CMixiData& subItem = m_data.GetChild(0);
-		if (subItem.GetCommentIndex() > m_lastIndex && m_lastIndex != 0) {
-			// 先頭のデータを取得
-			m_lastIndex = subItem.GetCommentIndex();
+		CMixiData& firstCommentItem = m_data.GetChild(0);
+		if (m_lastIndex < firstCommentItem.GetCommentIndex() && m_lastIndex > 0) {
+			// 先頭項目のインデックスよりも既読位置が小さい場合、
+			// 以前に見ていた既読項目が「流れている」と判断し、
+			// 既読位置を先頭項目のインデックスを与える。
+			m_lastIndex = firstCommentItem.GetCommentIndex();
 			focusItem = 1;
 		}
 	}
@@ -543,9 +546,21 @@ void CReportView::OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	CMixiData* data = (CMixiData*)m_list.GetItemData(pNMLV->iItem);
 	m_currentData = data;
-	if (data->GetCommentIndex() > m_lastIndex) {
+	if (m_lastIndex < data->GetCommentIndex()) {
+		// 既読位置が小さいため、より新しい項目を見たと判断し、
+		// 既読位置を更新する。
 		m_lastIndex = data->GetCommentIndex();
 	}
+	if ((pNMLV->iItem+1)==m_list.GetItemCount()) {
+		// 最終項目を見ている場合、
+		// （コメント削除等の可能性があるため）
+		// URL 内に comment_count があれば、その値を既読位置とする。
+		CString comment_count = util::GetParamFromURL( m_data.GetURL(), L"comment_count" );
+		if (!comment_count.IsEmpty() && _wtoi(comment_count)>0) {
+			m_lastIndex = _wtoi(comment_count);
+		}
+	}
+		
 
 	m_list.SetRedraw(FALSE);
 	if (pNMLV->iItem == 0) {
