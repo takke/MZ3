@@ -102,6 +102,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
 	ON_NOTIFY(NM_RCLICK, IDC_REPORT_LIST, &CReportView::OnNMRclickReportList)
 	ON_COMMAND(ID_OPEN_PROFILE, &CReportView::OnOpenProfile)
+	ON_COMMAND(ID_OPEN_PROFILE_LOG, &CReportView::OnOpenProfileLog)
+	ON_COMMAND(ID_SEND_MESSAGE, &CReportView::OnSendMessage)
 END_MESSAGE_MAP()
 
 
@@ -490,20 +492,47 @@ void CReportView::ShowCommentData(CMixiData* data)
 		m_posHtmlScrollMax = n;
 
 		CString str;
-		str.AppendFormat( L"<a name='mz3line0'><span style='color: blue;'>%s %s</span></a><br />", 
+		str.AppendFormat( L"<a name='mz3line0'><span style='color: blue;'>%s %s</span></a><br />\r\n", 
 				data->GetAuthor(), data->GetDate() );
 
-		for( int i=0; i<n; i++ ){
-			str.AppendFormat( L"<a name='mz3line%d'>", i+1 );
-			str += data->GetBody(i);
-			str += L"</a><br />\r\n";
+		int lineNumber = 0;
+		for (int i=0; i<n; i++) {
+			// 行の途中に \r\n があれば分離する。
+			CString target = data->GetBody(i);
+			CString after;
+			for( ;; ) {
+				int idx = util::GetAfterSubString( target, L"\r\n", after );
+				if (idx == -1) {
+					if (!target.IsEmpty()) {
+						str.AppendFormat( L"<a name='mz3line%d'>", ++lineNumber );
+//						str += L"{";
+						str += target;
+//						str += L"}";
+						str += L"</a>\r\n";
+					}
+					break;
+				} else {
+					// \r\n 発見。分離する。
+					CString left = target.Left( idx+wcslen(L"\r\n") );
+					str.AppendFormat( L"<a name='mz3line%d'>", ++lineNumber );
+//					str += L"[";
+					str += left;
+//					str += L"]";
+					str += L"</a><br />\r\n";
+					m_posHtmlScrollMax ++;
+
+					target = after;
+				}
+			}
 		}
 
 		str += _T("<br />");		// 最後に１行入れて見やすくする
+		MZ3LOGGER_DEBUG( util::FormatString( L"str : [%s]\n", str ) );
 
 		// 絵文字用フィルタ
 		ViewFilter::ReplaceEmojiCodeToInlineImageTags( str, theApp.m_emoji );
 
+//		m_edit.SetWindowText(str);	// for debug
 		SetHtmlText(str);
 	} else {
 		CString str = _T("");
@@ -1864,7 +1893,6 @@ void CReportView::OnOpenBrowserUser()
 	util::OpenBrowserForUser( url, strUserName );
 }
 
-
 /**
  * プロフィールページを開く
  */
@@ -1878,15 +1906,104 @@ void CReportView::OnOpenProfile()
 	CMixiData* data = (CMixiData*)m_list.GetItemData(idx);
 
 	// URLの生成
-	int nUserId = data->GetAuthorID();
-	if( nUserId < 0 ) {
-		nUserId = data->GetOwnerID();
+	int nUserId = util::GetUserIdFromAuthorOrOwnerID(*data);
+	if (nUserId<0) {
+		return;
 	}
+	
 	CString url;
 	url.Format( L"http://mixi.jp/show_friend.pl?id=%d", nUserId );
 
 	// 開く
 	MyLoadMixiViewPage( CMixiData::Link( url, data->GetAuthor() ) );
+}
+
+/**
+ * プロフィールページを開く（ログ）
+ */
+void CReportView::OnOpenProfileLog()
+{
+	// 選択アイテムの取得
+	int idx = m_list.GetSelectedItem();
+	if( idx < 0 ) {
+		return;
+	}
+	CMixiData* data = (CMixiData*)m_list.GetItemData(idx);
+
+	// URLの生成
+	int nUserId = util::GetUserIdFromAuthorOrOwnerID(*data);
+	if (nUserId<0) {
+		return;
+	}
+	
+	CString url;
+	url.Format( L"http://mixi.jp/show_friend.pl?id=%d", nUserId );
+
+	// 開く
+	static CMixiData s_mixi;
+	CMixiData dummy;
+	s_mixi = dummy;
+	s_mixi.SetAccessType(ACCESS_PROFILE);
+	s_mixi.SetURL(url);
+
+	CString strLogfilePath = util::MakeLogfilePath( s_mixi );
+
+	// ファイル存在確認
+	if(! util::ExistFile( strLogfilePath ) ) {
+		// FILE NOT FOUND.
+		CString msg = L"ログファイルがありません : " + strLogfilePath;
+		MZ3LOGGER_ERROR( msg );
+
+		util::MySetInformationText( m_hWnd, msg );
+		
+		return;
+	}
+
+	// HTML の取得
+	CHtmlArray html;
+	html.Load( strLogfilePath );
+
+	// HTML 解析
+	mixi::MyDoParseMixiHtml( s_mixi.GetAccessType(), s_mixi, html );
+	util::MySetInformationText( m_hWnd, L"完了" );
+
+	// URL 設定
+	s_mixi.SetBrowseUri( util::CreateMixiUrl(s_mixi.GetURL()) );
+
+	// 表示
+	SetData( s_mixi );
+}
+
+
+/**
+ * メッセージ送信
+ */
+void CReportView::OnSendMessage()
+{
+	// 選択アイテムの取得
+	int idx = m_list.GetSelectedItem();
+	if( idx < 0 ) {
+		return;
+	}
+	CMixiData* data = (CMixiData*)m_list.GetItemData(idx);
+
+	// URLの生成
+	int nUserId = util::GetUserIdFromAuthorOrOwnerID(*data);
+	if (nUserId<0) {
+		return;
+	}
+	CString url;
+	url.Format( L"http://mixi.jp/show_friend.pl?id=%d", nUserId );
+
+	// mixi アイテムの生成
+	static CMixiData s_mixi;
+	CMixiData dummy;
+	s_mixi = dummy;
+	s_mixi.SetAccessType(ACCESS_PROFILE);
+	s_mixi.SetURL(url);
+
+	// 書き込み画面生成
+	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &s_mixi );
 }
 
 /**
@@ -1991,15 +2108,23 @@ void CReportView::MyPopupReportMenu(void)
 		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER, MF_BYCOMMAND);
 	}
 
-	// ブラウザで開く(ユーザページ)
-	// プロフィールページを開く：IDがなければ無効
-	int nUserId = m_currentData->GetAuthorID();
-	if( nUserId < 0 ) {
-		nUserId = m_currentData->GetOwnerID();
-	}
+	// ブラウザで開く(ユーザページ), 
+	// プロフィールページを開く, メッセージを送信する：IDがなければ無効
+	int nUserId = util::GetUserIdFromAuthorOrOwnerID(*m_currentData);
 	if (nUserId<=0) {
 		pcThisMenu->RemoveMenu(ID_OPEN_BROWSER_USER, MF_BYCOMMAND);
 		pcThisMenu->RemoveMenu(ID_OPEN_PROFILE, MF_BYCOMMAND);
+		pcThisMenu->RemoveMenu(ID_OPEN_PROFILE_LOG, MF_BYCOMMAND);
+		pcThisMenu->RemoveMenu(ID_SEND_MESSAGE, MF_BYCOMMAND);
+	} else {
+		// プロフィールページを開く（ログ）はログがなければ無効化
+		CMixiData mixi;
+		mixi.SetAccessType( ACCESS_PROFILE );
+		mixi.SetURL( util::FormatString( L"http://mixi.jp/show_friend.pl?id=%d", nUserId ) );
+		CString path = util::MakeLogfilePath( mixi );
+		if (!util::ExistFile(path)) {
+			pcThisMenu->EnableMenuItem( ID_OPEN_PROFILE_LOG, MF_GRAYED | MF_BYCOMMAND );
+		}
 	}
 
 	// メニューのポップアップ

@@ -142,6 +142,8 @@ private:
 	bool MyLoadMixiViewPage( const CMixiData::Link link );
 public:
 	afx_msg void OnOpenProfile();
+	afx_msg void OnOpenProfileLog();
+	afx_msg void OnSendMessage();
 };
 
 

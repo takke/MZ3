@@ -30,6 +30,18 @@ inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 }
 
 /**
+ * ユーザIDを AuthorID, OwnerID から取得する
+ */
+inline int GetUserIdFromAuthorOrOwnerID( const CMixiData& mixi )
+{
+	int userId = mixi.GetAuthorID();
+	if( userId < 0 ) {
+		userId = mixi.GetOwnerID();
+	}
+	return userId;
+}
+
+/**
  * url 作成（http://mixi.jp/ の補完）
  */
 inline CString CreateMixiUrl(LPCTSTR str)

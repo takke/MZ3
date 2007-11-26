@@ -48,7 +48,7 @@ void COptionSheet::SetPage()
 
 void COptionSheet::OnDestroy()
 {
-	CPropertySheet::OnDestroy();
-
 	m_iLastPage = GetActiveIndex();
+
+	CPropertySheet::OnDestroy();
 }

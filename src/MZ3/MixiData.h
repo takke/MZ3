@@ -111,7 +111,7 @@ public:
 		// ”’l•ÏŠ·
 		m_authorId = authorId;
 	}
-	int GetAuthorID()					{ return m_authorId; }
+	int GetAuthorID() const				{ return m_authorId; }
 
 	void SetTitle(CString title);
 	CString GetTitle()					{ return m_title; }

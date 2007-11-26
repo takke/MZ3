@@ -210,10 +210,6 @@ public:
 		}
 		while( line.Replace(_T("</span>"), _T("")) );
 
-		if (theApp.m_optionMng.m_bRenderByIE) {
-			return;
-		}
-
 		// br ƒ^ƒO‚Ì’uŠ·
 		{
 			static MyRegex reg;
@@ -232,6 +228,10 @@ public:
 			}
 			if( line.Find( L"<!--" ) != -1 ) 
 				reg.replaceAll( line, L"" );
+		}
+
+		if (theApp.m_optionMng.m_bRenderByIE) {
+			return;
 		}
 
 		// "<p>" ¨ íœ

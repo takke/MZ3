@@ -350,6 +350,8 @@
 #define IDM_INSERT_EMOJI_END            33994
 #define ID_DOWNLOAD_MANAGER_VIEW        33996
 #define ID_OPEN_PROFILE                 34000
+#define ID_OPEN_PROFILE_LOG             34003
+#define ID_SEND_MESSAGE                 34004
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -361,7 +363,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        162
-#define _APS_NEXT_COMMAND_VALUE         34001
+#define _APS_NEXT_COMMAND_VALUE         34005
 #define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

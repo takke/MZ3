@@ -183,6 +183,9 @@ BEGIN
         MENUITEM "ブラウザで開く（このページ）...",           ID_OPEN_BROWSER
         MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
         MENUITEM "プロフィールページを開く",                ID_OPEN_PROFILE
+        MENUITEM "プロフィールページを開く（ログ）",            ID_OPEN_PROFILE_LOG
+        MENUITEM "メッセージを送信する",                  ID_SEND_MESSAGE
+        MENUITEM SEPARATOR
         POPUP "画面レイアウト"
         BEGIN
             MENUITEM "↑リストを狭くする",                   IDM_LAYOUT_REPORTLIST_MAKE_NARROW
