@@ -41,7 +41,7 @@ inline int GetOpenFileNameEx(OPENFILENAME* pofn)
 /**
  * 指定されたビットマップ hBitmap を hdc に描画する
  */
-inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int tox, int toy )
+inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int srcx, int srcy )
 {
 	if( hBitmap == NULL ) {
 		return false;
@@ -55,7 +55,7 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 
 	// 転送
 //	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
-	BitBlt( hdc, x, y, w, h, hdc1, tox, toy, SRCCOPY );
+	BitBlt( hdc, x, y, w, h, hdc1, srcx, srcy, SRCCOPY );
 
 	SelectObject( hdc1, hBitmapOld );
 

@@ -215,7 +215,7 @@ void CReportView::OnInitialUpdate()
 	const int h1 = theApp.m_optionMng.m_nReportViewListHeightRatio;
 	const int h2 = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
 	int hList   = (clientRect.Height() * h1 / (h1+h2))-hTitle;	// (全体のN%-タイトル領域) をリスト領域とする
-//		int hReport = (clientRect.Height() * h2 / (h1+h2));			// 全体のN%をレポート領域とする
+//	int hReport = (clientRect.Height() * h2 / (h1+h2));			// 全体のN%をレポート領域とする
 	int hReport = (clientRect.Height() - ((hTitle*2)+hList));
 
 	int viewWidth = clientRect.Width();
@@ -227,7 +227,8 @@ void CReportView::OnInitialUpdate()
 	TRACE(TEXT("sy=%d,viewWidth=%d,viewHeight=%d\r\n"),sy,viewWidth,viewHeight);
 
 	m_detailView->Create(TEXT("RAN2WND"),TEXT(""),CS_GLOBALCLASS,viewRect,(CWnd*)this,DETAIL_VIEWID);
-	m_detailView->ChangeViewFont(13);
+//	m_detailView->ChangeViewFont(13);
+	m_detailView->ChangeViewFont(fontHeight);
 	m_detailView->ShowWindow(SW_SHOW);
 #else
 #ifdef WINCE
@@ -644,23 +645,8 @@ void CReportView::ShowCommentData(CMixiData* data)
 		}
 
 		str += _T("\r\n");			// 最後に１行入れて見やすくする
-#else
-		CString str = _T("");
 
-		str += data->GetAuthor();
-		str += _T("　");
-		str += data->GetDate();
-		str += _T("\r\n");
-
-		const int n = data->GetBodySize();
-		for( int i=0; i<n; i++ ){
-			str += data->GetBody(i);
-		}
-
-		str += _T("\r\n");			// 最後に１行入れて見やすくする
-#endif
-
-#ifdef USE_RAN2
+		// 描画開始
 		m_edit.ShowWindow(SW_HIDE);
 		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray);
 		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"),m_scrollBarHeight);
@@ -679,6 +665,20 @@ void CReportView::ShowCommentData(CMixiData* data)
 			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 #else
+		CString str = _T("");
+
+		str += data->GetAuthor();
+		str += _T("　");
+		str += data->GetDate();
+		str += _T("\r\n");
+
+		const int n = data->GetBodySize();
+		for( int i=0; i<n; i++ ){
+			str += data->GetBody(i);
+		}
+
+		str += _T("\r\n");			// 最後に１行入れて見やすくする
+
 		// 絵文字用フィルタ
 		ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
 		m_edit.SetWindowText(str);

@@ -69,8 +69,6 @@ private:
 #ifdef WINCE
 		return SHLoadImageFile( szFilepath );
 #else
-//		HBITMAP hBitmap = (HBITMAP)LoadImage( NULL, szFilepath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
-//		return hBitmap;
 		if (!m_gdiPlusImage.IsNull()) {
 			m_gdiPlusImage.Destroy();
 		}
