@@ -594,6 +594,10 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		// エディット
 		pView->m_edit.SetFont( &theApp.m_font );
 
+		// RAN2エディット
+		pView->m_detailView->ChangeViewFont( fontHeight );
+		pView->m_detailView->DrawDetail(0);
+
 		// 通知領域
 		pView->m_infoEdit.SetFont( &theApp.m_font );
 	}

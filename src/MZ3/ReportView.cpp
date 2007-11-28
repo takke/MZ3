@@ -202,31 +202,19 @@ void CReportView::OnInitialUpdate()
 		delete m_detailView;
 	}
 
+	// 画面サイズで構築する（超富豪的・・・）
+	CRect viewRect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &viewRect, 0);
+	m_detailView = new Ran2View();
+//	TRACE(TEXT("sy=%d,viewWidth=%d,viewHeight=%d\r\n"),sy,viewWidth,viewHeight);
+
+	m_detailView->Create(TEXT("RAN2WND"),TEXT(""),CS_GLOBALCLASS,viewRect,(CWnd*)this,DETAIL_VIEWID);
+
 	// 超暫定
 	int fontHeight = theApp.m_optionMng.GetFontHeight();
 	if( fontHeight == 0 ) {
 		fontHeight = 24;
 	}
-
-	CRect clientRect;
-	this->GetClientRect(clientRect);
-
-	int hTitle  = theApp.GetInfoRegionHeight(fontHeight);	// タイトル領域はフォントサイズ依存
-	const int h1 = theApp.m_optionMng.m_nReportViewListHeightRatio;
-	const int h2 = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
-	int hList   = (clientRect.Height() * h1 / (h1+h2))-hTitle;	// (全体のN%-タイトル領域) をリスト領域とする
-//	int hReport = (clientRect.Height() * h2 / (h1+h2));			// 全体のN%をレポート領域とする
-	int hReport = (clientRect.Height() - ((hTitle*2)+hList));
-
-	int viewWidth = clientRect.Width();
-	int sy = hTitle + hList;
-//	int viewHeight = sy + hReport;
-	int viewHeight = sy + hReport;
-	CRect viewRect(0,sy,viewWidth,viewHeight);
-	m_detailView = new Ran2View();
-	TRACE(TEXT("sy=%d,viewWidth=%d,viewHeight=%d\r\n"),sy,viewWidth,viewHeight);
-
-	m_detailView->Create(TEXT("RAN2WND"),TEXT(""),CS_GLOBALCLASS,viewRect,(CWnd*)this,DETAIL_VIEWID);
 //	m_detailView->ChangeViewFont(13);
 	m_detailView->ChangeViewFont(fontHeight);
 	m_detailView->ShowWindow(SW_SHOW);
@@ -328,11 +316,19 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 			::ShowWindow( m_hwndHtml, SW_HIDE );
 		}
 
+#ifdef USE_RAN2
+		// RAN2 の移動
+		if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
+			m_detailView->MoveWindow( 0, hTitle+hList, cx, hReport );
+		}
+#else
 		// エディットコントロールの移動
 		util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
+#endif
 	}
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
 
+	// スクロールバー調整
 #ifdef USE_RAN2
 	int barWidth = ::GetSystemMetrics(SM_CXVSCROLL);
 //	util::MoveDlgItemWindow(this, IDC_VSCROLLBAR, cx-barWidth, cy - hInfo, cx, hInfo);
