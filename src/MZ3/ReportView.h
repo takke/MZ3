@@ -7,6 +7,8 @@
 #include "InetAccess.h"
 #include "HtmlArray.h"
 #include "XcrawlCanceler.h"
+#include "Ran2View.h"
+#include "ReportScrollBar.h"
 
 // CReportView フォーム ビュー
 
@@ -54,8 +56,11 @@ public:
 	CEdit				m_titleEdit;
 	CEdit				m_infoEdit;
 
+	ReportScrollBar		m_vScrollbar;
+	Ran2View*			m_detailView;			// 絵文字対応コントロール
 	XcrawlCanceler		m_xcrawl;				///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
+	int					m_scrollBarHeight;		// 垂直スクロールバーが扱える行数
 
 private:
 	CMixiData*	m_focusBodyItem;
@@ -137,6 +142,7 @@ public:
 	afx_msg void OnLayoutReportlistMakeWide();
 	afx_msg void OnEnVscrollReportEdit();
 	afx_msg void OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
 private:
 	bool MyLoadMixiViewPage( const CMixiData::Link link );
