@@ -1624,10 +1624,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\DIBSectionLite.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\IniFile.cpp"
 					>
 				</File>
@@ -2227,10 +2223,6 @@
 				>
 				<File
 					RelativePath=".\bf.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DIBSectionLite.h"
 					>
 				</File>
 				<File

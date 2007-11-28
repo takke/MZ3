@@ -2,7 +2,7 @@
 #define AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_
 
 //#pragma once
-#include "DIBSectionLite.h"
+//#include "DIBSectionLite.h"
 
 const int framePixel = 1;					// ワク線の太さ(ピクセル数)
 const int lineVirtualHeightPixel = 3;		// 仮想行間の太さ
@@ -214,7 +214,6 @@ class Ran2View : public CWnd
 	CString							uidStr;				// 現在描画中のUID名(テストでのみ使用)
 	int								currentUIDNumber;	// 現在描画中のUID番号
 
-	CDIBSectionLite*	dibLite;	// DIBSectionのラッパー
 	CPen		underLinePen;		// 汎用の黒ペン
 	CBrush		blueBrush;			// 汎用の青ブラシ
 	CBrush*		oldBrush;			// 復帰用のポインタ
