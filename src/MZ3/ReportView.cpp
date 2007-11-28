@@ -219,7 +219,7 @@ void CReportView::OnInitialUpdate()
 	int hReport = (clientRect.Height() - ((hTitle*2)+hList));
 
 	int viewWidth = clientRect.Width();
-	int sy = hTitle+hList;
+	int sy = hTitle + hList;
 //	int viewHeight = sy + hReport;
 	int viewHeight = sy + hReport;
 	CRect viewRect(0,sy,viewWidth,viewHeight);
@@ -1075,6 +1075,10 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 	} else {
 		// Xcrawl オプション無効時の処理
 		if (pMsg->hwnd == m_list.m_hWnd) {
+#ifdef USE_RAN2
+			int newPos = m_vScrollbar.GetScrollPos();
+			int pageOffset = (m_detailView->GetViewLineMax()-1);
+#endif
 			// リストでのキー押下イベント
 			switch(pMsg->wParam) {
 			case VK_UP:
@@ -1085,11 +1089,26 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 							return CommandScrollUpEdit();
 						}
 					} else {
+#ifdef USE_RAN2
+						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+						if( newPos <= 0 ){
+							// レポートビューへフォーカスを移して次レコードへGo!
+							return CommandMoveUpList();
+						}
+
+						if( newPos - 1 >= 0 )
+							newPos -= 1;
+
+						m_vScrollbar.SetScrollPos(newPos);
+						m_detailView->DrawDetail(newPos);
+						return TRUE;
+#else
 						SCROLLINFO si;
 						m_edit.GetScrollInfo( SB_VERT, &si );
 						if (si.nPos > si.nMin) {
 							return CommandScrollUpEdit();
 						}
+#endif
 					}
 				}
 
@@ -1114,11 +1133,26 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 							return CommandScrollDownEdit();
 						}
 					} else {
+#ifdef USE_RAN2
+						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+						if( newPos >= m_scrollBarHeight ){
+							// レポートビューへフォーカスを移して次レコードへGo!
+							return CommandMoveDownList();
+						}
+
+						if( newPos + 1 <= m_scrollBarHeight )
+							newPos += 1;
+
+						m_vScrollbar.SetScrollPos(newPos);
+						m_detailView->DrawDetail(newPos);
+						return TRUE;
+#else
 						SCROLLINFO si;
 						m_edit.GetScrollInfo( SB_VERT, &si );
 						if (si.nPos+si.nPage <= (UINT)si.nMax) {
 							return CommandScrollDownEdit();
 						}
+#endif
 					}
 				}
 
