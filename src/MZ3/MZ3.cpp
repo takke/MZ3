@@ -8,6 +8,7 @@
 #include "MZ3View.h"
 #include "ReportView.h"
 #include "WriteView.h"
+#include "Ran2View.h"
 #include "DownloadView.h"
 #include "AboutDlg.h"
 #include "util.h"
@@ -139,6 +140,11 @@ BOOL CMZ3App::InitInstance()
 	if (m_optionMng.m_bRenderByIE) {	// TODO この条件はIE正式対応前のための仮設定。正式対応後は常に実行すること。
 		InitHTMLControl( AfxGetInstanceHandle() );
 	}
+#endif
+
+	// 詳細画面のクラス登録
+#ifdef USE_RAN2
+	Ran2View::RegisterWndClass(AfxGetInstanceHandle());
 #endif
 
 	// トップページ用の初期化
@@ -408,6 +414,11 @@ int CMZ3App::ExitInstance()
 //	CString msg;
 //	msg.Format( L"ログファイルを\n%s\nに保存します", logfile );
 //	MessageBox( NULL, msg, 0, MB_OK );
+
+	// 詳細画面のクラス登録解除
+#ifdef USE_RAN2
+	Ran2View::UnregisterWndClass(AfxGetInstanceHandle());
+#endif
 
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理開始" );
 
