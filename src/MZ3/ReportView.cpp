@@ -40,6 +40,7 @@ CReportView::CReportView()
 	m_imageState = FALSE;
 	m_posHtmlScroll = 0;
 	m_posHtmlScrollMax = 0;
+	m_detailView = NULL;
 }
 
 /**
@@ -47,6 +48,7 @@ CReportView::CReportView()
  */
 CReportView::~CReportView()
 {
+	delete m_detailView;
 }
 
 void CReportView::DoDataExchange(CDataExchange* pDX)
@@ -57,11 +59,13 @@ void CReportView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TITLE_EDIT, m_titleEdit);
 	DDX_Control(pDX, IDC_PROGRESS_BAR, mc_progressBar);
 	DDX_Control(pDX, IDC_INFO_EDIT, m_infoEdit);
+	DDX_Control(pDX, IDC_VSCROLLBAR, m_vScrollbar);
 }
 
 BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_SIZE()
 	ON_WM_CTLCOLOR()
+	ON_WM_VSCROLL()
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_REPORT_LIST, &CReportView::OnLvnItemchangedReportList)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_REPORT_LIST, &CReportView::OnLvnKeydownReportList)
 
@@ -192,6 +196,40 @@ void CReportView::OnInitialUpdate()
 	m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
 
 	// PocketIE コントロールの初期化
+#ifdef USE_RAN2
+	const int DETAIL_VIEWID = 1000;	// 暫定なのでてきとー
+	if( m_detailView != NULL ){
+		delete m_detailView;
+	}
+
+	// 超暫定
+	int fontHeight = theApp.m_optionMng.GetFontHeight();
+	if( fontHeight == 0 ) {
+		fontHeight = 24;
+	}
+
+	CRect clientRect;
+	this->GetClientRect(clientRect);
+
+	int hTitle  = theApp.GetInfoRegionHeight(fontHeight);	// タイトル領域はフォントサイズ依存
+	const int h1 = theApp.m_optionMng.m_nReportViewListHeightRatio;
+	const int h2 = theApp.m_optionMng.m_nReportViewBodyHeightRatio;
+	int hList   = (clientRect.Height() * h1 / (h1+h2))-hTitle;	// (全体のN%-タイトル領域) をリスト領域とする
+//		int hReport = (clientRect.Height() * h2 / (h1+h2));			// 全体のN%をレポート領域とする
+	int hReport = (clientRect.Height() - ((hTitle*2)+hList));
+
+	int viewWidth = clientRect.Width();
+	int sy = hTitle+hList;
+//	int viewHeight = sy + hReport;
+	int viewHeight = sy + hReport;
+	CRect viewRect(0,sy,viewWidth,viewHeight);
+	m_detailView = new Ran2View();
+	TRACE(TEXT("sy=%d,viewWidth=%d,viewHeight=%d\r\n"),sy,viewWidth,viewHeight);
+
+	m_detailView->Create(TEXT("RAN2WND"),TEXT(""),CS_GLOBALCLASS,viewRect,(CWnd*)this,DETAIL_VIEWID);
+	m_detailView->ChangeViewFont(13);
+	m_detailView->ShowWindow(SW_SHOW);
+#else
 #ifdef WINCE
 	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
 		DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER;
@@ -215,7 +253,8 @@ void CReportView::OnInitialUpdate()
 
 		::SetWindowLong( m_hwndHtml, GWL_ID, 12321);
 	}
-#endif
+#endif	// endif WINCE
+#endif	// endif USE_RAN2
 }
 
 /**
@@ -292,6 +331,25 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
 	}
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
+
+#ifdef USE_RAN2
+	int barWidth = ::GetSystemMetrics(SM_CXVSCROLL);
+//	util::MoveDlgItemWindow(this, IDC_VSCROLLBAR, cx-barWidth, cy - hInfo, cx, hInfo);
+	if( m_vScrollbar ){
+		int barSX = cx - barWidth;
+		m_vScrollbar.SetWindowPos(&wndTopMost,barSX,hTitle+hList,barWidth,hReport,SWP_SHOWWINDOW);
+
+		int detailTotalLines = m_detailView->GetViewLineMax();
+		// スクロールバーが不要な時は隠す
+		if( detailTotalLines + m_scrollBarHeight > m_scrollBarHeight && m_scrollBarHeight > 0 ){
+			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
+			m_vScrollbar.ShowWindow(SW_SHOW);
+		}else{
+			m_vScrollbar.ShowWindow(SW_HIDE);
+		}
+	}
+
+#endif
 
 	// スクロールタイプが「ページ単位」なら再計算
 	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
@@ -534,7 +592,59 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 //		m_edit.SetWindowText(str);	// for debug
 		SetHtmlText(str);
+
 	} else {
+#ifdef USE_RAN2
+		CStringArray* bodyStrArray = new CStringArray();
+		CString str = _T("");
+
+		str += data->GetAuthor();
+		str += _T("　");
+		str += data->GetDate();
+		str += _T("\r\n");
+
+		const int n = data->GetBodySize();
+
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if (!util::CompileRegex( reg, L"(\\[m:[0-9]+?\\])" )) {
+			return;
+		}
+
+		for( int i=0; i<n; i++ ){
+			str += data->GetBody(i);
+			CString lineStr = data->GetBody(i);
+			lineStr.Trim();
+			lineStr.Replace(TEXT("\r\n"),TEXT(""));
+
+			if( lineStr.GetLength() > 1 ){
+				// 絵文字用フィルタ
+				//ViewFilter::ReplaceEmojiCodeToRan2ImageTags( lineStr, theApp.m_emoji );
+				// 文中に[m:で始まる行がある場合は分割する
+				
+				// 文中に存在しない場合
+				if( !reg.exec(lineStr) ){
+					bodyStrArray->Add(lineStr);
+				// 文中に存在する場合
+				}else{
+					do{
+						std::vector<MyRegex::Result>& results = reg.results;
+						CString gaijiLine;
+						const std::wstring& emoji_number = results[1].str;
+						gaijiLine = emoji_number.c_str();
+						bodyStrArray->Add(gaijiLine);
+						lineStr.Delete( 0, results[0].end );
+					}while( reg.exec(lineStr) );
+
+					CString brLine = TEXT("[br]");
+					bodyStrArray->Add(brLine);
+
+				}
+			}
+		}
+
+		str += _T("\r\n");			// 最後に１行入れて見やすくする
+#else
 		CString str = _T("");
 
 		str += data->GetAuthor();
@@ -548,16 +658,37 @@ void CReportView::ShowCommentData(CMixiData* data)
 		}
 
 		str += _T("\r\n");			// 最後に１行入れて見やすくする
+#endif
 
+#ifdef USE_RAN2
+		m_edit.ShowWindow(SW_HIDE);
+		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray);
+		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"),m_scrollBarHeight);
+		m_detailView->DrawDetail(0);
+		m_detailView->Invalidate();
+		bodyStrArray->RemoveAll();
+		delete bodyStrArray;
+
+		int detailTotalLines = m_detailView->GetViewLineMax();
+		// スクロールバーが不要な時は隠す
+		if( detailTotalLines + m_scrollBarHeight > m_scrollBarHeight && m_scrollBarHeight > 0 ){
+			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
+			m_vScrollbar.SetScrollPos(0);
+			m_vScrollbar.ShowWindow(SW_SHOW);
+		}else{
+			m_vScrollbar.ShowWindow(SW_HIDE);
+		}
+#else
 		// 絵文字用フィルタ
 		ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
-
 		m_edit.SetWindowText(str);
 
 		// Win32 の場合は再描画
 #ifndef WINCE
 		m_edit.Invalidate();
-#endif
+#endif	// endif WINCE
+#endif	// endif USE_RAN2
+
 	}
 }
 
@@ -2455,3 +2586,64 @@ void CReportView::OnNMRclickReportList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+
+
+void CReportView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	CString logStr;
+	int newPos = pScrollBar->GetScrollPos();
+	int pageOffset = (m_detailView->GetViewLineMax()-1);
+
+	// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+	if( newPos > m_scrollBarHeight ){
+		return;
+	}
+
+	switch( nSBCode ){
+
+		case SB_THUMBTRACK:	// ノブによる移動は禁止
+			if( nPos < m_scrollBarHeight )
+				newPos = nPos;
+			break;
+
+		case SB_PAGEUP:
+			if( newPos - pageOffset >= 0 )
+				newPos -= pageOffset;
+			else
+				newPos = 0;
+			break;
+
+		case SB_PAGEDOWN:
+			if( newPos + pageOffset <= m_scrollBarHeight )
+				newPos += pageOffset;
+			else
+				newPos = m_scrollBarHeight;
+			break;
+
+		case SB_LINEUP:
+			if( newPos - 1 >= 0 )
+				newPos -= 1;
+			break;
+
+		case SB_LINEDOWN:
+			if( newPos + 1 <= m_scrollBarHeight )
+				newPos += 1;
+			break;
+	}
+
+	// 終了通知以外は位置を再設定する。
+	if( nSBCode != SB_ENDSCROLL ){ 
+		// 暫定でLINEUP/DOWN,PAGEUP/DOWNのみだけ透過
+		if( nSBCode == SB_LINEUP || nSBCode == SB_LINEDOWN ||
+			nSBCode == SB_PAGEUP || nSBCode == SB_PAGEDOWN ||
+			nSBCode == SB_THUMBTRACK ){
+/*			logStr.Format(TEXT("バー位置:%d/%d\r\n"),newPos,scrollBarHeight);
+			OutputDebugString(logStr);
+*/
+			pScrollBar->SetScrollPos(newPos);
+			m_detailView->DrawDetail(newPos);
+		}
+	}else if( nSBCode == SB_ENDSCROLL ){
+	}
+}
+
