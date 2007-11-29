@@ -600,47 +600,55 @@ void CReportView::ShowCommentData(CMixiData* data)
 		str += data->GetDate();
 		str += _T("\r\n");
 
+//		TRACE( L"■---xdump start---\r\n" );
+//		for (int i=0; i<data->GetBodySize(); i++) {
+//			TRACE( L"{%d}%s|\r\n", CString(data->GetBody(i)).GetLength(), data->GetBody(i) );
+//		}
+//		TRACE( L"■---xdump end---\r\n" );
+
+		// 先頭に改行があったりと、色々フォーマットがおかしいので単一の文字列に連結する
 		const int n = data->GetBodySize();
-
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if (!util::CompileRegex( reg, L"(\\[m:[0-9]+?\\])" )) {
-			return;
-		}
-
 		for( int i=0; i<n; i++ ){
 			str += data->GetBody(i);
-			CString lineStr = data->GetBody(i);
-			lineStr.Trim();
-			lineStr.Replace(TEXT("\r\n"),TEXT(""));
-
-			if( lineStr.GetLength() > 1 ){
-				// 絵文字用フィルタ
-				//ViewFilter::ReplaceEmojiCodeToRan2ImageTags( lineStr, theApp.m_emoji );
-				// 文中に[m:で始まる行がある場合は分割する
-				
-				// 文中に存在しない場合
-				if( !reg.exec(lineStr) ){
-					bodyStrArray->Add(lineStr);
-				// 文中に存在する場合
-				}else{
-					do{
-						std::vector<MyRegex::Result>& results = reg.results;
-						CString gaijiLine;
-						const std::wstring& emoji_number = results[1].str;
-						gaijiLine = emoji_number.c_str();
-						bodyStrArray->Add(gaijiLine);
-						lineStr.Delete( 0, results[0].end );
-					}while( reg.exec(lineStr) );
-
-					CString brLine = TEXT("[br]");
-					bodyStrArray->Add(brLine);
-
-				}
-			}
 		}
 
-		str += _T("\r\n");			// 最後に１行入れて見やすくする
+		// 改行分割して追加する
+		for (;;) {
+			int idxCrlf = str.Find( L"\r\n" );
+
+			CString target;
+			if (idxCrlf == -1) {
+				target = str;
+				if (target.IsEmpty()) {
+					break;
+				}
+			} else {
+				target.SetString( str, idxCrlf );
+			}
+
+			if( target.GetLength() == 0 ) {
+				if (idxCrlf != -1) {
+					LPCTSTR brLine = TEXT("[br]");
+					bodyStrArray->Add(brLine);
+				}
+			} else {
+				// 絵文字用フィルタ
+				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray );
+				LPCTSTR brLine = TEXT("[br]");
+				bodyStrArray->Add(brLine);
+			}
+
+			if (idxCrlf == -1) {
+				break;
+			}
+			str.Delete(0, idxCrlf+2);
+		}
+
+//		TRACE( L"■---dump start---\r\n" );
+//		for (int i=0; i<bodyStrArray->GetCount(); i++) {
+//			TRACE( L"{%d}%s|\r\n", bodyStrArray->GetAt(i).GetLength(), bodyStrArray->GetAt(i) );
+//		}
+//		TRACE( L"■---dump end---\r\n" );
 
 		// 描画開始
 		m_edit.ShowWindow(SW_HIDE);

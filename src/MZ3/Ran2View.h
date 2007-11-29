@@ -29,16 +29,38 @@ namespace Ran2ViewEnum
 	//	EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
 	//	FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
 	//	FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
-	const enum ProcessStateEnum { BOL=0, EOL, FBL, FOL, through, error, };
+	const enum ProcessStateEnum { 
+		ProcessState_BOL=0, 
+		ProcessState_EOL, 
+		ProcessState_FBL, 
+		ProcessState_FOL, 
+		ProcessState_through, 
+		ProcessState_error, 
+	};
 
 	// 通常、太字、1/4サイズの定義
-	const enum FontTypeEnum  { normal=0, bold, quarter, };
+	const enum FontTypeEnum {
+		FontType_normal=0, 
+		FontType_bold, 
+		FontType_quarter, 
+	};
 
 	// ワク線の描画種別(nothing:描画しない、open:ワク無し、roof:開始行、follow:継続行、stool:終了行
-	const enum FrameTypeEnum { nothing=-1, open=0, roof, follow, stool, };
+	const enum FrameTypeEnum {
+		FrameType_nothing=-1, 
+		FrameType_open=0, 
+		FrameType_roof, 
+		FrameType_follow, 
+		FrameType_stool, 
+	};
 
 	// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2
-	enum	LinkType { noLink = 0, internal, external, picture, }; 
+	enum LinkType { 
+		LinkType_noLink = 0, 
+		LinkType_internal, 
+		LinkType_external, 
+		LinkType_picture, 
+	};
 };
 
 using namespace Ran2ViewEnum;
@@ -290,7 +312,7 @@ public:
 	void	ChangeFrameProperty(BigBridgeProperty* bigBridgeInfo);
 
 	// 大跨ぎ情報のリセット
-	void	ResetBigBridgeProperty(BigBridgeProperty* bigBridgeInfo,BridgeProperty* bridgeInfo,ProcessStateEnum mode=through,int width=0);
+	void	ResetBigBridgeProperty(BigBridgeProperty* bigBridgeInfo,BridgeProperty* bridgeInfo,ProcessStateEnum mode=ProcessState_through,int width=0);
 
 	// 新行情報の追加
 	void	AddNewRowProperty(CPtrArray* rowPropertyArray,bool forceNewRow=false);
