@@ -108,6 +108,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_OPEN_PROFILE, &CReportView::OnOpenProfile)
 	ON_COMMAND(ID_OPEN_PROFILE_LOG, &CReportView::OnOpenProfileLog)
 	ON_COMMAND(ID_SEND_MESSAGE, &CReportView::OnSendMessage)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -320,6 +321,7 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		// RAN2 の移動
 		if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
 			m_detailView->MoveWindow( 0, hTitle+hList, cx, hReport );
+			ShowCommentData( m_currentData );
 		}
 #else
 		// エディットコントロールの移動
@@ -2685,3 +2687,12 @@ void CReportView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 }
 
+
+void CReportView::OnDestroy()
+{
+	CFormView::OnDestroy();
+
+#ifdef USE_RAN2
+	m_detailView->DestroyWindow();
+#endif
+}
