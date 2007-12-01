@@ -600,12 +600,14 @@ void CReportView::ShowCommentData(CMixiData* data)
 	} else {
 #ifdef USE_RAN2
 		CStringArray* bodyStrArray = new CStringArray();
-		CString str = _T("");
 
-		str += data->GetAuthor();
-		str += _T("　");
-		str += data->GetDate();
-		str += _T("\r\n");
+		// 書体を変更して1行目を描画
+		bodyStrArray->Add(L"[b]");
+		bodyStrArray->Add(L"[blue]");
+		bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
+		bodyStrArray->Add(L"[/b]");
+		bodyStrArray->Add(L"[/blue]");
+		bodyStrArray->Add(L"[br]");
 
 //		TRACE( L"■---xdump start---\r\n" );
 //		for (int i=0; i<data->GetBodySize(); i++) {
@@ -614,6 +616,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 //		TRACE( L"■---xdump end---\r\n" );
 
 		// 先頭に改行があったりと、色々フォーマットがおかしいので単一の文字列に連結する
+		CString str = _T("");
 		const int n = data->GetBodySize();
 		for( int i=0; i<n; i++ ){
 			str += data->GetBody(i);
@@ -650,6 +653,9 @@ void CReportView::ShowCommentData(CMixiData* data)
 			}
 			str.Delete(0, idxCrlf+2);
 		}
+
+		// 最後に１行入れて見やすくする
+		bodyStrArray->Add(_T("[br]"));
 
 //		TRACE( L"■---dump start---\r\n" );
 //		for (int i=0; i<bodyStrArray->GetCount(); i++) {
