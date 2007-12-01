@@ -32,6 +32,8 @@
 <param name="Local" value="20071015204554227.htm">
 <param name="Name" value="設定画面">
 <param name="Local" value="20071015204230561.htm">
+<param name="Name" value="ダウンロードマネージャ">
+<param name="Local" value="2007121172214289.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="画面構成について">
@@ -52,6 +54,10 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="設定画面">
 <param name="Local" value="20071015204230561.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="ダウンロードマネージャ">
+<param name="Local" value="2007121172214289.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="キー操作">
