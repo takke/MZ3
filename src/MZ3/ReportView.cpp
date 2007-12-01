@@ -303,6 +303,12 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	// 情報領域は必要に応じて表示されるため、上記の比率とは関係なくサイズを設定する
 	int hInfo   = theApp.GetInfoRegionHeight(fontHeight);	// 情報領域もフォントサイズ依存
 
+#ifdef USE_RAN2
+	// スクロールバーの幅
+	int barWidth = ::GetSystemMetrics(SM_CXVSCROLL);
+#endif
+
+	// 各コントロールの移動
 	util::MoveDlgItemWindow( this, IDC_TITLE_EDIT,  0, 0,            cx, hTitle  );
 	util::MoveDlgItemWindow( this, IDC_REPORT_LIST, 0, hTitle,       cx, hList   );
 	if (theApp.m_optionMng.m_bRenderByIE) {
@@ -320,7 +326,8 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 #ifdef USE_RAN2
 		// RAN2 の移動
 		if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
-			m_detailView->MoveWindow( 0, hTitle+hList, cx, hReport );
+			int wRan2 = cx - barWidth;
+			m_detailView->MoveWindow( 0, hTitle+hList, wRan2, hReport );
 			ShowCommentData( m_currentData );
 		}
 #else
@@ -331,24 +338,21 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
 
 	// スクロールバー調整
-#ifdef USE_RAN2
-	int barWidth = ::GetSystemMetrics(SM_CXVSCROLL);
 //	util::MoveDlgItemWindow(this, IDC_VSCROLLBAR, cx-barWidth, cy - hInfo, cx, hInfo);
 	if( m_vScrollbar ){
 		int barSX = cx - barWidth;
-		m_vScrollbar.SetWindowPos(&wndTopMost,barSX,hTitle+hList,barWidth,hReport,SWP_SHOWWINDOW);
+		util::MoveDlgItemWindow(this, IDC_VSCROLLBAR, cx-barWidth, hTitle+hList, barWidth, hReport);
+		m_vScrollbar.SetWindowPos( &wndTopMost, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
 
 		int detailTotalLines = m_detailView->GetViewLineMax();
 		// スクロールバーが不要な時は隠す
-		if( detailTotalLines + m_scrollBarHeight > m_scrollBarHeight && m_scrollBarHeight > 0 ){
+		if( detailTotalLines > 0 && m_scrollBarHeight > 0 ){
 			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
 			m_vScrollbar.ShowWindow(SW_SHOW);
 		}else{
 			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 	}
-
-#endif
 
 	// スクロールタイプが「ページ単位」なら再計算
 	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
@@ -663,7 +667,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 		int detailTotalLines = m_detailView->GetViewLineMax();
 		// スクロールバーが不要な時は隠す
-		if( detailTotalLines + m_scrollBarHeight > m_scrollBarHeight && m_scrollBarHeight > 0 ){
+		if( detailTotalLines > 0 && m_scrollBarHeight > 0 ){
 			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
 			m_vScrollbar.SetScrollPos(0);
 			m_vScrollbar.ShowWindow(SW_SHOW);
