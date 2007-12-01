@@ -36,6 +36,7 @@ CReportView::CReportView()
 	: CFormView(CReportView::IDD)
 	, m_nKeydownRepeatCount(0)
 	, m_hwndHtml(NULL)
+	, m_currentData(NULL)
 {
 	m_imageState = FALSE;
 	m_posHtmlScroll = 0;
