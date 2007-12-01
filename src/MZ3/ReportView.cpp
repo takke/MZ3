@@ -602,11 +602,11 @@ void CReportView::ShowCommentData(CMixiData* data)
 		CStringArray* bodyStrArray = new CStringArray();
 
 		// 書体を変更して1行目を描画
-		bodyStrArray->Add(L"[b]");
+//		bodyStrArray->Add(L"[b]");
 		bodyStrArray->Add(L"[blue]");
 		bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
-		bodyStrArray->Add(L"[/b]");
 		bodyStrArray->Add(L"[/blue]");
+//		bodyStrArray->Add(L"[/b]");
 		bodyStrArray->Add(L"[br]");
 
 //		TRACE( L"■---xdump start---\r\n" );
@@ -679,6 +679,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 			m_vScrollbar.SetScrollPos(0);
 			m_vScrollbar.ShowWindow(SW_SHOW);
 		}else{
+			m_vScrollbar.SetScrollPos(0);
 			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 #else
@@ -837,11 +838,22 @@ BOOL CReportView::CommandScrollUpEdit()
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
 #endif
 	} else {
-		m_edit.LineScroll( -m_scrollLine );
+#ifdef USE_RAN2
+		int newPos = m_vScrollbar.GetScrollPos();
+		if( newPos -1 >= 0 )
+			newPos -= 1;
 
-		// Win32 の場合は再描画
-#ifndef WINCE
-//		m_edit.Invalidate();
+		m_vScrollbar.SetScrollPos(newPos);
+		m_detailView->DrawDetail(newPos);
+#else
+		SCROLLINFO si;
+		m_edit.GetScrollInfo( SB_VERT, &si );
+		if (si.nPos > si.nMin) {
+			m_edit.LineScroll( -m_scrollLine );
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 #endif
 	}
 	return TRUE;
@@ -859,11 +871,22 @@ BOOL CReportView::CommandScrollDownEdit()
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
 #endif
 	} else {
-		m_edit.LineScroll( m_scrollLine );
+#ifdef USE_RAN2
+		int newPos = m_vScrollbar.GetScrollPos();
+		if( newPos + 1 <= m_scrollBarHeight )
+			newPos += 1;
 
-		// Win32 の場合は再描画
-#ifndef WINCE
-//		m_edit.Invalidate();
+		m_vScrollbar.SetScrollPos(newPos);
+		m_detailView->DrawDetail(newPos);
+#else
+		SCROLLINFO si;
+		m_edit.GetScrollInfo( SB_VERT, &si );
+		if (si.nPos+si.nPage <= (UINT)si.nMax) {
+			m_edit.LineScroll( m_scrollLine );
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 #endif
 	}
 	return TRUE;
@@ -965,11 +988,20 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 								return CommandScrollUpEdit();
 							}
 						} else {
-							SCROLLINFO si;
-							m_edit.GetScrollInfo( SB_VERT, &si );
-							if (si.nPos > si.nMin) {
-								return CommandScrollUpEdit();
+#ifdef USE_RAN2
+							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+							int newPos = m_vScrollbar.GetScrollPos();
+							if( newPos <= 0 ){
+								// レポートビューへフォーカスを移して次レコードへGo!
+								return CommandMoveUpList();
 							}
+
+							return CommandScrollUpEdit();
+#else
+							if (CommandScrollUpEdit()) {
+								return TRUE;
+							}
+#endif
 						}
 					}
 
@@ -996,11 +1028,20 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 								return CommandScrollDownEdit();
 							}
 						} else {
-							SCROLLINFO si;
-							m_edit.GetScrollInfo( SB_VERT, &si );
-							if (si.nPos+si.nPage <= (UINT)si.nMax) {
-								return CommandScrollDownEdit();
+#ifdef USE_RAN2
+							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+							int newPos = m_vScrollbar.GetScrollPos();
+							if( newPos >= m_scrollBarHeight ){
+								// レポートビューへフォーカスを移して次レコードへGo!
+								return CommandMoveDownList();
 							}
+
+							return CommandScrollDownEdit();
+#else
+							if (CommandScrollDownEdit()) {
+								return TRUE;
+							}
+#endif
 						}
 					}
 
@@ -1048,11 +1089,20 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 								return CommandScrollUpEdit();
 							}
 						} else {
-							SCROLLINFO si;
-							m_edit.GetScrollInfo( SB_VERT, &si );
-							if (si.nPos > si.nMin) {
-								return CommandScrollUpEdit();
+#ifdef USE_RAN2
+							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+							int newPos = m_vScrollbar.GetScrollPos();
+							if( newPos <= 0 ){
+								// レポートビューへフォーカスを移して次レコードへGo!
+								return CommandMoveUpList();
 							}
+
+							return CommandScrollUpEdit();
+#else
+							if (CommandScrollUpEdit()) {
+								return TRUE;
+							}
+#endif
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1075,11 +1125,20 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 								return CommandScrollDownEdit();
 							}
 						} else {
-							SCROLLINFO si;
-							m_edit.GetScrollInfo( SB_VERT, &si );
-							if (si.nPos+si.nPage <= (UINT)si.nMax) {
-								return CommandScrollDownEdit();
+#ifdef USE_RAN2
+							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+							int newPos = m_vScrollbar.GetScrollPos();
+							if( newPos >= m_scrollBarHeight ){
+								// レポートビューへフォーカスを移して次レコードへGo!
+								return CommandMoveDownList();
 							}
+
+							return CommandScrollDownEdit();
+#else
+							if (CommandScrollDownEdit()) {
+								return TRUE;
+							}
+#endif
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1092,10 +1151,6 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 	} else {
 		// Xcrawl オプション無効時の処理
 		if (pMsg->hwnd == m_list.m_hWnd) {
-#ifdef USE_RAN2
-			int newPos = m_vScrollbar.GetScrollPos();
-			int pageOffset = (m_detailView->GetViewLineMax()-1);
-#endif
 			// リストでのキー押下イベント
 			switch(pMsg->wParam) {
 			case VK_UP:
@@ -1108,22 +1163,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					} else {
 #ifdef USE_RAN2
 						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+						int newPos = m_vScrollbar.GetScrollPos();
 						if( newPos <= 0 ){
 							// レポートビューへフォーカスを移して次レコードへGo!
 							return CommandMoveUpList();
 						}
 
-						if( newPos - 1 >= 0 )
-							newPos -= 1;
-
-						m_vScrollbar.SetScrollPos(newPos);
-						m_detailView->DrawDetail(newPos);
-						return TRUE;
+						return CommandScrollUpEdit();
 #else
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos > si.nMin) {
-							return CommandScrollUpEdit();
+						if (CommandScrollUpEdit()) {
+							return TRUE;
 						}
 #endif
 					}
@@ -1152,22 +1201,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					} else {
 #ifdef USE_RAN2
 						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
+						int newPos = m_vScrollbar.GetScrollPos();
 						if( newPos >= m_scrollBarHeight ){
 							// レポートビューへフォーカスを移して次レコードへGo!
 							return CommandMoveDownList();
 						}
 
-						if( newPos + 1 <= m_scrollBarHeight )
-							newPos += 1;
-
-						m_vScrollbar.SetScrollPos(newPos);
-						m_detailView->DrawDetail(newPos);
-						return TRUE;
+						return CommandScrollDownEdit();
 #else
-						SCROLLINFO si;
-						m_edit.GetScrollInfo( SB_VERT, &si );
-						if (si.nPos+si.nPage <= (UINT)si.nMax) {
-							return CommandScrollDownEdit();
+						if (CommandScrollDownEdit()) {
+							return TRUE;
 						}
 #endif
 					}
