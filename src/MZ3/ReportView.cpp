@@ -110,6 +110,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_OPEN_PROFILE_LOG, &CReportView::OnOpenProfileLog)
 	ON_COMMAND(ID_SEND_MESSAGE, &CReportView::OnSendMessage)
 	ON_WM_DESTROY()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
@@ -2706,4 +2708,30 @@ void CReportView::OnDestroy()
 #ifdef USE_RAN2
 	m_detailView->DestroyWindow();
 #endif
+}
+
+void CReportView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+#ifdef USE_RAN2
+//	if (GetFocus() == m_detailView) {
+		// スクロール確定。
+		// スクロールバーの位置を変更。
+		m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
+//	}
+#endif
+
+	CFormView::OnLButtonUp(nFlags, point);
+}
+
+void CReportView::OnMouseMove(UINT nFlags, CPoint point)
+{
+#ifdef USE_RAN2
+//	if (GetFocus() == m_detailView) {
+		// スクロール確定。
+		// スクロールバーの位置を変更。
+		m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
+//	}
+#endif
+
+	CFormView::OnMouseMove(nFlags, point);
 }

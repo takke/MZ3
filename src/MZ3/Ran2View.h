@@ -273,7 +273,12 @@ class Ran2View : public CWnd
 	int			viewLineMax;				// 現在のフォントで行表示可能な数
 	COLORREF	normalBkColor,reverseBkColor;	// 通常時背景色と反転時背景色
 	COLORREF	normalTextColor,reverseTextColor,markTextColor;	// 通常時文字色、反転時文字色、特殊マーク色
-	int			drawOffsetLine;					// 現在描画を行っている行位置
+	int			drawOffsetLine;				// 現在描画を行っている行位置
+
+	// ドラッグ関連情報
+	bool		m_bDragging;				// マウスドラッグ中
+	CPoint		m_ptDragStart;				// ドラッグ開始位置
+	int			m_dragStartLine;			// ドラッグ開始時の行番号
 
 	MainInfo*	parsedRecord;
 

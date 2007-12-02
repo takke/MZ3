@@ -151,6 +151,8 @@ public:
 	afx_msg void OnOpenProfileLog();
 	afx_msg void OnSendMessage();
 	afx_msg void OnDestroy();
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 
