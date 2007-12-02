@@ -994,6 +994,14 @@ IDR_TOOLBAR_WIN32       BITMAP                  "res\\toolbar_win32.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Cursor
+//
+
+IDC_GRABBABLE_CURSOR    CURSOR                  "res\\grabbable_cursor.cur"
+IDC_GRABBING_CURSOR     CURSOR                  "res\\grabbing_cursor.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 

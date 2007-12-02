@@ -41,6 +41,8 @@
 #define IDD_DIALOG1                     160
 #define IDD_MINI_IMAGE_DIALOG           160
 #define IDI_DOWNLOADED_ICON             160
+#define IDC_GRABBABLE_CURSOR            162
+#define IDC_GRABBING_CURSOR             163
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -363,7 +365,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        162
+#define _APS_NEXT_RESOURCE_VALUE        164
 #define _APS_NEXT_COMMAND_VALUE         34005
 #define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           117

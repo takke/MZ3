@@ -2477,6 +2477,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\grabbable_cursor.cur"
+				>
+			</File>
+			<File
+				RelativePath=".\res\grabbing_cursor.cur"
+				>
+			</File>
+			<File
 				RelativePath=".\res\MZ3.ico"
 				>
 			</File>
