@@ -854,8 +854,10 @@ BOOL CReportView::CommandScrollUpEdit()
 	} else {
 #ifdef USE_RAN2
 		int pos = m_vScrollbar.GetScrollPos();
-		if( pos -1 >= 0 )
-			pos -= 1;
+		if( pos <= 0 ) {
+			return FALSE;
+		}
+		pos -= 1;
 
 		m_vScrollbar.SetScrollPos(pos);
 		m_detailView->DrawDetail(pos);
@@ -887,8 +889,10 @@ BOOL CReportView::CommandScrollDownEdit()
 	} else {
 #ifdef USE_RAN2
 		int pos = m_vScrollbar.GetScrollPos();
-		if( pos +1 <= m_scrollBarHeight )
-			pos += 1;
+		if( pos >= m_scrollBarHeight ){
+			return FALSE;
+		}
+		pos += 1;
 
 		m_vScrollbar.SetScrollPos(pos);
 		m_detailView->DrawDetail(pos);
@@ -1002,16 +1006,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 								return CommandScrollUpEdit();
 							}
 						} else {
-#ifdef USE_RAN2
-							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							if( m_vScrollbar.GetScrollPos() > 0 ){
-								return CommandScrollUpEdit();
-							}
-#else
 							if (CommandScrollUpEdit()) {
 								return TRUE;
 							}
-#endif
 						}
 					}
 
@@ -1038,16 +1035,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 								return CommandScrollDownEdit();
 							}
 						} else {
-#ifdef USE_RAN2
-							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
-								return CommandScrollDownEdit();
-							}
-#else
 							if (CommandScrollDownEdit()) {
 								return TRUE;
 							}
-#endif
 						}
 					}
 
@@ -1095,16 +1085,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 								return CommandScrollUpEdit();
 							}
 						} else {
-#ifdef USE_RAN2
-							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							if( m_vScrollbar.GetScrollPos() > 0 ){
-								return CommandScrollUpEdit();
-							}
-#else
 							if (CommandScrollUpEdit()) {
 								return TRUE;
 							}
-#endif
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1127,16 +1110,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 								return CommandScrollDownEdit();
 							}
 						} else {
-#ifdef USE_RAN2
-							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
-								return CommandScrollDownEdit();
-							}
-#else
 							if (CommandScrollDownEdit()) {
 								return TRUE;
 							}
-#endif
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1159,16 +1135,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 							return CommandScrollUpEdit();
 						}
 					} else {
-#ifdef USE_RAN2
-						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-						if( m_vScrollbar.GetScrollPos() > 0 ){
-							return CommandScrollUpEdit();
-						}
-#else
 						if (CommandScrollUpEdit()) {
 							return TRUE;
 						}
-#endif
 					}
 				}
 
@@ -1193,16 +1162,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 							return CommandScrollDownEdit();
 						}
 					} else {
-#ifdef USE_RAN2
-						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-						if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
-							return CommandScrollDownEdit();
-						}
-#else
 						if (CommandScrollDownEdit()) {
 							return TRUE;
 						}
-#endif
 					}
 				}
 
