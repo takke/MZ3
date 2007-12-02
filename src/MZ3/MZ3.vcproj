@@ -1127,10 +1127,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
-				FavorSizeOrSpeed="1"
+				FavorSizeOrSpeed="2"
 				WholeProgramOptimization="false"
 				PreprocessorDefinitions="NDEBUG;USE_RAN2"
 				StringPooling="true"
