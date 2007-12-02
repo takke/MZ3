@@ -343,12 +343,20 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	if( m_vScrollbar ){
 		int barSX = cx - barWidth;
 		util::MoveDlgItemWindow(this, IDC_VSCROLLBAR, cx-barWidth, hTitle+hList, barWidth, hReport);
-		m_vScrollbar.SetWindowPos( &wndTopMost, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
+		m_vScrollbar.SetWindowPos( m_detailView, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
 
-		int detailTotalLines = m_detailView->GetViewLineMax();
 		// スクロールバーが不要な時は隠す
-		if( detailTotalLines > 0 && m_scrollBarHeight > 0 ){
-			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
+		int viewLineCount = m_detailView->GetViewLineMax();
+		int allLineCount  = m_detailView->GetAllLineCount();
+		SCROLLINFO si;
+		si.cbSize = sizeof(SCROLLINFO);
+		si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+		si.nMin  = 0;
+		si.nMax  = allLineCount-1;
+		si.nPage = viewLineCount;
+		si.nPos  = 0;
+		m_vScrollbar.SetScrollInfo(&si, TRUE);
+		if( allLineCount-viewLineCount > 0 ) {
 			m_vScrollbar.ShowWindow(SW_SHOW);
 		}else{
 			m_vScrollbar.ShowWindow(SW_HIDE);
@@ -666,20 +674,26 @@ void CReportView::ShowCommentData(CMixiData* data)
 		// 描画開始
 		m_edit.ShowWindow(SW_HIDE);
 		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray);
-		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"),m_scrollBarHeight);
+		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
 		m_detailView->DrawDetail(0);
 		m_detailView->Invalidate();
 		bodyStrArray->RemoveAll();
 		delete bodyStrArray;
 
-		int detailTotalLines = m_detailView->GetViewLineMax();
 		// スクロールバーが不要な時は隠す
-		if( detailTotalLines > 0 && m_scrollBarHeight > 0 ){
-			m_vScrollbar.SetScrollRange(0,m_scrollBarHeight);
-			m_vScrollbar.SetScrollPos(0);
+		int viewLineCount = m_detailView->GetViewLineMax();
+		int allLineCount  = m_detailView->GetAllLineCount();
+		SCROLLINFO si;
+		si.cbSize = sizeof(SCROLLINFO);
+		si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+		si.nMin  = 0;
+		si.nMax  = allLineCount-1;
+		si.nPage = viewLineCount;
+		si.nPos  = 0;
+		m_vScrollbar.SetScrollInfo(&si, TRUE);
+		if( allLineCount-viewLineCount > 0 ) {
 			m_vScrollbar.ShowWindow(SW_SHOW);
 		}else{
-			m_vScrollbar.SetScrollPos(0);
 			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 #else
@@ -839,12 +853,12 @@ BOOL CReportView::CommandScrollUpEdit()
 #endif
 	} else {
 #ifdef USE_RAN2
-		int newPos = m_vScrollbar.GetScrollPos();
-		if( newPos -1 >= 0 )
-			newPos -= 1;
+		int pos = m_vScrollbar.GetScrollPos();
+		if( pos -1 >= 0 )
+			pos -= 1;
 
-		m_vScrollbar.SetScrollPos(newPos);
-		m_detailView->DrawDetail(newPos);
+		m_vScrollbar.SetScrollPos(pos);
+		m_detailView->DrawDetail(pos);
 #else
 		SCROLLINFO si;
 		m_edit.GetScrollInfo( SB_VERT, &si );
@@ -872,12 +886,12 @@ BOOL CReportView::CommandScrollDownEdit()
 #endif
 	} else {
 #ifdef USE_RAN2
-		int newPos = m_vScrollbar.GetScrollPos();
-		if( newPos + 1 <= m_scrollBarHeight )
-			newPos += 1;
+		int pos = m_vScrollbar.GetScrollPos();
+		if( pos +1 <= m_scrollBarHeight )
+			pos += 1;
 
-		m_vScrollbar.SetScrollPos(newPos);
-		m_detailView->DrawDetail(newPos);
+		m_vScrollbar.SetScrollPos(pos);
+		m_detailView->DrawDetail(pos);
 #else
 		SCROLLINFO si;
 		m_edit.GetScrollInfo( SB_VERT, &si );
@@ -990,13 +1004,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 						} else {
 #ifdef USE_RAN2
 							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							int newPos = m_vScrollbar.GetScrollPos();
-							if( newPos <= 0 ){
-								// レポートビューへフォーカスを移して次レコードへGo!
-								return CommandMoveUpList();
+							if( m_vScrollbar.GetScrollPos() > 0 ){
+								return CommandScrollUpEdit();
 							}
-
-							return CommandScrollUpEdit();
 #else
 							if (CommandScrollUpEdit()) {
 								return TRUE;
@@ -1030,13 +1040,9 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 						} else {
 #ifdef USE_RAN2
 							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							int newPos = m_vScrollbar.GetScrollPos();
-							if( newPos >= m_scrollBarHeight ){
-								// レポートビューへフォーカスを移して次レコードへGo!
-								return CommandMoveDownList();
+							if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
+								return CommandScrollDownEdit();
 							}
-
-							return CommandScrollDownEdit();
 #else
 							if (CommandScrollDownEdit()) {
 								return TRUE;
@@ -1091,13 +1097,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 						} else {
 #ifdef USE_RAN2
 							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							int newPos = m_vScrollbar.GetScrollPos();
-							if( newPos <= 0 ){
-								// レポートビューへフォーカスを移して次レコードへGo!
-								return CommandMoveUpList();
+							if( m_vScrollbar.GetScrollPos() > 0 ){
+								return CommandScrollUpEdit();
 							}
-
-							return CommandScrollUpEdit();
 #else
 							if (CommandScrollUpEdit()) {
 								return TRUE;
@@ -1127,13 +1129,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 						} else {
 #ifdef USE_RAN2
 							// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-							int newPos = m_vScrollbar.GetScrollPos();
-							if( newPos >= m_scrollBarHeight ){
-								// レポートビューへフォーカスを移して次レコードへGo!
-								return CommandMoveDownList();
+							if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
+								return CommandScrollDownEdit();
 							}
-
-							return CommandScrollDownEdit();
 #else
 							if (CommandScrollDownEdit()) {
 								return TRUE;
@@ -1163,13 +1161,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					} else {
 #ifdef USE_RAN2
 						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-						int newPos = m_vScrollbar.GetScrollPos();
-						if( newPos <= 0 ){
-							// レポートビューへフォーカスを移して次レコードへGo!
-							return CommandMoveUpList();
+						if( m_vScrollbar.GetScrollPos() > 0 ){
+							return CommandScrollUpEdit();
 						}
-
-						return CommandScrollUpEdit();
 #else
 						if (CommandScrollUpEdit()) {
 							return TRUE;
@@ -1201,13 +1195,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					} else {
 #ifdef USE_RAN2
 						// スクルールバーの位置が行数を越えるなら無条件で処理を中断
-						int newPos = m_vScrollbar.GetScrollPos();
-						if( newPos >= m_scrollBarHeight ){
-							// レポートビューへフォーカスを移して次レコードへGo!
-							return CommandMoveDownList();
+						if( m_vScrollbar.GetScrollPos() < m_scrollBarHeight ){
+							return CommandScrollDownEdit();
 						}
-
-						return CommandScrollDownEdit();
 #else
 						if (CommandScrollDownEdit()) {
 							return TRUE;

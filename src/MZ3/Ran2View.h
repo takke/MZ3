@@ -284,8 +284,13 @@ class Ran2View : public CWnd
 public:
 	Ran2View();
 	virtual ~Ran2View();
-	int GetViewLineMax(){ return(viewLineMax); }
-	void PurgeMainRecord();	// mainRecordの破棄
+
+	// 1画面で表示可能な行数
+	int		GetViewLineMax() { return(viewLineMax); }
+	// 全行数
+	int		GetAllLineCount() { return parsedRecord->rowInfo->GetSize(); }
+
+	void	PurgeMainRecord();	// mainRecordの破棄
 
 	// クラス登録
 	static BOOL RegisterWndClass(HINSTANCE hInstance);
