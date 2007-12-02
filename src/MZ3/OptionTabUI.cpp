@@ -6,6 +6,8 @@
 #include "OptionTabUI.h"
 #include "util.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
+
 // COptionTabUI ダイアログ
 
 IMPLEMENT_DYNAMIC(COptionTabUI, CPropertyPage)
@@ -76,3 +78,5 @@ void COptionTabUI::OnOK()
 
 	CPropertyPage::OnOK();
 }
+
+#endif

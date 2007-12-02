@@ -5,6 +5,7 @@
 #include "MZ3.h"
 #include "OptionSheet.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionSheet
 
@@ -52,3 +53,5 @@ void COptionSheet::OnDestroy()
 
 	CPropertySheet::OnDestroy();
 }
+
+#endif

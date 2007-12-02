@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionTabMainView ダイアログ
 
@@ -26,3 +27,5 @@ public:
 	afx_msg void OnBnClickedShowMiniImageCheck();
 	void UpdateControlItemStatus(void);
 };
+
+#endif

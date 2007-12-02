@@ -7,6 +7,8 @@
 #include "ReportView.h"
 #include "util.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
+
 // COptionTabGeneral ダイアログ
 
 IMPLEMENT_DYNAMIC(COptionTabGeneral, CPropertyPage)
@@ -68,3 +70,5 @@ void COptionTabGeneral::OnOK()
 
 	CPropertyPage::OnOK();
 }
+
+#endif

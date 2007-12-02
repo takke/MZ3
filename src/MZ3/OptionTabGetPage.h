@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionTabGetPage ダイアログ
 
@@ -29,3 +30,5 @@ private:
 
 	CComboBox mc_RecvBufCombo;
 };
+
+#endif

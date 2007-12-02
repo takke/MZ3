@@ -210,7 +210,9 @@ void CReportView::OnInitialUpdate()
 	m_detailView = new Ran2View();
 //	TRACE(TEXT("sy=%d,viewWidth=%d,viewHeight=%d\r\n"),sy,viewWidth,viewHeight);
 
+	MZ3LOGGER_INFO(L"らんらんビュー初期化開始");
 	m_detailView->Create(TEXT("RAN2WND"),TEXT(""),CS_GLOBALCLASS,viewRect,(CWnd*)this,DETAIL_VIEWID);
+	MZ3LOGGER_INFO(L"らんらんビュー初期化完了(1/2)");
 
 	// 超暫定
 	int fontHeight = theApp.m_optionMng.GetFontHeight();
@@ -220,6 +222,7 @@ void CReportView::OnInitialUpdate()
 //	m_detailView->ChangeViewFont(13);
 	m_detailView->ChangeViewFont(fontHeight);
 	m_detailView->ShowWindow(SW_SHOW);
+	MZ3LOGGER_INFO(L"らんらんビュー初期化完了(2/2)");
 #else
 #ifdef WINCE
 	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
@@ -553,6 +556,10 @@ void CReportView::ShowParentData(CMixiData* data)
  */
 void CReportView::ShowCommentData(CMixiData* data)
 {
+	if (data==NULL) {
+		return;
+	}
+
 	if (theApp.m_optionMng.m_bRenderByIE) {
 		const int n = data->GetBodySize();
 
@@ -2646,7 +2653,7 @@ void CReportView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	switch( nSBCode ){
 
 		case SB_THUMBTRACK:	// ノブによる移動は禁止
-			if( nPos < m_scrollBarHeight )
+			if( (int)nPos < m_scrollBarHeight )
 				newPos = nPos;
 			break;
 

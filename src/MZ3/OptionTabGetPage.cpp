@@ -6,6 +6,7 @@
 #include "util.h"
 #include "OptionTabGetPage.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionTabGetPage ダイアログ
 
@@ -150,3 +151,5 @@ void COptionTabGetPage::Save()
 	GetDlgItemText( IDC_INTERVAL_CHECK_SEC_EDIT, buf );
 	theApp.m_optionMng.m_nIntervalCheckSec = option::Option::normalizeIntervalCheckSec( _wtoi( buf ) );
 }
+
+#endif

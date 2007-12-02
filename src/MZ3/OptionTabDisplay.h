@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef SMARTPHONE2003_UI_MODEL
+
 // COptionTabDisplay ダイアログ
 
 class COptionTabDisplay : public CPropertyPage
@@ -24,3 +26,5 @@ public:
 	afx_msg void OnBnClickedResetTabButton();
 	afx_msg void OnBnClickedSelectFontButton();
 };
+
+#endif

@@ -444,6 +444,7 @@ void CMainFrame::OnSettingGeneral()
 			L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
 			L"お手数ですが、mz3.ini を直接編集してください" );
 	} else {
+#ifndef SMARTPHONE2003_UI_MODEL
 		static int s_iLastActivePage = 1;
 
 		COptionSheet cPropSht( _T("オプション"));
@@ -470,6 +471,7 @@ void CMainFrame::OnSettingGeneral()
 
 		// アクティブページのインデックスを保存しておく
 		s_iLastActivePage = cPropSht.m_iLastPage;
+#endif
 	}
 }
 

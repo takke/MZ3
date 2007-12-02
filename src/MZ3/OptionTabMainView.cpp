@@ -5,6 +5,7 @@
 #include "MZ3.h"
 #include "OptionTabMainView.h"
 
+#ifndef SMARTPHONE2003_UI_MODEL
 
 // COptionTabMainView ダイアログ
 
@@ -146,3 +147,5 @@ void COptionTabMainView::UpdateControlItemStatus(void)
 	}
 #endif
 }
+
+#endif

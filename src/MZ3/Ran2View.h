@@ -288,7 +288,14 @@ public:
 	// 1画面で表示可能な行数
 	int		GetViewLineMax() { return(viewLineMax); }
 	// 全行数
-	int		GetAllLineCount() { return parsedRecord->rowInfo->GetSize(); }
+	int		GetAllLineCount() {
+		if (parsedRecord != NULL &&
+			parsedRecord->rowInfo != NULL)
+		{
+			return parsedRecord->rowInfo->GetSize();
+		}
+		return 0;
+	}
 
 	void	PurgeMainRecord();	// mainRecordの破棄
 

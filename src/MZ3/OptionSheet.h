@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef SMARTPHONE2003_UI_MODEL
+
 #include "OptionTabProxy.h"
 #include "OptionTabGetPage.h"
 #include "OptionTabGeneral.h"
@@ -38,3 +40,5 @@ public:
 	afx_msg void OnDestroy();
 	int m_iLastPage;
 };
+
+#endif
