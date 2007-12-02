@@ -571,30 +571,7 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	int hInfo     = theApp.GetInfoRegionHeight(fontHeight);
 
 	// グループタブ
-	int hGroup    = fontHeight -2;				// デフォルト値
-#ifdef WINCE
-	switch( theApp.GetDisplayMode() ) {
-	case SR_VGA:
-		if( theApp.GetDPI() > 96 ) {
-			// VGA かつ非RealVGA環境
-			hGroup    = fontHeight +12;
-		}else{
-			// VGA かつRealVGA環境
-			hGroup    = fontHeight + 8;
-		}
-		break;
-
-	case SR_QVGA:
-		if( theApp.m_bSmartphone ) {
-			// Smartphone/Standard Edition 環境
-			hGroup    = fontHeight + 8;
-		}
-		break;
-	}
-#else
-	// for win32
-	hGroup = fontHeight + 12;
-#endif
+	int hGroup    = theApp.GetTabHeight(fontHeight);
 
 	// カテゴリ、ボディリストの領域を % で指定
 	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）

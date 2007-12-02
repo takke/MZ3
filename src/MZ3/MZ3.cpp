@@ -699,16 +699,55 @@ int CMZ3App::GetInfoRegionHeight( int fontHeight )
 			return fontHeight +6;
 		}
 		break;
+
+	case SR_QVGA:
 	default:
 		// VGA 以外
 		if (m_bSmartphone) {
+			// Smartphone/Standard Edition 環境
+			// X02HT での検証結果を受けて下記の値を設定。
 			return fontHeight +6;
 		} else {
-			return fontHeight -4;
+			return fontHeight +6;
+//			return fontHeight -4;
 		}
 	}
 #else
 	return fontHeight +6*2;
+#endif
+}
+
+/**
+ * タブの高さをフォントの高さをベースに計算する
+ */
+int CMZ3App::GetTabHeight( int fontHeight )
+{
+#ifdef WINCE
+	switch( theApp.GetDisplayMode() ) {
+	case SR_VGA:
+		if( theApp.GetDPI() > 96 ) {
+			// VGA かつ非RealVGA環境
+			return fontHeight + 6*2;
+		}else{
+			// VGA かつRealVGA環境
+			return fontHeight + 8;
+		}
+		break;
+
+	case SR_QVGA:
+	default:
+		// VGA 以外
+		if( theApp.m_bSmartphone ) {
+			// Smartphone/Standard Edition 環境
+			return fontHeight +8;
+		} else {
+			return fontHeight +8;
+//			return fontHeight -2;
+		}
+	}
+#else
+	// for win32
+	return fontHeight + 6*2;
 #endif
 }
 

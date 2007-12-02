@@ -164,6 +164,7 @@ public:
 	ScreenResolution GetDisplayMode() { return m_currentDisplayMode; }
 	DWORD GetDPI() { return m_dpi; }
 	int GetInfoRegionHeight( int fontHeight );
+	int GetTabHeight( int fontHeight );
 
 	bool LoadSkinSetting();
 	void InitPlatformFlags();
