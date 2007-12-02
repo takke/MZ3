@@ -4,6 +4,8 @@
 //#pragma once
 //#include "DIBSectionLite.h"
 
+namespace Ran2 {
+
 const int framePixel = 1;					// ワク線の太さ(ピクセル数)
 const int lineVirtualHeightPixel = 3;		// 仮想行間の太さ
 const int charInfoBlockSize = 64;	// 行情報に踏めることのできる文字修飾情報の最大要素数
@@ -22,48 +24,43 @@ public:
 };
 
 
-namespace Ran2ViewEnum
-{
-	// SetRowPropertyが返す処理中の状態
-	//	BOL:(BeginOfLine)	開始タグ。新行の作成が必要。
-	//	EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
-	//	FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
-	//	FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
-	const enum ProcessStateEnum { 
-		ProcessState_BOL=0, 
-		ProcessState_EOL, 
-		ProcessState_FBL, 
-		ProcessState_FOL, 
-		ProcessState_through, 
-		ProcessState_error, 
-	};
-
-	// 通常、太字、1/4サイズの定義
-	const enum FontTypeEnum {
-		FontType_normal=0, 
-		FontType_bold, 
-		FontType_quarter, 
-	};
-
-	// ワク線の描画種別(nothing:描画しない、open:ワク無し、roof:開始行、follow:継続行、stool:終了行
-	const enum FrameTypeEnum {
-		FrameType_nothing=-1, 
-		FrameType_open=0, 
-		FrameType_roof, 
-		FrameType_follow, 
-		FrameType_stool, 
-	};
-
-	// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2
-	enum LinkType { 
-		LinkType_noLink = 0, 
-		LinkType_internal, 
-		LinkType_external, 
-		LinkType_picture, 
-	};
+// SetRowPropertyが返す処理中の状態
+//	BOL:(BeginOfLine)	開始タグ。新行の作成が必要。
+//	EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
+//	FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
+//	FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
+const enum ProcessStateEnum { 
+	ProcessState_BOL=0, 
+	ProcessState_EOL, 
+	ProcessState_FBL, 
+	ProcessState_FOL, 
+	ProcessState_through, 
+	ProcessState_error, 
 };
 
-using namespace Ran2ViewEnum;
+// 通常、太字、1/4サイズの定義
+const enum FontTypeEnum {
+	FontType_normal=0, 
+	FontType_bold, 
+	FontType_quarter, 
+};
+
+// ワク線の描画種別(nothing:描画しない、open:ワク無し、roof:開始行、follow:継続行、stool:終了行
+const enum FrameTypeEnum {
+	FrameType_nothing=-1, 
+	FrameType_open=0, 
+	FrameType_roof, 
+	FrameType_follow, 
+	FrameType_stool, 
+};
+
+// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2
+enum LinkType { 
+	LinkType_noLink = 0, 
+	LinkType_internal, 
+	LinkType_external, 
+	LinkType_picture, 
+};
 
 // 文字情報。背景色やフォント種別などか切り変わるまでを一つのブロックとして扱う。
 class TextProperty
@@ -226,7 +223,9 @@ public:
 	~BigBridgeProperty();
 };
 
+}
 
+using namespace Ran2;
 
 // 絵文字対応描画コントロール「らんらん」
 class Ran2View : public CWnd
