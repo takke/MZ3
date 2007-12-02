@@ -346,6 +346,7 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		m_vScrollbar.SetWindowPos( m_detailView, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
 
 		// スクロールバーが不要な時は隠す
+		m_vScrollbar.ShowWindow(SW_HIDE);
 		int viewLineCount = m_detailView->GetViewLineMax();
 		int allLineCount  = m_detailView->GetAllLineCount();
 		SCROLLINFO si;
@@ -358,8 +359,6 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		m_vScrollbar.SetScrollInfo(&si, TRUE);
 		if( allLineCount-viewLineCount > 0 ) {
 			m_vScrollbar.ShowWindow(SW_SHOW);
-		}else{
-			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 	}
 
@@ -681,6 +680,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 		delete bodyStrArray;
 
 		// スクロールバーが不要な時は隠す
+		m_vScrollbar.ShowWindow(SW_HIDE);
 		int viewLineCount = m_detailView->GetViewLineMax();
 		int allLineCount  = m_detailView->GetAllLineCount();
 		SCROLLINFO si;
@@ -693,8 +693,6 @@ void CReportView::ShowCommentData(CMixiData* data)
 		m_vScrollbar.SetScrollInfo(&si, TRUE);
 		if( allLineCount-viewLineCount > 0 ) {
 			m_vScrollbar.ShowWindow(SW_SHOW);
-		}else{
-			m_vScrollbar.ShowWindow(SW_HIDE);
 		}
 #else
 		CString str = _T("");
