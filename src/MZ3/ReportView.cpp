@@ -2713,11 +2713,9 @@ void CReportView::OnDestroy()
 void CReportView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 #ifdef USE_RAN2
-//	if (GetFocus() == m_detailView) {
-		// スクロール確定。
-		// スクロールバーの位置を変更。
-		m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
-//	}
+	// スクロール確定。
+	// スクロールバーの位置を変更。
+	m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
 #endif
 
 	CFormView::OnLButtonUp(nFlags, point);
@@ -2726,11 +2724,8 @@ void CReportView::OnLButtonUp(UINT nFlags, CPoint point)
 void CReportView::OnMouseMove(UINT nFlags, CPoint point)
 {
 #ifdef USE_RAN2
-//	if (GetFocus() == m_detailView) {
-		// スクロール確定。
-		// スクロールバーの位置を変更。
-		m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
-//	}
+	// スクロールバーの位置を変更。
+	m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
 #endif
 
 	CFormView::OnMouseMove(nFlags, point);
