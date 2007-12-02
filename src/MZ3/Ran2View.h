@@ -279,6 +279,7 @@ class Ran2View : public CWnd
 	bool		m_bDragging;				// マウスドラッグ中
 	CPoint		m_ptDragStart;				// ドラッグ開始位置
 	int			m_dragStartLine;			// ドラッグ開始時の行番号
+	int			m_offsetPixelY;				// オフセットピクセル数
 
 	MainInfo*	parsedRecord;
 
