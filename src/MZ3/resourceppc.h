@@ -355,6 +355,8 @@
 #define ID_OPEN_PROFILE                 34000
 #define ID_OPEN_PROFILE_LOG             34003
 #define ID_SEND_MESSAGE                 34004
+#define ID_ACCELERATOR_SCROLL_OR_NEXT_COMMENT 34005
+#define ID_ACCELERATOR_NEXT_COMMENT     34006
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -366,7 +368,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        164
-#define _APS_NEXT_COMMAND_VALUE         34005
+#define _APS_NEXT_COMMAND_VALUE         34008
 #define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

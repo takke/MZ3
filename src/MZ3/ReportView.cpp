@@ -112,6 +112,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_COMMAND(ID_ACCELERATOR_SCROLL_OR_NEXT_COMMENT, &CReportView::OnAcceleratorScrollOrNextComment)
+	ON_COMMAND(ID_ACCELERATOR_NEXT_COMMENT, &CReportView::OnAcceleratorNextComment)
 END_MESSAGE_MAP()
 
 
@@ -851,6 +853,9 @@ BOOL CReportView::CommandScrollUpEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
+		if (m_posHtmlScroll <= 0) {
+			return FALSE;
+		}
 		// アンカーによりスクロールする
 		m_posHtmlScroll = max(m_posHtmlScroll-1, 0);
 
@@ -864,7 +869,11 @@ BOOL CReportView::CommandScrollUpEdit()
 		if( pos <= 0 ) {
 			return FALSE;
 		}
-		pos -= 1;
+		pos -= m_scrollLine;
+		if (pos<0) {
+			// 下限値補正
+			pos = 0;
+		}
 
 		m_vScrollbar.SetScrollPos(pos);
 		m_detailView->DrawDetail(pos);
@@ -886,6 +895,9 @@ BOOL CReportView::CommandScrollDownEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
+		if (m_posHtmlScroll >= m_posHtmlScrollMax) {
+			return FALSE;
+		}
 		// アンカーによりスクロールする
 		m_posHtmlScroll = min(m_posHtmlScroll+1, m_posHtmlScrollMax);
 
@@ -899,7 +911,11 @@ BOOL CReportView::CommandScrollDownEdit()
 		if( pos >= m_scrollBarHeight ){
 			return FALSE;
 		}
-		pos += 1;
+		pos += m_scrollLine;
+		if (pos > m_scrollBarHeight) {
+			// 上限値補正
+			pos = m_scrollBarHeight;
+		}
 
 		m_vScrollbar.SetScrollPos(pos);
 		m_detailView->DrawDetail(pos);
@@ -1008,14 +1024,8 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						if (theApp.m_optionMng.m_bRenderByIE) {
-							if (m_posHtmlScroll > 0) {
-								return CommandScrollUpEdit();
-							}
-						} else {
-							if (CommandScrollUpEdit()) {
-								return TRUE;
-							}
+						if (CommandScrollUpEdit()) {
+							return TRUE;
 						}
 					}
 
@@ -1037,14 +1047,8 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						if (theApp.m_optionMng.m_bRenderByIE) {
-							if (m_posHtmlScroll < m_posHtmlScrollMax) {
-								return CommandScrollDownEdit();
-							}
-						} else {
-							if (CommandScrollDownEdit()) {
-								return TRUE;
-							}
+						if (CommandScrollDownEdit()) {
+							return TRUE;
 						}
 					}
 
@@ -1087,14 +1091,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						if (theApp.m_optionMng.m_bRenderByIE) {
-							if (m_posHtmlScroll > 0) {
-								return CommandScrollUpEdit();
-							}
-						} else {
-							if (CommandScrollUpEdit()) {
-								return TRUE;
-							}
+						if (CommandScrollUpEdit()) {
+							return TRUE;
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1112,14 +1110,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
 					if (g_bUseVer09KeyInterface) {
-						if (theApp.m_optionMng.m_bRenderByIE) {
-							if (m_posHtmlScroll < m_posHtmlScrollMax) {
-								return CommandScrollDownEdit();
-							}
-						} else {
-							if (CommandScrollDownEdit()) {
-								return TRUE;
-							}
+						if (CommandScrollDownEdit()) {
+							return TRUE;
 						}
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
@@ -1137,14 +1129,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			case VK_UP:
 				// スクロール位置判定（スクロール余地があればスクロールする）
 				if (g_bUseVer09KeyInterface) {
-					if (theApp.m_optionMng.m_bRenderByIE) {
-						if (m_posHtmlScroll > 0) {
-							return CommandScrollUpEdit();
-						}
-					} else {
-						if (CommandScrollUpEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollUpEdit()) {
+						return TRUE;
 					}
 				}
 
@@ -1164,14 +1150,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			case VK_DOWN:
 				// スクロール位置判定（スクロール余地があればスクロールする）
 				if (g_bUseVer09KeyInterface) {
-					if (theApp.m_optionMng.m_bRenderByIE) {
-						if (m_posHtmlScroll < m_posHtmlScrollMax) {
-							return CommandScrollDownEdit();
-						}
-					} else {
-						if (CommandScrollDownEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollDownEdit()) {
+						return TRUE;
 					}
 				}
 
@@ -2729,4 +2709,30 @@ void CReportView::OnMouseMove(UINT nFlags, CPoint point)
 #endif
 
 	CFormView::OnMouseMove(nFlags, point);
+}
+
+void CReportView::OnAcceleratorScrollOrNextComment()
+{
+	// スクロール位置判定（スクロール余地があればスクロールする）
+	if (g_bUseVer09KeyInterface) {
+		if (theApp.m_optionMng.m_bRenderByIE) {
+			if (m_posHtmlScroll < m_posHtmlScrollMax) {
+				CommandScrollDownEdit();
+				return;
+			}
+		} else {
+			if (CommandScrollDownEdit()) {
+				return;
+			}
+		}
+	}
+
+	// 次の項目に移動
+	CommandMoveDownList();
+}
+
+void CReportView::OnAcceleratorNextComment()
+{
+	// 次の項目に移動
+	CommandMoveDownList();
 }
