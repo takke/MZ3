@@ -308,7 +308,7 @@ public:
 	static BOOL RegisterWndClass(HINSTANCE hInstance);
 	static BOOL UnregisterWndClass(HINSTANCE hInstance);
 
-	int		ChangeViewFont(int newHeight);
+	int		ChangeViewFont(int newHeight, LPCTSTR szFontFace);
 	CString	CalcTextByWidth(CDC* dstDC,CString srcStr,int width);
 	int		GetDrawOffsetLine(){ return(drawOffsetLine); }	// Œ»İ‚Ì•`‰æŠJnˆÊ’u‚Ìæ“¾
 

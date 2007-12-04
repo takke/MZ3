@@ -223,8 +223,7 @@ void CReportView::OnInitialUpdate()
 	if( fontHeight == 0 ) {
 		fontHeight = 24;
 	}
-//	m_detailView->ChangeViewFont(13);
-	m_detailView->ChangeViewFont(fontHeight);
+	m_detailView->ChangeViewFont( fontHeight, theApp.m_optionMng.GetFontFace() );
 	m_detailView->ShowWindow(SW_SHOW);
 	MZ3LOGGER_INFO(L"‚ç‚ñ‚ç‚ñƒrƒ…[‰Šú‰»Š®—¹(2/2)");
 #else
