@@ -2761,7 +2761,8 @@ void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	m_detailView->GetClientRect(&rect);
 	int y = point.y - rect.top;
 	double y_pos_in_percent = y / (double)rect.Height() * 100.0;
-#define N_DOUBLE_CLICK_MOVE_ITEM_LIMIT 20.0
+
+#define N_DOUBLE_CLICK_MOVE_ITEM_LIMIT	40.0
 	if (y_pos_in_percent < N_DOUBLE_CLICK_MOVE_ITEM_LIMIT) {
 		// ‘O‚Ì€–Ú‚ÉˆÚ“®
 		CommandMoveUpList();
