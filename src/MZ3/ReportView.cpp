@@ -112,6 +112,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 
@@ -1214,31 +1215,31 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->hwnd == m_list.m_hWnd) {
-		if (pMsg->message == WM_KEYUP) {
-			BOOL r = OnKeyUp(pMsg);
+		switch (pMsg->message) {
+		case WM_KEYUP:
+			{
+				BOOL r = OnKeyUp(pMsg);
 
-//			CString s;
-//			s.Format( L"keyup, %0X", pMsg->wParam );
-//			MZ3LOGGER_ERROR( s );
+				// KEYDOWN リピート回数を初期化
+				m_nKeydownRepeatCount = 0;
 
-			// KEYDOWN リピート回数を初期化
-			m_nKeydownRepeatCount = 0;
-
-			if( r ) {
-				return TRUE;
+				if( r ) {
+					return TRUE;
+				}
 			}
-		}
-		else if (pMsg->message == WM_KEYDOWN) {
-			// KEYDOWN リピート回数をインクリメント
-			m_nKeydownRepeatCount ++;
+			break;
 
-//			CString s;
-//			s.Format( L"keydown, %0X", pMsg->wParam );
-//			MZ3LOGGER_ERROR( s );
+		case WM_KEYDOWN:
+			{
+				// KEYDOWN リピート回数をインクリメント
+				m_nKeydownRepeatCount ++;
 
-			if( OnKeyDown(pMsg) ) {
-				return TRUE;
+				if( OnKeyDown(pMsg) ) {
+					return TRUE;
+				}
 			}
+			break;
+
 		}
 	}
 
@@ -2746,4 +2747,27 @@ void CReportView::OnAcceleratorNextComment()
 {
 	// 次の項目に移動
 	CommandMoveDownList();
+}
+
+void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+#ifdef USE_RAN2
+	if (m_detailView == NULL) {
+		return;
+	}
+
+	// 上下N%以内でのダブルクリックであれば項目変更
+	CRect rect;
+	m_detailView->GetClientRect(&rect);
+	int y = point.y - rect.top;
+	double y_pos_in_percent = y / (double)rect.Height() * 100.0;
+#define N_DOUBLE_CLICK_MOVE_ITEM_LIMIT 20.0
+	if (y_pos_in_percent < N_DOUBLE_CLICK_MOVE_ITEM_LIMIT) {
+		// 前の項目に移動
+		CommandMoveUpList();
+	} else if (y_pos_in_percent > 100.0-N_DOUBLE_CLICK_MOVE_ITEM_LIMIT) {
+		// 次の項目に移動
+		CommandMoveDownList();
+	}
+#endif
 }

@@ -281,6 +281,8 @@ class Ran2View : public CWnd
 	int			m_dragStartLine;			// ドラッグ開始時の行番号
 	int			m_offsetPixelY;				// オフセットピクセル数
 
+	DWORD		m_dwLastLButtonUp;			// 前回左クリックされた時刻
+
 	MainInfo*	parsedRecord;
 
 #ifdef DEBUG
@@ -359,6 +361,7 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };
 
 

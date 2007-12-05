@@ -475,7 +475,7 @@ void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp
 #ifndef WINCE
 void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
-	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
+//	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
 	// ƒIƒvƒVƒ‡ƒ“‚ªOn‚È‚çmini‰æ‘œ‰æ–Ê‚ðˆÚ“®
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage &&
 		theApp.m_optionMng.m_bShowMainViewMiniImageDlg &&
