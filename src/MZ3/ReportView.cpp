@@ -112,8 +112,6 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
-	ON_COMMAND(ID_ACCELERATOR_SCROLL_OR_NEXT_COMMENT, &CReportView::OnAcceleratorScrollOrNextComment)
-	ON_COMMAND(ID_ACCELERATOR_NEXT_COMMENT, &CReportView::OnAcceleratorNextComment)
 END_MESSAGE_MAP()
 
 
@@ -818,12 +816,14 @@ BOOL CReportView::CommandMoveUpList()
 	} else {
 		// 一番上ではないので、上に移動
 		int idx = m_list.GetSelectedItem();
-		util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
-		util::MySetListCtrlItemFocusedAndSelected( m_list, --idx, true );
+		if (idx>=0) {
+			util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
+			util::MySetListCtrlItemFocusedAndSelected( m_list, --idx, true );
 
-		// 移動先が非表示なら上方向にスクロール
-		if( !util::IsVisibleOnListBox( m_list, idx ) ) {
-			m_list.Scroll( CSize(0, -m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			// 移動先が非表示なら上方向にスクロール
+			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+				m_list.Scroll( CSize(0, -m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			}
 		}
 	}
 	return TRUE;
@@ -837,12 +837,14 @@ BOOL CReportView::CommandMoveDownList()
 	} else {
 		// 一番下ではないので、下に移動
 		int idx = m_list.GetSelectedItem();
-		util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
-		util::MySetListCtrlItemFocusedAndSelected( m_list, ++idx, true );
+		if (idx>=0) {
+			util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
+			util::MySetListCtrlItemFocusedAndSelected( m_list, ++idx, true );
 
-		// 移動先が非表示なら下方向にスクロール
-		if( !util::IsVisibleOnListBox( m_list, idx ) ) {
-			m_list.Scroll( CSize(0, m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			// 移動先が非表示なら下方向にスクロール
+			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+				m_list.Scroll( CSize(0, m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			}
 		}
 	}
 	return TRUE;
@@ -1193,6 +1195,16 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				// 上スクロール
 				return CommandScrollUpEdit();
 			}
+		case VK_SPACE:
+			if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
+				// Ctrl+Space
+				OnAcceleratorNextComment();
+			} else {
+				// Space
+				OnAcceleratorScrollOrNextComment();
+			}
+			return TRUE;
+
 		}
 	}
 

@@ -355,7 +355,6 @@
 #define ID_OPEN_PROFILE                 34000
 #define ID_OPEN_PROFILE_LOG             34003
 #define ID_SEND_MESSAGE                 34004
-#define ID_ACCELERATOR_SCROLL_OR_NEXT_COMMENT 34005
 #define ID_ACCELERATOR_NEXT_COMMENT     34006
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
