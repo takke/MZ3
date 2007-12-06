@@ -353,4 +353,23 @@ inline void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ
 	::DeleteDC( hdcFrom );
 }
 
+
+/**
+ * 指定されたIDのウインドウのスタイルをを移動する
+ */
+inline void ModifyStyleDlgItemWindow( CWnd* pParent,int idc, DWORD dwRemove,DWORD dwAdd,UINT nFlags=NULL)
+{
+	if (pParent==NULL) {
+		return;
+	}
+
+	CWnd* pDlgItem = pParent->GetDlgItem(idc);
+	if (pDlgItem==NULL) {
+		return;
+	}
+
+	pDlgItem->ModifyStyle(dwRemove,dwAdd,nFlags);
 }
+
+
+}	// end of namespace "util"
