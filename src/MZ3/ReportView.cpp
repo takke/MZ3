@@ -368,7 +368,6 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
-	theApp.m_optionMng.m_killPaneLabel = true;
 	if( theApp.m_optionMng.m_killPaneLabel ){
 		util::ModifyStyleDlgItemWindow(this,IDC_REPORT_LIST,NULL,LVS_NOCOLUMNHEADER);
 	}
