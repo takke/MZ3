@@ -276,6 +276,17 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_lastTopPageCategoryIndex = atoi(s.c_str());
 		}
+
+		// Treo用の画面節約モード::ペインのラベル非表示
+		s = inifile.GetValue( "KillPaneLabel", "UI" );
+		if(! s.empty() ) {
+			m_killPaneLabel = (bool)atoi(s.c_str());
+		}
+
+		// VGA/WVGA以外であれば値を縮尺する
+		if( theApp.GetDisplayMode() != SR_VGA) {
+			m_nReportViewListCol1Ratio /= 2;
+		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
