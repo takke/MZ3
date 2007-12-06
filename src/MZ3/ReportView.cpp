@@ -367,6 +367,12 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 		}
 	}
 
+	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
+	theApp.m_optionMng.m_killPaneLabel = true;
+	if( theApp.m_optionMng.m_killPaneLabel ){
+		util::ModifyStyleDlgItemWindow(this,IDC_REPORT_LIST,NULL,LVS_NOCOLUMNHEADER);
+	}
+
 	// スクロールタイプが「ページ単位」なら再計算
 	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
 		m_scrollLine = (hReport / fontHeight) - 2;
