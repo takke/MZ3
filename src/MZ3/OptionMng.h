@@ -76,7 +76,7 @@ public:
 	int				m_nReportViewListCol2Ratio;			///< レポート画面のリストのカラム２の幅（比率）[1,1000]
 	int				m_nReportViewListCol3Ratio;			///< レポート画面のリストのカラム３の幅（比率）[1,1000]
 
-	bool			m_killPaneLabel;					///< ペインのラベルを表示しない？>
+	bool			m_killPaneLabel;					///< ペインのラベルを表示しない？
 
 	enum REPORT_SCROLL_TYPE {
 		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
