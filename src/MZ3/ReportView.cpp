@@ -688,6 +688,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 		m_edit.ShowWindow(SW_HIDE);
 		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray);
 		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
+		m_detailView->ResetDragOffset();
 		m_detailView->DrawDetail(0);
 		m_detailView->Invalidate();
 		bodyStrArray->RemoveAll();
@@ -883,6 +884,7 @@ BOOL CReportView::CommandScrollUpEdit()
 		}
 
 		m_vScrollbar.SetScrollPos(pos);
+		m_detailView->ResetDragOffset();
 		m_detailView->DrawDetail(pos);
 #else
 		SCROLLINFO si;
@@ -925,6 +927,7 @@ BOOL CReportView::CommandScrollDownEdit()
 		}
 
 		m_vScrollbar.SetScrollPos(pos);
+		m_detailView->ResetDragOffset();
 		m_detailView->DrawDetail(pos);
 #else
 		SCROLLINFO si;
@@ -2691,6 +2694,7 @@ void CReportView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 			OutputDebugString(logStr);
 */
 			pScrollBar->SetScrollPos(newPos);
+			m_detailView->ResetDragOffset();
 			m_detailView->DrawDetail(newPos);
 		}
 	}else if( nSBCode == SB_ENDSCROLL ){
