@@ -1,0 +1,6 @@
+[Info]
+Name=足あとが10件しか表示されない
+KeyWord=足あとが10件しか表示されない
+Context=IDH_HELP61
+[Date]
+<FONT face="ＭＳ ゴシック">　Q.足あとが10件しか表示されない<BR>　A.仕様です<BR>　　Ver.0.9.0.0 Beta5 より，足あと取得の仕様が変更になり，10件の表示となっています<BR>　　これは，今まで mixi の HTML から取得していたものを mixi の API を使用するようにしたためです</FONT> 
