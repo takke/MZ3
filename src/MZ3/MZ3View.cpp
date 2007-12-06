@@ -590,6 +590,11 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
 	y += hBody;
 
+
+	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
+	if( theApp.m_optionMng.m_killPaneLabel ){
+		util::ModifyStyleDlgItemWindow(this,IDC_BODY_LIST,NULL,LVS_NOCOLUMNHEADER);
+	}
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
 
 	MoveMiniImageDlg();
