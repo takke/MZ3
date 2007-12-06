@@ -282,11 +282,6 @@ void Option::Load()
 		if(! s.empty() ) {
 			m_killPaneLabel = (bool)atoi(s.c_str());
 		}
-
-		// VGA/WVGAà»äOÇ≈Ç†ÇÍÇŒílÇèké⁄Ç∑ÇÈ
-		if( theApp.GetDisplayMode() != SR_VGA) {
-			m_nReportViewListCol1Ratio /= 2;
-		}
 	}
 
 	if (inifile.SectionExists("Log") != FALSE) {
