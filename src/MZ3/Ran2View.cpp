@@ -227,6 +227,7 @@ BEGIN_MESSAGE_MAP(Ran2View, CWnd)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -1843,4 +1844,12 @@ void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
 void Ran2View::ResetDragOffset(void)
 {
 	m_offsetPixelY = 0;
+}
+
+void Ran2View::OnRButtonUp(UINT nFlags, CPoint point)
+{
+	// e‚ÌŒÄ‚Ño‚µ
+	::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+
+	CWnd::OnRButtonUp(nFlags, point);
 }

@@ -413,4 +413,30 @@ int FindFileCallback(const TCHAR* szDirectory,
     return nResult;
 }
 
+/**
+ * クリップボードにテキストを設定 (UNICODE)
+ *
+ * @return エラー時 false、成功時 true を返す。
+ */
+inline bool SetClipboardDataTextW( const wchar_t* szText_ )
+{
+	HGLOBAL hMem = GlobalAlloc( GHND | GMEM_SHARE, (wcslen(szText_)+1)*sizeof(TCHAR) );
+	wchar_t* pPtr = (wchar_t*)::GlobalLock( hMem );
+	wcscpy( pPtr, szText_ );
+	GlobalUnlock( hMem );
+	
+	if( !OpenClipboard(NULL) )
+		return false;
+	EmptyClipboard();
+	HANDLE hRet = SetClipboardData( CF_UNICODETEXT, hMem );
+	CloseClipboard();
+	
+	if( hRet == NULL ) {
+		GlobalFree( hMem );
+		return false;
+	}
+	// GlobalFree は OS が行う
+	return true;
+}
+
 }

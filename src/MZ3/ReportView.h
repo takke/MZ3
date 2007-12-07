@@ -108,8 +108,10 @@ private:
 	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
 	afx_msg LRESULT OnFit(WPARAM, LPARAM);
-	afx_msg void OnEditCopy() { m_edit.Copy(); };
-	afx_msg void OnSelectAll() { m_edit.SetSel(0, -1); };
+	afx_msg void OnEditCopy();
+	afx_msg void OnSelectAll() {
+		m_edit.SetSel(0, -1);
+	}
 	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 
 
@@ -156,6 +158,7 @@ public:
 	afx_msg void OnAcceleratorScrollOrNextComment();
 	afx_msg void OnAcceleratorNextComment();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 };
 
 

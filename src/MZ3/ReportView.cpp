@@ -113,6 +113,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -2779,5 +2780,47 @@ void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
 		// 次の項目に移動
 		CommandMoveDownList();
 	}
+#endif
+}
+
+void CReportView::OnRButtonUp(UINT nFlags, CPoint point)
+{
+#ifdef USE_RAN2
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+
+	CMenu menu;
+	menu.LoadMenu(IDR_RAN2_MENU);
+	CMenu* pcThisMenu = menu.GetSubMenu(0);
+
+	// メニューのポップアップ
+	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this);
+#endif
+
+//	CFormView::OnRButtonUp(nFlags, point);
+}
+
+afx_msg void CReportView::OnEditCopy()
+{
+#ifdef USE_RAN2
+	if (m_currentData==NULL) {
+		return;
+	}
+
+	CString str;
+
+	str += m_currentData->GetAuthor();
+	str += _T("　");
+	str += m_currentData->GetDate();
+	str += _T("\r\n");
+
+	const int n = m_currentData->GetBodySize();
+	for( int i=0; i<n; i++ ){
+		str += m_currentData->GetBody(i);
+	}
+
+	util::SetClipboardDataTextW( str );
+#else
+	m_edit.Copy();
 #endif
 }

@@ -363,6 +363,7 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	void ResetDragOffset(void);
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 };
 
 
