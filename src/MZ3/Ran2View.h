@@ -232,34 +232,35 @@ class Ran2View : public CWnd
 	CString							uidStr;				// 現在描画中のUID名(テストでのみ使用)
 	int								currentUIDNumber;	// 現在描画中のUID番号
 
-	CPen		underLinePen;		// 汎用の黒ペン
-	CBrush		blueBrush;			// 汎用の青ブラシ
-	CBrush*		oldBrush;			// 復帰用のポインタ
+	CPen		underLinePen;			// 汎用の黒ペン
+	CBrush		blueBrush;				// 汎用の青ブラシ
+	CBrush*		oldBrush;				// 復帰用のポインタ
 
-	CFont*		normalFont;			// 通常フォント
-	CFont*		boldFont;			// 太字表示で使うフォント
-	CFont*		qFont;				// 上付き/下付きで使う1/4サイズのフォント
-	CFont*		qBoldFont;			// 上付き/下付きで使う1/4サイズの太字フォント
+	CFont*		normalFont;				// 通常フォント
+	CFont*		boldFont;				// 太字表示で使うフォント
+	CFont*		qFont;					// 上付き/下付きで使う1/4サイズのフォント
+	CFont*		qBoldFont;				// 上付き/下付きで使う1/4サイズの太字フォント
 
-	CFont*		oldFont;			// 切り替え前のフォント
-	int			topOffset;			// 上端の余白(ピクセル)
-	int			leftOffset;			// 左端の余白(ピクセル)
-	int			frameOffset;		// ネストする枠線の余白(ピクセル)
-	int			NormalWidthOffset;	// タグ指定がないときの画面幅差分
+	CFont*		oldFont;				// 切り替え前のフォント
+	int			m_drawStartTopOffset;	// 描画開始オフセット(ピクセル)
+	int			topOffset;				// 上端の余白(ピクセル)
+	int			leftOffset;				// 左端の余白(ピクセル)
+	int			frameOffset;			// ネストする枠線の余白(ピクセル)
+	int			NormalWidthOffset;		// タグ指定がないときの画面幅差分
 
-	CRect		viewRect;			// 描画領域：矩形
-	int			screenWidth;		// 描画領域：横幅
-	int			screenHeight;		// 描画領域：縦幅
-	int			charHeightOffset;	// 行間のマージン
-	int			gaijiWidthOffset;	// 外字の文字間のマージン
+	CRect		viewRect;				// 描画領域：矩形
+	int			screenWidth;			// 描画領域：横幅
+	int			screenHeight;			// 描画領域：縦幅
+	int			charHeightOffset;		// 行間のマージン
+	int			gaijiWidthOffset;		// 外字の文字間のマージン
 
-	int			charSpacing;		// 文字の前後スペース幅の総量(ABC幅のAとC)
-	int			charHeight;			// 通常文字の高さ
-	int			charWidth;			// 通常文字の幅(boldの太さに変更)
-	int			boldCharWidth;		// 太文字の幅
-	int			charQHeight;		// 1/4文字の高さ
-	int			charQWidth;			// 1/4文字の幅
-	int			currentCharWidth;	// 現在出力に使っている文字の幅(折り返し処理で使用)
+	int			charSpacing;			// 文字の前後スペース幅の総量(ABC幅のAとC)
+	int			charHeight;				// 通常文字の高さ
+	int			charWidth;				// 通常文字の幅(boldの太さに変更)
+	int			boldCharWidth;			// 太文字の幅
+	int			charQHeight;			// 1/4文字の高さ
+	int			charQWidth;				// 1/4文字の幅
+	int			currentCharWidth;		// 現在出力に使っている文字の幅(折り返し処理で使用)
 
 	int			hangingOffset;				// 上付き、下付きの突き出し量
 	CDC*		backDC;						// 画像描画用DC
@@ -314,8 +315,8 @@ public:
 	int		GetDrawOffsetLine(){ return(drawOffsetLine); }	// 現在の描画開始位置の取得
 
 	// 描画
-	int		DrawDetail(int startLine);	// 任意の行から描画
-	void	Refresh();					// 現在位置を再描画
+	int		DrawDetail(int startLine, bool bForceDraw=true);	// 任意の行から描画
+	void	Refresh();											// 現在位置を再描画
 
 	// データの読み込み
 	int		LoadDetail(CStringArray* bodyArray, CImageList* pImageList);
@@ -363,6 +364,7 @@ public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	void ResetDragOffset(void);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	void DrawToScreen(CDC* pDC);
 };
 
 

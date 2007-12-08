@@ -189,6 +189,7 @@ Ran2View::Ran2View()
 	, m_offsetPixelY(0)
 	, m_dwLastLButtonUp(0)
 	, m_pImageList(NULL)
+	, m_drawStartTopOffset(0)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -284,10 +285,12 @@ BOOL Ran2View::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSty
 
 	memBMP = new CBitmap();
 	// 画面の高さをn倍して余裕をもたせてみた
-	if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE ){
+	if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE ){
 		MessageBox(TEXT("CreateCompatibelBitmap error!"));
 		return(FALSE);
 	}
+	m_drawStartTopOffset = screenHeight/2;
+
 	memDC = new CDC();
 	memDC->CreateCompatibleDC(&cdc);
 	memDC->SetBkMode(OPAQUE);	// 透過モードに設定
@@ -325,10 +328,11 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 
 		// バックバッファ生成
 		CPaintDC	cdc(GetParent());	// ダイアログのクライアント領域をベースとする。
-		if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE ){
+		if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE ){
 			MessageBox(TEXT("CreateCompatibelBitmap error!"));
 			return;
 		}
+		m_drawStartTopOffset = screenHeight/2;
 
 		memDC->CreateCompatibleDC(&cdc);
 		memDC->SetBkMode(OPAQUE);	// 透過モードに設定
@@ -611,11 +615,18 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 void Ran2View::OnPaint()
 {
 	CPaintDC dc(this); // 描画用のデバイス コンテキスト
-	int y = -m_offsetPixelY;
-	dc.BitBlt( 0, 0, screenWidth, screenHeight, memDC, 0, y, SRCCOPY );
-//	dc.Rectangle(0, 0, screenWidth, screenHeight);
+
+	DrawToScreen(&dc);
 }
 
+
+void Ran2View::DrawToScreen(CDC* pDC)
+{
+	int y = -m_offsetPixelY;
+	
+	pDC->BitBlt( 0, 0, screenWidth, screenHeight, memDC, 0, m_drawStartTopOffset +y, SRCCOPY );
+//	pDC->Rectangle(0, 0, screenWidth, screenHeight);
+}
 
 
 // 表示幅一杯まで何文字入るかを再計算し続ける。
@@ -1193,7 +1204,7 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 
 
 // 描画の入り口
-int	Ran2View::DrawDetail(int startLine)
+int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 {
 	if (startLine<0) {
 		return 0;
@@ -1201,34 +1212,40 @@ int	Ran2View::DrawDetail(int startLine)
 	// どの行から描画したかを保存しておく
 	drawOffsetLine = startLine;
 
-	int picLines = 0;	// 画像の後続描画カット行数
-	CString logStr;
 	// レコードの展開ミスや範囲外の指定は弾く
 	if( parsedRecord == NULL || startLine > parsedRecord->rowInfo->GetSize() ){
 		return(0);
 	}
 
-	const int N_OVER_OFFSET_LINES = 2;
+	// 塗りつぶす
 //	memDC->PatBlt( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, WHITENESS );
-	memDC->FillSolidRect( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, RGB(255,255,255) );
+//	memDC->FillSolidRect( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, RGB(255,255,255) );
+	BITMAP bmp;
+	GetObject(memBMP->m_hObject, sizeof(BITMAP), &bmp);
+	memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
+
+//	TRACE( L"[DrawRect]\n" );
+//	TRACE( L" %dx%d\n", bmp.bmWidth, bmp.bmHeight );
+//	TRACE( L" %dx%d\n", screenWidth, screenHeight );
 
 	// オフセットスクロール用にN行余分に描画する。
+	const int N_OVER_OFFSET_LINES = 2;
 	for(int i=-N_OVER_OFFSET_LINES; i<=viewLineMax+N_OVER_OFFSET_LINES ; i++){
-		int offsetPos = startLine + i;
+		int targetLine = startLine + i;
 
-		if (offsetPos < 0) {
+		if (targetLine < 0) {
 			continue;
 		}
 
-		// 範囲外を越えたらスルー
-		if( parsedRecord->rowInfo->GetSize() <= offsetPos ){
+		// 範囲を越えたらスルー
+		if( parsedRecord->rowInfo->GetSize() <= targetLine ){
 			break;
 		}
 
-		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(offsetPos);
+		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(targetLine);
 
 		if( row != NULL ){
-//			TRACE(TEXT("%dの描画を開始します\r\n"),offsetPos);
+//			TRACE(TEXT("%dの描画を開始します\r\n"), targetLine);
 			// フレームの描画。画像が設定されていたら描画しない
 /*
 			if( row->imageProperty.imageNumber == -1 ){
@@ -1241,10 +1258,22 @@ int	Ran2View::DrawDetail(int startLine)
 			// 外字要素の出力
 			this->DrawGaijiProperty(i,row->gaijiProperties);
 		}
+
+//		TRACE( L" line : %d\n", targetLine );
 	}
 //	memDC->Rectangle( 0, 0, 10, 10 );
 
-	this->Invalidate(FALSE);
+	// 描画
+//	this->Invalidate(FALSE);
+
+	if (bForceDraw) {
+		// 強制的に描画する
+		CDC* pDC = GetDC();
+
+		DrawToScreen(pDC);
+
+		ReleaseDC(pDC);
+	}
 
 	return(1);
 }
@@ -1265,7 +1294,7 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 				CBrush backBrush(rowProperty->frameProperty[i].backgroundColor);
 				int sx = leftOffset + (i * frameOffset);
 				int ex = (screenWidth - NormalWidthOffset) - leftOffset - (i * frameOffset);
-				int sy = topOffset + (line*(charHeight+charHeightOffset));
+				int sy = m_drawStartTopOffset + topOffset + (line*(charHeight+charHeightOffset));
 				int ey = sy + (charHeight+charHeightOffset);
 				drawRect = CRect(sx,sy,ex,ey);
 				memDC->FillRect(drawRect,&backBrush);
@@ -1291,7 +1320,7 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 				int sx = leftOffset + (i * frameOffset);
 				int ex = (screenWidth - NormalWidthOffset) - leftOffset - (i * frameOffset);
 				// 終行は次の行と連結されてしまうので-1行する
-				int sy = topOffset + ((line-1)*(charHeight+charHeightOffset));
+				int sy = m_drawStartTopOffset + topOffset + ((line-1)*(charHeight+charHeightOffset));
 				int ey = sy + (charHeight+charHeightOffset);
 				CRect drawRect = CRect(sx,sy,ex,ey);
 
@@ -1330,7 +1359,7 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 	for(int j=0 ; j<textProperties->GetSize() ; j++){
 		// テキストブロックの出力(後で関数化する)
 		TextProperty* text = (TextProperty*)textProperties->GetAt(j);
-		int sy = topOffset + framePixel + (line*(charHeight+charHeightOffset));
+		int sy = m_drawStartTopOffset + topOffset + framePixel + (line*(charHeight+charHeightOffset));
 		// 上付き指定の場合は表示位置をずらす
 		if( text->isDownHanging == true ){
 			sy += (charHeight - charQHeight - framePixel);
@@ -1386,7 +1415,7 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 	for(int j=0 ; j<gaijiProperties->GetSize() ; j++){
 		// テキストブロックの出力(後で関数化する)
 		GaijiProperty* gaiji = (GaijiProperty*)gaijiProperties->GetAt(j);
-		int sy = topOffset + framePixel + (line*(charHeight+charHeightOffset));
+		int sy = m_drawStartTopOffset + topOffset + framePixel + (line*(charHeight+charHeightOffset));
 
 		if (m_pImageList!=NULL) {
 			int imageIdx = _wtoi(gaiji->resourceID);
@@ -1831,3 +1860,4 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 
 	CWnd::OnMouseMove(nFlags, point);
 }
+

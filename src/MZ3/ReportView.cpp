@@ -690,8 +690,10 @@ void CReportView::ShowCommentData(CMixiData* data)
 		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());
 		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
 		m_detailView->ResetDragOffset();
-		m_detailView->DrawDetail(0);
-		m_detailView->Invalidate();
+		// OnSize 時にこのルートを2回通るため、即時描画を行うとMZ3の場合に一瞬だけ画面が乱れる。
+		// これを回避するため、即時描画を行わず、Invalidate により WM_PAINT 通知でまとめて描画する。
+		m_detailView->DrawDetail(0, false);
+		m_detailView->Invalidate(FALSE);
 		bodyStrArray->RemoveAll();
 		delete bodyStrArray;
 
