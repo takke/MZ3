@@ -99,7 +99,9 @@ void CChooseFontDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 
-	m_FontList.MoveWindow( 0, 0, cx, cy );
+	if (m_FontList.m_hWnd != NULL) {
+		m_FontList.MoveWindow( 0, 0, cx, cy );
+	}
 }
 
 void CChooseFontDlg::OnNMReturnFontList(NMHDR *pNMHDR, LRESULT *pResult)
