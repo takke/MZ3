@@ -249,6 +249,30 @@ public:
 
 		return !data.m_linkPage.empty();
 	}
+
+	/**
+	 * コミュニティ名抽出
+	 */
+	static bool parseCommunityName( CMixiData& mixi, const CHtmlArray& html_ )
+	{
+		// <p class="utilityLinks03"><a href="view_community.pl?id=1198460">[MZ3 -Mixi for ZERO3-] コミュニティトップへ</a></p>
+		const int lastLine = html_.GetCount();
+		for (int i=0; i<lastLine; i++) {
+			const CString& line = html_.GetAt(i);
+
+			if (util::LineHasStringsNoCase( line, L"<p", L"utilityLinks03", L"view_community.pl" )) {
+				CString name;
+				if (util::GetBetweenSubString( line, L"<a", L"</a>", name ) >= 0) {
+					if (util::GetBetweenSubString( name, L"[", L"]", name ) >= 0) {
+						mixi.SetName( name );
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 };
 
 //■■■共通■■■
@@ -1933,6 +1957,9 @@ public:
 			}
 		}
 
+		// コミュニティ名抽出
+		parseCommunityName( mixi, html_ );
+
 		// ページ移動リンクの抽出
 		parsePageLink( mixi, html_ );
 
@@ -2156,6 +2183,9 @@ public:
 				break;
 			}
 		}
+
+		// コミュニティ名抽出
+		parseCommunityName( data_, html_ );
 
 		// ページ移動リンクの抽出
 		parsePageLink( data_, html_ );
@@ -2547,6 +2577,9 @@ public:
 				break;
 			}
 		}
+
+		// コミュニティ名抽出
+		parseCommunityName( data_, html_ );
 
 		// ページ移動リンクの抽出
 		parsePageLink( data_, html_ );
