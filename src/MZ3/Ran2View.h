@@ -1,9 +1,6 @@
 #if !defined(AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_)
 #define AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_
 
-//#pragma once
-//#include "DIBSectionLite.h"
-
 namespace Ran2 {
 
 const int framePixel = 1;					// ワク線の太さ(ピクセル数)

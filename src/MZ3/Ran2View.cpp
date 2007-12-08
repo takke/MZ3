@@ -2,9 +2,7 @@
 //
 #include "stdafx.h"
 #include "Ran2View.h"
-#include "MZ3.h"
-#include "util.h"
-#include "util_gui.h"
+#include "resourceppc.h"
 
 IMPLEMENT_DYNAMIC(Ran2View, CWnd)
 
@@ -1210,11 +1208,9 @@ int	Ran2View::DrawDetail(int startLine)
 		return(0);
 	}
 
-	const int N_OVER_OFFSET_LINES = 1;
-	memDC->PatBlt(0,0,screenWidth,screenHeight+charHeight*N_OVER_OFFSET_LINES,WHITENESS);
-//	CBrush grayBrush(COLORREF(RGB(128,128,128)));
-//	memDC->SelectObject(&grayBrush);
-//	memDC->PatBlt(0,0,screenWidth,screenHeight,PATCOPY);
+	const int N_OVER_OFFSET_LINES = 2;
+//	memDC->PatBlt( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, WHITENESS );
+	memDC->FillSolidRect( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, RGB(255,255,255) );
 
 	// オフセットスクロール用にN行余分に描画する。
 	for(int i=-N_OVER_OFFSET_LINES; i<=viewLineMax+N_OVER_OFFSET_LINES ; i++){
@@ -1402,123 +1398,6 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 		}
 	}
 }
-
-
-// タップによるリンク位置の探索
-void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	if (m_bDragging) {
-		m_bDragging = false;
-		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
-		ReleaseCapture();
-	}
-
-	// ダブルクリック判定
-	if (m_dwLastLButtonUp>0 &&
-		(GetTickCount() - m_dwLastLButtonUp) < GetDoubleClickTime())
-	{
-		// ダブルクリック済みなのでクリアする
-		m_dwLastLButtonUp = 0;
-
-		// ダブルクリックとみなす
-		// 親の呼び出し
-		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
-	} else {
-		m_dwLastLButtonUp = GetTickCount();
-		
-		// 親の呼び出し
-		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
-	}
-
-	//CWnd::OnLButtonUp(nFlags, point);
-}
-
-
-// タップによるリンクの処理
-void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	if (m_bDragging) {
-		m_bDragging = false;
-		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
-	}
-
-
-	CString logStr;
-	// タップ位置の行番号を取得
-	int tapLine = (point.y - topOffset) / (charHeightOffset + charHeight);
-
-	// Row配列からの取得位置を算出
-	int rowNumber = drawOffsetLine + tapLine;
-
-	bool bProcessed = false;
-
-	// タップ位置が範囲内を越える場合は何もしない
-	if( parsedRecord->rowInfo->GetSize() > rowNumber ){
-		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
-		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
-			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
-	/*
-			logStr.Format(TEXT("リンク情報は[Type:%d][ID:%d][PA:%d][left:%d]～[right:%d]\r\n"),
-				linkInfo->linkType, linkInfo->jumpUID, linkInfo->anchorIndex,
-				linkInfo->grappleRect.left, linkInfo->grappleRect.right);
-			OutputDebugString(logStr);
-	*/
-			// リンク範囲の該当内部であれうばジャンプ処理を行う
-			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
-				if( linkInfo->linkType == LinkType_internal ){
-	/*
-					HistoryInfo* jumpInfo = new HistoryInfo();
-					jumpInfo->uid = linkInfo->jumpUID;
-					jumpInfo->pageAnchor = linkInfo->anchorIndex;
-					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
-					//logStr.Format(TEXT("アンカー[%d]へのリンクです"),linkInfo->anchorIndex);
-					//MessageBox(logStr,TEXT("ページ内アンカーの呼び出し"),MB_OK);
-	*/
-					bProcessed = true;
-					break;
-				}else if( linkInfo->linkType == LinkType_external ){
-	/*
-					HistoryInfo* jumpInfo = new HistoryInfo();
-					jumpInfo->uid = linkInfo->jumpUID;
-					jumpInfo->pageAnchor = linkInfo->anchorIndex;
-					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
-	*/
-					bProcessed = true;
-					break;
-				}else if( linkInfo->linkType == LinkType_picture ){
-	//				this->GetParent()->SendMessage(WM_HTML_NEXTITEM,linkInfo->jumpUID,1);
-	//				CString rcStr = app->GetImageNameByNumber(linkInfo->jumpUID);
-	//				logStr.Format(TEXT("画像名[%s]へのリンクです"),rcStr);
-	//				MessageBox(logStr,TEXT("画像の呼び出し"),MB_OK);
-					bProcessed = true;
-					break;
-				}
-			}
-		}
-	}
-	if (bProcessed) {
-		Default();
-		return;
-	}
-
-	// ドラッグ開始
-	if (GetAllLineCount()-GetViewLineMax() > 0) {
-		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
-		SetCapture();
-		m_bDragging = true;
-		m_ptDragStart = point;
-		m_dragStartLine = drawOffsetLine;
-		m_ptDragStart.y -= m_offsetPixelY;
-		m_offsetPixelY = 0;
-	}
-
-//	CWnd::OnLButtonDown(nFlags, point);
-}
-
-
-
-
-
 // datファイルから実行時クラスへの変換その2(Unicodeに変換されている事が前提)
 // ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
 MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
@@ -1781,22 +1660,156 @@ int Ran2View::GetScreenDPI()
 }
 
 
+void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+
+	CWnd::OnLButtonDblClk(nFlags, point);
+}
+
+
+void Ran2View::ResetDragOffset(void)
+{
+	m_offsetPixelY = 0;
+}
+
+
+void Ran2View::OnRButtonUp(UINT nFlags, CPoint point)
+{
+	// 親の呼び出し
+	::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+
+	CWnd::OnRButtonUp(nFlags, point);
+}
+
+
+// タップによるリンク位置の探索
+void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (m_bDragging) {
+		m_bDragging = false;
+		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
+		ReleaseCapture();
+	}
+
+	// ダブルクリック判定
+	if (m_dwLastLButtonUp>0 &&
+		(GetTickCount() - m_dwLastLButtonUp) < GetDoubleClickTime())
+	{
+		// ダブルクリック済みなのでクリアする
+		m_dwLastLButtonUp = 0;
+
+		// ダブルクリックとみなす
+		// 親の呼び出し
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+	} else {
+		m_dwLastLButtonUp = GetTickCount();
+		
+		// 親の呼び出し
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+	}
+
+	//CWnd::OnLButtonUp(nFlags, point);
+}
+
+
+// タップによるリンクの処理
+void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	if (m_bDragging) {
+		m_bDragging = false;
+		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
+	}
+
+
+	CString logStr;
+	// タップ位置の行番号を取得
+	int tapLine = (point.y - topOffset) / (charHeightOffset + charHeight);
+
+	// Row配列からの取得位置を算出
+	int rowNumber = drawOffsetLine + tapLine;
+
+	bool bProcessed = false;
+
+	// タップ位置が範囲内を越える場合は何もしない
+	if( parsedRecord->rowInfo->GetSize() > rowNumber ){
+		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
+		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
+			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
+/*
+			logStr.Format(TEXT("リンク情報は[Type:%d][ID:%d][PA:%d][left:%d]～[right:%d]\r\n"),
+				linkInfo->linkType, linkInfo->jumpUID, linkInfo->anchorIndex,
+				linkInfo->grappleRect.left, linkInfo->grappleRect.right);
+			OutputDebugString(logStr);
+*/
+			// リンク範囲の該当内部であれうばジャンプ処理を行う
+			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
+				if( linkInfo->linkType == LinkType_internal ){
+/*
+					HistoryInfo* jumpInfo = new HistoryInfo();
+					jumpInfo->uid = linkInfo->jumpUID;
+					jumpInfo->pageAnchor = linkInfo->anchorIndex;
+					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
+					//logStr.Format(TEXT("アンカー[%d]へのリンクです"),linkInfo->anchorIndex);
+					//MessageBox(logStr,TEXT("ページ内アンカーの呼び出し"),MB_OK);
+*/
+					bProcessed = true;
+					break;
+				}else if( linkInfo->linkType == LinkType_external ){
+/*
+					HistoryInfo* jumpInfo = new HistoryInfo();
+					jumpInfo->uid = linkInfo->jumpUID;
+					jumpInfo->pageAnchor = linkInfo->anchorIndex;
+					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
+*/
+					bProcessed = true;
+					break;
+				}else if( linkInfo->linkType == LinkType_picture ){
+/*					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,linkInfo->jumpUID,1);
+					CString rcStr = app->GetImageNameByNumber(linkInfo->jumpUID);
+					logStr.Format(TEXT("画像名[%s]へのリンクです"),rcStr);
+					MessageBox(logStr,TEXT("画像の呼び出し"),MB_OK);
+*/					bProcessed = true;
+					break;
+				}
+			}
+		}
+	}
+	if (bProcessed) {
+		Default();
+		return;
+	}
+
+	// ドラッグ開始
+	if (GetAllLineCount()-GetViewLineMax() > 0) {
+		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
+		SetCapture();
+		m_bDragging = true;
+		m_ptDragStart = point;
+		m_dragStartLine = drawOffsetLine;
+		m_ptDragStart.y -= m_offsetPixelY;
+		m_offsetPixelY = 0;
+	}
+
+//	CWnd::OnLButtonDown(nFlags, point);
+}
+
+
 void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (m_bDragging) {
 		// ドラッグ処理
 		int dy = m_ptDragStart.y - point.y;
-		int d_line = dy / charHeight;
+		int d_line = dy / (charHeight + charHeightOffset);
 
 //		TRACE( L"---\n" );
 //		TRACE( L"d_line       : %5d\n", d_line );
 //		TRACE( L"dy           : %5d\n", dy );
 //		TRACE( L"offset       : %5d\n", m_offsetPixelY );
 
-		if (-dy%charHeight <=0 || drawOffsetLine > 0) {
+		if (-dy%(charHeight + charHeightOffset) <=0 || drawOffsetLine > 0) {
 			// ピクセルオフセット
 			// （0行目であれば上方向のスクロールは行わない）
-			m_offsetPixelY = -dy % charHeight;
+			m_offsetPixelY = -dy % (charHeight + charHeightOffset);
 		}
 
 		// 下の方にスクロール可能か確認する
@@ -1817,23 +1830,4 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 	}
 
 	CWnd::OnMouseMove(nFlags, point);
-}
-
-void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
-{
-
-	CWnd::OnLButtonDblClk(nFlags, point);
-}
-
-void Ran2View::ResetDragOffset(void)
-{
-	m_offsetPixelY = 0;
-}
-
-void Ran2View::OnRButtonUp(UINT nFlags, CPoint point)
-{
-	// 親の呼び出し
-	::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
-
-	CWnd::OnRButtonUp(nFlags, point);
 }
