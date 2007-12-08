@@ -147,6 +147,9 @@ BOOL CMZ3App::InitInstance()
 	Ran2View::RegisterWndClass(AfxGetInstanceHandle());
 #endif
 
+	// 画像キャッシュの初期化
+	m_imageCache.Create();
+
 	// トップページ用の初期化
 	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
 	bool bExistGroupFile = util::ExistFile( theApp.m_filepath.groupfile );

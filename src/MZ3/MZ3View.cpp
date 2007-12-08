@@ -349,8 +349,6 @@ void CMZ3View::OnInitialUpdate()
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
 		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
-		m_iconExtendedImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
-		m_extendeImageListMap.RemoveAll();
 
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
@@ -1211,14 +1209,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			CString miniImagePath = util::MakeImageLogfilePath( mixi );
 
 			// ロード済みか判定
-			bool bLoaded = false;
-			for (int i=0; i<m_extendeImageListMap.GetCount(); i++) {
-				if (m_extendeImageListMap[i] == miniImagePath) {
-					bLoaded = true;
-					break;
-				}
-			}
-
+			bool bLoaded = theApp.m_imageCache.GetImageIndex(miniImagePath) >= 0 ? true : false;
 			if (bLoaded) {
 				// ロード済みなのでロード不要
 				bUseExtendedIcon = true;
@@ -1235,8 +1226,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 				// ビットマップの追加
 				CBitmap bm;
 				bm.Attach( resizedImage.getHandle() );
-				m_iconExtendedImageList.Add( &bm, (CBitmap*) NULL );
-				m_extendeImageListMap.Add( miniImagePath );
+
+				theApp.m_imageCache.Add( &bm, (CBitmap*)NULL, miniImagePath );
 
 				bUseExtendedIcon = true;
 			} else {
@@ -1257,7 +1248,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
 	}
 	if (bUseExtendedIcon) {
-		m_bodyList.SetImageList(&m_iconExtendedImageList, LVSIL_SMALL);
+		m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList(), LVSIL_SMALL);
 	}
 
 	// アイコンの設定
@@ -1275,12 +1266,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			CString miniImagePath = util::MakeImageLogfilePath( mixi );
 
 			// インデックス探索
-			for (int i=0; i<m_extendeImageListMap.GetCount(); i++) {
-				if (m_extendeImageListMap[i] == miniImagePath) {
-					iconIndex = i;
-					break;
-				}
-			}
+			iconIndex = theApp.m_imageCache.GetImageIndex( miniImagePath );
 		}
 
 		// アイコンのインデックスを設定

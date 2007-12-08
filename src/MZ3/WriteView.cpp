@@ -125,10 +125,6 @@ void CWriteView::OnInitialUpdate()
 		// 通知領域
 		m_infoEdit.SetFont( &theApp.m_font );
 	}
-
-	// 絵文字アイコンロード
-	m_menuImageList.Create(16, 16, ILC_COLOR24, 0, 4);
-	m_menuImageListMap.RemoveAll();
 }
 
 void CWriteView::OnSize(UINT nType, int cx, int cy)
@@ -1228,7 +1224,9 @@ void CWriteView::PopupWriteBodyMenu(void)
 	POINT pt    = util::GetPopupPos();
 	int   flags = util::GetPopupFlags();
 
-	CWMMenu menu( &m_menuImageList );
+	CImageList* pGlobalImageList = &theApp.m_imageCache.GetImageList();
+
+	CWMMenu menu( pGlobalImageList );
 	menu.LoadMenu( IDR_WRITE_MENU );
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
@@ -1241,10 +1239,10 @@ void CWriteView::PopupWriteBodyMenu(void)
 	const int SUBMENU_MAX = 20;
 	int iSubMenu = 0;
 	CWMMenu emojiSubMenu[SUBMENU_MAX] = {
-		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
-		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
-		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
-		CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), CWMMenu(&m_menuImageList), 
+		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
 	};
 
 	std::vector<WMMENUBITMAP> menuBitmapArray;
@@ -1279,14 +1277,7 @@ void CWriteView::PopupWriteBodyMenu(void)
 			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_emoji[i].url );
 
 			// ロード済みか判定
-			int imageIndex = -1;
-			for (int i=0; i<m_menuImageListMap.GetCount(); i++) {
-				if (m_menuImageListMap[i] == path) {
-					// インデックス設定
-					imageIndex = i;
-					break;
-				}
-			}
+			int imageIndex = theApp.m_imageCache.GetImageIndex( path );
 			if (imageIndex<0) {
 				// 未ロードなのでロード
 				CMZ3BackgroundImage image(L"");
@@ -1299,11 +1290,9 @@ void CWriteView::PopupWriteBodyMenu(void)
 					// ビットマップの追加
 					CBitmap bm;
 					bm.Attach( resizedImage.getHandle() );
-					m_menuImageList.Add( &bm, (CBitmap*) NULL );
-					m_menuImageListMap.Add( path );
 
-					// インデックス設定
-					imageIndex = m_menuImageList.GetImageCount() -1;
+					// グローバルキャッシュに追加し、インデックスを取得する
+					imageIndex = theApp.m_imageCache.Add( &bm, (CBitmap*) NULL, path );
 				}
 			}
 			if (imageIndex>=0) {

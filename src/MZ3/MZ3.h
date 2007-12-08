@@ -19,6 +19,7 @@
 #include "MZ3BackgroundImage.h"
 #include "MZ3SkinInfo.h"
 #include "EmojiMap.h"
+#include "ImageCacheManager.h"
 
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
@@ -100,6 +101,7 @@ public:
 public:
 	DWORD				m_dpi;					///< DPI
 	ScreenResolution	m_currentDisplayMode;	///< 解像度
+
 	/// プラットフォーム用のフラグ
 	BOOL				m_bPocketPC;
 	BOOL				m_bSmartphone;
@@ -136,11 +138,13 @@ public:
 	inifile::IniFile	m_logfile;				///< ログ用 INI ファイル
 
 	//--- mixi データ
-
 	Mz3GroupData		m_root;					///< mixi 用データのルート要素
 
 	//--- 絵文字マップ
 	EmojiMapList		m_emoji;				///< mixi 絵文字マップ
+
+	//--- 画像
+	ImageCacheManager	m_imageCache;			///< グローバル画像キャッシュ（16x16）
 
 	//--- 通信系
 	CMixiData			m_mixiBeforeRelogin;	///< 再ログイン前の mixi オブジェクト
