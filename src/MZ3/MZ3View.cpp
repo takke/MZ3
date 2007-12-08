@@ -3376,6 +3376,9 @@ void CMZ3View::OnCheckCruise()
 
 	// YES なので予約設定/解除を実行する
 	pCategory->m_bCruise = !pCategory->m_bCruise;
+
+	// グループ定義ファイルの保存
+	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
 }
 
 bool CMZ3View::CruiseToNextCategory(void)

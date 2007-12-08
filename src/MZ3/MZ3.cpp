@@ -430,9 +430,6 @@ int CMZ3App::ExitInstance()
 	// オプションの保存
 	m_optionMng.Save();
 
-	// グループ定義ファイルの保存
-	Mz3GroupDataWriter::save( m_root, m_filepath.groupfile );
-
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理完了" );
 
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 終了" );
