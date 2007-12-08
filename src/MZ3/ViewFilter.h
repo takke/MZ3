@@ -95,7 +95,7 @@ public:
 	/**
 	 * 絵文字コード [m:xx] の分離
 	 */
-	static void ReplaceEmojiCodeToRan2ImageTags( CString& line, CStringArray& bodyArray )
+	static void ReplaceEmojiCodeToRan2ImageTags( CString& line, CStringArray& bodyArray, EmojiMapList& emojiMap )
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
@@ -121,16 +121,29 @@ public:
 			bodyArray.Add( CString( target, results[0].start ) );
 
 			// 絵文字を追加
-/*			const std::wstring& emoji_number = results[1].str;
+			const std::wstring& emoji_code = results[1].str;
 			size_t n = emojiMap.size();
 			for (size_t j=0; j<n; j++) {
-				if (emojiMap[j].code == emoji_number.c_str()) {
-					line.AppendFormat( L"<img src=\"%s\" alt=\"%s\"/>", emojiMap[j].url, emojiMap[j].text );
+				if (emojiMap[j].code == emoji_code.c_str()) {
+					CString path = util::MakeImageLogfilePathFromUrl( emojiMap[j].url );
+					int imageIndex = theApp.m_imageCache.GetImageIndex(path);
+					if (imageIndex == -1) {
+						// 未ロードなのでロードする
+						CMZ3BackgroundImage image(L"");
+						if (!image.load( path )) {
+							// ロードエラー
+							break;
+						}
+
+						// ビットマップの追加
+						CBitmap bm;
+						bm.Attach( image.getHandle() );
+						imageIndex = theApp.m_imageCache.Add( &bm, (CBitmap*)NULL, path );
+					}
+					bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );
 					break;
 				}
 			}
-*/
-			bodyArray.Add( results[1].str.c_str() );
 
 			// ターゲットを更新。
 			target.Delete( 0, results[0].end );

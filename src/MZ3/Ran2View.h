@@ -275,6 +275,8 @@ class Ran2View : public CWnd
 	COLORREF	normalTextColor,reverseTextColor,markTextColor;	// 通常時文字色、反転時文字色、特殊マーク色
 	int			drawOffsetLine;				// 現在描画を行っている行位置
 
+	CImageList*	m_pImageList;				// 画像キャッシュへのポインタ
+
 	// ドラッグ関連情報
 	bool		m_bDragging;				// マウスドラッグ中
 	CPoint		m_ptDragStart;				// ドラッグ開始位置
@@ -319,7 +321,7 @@ public:
 	void	Refresh();					// 現在位置を再描画
 
 	// データの読み込み
-	int		LoadDetail(CStringArray* bodyArray);
+	int		LoadDetail(CStringArray* bodyArray, CImageList* pImageList);
 
 	// 小分けした描画関数
 	void	DrawTextProperty(int line,CPtrArray* textProperties);

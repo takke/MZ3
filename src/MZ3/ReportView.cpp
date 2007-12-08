@@ -665,7 +665,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 				}
 			} else {
 				// 絵文字用フィルタ
-				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray );
+				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji );
 				LPCTSTR brLine = TEXT("[br]");
 				bodyStrArray->Add(brLine);
 			}
@@ -687,7 +687,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 		// 描画開始
 		m_edit.ShowWindow(SW_HIDE);
-		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray);
+		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());
 		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
 		m_detailView->ResetDragOffset();
 		m_detailView->DrawDetail(0);

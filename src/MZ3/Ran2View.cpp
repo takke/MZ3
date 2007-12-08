@@ -190,6 +190,7 @@ Ran2View::Ran2View()
 	, m_dragStartLine(0)
 	, m_offsetPixelY(0)
 	, m_dwLastLButtonUp(0)
+	, m_pImageList(NULL)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -1039,8 +1040,10 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 	// 外字の設定
 	}else if( currentTag == Tag_gaiji ){
 		GaijiProperty* newGaiji = new GaijiProperty();
+
+		// [m:xx] から xx を抽出し、リソースIDとする
 		newGaiji->resourceID = hashRecord->value.Mid(3,hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
-		int blockWidth = charWidth;	// 固定値でおｋじゃね？192dpi機は二倍すること！
+		int blockWidth = charWidth;	// 文字幅と同一とする
 
 		// 外字が幅に収まらない場合は改行して再チャレンジ支援
 		if( blockWidth > bigBridgeInfo->remainWidth ){
@@ -1154,12 +1157,15 @@ void Ran2View::ChangeFrameProperty(BigBridgeProperty* bigBridgeInfo)
 
 
 // DATファイルからのデータ構築
-int Ran2View::LoadDetail(CStringArray* bodyArray)
+int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 {
 #ifdef DEBUG
 	::GlobalMemoryStatus(&memState);
 	TRACE(TEXT("★LoadDetail起動時の残メモリ:%d bytes\r\n"),memState.dwAvailPhys);
 #endif
+
+	m_pImageList = pImageList;
+
 	int rc = 0;
 	::SetCursor(::LoadCursor(NULL, IDC_WAIT));
 	m_offsetPixelY = 0;
@@ -1385,51 +1391,16 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 		// テキストブロックの出力(後で関数化する)
 		GaijiProperty* gaiji = (GaijiProperty*)gaijiProperties->GetAt(j);
 		int sy = topOffset + framePixel + (line*(charHeight+charHeightOffset));
-//		if( line > 0 )
-//			sy -= (charHeightOffset/2);	// 外字は文字高のオフセット位置を通常文字の半分から描画する
 
-		CString szTarget;
-		szTarget.Format(TEXT("\\%s.gif"),gaiji->resourceID);
-		CString localpath = theApp.m_filepath.imageFolder + szTarget;
-
-		CMZ3BackgroundImage image(L"");
-		if (!image.load( localpath )) {
-			// ロードエラー
-			return;
-		}
-
-		// 描画
-		CSize size = image.getBitmapSize();
-//#ifdef WINCE
-		util::DrawBitmap( memDC->m_hDC, image.getHandle(), 0, 0, size.cx, size.cy, gaiji->drawRect.left, sy, charHeight, charHeight );
-//#else
-//		image.m_gdiPlusImage.Draw( memDC->m_hDC, gaiji->drawRect.left, sy, charHeight, charHeight, 0, 0, size.cx, size.cy );
-//#endif
-
-/*		CBitmap* gaijiBMP = new CBitmap();
-
-		// ローカルキャッシュから取得する
-		bool bLoaded = false;
-		CString localpath = theApp.m_filepath.imageFolder + szTarget;
-		if (util::ExistFile(localpath)) {
-			// 画像ロード
-			HBITMAP hBitmap = ::SHLoadImageFile( localpath );
-			if( hBitmap ) {
-				gaijiBMP->Attach(hBitmap);
+		if (m_pImageList!=NULL) {
+			int imageIdx = _wtoi(gaiji->resourceID);
+			// 長さチェック
+			if (0 <= imageIdx && imageIdx < m_pImageList->GetImageCount()) {
+				// 描画
+				m_pImageList->Draw( memDC, imageIdx, CPoint(gaiji->drawRect.left, sy), ILD_TRANSPARENT );
 			}
 		}
-
-		BITMAP bmpObj;
-		gaijiBMP->GetObject(sizeof(BITMAP),&bmpObj);
-
-#ifdef WINCE
-		::TransparentImage(memDC->m_hDC, gaiji->drawRect.left, sy, bmpObj.bmWidth, bmpObj.bmHeight,
-			 gaijiBMP->m_hObject, 0, 0, bmpObj.bmWidth, bmpObj.bmHeight, RGB(0xFF,0x00,0xFF)) ;
-#else
-#endif
-
-		delete gaijiBMP;
-*/	}
+	}
 }
 
 
@@ -1599,8 +1570,21 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		HtmlRecord*	hashRecord = new HtmlRecord();
 
 		// 文字、絵文字の振り分け
-		if( lineStr.Find(TEXT("[m:")) != -1 ){
-			hashRecord->key = TEXT("gaiji");
+		if( wcsncmp(lineStr, TEXT("[m:"), 2) == 0){
+			// 数値, インデックスチェックが通れば外字、それ以外はテキストとみなす
+			CString code = lineStr.Mid(3,lineStr.GetLength()-4);
+			for (int i=0; i<code.GetLength(); i++) {
+				if (!isdigit(code[i])) {
+					code = L"";
+				}
+			}
+			if (code.IsEmpty()) {
+				// 非外字
+				hashRecord->key = TEXT("text");
+			} else {
+				// 外字
+				hashRecord->key = TEXT("gaiji");
+			}
 		}else if( lineStr.Compare(TEXT("[br]")) == 0 ) {
 			hashRecord->key = TEXT("br");
 		}else if( lineStr.Compare(TEXT("[b]")) == 0 ) {
