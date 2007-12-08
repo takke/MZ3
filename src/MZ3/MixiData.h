@@ -23,7 +23,6 @@ protected:
 	CString			m_url;					///< URL
 	CString			m_postAddress;			///< ＰＯＳＴ用のアドレス
 	int				m_id;					///< 記事ID
-	int				m_commId;				///< コメントID
 	int				m_commentIndex;			///< コメント番号
 	int				m_commentCount;			///< コメントの数
 	CONTENT_TYPE	m_contentType;			///< Content-Type
@@ -65,7 +64,6 @@ public:
 		: m_accessType(ACCESS_INVALID) // 初期値
 		, m_authorId(-1)
 		, m_id(-1)
-		, m_commId(-1)
 		, m_commentIndex(-1)
 		, m_commentCount(0)
 		, m_contentType(CONTENT_TYPE_INVALID)
@@ -119,29 +117,26 @@ public:
 	void SetURL(CString url)			{ m_url = url; }
 	CString GetURL() const				{ return m_url; }
 
-	void SetAccessType(ACCESS_TYPE type) { m_accessType = type; };
-	ACCESS_TYPE GetAccessType()	const	{ return m_accessType; };
+	void SetAccessType(ACCESS_TYPE type) { m_accessType = type; }
+	ACCESS_TYPE GetAccessType()	const	{ return m_accessType; }
 
-	void SetCommentIndex(int value)		{ m_commentIndex = value; };
-	int GetCommentIndex() const			{ return m_commentIndex; };
+	void SetCommentIndex(int value)		{ m_commentIndex = value; }
+	int GetCommentIndex() const			{ return m_commentIndex; }
 
-	void SetID(int value)				{ m_id = value; };
-	int GetID()	const					{ return m_id; };
+	void SetID(int value)				{ m_id = value; }
+	int GetID()	const					{ return m_id; }
 
-	void SetCommentID(int value)		{ m_commId = value; };
-	int GetCommentID()					{ return m_commId; };
+	void SetPostAddress(LPCTSTR str)	{ m_postAddress = str; }
+	LPCTSTR GetPostAddress()			{ return m_postAddress; }
 
-	void SetPostAddress(LPCTSTR str)	{ m_postAddress = str; };
-	LPCTSTR GetPostAddress()			{ return m_postAddress; };
+	void SetContentType(CONTENT_TYPE value)	{ m_contentType = value; }
+	CONTENT_TYPE GetContentType() const		{ return m_contentType; }
 
-	void SetContentType(CONTENT_TYPE value)	{ m_contentType = value; };
-	CONTENT_TYPE GetContentType() const		{ return m_contentType; };
+	void SetCommentCount(int value)	    { m_commentCount = value; }
+	int GetCommentCount() const			{ return m_commentCount; }
 
-	void SetCommentCount(int value)	    { m_commentCount = value; };
-	int GetCommentCount() const			{ return m_commentCount; };
-
-	void SetOwnerID(int value)			{ m_ownerId = value; };
-	int GetOwnerID() const				{ return m_ownerId; };
+	void SetOwnerID(int value)			{ m_ownerId = value; }
+	int GetOwnerID() const				{ return m_ownerId; }
 
 	void	AddImage(LPCTSTR str)		{ m_imageArray.push_back(str); }
 	void	AddMovie(LPCTSTR str)		{ m_MovieArray.push_back(str); }

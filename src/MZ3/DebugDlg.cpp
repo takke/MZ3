@@ -92,10 +92,6 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, util::int2str( data->GetID() ) );
 	idx++;
 
-	m_List.InsertItem( idx, L"コメントID" );
-	m_List.SetItemText( idx, 1, util::int2str( data->GetCommentID() ) );
-	idx++;
-
 	m_List.InsertItem( idx, L"コメント番号" );
 	m_List.SetItemText( idx, 1, util::int2str( data->GetCommentIndex() ) );
 	idx++;
