@@ -421,7 +421,7 @@ int FindFileCallback(const TCHAR* szDirectory,
 inline bool SetClipboardDataTextW( const wchar_t* szText_ )
 {
 	HGLOBAL hMem = GlobalAlloc( GHND | GMEM_SHARE, (wcslen(szText_)+1)*sizeof(TCHAR) );
-	wchar_t* pPtr = (wchar_t*)::GlobalLock( hMem );
+	wchar_t* pPtr = (wchar_t*)GlobalLock( hMem );
 	wcscpy( pPtr, szText_ );
 	GlobalUnlock( hMem );
 	

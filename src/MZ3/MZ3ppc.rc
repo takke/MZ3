@@ -180,6 +180,10 @@ BEGIN
             MENUITEM "ブックマークに追加",                   ID_ADD_BOOKMARK
             MENUITEM "ブックマークから削除",                  ID_DEL_BOOKMARK
         END
+        POPUP "編集"
+        BEGIN
+            MENUITEM "コピー",                         ID_EDIT_COPY
+        END
         MENUITEM "ブラウザで開く（このページ）...",           ID_OPEN_BROWSER
         MENUITEM "ブラウザで開く（ユーザーページ）...",         ID_OPEN_BROWSER_USER
         MENUITEM "プロフィールページを開く",                ID_OPEN_PROFILE
