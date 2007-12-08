@@ -280,7 +280,7 @@ void Option::Load()
 		// Treo用の画面節約モード::ペインのラベル非表示
 		s = inifile.GetValue( "KillPaneLabel", "UI" );
 		if(! s.empty() ) {
-			m_killPaneLabel = (bool)atoi(s.c_str());
+			m_killPaneLabel = atoi(s.c_str()) != 0 ? true : false;
 		}
 	}
 
