@@ -114,6 +114,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONUP()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 
@@ -1267,6 +1268,21 @@ BOOL CReportView::PreTranslateMessage(MSG* pMsg)
 			}
 			break;
 
+		case WM_MOUSEWHEEL:
+			// らんらんビュー上のホイールもフォーカスが違うのでこちらに来る。
+			// マウスの座標で判定する。
+			{
+				CPoint pt;
+				GetCursorPos( &pt );
+
+				CRect rect;
+				m_detailView->GetWindowRect( &rect );
+				if (rect.PtInRect( pt )) {
+					OnMouseWheel( LOWORD(pMsg->wParam), HIWORD(pMsg->wParam), CPoint(LOWORD(pMsg->lParam), HIWORD(pMsg->lParam)) );
+					return TRUE;
+				}
+			}
+			break;
 		}
 	}
 
@@ -2833,4 +2849,26 @@ afx_msg void CReportView::OnEditCopy()
 #else
 	m_edit.Copy();
 #endif
+}
+
+BOOL CReportView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// 高解像度ホイール対応のため、delta 値を累積する。
+	static int s_delta = 0;
+	// 方向が逆になったらキャンセル
+	if ((s_delta>0 && zDelta<0) || (s_delta<0 && zDelta>0)) {
+		s_delta = 0;
+	}
+	s_delta += zDelta;
+
+	if (s_delta>WHEEL_DELTA) {
+		CommandScrollUpEdit();
+		s_delta -= WHEEL_DELTA;
+	} else if (s_delta<-WHEEL_DELTA) {
+		CommandScrollDownEdit();
+		s_delta += WHEEL_DELTA;
+	}
+	return TRUE;
+
+//	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
 }
