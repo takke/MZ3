@@ -362,14 +362,6 @@ BEGIN
     END
 END
 
-IDR_RAN2_MENU MENU 
-BEGIN
-    POPUP "RAN2MENU"
-    BEGIN
-        MENUITEM "ÉRÉsÅ[(&C)",                     ID_EDIT_COPY
-    END
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

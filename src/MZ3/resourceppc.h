@@ -43,7 +43,6 @@
 #define IDI_DOWNLOADED_ICON             160
 #define IDC_GRABBABLE_CURSOR            162
 #define IDC_GRABBING_CURSOR             163
-#define IDR_RAN2_MENU                   164
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201

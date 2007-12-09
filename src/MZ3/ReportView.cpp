@@ -2788,15 +2788,7 @@ void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CReportView::OnRButtonUp(UINT nFlags, CPoint point)
 {
 #ifdef USE_RAN2
-	POINT pt    = util::GetPopupPos();
-	int   flags = util::GetPopupFlags();
-
-	CMenu menu;
-	menu.LoadMenu(IDR_RAN2_MENU);
-	CMenu* pcThisMenu = menu.GetSubMenu(0);
-
-	// メニューのポップアップ
-	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this);
+	MyPopupReportMenu();
 #endif
 
 //	CFormView::OnRButtonUp(nFlags, point);
