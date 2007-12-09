@@ -666,7 +666,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 				}
 			} else {
 				// 絵文字用フィルタ
-				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji );
+				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
 				LPCTSTR brLine = TEXT("[br]");
 				bodyStrArray->Add(brLine);
 			}

@@ -95,7 +95,7 @@ public:
 	/**
 	 * 絵文字コード [m:xx] の分離
 	 */
-	static void ReplaceEmojiCodeToRan2ImageTags( CString& line, CStringArray& bodyArray, EmojiMapList& emojiMap )
+	static void ReplaceEmojiCodeToRan2ImageTags( CString& line, CStringArray& bodyArray, EmojiMapList& emojiMap, CWnd* pWnd )
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
@@ -135,9 +135,13 @@ public:
 							break;
 						}
 
+						// 16x16 にリサイズする。
+						CMZ3BackgroundImage resizedImage(L"");
+						util::MakeResizedImage( pWnd, resizedImage, image );
+
 						// ビットマップの追加
 						CBitmap bm;
-						bm.Attach( image.getHandle() );
+						bm.Attach( resizedImage.getHandle() );
 						imageIndex = theApp.m_imageCache.Add( &bm, (CBitmap*)NULL, path );
 					}
 					bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );

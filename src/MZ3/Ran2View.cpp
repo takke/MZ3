@@ -1060,7 +1060,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 		// [m:xx] から xx を抽出し、リソースIDとする
 		newGaiji->resourceID = hashRecord->value.Mid(3,hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
-		int blockWidth = charWidth;	// 文字幅と同一とする
+//		int blockWidth = charWidth;	// 文字幅と同一とする
+		int blockWidth = 16 +gaijiWidthOffset;	// 絵文字は16ピクセル固定（CImageListを利用するため）
 
 		// 外字が幅に収まらない場合は改行して再チャレンジ支援
 		if( blockWidth > bigBridgeInfo->remainWidth ){
