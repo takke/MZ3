@@ -187,7 +187,7 @@ Ran2View::Ran2View()
 	: m_bDragging(false)
 	, m_dragStartLine(0)
 	, m_offsetPixelY(0)
-	, m_dwLastLButtonUp(0)
+	, m_dwFirstLButtonUp(0)
 	, m_pImageList(NULL)
 	, m_drawStartTopOffset(0)
 {
@@ -1721,17 +1721,18 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 
 	// ダブルクリック判定
-	if (m_dwLastLButtonUp>0 &&
-		(GetTickCount() - m_dwLastLButtonUp) < GetDoubleClickTime())
+	if (m_dwFirstLButtonUp>0 &&
+		(GetTickCount() - m_dwFirstLButtonUp) < GetDoubleClickTime())
 	{
 		// ダブルクリック済みなのでクリアする
-		m_dwLastLButtonUp = 0;
+		m_dwFirstLButtonUp = 0;
 
 		// ダブルクリックとみなす
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
 	} else {
-		m_dwLastLButtonUp = GetTickCount();
+		m_dwFirstLButtonUp = GetTickCount();
+		m_ptFirstLButtonUp = point;
 		
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
@@ -1825,6 +1826,27 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 
 void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 {
+	// Nピクセル移動したらダブルクリックキャンセル
+	if (m_dwFirstLButtonUp!=0) {
+		int dx = point.x - m_ptFirstLButtonUp.x;
+		int dy = point.y - m_ptFirstLButtonUp.y;
+//		TRACE( L"dx,dy = (%3d,%3d), r^2=%3d\n", dx, dy, dx*dx+dy*dy );
+#ifdef WINCE
+		// WindowsMobile : タップのためかなり大きなズレが生じる
+		// TODO : 本来は DPI 値で自動調整かつユーザ毎に変更可能にすべき。
+		const int N = 30;
+#else
+		// Windows : クリックのためズレはかなり小さい
+		const int N = 2;
+#endif
+		if (dx*dx + dy*dy > N*N) {
+//			CString msg;
+//			msg.Format( L"ダブルクリックキャンセル, dx,dy = (%3d,%3d), r^2=%3d\n", dx, dy, dx*dx+dy*dy );
+//			MZ3LOGGER_DEBUG( msg );
+			m_dwFirstLButtonUp = 0;
+		}
+	}
+
 	if (m_bDragging) {
 		// ドラッグ処理
 		int dy = m_ptDragStart.y - point.y;

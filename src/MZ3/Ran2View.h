@@ -281,7 +281,9 @@ class Ran2View : public CWnd
 	int			m_dragStartLine;			// ドラッグ開始時の行番号
 	int			m_offsetPixelY;				// オフセットピクセル数
 
-	DWORD		m_dwLastLButtonUp;			// 前回左クリックされた時刻
+	// ダブルクリック判定情報
+	DWORD		m_dwFirstLButtonUp;			// 最初に左クリックされた時刻
+	CPoint		m_ptFirstLButtonUp;			// 最初に左クリックされた位置
 
 	MainInfo*	parsedRecord;
 
