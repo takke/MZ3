@@ -826,7 +826,15 @@ BOOL CReportView::CommandMoveUpList()
 	} else {
 		// 一番上ではないので、上に移動
 		int idx = m_list.GetSelectedItem();
-		if (idx>=0) {
+		if (idx<0) {
+			// 選択なしなので最初の項目を選択
+			idx = 0;
+			util::MySetListCtrlItemFocusedAndSelected( m_list, idx, true );
+			// 非表示ならスクロール
+			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+				m_list.EnsureVisible( idx, FALSE );
+			}
+		} else {
 			util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
 			util::MySetListCtrlItemFocusedAndSelected( m_list, --idx, true );
 
@@ -847,7 +855,15 @@ BOOL CReportView::CommandMoveDownList()
 	} else {
 		// 一番下ではないので、下に移動
 		int idx = m_list.GetSelectedItem();
-		if (idx>=0) {
+		if (idx<0) {
+			// 選択なしなので最初の項目を選択
+			idx = 0;
+			util::MySetListCtrlItemFocusedAndSelected( m_list, idx, true );
+			// 非表示ならスクロール
+			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
+				m_list.EnsureVisible( idx, FALSE );
+			}
+		} else {
 			util::MySetListCtrlItemFocusedAndSelected( m_list,   idx, false );
 			util::MySetListCtrlItemFocusedAndSelected( m_list, ++idx, true );
 
