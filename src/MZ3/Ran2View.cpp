@@ -321,7 +321,7 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 	BITMAP bmp;
 	GetObject(memBMP->m_hObject, sizeof(BITMAP), &bmp);
 	if (bmp.bmWidth < screenWidth ||
-		bmp.bmHeight < screenHeight) 
+		bmp.bmHeight < screenHeight*2) 
 	{
 		// 解放
 		if( backDC != NULL ){
@@ -330,6 +330,12 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 
 		if( memDC != NULL ){
 			memDC->DeleteDC();
+		}
+
+		if( memBMP != NULL ){
+			memBMP->DeleteObject();
+			delete memBMP;
+			memBMP = new CBitmap();
 		}
 
 		// バックバッファ生成
@@ -612,10 +618,6 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 	// 特に補正とかがなければそのまま設定した値を返す。
 	return(newHeight);
 }
-
-
-
-
 
 
 void Ran2View::OnPaint()
