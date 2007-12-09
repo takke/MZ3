@@ -1707,6 +1707,7 @@ void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void Ran2View::ResetDragOffset(void)
 {
+	KillTimer(TIMERID_AUTOSCROLL);
 	m_offsetPixelY = 0;
 }
 
