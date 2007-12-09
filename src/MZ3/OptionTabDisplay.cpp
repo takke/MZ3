@@ -99,6 +99,9 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 	// 初期化
 	theApp.m_root.initForTopPage();
 
+	// グループ定義ファイルの保存
+	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+
 	// 再起動
 	// ・・・できないのでメッセージを表示して終了。
 	MessageBox( L"初期化処理が完了したため" MZ3_APP_NAME L"を終了します" );
