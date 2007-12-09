@@ -289,6 +289,7 @@ class Ran2View : public CWnd
 	DWORD		m_dwLastMouseMoveTick;		// 前回の移動時刻
 	CPoint		m_ptLastMouseMove;			// 前回の移動位置
 	double		m_dLastMouseMoveSpeed;		// 前回のMOUSEMOVE時の移動速度 [pixel/msec]
+	double		m_dLastMouseMoveAccel;		// 前回のMOUSEMOVE時の移動加速度 [pixel/msec^2]
 	DWORD		m_dwAutoScrollStartTick;	// 自動スクロール開始時刻
 	int			m_yAutoScrollMax;			// 自動スクロール中の最大移動量
 

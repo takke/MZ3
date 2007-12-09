@@ -194,6 +194,7 @@ Ran2View::Ran2View()
 	, m_dwLastMouseMoveTick(0)
 	, m_ptLastMouseMove(0,0)
 	, m_dLastMouseMoveSpeed(0.0)
+	, m_dLastMouseMoveAccel(0.0)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -1410,7 +1411,6 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 }
 
 
-
 // 行内のテキストプロパティの配列を描画する
 // line: 描画したい行
 // textProperties: textPropertyをまとめた配列
@@ -1432,6 +1432,8 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 		}
 	}
 }
+
+
 // datファイルから実行時クラスへの変換その2(Unicodeに変換されている事が前提)
 // ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
 MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
@@ -1835,12 +1837,16 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		m_dragStartLine = drawOffsetLine;
 		m_ptDragStart.y -= m_offsetPixelY;
 		m_offsetPixelY = 0;
+
+		// 自動スクロール停止
+		KillTimer( TIMERID_AUTOSCROLL );
 	}
 
 	// 自動スクロール情報
 	m_dwLastMouseMoveTick = GetTickCount();
 	m_ptLastMouseMove = point;
 	m_dLastMouseMoveSpeed = 0.0;
+	m_dLastMouseMoveAccel = 0.0;
 
 //	CWnd::OnLButtonDown(nFlags, point);
 }
@@ -1878,10 +1884,13 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 			TRACE( L" elapsed : %5d [msec] ", dt );
 			TRACE( L" dy      : %5d [px] ", dy );
 			if (dt>0) {
-				m_dLastMouseMoveSpeed = dy / (double)dt;
+				m_dLastMouseMoveSpeed = (double)dy / dt;
+				m_dLastMouseMoveAccel = (double)dy / dt / dt;
 				TRACE( L" speed   : %5.2f [px/msec]", m_dLastMouseMoveSpeed );
+				TRACE( L" accel   : %5.2f [px/msec]", m_dLastMouseMoveAccel );
 			} else {
 				m_dLastMouseMoveSpeed = 0.0;
+				m_dLastMouseMoveAccel = 0.0;
 			}
 			TRACE( L"\n" );
 		
@@ -1934,25 +1943,29 @@ void Ran2View::ScrollByMoveY(int dy)
 void Ran2View::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent==TIMERID_AUTOSCROLL) {
+		// 自動スクロール
+
 		// 仮想的な移動量算出
 		int dt = GetTickCount() - m_dwAutoScrollStartTick;
 		// 擬似的なマイナスの加速度とする。
-		double accel = -30 * 0.01 * 0.01;	// マイナスの加速度, 値は適当ｗ
-		if (m_dLastMouseMoveSpeed<0) {
-			accel *= -1.0;
-		}
+#ifdef WINCE
+		double accel = -m_dLastMouseMoveAccel * 0.10;	// マイナスの加速度, スケーリングは適当ｗ
+#else
+		double accel = -m_dLastMouseMoveAccel * 0.03;	// マイナスの加速度, スケーリングは適当ｗ
+#endif
 
 		int dyByAccel    = (int)((accel*dt*dt)/2.0);			// マイナスの加速度
 		int dyByVelocity = (int)(dt * m_dLastMouseMoveSpeed);	// 初速による移動	
 		int dyAutoScroll = dyByAccel + dyByVelocity;			// LButtonUp からの移動量
 
-		TRACE( L" dt : %5d, speed : %5.2f, dy : %5d (%5d,%5d)\n", dt, m_dLastMouseMoveSpeed, dyAutoScroll, dyByAccel, dyByVelocity );
+		TRACE( L" dt : %5d, speed : %5.2f, accel : %5.2f, dy : %5d (%5d,%5d)\n", 
+			dt, m_dLastMouseMoveSpeed, m_dLastMouseMoveAccel, dyAutoScroll, dyByAccel, dyByVelocity );
 
 		// 最大位置より戻った（極点を超えた）、またはN秒経過したなら終了
 		if (m_dLastMouseMoveSpeed == 0.0 ||
 			(m_dLastMouseMoveSpeed < 0 && dyAutoScroll > m_yAutoScrollMax) ||
 			(m_dLastMouseMoveSpeed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
-			dt > 2 * 1000)
+			dt > 5 * 1000)
 		{
 			KillTimer(nIDEvent);
 		} else {
