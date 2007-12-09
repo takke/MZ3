@@ -13,6 +13,7 @@ COLORREF solidWhite = RGB(0xFF,0xFF,0xFF);
 COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
 COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
+#define TIMERID_AUTOSCROLL	1
 
 // 各プロパティのコンストラクタ/デストラクタ
 MainInfo::MainInfo() : rowInfo(NULL)
@@ -190,6 +191,9 @@ Ran2View::Ran2View()
 	, m_dwFirstLButtonUp(0)
 	, m_pImageList(NULL)
 	, m_drawStartTopOffset(0)
+	, m_dwLastMouseMoveTick(0)
+	, m_ptLastMouseMove(0,0)
+	, m_dLastMouseMoveSpeed(0.0)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -228,6 +232,7 @@ BEGIN_MESSAGE_MAP(Ran2View, CWnd)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONUP()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -1731,9 +1736,21 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
 	} else {
+		// ドラッグ完了
 		m_dwFirstLButtonUp = GetTickCount();
 		m_ptFirstLButtonUp = point;
-		
+
+		// 自動スクロール
+		TRACE( L"! speed   : %5.2f [px/msec]\n", m_dLastMouseMoveSpeed );
+
+		KillTimer( TIMERID_AUTOSCROLL );
+		if (m_dLastMouseMoveSpeed != 0.0) {
+			// 自動スクロール開始
+			m_dwAutoScrollStartTick = GetTickCount();
+			m_yAutoScrollMax = 0;
+			SetTimer( TIMERID_AUTOSCROLL, 20L, NULL );
+		}
+
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
 	}
@@ -1820,6 +1837,11 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		m_offsetPixelY = 0;
 	}
 
+	// 自動スクロール情報
+	m_dwLastMouseMoveTick = GetTickCount();
+	m_ptLastMouseMove = point;
+	m_dLastMouseMoveSpeed = 0.0;
+
 //	CWnd::OnLButtonDown(nFlags, point);
 }
 
@@ -1848,31 +1870,28 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 	}
 
 	if (m_bDragging) {
+		// 自動スクロール情報収集
+		{
+			int dt = GetTickCount() - m_dwLastMouseMoveTick;
+			int dy = point.y - m_ptLastMouseMove.y;
+//			TRACE( L"---\n" );
+			TRACE( L" elapsed : %5d [msec] ", dt );
+			TRACE( L" dy      : %5d [px] ", dy );
+			if (dt>0) {
+				m_dLastMouseMoveSpeed = dy / (double)dt;
+				TRACE( L" speed   : %5.2f [px/msec]", m_dLastMouseMoveSpeed );
+			} else {
+				m_dLastMouseMoveSpeed = 0.0;
+			}
+			TRACE( L"\n" );
+		
+			m_dwLastMouseMoveTick = GetTickCount();
+			m_ptLastMouseMove = point;
+		}
+
 		// ドラッグ処理
 		int dy = m_ptDragStart.y - point.y;
-		int d_line = dy / (charHeight + charHeightOffset);
-
-//		TRACE( L"---\n" );
-//		TRACE( L"d_line       : %5d\n", d_line );
-//		TRACE( L"dy           : %5d\n", dy );
-//		TRACE( L"offset       : %5d\n", m_offsetPixelY );
-
-		if (-dy%(charHeight + charHeightOffset) <=0 || drawOffsetLine > 0) {
-			// ピクセルオフセット
-			// （0行目であれば上方向のスクロールは行わない）
-			m_offsetPixelY = -dy % (charHeight + charHeightOffset);
-		}
-
-		// 下の方にスクロール可能か確認する
-		if (parsedRecord != NULL &&
-			parsedRecord->rowInfo != NULL &&
-			(m_dragStartLine + d_line) <= parsedRecord->rowInfo->GetSize() - viewLineMax) 
-		{
-			DrawDetail(m_dragStartLine + d_line);
-
-			// スクロール位置が変化したかもしれないのでオーナーに通知
-			::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
-		}
+		ScrollByMoveY( dy );
 	} else {
 		// スクロール可能であれば「パー」のカーソルに変更
 		if (GetAllLineCount()-GetViewLineMax() > 0) {
@@ -1883,3 +1902,67 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 	CWnd::OnMouseMove(nFlags, point);
 }
 
+
+void Ran2View::ScrollByMoveY(int dy)
+{
+	int d_line = dy / (charHeight + charHeightOffset);
+
+//	TRACE( L"---\n" );
+//	TRACE( L"d_line       : %5d\n", d_line );
+//	TRACE( L"dy           : %5d\n", dy );
+//	TRACE( L"offset       : %5d\n", m_offsetPixelY );
+
+	if (-dy % (charHeight + charHeightOffset) <=0 || drawOffsetLine > 0) {
+		// ピクセルオフセット
+		// （0行目であれば上方向のスクロールは行わない）
+		m_offsetPixelY = -dy % (charHeight + charHeightOffset);
+	}
+
+	// 下の方にスクロール可能か確認する
+	if (parsedRecord != NULL &&
+		parsedRecord->rowInfo != NULL &&
+		(m_dragStartLine + d_line) <= parsedRecord->rowInfo->GetSize() - viewLineMax) 
+	{
+		DrawDetail(m_dragStartLine + d_line);
+
+		// スクロール位置が変化したかもしれないのでオーナーに通知
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(m_ptLastMouseMove.x, m_ptLastMouseMove.y+dy) );
+	}
+}
+
+
+void Ran2View::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent==TIMERID_AUTOSCROLL) {
+		// 仮想的な移動量算出
+		int dt = GetTickCount() - m_dwAutoScrollStartTick;
+		// 擬似的なマイナスの加速度とする。
+		double accel = -30 * 0.01 * 0.01;	// マイナスの加速度, 値は適当ｗ
+		if (m_dLastMouseMoveSpeed<0) {
+			accel *= -1.0;
+		}
+
+		int dyByAccel    = (int)((accel*dt*dt)/2.0);			// マイナスの加速度
+		int dyByVelocity = (int)(dt * m_dLastMouseMoveSpeed);	// 初速による移動	
+		int dyAutoScroll = dyByAccel + dyByVelocity;			// LButtonUp からの移動量
+
+		TRACE( L" dt : %5d, speed : %5.2f, dy : %5d (%5d,%5d)\n", dt, m_dLastMouseMoveSpeed, dyAutoScroll, dyByAccel, dyByVelocity );
+
+		// 最大位置より戻った（極点を超えた）、またはN秒経過したなら終了
+		if (m_dLastMouseMoveSpeed == 0.0 ||
+			(m_dLastMouseMoveSpeed < 0 && dyAutoScroll > m_yAutoScrollMax) ||
+			(m_dLastMouseMoveSpeed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
+			dt > 2 * 1000)
+		{
+			KillTimer(nIDEvent);
+		} else {
+			// dyAutoScroll 分だけ移動する。
+			int dy = m_ptDragStart.y - m_ptLastMouseMove.y - dyAutoScroll;
+			ScrollByMoveY( dy );
+		}
+
+		m_yAutoScrollMax = dyAutoScroll;
+	}
+
+	CWnd::OnTimer(nIDEvent);
+}

@@ -285,6 +285,13 @@ class Ran2View : public CWnd
 	DWORD		m_dwFirstLButtonUp;			// 最初に左クリックされた時刻
 	CPoint		m_ptFirstLButtonUp;			// 最初に左クリックされた位置
 
+	// 自動スクロール情報
+	DWORD		m_dwLastMouseMoveTick;		// 前回の移動時刻
+	CPoint		m_ptLastMouseMove;			// 前回の移動位置
+	double		m_dLastMouseMoveSpeed;		// 前回のMOUSEMOVE時の移動速度 [pixel/msec]
+	DWORD		m_dwAutoScrollStartTick;	// 自動スクロール開始時刻
+	int			m_yAutoScrollMax;			// 自動スクロール中の最大移動量
+
 	MainInfo*	parsedRecord;
 
 #ifdef DEBUG
@@ -367,6 +374,8 @@ public:
 	void ResetDragOffset(void);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	void DrawToScreen(CDC* pDC);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	void ScrollByMoveY(int dy);
 };
 
 
