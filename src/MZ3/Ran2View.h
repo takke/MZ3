@@ -313,6 +313,10 @@ public:
 		}
 		return 0;
 	}
+	// 1行あたりのオフセットピクセル数
+	int		GetCharHeightOffset() {
+		return charHeightOffset;
+	}
 
 	void	PurgeMainRecord();	// mainRecordの破棄
 

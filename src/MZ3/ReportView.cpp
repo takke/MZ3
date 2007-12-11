@@ -376,7 +376,8 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 
 	// スクロールタイプが「ページ単位」なら再計算
 	if( theApp.m_optionMng.m_reportScrollType == option::Option::REPORT_SCROLL_TYPE_PAGE ) {
-		m_scrollLine = (hReport / fontHeight) - 2;
+		int charHeightOffset = m_detailView->GetCharHeightOffset();
+		m_scrollLine = (hReport / (fontHeight+charHeightOffset)) - 2;
 		TRACE(_T("Scrol Line = %d\n"), m_scrollLine);
 	}else{
 		m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
