@@ -393,15 +393,15 @@ public:
 
 			for (int i=0; i<count; i++) {
 				const CString& line = html_.GetAt(i);
-				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"list_community.pl" ) ) {
+				if( util::LineHasStringsNoCase( line, L"<a", L"href=", L"add_diary.pl?id=" ) ) {
 
-					// list_community.pl 以降を抽出
+					// add_diary.pl 以降を抽出
 					CString after;
-					util::GetAfterSubString( line, L"list_community.pl", after );
+					util::GetAfterSubString( line, L"add_diary.pl", after );
 
 					CString id;
 					if( util::GetBetweenSubString( after, L"id=", L"\"", id ) == -1 ) {
-						MZ3LOGGER_ERROR( L"list_community.pl の引数に id 指定がありません。 line[" + line + L"], after[" + after + L"]" );
+						MZ3LOGGER_ERROR( L"add_diary.pl の引数に id 指定がありません。 line[" + line + L"], after[" + after + L"]" );
 					}else{
 						MZ3LOGGER_DEBUG( L"OwnerID = " + id );
 						theApp.m_loginMng.SetOwnerID(id);
