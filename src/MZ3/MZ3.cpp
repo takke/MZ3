@@ -175,6 +175,7 @@ BOOL CMZ3App::InitInstance()
 		// ‰Šú‰»
 		MZ3LOGGER_INFO( L"ƒ^ƒu‰Šú‰»" );
 		m_root.initForTopPage();
+		Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
 	}
 
 	CSingleDocTemplate* pDocTemplate;
