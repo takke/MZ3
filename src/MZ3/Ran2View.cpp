@@ -191,10 +191,6 @@ Ran2View::Ran2View()
 	, m_dwFirstLButtonUp(0)
 	, m_pImageList(NULL)
 	, m_drawStartTopOffset(0)
-	, m_dwLastMouseMoveTick(0)
-	, m_ptLastMouseMove(0,0)
-	, m_dLastMouseMoveSpeed(0.0)
-	, m_dLastMouseMoveAccel(0.0)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -1747,10 +1743,12 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		m_ptFirstLButtonUp = point;
 
 		// 自動スクロール
-		TRACE( L"! speed   : %5.2f [px/msec]\n", m_dLastMouseMoveSpeed );
+		m_autoScrollInfo.push( GetTickCount(), point );
+		double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
+		TRACE( L"! speed   : %5.2f [px/msec]\n", speed );
 
 		KillTimer( TIMERID_AUTOSCROLL );
-		if (m_dLastMouseMoveSpeed != 0.0) {
+		if (speed != 0.0) {
 			// 自動スクロール開始
 			m_dwAutoScrollStartTick = GetTickCount();
 			m_yAutoScrollMax = 0;
@@ -1847,10 +1845,8 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 
 	// 自動スクロール情報
-	m_dwLastMouseMoveTick = GetTickCount();
-	m_ptLastMouseMove = point;
-	m_dLastMouseMoveSpeed = 0.0;
-	m_dLastMouseMoveAccel = 0.0;
+	m_autoScrollInfo.clear();
+	m_autoScrollInfo.push( GetTickCount(), point );
 
 //	CWnd::OnLButtonDown(nFlags, point);
 }
@@ -1881,26 +1877,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_bDragging) {
 		// 自動スクロール情報収集
-		{
-			int dt = GetTickCount() - m_dwLastMouseMoveTick;
-			int dy = point.y - m_ptLastMouseMove.y;
-//			TRACE( L"---\n" );
-			TRACE( L" elapsed : %5d [msec] ", dt );
-			TRACE( L" dy      : %5d [px] ", dy );
-			if (dt>0) {
-				m_dLastMouseMoveSpeed = (double)dy / dt;
-				m_dLastMouseMoveAccel = (double)dy / dt / dt;
-				TRACE( L" speed   : %5.2f [px/msec]", m_dLastMouseMoveSpeed );
-				TRACE( L" accel   : %5.2f [px/msec]", m_dLastMouseMoveAccel );
-			} else {
-				m_dLastMouseMoveSpeed = 0.0;
-				m_dLastMouseMoveAccel = 0.0;
-			}
-			TRACE( L"\n" );
-		
-			m_dwLastMouseMoveTick = GetTickCount();
-			m_ptLastMouseMove = point;
-		}
+		m_autoScrollInfo.push( GetTickCount(), point );
 
 		// ドラッグ処理
 		int dy = m_ptDragStart.y - point.y;
@@ -1939,7 +1916,8 @@ void Ran2View::ScrollByMoveY(int dy)
 		DrawDetail(m_dragStartLine + d_line);
 
 		// スクロール位置が変化したかもしれないのでオーナーに通知
-		::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(m_ptLastMouseMove.x, m_ptLastMouseMove.y+dy) );
+		CPoint lastPoint = m_autoScrollInfo.getLastPoint();
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(lastPoint.x, lastPoint.y+dy) );
 	}
 }
 
@@ -1953,28 +1931,30 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 		int dt = GetTickCount() - m_dwAutoScrollStartTick;
 		// 擬似的なマイナスの加速度とする。
 #ifdef WINCE
-		double accel = -m_dLastMouseMoveAccel * 0.10;	// マイナスの加速度, スケーリングは適当ｗ
+		double accel = -m_autoScrollInfo.calcMouseMoveAccelY() * 0.20;	// マイナスの加速度, スケーリングは適当ｗ
 #else
-		double accel = -m_dLastMouseMoveAccel * 0.03;	// マイナスの加速度, スケーリングは適当ｗ
+		double accel = -m_autoScrollInfo.calcMouseMoveAccelY() * 0.06;	// マイナスの加速度, スケーリングは適当ｗ
 #endif
+		double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
 
-		int dyByAccel    = (int)((accel*dt*dt)/2.0);			// マイナスの加速度
-		int dyByVelocity = (int)(dt * m_dLastMouseMoveSpeed);	// 初速による移動	
-		int dyAutoScroll = dyByAccel + dyByVelocity;			// LButtonUp からの移動量
+		int dyByAccel    = (int)((accel*dt*dt)/2.0);		// マイナスの加速度
+		int dyByVelocity = (int)(dt * speed);				// 初速による移動	
+		int dyAutoScroll = dyByAccel + dyByVelocity;		// LButtonUp からの移動量
 
 		TRACE( L" dt : %5d, speed : %5.2f, accel : %5.2f, dy : %5d (%5d,%5d)\n", 
-			dt, m_dLastMouseMoveSpeed, m_dLastMouseMoveAccel, dyAutoScroll, dyByAccel, dyByVelocity );
+			dt, speed, accel, dyAutoScroll, dyByAccel, dyByVelocity );
 
 		// 最大位置より戻った（極点を超えた）、またはN秒経過したなら終了
-		if (m_dLastMouseMoveSpeed == 0.0 ||
-			(m_dLastMouseMoveSpeed < 0 && dyAutoScroll > m_yAutoScrollMax) ||
-			(m_dLastMouseMoveSpeed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
+		if (speed == 0.0 ||
+			(speed < 0 && dyAutoScroll > m_yAutoScrollMax) ||
+			(speed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
 			dt > 5 * 1000)
 		{
 			KillTimer(nIDEvent);
 		} else {
 			// dyAutoScroll 分だけ移動する。
-			int dy = m_ptDragStart.y - m_ptLastMouseMove.y - dyAutoScroll;
+			CPoint lastPoint = m_autoScrollInfo.getLastPoint();
+			int dy = m_ptDragStart.y - lastPoint.y - dyAutoScroll;
 			ScrollByMoveY( dy );
 		}
 

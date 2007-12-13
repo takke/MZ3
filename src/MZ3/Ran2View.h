@@ -1,6 +1,8 @@
 #if !defined(AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_)
 #define AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_
 
+#include <vector>
+
 namespace Ran2 {
 
 const int framePixel = 1;					// ワク線の太さ(ピクセル数)
@@ -220,6 +222,74 @@ public:
 	~BigBridgeProperty();
 };
 
+// 自動スクロール情報
+struct MouseMoveInfo {
+	DWORD	tick;	///< 時刻
+	CPoint	pt;		///< 位置
+
+	MouseMoveInfo( DWORD tick_, const CPoint& pt_ )
+		: tick(tick_)
+		, pt(pt_)
+	{
+	}
+};
+class AutoScrollInfo {
+public:
+	std::vector<MouseMoveInfo> m_moveInfoList;	///< 移動情報のログ
+
+	void clear() {
+		m_moveInfoList.clear();
+	}
+
+	void push( DWORD tick, const CPoint& pt ) {
+		m_moveInfoList.push_back( MouseMoveInfo(tick,pt) );
+		while (m_moveInfoList.size()>4) {
+			m_moveInfoList.erase( m_moveInfoList.begin() );
+		}
+	}
+
+	double calcMouseMoveSpeedY() {
+		double speed = 0.0;
+
+		if (m_moveInfoList.size()>=2) {
+			MouseMoveInfo& p1 = m_moveInfoList[0];
+			MouseMoveInfo& p2 = m_moveInfoList[m_moveInfoList.size()-1];
+
+			int dt = p2.tick - p1.tick;
+			if (dt>0) {
+				speed = (double)(p2.pt.y - p1.pt.y) / dt;
+			}
+		}
+
+		return speed;
+	}
+
+	double calcMouseMoveAccelY() {
+		double accel = 0.0;
+
+		if (m_moveInfoList.size()>=2) {
+			MouseMoveInfo& p1 = m_moveInfoList[0];
+			MouseMoveInfo& p2 = m_moveInfoList[m_moveInfoList.size()-1];
+
+			int dt = p2.tick - p1.tick;
+			if (dt>0) {
+				accel = (double)(p2.pt.y - p1.pt.y) / dt / dt;
+			}
+		}
+
+		return accel;
+	}
+
+	CPoint getLastPoint()
+	{
+		if (m_moveInfoList.empty()) {
+			return CPoint(0,0);
+		} else {
+			return m_moveInfoList[ m_moveInfoList.size()-1 ].pt;
+		}
+	}
+};
+
 }
 
 using namespace Ran2;
@@ -285,11 +355,8 @@ class Ran2View : public CWnd
 	DWORD		m_dwFirstLButtonUp;			// 最初に左クリックされた時刻
 	CPoint		m_ptFirstLButtonUp;			// 最初に左クリックされた位置
 
-	// 自動スクロール情報
-	DWORD		m_dwLastMouseMoveTick;		// 前回の移動時刻
-	CPoint		m_ptLastMouseMove;			// 前回の移動位置
-	double		m_dLastMouseMoveSpeed;		// 前回のMOUSEMOVE時の移動速度 [pixel/msec]
-	double		m_dLastMouseMoveAccel;		// 前回のMOUSEMOVE時の移動加速度 [pixel/msec^2]
+	AutoScrollInfo	m_autoScrollInfo;		// 自動スクロール情報
+
 	DWORD		m_dwAutoScrollStartTick;	// 自動スクロール開始時刻
 	int			m_yAutoScrollMax;			// 自動スクロール中の最大移動量
 
