@@ -166,7 +166,7 @@ void CDownloadView::OnSize(UINT nType, int cx, int cy)
 	y += hList;
 
 	int x = 0;
-	int w = 80;
+	int w = 100;
 	util::MoveDlgItemWindow( this, IDC_START_STOP_BUTTON, x, y, w,  hButton );
 	x += w;
 	util::MoveDlgItemWindow( this, IDC_EXIT_BUTTON,       x, y, w,  hButton );
@@ -288,6 +288,20 @@ LRESULT CDownloadView::OnFit(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の更新
 	MyUpdateControls();
 
+	// フォーカス設定。
+	// 未ダウンロードファイルがあれば開始ボタン。なければ終了ボタン。
+	bool bHasNoFinishedItem = false;
+	for (int i=0; i<(int)m_items.size(); i++) {
+		if (!m_items[i].bFinished) {
+			bHasNoFinishedItem = true;
+			break;
+		}
+	}
+	if (bHasNoFinishedItem) {
+		GetDlgItem( IDC_START_STOP_BUTTON )->SetFocus();
+	} else {
+		GetDlgItem( IDC_EXIT_BUTTON )->SetFocus();
+	}
 	if (!m_access) {
 		// 準備完了
 		util::MySetInformationText( m_hWnd, L"準備完了" );
