@@ -1062,6 +1062,7 @@ void CMainFrame::OnDownloadManagerView()
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
+#ifndef WINCE
 	switch (pMsg->message) {
 	case WM_XBUTTONUP:
 		{
@@ -1079,6 +1080,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		}
 		break;
 	}
+#endif
 
 	return CFrameWnd::PreTranslateMessage(pMsg);
 }
