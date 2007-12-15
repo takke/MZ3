@@ -801,6 +801,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
+				AdditionalOptions="/MP2"
 				Optimization="3"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
@@ -1127,6 +1128,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
@@ -1344,6 +1346,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
 				Optimization="0"
 				WholeProgramOptimization="false"
 				PreprocessorDefinitions="_DEBUG;USE_RAN2"
