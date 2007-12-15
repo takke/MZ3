@@ -788,12 +788,18 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		// HTML の取得
 
 		// ログアウトチェック
-		if (mixi::LoginPageParser::isLogout(theApp.m_filepath.temphtml) ) {
+		bool bLogout = false;
+		if (mixi::MixiParserBase::isLogout(theApp.m_filepath.temphtml) ) {
+			bLogout = true;
+		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetOwnerID())==0) {
+			// オーナーID未取得の場合もログアウトとみなす。
+			bLogout = true;
+		}
 
+		if (bLogout) {
 			// ログアウト状態になっている
 //			MessageBox(_T("ログアウトしてます\n"));
-			MZ3LOGGER_DEBUG(_T("再度ログインしてからデータを取得します。\n"));
-
+			MZ3LOGGER_INFO(_T("再度ログインしてからデータを取得します。"));
 			util::MySetInformationText( m_hWnd, L"再度ログインしてからデータを取得します" );
 
 			// mixi データを保存（待避）
@@ -900,7 +906,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
 				break;
-			}else{
+			} else {
 				// 新着メッセージ以外なので、ログインのための取得だった。
 
 				// データを待避データに戻す

@@ -20,12 +20,12 @@ public:
 	void Read();
 	void Write();
 
-	void SetEmail(LPCTSTR str) {m_loginMail = str;};
-	LPCTSTR GetEmail() { return m_loginMail; }
-	void SetPassword(LPCTSTR str) {m_loginPwd = str;};
-	LPCTSTR GetPassword() { return m_loginPwd; };
-	void SetOwnerID(LPCTSTR str) {m_ownerId = str;};
-	LPCTSTR GetOwnerID() { return m_ownerId; };
+	void SetEmail(LPCTSTR str)		{ m_loginMail = str; }
+	LPCTSTR GetEmail()				{ return m_loginMail; }
+	void SetPassword(LPCTSTR str)	{ m_loginPwd = str; }
+	LPCTSTR GetPassword()			{ return m_loginPwd; }
+	void SetOwnerID(LPCTSTR str)	{ m_ownerId = str; }
+	LPCTSTR GetOwnerID()			{ return m_ownerId; }
 
 private:
 	CString Read(FILE*);

@@ -27,6 +27,7 @@ IMPLEMENT_DYNCREATE(CWriteView, CFormView)
 // -----------------------------------------------------------------------------
 CWriteView::CWriteView()
 	: CFormView(CWriteView::IDD)
+	, m_abort(FALSE)
 {
 	m_postData = new CPostData();
 	m_sendEnd = TRUE;
@@ -238,7 +239,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 	m_infoEdit.ShowWindow(SW_SHOW);
 
 	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
-		MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
+		MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
 
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
@@ -303,9 +304,18 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ログアウトチェック
-	if (mixi::LoginPageParser::isLogout(theApp.m_filepath.temphtml) ) {
+	bool bLogout = false;
+	if (mixi::MixiParserBase::isLogout(theApp.m_filepath.temphtml) ) {
+		bLogout = true;
+	} else if (wcslen(theApp.m_loginMng.GetOwnerID())==0) {
+		// オーナーID未取得の場合もログアウトとみなす。
+		bLogout = true;
+	}
+
+	if (bLogout) {
 		// ログアウト状態になっている
 		// ログイン処理実施
+		MZ3LOGGER_INFO(_T("ログインします。"));
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
 
 		theApp.m_accessType = ACCESS_LOGIN;
@@ -750,7 +760,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			if (wcslen(theApp.m_loginMng.GetOwnerID()) != 0) {
 				MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
 			} else {
-				MZ3LOGGER_DEBUG( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
+				MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
 
 				((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
 				theApp.m_accessType = ACCESS_MAIN;
