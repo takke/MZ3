@@ -1059,3 +1059,26 @@ void CMainFrame::OnDownloadManagerView()
 
 	theApp.ChangeView(theApp.m_pDownloadView);
 }
+
+BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
+{
+	switch (pMsg->message) {
+	case WM_XBUTTONUP:
+		{
+			// IntelliMouseのサイドキーボタン
+			switch (GET_XBUTTON_WPARAM(pMsg->wParam)) {
+			case XBUTTON1:
+				// first X button
+				OnBackButton();
+				return TRUE;
+			case XBUTTON2:
+				// second X button
+				OnForwardButton();
+				return TRUE;
+			}
+		}
+		break;
+	}
+
+	return CFrameWnd::PreTranslateMessage(pMsg);
+}

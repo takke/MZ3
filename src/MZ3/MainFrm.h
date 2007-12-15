@@ -96,6 +96,7 @@ public:
 	void MySetTitle(void);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnDownloadManagerView();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 
