@@ -109,6 +109,8 @@ enum ACCESS_TYPE {
 	//--- Twitter GET 系
 	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< friends_timeline
 
+	ACCESS_TWITTER_USER,				///< 各発言要素
+
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ
 	ACCESS_ERRORLOG,			///< mz3log.txt 専用の特殊タイプ

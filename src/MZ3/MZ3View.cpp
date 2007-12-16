@@ -1257,7 +1257,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			} else {
 				// ロードエラー
 				// ダウンロードマネージャに登録する
-				if (mixi.GetImageCount()>0) {
+				if (mixi.GetImageCount()>0 && !miniImagePath.IsEmpty()) {
 					CString url = mixi.GetImage(0);
 					DownloadItem item( url, L"絵文字", miniImagePath, true );
 					theApp.m_pDownloadView->AppendDownloadItem( item );

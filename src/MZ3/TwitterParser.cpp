@@ -40,7 +40,7 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 
 				// オブジェクト生成
 				CMixiData data;
-				data.SetAccessType( ACCESS_INVALID );
+				data.SetAccessType( ACCESS_TWITTER_USER );
 
 				// text : status/text
 				CString strBody = status.getNode(L"text").getTextAll().c_str();
@@ -60,7 +60,9 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 				data.SetBrowseUri( url );
 
 				// Image : status/user/profile_image_url
-				data.AddImage( user.getNode( L"profile_image_url" ).getTextAll().c_str() );
+				CString strImage = user.getNode( L"profile_image_url" ).getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strImage );
+				data.AddImage( strImage );
 
 				// updated : status/created_at
 				mixi::ParserUtil::ParseDate( status.getNode( L"created_at" ).getTextAll().c_str(), data );

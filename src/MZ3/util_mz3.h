@@ -72,6 +72,7 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 	switch( data.GetAccessType() ) {
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
+	case ACCESS_TWITTER_USER:
 		if (data.GetImageCount()>0) {
 			CString path = MakeImageLogfilePathFromUrl( data.GetImage(0) );
 			if (!path.IsEmpty()) {
@@ -86,7 +87,7 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 }
 
 /**
- *
+ * mixi 用アクセス種別かどうかを返す
  */
 inline bool IsMixiAccessType( ACCESS_TYPE type )
 {
