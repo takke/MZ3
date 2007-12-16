@@ -2583,6 +2583,12 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		// Twitter API => Basic 認証
 		szUser     = theApp.m_loginMng.GetTwitterId();
 		szPassword = theApp.m_loginMng.GetTwitterPassword();
+
+		// 未指定の場合はエラー出力
+		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+			return;
+		}
 		break;
 	}
 
