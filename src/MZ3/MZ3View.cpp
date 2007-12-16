@@ -146,8 +146,17 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 		default:
 			return _T("日付>>");
 		}
+
 	case ACCESS_LIST_FOOTSTEP:
 		return _T("時刻");
+
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		switch( bodyIndicateType ) {
+		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
+			return _T("名前>>");
+		default:
+			return _T("日付>>");
+		}
 
 	default:
 		return L"";
@@ -790,7 +799,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	ACCESS_TYPE aType = data->GetAccessType();
 
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
-	if (aType != ACCESS_LOGIN ) {
+	if (aType != ACCESS_LOGIN &&
+		util::IsMixiAccessType(aType))
+	{
 		// HTML の取得
 
 		// ログアウトチェック
@@ -940,6 +951,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_INTRO:
 	case ACCESS_LIST_BBS:
 	case ACCESS_LIST_CALENDAR:
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 		// --------------------------------------------------
 		// カテゴリ項目の取得
 		// --------------------------------------------------
@@ -1340,6 +1352,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		break;
 	case ACCESS_LIST_INTRO:
 		m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
+		break;
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
 		break;
 	}
 
@@ -2545,13 +2560,31 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// URL 内のID置換
 	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
 
+	data->SetBrowseUri(uri);
+
 	// encoding 指定
-	if (data->GetAccessType() == ACCESS_LIST_FOOTSTEP) {
+	switch (data->GetAccessType()) {
+	case ACCESS_LIST_FOOTSTEP:
+		// mixi API => UTF-8
 		encoding = CInetAccess::ENCODING_UTF8;
+		break;
+
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// Twitter API => UTF-8
+		encoding = CInetAccess::ENCODING_UTF8;
+		break;
 	}
 
-
-	data->SetBrowseUri(uri);
+	// 認証情報の設定
+	LPCTSTR szUser = NULL;
+	LPCTSTR szPassword = NULL;
+	switch (data->GetAccessType()) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// Twitter API => Basic 認証
+		szUser     = theApp.m_loginMng.GetTwitterId();
+		szPassword = theApp.m_loginMng.GetTwitterPassword();
+		break;
+	}
 
 	// 中止ボタンを使用可にする
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
@@ -2561,7 +2594,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
-	theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML );
+	theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
 }
 
 /// 右ソフトキーメニュー｜全部読む
@@ -2816,6 +2849,14 @@ bool CMZ3View::MyChangeBodyHeader(void)
 			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		}else{
 			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+		}
+		break;
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// 「日付」と「本文」
+		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_DATE ) {
+			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+		}else{
+			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		}
 		break;
 	case ACCESS_LIST_FRIEND:
@@ -3786,6 +3827,7 @@ void CMZ3View::PopupCategoryMenu(void)
 	case ACCESS_LIST_DIARY:
 	case ACCESS_LIST_MYDIARY:
 	case ACCESS_LIST_BBS:
+//	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 		// 巡回対象なので巡回メニューを無効化しない
 		break;
 	default:

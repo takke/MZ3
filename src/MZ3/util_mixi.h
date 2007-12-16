@@ -53,7 +53,9 @@ inline int GetUserIdFromAuthorOrOwnerID( const CMixiData& mixi )
  */
 inline CString CreateMixiUrl(LPCTSTR str)
 {
-	if( wcsstr( str, L"mixi.jp" ) == NULL ) {
+	if( wcsstr( str, L"mixi.jp" ) == NULL &&
+		wcsstr( str, L"http://" ) == NULL)
+	{
 		CString uri;
 		uri.Format(_T("http://mixi.jp/%s"), str);
 		return uri;
@@ -141,6 +143,7 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_GROUP_MYDIARY:		text = L"日記G";				break;
 	case ACCESS_GROUP_NEWS:			text = L"ニュースG";			break;
 	case ACCESS_GROUP_OTHERS:		text = L"その他G";				break;
+	case ACCESS_GROUP_TWITTER:		text = L"TwitterG";				break;
 
 	// POST 系
 	case ACCESS_POST_CONFIRM_COMMENT:		text = L"コメント投稿（確認）";		break;
@@ -151,6 +154,10 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_POST_ENTRY_NEWMESSAGE:		text = L"新規メッセージ（書込）";	break;
 	case ACCESS_POST_CONFIRM_NEWDIARY:		text = L"日記投稿（確認）";			break;
 	case ACCESS_POST_ENTRY_NEWDIARY:		text = L"コメント投稿（書込）";		break;
+
+	// Twitter 系
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:	text = L"タイムライン";	break;
+
 
 	case ACCESS_INVALID:			text = L"<invalid>";			break;
 	default:						text = L"<unknown>";			break;

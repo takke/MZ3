@@ -15,9 +15,15 @@ namespace option {
 class Login
 {
 private:
-	CString m_loginMail;
-	CString m_loginPwd;
-	CString m_ownerId;
+	//--- mixi 用
+	CString m_loginMail;		///< メールアドレス
+	CString m_loginPwd;			///< パスワード
+
+	CString m_ownerId;			///< オーナーID（ファイル保存はしない）
+
+	//--- Twitter 用
+	CString m_twitterId;		///< Twitter 用ID
+	CString m_twitterPwd;	///< Twitter 用パスワード
 
 public:
 	Login();
@@ -26,12 +32,19 @@ public:
 	void Read();
 	void Write();
 
-	void SetEmail(LPCTSTR str)		{ m_loginMail = str; }
-	LPCTSTR GetEmail()				{ return m_loginMail; }
-	void SetPassword(LPCTSTR str)	{ m_loginPwd = str; }
-	LPCTSTR GetPassword()			{ return m_loginPwd; }
-	void SetOwnerID(LPCTSTR str)	{ m_ownerId = str; }
-	LPCTSTR GetOwnerID()			{ return m_ownerId; }
+	//--- mixi 用
+	void	SetEmail(LPCTSTR str)		{ m_loginMail = str;	}
+	LPCTSTR GetEmail()					{ return m_loginMail;	}
+	void	SetPassword(LPCTSTR str)	{ m_loginPwd = str;		}
+	LPCTSTR GetPassword()				{ return m_loginPwd;	}
+	void	SetOwnerID(LPCTSTR str)		{ m_ownerId = str;		}
+	LPCTSTR GetOwnerID()				{ return m_ownerId;		}
+
+	//--- Twitter 用
+	void	SetTwitterId(LPCTSTR str)		{ m_twitterId = str;	}
+	LPCTSTR GetTwitterId()					{ return m_twitterId;	}
+	void	SetTwitterPassword(LPCTSTR str)	{ m_twitterPwd = str;	}
+	LPCTSTR	GetTwitterPassword()			{ return m_twitterPwd;	}
 
 private:
 	CString Read(FILE*);

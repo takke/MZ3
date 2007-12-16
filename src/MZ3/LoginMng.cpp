@@ -58,8 +58,12 @@ void Login::Read()
 			return;
 		}
 
-		m_loginMail = Read(fp);
-		m_loginPwd  = Read(fp);
+		m_loginMail   = Read(fp);
+		m_loginPwd    = Read(fp);
+		CString dummy = Read(fp);		// 旧オーナーID（互換性確保のためのパディング）
+
+		m_twitterId	  = Read(fp);
+		m_twitterPwd  = Read(fp);
 
 //		TRACE(_T("Mail = %s\n"), m_loginMail);
 //		TRACE(_T("Password = %s\n"), m_loginPwd);
@@ -88,8 +92,12 @@ void Login::Write()
 		return;
 	}
 
-	Write(fp, m_loginMail);
-	Write(fp, m_loginPwd);
+	Write( fp, m_loginMail );
+	Write( fp, m_loginPwd  );
+	CString dummyId;
+	Write( fp, dummyId );
+	Write( fp, m_twitterId );
+	Write( fp, m_twitterPwd );
 
 	fclose(fp);
 }

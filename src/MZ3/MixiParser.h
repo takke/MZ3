@@ -2770,17 +2770,7 @@ public:
 
 		// html_ の文字列化
 		std::vector<TCHAR> text;
-		text.reserve( 10*1024 );	// バッファ予約
-		INT_PTR count = html_.GetCount();
-		for (int i=0; i<count; i++) {
-			const CString& line = html_.GetAt(i);
-			size_t size = text.size();
-			int new_size = wcslen(line);
-			if (new_size>0) {
-				text.resize( size+new_size );
-				wcsncpy( &text[size], (LPCTSTR)line, new_size );
-			}
-		}
+		html_.TranslateToVectorBuffer( text );
 
 		// XML 解析
 		xml2stl::Container root;
@@ -3825,17 +3815,7 @@ public:
 
 		// html_ の文字列化
 		std::vector<TCHAR> text;
-		text.reserve( 10*1024 );	// バッファ予約
-		INT_PTR count = html_.GetCount();
-		for (int i=0; i<count; i++) {
-			const CString& line = html_.GetAt(i);
-			size_t size = text.size();
-			int new_size = wcslen(line);
-			if (new_size>0) {
-				text.resize( size+new_size );
-				wcsncpy( &text[size], (LPCTSTR)line, new_size );
-			}
-		}
+		html_.TranslateToVectorBuffer( text );
 
 		// XML 解析
 		xml2stl::Container root;
@@ -4609,27 +4589,52 @@ public:
 	}
 };
 
+}//namespace mixi
+
+/// Twitter 用パーサ
+namespace twitter {
+
+/**
+ * [list] タイムライン用パーサ
+ * 【タイムライン】
+ * http://twitter.com/statuses/friends_timeline.xml
+ */
+class TwitterFriendsTimelineAtomParser : public mixi::MixiListParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
+};
+
+}//namespace twitter
+
+
+/// mixi 用HTMLパーサ
+namespace mixi {
+
 /// リスト系HTMLの解析
-inline void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html )
+inline bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html )
 {
 	switch (aType) {
-	case ACCESS_LIST_DIARY:				mixi::ListNewFriendDiaryParser::parse( body, html );	break;
-	case ACCESS_LIST_NEW_COMMENT:		mixi::NewCommentParser::parse( body, html );			break;
-	case ACCESS_LIST_COMMENT:			mixi::ListCommentParser::parse( body, html );			break;
-	case ACCESS_LIST_NEW_BBS:			mixi::NewBbsParser::parse( body, html );				break;
-	case ACCESS_LIST_MYDIARY:			mixi::ListDiaryParser::parse( body, html );				break;
-//	case ACCESS_LIST_FOOTSTEP:			mixi::ShowLogParser::parse( body, html );				break;
-	case ACCESS_LIST_FOOTSTEP:			mixi::TrackParser::parse( body, html );					break;
-	case ACCESS_LIST_MESSAGE_IN:		mixi::ListMessageParser::parse( body, html );			break;
-	case ACCESS_LIST_MESSAGE_OUT:		mixi::ListMessageParser::parse( body, html );			break;
-	case ACCESS_LIST_NEWS:				mixi::ListNewsCategoryParser::parse( body, html );		break;
-	case ACCESS_LIST_FAVORITE:			mixi::ListBookmarkParser::parse( body, html );			break;
-	case ACCESS_LIST_FRIEND:			mixi::ListFriendParser::parse( body, html );			break;
-	case ACCESS_LIST_COMMUNITY:			mixi::ListCommunityParser::parse( body, html );			break;
-	case ACCESS_LIST_INTRO:				mixi::ShowIntroParser::parse( body, html );				break;
-	case ACCESS_LIST_BBS:				mixi::ListBbsParser::parse( body, html );				break;
-	case ACCESS_LIST_NEW_BBS_COMMENT:	mixi::ListNewBbsCommentParser::parse( body, html );		break;
-	case ACCESS_LIST_CALENDAR:			mixi::ShowCalendarParser::parse( body, html );			break;
+	case ACCESS_LIST_DIARY:					return mixi::ListNewFriendDiaryParser::parse( body, html );
+	case ACCESS_LIST_NEW_COMMENT:			return mixi::NewCommentParser::parse( body, html );
+	case ACCESS_LIST_COMMENT:				return mixi::ListCommentParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS:				return mixi::NewBbsParser::parse( body, html );
+	case ACCESS_LIST_MYDIARY:				return mixi::ListDiaryParser::parse( body, html );
+//	case ACCESS_LIST_FOOTSTEP:				return mixi::ShowLogParser::parse( body, html );
+	case ACCESS_LIST_FOOTSTEP:				return mixi::TrackParser::parse( body, html );
+	case ACCESS_LIST_MESSAGE_IN:			return mixi::ListMessageParser::parse( body, html );
+	case ACCESS_LIST_MESSAGE_OUT:			return mixi::ListMessageParser::parse( body, html );
+	case ACCESS_LIST_NEWS:					return mixi::ListNewsCategoryParser::parse( body, html );
+	case ACCESS_LIST_FAVORITE:				return mixi::ListBookmarkParser::parse( body, html );
+	case ACCESS_LIST_FRIEND:				return mixi::ListFriendParser::parse( body, html );
+	case ACCESS_LIST_COMMUNITY:				return mixi::ListCommunityParser::parse( body, html );
+	case ACCESS_LIST_INTRO:					return mixi::ShowIntroParser::parse( body, html );
+	case ACCESS_LIST_BBS:					return mixi::ListBbsParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS_COMMENT:		return mixi::ListNewBbsCommentParser::parse( body, html );
+	case ACCESS_LIST_CALENDAR:				return mixi::ShowCalendarParser::parse( body, html );
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineAtomParser::parse( body, html );
+	default:
+		return false;
 	}
 }
 

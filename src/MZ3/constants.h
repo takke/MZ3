@@ -75,6 +75,7 @@ enum ACCESS_TYPE {
 	ACCESS_GROUP_MESSAGE,		///< メッセージ グループ
 	ACCESS_GROUP_NEWS,			///< ニュースグループ
 	ACCESS_GROUP_OTHERS,		///< その他 グループ
+	ACCESS_GROUP_TWITTER,		///< Twitter グループ
 
 	//--- LIST 系：カテゴリリストの項目。
 	ACCESS_LIST_MYDIARY,		///< 自分の日記一覧
@@ -104,6 +105,9 @@ enum ACCESS_TYPE {
 	ACCESS_POST_ENTRY_NEWMESSAGE,		///< 新規メッセージ（書き込み画面）
 	ACCESS_POST_CONFIRM_NEWDIARY,		///< 日記投稿（確認画面）
 	ACCESS_POST_ENTRY_NEWDIARY,			///< コメント投稿（書き込み画面）
+
+	//--- Twitter GET 系
+	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< friends_timeline
 
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ

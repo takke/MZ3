@@ -86,6 +86,19 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 }
 
 /**
+ *
+ */
+inline bool IsMixiAccessType( ACCESS_TYPE type )
+{
+	switch (type) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		return false;
+	default:
+		return true;
+	}
+}
+
+/**
  * CMixiData に対応するログファイルのパスを生成する
  */
 inline CString MakeLogfilePath( const CMixiData& data )
@@ -364,6 +377,10 @@ inline CString MakeLogfilePath( const CMixiData& data )
 			path.AppendFormat( L"\\%s.html", id );
 			return path;
 		}
+
+	//--- Twitter 系
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		return theApp.m_filepath.logFolder + L"\\twitter_friends_timeline.xml";
 
 	default:
 		// 上記以外なら、ファイル名なし

@@ -51,6 +51,22 @@ void CHtmlArray::Load( LPCTSTR szHtmlFilename )
 	}
 }
 
+void CHtmlArray::TranslateToVectorBuffer( std::vector<TCHAR>& text ) const
+{
+	text.reserve( 10*1024 );	// バッファ予約
+
+	INT_PTR count = this->GetCount();
+	for (int i=0; i<count; i++) {
+		const CString& line = this->GetAt(i);
+		size_t size = text.size();
+		int new_size = wcslen(line);
+		if (new_size>0) {
+			text.resize( size+new_size );
+			wcsncpy( &text[size], (LPCTSTR)line, new_size );
+		}
+	}
+}
+
 /**
  * Confirmデータの解析
  *

@@ -92,6 +92,7 @@ private:
 		group_string2type[ L"MESSAGE"   ] = ACCESS_GROUP_MESSAGE;
 		group_string2type[ L"NEWS"      ] = ACCESS_GROUP_NEWS;
 		group_string2type[ L"OTHERS"    ] = ACCESS_GROUP_OTHERS;
+		group_string2type[ L"TWITTER"   ] = ACCESS_GROUP_TWITTER;
 
 		group_type2string.RemoveAll();
 		group_type2string.InitHashTable( 10 );
@@ -100,6 +101,7 @@ private:
 		group_type2string[ ACCESS_GROUP_MESSAGE   ] = L"MESSAGE";
 		group_type2string[ ACCESS_GROUP_NEWS      ] = L"NEWS";
 		group_type2string[ ACCESS_GROUP_OTHERS    ] = L"OTHERS";
+		group_type2string[ ACCESS_GROUP_TWITTER   ] = L"TWITTER";
 
 		category_string2type.RemoveAll();
 		category_string2type.InitHashTable( 20 );
@@ -119,6 +121,8 @@ private:
 		category_string2type[ L"COMMUNITY"   ] = ACCESS_LIST_COMMUNITY;
 		category_string2type[ L"NEW_BBS_COMMENT" ] = ACCESS_LIST_NEW_BBS_COMMENT;
 		category_string2type[ L"CALENDAR"    ] = ACCESS_LIST_CALENDAR;  //icchu’Ç‰Á
+		// Twitter
+		category_string2type[ L"TWITTER_FRIENDS_TIMELINE" ] = ACCESS_TWITTER_FRIENDS_TIMELINE;
 
 		category_type2string.RemoveAll();
 		category_type2string.InitHashTable( 20 );
@@ -138,6 +142,8 @@ private:
 		category_type2string[ ACCESS_LIST_COMMUNITY   ] = L"COMMUNITY";
 		category_type2string[ ACCESS_LIST_NEW_BBS_COMMENT ] = L"NEW_BBS_COMMENT";
 		category_type2string[ ACCESS_LIST_CALENDAR    ] = L"CALENDAR";  //icchu’Ç‰Á
+		// Twitter
+		category_type2string[ ACCESS_TWITTER_FRIENDS_TIMELINE ] = L"TWITTER_FRIENDS_TIMELINE";
 	}
 
 public:

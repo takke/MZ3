@@ -9,6 +9,8 @@
 #include "MyRegex.h"
 #include "HtmlArray.h"
 #include "util_base.h"
+#include "util_mixi.h"
+#include "util_mz3.h"
 
 /// mixi 用HTMLパーサ
 namespace mixi {
@@ -78,7 +80,7 @@ public:
 			}
 		}
 
-		// RSS 形式
+		// RSS 形式 (YYYY-MM-DDT00:00:00Z)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
@@ -95,6 +97,52 @@ public:
 				int minute = _wtoi( reg.results[5].str.c_str() );
 
 				CTime t(year, month, day, hour, minute, 0);
+				t += CTimeSpan(0, 9, 0, 0);
+
+				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+				return;
+			}
+		}
+
+		// RSS 形式 (Sun Dec 16 09:00:00 +0000 2007)
+		{
+			// 正規表現のコンパイル
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"([a-zA-Z]{3}) ([a-zA-Z]{3}) ([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) \\+([0-9]{4}) ([0-9]{4})" ) ) {
+				return;
+			}
+			// 検索
+			if( reg.exec(line) && reg.results.size() == 9 ) {
+				// 抽出
+
+				// 年
+				int year   = _wtoi( reg.results[8].str.c_str() );
+
+				// 月
+				CString strMonth = reg.results[2].str.c_str();
+				int month = 1;
+				if (strMonth == L"Jan")			month = 1;
+				else if (strMonth == L"Feb")	month = 2;
+				else if (strMonth == L"Mar")	month = 3;
+				else if (strMonth == L"Apr")	month = 4;
+				else if (strMonth == L"May")	month = 5;
+				else if (strMonth == L"Jun")	month = 6;
+				else if (strMonth == L"Jul")	month = 7;
+				else if (strMonth == L"Aug")	month = 8;
+				else if (strMonth == L"Sep")	month = 9;
+				else if (strMonth == L"Oct")	month = 10;
+				else if (strMonth == L"Nov")	month = 11;
+				else if (strMonth == L"Dec")	month = 12;
+				else {
+					// ??
+				}
+
+				int day    = _wtoi( reg.results[3].str.c_str() );
+				int hour   = _wtoi( reg.results[4].str.c_str() );
+				int minute = _wtoi( reg.results[5].str.c_str() );
+				int sec    = _wtoi( reg.results[6].str.c_str() );
+
+				CTime t(year, month, day, hour, minute, sec);
 				t += CTimeSpan(0, 9, 0, 0);
 
 				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());

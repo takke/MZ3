@@ -43,6 +43,9 @@ private:
 	CString				m_uri;					///< URI
 	CString				m_ref;					///< リファラー
 
+	CString				m_strUserId;			///< 認証用ユーザID
+	CString				m_strPassword;			///< 認証用パスワード
+
 	HWND				m_hwnd;					///< 終了通知を送るウィンドウのハンドル
 
 
@@ -97,7 +100,7 @@ public:
 
 	LPCTSTR	GetURL()			{ return m_uri; }
 
-	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
+	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL );
 	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
 	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData );
 

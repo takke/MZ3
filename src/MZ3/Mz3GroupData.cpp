@@ -89,6 +89,13 @@ bool Mz3GroupData::initForTopPage()
 	}
 	this->groups.push_back( group );
 
+	// Twitterグループ
+	group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
+	{
+		appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
+	}
+	this->groups.push_back( group );
+
 	return true;
 }
 
@@ -224,6 +231,13 @@ bool Mz3GroupData::appendCategoryByIniData(
 		default_category_url = L"show_calendar.pl";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
+		break;
+
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// タイムライン
+		default_category_url = L"http://twitter.com/statuses/friends_timeline.xml";
+		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		break;
 
 	default:

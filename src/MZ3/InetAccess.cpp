@@ -211,7 +211,7 @@ void CInetAccess::Initialize( HWND hwnd, void* object, ENCODING encoding/*=ENCOD
  *
  * @return 常に TRUE を返す。
  */
-BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
+BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId, LPCTSTR szPassword )
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -220,6 +220,10 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
 	m_ref		= ref;
 	m_fileType	= type;
 	m_nRedirect = 0;
+
+	// 認証情報の取得・設定
+	m_strUserId   = szUserId==NULL ? L"" : szUserId;
+	m_strPassword = szPassword==NULL ? L"" : szPassword;
 
 	// スレッド開始
 	m_pThreadMain = AfxBeginThread(ExecGet_Thread, this);
@@ -506,6 +510,14 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY, proxy, lstrlen(proxy));
 		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_USERNAME, user, lstrlen(user));
 		::InternetSetOption(m_hConnection, INTERNET_OPTION_PROXY_PASSWORD, pass, lstrlen(pass));
+	}
+
+	// ユーザID/パスワードの設定
+	if (!m_strUserId.IsEmpty()) {
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_USERNAME, (LPVOID)(LPCTSTR)m_strUserId, m_strUserId.GetLength());
+	}
+	if (!m_strPassword.IsEmpty()) {
+		::InternetSetOption(m_hConnection, INTERNET_OPTION_PASSWORD, (LPVOID)(LPCTSTR)m_strPassword, m_strPassword.GetLength());
 	}
 
 	// リクエスト送信

@@ -152,6 +152,9 @@
 #define IDC_STOP_BUTTON                 1063
 #define IDC_EXIT_BUTTON                 1063
 #define IDC_VSCROLLBAR                  1063
+#define IDC_ID_STATIC                   1064
+#define IDC_PASSWORD_STATIC             1065
+#define IDC_TYPE_COMBO                  1066
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_32774                        32774
@@ -368,7 +371,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
 #define _APS_NEXT_COMMAND_VALUE         34011
-#define _APS_NEXT_CONTROL_VALUE         1064
+#define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

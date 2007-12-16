@@ -23,6 +23,8 @@ public:
 public:
 	void		Load( LPCTSTR szHtmlFilename );
 
+	void		TranslateToVectorBuffer( std::vector<TCHAR>& text ) const;
+
 	bool		GetPostConfirmData(CPostData*);
 	BOOL		IsPostSucceeded(WRITEVIEW_TYPE type);
 };
