@@ -2858,9 +2858,9 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		}
 		break;
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		// 「日付」と「本文」
+		// 「日付」と「名前」
 		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_DATE ) {
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		}else{
 			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
 		}
