@@ -362,6 +362,20 @@ BEGIN
     END
 END
 
+IDR_TWITTER_MENU MENU 
+BEGIN
+    POPUP "TwitterContextMenu"
+    BEGIN
+        MENUITEM "全文を読む...",                    ID_MENU_TWITTER_READ
+        MENUITEM "つぶやく...",                     ID_MENU_TWITTER_UPDATE
+        MENUITEM "言い返す...",                     ID_MENU_TWITTER_REPLY
+        MENUITEM SEPARATOR
+        MENUITEM "友達のホーム",                      ID_MENU_TWITTER_HOME
+        MENUITEM "友達のFavorites",                ID_MENU_TWITTER_FAVORITES
+        MENUITEM "友達のサイト",                      ID_MENU_TWITTER_SITE
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

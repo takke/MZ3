@@ -322,6 +322,12 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnSetRead();
 	afx_msg void OnAcceleratorReload();
+	afx_msg void OnMenuTwitterRead();
+	afx_msg void OnMenuTwitterReply();
+	afx_msg void OnMenuTwitterUpdate();
+	afx_msg void OnMenuTwitterHome();
+	afx_msg void OnMenuTwitterFavorites();
+	afx_msg void OnMenuTwitterSite();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

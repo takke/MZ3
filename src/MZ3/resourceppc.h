@@ -43,6 +43,7 @@
 #define IDI_DOWNLOADED_ICON             160
 #define IDC_GRABBABLE_CURSOR            162
 #define IDC_GRABBING_CURSOR             163
+#define IDR_TWITTER_MENU                165
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -359,6 +360,12 @@
 #define ID_OPEN_PROFILE_LOG             34003
 #define ID_SEND_MESSAGE                 34004
 #define ID_RAN2MENU_34008               34008
+#define ID_MENU_TWITTER_READ            34013
+#define ID_MENU_TWITTER_REPLY           34014
+#define ID_MENU_TWITTER_UPDATE          34016
+#define ID_MENU_TWITTER_HOME            34020
+#define ID_MENU_TWITTER_FAVORITES       34021
+#define ID_MENU_TWITTER_SITE            34022
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -369,8 +376,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         34011
+#define _APS_NEXT_RESOURCE_VALUE        166
+#define _APS_NEXT_COMMAND_VALUE         34023
 #define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

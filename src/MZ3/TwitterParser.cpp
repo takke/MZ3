@@ -11,6 +11,11 @@
 /// Twitter 用パーサ
 namespace twitter {
 
+/**
+ * [list] タイムライン用パーサ
+ * 【タイムライン】
+ * http://twitter.com/statuses/friends_timeline.xml
+ */
 bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineAtomParser.parse() start." );
@@ -51,8 +56,22 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 				const xml2stl::Node& user = status.getNode( L"user" );
 				data.SetName( user.getNode(L"screen_name").getTextAll().c_str() );
 
-				// id : status/user/id
-				data.SetID( _wtoi( user.getNode(L"id").getTextAll().c_str() ) );
+				// author : status/user/name
+				CString strAuthor = user.getNode(L"name").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strAuthor );
+				data.SetAuthor( strAuthor );
+
+				// description : status/user/description
+				// title に入れるのは苦肉の策・・・
+				CString strTitle = user.getNode(L"description").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strTitle );
+				data.SetTitle( strTitle );
+
+				// id : status/id
+				data.SetID( _wtoi( status.getNode(L"id").getTextAll().c_str() ) );
+
+				// owner-id : status/user/id
+				data.SetOwnerID( _wtoi( user.getNode(L"id").getTextAll().c_str() ) );
 
 				// URL : status/user/url
 				CString url = user.getNode( L"url" ).getTextAll().c_str();
@@ -75,7 +94,7 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 			}
 		}
 	} catch (xml2stl::NodeNotFoundException& e) {
-		MZ3LOGGER_ERROR( util::FormatString( L"feed not found... : %s", e.getMessage().c_str()) );
+		MZ3LOGGER_ERROR( util::FormatString( L"statuses not found... : %s", e.getMessage().c_str()) );
 	}
 
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineAtomParser.parse() finished." );

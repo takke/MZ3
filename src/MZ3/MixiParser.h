@@ -4594,11 +4594,6 @@ public:
 /// Twitter 用パーサ
 namespace twitter {
 
-/**
- * [list] タイムライン用パーサ
- * 【タイムライン】
- * http://twitter.com/statuses/friends_timeline.xml
- */
 class TwitterFriendsTimelineAtomParser : public mixi::MixiListParser
 {
 public:

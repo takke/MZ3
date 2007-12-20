@@ -223,6 +223,12 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_WM_MOUSEWHEEL()
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
+	ON_COMMAND(ID_MENU_TWITTER_READ, &CMZ3View::OnMenuTwitterRead)
+	ON_COMMAND(ID_MENU_TWITTER_REPLY, &CMZ3View::OnMenuTwitterReply)
+	ON_COMMAND(ID_MENU_TWITTER_UPDATE, &CMZ3View::OnMenuTwitterUpdate)
+	ON_COMMAND(ID_MENU_TWITTER_HOME, &CMZ3View::OnMenuTwitterHome)
+	ON_COMMAND(ID_MENU_TWITTER_FAVORITES, &CMZ3View::OnMenuTwitterFavorites)
+	ON_COMMAND(ID_MENU_TWITTER_SITE, &CMZ3View::OnMenuTwitterSite)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1432,8 +1438,14 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// コミュニティの場合は、トピック一覧を表示する。
 	// （暫定対応）
-	if (data.GetAccessType() == ACCESS_COMMUNITY) {
+	switch (data.GetAccessType()) {
+	case ACCESS_COMMUNITY:
 		OnViewBbsList();
+		return;
+
+	case ACCESS_TWITTER_USER:
+		// ダブルクリックの場合は全文表示
+		OnMenuTwitterRead();
 		return;
 	}
 
@@ -2100,6 +2112,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
+		case ACCESS_TWITTER_USER:
 			// メニュー表示
 			PopupBodyMenu();
 			break;
@@ -3177,6 +3190,18 @@ bool CMZ3View::PopupBodyMenu(void)
 			break;
 		}
 		break;
+
+	case ACCESS_TWITTER_USER:
+		{
+			CMenu menu;
+			menu.LoadMenu( IDR_TWITTER_MENU );
+			CMenu* pSubMenu = menu.GetSubMenu(0);	// メニューはidx=0
+
+			// メニューを開く
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		}
+		break;
+
 	}
 	return true;
 }
@@ -4259,4 +4284,73 @@ void CMZ3View::OnAcceleratorReload()
 	if (!RetrieveCategoryItem()) {
 		return;
 	}
+}
+
+/**
+ * Twitter | 全文を読む
+ */
+void CMZ3View::OnMenuTwitterRead()
+{
+	CMixiData& data = GetSelectedBodyItem();
+
+	// 本文を1行に変換して割り当て。
+	CString item;
+	for( u_int i=0; i<data.GetBodySize(); i++ ) {
+		CString line = data.GetBody(i);
+		while( line.Replace( L"\r\n", L"" ) );
+		item.Append( line );
+	}
+
+	item.Append( L"\r\n" );
+	item.Append( L"----\r\n" );
+	item.AppendFormat( L"name : %s\r\n", data.GetAuthor() );
+	item.AppendFormat( L"description : %s\r\n", data.GetTitle() );
+	item.AppendFormat( L"%s\r\n", data.GetDate() );
+	item.AppendFormat( L"id : %d\r\n", data.GetID() );
+	item.AppendFormat( L"owner-id : %d\r\n", data.GetOwnerID() );
+
+	MessageBox( item, data.GetName() );
+}
+
+/**
+ * Twitter | 言い返す
+ */
+void CMZ3View::OnMenuTwitterReply()
+{
+	MessageBox( L"未実装だじょ" );
+}
+
+/**
+ * Twitter | つぶやく
+ */
+void CMZ3View::OnMenuTwitterUpdate()
+{
+	MessageBox( L"未実装だじょ" );
+}
+
+/**
+ * Twitter | ホーム
+ */
+void CMZ3View::OnMenuTwitterHome()
+{
+	CMixiData& data = GetSelectedBodyItem();
+	util::OpenBrowserForUrl( util::FormatString(L"http://twitter.com/%s", data.GetName()) );
+}
+
+/**
+ * Twitter | Favorites
+ */
+void CMZ3View::OnMenuTwitterFavorites()
+{
+	CMixiData& data = GetSelectedBodyItem();
+	util::OpenBrowserForUrl( util::FormatString(L"http://twitter.com/%s/favorites", data.GetName()) );
+}
+
+/**
+ * Twitter | サイト
+ */
+void CMZ3View::OnMenuTwitterSite()
+{
+	CMixiData& data = GetSelectedBodyItem();
+	util::OpenBrowserForUrl( data.GetURL() );
 }
