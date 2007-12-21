@@ -1470,7 +1470,6 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_selGroup->getSelectedCategory()->selectedBody = pNMLV->iItem;
 
 	// 第1カラムに表示している内容を表示する。
-//	m_infoEdit.SetWindowText( GetSelectedBodyItem().GetTitle() );
 	m_infoEdit.SetWindowText( 
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
 
@@ -1822,7 +1821,10 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 	if (m_bodyList.GetItemCount() != 0) {
 		m_bodyList.SetFocus();
 		m_hotList = &m_bodyList;
-		m_infoEdit.SetWindowText( GetSelectedBodyItem().GetTitle() );
+
+		// 第1カラムに表示している内容を表示する。
+		m_infoEdit.SetWindowText( 
+			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
