@@ -649,6 +649,11 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		//--- POST メソッドなので「データ送信」を実行
 		util::MySetInformationText( m_hwnd, _T("データ送信中") );
 
+		// 任意のヘッダーを送信する
+		if (!m_postData->GetAdditionalHeaders().IsEmpty()) {
+			::HttpAddRequestHeaders( m_hRequest, m_postData->GetAdditionalHeaders(), -1, HTTP_ADDREQ_FLAG_ADD );
+		}
+
 		// データ送信
 		// POSTデータの設定
 		CPostData::post_array& buf = m_postData->GetPostBody();

@@ -31,15 +31,32 @@ private:
 								///< 成功時に CInternetAccess スレッドから送信されるメッセージ種別になる。
 	CString		 m_confirmUri;	///< 確認URI
 
+	CString		 m_additionalHeaders;	///< 追加パラメータ
+
 public:
 	CPostData() { m_postBody.reserve(10 * 1024); }
 	virtual ~CPostData() {}
+
+	bool AppendAdditionalHeader( LPCTSTR szHeader ) {
+		if (!m_additionalHeaders.IsEmpty()) {
+			m_additionalHeaders.Append( L"\r\n" );
+		}
+		m_additionalHeaders.Append( szHeader );
+		return true;
+	}
+
+	const CString& GetAdditionalHeaders() {
+		return m_additionalHeaders;
+	}
 
 	/// POST のボディ部の取得（参照により設定も可能）
 	post_array& GetPostBody() { return m_postBody; }
 
 	/// POST のボディ部を初期化する
-	void ClearPostBody() { m_postBody.clear(); }
+	void ClearPostBody() {
+		m_postBody.clear();
+		m_additionalHeaders = L"";
+	}
 
 	/// POST のボディ部に文字列を追加する。
 	/// 末尾に CRLF を追加する。

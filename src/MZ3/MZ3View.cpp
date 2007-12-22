@@ -7,6 +7,7 @@
 /// MZ3View.cpp : CMZ3View クラスの実装
 
 #include "stdafx.h"
+#include "version.h"
 #include "MZ3.h"
 
 #include "MZ3Doc.h"
@@ -33,7 +34,7 @@
 
 #define TIMERID_INTERVAL_CHECK	101
 
-inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType )
+inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
 {
 	CString item;
 
@@ -60,13 +61,17 @@ inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDI
 	}
 
 	// 上限設定
+	if (bLimitForList) {
 #ifdef WINCE
-	// WindowsMobile の場合は、30文字くらいで切らないと落ちるので制限する。
-	return item.Left( 30 );
+		// WindowsMobile の場合は、30文字くらいで切らないと落ちるので制限する。
+		return item.Left( 30 );
 #else
-	// Windows の場合は、とりあえず100文字で切っておく。
-	return item.Left( 100 );
+		// Windows の場合は、とりあえず100文字で切っておく。
+		return item.Left( 100 );
 #endif
+	} else {
+		return item;
+	}
 }
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
@@ -1416,7 +1421,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// 第1カラムに表示している内容を表示する。
 	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
+		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
@@ -1776,7 +1781,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 
 		// 第1カラムに表示している内容を表示する。
 		m_infoEdit.SetWindowText( 
-			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType) );
+			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
@@ -4374,6 +4379,13 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	static CPostData post;
 	post.ClearPostBody();
+
+	// ヘッダーを設定
+	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client: %s", MZ3_APP_NAME ) );
+	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-URL: %s", L"http://mz3.jp/" ) );
+	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-Version: %s", MZ3_VERSION_TEXT_SHORT ) );
+
+	// POST パラメータを設定
 	post.AppendPostBody( "status=" );
 	post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
 	post.AppendPostBody( util::FormatString(L" *%s*", MZ3_APP_NAME) );
