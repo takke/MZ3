@@ -104,6 +104,8 @@ public:
 	};
 	VIEW_STYLE			m_viewStyle;	///< 表示スタイル
 
+	CRect				m_rectIcon;		///< アイコン表示領域のRECT
+
 private:
 	BOOL				m_access;		///< アクセス中フラグ
 
@@ -339,6 +341,7 @@ public:
 	CEdit m_statusEdit;
 	void MySetLayout(int cx, int cy);
 	afx_msg void OnLoadUrl(UINT);
+	afx_msg void OnPaint();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -238,6 +238,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_SITE, &CMZ3View::OnMenuTwitterSite)
 	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
 	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -251,6 +252,7 @@ CMZ3View::CMZ3View()
 	, m_nKeydownRepeatCount( 0 )
 	, m_checkNewComment( false )
 	, m_viewStyle(VIEW_STYLE_DEFAULT)
+	, m_rectIcon(0,0,0,0)
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -1467,6 +1469,9 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// 画像位置変更
 	MoveMiniImageDlg();
+
+	// アイコン再描画
+	InvalidateRect( m_rectIcon );
 
 	*pResult = 0;
 }
@@ -4606,8 +4611,18 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
 	y += hBody;
 
-	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
-	y += hInfo;
+	switch (m_viewStyle) {
+	case VIEW_STYLE_DEFAULT:
+		m_rectIcon.SetRect( 0, 0, 0, 0 );
+		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, 0, y, cx, hInfo     );
+		y += hInfo;
+		break;
+	case VIEW_STYLE_TWITTER:
+		m_rectIcon.SetRect( 0, y, hInfo, y+hInfo );
+		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, hInfo, y, cx-hInfo, hInfo     );
+		y += hInfo;
+		break;
+	}
 
 	if (pUpdateButton!=NULL) {
 		int w = rectUpdateButton.Width();
@@ -4650,4 +4665,47 @@ void CMZ3View::OnLoadUrl(UINT nID)
 
 	// 確認画面
 	util::OpenBrowserForUrl( url );
+}
+
+void CMZ3View::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// 描画メッセージで CFormView::OnPaint() を呼び出さないでください。
+
+	switch (m_viewStyle) {
+	case VIEW_STYLE_DEFAULT:
+		break;
+	case VIEW_STYLE_TWITTER:
+		// アイコン描画
+		if (m_rectIcon.Width()>0 && m_rectIcon.Height()>0) {
+
+			bool bDrawFinished = false;
+
+			const CMixiData& data = GetSelectedBodyItem();
+			CString path = util::MakeImageLogfilePath( data );
+			if (!path.IsEmpty() ) {
+				// 情報領域の左側に描画する。
+				const CRect& rectIcon = m_rectIcon;
+
+				CMZ3BackgroundImage image(L"");
+				image.load( path );
+				if (image.isEnableImage()) {
+					// リサイズする。
+					CMZ3BackgroundImage resizedImage(L"");
+					util::MakeResizedImage( this, resizedImage, image, rectIcon.Width(), rectIcon.Height() );
+
+					util::DrawBitmap( dc.GetSafeHdc(), resizedImage.getHandle(), 
+						rectIcon.left, rectIcon.top, rectIcon.Width(), rectIcon.Height(), 0, 0 );
+
+					bDrawFinished = true;
+				}
+			}
+
+			if (!bDrawFinished) {
+				// 塗りつぶす
+				dc.FillSolidRect( m_rectIcon, RGB(255,255,255) );
+			}
+		}
+		break;
+	}
 }
