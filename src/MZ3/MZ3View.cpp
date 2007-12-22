@@ -912,6 +912,47 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		// カテゴリ項目の取得
 		// --------------------------------------------------
 		{
+			// ステータスコードチェック
+			LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
+			switch (aType) {
+			case ACCESS_TWITTER_FRIENDS_TIMELINE:
+
+				switch (theApp.m_inet.m_dwHttpStatus) {
+				case 200:	// OK: 成功
+				case 304:	// Not Modified: 新しい情報はない
+					break;
+				case 400:	// Bad Request:
+					szStatusErrorMessage = L"API の実行回数制限に引っ掛かった、などの理由でリクエストを却下した";
+					break;
+				case 401:	// Not Authorized:
+					szStatusErrorMessage = L"認証失敗";
+					break;
+				case 403:	// Forbidden:
+					szStatusErrorMessage = L"権限がないAPI を実行しようとした";
+					break;
+				case 404:	// Not Found:
+					szStatusErrorMessage = L"存在しない API を実行しようとした、存在しないユーザを引数で指定して API を実行しようとした";
+					break;
+				case 500:	// Internal Server Error:
+					szStatusErrorMessage = L"Twitter 側で何らかの問題が発生しています";
+					break;
+				case 502:	// Bad Gateway:
+					szStatusErrorMessage = L"Twitter のサーバが止まっています（メンテ中かもしれません）";
+					break;
+				case 503:	// Service Unavailable:
+					szStatusErrorMessage = L"Twitter のサーバの負荷が高すぎて、リクエストを裁き切れない状態になっています";
+					break;
+				}
+				break;
+			}
+			if (szStatusErrorMessage!=NULL) {
+				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+				util::MySetInformationText( m_hWnd, msg );
+				MZ3LOGGER_ERROR( msg );
+				// 以降の処理を行わない。
+				break;
+			}
+
 			util::MySetInformationText( m_hWnd, _T("HTML解析中 : 1/3") );
 
 			// 巡回モード（リストモード）の場合は、巡回モードを終了する。
@@ -3171,6 +3212,18 @@ bool CMZ3View::PopupBodyMenu(void)
 			CMenu menu;
 			menu.LoadMenu( IDR_TWITTER_MENU );
 			CMenu* pSubMenu = menu.GetSubMenu(0);	// メニューはidx=0
+
+			// リンク
+			int n = (int)bodyItem.m_linkList.size();
+			if( n > 0 ) {
+				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+				for( int i=0; i<n; i++ ) {
+					// 追加
+					CString s;
+					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				}
+			}
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );

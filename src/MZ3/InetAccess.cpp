@@ -798,6 +798,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 				// ステータスコードをダンプ
 				MZ3LOGGER_DEBUG( util::FormatString( L"ステータスコード：%s", szStatusCode ) );
 
+				m_dwHttpStatus = _wtoi( szStatusCode );
+
 				// ステータスコードが 30x ならリダイレクト。
 				if( lstrcmp( szStatusCode, L"301" ) == 0 ||
 					lstrcmp( szStatusCode, L"302" ) == 0 ) 

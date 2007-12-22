@@ -48,8 +48,6 @@ private:
 
 	HWND				m_hwnd;					///< 終了通知を送るウィンドウのハンドル
 
-
-
 	void*				m_object;				///< 終了メッセージで LPARAM に渡すポインタ
 
 	BOOL				m_abort;				///< 中断フラグ
@@ -80,7 +78,9 @@ public:
 		ENCODING_EUC  = 1,
 		ENCODING_UTF8 = 2,
 	};
-	ENCODING		m_encodingFrom;			///< 通信取得データのエンコーディング（デフォルトは mixi HTML なので EUC-JP）
+	ENCODING			m_encodingFrom;			///< 通信取得データのエンコーディング（デフォルトは mixi HTML なので EUC-JP）
+
+	DWORD				m_dwHttpStatus;			///< HTTPステータス
 
 	/**
 	 * コンストラクタ
@@ -88,6 +88,7 @@ public:
 	CInetAccess()
 		: m_hInternet(NULL)
 		, m_encodingFrom(ENCODING_EUC)
+		, m_dwHttpStatus(0)
 	{
 		Initialize( NULL, NULL );
 	}
