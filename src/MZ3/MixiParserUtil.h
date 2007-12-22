@@ -312,7 +312,7 @@ public:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"&#([0-9]{4,5});" ) ) {
+		if( !util::CompileRegex( reg, L"&#([0-9]{3,5});" ) ) {
 			return;
 		}
 
