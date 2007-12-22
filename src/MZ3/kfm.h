@@ -79,5 +79,7 @@ private:
 /// UTF-8‚©‚çMBCS‚Ö‚Ì•ÏŠ·
 int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output );
 
+/// UCS2(SJIS) ‚©‚ç UTF-8 ‚Ö‚Ì•ÏŠ·
+bool ucs2_to_utf8(const CString& strText, CStringA& strResult);
 
 }

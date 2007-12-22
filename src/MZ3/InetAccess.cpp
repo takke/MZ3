@@ -275,7 +275,7 @@ unsigned int CInetAccess::ExecGet_Thread(LPVOID This)
 /**
  * データをポストする
  */
-BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData )
+BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId, LPCTSTR szPassword )
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -285,6 +285,10 @@ BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* p
 	m_fileType	= type;
 	m_postData	= postData;
 	m_nRedirect = 0;
+
+	// 認証情報の取得・設定
+	m_strUserId   = szUserId==NULL ? L"" : szUserId;
+	m_strPassword = szPassword==NULL ? L"" : szPassword;
 
 	// スレッド開始
 	m_pThreadMain = AfxBeginThread(ExecPost_Thread, this);
@@ -785,6 +789,10 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			DWORD len = sizeof(szStatusCode);
 			if( HttpQueryInfo(m_hRequest, HTTP_QUERY_STATUS_CODE, &szStatusCode, &len, 0 ) ) {
 				// ステータスコード取得成功。
+
+				// ステータスコードをダンプ
+				MZ3LOGGER_DEBUG( util::FormatString( L"ステータスコード：%s", szStatusCode ) );
+
 				// ステータスコードが 30x ならリダイレクト。
 				if( lstrcmp( szStatusCode, L"301" ) == 0 ||
 					lstrcmp( szStatusCode, L"302" ) == 0 ) 

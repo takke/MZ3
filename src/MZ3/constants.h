@@ -111,6 +111,9 @@ enum ACCESS_TYPE {
 
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
+	//--- Twitter POST 系
+	ACCESS_TWITTER_UPDATE,				///< ステータス更新
+
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ
 	ACCESS_ERRORLOG,			///< mz3log.txt 専用の特殊タイプ

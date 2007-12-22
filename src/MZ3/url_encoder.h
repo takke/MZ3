@@ -115,4 +115,24 @@ public:
 		return url_encoded_text;
 	}
 
+	/**
+	 * URL エンコード(UTF-8)を行う。
+	 */
+	static CStringA encode_utf8( LPCSTR msg )
+	{
+		char url_encoded_text[ MY_BUFFER_MAX+1 ];
+		memset(url_encoded_text, 0x00, sizeof(char) * (MY_BUFFER_MAX+1));
+
+		UrlEncode((unsigned char*)&msg[0], (unsigned char*)url_encoded_text, MY_BUFFER_MAX);
+
+		return url_encoded_text;
+	}
+
+	static CStringA encode_utf8( LPCTSTR msg )
+	{
+		CStringA strUtf8;
+		kfm::ucs2_to_utf8(msg, strUtf8);
+
+		return encode_utf8(strUtf8);
+	}
 };

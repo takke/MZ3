@@ -102,7 +102,7 @@ public:
 
 	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL );
 	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
-	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData );
+	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL );
 
 	void Initialize( HWND hwnd, void* object, ENCODING encoding=ENCODING_EUC );
 

@@ -157,6 +157,7 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 
 	// Twitter 系
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	text = L"タイムライン";	break;
+	case ACCESS_TWITTER_UPDATE:				text = L"更新";			break;
 
 
 	case ACCESS_INVALID:			text = L"<invalid>";			break;

@@ -25,6 +25,7 @@
 #include "ChooseAccessTypeDlg.h"
 #include "OpenUrlDlg.h"
 #include "MiniImageDialog.h"
+#include "url_encoder.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -194,6 +195,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_MESSAGE(WM_MZ3_ACCESS_LOADED, OnAccessLoaded)
     ON_MESSAGE(WM_MZ3_CHANGE_VIEW, OnChangeView)
 	ON_MESSAGE(WM_MZ3_HIDE_VIEW, OnHideView)
+	ON_MESSAGE(WM_MZ3_POST_END, OnPostEnd)
 	ON_COMMAND(ID_WRITE_DIARY, &CMZ3View::OnWriteDiary)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
 	ON_COMMAND(ID_OPEN_BROWSER, &CMZ3View::OnOpenBrowser)
@@ -229,6 +231,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_HOME, &CMZ3View::OnMenuTwitterHome)
 	ON_COMMAND(ID_MENU_TWITTER_FAVORITES, &CMZ3View::OnMenuTwitterFavorites)
 	ON_COMMAND(ID_MENU_TWITTER_SITE, &CMZ3View::OnMenuTwitterSite)
+	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -241,6 +244,7 @@ CMZ3View::CMZ3View()
 	, m_dwLastReturn( 0 )
 	, m_nKeydownRepeatCount( 0 )
 	, m_checkNewComment( false )
+	, m_viewStyle(VIEW_STYLE_DEFAULT)
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -267,6 +271,7 @@ void CMZ3View::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BODY_LIST, m_bodyList);
 	DDX_Control(pDX, IDC_INFO_EDIT, m_infoEdit);
 	DDX_Control(pDX, IDC_PROGRESS_BAR, mc_progressBar);
+	DDX_Control(pDX, IDC_STATUS_EDIT, m_statusEdit);
 }
 
 BOOL CMZ3View::PreCreateWindow(CREATESTRUCT& cs)
@@ -494,6 +499,14 @@ bool CMZ3View::DoInitialize()
 		DoNewCommentCheck();
 	}
 
+	// スタイル変更
+	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
+	if (newStyle!=m_viewStyle) {
+		m_viewStyle = newStyle;
+		MySetLayout(0,0);
+//		ShowScrollBar( SB_BOTH, FALSE );
+	}
+
 	return true;
 }
 
@@ -554,78 +567,10 @@ CMZ3Doc* CMZ3View::GetDocument() const // デバッグ以外のバージョンはインラインで
  */
 void CMZ3View::OnSize(UINT nType, int cx, int cy)
 {
-	// 前回の値を保存し、(0,0) の場合はその値を利用する
-	static int s_cx = 0;
-	static int s_cy = 0;
-	if (cx==0 && cy==0) {
-		cx = s_cx;
-		cy = s_cy;
-	} else {
-		s_cx = cx;
-		s_cy = cy;
-	}
-
 	CFormView::OnSize(nType, cx, cy);
-
 	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );
-/*	{
-		CRect rect;
-		CString msg;
 
-		GetWindowRect( &rect );
-		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
-
-		GetWindowRect( &rect );
-		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
-	}
-*/
-	int fontHeight = theApp.m_optionMng.m_fontHeight;
-	if( fontHeight == 0 ) {
-		fontHeight = 24;
-	}
-
-	// 画面下部の情報領域
-	int hInfo     = theApp.GetInfoRegionHeight(fontHeight);
-
-	// グループタブ
-	int hGroup    = theApp.GetTabHeight(fontHeight);
-
-	// カテゴリ、ボディリストの領域を % で指定
-	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
-	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
-	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
-
-	int hCategory = (cy * h1 / (h1+h2)) - (hGroup - 1);
-	int hBody     = (cy * h2 / (h1+h2)) - (hInfo - 1);
-
-	int y = 0;
-	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
-	y += hGroup;
-
-	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
-	y += hCategory;
-	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
-	y += hBody;
-
-
-	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
-	if( theApp.m_optionMng.m_killPaneLabel ){
-		util::ModifyStyleDlgItemWindow(this,IDC_BODY_LIST,NULL,LVS_NOCOLUMNHEADER);
-	}
-	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
-
-	MoveMiniImageDlg();
-
-	// プログレスバーは別途配置
-	// サイズは hInfo の 2/3 とする
-	int hProgress = hInfo * 2 / 3;
-	y = cy - hInfo - hProgress;
-	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
-
-	// リストカラム幅の変更
-	ResetColumnWidth();
+	MySetLayout( cx, cy );
 }
 
 /**
@@ -1595,6 +1540,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	}
 
 	// Xcrawl Canceler
+#ifdef WINCE
 	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
 		if( m_xcrawl.procKeyup( pMsg->wParam ) ) {
 			// キャンセルされたので上下キーを無効にする。
@@ -1602,6 +1548,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			return TRUE;
 		}
 	}
+#endif
 
 	// 各ペイン毎の処理
 	if (pMsg->hwnd == m_categoryList.m_hWnd) {
@@ -1639,6 +1586,7 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 		if( OnKeydownBodyList( pMsg->wParam ) ) {
 			return TRUE;
 		}
+	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
 	}
 
 	return FALSE;
@@ -1664,13 +1612,17 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 		// KEYDOWN リピート回数を初期化
 		m_nKeydownRepeatCount = 0;
 
-		return r;
+		if (r) {
+			return r;
+		}
 	}
 	else if (pMsg->message == WM_KEYDOWN) {
 		// KEYDOWN リピート回数をインクリメント
 		m_nKeydownRepeatCount ++;
 
-		return OnKeyDown( pMsg );
+		if (OnKeyDown( pMsg )) {
+			return TRUE;
+		}
 	}
 
 	return CFormView::PreTranslateMessage(pMsg);
@@ -2183,8 +2135,15 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			// アクセス中は無視
 			return TRUE;
 		}
-		// 非アクセス中は、カテゴリリストに移動する
-		return CommandSetFocusCategoryList();
+		// 非アクセス中は、カテゴリリストまたは入力領域に移動する
+		switch (m_viewStyle) {
+		case VIEW_STYLE_TWITTER:
+			GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+			return TRUE;
+		case VIEW_STYLE_DEFAULT:
+		default:
+			return CommandSetFocusCategoryList();
+		}
 
 	default:
 //		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
@@ -2667,6 +2626,15 @@ void CMZ3View::OnGetLast10()
  */
 void CMZ3View::OnMySelchangedCategoryList(void)
 {
+	// スタイル変更
+	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
+	if (newStyle!=m_viewStyle) {
+		m_viewStyle = newStyle;
+		MySetLayout(0,0);
+//		OnSize(SIZE_RESTORED, 0, 0);
+//		ShowScrollBar( SB_BOTH, FALSE );
+	}
+
 	// 選択状態（赤）の変更
 	m_categoryList.SetActiveItem( m_selGroup->selectedCategory );
 
@@ -4319,7 +4287,21 @@ void CMZ3View::OnMenuTwitterRead()
  */
 void CMZ3View::OnMenuTwitterReply()
 {
-	MessageBox( L"未実装だじょ" );
+	// 入力領域にユーザのスクリーン名を追加。
+	CString strStatus;
+	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
+
+	CMixiData& data = GetSelectedBodyItem();
+	strStatus.AppendFormat( L"@%s ", (LPCTSTR)data.GetName() );
+
+	SetDlgItemText( IDC_STATUS_EDIT, strStatus );
+
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+
+	// End
+	keybd_event( VK_END, 0, 0, 0 );
+	keybd_event( VK_END, 0, KEYEVENTF_KEYUP, 0 );
 }
 
 /**
@@ -4327,7 +4309,8 @@ void CMZ3View::OnMenuTwitterReply()
  */
 void CMZ3View::OnMenuTwitterUpdate()
 {
-	MessageBox( L"未実装だじょ" );
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
 
 /**
@@ -4355,4 +4338,231 @@ void CMZ3View::OnMenuTwitterSite()
 {
 	CMixiData& data = GetSelectedBodyItem();
 	util::OpenBrowserForUrl( data.GetURL() );
+}
+
+CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
+{
+	if (m_selGroup!=NULL) {
+		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+		if (pCategory!=NULL) {
+			switch (pCategory->m_mixi.GetAccessType()) {
+			case ACCESS_TWITTER_FRIENDS_TIMELINE:
+				return VIEW_STYLE_TWITTER;
+			default:
+				break;
+			}
+		}
+	}
+	return VIEW_STYLE_DEFAULT;
+}
+
+/**
+ * Twitter, 更新
+ */
+void CMZ3View::OnBnClickedUpdateButton()
+{
+	if (m_access) {
+		return;
+	}
+
+	CString strStatus;
+	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
+
+	if (strStatus.IsEmpty()) {
+		return;
+	}
+
+	static CPostData post;
+	post.ClearPostBody();
+	post.AppendPostBody( "status=" );
+	post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+	post.AppendPostBody( util::FormatString(L" *%s*", MZ3_APP_NAME) );
+	post.AppendPostBody( "&source=" );
+	post.AppendPostBody( MZ3_APP_NAME );
+
+	post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
+
+	post.SetSuccessMessage( WM_MZ3_POST_END );
+
+	CString url = L"http://twitter.com/statuses/update.xml";
+
+	// Twitter API => Basic 認証
+	LPCTSTR szUser = NULL;
+	LPCTSTR szPassword = NULL;
+	szUser     = theApp.m_loginMng.GetTwitterId();
+	szPassword = theApp.m_loginMng.GetTwitterPassword();
+
+	// 未指定の場合はエラー出力
+	if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+		MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+		return;
+	}
+
+	// 中止ボタンを使用可にする
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+
+	// アクセス種別を設定
+	theApp.m_accessType = ACCESS_TWITTER_UPDATE;
+
+	// アクセス開始
+	m_access = TRUE;
+	m_abort = FALSE;
+
+	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.DoPost(
+		url, 
+		L"", 
+		CInetAccess::FILE_HTML, 
+		&post, szUser, szPassword );
+
+//	CPostData::post_array& buf = post.GetPostBody();
+//	MessageBox( CStringW(&buf[0], buf.size()) );
+}
+
+/**
+ * アクセス終了通知受信 (POST)
+ */
+LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
+{
+	if (m_abort) {
+		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
+		return TRUE;
+	}
+
+	// 通信完了（フラグを下げる）
+	m_access = FALSE;
+
+	util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+
+	// 入力値を消去
+	SetDlgItemText( IDC_STATUS_EDIT, L"" );
+
+	// フォーカスを入力領域に移動
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+
+	// プログレスバーを非表示
+	mc_progressBar.ShowWindow( SW_HIDE );
+
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+
+	return TRUE;
+}
+
+void CMZ3View::MySetLayout(int cx, int cy)
+{
+	// 前回の値を保存し、(0,0) の場合はその値を利用する
+	static int s_cx = 0;
+	static int s_cy = 0;
+	if (cx==0 && cy==0) {
+		cx = s_cx;
+		cy = s_cy;
+	} else {
+		s_cx = cx;
+		s_cy = cy;
+	}
+/*	{
+		CRect rect;
+		CString msg;
+
+		GetWindowRect( &rect );
+		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+
+		GetWindowRect( &rect );
+		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+	}
+*/
+	int fontHeight = theApp.m_optionMng.m_fontHeight;
+	if( fontHeight == 0 ) {
+		fontHeight = 24;
+	}
+
+	// 画面下部の情報領域
+	int hInfoBase = theApp.GetInfoRegionHeight(fontHeight);
+	int hInfo     = hInfoBase;
+
+	// グループタブ
+	int hGroup    = theApp.GetTabHeight(fontHeight);
+
+	// 投稿領域
+	int hPost     = 0;
+	CWnd* pStatusEdit   = GetDlgItem( IDC_STATUS_EDIT );
+	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
+	CRect rectUpdateButton;
+	switch (m_viewStyle) {
+	case VIEW_STYLE_DEFAULT:
+		if (m_infoEdit.m_hWnd!=NULL) {
+			m_infoEdit.ModifyStyle( ES_MULTILINE, 0 );
+		}
+		if (pStatusEdit!=NULL) {
+			pStatusEdit->ShowWindow(SW_HIDE);
+		}
+		if (pUpdateButton!=NULL) {
+			pUpdateButton->ShowWindow(SW_HIDE);
+		}
+		break;
+	case VIEW_STYLE_TWITTER:
+		if (m_infoEdit.m_hWnd!=NULL) {
+			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
+		}
+		if (pStatusEdit!=NULL) {
+			pStatusEdit->ShowWindow(SW_SHOW);
+		}
+		if (pUpdateButton!=NULL) {
+			pUpdateButton->ShowWindow(SW_SHOW);
+			pUpdateButton->GetClientRect(&rectUpdateButton);
+		}
+		hPost = rectUpdateButton.Height();
+#ifdef WINCE
+		hInfo = (int)(hInfoBase * 1.8);
+#else
+		hInfo = (int)(hInfoBase * 1.5);
+#endif
+		break;
+	}
+
+	// カテゴリ、ボディリストの領域を % で指定
+	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
+	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+	int hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
+	int hBody     = (cy * h2 / (h1+h2)) - (hInfo + hPost -1);
+
+	int y = 0;
+	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
+	y += hGroup;
+
+	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
+	y += hCategory;
+
+	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
+	y += hBody;
+
+	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, y, cx, hInfo     );
+	y += hInfo;
+
+	if (pUpdateButton!=NULL) {
+		int w = rectUpdateButton.Width();
+		if (hPost>0) {
+			util::MoveDlgItemWindow( this, IDC_STATUS_EDIT,   0,    y, cx - w, hPost );
+			util::MoveDlgItemWindow( this, IDC_UPDATE_BUTTON, cx-w, y, w,      hPost );
+		}
+	}
+
+	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
+	if( theApp.m_optionMng.m_killPaneLabel ) {
+		util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
+	}
+	MoveMiniImageDlg();
+
+	// プログレスバーは別途配置
+	// サイズは hInfoBase の 2/3 とする
+	int hProgress = hInfoBase * 2 / 3;
+	y = cy -hInfo -hPost -hProgress;
+	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
+
+	// リストカラム幅の変更
+	ResetColumnWidth();
 }

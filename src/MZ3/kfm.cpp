@@ -668,4 +668,25 @@ int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output )
 	return output.size();
 }
 
+// this code is based on the code from http://www.atmark.gr.jp/~s2000/r/rtl/encode.html
+bool ucs2_to_utf8(const CString& strText, CStringA& strResult)
+{
+    if (strText.IsEmpty()) {
+        return false;
+    }
+
+    USES_CONVERSION;
+
+    // Unicode •¶Žš—ñ‚ð UTF-8 ‚É•ÏŠ·
+    const int cchMultiByte = (lstrlenW(strText) + 1) * 3;
+    LPSTR lpa = reinterpret_cast<LPSTR>(_alloca(cchMultiByte));
+    *lpa = '\0';
+    const int nBytes = ::WideCharToMultiByte(CP_UTF8, 0, strText, -1, lpa, cchMultiByte, NULL, NULL);
+//	ATLASSERT( nBytes > 0 );
+
+    strResult = lpa;
+
+    return true;
+}
+
 }

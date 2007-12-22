@@ -66,6 +66,7 @@ public:
 	afx_msg void OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnPostEnd(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetEndBinary(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
@@ -97,8 +98,14 @@ public:
 
 	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
+	enum VIEW_STYLE {
+		VIEW_STYLE_DEFAULT = 0,			///< 標準
+		VIEW_STYLE_TWITTER = 1,			///< Twitter 用スタイル
+	};
+	VIEW_STYLE			m_viewStyle;	///< 表示スタイル
+
 private:
-	BOOL			m_access;			///< アクセス中フラグ
+	BOOL				m_access;		///< アクセス中フラグ
 
 	/**
 	 * 巡回用データ
@@ -196,7 +203,6 @@ public:
 private:
 	int				m_preCategory;		///< 前回選択していたカテゴリリスト項目のインデックス
 	CListCtrl*		m_hotList;			///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
-	CPostData*		m_postData;
 
 	CImageList		m_iconImageList;	///< アイコン用画像リスト
 
@@ -328,6 +334,10 @@ public:
 	afx_msg void OnMenuTwitterHome();
 	afx_msg void OnMenuTwitterFavorites();
 	afx_msg void OnMenuTwitterSite();
+	VIEW_STYLE MyGetViewStyleForSelectedCategory(void);
+	afx_msg void OnBnClickedUpdateButton();
+	CEdit m_statusEdit;
+	void MySetLayout(int cx, int cy);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
