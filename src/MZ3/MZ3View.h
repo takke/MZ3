@@ -338,6 +338,7 @@ public:
 	afx_msg void OnBnClickedUpdateButton();
 	CEdit m_statusEdit;
 	void MySetLayout(int cx, int cy);
+	afx_msg void OnLoadUrl(UINT);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

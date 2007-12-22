@@ -16,9 +16,9 @@ namespace twitter {
  * 【タイムライン】
  * http://twitter.com/statuses/friends_timeline.xml
  */
-bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
+bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
-	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineAtomParser.parse() start." );
+	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
 
 	// html_ の文字列化
 	std::vector<TCHAR> text;
@@ -86,6 +86,9 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 				// updated : status/created_at
 				mixi::ParserUtil::ParseDate( status.getNode( L"created_at" ).getTextAll().c_str(), data );
 
+				// URL を抽出し、リンクにする
+				TwitterFriendsTimelineXmlParser::ExtractLinks( data );
+
 				// 完成したので追加する
 				out_.push_back( data );
 			} catch (xml2stl::NodeNotFoundException& e) {
@@ -97,7 +100,46 @@ bool TwitterFriendsTimelineAtomParser::parse( CMixiDataList& out_, const CHtmlAr
 		MZ3LOGGER_ERROR( util::FormatString( L"statuses not found... : %s", e.getMessage().c_str()) );
 	}
 
-	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineAtomParser.parse() finished." );
+	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() finished." );
+	return true;
+}
+
+bool TwitterFriendsTimelineXmlParser::ExtractLinks(CMixiData &data_)
+{
+	// 正規表現のコンパイル（一回のみ）
+	static MyRegex reg;
+	if( !util::CompileRegex( reg, L"(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+		MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+		return false;
+	}
+
+	CString target;
+	for (int i=0; i<data_.GetBodySize(); i++) {
+		target.Append( data_.GetBody(i) );
+	}
+
+	for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+		if( reg.exec(target) == false || reg.results.size() != 2 ) {
+			// 未発見。終了。
+			break;
+		}
+
+		// 発見。
+
+		// URL
+		std::wstring& url = reg.results[1].str;
+
+		if (!url.empty() && url[0] != 'h') {
+			url.insert( url.begin(), 'h' );
+		}
+
+		// データに追加
+		data_.m_linkList.push_back( CMixiData::Link(url.c_str(), url.c_str()) );
+
+		// ターゲットを更新。
+		target = target.Mid( reg.results[0].end );
+	}
+
 	return true;
 }
 

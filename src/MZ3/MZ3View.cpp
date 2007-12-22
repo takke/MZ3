@@ -237,6 +237,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_FAVORITES, &CMZ3View::OnMenuTwitterFavorites)
 	ON_COMMAND(ID_MENU_TWITTER_SITE, &CMZ3View::OnMenuTwitterSite)
 	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
+	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -4630,4 +4631,23 @@ void CMZ3View::MySetLayout(int cx, int cy)
 
 	// リストカラム幅の変更
 	ResetColumnWidth();
+}
+
+/**
+ * URL
+ */
+void CMZ3View::OnLoadUrl(UINT nID)
+{
+	const CMixiData& data = GetSelectedBodyItem();
+
+	UINT idx = nID - (ID_REPORT_URL_BASE+1);
+	if( idx > data.m_linkList.size() ) {
+		return;
+	}
+
+	LPCTSTR url  = data.m_linkList[idx].url;
+	LPCTSTR text = data.m_linkList[idx].text;
+
+	// 確認画面
+	util::OpenBrowserForUrl( url );
 }

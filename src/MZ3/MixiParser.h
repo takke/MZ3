@@ -4594,10 +4594,12 @@ public:
 /// Twitter 用パーサ
 namespace twitter {
 
-class TwitterFriendsTimelineAtomParser : public mixi::MixiListParser
+class TwitterFriendsTimelineXmlParser : public mixi::MixiListParser
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
+private:
+	static bool ExtractLinks( CMixiData& data_ );
 };
 
 }//namespace twitter
@@ -4627,7 +4629,7 @@ inline bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArra
 	case ACCESS_LIST_BBS:					return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_NEW_BBS_COMMENT:		return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:				return mixi::ShowCalendarParser::parse( body, html );
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineAtomParser::parse( body, html );
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );
 	default:
 		return false;
 	}
