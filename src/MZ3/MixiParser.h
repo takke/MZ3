@@ -2029,6 +2029,11 @@ private:
 				return -1;
 			}
 
+			// bbs_comment_formを発見したら、コメント終了なので抜ける 
+			if (util::LineHasStringsNoCase( line, L"<form", L"bbs_comment_form", L"action" )) { 
+				return -1; 
+			}
+
 			// <!-- ADD_COMMENT: start -->を発見したら、コメント終了なので抜ける
 			if (util::LineHasStringsNoCase( line, L"<!", L"ADD_COMMENT", L"start" )) {
 				return -1;
