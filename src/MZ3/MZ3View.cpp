@@ -1471,7 +1471,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	MoveMiniImageDlg();
 
 	// ÉAÉCÉRÉìçƒï`âÊ
-	InvalidateRect( m_rectIcon );
+	InvalidateRect( m_rectIcon, FALSE );
 
 	*pResult = 0;
 }
