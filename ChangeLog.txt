@@ -17,13 +17,15 @@ $Id$
 - 各ページのスタックモデル化
 - 絵文字パレット
 
-
 * MZ3.i/MZ4 Ver.0.9 series
 
-** MZ3.i/MZ4 Ver.0.9.1.0 Beta1	(2007.12.16)
-- Twitter のタイムライン取得機能を追加。
-- Twitter の「更新」機能を追加。
-- ログイン設定画面に Twitter 用設定項目を追加。
+** MZ3.i/MZ4 Ver.0.9.1.0 Beta2	(2007.12.22)
+- Twitter サーバのエラーを検出するようにした（HTTPステータスチェック）。
+- Twitter 発言中のURLを抽出するようにした。
+- Twitter の各ユーザのアイコンを発言の左側に表示するようにした。
+- HTTPエンティティの再現を強化（&#xxx; と表示されないようにした）。
+- Twitter タブに「返信一覧」(Replies)を追加。タブの初期化を行うこと。
+- ニュースのカテゴリに「ゲーム・アニメ」と「コラム」を追加。タブの初期化を行うこと。
 - その他
 
 ** 既知の不具合
@@ -35,8 +37,14 @@ $Id$
 - (仕様) 各リスト上でのCtrl+HomeやCtrl+Endでフォーカスが不明になる。
 - (仕様) [MZ4] いくつかの絵文字の背景が黒になる(解決策不明のため仕様)
 
-http://www.mz3.jp/bin/MZ3.0.9.1.0b1.CAB (WindowsMobile版)
-http://www.mz3.jp/bin/MZ4.0.9.1.0b1.lzh (Windows版)
+http://www.mz3.jp/bin/MZ3.0.9.1.0b2.CAB (WindowsMobile版)
+http://www.mz3.jp/bin/MZ4.0.9.1.0b2.lzh (Windows版)
+
+** MZ3.i/MZ4 Ver.0.9.1.0 Beta1	(2007.12.22)
+- Twitter のタイムライン取得機能を追加。
+- Twitter の「更新」機能を追加。
+- ログイン設定画面に Twitter 用設定項目を追加。
+- その他
 
 ** MZ3.i/MZ4 Ver.0.9.0.0 正式版	(2007.12.15)
 - [MZ4] マウスの「進む」「戻る」ボタンに対応。
