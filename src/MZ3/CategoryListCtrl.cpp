@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
+#include "MZ3View.h"
 #include "CategoryListCtrl.h"
 #include "util.h"
 #include "util_gui.h"
@@ -36,6 +37,7 @@ BEGIN_MESSAGE_MAP(CCategoryListCtrl, CListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_WM_VSCROLL()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CCategoryListCtrl::OnLvnItemchanged)
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -256,3 +258,23 @@ BOOL CCategoryListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	return FALSE;
 }
 
+
+void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+#ifdef WINCE
+	// タップ長押しでソフトキーメニュー表示
+	SHRGINFO RGesture;
+	RGesture.cbSize     = sizeof(SHRGINFO);
+	RGesture.hwndClient = m_hWnd;
+	RGesture.ptDown     = point;
+	RGesture.dwFlags    = SHRG_RETURNCMD;
+	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		// TODO 本来は WM_COMMAND で通知すべき。
+		ClientToScreen(&point);
+		theApp.m_pMainView->PopupCategoryMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+		return;
+	}
+#endif
+
+	CListCtrl::OnLButtonDown(nFlags, point);
+}

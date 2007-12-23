@@ -3227,10 +3227,15 @@ void CMZ3View::OnSetRead()
 }
 
 /// ボディリストでの右クリックメニュー
-bool CMZ3View::PopupBodyMenu(void)
+bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 {
-	POINT pt    = util::GetPopupPos();
-	int   flags = util::GetPopupFlags();
+	POINT pt    = pt_;
+	int   flags = flags_;
+
+	if (pt.x==0 && pt.y==0) {
+		pt = util::GetPopupPos();
+		flags = util::GetPopupFlags();
+	}
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	switch( bodyItem.GetAccessType() ) {
@@ -4004,10 +4009,15 @@ void CMZ3View::OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 /**
  * カテゴリリストのポップアップメニュー
  */
-void CMZ3View::PopupCategoryMenu(void)
+void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 {
-	POINT pt    = util::GetPopupPos();
-	int   flags = util::GetPopupFlags();
+	POINT pt    = pt_;
+	int   flags = flags_;
+
+	if (pt.x==0 && pt.y==0) {
+		pt = util::GetPopupPos();
+		flags = util::GetPopupFlags();
+	}
 
 	CMenu menu;
 	menu.LoadMenu(IDR_CATEGORY_MENU);

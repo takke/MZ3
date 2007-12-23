@@ -40,6 +40,7 @@ public:
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 #endif
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 

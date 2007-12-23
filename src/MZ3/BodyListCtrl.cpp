@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CListCtrl)
 	ON_WM_NCCALCSIZE()
 	ON_WM_MOUSEMOVE()
 #endif
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -498,3 +499,23 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 	CListCtrl::OnMouseMove(nFlags, point);
 }
 #endif
+
+void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+#ifdef WINCE
+	// タップ長押しでソフトキーメニュー表示
+	SHRGINFO RGesture;
+	RGesture.cbSize     = sizeof(SHRGINFO);
+	RGesture.hwndClient = m_hWnd;
+	RGesture.ptDown     = point;
+	RGesture.dwFlags    = SHRG_RETURNCMD;
+	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		// TODO 本来は WM_COMMAND で通知すべき。
+		ClientToScreen(&point);
+		theApp.m_pMainView->PopupBodyMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+		return;
+	}
+#endif
+
+	CListCtrl::OnLButtonDown(nFlags, point);
+}

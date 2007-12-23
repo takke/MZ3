@@ -287,7 +287,8 @@ public:
 	afx_msg void OnOpenSelfintro();
 	afx_msg void OnSetNoRead();
 	afx_msg void OnViewBbsList();
-	bool PopupBodyMenu(void);
+	bool PopupBodyMenu(POINT pt_=CPoint(0,0), int flags_=0);
+	void PopupCategoryMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	afx_msg void OnViewBbsListLog();
 	bool PrepareViewBbsList(void);
 	afx_msg void OnCruise();
@@ -307,7 +308,6 @@ public:
 	afx_msg void OnLayoutCategoryMakeNarrow();
 	afx_msg void OnLayoutCategoryMakeWide();
 	afx_msg void OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
-	void PopupCategoryMenu(void);
 	afx_msg void OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
