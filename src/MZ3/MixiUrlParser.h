@@ -54,52 +54,6 @@ public:
 
 		return _wtoi(strCommentCount);
 	}
-
-	/**
-	 * 名前の取得。
-	 *
-	 * show_friend.pl?id=xxx">なまえ</a>
-	 *
-	 * @param str A タグの部分文字列
-	 */
-	static bool GetAuthor(LPCTSTR str, CMixiData* data)
-	{
-		TRACE( L"GetAuthor, param[%s]\n", str );
-
-		// show_friend.pl 以降に整形。
-		CString target;
-		if( util::GetAfterSubString( str, L"show_friend.pl", target ) == -1 ) {
-			// not found.
-			CString msg;
-			msg.Format( L"引数が show_friend.pl を含みません str[%s]", str );
-			MZ3LOGGER_ERROR(msg);
-			return false;
-		}
-
-		// ID 抽出
-		CString id;
-		if( util::GetBetweenSubString( target, L"id=", L"\">", id ) == -1 ) {
-			// not found.
-			CString msg;
-			msg.Format( L"引数が 'id=' を含みません str[%s]", str );
-			MZ3LOGGER_ERROR(msg);
-			return false;
-		}
-		data->SetAuthorID( _wtoi(id) );
-
-		// 名前抽出
-		CString name;
-		if( util::GetBetweenSubString( target, L">", L"<", name ) == -1 ) {
-			CString msg;
-			msg.Format( L"引数が '>', '<' を含みません str[%s]", str );
-			MZ3LOGGER_ERROR(msg);
-			return false;
-		}
-		data->SetAuthor( name );
-
-		return true;
-	}
-
 };
 
 }

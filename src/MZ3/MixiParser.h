@@ -1273,7 +1273,7 @@ private:
 
 					// 名前
 					buf = str.Mid(index);
-					MixiUrlParser::GetAuthor(buf, &cmtData);
+					ParserUtil::GetAuthor(buf, &cmtData);
 
 					// 時刻
 					for (int j=i+3; j>0; j--) {
@@ -1895,7 +1895,7 @@ public:
 					// トピ作成者のユーザ名を取得する。
 					if( util::LineHasStringsNoCase( line, L"show_friend.pl" ) ) {
 
-						MixiUrlParser::GetAuthor(line, &mixi);
+						ParserUtil::GetAuthor(line, &mixi);
 
 						// この行にはないので次の行へ。
 						continue;
@@ -2048,7 +2048,7 @@ private:
 			// <dt><a href="show_friend.pl?id=XXX">なまえ</a></dt>
 			if (util::LineHasStringsNoCase( line, L"<dt", L"show_friend.pl" )) {
 
-				MixiUrlParser::GetAuthor( line, &cmtData );
+				ParserUtil::GetAuthor( line, &cmtData );
 			}
 
 			// <dd> 発見したらループ抜ける
@@ -2134,7 +2134,7 @@ public:
 			// ●企画者解析
 			if( util::LineHasStringsNoCase( line, L"<dt>", L"show_friend" ) )
 			{
-				MixiUrlParser::GetAuthor( line, &data_ );
+				ParserUtil::GetAuthor( line, &data_ );
 				continue;
 			}
 
@@ -2387,7 +2387,7 @@ private:
 					if( util::LineHasStringsNoCase( line, L"<dt>", L"</dt>")) {
 						CString Author;
 						util::GetBetweenSubString( line, L"<dt>", L"</dt>", Author );
-						MixiUrlParser::GetAuthor( Author, &cmtData );
+						ParserUtil::GetAuthor( Author, &cmtData );
 						//コメント開始フラグをON
 						findFlag = TRUE;
 					}
@@ -2519,7 +2519,7 @@ public:
 				const CString& line2 = html_.GetAt(iLine );
 				CString Author;
 				util::GetBetweenSubString( line2, L"<dt>", L"</dt>", Author );
-				MixiUrlParser::GetAuthor( Author, &data_ );
+				ParserUtil::GetAuthor( Author, &data_ );
 
 				// ●内容解析
 				//内容解析関数へ、</dd>が見つかったら戻る
@@ -2690,7 +2690,7 @@ private:
 					if( util::LineHasStringsNoCase( line, L"show_friend", L"</dt>")) {
 						CString Author;
 						util::GetBetweenSubString( line, L"<dt>", L"</dt>", Author );
-						MixiUrlParser::GetAuthor( Author, &cmtData );
+						ParserUtil::GetAuthor( Author, &cmtData );
 						//コメント開始フラグをON
 						findFlag = TRUE;
 					}
