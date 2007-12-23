@@ -114,7 +114,7 @@ bool TwitterFriendsTimelineXmlParser::ExtractLinks(CMixiData &data_)
 	}
 
 	CString target;
-	for (int i=0; i<data_.GetBodySize(); i++) {
+	for (u_int i=0; i<data_.GetBodySize(); i++) {
 		target.Append( data_.GetBody(i) );
 	}
 

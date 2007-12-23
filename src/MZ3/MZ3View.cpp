@@ -1639,6 +1639,32 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 			return TRUE;
 		}
 	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
+		switch (pMsg->wParam) {
+		case 'V':
+			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+				m_statusEdit.Paste();
+				return TRUE;
+			}
+			break;
+		case 'C':
+			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+				m_statusEdit.Copy();
+				return TRUE;
+			}
+			break;
+		case 'X':
+			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+				m_statusEdit.Cut();
+				return TRUE;
+			}
+			break;
+		case 'Z':
+			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+				m_statusEdit.Undo();
+				return TRUE;
+			}
+			break;
+		}
 	}
 
 	return FALSE;
