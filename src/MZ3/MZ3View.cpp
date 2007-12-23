@@ -27,6 +27,7 @@
 #include "OpenUrlDlg.h"
 #include "MiniImageDialog.h"
 #include "url_encoder.h"
+#include "twitter_util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -581,6 +582,135 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 	MySetLayout( cx, cy );
 }
 
+void CMZ3View::MySetLayout(int cx, int cy)
+{
+	// 前回の値を保存し、(0,0) の場合はその値を利用する
+	static int s_cx = 0;
+	static int s_cy = 0;
+	if (cx==0 && cy==0) {
+		cx = s_cx;
+		cy = s_cy;
+	} else {
+		s_cx = cx;
+		s_cy = cy;
+	}
+/*	{
+		CRect rect;
+		CString msg;
+
+		GetWindowRect( &rect );
+		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+
+		GetWindowRect( &rect );
+		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
+		MZ3LOGGER_DEBUG( msg );
+	}
+*/
+	int fontHeight = theApp.m_optionMng.m_fontHeight;
+	if( fontHeight == 0 ) {
+		fontHeight = 24;
+	}
+
+	// 画面下部の情報領域
+	int hInfoBase = theApp.GetInfoRegionHeight(fontHeight);
+	int hInfo     = hInfoBase;
+
+	// グループタブ
+	int hGroup    = theApp.GetTabHeight(fontHeight);
+
+	// 投稿領域
+	int hPost     = 0;
+	CWnd* pStatusEdit   = GetDlgItem( IDC_STATUS_EDIT );
+	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
+	CRect rectUpdateButton;
+	switch (m_viewStyle) {
+	case VIEW_STYLE_DEFAULT:
+		if (m_infoEdit.m_hWnd!=NULL) {
+			m_infoEdit.ModifyStyle( ES_MULTILINE, 0 );
+		}
+		if (pStatusEdit!=NULL) {
+			pStatusEdit->ShowWindow(SW_HIDE);
+		}
+		if (pUpdateButton!=NULL) {
+			pUpdateButton->ShowWindow(SW_HIDE);
+		}
+		break;
+	case VIEW_STYLE_TWITTER:
+		if (m_infoEdit.m_hWnd!=NULL) {
+			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
+		}
+		if (pStatusEdit!=NULL) {
+			pStatusEdit->ShowWindow(SW_SHOW);
+		}
+		if (pUpdateButton!=NULL) {
+			pUpdateButton->ShowWindow(SW_SHOW);
+			pUpdateButton->GetClientRect(&rectUpdateButton);
+		}
+		hPost = rectUpdateButton.Height();
+#ifdef WINCE
+		hInfo = (int)(hInfoBase * 1.8);
+#else
+		hInfo = (int)(hInfoBase * 1.5);
+#endif
+		break;
+	}
+
+	// カテゴリ、ボディリストの領域を % で指定
+	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
+	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+	int hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
+	int hBody     = (cy * h2 / (h1+h2)) - (hInfo + hPost -1);
+
+	int y = 0;
+	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
+	y += hGroup;
+
+	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
+	y += hCategory;
+
+	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
+	y += hBody;
+
+	switch (m_viewStyle) {
+	case VIEW_STYLE_DEFAULT:
+		m_rectIcon.SetRect( 0, 0, 0, 0 );
+		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, 0, y, cx, hInfo     );
+		y += hInfo;
+		break;
+	case VIEW_STYLE_TWITTER:
+		m_rectIcon.SetRect( 0, y, hInfo, y+hInfo );
+		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, hInfo, y, cx-hInfo, hInfo     );
+		y += hInfo;
+		break;
+	}
+
+	if (pUpdateButton!=NULL) {
+		int w = rectUpdateButton.Width();
+		if (hPost>0) {
+			util::MoveDlgItemWindow( this, IDC_STATUS_EDIT,   0,    y, cx - w, hPost );
+			util::MoveDlgItemWindow( this, IDC_UPDATE_BUTTON, cx-w, y, w,      hPost );
+		}
+	}
+
+	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
+	if( theApp.m_optionMng.m_killPaneLabel ) {
+		util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
+	}
+	MoveMiniImageDlg();
+
+	// プログレスバーは別途配置
+	// サイズは hInfoBase の 2/3 とする
+	int hProgress = hInfoBase * 2 / 3;
+	y = cy -hInfo -hPost -hProgress;
+	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
+
+	// リストカラム幅の変更
+	ResetColumnWidth();
+}
+
 /**
  * カテゴリリストクリック時の処理
  */
@@ -919,33 +1049,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
 			switch (aType) {
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
-
-				switch (theApp.m_inet.m_dwHttpStatus) {
-				case 200:	// OK: 成功
-				case 304:	// Not Modified: 新しい情報はない
-					break;
-				case 400:	// Bad Request:
-					szStatusErrorMessage = L"API の実行回数制限に引っ掛かった、などの理由でリクエストを却下した";
-					break;
-				case 401:	// Not Authorized:
-					szStatusErrorMessage = L"認証失敗";
-					break;
-				case 403:	// Forbidden:
-					szStatusErrorMessage = L"権限がないAPI を実行しようとした";
-					break;
-				case 404:	// Not Found:
-					szStatusErrorMessage = L"存在しない API を実行しようとした、存在しないユーザを引数で指定して API を実行しようとした";
-					break;
-				case 500:	// Internal Server Error:
-					szStatusErrorMessage = L"Twitter 側で何らかの問題が発生しています";
-					break;
-				case 502:	// Bad Gateway:
-					szStatusErrorMessage = L"Twitter のサーバが止まっています（メンテ中かもしれません）";
-					break;
-				case 503:	// Service Unavailable:
-					szStatusErrorMessage = L"Twitter のサーバの負荷が高すぎて、リクエストを裁き切れない状態になっています";
-					break;
-				}
+				szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
 				break;
 			}
 			if (szStatusErrorMessage!=NULL) {
@@ -4529,10 +4633,19 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+	// 現状はTwitterのみ対応。
+	// HTTPステータスチェックを行う。
+	LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
+	if (szStatusErrorMessage!=NULL) {
+		CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+		util::MySetInformationText( m_hWnd, msg );
+		MZ3LOGGER_ERROR( msg );
+	} else {
+		util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
 
-	// 入力値を消去
-	SetDlgItemText( IDC_STATUS_EDIT, L"" );
+		// 入力値を消去
+		SetDlgItemText( IDC_STATUS_EDIT, L"" );
+	}
 
 	// フォーカスを入力領域に移動
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
@@ -4543,135 +4656,6 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
 	return TRUE;
-}
-
-void CMZ3View::MySetLayout(int cx, int cy)
-{
-	// 前回の値を保存し、(0,0) の場合はその値を利用する
-	static int s_cx = 0;
-	static int s_cy = 0;
-	if (cx==0 && cy==0) {
-		cx = s_cx;
-		cy = s_cy;
-	} else {
-		s_cx = cx;
-		s_cy = cy;
-	}
-/*	{
-		CRect rect;
-		CString msg;
-
-		GetWindowRect( &rect );
-		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
-
-		GetWindowRect( &rect );
-		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
-	}
-*/
-	int fontHeight = theApp.m_optionMng.m_fontHeight;
-	if( fontHeight == 0 ) {
-		fontHeight = 24;
-	}
-
-	// 画面下部の情報領域
-	int hInfoBase = theApp.GetInfoRegionHeight(fontHeight);
-	int hInfo     = hInfoBase;
-
-	// グループタブ
-	int hGroup    = theApp.GetTabHeight(fontHeight);
-
-	// 投稿領域
-	int hPost     = 0;
-	CWnd* pStatusEdit   = GetDlgItem( IDC_STATUS_EDIT );
-	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
-	CRect rectUpdateButton;
-	switch (m_viewStyle) {
-	case VIEW_STYLE_DEFAULT:
-		if (m_infoEdit.m_hWnd!=NULL) {
-			m_infoEdit.ModifyStyle( ES_MULTILINE, 0 );
-		}
-		if (pStatusEdit!=NULL) {
-			pStatusEdit->ShowWindow(SW_HIDE);
-		}
-		if (pUpdateButton!=NULL) {
-			pUpdateButton->ShowWindow(SW_HIDE);
-		}
-		break;
-	case VIEW_STYLE_TWITTER:
-		if (m_infoEdit.m_hWnd!=NULL) {
-			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
-		}
-		if (pStatusEdit!=NULL) {
-			pStatusEdit->ShowWindow(SW_SHOW);
-		}
-		if (pUpdateButton!=NULL) {
-			pUpdateButton->ShowWindow(SW_SHOW);
-			pUpdateButton->GetClientRect(&rectUpdateButton);
-		}
-		hPost = rectUpdateButton.Height();
-#ifdef WINCE
-		hInfo = (int)(hInfoBase * 1.8);
-#else
-		hInfo = (int)(hInfoBase * 1.5);
-#endif
-		break;
-	}
-
-	// カテゴリ、ボディリストの領域を % で指定
-	// （但し、カテゴリリストはグループタブを、ボディリストは情報領域を含む）
-	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
-	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
-
-	int hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
-	int hBody     = (cy * h2 / (h1+h2)) - (hInfo + hPost -1);
-
-	int y = 0;
-	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
-	y += hGroup;
-
-	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
-	y += hCategory;
-
-	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
-	y += hBody;
-
-	switch (m_viewStyle) {
-	case VIEW_STYLE_DEFAULT:
-		m_rectIcon.SetRect( 0, 0, 0, 0 );
-		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, 0, y, cx, hInfo     );
-		y += hInfo;
-		break;
-	case VIEW_STYLE_TWITTER:
-		m_rectIcon.SetRect( 0, y, hInfo, y+hInfo );
-		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, hInfo, y, cx-hInfo, hInfo     );
-		y += hInfo;
-		break;
-	}
-
-	if (pUpdateButton!=NULL) {
-		int w = rectUpdateButton.Width();
-		if (hPost>0) {
-			util::MoveDlgItemWindow( this, IDC_STATUS_EDIT,   0,    y, cx - w, hPost );
-			util::MoveDlgItemWindow( this, IDC_UPDATE_BUTTON, cx-w, y, w,      hPost );
-		}
-	}
-
-	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
-	if( theApp.m_optionMng.m_killPaneLabel ) {
-		util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
-	}
-	MoveMiniImageDlg();
-
-	// プログレスバーは別途配置
-	// サイズは hInfoBase の 2/3 とする
-	int hProgress = hInfoBase * 2 / 3;
-	y = cy -hInfo -hPost -hProgress;
-	util::MoveDlgItemWindow( this, IDC_PROGRESS_BAR, 0, y, cx, hProgress );
-
-	// リストカラム幅の変更
-	ResetColumnWidth();
 }
 
 /**

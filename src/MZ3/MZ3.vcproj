@@ -2475,6 +2475,10 @@
 			<Filter
 				Name="twitter"
 				>
+				<File
+					RelativePath=".\twitter_util.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
