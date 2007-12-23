@@ -59,6 +59,8 @@ bool Mz3GroupData::initForTopPage()
 			{"スポーツ",			  "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1"	},
 			{"エンターテインメント",  "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1"	},
 			{"IT",					  "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1"	},
+			{"ゲーム・アニメ",		  "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1"	},
+			{"コラム",				  "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1"	},
 			{NULL, NULL}
 		};
 
@@ -93,6 +95,7 @@ bool Mz3GroupData::initForTopPage()
 	group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
 	{
 		appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
+		appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
 	}
 	this->groups.push_back( group );
 
