@@ -381,7 +381,26 @@ inline CString MakeLogfilePath( const CMixiData& data )
 
 	//--- Twitter 系
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		return theApp.m_filepath.logFolder + L"\\twitter_friends_timeline.xml";
+		{
+			// http://twitter.com/statuses/friends_timeline.xml
+			// http://twitter.com/statuses/friends_timeline/takke.xml
+			// http://twitter.com/statuses/replies.xml
+			// http://twitter.com/statuses/user_timeline.xml
+			// http://twitter.com/statuses/user_timeline/takke.xml
+			// => twitter_user_timeline_takke.xml
+
+			CString filename;
+			CString after;
+			if (util::GetAfterSubString( data.GetURL(), L"statuses/", after )<0) {
+				// default
+				filename = L"twitter_friends_timeline.xml";
+			} else {
+				after.Replace( L"/", L"_" );
+				filename = L"twitter_" + after;
+			}
+
+			return theApp.m_filepath.logFolder + L"\\" + filename;
+		}
 
 	default:
 		// 上記以外なら、ファイル名なし
