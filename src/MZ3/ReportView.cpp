@@ -31,22 +31,15 @@ bool g_bUseVer09KeyInterface = true;
 
 IMPLEMENT_DYNCREATE(CReportView, CFormView)
 
-#ifdef WINCE
-static HINSTANCE g_HtmlViewInstance = NULL;			///< htmlview.dll のインスタンス
-#endif
-
 /**
  * コンストラクタ
  */
 CReportView::CReportView()
 	: CFormView(CReportView::IDD)
 	, m_nKeydownRepeatCount(0)
-	, m_hwndHtml(NULL)
 	, m_currentData(NULL)
 {
 	m_imageState = FALSE;
-	m_posHtmlScroll = 0;
-	m_posHtmlScrollMax = 0;
 	m_detailView = NULL;
 }
 
@@ -208,7 +201,6 @@ void CReportView::OnInitialUpdate()
 	// スクロール量の初期値設定
 	m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
 
-	// PocketIE コントロールの初期化
 #ifdef USE_RAN2
 	const int DETAIL_VIEWID = 1000;	// 暫定なのでてきとー
 	if( m_detailView != NULL ){
@@ -233,57 +225,7 @@ void CReportView::OnInitialUpdate()
 	m_detailView->ChangeViewFont( fontHeight, theApp.m_optionMng.GetFontFace() );
 	m_detailView->ShowWindow(SW_SHOW);
 	MZ3LOGGER_INFO(L"らんらんビュー初期化完了(2/2)");
-#else
-#ifdef WINCE
-/*	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
-		DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER;
-		CString sInfo;
-		if (!g_HtmlViewInstance) {
-			g_HtmlViewInstance = ::LoadLibrary(L"htmlview.dll");
-		}
-
-		CRect rect( 0, 30, 40, 60);
-		m_hwndHtml = ::CreateWindow(DISPLAYCLASS,//DISPLAYCLASS,
-									NULL,
-									dwStyle,
-									rect.left,
-									rect.top,
-									rect.right,
-									rect.bottom,
-									m_hWnd,
-									0,
-									g_HtmlViewInstance,
-									NULL);
-
-		::SetWindowLong( m_hwndHtml, GWL_ID, 12321);
-	}
-*/
-#endif	// endif WINCE
 #endif	// endif USE_RAN2
-}
-
-/**
- * HTML コントロールに文字列を設定する
- */
-void CReportView::SetHtmlText(LPCTSTR szHtmlText)
-{
-#ifdef WINCE
-/*	::SendMessage( m_hwndHtml, WM_SETTEXT, 0, (LPARAM)(LPCTSTR)_T(""));
-
-	CString s;
-
-	// TODO 正式対応時はスタイルシートで「動的に」設定すること。メッセージで。
-	s.Format( L"<html><body style=\"font-size: %dpx; font-family: '%s';\"><pre>", 
-		theApp.m_optionMng.GetFontHeight()*5/10, (LPCTSTR)theApp.m_optionMng.GetFontFace() );
-	::SendMessage(m_hwndHtml, DTM_ADDTEXTW, FALSE, (LPARAM)(LPCTSTR)s);
-
-	::SendMessage(m_hwndHtml, DTM_ADDTEXTW, FALSE, (LPARAM)(LPCTSTR)szHtmlText);
-
-	::SendMessage(m_hwndHtml, DTM_ADDTEXTW, FALSE, (LPARAM)(LPCTSTR)L"</pre></body></html>");
-
-	::SendMessage(m_hwndHtml, DTM_ENDOFSOURCE, 0, 0);
-*/
-#endif
 }
 
 /**
@@ -327,30 +269,19 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	// 各コントロールの移動
 	util::MoveDlgItemWindow( this, IDC_TITLE_EDIT,  0, 0,            cx, hTitle  );
 	util::MoveDlgItemWindow( this, IDC_REPORT_LIST, 0, hTitle,       cx, hList   );
-	if (theApp.m_optionMng.m_bRenderByIE) {
-		// HTML コントロールの移動
-		::MoveWindow( m_hwndHtml, 0, hTitle+hList, cx, hReport, TRUE );
-		// エディットコントロールの非表示化
-		CWnd* pDlg = GetDlgItem( IDC_REPORT_EDIT );
-		if (pDlg) pDlg->ShowWindow( SW_HIDE );
-	} else {
-		// HTML コントロールの非表示化
-		if (m_hwndHtml) {
-			::ShowWindow( m_hwndHtml, SW_HIDE );
-		}
 
 #ifdef USE_RAN2
-		// RAN2 の移動
-		if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
-			int wRan2 = cx - barWidth;
-			m_detailView->MoveWindow( 0, hTitle+hList, wRan2, hReport );
-			ShowCommentData( m_currentData );
-		}
-#else
-		// エディットコントロールの移動
-		util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
-#endif
+	// RAN2 の移動
+	if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
+		int wRan2 = cx - barWidth;
+		m_detailView->MoveWindow( 0, hTitle+hList, wRan2, hReport );
+		ShowCommentData( m_currentData );
 	}
+#else
+	// エディットコントロールの移動
+	util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
+#endif
+
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
 
 	// スクロールバー調整
@@ -582,176 +513,122 @@ void CReportView::ShowCommentData(CMixiData* data)
 		return;
 	}
 
-	if (theApp.m_optionMng.m_bRenderByIE) {
-		const int n = data->GetBodySize();
-
-		// スクロール位置の初期化
-		m_posHtmlScroll = 0;
-		m_posHtmlScrollMax = n;
-
-		CString str;
-		str.AppendFormat( L"<a name='mz3line0'><span style='color: blue;'>%s %s</span></a><br />\r\n", 
-				data->GetAuthor(), data->GetDate() );
-
-		int lineNumber = 0;
-		for (int i=0; i<n; i++) {
-			// 行の途中に \r\n があれば分離する。
-			CString target = data->GetBody(i);
-			CString after;
-			for( ;; ) {
-				int idx = util::GetAfterSubString( target, L"\r\n", after );
-				if (idx == -1) {
-					if (!target.IsEmpty()) {
-						str.AppendFormat( L"<a name='mz3line%d'>", ++lineNumber );
-//						str += L"{";
-						str += target;
-//						str += L"}";
-						str += L"</a>\r\n";
-					}
-					break;
-				} else {
-					// \r\n 発見。分離する。
-					CString left = target.Left( idx+wcslen(L"\r\n") );
-					str.AppendFormat( L"<a name='mz3line%d'>", ++lineNumber );
-//					str += L"[";
-					str += left;
-//					str += L"]";
-					str += L"</a><br />\r\n";
-					m_posHtmlScrollMax ++;
-
-					target = after;
-				}
-			}
-		}
-
-		str += _T("<br />");		// 最後に１行入れて見やすくする
-		MZ3LOGGER_DEBUG( util::FormatString( L"str : [%s]\n", str ) );
-
-		// 絵文字用フィルタ
-		ViewFilter::ReplaceEmojiCodeToInlineImageTags( str, theApp.m_emoji );
-
-//		m_edit.SetWindowText(str);	// for debug
-		SetHtmlText(str);
-
-	} else {
 #ifdef USE_RAN2
-		CStringArray* bodyStrArray = new CStringArray();
+	CStringArray* bodyStrArray = new CStringArray();
 
-		// 書体を変更して1行目を描画
-//		bodyStrArray->Add(L"[b]");
-		bodyStrArray->Add(L"[blue]");
-		bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
-		bodyStrArray->Add(L"[/blue]");
-//		bodyStrArray->Add(L"[/b]");
-		bodyStrArray->Add(L"[br]");
+	// 書体を変更して1行目を描画
+//	bodyStrArray->Add(L"[b]");
+	bodyStrArray->Add(L"[blue]");
+	bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
+	bodyStrArray->Add(L"[/blue]");
+//	bodyStrArray->Add(L"[/b]");
+	bodyStrArray->Add(L"[br]");
 
-//		TRACE( L"■---xdump start---\r\n" );
-//		for (int i=0; i<data->GetBodySize(); i++) {
-//			TRACE( L"{%d}%s|\r\n", CString(data->GetBody(i)).GetLength(), data->GetBody(i) );
-//		}
-//		TRACE( L"■---xdump end---\r\n" );
+//	TRACE( L"■---xdump start---\r\n" );
+//	for (int i=0; i<data->GetBodySize(); i++) {
+//		TRACE( L"{%d}%s|\r\n", CString(data->GetBody(i)).GetLength(), data->GetBody(i) );
+//	}
+//	TRACE( L"■---xdump end---\r\n" );
 
-		// 先頭に改行があったりと、色々フォーマットがおかしいので単一の文字列に連結する
-		CString str = _T("");
-		const int n = data->GetBodySize();
-		for( int i=0; i<n; i++ ){
-			str += data->GetBody(i);
+	// 先頭に改行があったりと、色々フォーマットがおかしいので単一の文字列に連結する
+	CString str = _T("");
+	const int n = data->GetBodySize();
+	for( int i=0; i<n; i++ ){
+		str += data->GetBody(i);
+	}
+
+	// 改行分割して追加する
+	for (;;) {
+		int idxCrlf = str.Find( L"\r\n" );
+
+		CString target;
+		if (idxCrlf == -1) {
+			target = str;
+			if (target.IsEmpty()) {
+				break;
+			}
+		} else {
+			target.SetString( str, idxCrlf );
 		}
 
-		// 改行分割して追加する
-		for (;;) {
-			int idxCrlf = str.Find( L"\r\n" );
-
-			CString target;
-			if (idxCrlf == -1) {
-				target = str;
-				if (target.IsEmpty()) {
-					break;
-				}
-			} else {
-				target.SetString( str, idxCrlf );
-			}
-
-			if( target.GetLength() == 0 ) {
-				if (idxCrlf != -1) {
-					LPCTSTR brLine = TEXT("[br]");
-					bodyStrArray->Add(brLine);
-				}
-			} else {
-				// 絵文字用フィルタ
-				ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
+		if( target.GetLength() == 0 ) {
+			if (idxCrlf != -1) {
 				LPCTSTR brLine = TEXT("[br]");
 				bodyStrArray->Add(brLine);
 			}
-
-			if (idxCrlf == -1) {
-				break;
-			}
-			str.Delete(0, idxCrlf+2);
+		} else {
+			// 絵文字用フィルタ
+			ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
+			LPCTSTR brLine = TEXT("[br]");
+			bodyStrArray->Add(brLine);
 		}
 
-		// 最後に１行入れて見やすくする
-		bodyStrArray->Add(_T("[br]"));
-
-//		TRACE( L"■---dump start---\r\n" );
-//		for (int i=0; i<bodyStrArray->GetCount(); i++) {
-//			TRACE( L"{%d}%s|\r\n", bodyStrArray->GetAt(i).GetLength(), bodyStrArray->GetAt(i) );
-//		}
-//		TRACE( L"■---dump end---\r\n" );
-
-		// 描画開始
-		m_edit.ShowWindow(SW_HIDE);
-		m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());
-		TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
-		m_detailView->ResetDragOffset();
-		// OnSize 時にこのルートを2回通るため、即時描画を行うとMZ3の場合に一瞬だけ画面が乱れる。
-		// これを回避するため、即時描画を行わず、Invalidate により WM_PAINT 通知でまとめて描画する。
-		m_detailView->DrawDetail(0, false);
-		m_detailView->Invalidate(FALSE);
-		bodyStrArray->RemoveAll();
-		delete bodyStrArray;
-
-		// スクロールバーが不要な時は隠す
-		m_vScrollbar.ShowWindow(SW_HIDE);
-		int viewLineCount = m_detailView->GetViewLineMax();
-		int allLineCount  = m_detailView->GetAllLineCount();
-		SCROLLINFO si;
-		si.cbSize = sizeof(SCROLLINFO);
-		si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
-		si.nMin  = 0;
-		si.nMax  = allLineCount-1;
-		si.nPage = viewLineCount;
-		si.nPos  = 0;
-		m_vScrollbar.SetScrollInfo(&si, TRUE);
-		if( allLineCount-viewLineCount > 0 ) {
-			m_vScrollbar.ShowWindow(SW_SHOW);
+		if (idxCrlf == -1) {
+			break;
 		}
+		str.Delete(0, idxCrlf+2);
+	}
+
+	// 最後に１行入れて見やすくする
+	bodyStrArray->Add(_T("[br]"));
+
+//	TRACE( L"■---dump start---\r\n" );
+//	for (int i=0; i<bodyStrArray->GetCount(); i++) {
+//		TRACE( L"{%d}%s|\r\n", bodyStrArray->GetAt(i).GetLength(), bodyStrArray->GetAt(i) );
+//	}
+//	TRACE( L"■---dump end---\r\n" );
+
+	// 描画開始
+	m_edit.ShowWindow(SW_HIDE);
+	m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());
+	TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
+	m_detailView->ResetDragOffset();
+	// OnSize 時にこのルートを2回通るため、即時描画を行うとMZ3の場合に一瞬だけ画面が乱れる。
+	// これを回避するため、即時描画を行わず、Invalidate により WM_PAINT 通知でまとめて描画する。
+	m_detailView->DrawDetail(0, false);
+	m_detailView->Invalidate(FALSE);
+	bodyStrArray->RemoveAll();
+	delete bodyStrArray;
+
+	// スクロールバーが不要な時は隠す
+	m_vScrollbar.ShowWindow(SW_HIDE);
+	int viewLineCount = m_detailView->GetViewLineMax();
+	int allLineCount  = m_detailView->GetAllLineCount();
+	SCROLLINFO si;
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
+	si.nMin  = 0;
+	si.nMax  = allLineCount-1;
+	si.nPage = viewLineCount;
+	si.nPos  = 0;
+	m_vScrollbar.SetScrollInfo(&si, TRUE);
+	if( allLineCount-viewLineCount > 0 ) {
+		m_vScrollbar.ShowWindow(SW_SHOW);
+	}
 #else
-		CString str = _T("");
+	CString str = _T("");
 
-		str += data->GetAuthor();
-		str += _T("　");
-		str += data->GetDate();
-		str += _T("\r\n");
+	str += data->GetAuthor();
+	str += _T("　");
+	str += data->GetDate();
+	str += _T("\r\n");
 
-		const int n = data->GetBodySize();
-		for( int i=0; i<n; i++ ){
-			str += data->GetBody(i);
-		}
+	const int n = data->GetBodySize();
+	for( int i=0; i<n; i++ ){
+		str += data->GetBody(i);
+	}
 
-		str += _T("\r\n");			// 最後に１行入れて見やすくする
+	str += _T("\r\n");			// 最後に１行入れて見やすくする
 
-		// 絵文字用フィルタ
-		ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
-		m_edit.SetWindowText(str);
+	// 絵文字用フィルタ
+	ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
+	m_edit.SetWindowText(str);
 
-		// Win32 の場合は再描画
+	// Win32 の場合は再描画
 #ifndef WINCE
-		m_edit.Invalidate();
+	m_edit.Invalidate();
 #endif	// endif WINCE
 #endif	// endif USE_RAN2
-
-	}
 }
 
 void CReportView::OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -892,89 +769,59 @@ BOOL CReportView::CommandMoveDownList()
 
 BOOL CReportView::CommandScrollUpEdit()
 {
-	if (theApp.m_optionMng.m_bRenderByIE) {
-#ifdef WINCE
-/*		if (m_posHtmlScroll <= 0) {
-			return FALSE;
-		}
-		// アンカーによりスクロールする
-		m_posHtmlScroll = max(m_posHtmlScroll-1, 0);
-
-		CString s;
-		s.Format(L"mz3line%d", m_posHtmlScroll);
-		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
-*/
-#endif
-	} else {
 #ifdef USE_RAN2
-		int pos = m_vScrollbar.GetScrollPos();
-		if( pos <= 0 ) {
-			return FALSE;
-		}
-		pos -= m_scrollLine;
-		if (pos<0) {
-			// 下限値補正
-			pos = 0;
-		}
-
-		m_vScrollbar.SetScrollPos(pos);
-		m_detailView->ResetDragOffset();
-		m_detailView->DrawDetail(pos);
-#else
-		SCROLLINFO si;
-		m_edit.GetScrollInfo( SB_VERT, &si );
-		if (si.nPos > si.nMin) {
-			m_edit.LineScroll( -m_scrollLine );
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-#endif
+	int pos = m_vScrollbar.GetScrollPos();
+	if( pos <= 0 ) {
+		return FALSE;
 	}
+	pos -= m_scrollLine;
+	if (pos<0) {
+		// 下限値補正
+		pos = 0;
+	}
+
+	m_vScrollbar.SetScrollPos(pos);
+	m_detailView->ResetDragOffset();
+	m_detailView->DrawDetail(pos);
+#else
+	SCROLLINFO si;
+	m_edit.GetScrollInfo( SB_VERT, &si );
+	if (si.nPos > si.nMin) {
+		m_edit.LineScroll( -m_scrollLine );
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+#endif
 	return TRUE;
 }
 
 BOOL CReportView::CommandScrollDownEdit()
 {
-	if (theApp.m_optionMng.m_bRenderByIE) {
-#ifdef WINCE
-/*		if (m_posHtmlScroll >= m_posHtmlScrollMax) {
-			return FALSE;
-		}
-		// アンカーによりスクロールする
-		m_posHtmlScroll = min(m_posHtmlScroll+1, m_posHtmlScrollMax);
-
-		CString s;
-		s.Format(L"mz3line%d", m_posHtmlScroll);
-		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
-*/
-#endif
-	} else {
 #ifdef USE_RAN2
-		int pos = m_vScrollbar.GetScrollPos();
-		if( pos >= m_scrollBarHeight ){
-			return FALSE;
-		}
-		pos += m_scrollLine;
-		if (pos > m_scrollBarHeight) {
-			// 上限値補正
-			pos = m_scrollBarHeight;
-		}
-
-		m_vScrollbar.SetScrollPos(pos);
-		m_detailView->ResetDragOffset();
-		m_detailView->DrawDetail(pos);
-#else
-		SCROLLINFO si;
-		m_edit.GetScrollInfo( SB_VERT, &si );
-		if (si.nPos+si.nPage <= (UINT)si.nMax) {
-			m_edit.LineScroll( m_scrollLine );
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-#endif
+	int pos = m_vScrollbar.GetScrollPos();
+	if( pos >= m_scrollBarHeight ){
+		return FALSE;
 	}
+	pos += m_scrollLine;
+	if (pos > m_scrollBarHeight) {
+		// 上限値補正
+		pos = m_scrollBarHeight;
+	}
+
+	m_vScrollbar.SetScrollPos(pos);
+	m_detailView->ResetDragOffset();
+	m_detailView->DrawDetail(pos);
+#else
+	SCROLLINFO si;
+	m_edit.GetScrollInfo( SB_VERT, &si );
+	if (si.nPos+si.nPage <= (UINT)si.nMax) {
+		m_edit.LineScroll( m_scrollLine );
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+#endif
 	return TRUE;
 }
 
@@ -2548,71 +2395,10 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
 	case WM_NOTIFY:
-#ifdef WINCE
-/*		NM_HTMLVIEW * pnmHTML = (NM_HTMLVIEW *) lParam;
-		if (!pnmHTML)
-			break;
-		LPNMHDR pnmh = (LPNMHDR) &(pnmHTML->hdr);
-
-		switch(pnmh->code) {
-		case NM_HOTSPOT:
-			break;
-
-		case NM_INLINE_IMAGE:
-			// HTML コントロールのインライン画像の要求
-
-			// 画像をダウンロードする
-			LoadHTMLImage(pnmHTML->szTarget, pnmHTML->dwCookie);
-
-			// バグ回避のため親プロシージャへの転送を抑止する。
-			return TRUE;
-		}
-*/
-#endif
 		break;
 	}
 
 	return CFormView::WindowProc(message, wParam, lParam);
-}
-
-BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie) 
-{
-#ifdef WINCE
-	// TODO HTML再ロードの仕組みを実装すること。
-/*
-	// ローカルキャッシュから取得する
-	bool bLoaded = false;
-	CString localpath = util::MakeImageLogfilePathFromUrl( szTarget );
-	if (util::ExistFile(localpath)) {
-		// 画像ロード
-
-		// this is to read the image file from the pda and send to the 
-		// DTM_SETIMAGE for display 
-		// Problems occured here, when it send to DTM_SETIMAGE, it display on 
-		// the screen for a while and disappear 
-		HBITMAP hBitmap = SHLoadImageFile( localpath );
-		if( hBitmap ) {
-			BITMAP bmp;
-			GetObject(hBitmap, sizeof(BITMAP), &bmp);
-			INLINEIMAGEINFO imgInfo;
-			imgInfo.dwCookie    = dwCookie;
-			imgInfo.iOrigHeight = bmp.bmHeight;
-			imgInfo.iOrigWidth  = bmp.bmWidth;
-			imgInfo.hbm         = hBitmap;
-			imgInfo.bOwnBitmap  = TRUE;				// HTML コントロールにBITMAPを破棄させる
-			::SendMessage( m_hwndHtml, DTM_SETIMAGE, 0, (LPARAM)&imgInfo ); 
-			return TRUE;
-		}
-	}
-
-	// ロードできなかったため、キューに登録する
-	MZ3LOGGER_INFO( util::FormatString(_T("Load Not Ok, request queue. URL[%s]"), szTarget ) );
-	DownloadItem item( szTarget, L"inline image", localpath, true );
-	theApp.m_pDownloadView->AppendDownloadItem( item );
-	::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
-*/
-#endif
-	return TRUE; 
 }
 
 static const int N_HC_MIN = 10;		///< リストの最小値 [%]
@@ -2796,15 +2582,8 @@ void CReportView::OnAcceleratorScrollOrNextComment()
 {
 	// スクロール位置判定（スクロール余地があればスクロールする）
 	if (g_bUseVer09KeyInterface) {
-		if (theApp.m_optionMng.m_bRenderByIE) {
-			if (m_posHtmlScroll < m_posHtmlScrollMax) {
-				CommandScrollDownEdit();
-				return;
-			}
-		} else {
-			if (CommandScrollDownEdit()) {
-				return;
-			}
+		if (CommandScrollDownEdit()) {
+			return;
 		}
 	}
 

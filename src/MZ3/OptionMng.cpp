@@ -66,10 +66,6 @@ void Option::Load()
 	{
 		// UI セクション
 
-		// IE コントロールで閲覧するかどうか
-		m_bRenderByIE
-			= (atoi(inifile.GetValue("RenderByIE", "UI").c_str()) != 0) ? true : false;
-
 		// 背景画像の利用
 		std::string s;
 		s = inifile.GetValue("UseBgImage", "UI");
@@ -409,8 +405,6 @@ void Option::Save()
 
 	//--- UI 系
 	CStringA s;
-	// IE コントロールで閲覧するかどうか
-	inifile.SetValue( "RenderByIE", (LPCSTR)util::int2str_a(m_bRenderByIE), "UI");
 
 	// 背景画像の利用
 	inifile.SetValue( "UseBgImage", (LPCSTR)util::int2str_a(m_bUseBgImage), "UI");

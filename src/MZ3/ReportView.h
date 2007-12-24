@@ -137,14 +137,8 @@ public:
 	afx_msg void OnHdnEndtrackReportList(NMHDR *pNMHDR, LRESULT *pResult);
 	int GetListWidth(void);
 
-	//--- HTML コントロールによる描画対応
-	HWND m_hwndHtml;						///< HTML コントロール
-	void SetHtmlText(LPCTSTR szHtmlText);	///< HTML コントロールへのHTMLの設定
-	int	m_posHtmlScroll;					///< HTML コントロールのスクロール位置
-	int m_posHtmlScrollMax;					///< HTML コントロールのスクロール位置の最大値
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	BOOL LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie);
 public:
 	afx_msg void OnLayoutReportlistMakeNarrow();
 	afx_msg void OnLayoutReportlistMakeWide();

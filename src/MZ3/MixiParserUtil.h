@@ -331,10 +331,6 @@ public:
 				reg.replaceAll( line, L"" );
 		}
 
-		if (theApp.m_optionMng.m_bRenderByIE) {
-			return;
-		}
-
 		// "<p>" ¨ íœ
 		while( line.Replace(_T("<p>"), _T("")) ) ;
 

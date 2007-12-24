@@ -141,13 +141,6 @@ BOOL CMZ3App::InitInstance()
 	// スキン関連の初期化
 	LoadSkinSetting();
 
-	// IE コンポーネントの初期化
-#ifdef WINCE
-	if (m_optionMng.m_bRenderByIE) {	// TODO この条件はIE正式対応前のための仮設定。正式対応後は常に実行すること。
-		InitHTMLControl( AfxGetInstanceHandle() );
-	}
-#endif
-
 	// 詳細画面のクラス登録
 #ifdef USE_RAN2
 	Ran2View::RegisterWndClass(AfxGetInstanceHandle());
