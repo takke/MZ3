@@ -342,6 +342,9 @@ public:
 	void MySetLayout(int cx, int cy);
 	afx_msg void OnLoadUrl(UINT);
 	afx_msg void OnPaint();
+	afx_msg void OnMenuTwitterFriendTimeline();
+	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
+	bool AppendCategoryList(const CCategoryItem& categoryItem);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

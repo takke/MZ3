@@ -434,8 +434,9 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 			// 右辺値は順に、「カテゴリ名称」、「カテゴリ種別文字列」、「URL」
 			const CCategoryItem& item = group.categories[j];
 			LPCTSTR categoryString = helper.CategoryType2String(item.m_mixi.GetAccessType());
-			if( categoryString == NULL ) 
+			if (categoryString == NULL || item.m_bSaveToGroupFile==false) 
 				continue;
+
 			CString value;
 			value.Format( L"%s,%s,%s,%d", 
 				item.m_name, 

@@ -240,6 +240,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
 	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
 	ON_WM_PAINT()
+	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE, &CMZ3View::OnMenuTwitterFriendTimeline)
+	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS, &CMZ3View::OnMenuTwitterFriendTimelineWithOthers)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -3378,25 +3380,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 /// トピック一覧の閲覧準備
 bool CMZ3View::PrepareViewBbsList(void)
 {
-	// グループ(タブ)にコミュニティ専用項目を追加する。既にあれば取得する。
-	CCategoryItem* pCategoryItem = NULL;
-	for( u_int i=0; i<m_selGroup->categories.size(); i++ ) {
-		CCategoryItem& category = m_selGroup->categories[i];
-		if( category.m_mixi.GetAccessType() == ACCESS_LIST_BBS ) {
-			// 該当項目発見。
-			pCategoryItem = &category;
-			break;
-		}
-	}
-	// 未発見なら追加
-	if( pCategoryItem == NULL ) {
-		CCategoryItem category;
-		m_selGroup->categories.push_back( category );
-		pCategoryItem = &m_selGroup->categories[ m_selGroup->categories.size()-1 ];
-	}
-
-	// 初期化
-	
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	if (bodyItem.GetAccessType() == ACCESS_INVALID) {
 		return false;
@@ -3408,36 +3391,13 @@ bool CMZ3View::PrepareViewBbsList(void)
 	// 名前は分かるようにしておく
 	CString name;
 	name.Format( L"└%s", bodyItem.GetName() );
-	pCategoryItem->init( name, url, ACCESS_LIST_BBS, m_selGroup->categories.size(),
+	CCategoryItem categoryItem;
+	categoryItem.init( name, url, ACCESS_LIST_BBS, m_selGroup->categories.size(),
 		CCategoryItem::BODY_INDICATE_TYPE_TITLE,
-		CCategoryItem::BODY_INDICATE_TYPE_DATE );
+		CCategoryItem::BODY_INDICATE_TYPE_DATE,
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 
-	// タブの初期化
-	MyUpdateCategoryListByGroupItem();
-
-	// カテゴリの選択項目を再表示。
-	{
-		int idxLast = m_selGroup->focusedCategory;
-		int idxNew  = m_categoryList.GetItemCount()-1;
-
-		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxLast, false );
-		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxNew, true );
-		m_selGroup->focusedCategory  = idxNew;
-		m_selGroup->selectedCategory = idxNew;
-		m_categoryList.SetActiveItem( idxNew );
-		m_categoryList.Update( idxLast );
-		m_categoryList.Update( idxNew );
-	}
-
-	// フォーカスをカテゴリリストに。
-	m_categoryList.SetFocus();
-
-	// ボディリストは消去しておく。
-	m_bodyList.DeleteAllItems();
-	m_bodyList.SetRedraw(TRUE);
-	m_bodyList.Invalidate( FALSE );
-
-	return true;
+	return AppendCategoryList(categoryItem);
 }
 
 /// コミュニティの右ソフトキーメニュー｜トピック一覧
@@ -4728,4 +4688,111 @@ void CMZ3View::OnPaint()
 		}
 		break;
 	}
+}
+
+void CMZ3View::OnMenuTwitterFriendTimeline()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	// タイムライン項目の追加
+	CMixiData& bodyItem = GetSelectedBodyItem();
+	CCategoryItem categoryItem;
+	categoryItem.init( 
+		// 名前
+		util::FormatString( L"+%sのタイムライン", bodyItem.GetName() ),
+		util::FormatString( L"http://twitter.com/statuses/user_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
+		ACCESS_TWITTER_FRIENDS_TIMELINE, 
+		m_selGroup->categories.size()+1,
+		CCategoryItem::BODY_INDICATE_TYPE_BODY,
+		CCategoryItem::BODY_INDICATE_TYPE_NAME,
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+	AppendCategoryList(categoryItem);
+
+	// 取得開始
+	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
+}
+
+void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	// タイムライン項目の追加
+	CMixiData& bodyItem = GetSelectedBodyItem();
+	CCategoryItem categoryItem;
+	categoryItem.init( 
+		// 名前
+		util::FormatString( L"+%sのタイムライン", bodyItem.GetName() ),
+		util::FormatString( L"http://twitter.com/statuses/friends_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
+		ACCESS_TWITTER_FRIENDS_TIMELINE, 
+		m_selGroup->categories.size()+1,
+		CCategoryItem::BODY_INDICATE_TYPE_BODY,
+		CCategoryItem::BODY_INDICATE_TYPE_NAME,
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+	AppendCategoryList(categoryItem);
+
+	// 取得開始
+	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
+}
+
+bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
+{
+	CString url = categoryItem.m_mixi.GetURL();
+
+	// グループ(タブ)にタイムライン専用項目を追加する。既にあれば取得する。
+	CCategoryItem* pCategoryItem = NULL;
+	for( u_int i=0; i<m_selGroup->categories.size(); i++ ) {
+		CCategoryItem& category = m_selGroup->categories[i];
+		if( category.m_mixi.GetAccessType() == ACCESS_TWITTER_FRIENDS_TIMELINE &&
+			category.m_mixi.GetURL()==url)
+		{
+			// 該当項目発見。
+			pCategoryItem = &category;
+			break;
+		}
+	}
+	// 未発見なら追加
+	if( pCategoryItem == NULL ) {
+		m_selGroup->categories.push_back( categoryItem );
+		pCategoryItem = &m_selGroup->categories[ m_selGroup->categories.size()-1 ];
+		pCategoryItem->SetIndexOnList( m_selGroup->categories.size()-1 );
+	}
+
+//	*pCategoryItem = categoryItem;
+
+	// タブの初期化
+	MyUpdateCategoryListByGroupItem();
+
+	// カテゴリの選択項目を再表示。
+	{
+		int idxLast = m_selGroup->focusedCategory;
+		int idxNew  = pCategoryItem->GetIndexOnList();
+
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxLast, false );
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, idxNew, true );
+		m_selGroup->focusedCategory  = idxNew;
+		m_selGroup->selectedCategory = idxNew;
+		m_categoryList.SetActiveItem( idxNew );
+		m_categoryList.Update( idxLast );
+		m_categoryList.Update( idxNew );
+
+		m_categoryList.EnsureVisible( idxNew, FALSE );
+	}
+
+	// フォーカスをカテゴリリストに。
+	m_categoryList.SetFocus();
+
+	// ボディリストは消去しておく。
+	m_bodyList.DeleteAllItems();
+	m_bodyList.SetRedraw(TRUE);
+	m_bodyList.Invalidate( FALSE );
+
+	return true;
 }

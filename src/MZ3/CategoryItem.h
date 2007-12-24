@@ -42,6 +42,8 @@ public:
 
 	bool			m_bFromLog;				///< ログを取得した値かどうかを表すフラグ
 
+	bool			m_bSaveToGroupFile;		///< グループ定義ファイルに保存するか（永続化するか）
+
 private:
 	SYSTEMTIME		m_accessTime;			///< （カテゴリリストとしての）アクセス時刻
 	int				m_idxItemOnList;		///< リストコントロール内のインデックス
@@ -51,14 +53,21 @@ public:
 	CCategoryItem() 
 		: selectedBody(0)
 		, m_bFromLog(0)
+		, m_bSaveToGroupFile(true)
 	{
 		memset( &m_accessTime, 0, sizeof(SYSTEMTIME) );
 	}
 
+	enum SAVE_TO_GROUPFILE {
+		SAVE_TO_GROUPFILE_YES = 1,
+		SAVE_TO_GROUPFILE_NO = 2,
+	};
+
 	/// 初期化
 	void init( LPCTSTR name,
 			   LPCTSTR url, ACCESS_TYPE accessType, int index, 
-			   BODY_INDICATE_TYPE firstColType, BODY_INDICATE_TYPE secondColType )
+			   BODY_INDICATE_TYPE firstColType, BODY_INDICATE_TYPE secondColType,
+			   SAVE_TO_GROUPFILE saveToGroupFile=SAVE_TO_GROUPFILE_YES )
 	{
 		m_name = name;
 
@@ -68,6 +77,8 @@ public:
 		m_idxItemOnList = index;
 		m_firstBodyColType = firstColType;
 		m_secondBodyColType = secondColType;
+
+		m_bSaveToGroupFile = saveToGroupFile == SAVE_TO_GROUPFILE_YES ? true : false;
 	}
 	virtual ~CCategoryItem()				{}
 
