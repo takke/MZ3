@@ -21,6 +21,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 
