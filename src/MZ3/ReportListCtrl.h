@@ -32,6 +32,7 @@ public:
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 

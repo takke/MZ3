@@ -33,6 +33,7 @@ CReportListCtrl::~CReportListCtrl()
 BEGIN_MESSAGE_MAP(CReportListCtrl, CListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CReportListCtrl::OnLvnItemchanged)
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -340,4 +341,31 @@ BOOL CReportListCtrl::PreTranslateMessage(MSG* pMsg)
 #endif
 
 	return CListCtrl::PreTranslateMessage(pMsg);
+}
+
+void CReportListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// 選択変更
+	int nItem = HitTest(point);
+	if (nItem>=0) {
+		util::MySetListCtrlItemFocusedAndSelected( *this, GetSelectedItem(), false );
+		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+	}
+
+#ifdef WINCE
+	// タップ長押しでソフトキーメニュー表示
+	SHRGINFO RGesture;
+	RGesture.cbSize     = sizeof(SHRGINFO);
+	RGesture.hwndClient = m_hWnd;
+	RGesture.ptDown     = point;
+	RGesture.dwFlags    = SHRG_RETURNCMD;
+	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		// TODO 本来は WM_COMMAND で通知すべき。
+		ClientToScreen(&point);
+		theApp.m_pReportView->MyPopupReportMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+		return;
+	}
+#endif
+
+	CListCtrl::OnLButtonDown(nFlags, point);
 }

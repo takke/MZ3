@@ -261,6 +261,14 @@ BOOL CCategoryListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	// 選択変更
+	int nItem = HitTest(point);
+	if (nItem>=0) {
+		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, false );
+		m_activeItem = nItem;
+		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, true );
+	}
+
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;

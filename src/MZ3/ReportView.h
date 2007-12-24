@@ -130,7 +130,7 @@ private:
 	afx_msg void OnUpdateWriteComment(CCmdUI *pCmdUI);
 	afx_msg void OnMenuBack();
 public:
-	void MyPopupReportMenu(void);
+	void MyPopupReportMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	afx_msg void OnBackMenu();
 	afx_msg void OnNextMenu();
 	void ResetColumnWidth(const CMixiData& mixi);

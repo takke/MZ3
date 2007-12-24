@@ -235,7 +235,7 @@ void CReportView::OnInitialUpdate()
 	MZ3LOGGER_INFO(L"らんらんビュー初期化完了(2/2)");
 #else
 #ifdef WINCE
-	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
+/*	if (theApp.m_optionMng.m_bRenderByIE) {			// TODO 絵文字正式対応時は本条件を外し、UI からOn/Offを切り替え可能にすること。
 		DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER;
 		CString sInfo;
 		if (!g_HtmlViewInstance) {
@@ -257,6 +257,7 @@ void CReportView::OnInitialUpdate()
 
 		::SetWindowLong( m_hwndHtml, GWL_ID, 12321);
 	}
+*/
 #endif	// endif WINCE
 #endif	// endif USE_RAN2
 }
@@ -267,7 +268,7 @@ void CReportView::OnInitialUpdate()
 void CReportView::SetHtmlText(LPCTSTR szHtmlText)
 {
 #ifdef WINCE
-	::SendMessage( m_hwndHtml, WM_SETTEXT, 0, (LPARAM)(LPCTSTR)_T(""));
+/*	::SendMessage( m_hwndHtml, WM_SETTEXT, 0, (LPARAM)(LPCTSTR)_T(""));
 
 	CString s;
 
@@ -281,6 +282,7 @@ void CReportView::SetHtmlText(LPCTSTR szHtmlText)
 	::SendMessage(m_hwndHtml, DTM_ADDTEXTW, FALSE, (LPARAM)(LPCTSTR)L"</pre></body></html>");
 
 	::SendMessage(m_hwndHtml, DTM_ENDOFSOURCE, 0, 0);
+*/
 #endif
 }
 
@@ -892,7 +894,7 @@ BOOL CReportView::CommandScrollUpEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
-		if (m_posHtmlScroll <= 0) {
+/*		if (m_posHtmlScroll <= 0) {
 			return FALSE;
 		}
 		// アンカーによりスクロールする
@@ -901,6 +903,7 @@ BOOL CReportView::CommandScrollUpEdit()
 		CString s;
 		s.Format(L"mz3line%d", m_posHtmlScroll);
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
+*/
 #endif
 	} else {
 #ifdef USE_RAN2
@@ -935,7 +938,7 @@ BOOL CReportView::CommandScrollDownEdit()
 {
 	if (theApp.m_optionMng.m_bRenderByIE) {
 #ifdef WINCE
-		if (m_posHtmlScroll >= m_posHtmlScrollMax) {
+/*		if (m_posHtmlScroll >= m_posHtmlScrollMax) {
 			return FALSE;
 		}
 		// アンカーによりスクロールする
@@ -944,6 +947,7 @@ BOOL CReportView::CommandScrollDownEdit()
 		CString s;
 		s.Format(L"mz3line%d", m_posHtmlScroll);
 		::SendMessage( m_hwndHtml, DTM_ANCHORW, 0, (LPARAM)(LPCTSTR)s);
+*/
 #endif
 	} else {
 #ifdef USE_RAN2
@@ -2242,10 +2246,15 @@ void CReportView::OnSendMessage()
 /**
  * メニュー生成
  */
-void CReportView::MyPopupReportMenu(void)
+void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 {
-	POINT pt    = util::GetPopupPos();
-	int   flags = util::GetPopupFlags();
+	POINT pt    = pt_;
+	int   flags = flags_;
+
+	if (pt.x==0 && pt.y==0) {
+		pt = util::GetPopupPos();
+		flags = util::GetPopupFlags();
+	}
 
 	CMenu menu;
 	menu.LoadMenu(IDR_REPORT_MENU);
@@ -2540,7 +2549,7 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch(message) {
 	case WM_NOTIFY:
 #ifdef WINCE
-		NM_HTMLVIEW * pnmHTML = (NM_HTMLVIEW *) lParam;
+/*		NM_HTMLVIEW * pnmHTML = (NM_HTMLVIEW *) lParam;
 		if (!pnmHTML)
 			break;
 		LPNMHDR pnmh = (LPNMHDR) &(pnmHTML->hdr);
@@ -2558,6 +2567,7 @@ LRESULT CReportView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			// バグ回避のため親プロシージャへの転送を抑止する。
 			return TRUE;
 		}
+*/
 #endif
 		break;
 	}
@@ -2569,7 +2579,7 @@ BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie)
 {
 #ifdef WINCE
 	// TODO HTML再ロードの仕組みを実装すること。
-
+/*
 	// ローカルキャッシュから取得する
 	bool bLoaded = false;
 	CString localpath = util::MakeImageLogfilePathFromUrl( szTarget );
@@ -2600,6 +2610,7 @@ BOOL CReportView::LoadHTMLImage(LPCTSTR szTarget, DWORD dwCookie)
 	DownloadItem item( szTarget, L"inline image", localpath, true );
 	theApp.m_pDownloadView->AppendDownloadItem( item );
 	::SendMessage( m_hwndHtml, DTM_IMAGEFAIL, 0, dwCookie );
+*/
 #endif
 	return TRUE; 
 }
