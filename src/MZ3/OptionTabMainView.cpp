@@ -59,6 +59,9 @@ BOOL COptionTabMainView::OnInitDialog()
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ? BST_CHECKED : BST_UNCHECKED );
 #endif
 
+	// 画像の自動取得
+	CheckDlgButton( IDC_AUTO_LOAD_MINI_IMAGE_CHECK, theApp.m_optionMng.m_bAutoLoadMiniImage ? BST_CHECKED : BST_UNCHECKED );
+
 	// トピック等のアイコン表示
 	CheckDlgButton( IDC_SHOW_ICON_CHECK, theApp.m_optionMng.m_bShowMainViewIcon ? BST_CHECKED : BST_UNCHECKED );
 
@@ -105,6 +108,9 @@ void COptionTabMainView::OnOK()
 	theApp.m_optionMng.m_nMainViewMiniImageSize = mc_comboMiniImageSize.GetItemData( mc_comboMiniImageSize.GetCurSel() );
 #endif
 
+	// 画像の自動取得
+	theApp.m_optionMng.m_bAutoLoadMiniImage = IsDlgButtonChecked( IDC_AUTO_LOAD_MINI_IMAGE_CHECK ) == BST_CHECKED;
+
 	CPropertyPage::OnOK();
 }
 
@@ -126,20 +132,28 @@ void COptionTabMainView::UpdateControlItemStatus(void)
 	GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 	GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
 	GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
+
+	BOOL bImageCheck = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_CHECK ) == BST_CHECKED) ? TRUE : FALSE;
+	if (bImageCheck) {
+		GetDlgItem( IDC_AUTO_LOAD_MINI_IMAGE_CHECK )->EnableWindow( TRUE );
+	} else {
+		GetDlgItem( IDC_AUTO_LOAD_MINI_IMAGE_CHECK )->EnableWindow( FALSE );
+	}
+
 #else
 	BOOL bImageCheck = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_CHECK ) == BST_CHECKED) ? TRUE : FALSE;
 	BOOL bImageDlgCheck = (IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_DLG_CHECK ) == BST_CHECKED) ? TRUE : FALSE;
 
 	if (bImageCheck) {
+		GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( TRUE );
+		GetDlgItem( IDC_AUTO_LOAD_MINI_IMAGE_CHECK )->EnableWindow( TRUE );
 		if (bImageDlgCheck) {
 			// 全て有効
-			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( TRUE );
 			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( TRUE );
 			GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( TRUE );
 			GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( TRUE );
 		} else {
 			// カーソル位置とコンボボックス関連は無効
-			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_CHECK )->EnableWindow( TRUE );
 			GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 			GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
 			GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
@@ -150,6 +164,7 @@ void COptionTabMainView::UpdateControlItemStatus(void)
 		GetDlgItem( IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK )->EnableWindow( FALSE );
 		GetDlgItem( IDC_SIZE_STATIC )->EnableWindow( FALSE );
 		GetDlgItem( IDC_MINI_IMAGE_SIZE_COMBO )->EnableWindow( FALSE );
+		GetDlgItem( IDC_AUTO_LOAD_MINI_IMAGE_CHECK )->EnableWindow( FALSE );
 	}
 #endif
 }

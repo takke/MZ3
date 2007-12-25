@@ -4282,10 +4282,9 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 		return false;
 	}
 
-	// WINCE Ç≈ÇÕñ≥å¯ÅB
-#ifdef WINCE
-	return false;
-#endif
+	if (!theApp.m_optionMng.m_bAutoLoadMiniImage) {
+		return false;
+	}
 
 	CString miniImagePath = util::MakeImageLogfilePath( mixi );
 	if (!miniImagePath.IsEmpty()) {

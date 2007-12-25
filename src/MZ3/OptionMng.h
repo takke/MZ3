@@ -99,6 +99,7 @@ public:
 	bool			m_bShowMainViewMiniImageDlg;			///< 別画面で表示する？
 	bool			m_bShowMainViewMiniImageOnMouseOver;	///< マウスオーバーで表示する？
 	int				m_nMainViewMiniImageSize;	///< mini画面サイズ
+	bool			m_bAutoLoadMiniImage;		///< 画像の自動取得
 
 private:
 	int				m_recvBufSize;				///< 受信バッファサイズ
@@ -162,6 +163,7 @@ public:
 		, m_bShowMainViewMiniImageDlg( true )
 		, m_bShowMainViewMiniImageOnMouseOver( true )
 #endif
+		, m_bAutoLoadMiniImage( true )
 		, m_nMainViewMiniImageSize( 50 )
 	{
 	}
