@@ -241,6 +241,8 @@
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="TIPS">
+<param name="Name" value="TIPS">
+<param name="Local" value="20071015214016317.htm">
 <param name="Name" value="概要">
 <param name="Local" value="20071015214536314.htm">
 <param name="Name" value="ブラウザ連携機能">
@@ -305,6 +307,33 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="既知のバグ">
 <param name="Local" value="20071015215259966.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter">
+<param name="Name" value="目次">
+<param name="Local" value="20071226192121758.htm">
+<param name="Name" value="Twitter とは？">
+<param name="Local" value="20071226192142619.htm">
+<param name="Name" value="Twitter を利用する">
+<param name="Local" value="20071226194913316.htm">
+<param name="Name" value="画面上での操作">
+<param name="Local" value="2007122620810991.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="目次">
+<param name="Local" value="20071226192121758.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter とは？">
+<param name="Local" value="20071226192142619.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter を利用する">
+<param name="Local" value="20071226194913316.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="画面上での操作">
+<param name="Local" value="2007122620810991.htm">
 </OBJECT>
 </UL>
 </body>

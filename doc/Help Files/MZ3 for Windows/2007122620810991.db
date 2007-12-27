@@ -1,0 +1,24 @@
+[Info]
+Name=画面上での操作操作
+KeyWord=画面上での操作操作
+Context=IDH_HELP69
+[Date]
+<P><FONT face="ＭＳ ゴシック">* 画面上での操作</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 投稿の方法は通常の操作と異なり，投稿用の画面はありません<BR>&nbsp; 画面最下部にあるテキストボックスに入力し，更新ボタンを押下することで投稿になります</FONT></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/51_Twitter_発言.jpg"><IMG height=200 src="Capture/51_Twitter_発言.jpg"></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ※ タイムライン一覧の更新は更新ボタンでは行えません<BR>&nbsp;&nbsp;&nbsp;&nbsp; 他タブと同様の操作 ( エンター押下，ダブルクリック ) で更新します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ●タイムライン<BR>&nbsp;&nbsp;&nbsp; 自分と follow している人の発言を取得します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ●返信一覧<BR>&nbsp;&nbsp;&nbsp; 自分宛にされた発言 ( @ユーザ名 ) を取得します</FONT></P>
+<P><FONT face="ＭＳ ゴシック"></FONT>&nbsp;</P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 下部ペインの各発言にフォーカスを当てた状態でコンテキストメニューを表示させることができます</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【全文を読む】<BR>&nbsp;&nbsp; 新たな画面を開き，<BR>&nbsp;&nbsp;&nbsp; - 発言の全文<BR>&nbsp;&nbsp;&nbsp; - 発言者名<BR>&nbsp;&nbsp;&nbsp; - 発言時刻<BR>&nbsp;&nbsp;&nbsp; - 自己紹介<BR>&nbsp;&nbsp;&nbsp; - コメント ID<BR>&nbsp;&nbsp;&nbsp; - ユーザ ID<BR>&nbsp;&nbsp; を表示します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【つぶやく】<BR>&nbsp;&nbsp; フォーカスを下部ペインのテキストボックスに移します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【言い返す】<BR>&nbsp;&nbsp; 返信用のマーク ( @ + ユーザ名 ) を付加した上でフォーカスをテキストボックスに移します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【友達のタイムライン】<BR>&nbsp;&nbsp; 選択したユーザの発言履歴を表示します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【友達のタイムライン(with others)】<BR>&nbsp;&nbsp; 選択したユーザ，及びその Follow 対象のユーザの発言履歴を表示します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【友達のホーム】<BR>&nbsp;&nbsp; 選択したユーザのホームを開きます</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【友達のFavorites】<BR>&nbsp;&nbsp; 選択したユーザの Favorites を表示します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 【友達のサイト】<BR>&nbsp;&nbsp;&nbsp; 選択したユーザが Twitter で登録しているサイトを表示します</FONT></P>
+<P><FONT face="ＭＳ ゴシック"></FONT>&nbsp;</P>
+<P><FONT face="ＭＳ ゴシック"></FONT></P>
+<P><FONT face="ＭＳ ゴシック"></FONT></P>

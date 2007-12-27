@@ -231,6 +231,7 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="TIPS">
 <param name="ImageNumber" value="1">
+<param name="Local" value="20071015214016317.htm">
 </object>
 <UL>
 <LI><OBJECT type="text/sitemap">
@@ -289,6 +290,32 @@
 <param name="ImageNumber" value="9">
 <param name="Local" value="20071015215259966.htm">
 </object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter">
+<param name="ImageNumber" value="3">
+</object>
+<UL>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="–ÚŽŸ">
+<param name="ImageNumber" value="18">
+<param name="Local" value="20071226192121758.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter ‚Æ‚ÍH">
+<param name="ImageNumber" value="9">
+<param name="Local" value="20071226192142619.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Twitter ‚ð—˜—p‚·‚é">
+<param name="ImageNumber" value="9">
+<param name="Local" value="20071226194913316.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="‰æ–Êã‚Å‚Ì‘€ì">
+<param name="ImageNumber" value="9">
+<param name="Local" value="2007122620810991.htm">
+</object>
+</UL>
 </UL>
 </body>
 </html>

@@ -1,0 +1,7 @@
+[Info]
+Name=設定が反映されない
+KeyWord=設定が反映されない
+Context=IDH_HELP64
+[Date]
+<P><FONT face="ＭＳ ゴシック">　Q.設定が反映されない</FONT></P>
+<P><FONT face="ＭＳ ゴシック">　A. ini の編集やネットワーク関係の設定変更など，値を変更しただけでは反映されない場合があります<BR>　そのような場合は MZ4 ，または OS を再起動させてください<BR></FONT></P>
