@@ -8,8 +8,6 @@ $Id$
 　- CImage で TransparentBlt や AlphaBlend しても改善せず。
 　- 自分で描画するしかないのだろうか。
 　　http://www.winapi-database.com/special/2001_12_2002_1/page21.html
-- タップ長押しでソフトキーメニュー
-　http://www.wince.ne.jp/frame.asp?/review/kappy/p9.htm
 - 最近開いたページの一覧
 - 書き込みプレビュー
 - ニュース引用
@@ -19,13 +17,11 @@ $Id$
 
 * MZ3.i/MZ4 Ver.0.9 series
 
-** MZ3.i/MZ4 Ver.0.9.1.0 Beta2	(2007.12.22)
-- Twitter サーバのエラーを検出するようにした（HTTPステータスチェック）。
-- Twitter 発言中のURLを抽出するようにした。
-- Twitter の各ユーザのアイコンを発言の左側に表示するようにした。
-- HTTPエンティティの再現を強化（&#xxx; と表示されないようにした）。
-- Twitter タブに「返信一覧」(Replies)を追加。タブの初期化を行うこと。
-- ニュースのカテゴリに「ゲーム・アニメ」と「コラム」を追加。タブの初期化を行うこと。
+** MZ3.i/MZ4 Ver.0.9.1.0 Beta3	(2007.12.23)
+- タップ長押しでソフトキーメニューを表示するようにした。
+- ユーザのタイムラインを表示できるようにした。
+- ユーザやコミュニティ、Twitter 画像の自動取得オプションを追加。
+- Twitter モード時に下ペインでクリアキー押下すると投稿領域にフォーカス移動しないようにした。
 - その他
 
 ** 既知の不具合
@@ -37,8 +33,17 @@ $Id$
 - (仕様) 各リスト上でのCtrl+HomeやCtrl+Endでフォーカスが不明になる。
 - (仕様) [MZ4] いくつかの絵文字の背景が黒になる(解決策不明のため仕様)
 
-http://www.mz3.jp/bin/MZ3.0.9.1.0b2.CAB (WindowsMobile版)
-http://www.mz3.jp/bin/MZ4.0.9.1.0b2.lzh (Windows版)
+http://www.mz3.jp/bin/MZ3.0.9.1.0b3.CAB (WindowsMobile版)
+http://www.mz3.jp/bin/MZ4.0.9.1.0b3.lzh (Windows版)
+
+** MZ3.i/MZ4 Ver.0.9.1.0 Beta2	(2007.12.23)
+- Twitter サーバのエラーを検出するようにした（HTTPステータスチェック）。
+- Twitter 発言中のURLを抽出するようにした。
+- Twitter の各ユーザのアイコンを発言の左側に表示するようにした。
+- HTTPエンティティの再現を強化（&#xxx; と表示されないようにした）。
+- Twitter タブに「返信一覧」(Replies)を追加。タブの初期化を行うこと。
+- ニュースのカテゴリに「ゲーム・アニメ」と「コラム」を追加。タブの初期化を行うこと。
+- その他
 
 ** MZ3.i/MZ4 Ver.0.9.1.0 Beta1	(2007.12.22)
 - Twitter のタイムライン取得機能を追加。
