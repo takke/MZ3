@@ -2319,8 +2319,11 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			// アクセス中は無視
 			return TRUE;
 		}
+		// 非アクセス中は、カテゴリリストに移動する
+		return CommandSetFocusCategoryList();
+
 		// 非アクセス中は、カテゴリリストまたは入力領域に移動する
-		switch (m_viewStyle) {
+/*		switch (m_viewStyle) {
 		case VIEW_STYLE_TWITTER:
 			GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 			return TRUE;
@@ -2328,6 +2331,8 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		default:
 			return CommandSetFocusCategoryList();
 		}
+*/
+		return CommandSetFocusCategoryList();
 
 	default:
 //		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
