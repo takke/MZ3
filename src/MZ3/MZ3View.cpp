@@ -845,6 +845,9 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 				// CImageList::Replace が効かないので、リロードしてしまう。
 				SetBodyImageList( pCategory->GetBodyList() );
 			}
+
+			// アイコン再描画
+			InvalidateRect( m_rectIcon, FALSE );
 		}
 		break;
 	}
@@ -3062,6 +3065,13 @@ bool CMZ3View::MyChangeBodyHeader(void)
 			MyGetItemByBodyColType(&data,pCategory->m_secondBodyColType), 0, 0, 0, 0 );
 	}
 
+	// 第1カラムに表示している内容を表示する。
+	m_infoEdit.SetWindowText( 
+		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
+
+	// アイコン再描画
+	InvalidateRect( m_rectIcon, FALSE );
+
 	return true;
 }
 
@@ -3140,6 +3150,9 @@ void CMZ3View::OnSelchangedGroupTab(void)
 #else
 	m_categoryList.Invalidate( TRUE );
 #endif
+
+	// アイコン再描画
+	InvalidateRect( m_rectIcon, FALSE );
 }
 
 /**
