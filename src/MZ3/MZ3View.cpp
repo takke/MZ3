@@ -4042,20 +4042,21 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 
 		Mz3GroupData template_data;
 		template_data.initForTopPage();
+		static CArray<CMenu, CMenu> subMenu;
+		subMenu.SetSize( template_data.groups.size() );
 		int menuId = ID_APPEND_MENU_BEGIN;
-		for (int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
-			CMenu subMenu;
-			subMenu.CreatePopupMenu();
+		for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
+			subMenu[groupIdx].CreatePopupMenu();
 
 			CGroupItem& group = template_data.groups[groupIdx];
 
 			// subMenu ‚ÉƒJƒeƒSƒŠ–¼‚ð’Ç‰Á
-			for (int ic=0; ic<group.categories.size(); ic++) {
-				subMenu.AppendMenuW( MF_STRING, menuId, group.categories[ic].m_name );
+			for (unsigned int ic=0; ic<group.categories.size(); ic++) {
+				subMenu[groupIdx].AppendMenuW( MF_STRING, menuId, group.categories[ic].m_name );
 				menuId ++;
 			}
 
-			pAppendMenu->AppendMenuW( MF_POPUP, (UINT)subMenu.m_hMenu, group.name );
+			pAppendMenu->AppendMenuW( MF_POPUP, (UINT)subMenu[groupIdx].m_hMenu, group.name );
 		}
 	}
 
@@ -4913,10 +4914,10 @@ void CMZ3View::OnAppendCategoryMenu(UINT nID)
 	template_data.initForTopPage();
 
 	int idxCounter = 0;
-	for (int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
+	for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
 		CGroupItem& group = template_data.groups[groupIdx];
 
-		for (int ic=0; ic<group.categories.size(); ic++) {
+		for (unsigned int ic=0; ic<group.categories.size(); ic++) {
 			if (idxCounter==idx) {
 				// ‚±‚Ì€–Ú‚ð’Ç‰Á‚·‚é
 				CCategoryItem item = group.categories[ic];

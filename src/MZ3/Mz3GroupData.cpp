@@ -429,10 +429,11 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 
 		// CategoryXX 出力
 		int nc = group.categories.size();
+		int categoryNumber = 1;
 		for( int j=0; j<nc; j++ ) {
 			// キー生成
 			CString key;
-			key.Format( L"Category%02d", j+1 );
+			key.Format( L"Category%02d", categoryNumber );
 
 			// 右辺値生成
 			// 右辺値は順に、「カテゴリ名称」、「カテゴリ種別文字列」、「URL」
@@ -451,6 +452,7 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 
 			// 出力
 			inifile.SetValue( key, value, strSectionName );
+			categoryNumber ++;
 		}
 	}
 
