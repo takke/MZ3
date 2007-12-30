@@ -290,6 +290,7 @@ public:
 	afx_msg void OnViewBbsList();
 	bool PopupBodyMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	void PopupCategoryMenu(POINT pt_=CPoint(0,0), int flags_=0);
+	bool PopupTabMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	afx_msg void OnViewBbsListLog();
 	bool PrepareViewBbsList(void);
 	afx_msg void OnCruise();
@@ -348,7 +349,6 @@ public:
 	bool AppendCategoryList(const CCategoryItem& categoryItem);
 	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTabmenuDelete();
-	bool PopupTabMenu(void);
 	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 };
 

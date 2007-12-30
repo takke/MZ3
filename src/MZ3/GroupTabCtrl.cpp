@@ -39,7 +39,7 @@ void CGroupTabCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	RGesture.ptDown     = point;
 	RGesture.dwFlags    = SHRG_RETURNCMD;
 	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
-		theApp.m_pMainView->PopupTabMenu();
+		theApp.m_pMainView->PopupTabMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
 		return;
 	}
 #endif

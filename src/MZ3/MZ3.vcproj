@@ -1479,10 +1479,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GroupTabCtrl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\HtmlArray.cpp"
 				>
 			</File>
@@ -2062,6 +2058,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\GroupTabCtrl.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\MainFrm.cpp"
 					>
 				</File>
@@ -2182,10 +2182,6 @@
 			</File>
 			<File
 				RelativePath=".\GroupItem.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GroupTabCtrl.h"
 				>
 			</File>
 			<File
@@ -2381,6 +2377,10 @@
 				</File>
 				<File
 					RelativePath=".\ForcedDebugDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\GroupTabCtrl.h"
 					>
 				</File>
 				<File
