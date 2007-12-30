@@ -84,6 +84,7 @@ public:
 		CString		profileFolder;	///< プロフィールのログ用フォルダのパス
 		CString		messageFolder;	///< メッセージのログ用フォルダのパス
 		CString		newsFolder;		///< ニュースのログ用フォルダのパス
+		CString		twitterFolder;	///< Twitterのログ用フォルダのパス
 
 		void init();
 		void init_logpath();

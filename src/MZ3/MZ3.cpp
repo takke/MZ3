@@ -681,6 +681,10 @@ void CMZ3App::FilePath::init_logpath()
 	newsFolder.Format(_T("%s\\news"), logFolder );
 	CreateDirectory( newsFolder, NULL/*always null*/ );
 
+	// Twitterのログ用フォルダのパス
+	twitterFolder.Format(_T("%s\\twitter"), logFolder );
+	CreateDirectory( twitterFolder, NULL/*always null*/ );
+
 }
 
 /**
