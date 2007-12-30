@@ -12,7 +12,7 @@
 type %DAT_FILE%
 
 : sftp 実行
-type %DAT_FILE% | sftp takeuchi@mz3.jp
+type %DAT_FILE% | sftp -C takeuchi@mz3.jp
 
 : スクリプトファイル削除
 del %DAT_FILE%

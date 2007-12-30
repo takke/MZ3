@@ -42,7 +42,7 @@ public:
 
 	bool			m_bFromLog;				///< ログを取得した値かどうかを表すフラグ
 
-	bool			m_bSaveToGroupFile;		///< グループ定義ファイルに保存するか（永続化するか）
+	bool			bSaveToGroupFile;		///< グループ定義ファイルに保存するか（永続化するか）
 
 private:
 	SYSTEMTIME		m_accessTime;			///< （カテゴリリストとしての）アクセス時刻
@@ -53,7 +53,7 @@ public:
 	CCategoryItem() 
 		: selectedBody(0)
 		, m_bFromLog(0)
-		, m_bSaveToGroupFile(true)
+		, bSaveToGroupFile(true)
 	{
 		memset( &m_accessTime, 0, sizeof(SYSTEMTIME) );
 	}
@@ -78,7 +78,7 @@ public:
 		m_firstBodyColType = firstColType;
 		m_secondBodyColType = secondColType;
 
-		m_bSaveToGroupFile = saveToGroupFile == SAVE_TO_GROUPFILE_YES ? true : false;
+		bSaveToGroupFile = saveToGroupFile == SAVE_TO_GROUPFILE_YES ? true : false;
 	}
 	virtual ~CCategoryItem()				{}
 

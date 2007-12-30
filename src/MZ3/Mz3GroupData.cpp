@@ -408,6 +408,10 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 	for( int i=0; i<n; i++ ) {
 		const CGroupItem& group = target.groups[i];
 
+		if (!group.bSaveToGroupFile) {
+			continue;
+		}
+
 		// セクション名生成
 		CStringA strSectionName;
 		strSectionName.Format( "Group%d", i+1 );
@@ -434,7 +438,7 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 			// 右辺値は順に、「カテゴリ名称」、「カテゴリ種別文字列」、「URL」
 			const CCategoryItem& item = group.categories[j];
 			LPCTSTR categoryString = helper.CategoryType2String(item.m_mixi.GetAccessType());
-			if (categoryString == NULL || item.m_bSaveToGroupFile==false) 
+			if (categoryString == NULL || item.bSaveToGroupFile==false) 
 				continue;
 
 			CString value;

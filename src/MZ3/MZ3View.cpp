@@ -223,6 +223,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
     ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
 	ON_NOTIFY(NM_CLICK, IDC_GROUP_TAB, &CMZ3View::OnNMClickGroupTab)
+	ON_NOTIFY(NM_RCLICK, IDC_GROUP_TAB, &CMZ3View::OnNMRclickGroupTab)
 	ON_COMMAND(ID_ACCELERATOR_FONT_MAGNIFY, &CMZ3View::OnAcceleratorFontMagnify)
 	ON_COMMAND(ID_ACCELERATOR_FONT_SHRINK, &CMZ3View::OnAcceleratorFontShrink)
 	ON_COMMAND(ID_ACCELERATOR_CONTEXT_MENU, &CMZ3View::OnAcceleratorContextMenu)
@@ -242,6 +243,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_WM_PAINT()
 	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE, &CMZ3View::OnMenuTwitterFriendTimeline)
 	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS, &CMZ3View::OnMenuTwitterFriendTimelineWithOthers)
+	ON_COMMAND(ID_TABMENU_DELETE, &CMZ3View::OnTabmenuDelete)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -4162,6 +4164,9 @@ BOOL CMZ3View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	return CFormView::OnNotify(wParam, lParam, pResult);
 }
 
+/**
+ * タブのクリック
+ */
 void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// 仮想的にダブルクリックを判定する。
@@ -4810,6 +4815,51 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	m_bodyList.DeleteAllItems();
 	m_bodyList.SetRedraw(TRUE);
 	m_bodyList.Invalidate( FALSE );
+
+	return true;
+}
+
+/**
+ * タブの右クリックメニュー
+ */
+void CMZ3View::OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	PopupTabMenu();
+
+	*pResult = 0;
+}
+
+/**
+ * タブメニュー｜削除
+ */
+void CMZ3View::OnTabmenuDelete()
+{
+	if (m_selGroup->bSaveToGroupFile) {
+		m_selGroup->bSaveToGroupFile = false;
+
+		MessageBox( util::FormatString( L"[%s] タブは次回起動時に削除されます", (LPCTSTR)m_selGroup->name ) );
+	} else {
+		m_selGroup->bSaveToGroupFile = true;
+	}
+
+	// グループ定義ファイルの保存
+	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+}
+
+bool CMZ3View::PopupTabMenu(void)
+{
+	POINT pt    = util::GetPopupPos();
+	int   flags = util::GetPopupFlags();
+
+	CMenu menu;
+	menu.LoadMenu(IDR_TAB_MENU);
+	CMenu* pSubMenu = menu.GetSubMenu(0);
+
+	// 削除の有効・無効
+	pSubMenu->CheckMenuItem( ID_TABMENU_DELETE, MF_BYCOMMAND | (m_selGroup->bSaveToGroupFile ? MF_UNCHECKED : MF_CHECKED) );
+
+	// メニュー表示
+	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
 
 	return true;
 }

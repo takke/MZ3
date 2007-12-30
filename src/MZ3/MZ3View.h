@@ -14,6 +14,7 @@
 #include "CategoryItem.h"
 #include "CategoryListCtrl.h"
 #include "BodyListCtrl.h"
+#include "GroupTabCtrl.h"
 #include "PostData.h"
 #include "InetAccess.h"
 #include "XcrawlCanceler.h"
@@ -88,7 +89,7 @@ private:
 
 public:
 	//--- UI 要素
-	CTabCtrl			m_groupTab;		///< グループタブ。ItemData は theApp.m_root.groups のインデックス
+	CGroupTabCtrl		m_groupTab;		///< グループタブ。ItemData は theApp.m_root.groups のインデックス
 	CCategoryListCtrl	m_categoryList;	///< カテゴリリスト。ItemData は theApp.m_root.groups[].categories のインデックス
 	CBodyListCtrl		m_bodyList;		///< ボディリスト。
 	CEdit				m_infoEdit;		///< 情報表示用エディットボックス
@@ -345,6 +346,10 @@ public:
 	afx_msg void OnMenuTwitterFriendTimeline();
 	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
 	bool AppendCategoryList(const CCategoryItem& categoryItem);
+	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTabmenuDelete();
+	bool PopupTabMenu(void);
+	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

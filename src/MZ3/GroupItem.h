@@ -22,12 +22,14 @@ public:
 	CString				name;				///< リストに表示する名称
 	int					selectedCategory;	///< categories 内における選択項目のインデックス
 	int					focusedCategory;	///< categories 内におけるフォーカス項目のインデックス
+	bool				bSaveToGroupFile;	///< グループ定義ファイルに保存するか（永続化するか）
 
 public:
 	/// コンストラクタ
 	CGroupItem()
 		: selectedCategory(0)
 		, focusedCategory(0)
+		, bSaveToGroupFile(true)
 	{}
 
 	/// 初期化

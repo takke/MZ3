@@ -379,6 +379,14 @@ BEGIN
     END
 END
 
+IDR_TAB_MENU MENU 
+BEGIN
+    POPUP "TabMenu"
+    BEGIN
+        MENUITEM "çÌèú...",                       ID_TABMENU_DELETE
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

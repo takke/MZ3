@@ -44,6 +44,7 @@
 #define IDC_GRABBABLE_CURSOR            162
 #define IDC_GRABBING_CURSOR             163
 #define IDR_TWITTER_MENU                165
+#define IDR_TAB_MENU                    166
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -371,6 +372,7 @@
 #define ID_MENU_TWITTER_SITE            34022
 #define ID_MENU_TWITTER_FRIEND_TIMELINE 34025
 #define ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS 34026
+#define ID_TABMENU_DELETE               34028
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -381,8 +383,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        166
-#define _APS_NEXT_COMMAND_VALUE         34027
+#define _APS_NEXT_RESOURCE_VALUE        167
+#define _APS_NEXT_COMMAND_VALUE         34029
 #define _APS_NEXT_CONTROL_VALUE         1068
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
