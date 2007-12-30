@@ -4043,6 +4043,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		Mz3GroupData template_data;
 		template_data.initForTopPage();
 		static CArray<CMenu, CMenu> subMenu;
+		subMenu.RemoveAll();
 		subMenu.SetSize( template_data.groups.size() );
 		int menuId = ID_APPEND_MENU_BEGIN;
 		for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
