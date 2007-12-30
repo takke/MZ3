@@ -106,7 +106,7 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 	theApp.m_root.initForTopPage();
 
 	// グループ定義ファイルの保存
-	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+	theApp.SaveGroupData();
 
 	// 再起動
 	// ・・・できないのでメッセージを表示して終了。

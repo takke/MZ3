@@ -180,6 +180,7 @@ public:
 	bool LoadSkinSetting();
 	void InitPlatformFlags();
 	void InitResolutionFlags();
+	bool SaveGroupData(void);
 };
 
 extern CMZ3App theApp;

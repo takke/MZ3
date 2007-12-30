@@ -258,11 +258,18 @@ BEGIN
         MENUITEM "巡回",                          IDM_CRUISE
         MENUITEM "巡回予約",                        IDM_CHECK_CRUISE
         MENUITEM "日記を書く",                       ID_WRITE_DIARY
+        MENUITEM SEPARATOR
         POPUP "画面レイアウト"
         BEGIN
             MENUITEM "↑カテゴリリストを狭くする",               IDM_LAYOUT_CATEGORY_MAKE_NARROW
             MENUITEM "↓カテゴリリストを広くする",               IDM_LAYOUT_CATEGORY_MAKE_WIDE
         END
+        POPUP "項目を追加"
+        BEGIN
+            MENUITEM "ダミー",                         ID_APPEND_MENU_BEGIN
+        END
+        MENUITEM "項目を削除",                       ID_REMOVE_CATEGORY_ITEM
+        MENUITEM "項目を変更...",                    ID_EDIT_CATEGORY_ITEM
     END
 END
 
@@ -383,6 +390,7 @@ IDR_TAB_MENU MENU
 BEGIN
     POPUP "TabMenu"
     BEGIN
+        MENUITEM "変更...",                       ID_TABMENU_EDIT
         MENUITEM "削除...",                       ID_TABMENU_DELETE
     END
 END
@@ -733,6 +741,17 @@ BEGIN
     EDITTEXT        IDC_TITLE_EDIT,0,0,51,12,ES_AUTOHSCROLL | ES_READONLY
 END
 
+IDD_COMMON_EDIT_DIALOG DIALOG  0, 0, 139, 68
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CommonEditDialog"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    LTEXT           "メッセージ",IDC_MESSAGE_STATIC,7,7,125,8
+    EDITTEXT        IDC_EDIT1,7,21,125,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,7,47,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,67,47,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -969,6 +988,14 @@ BEGIN
         VERTGUIDE, 16
         TOPMARGIN, 7
         BOTTOMMARGIN, 141
+    END
+
+    IDD_COMMON_EDIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
     END
 END
 #endif    // APSTUDIO_INVOKED

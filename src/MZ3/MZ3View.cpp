@@ -25,6 +25,7 @@
 #include "MixiParser.h"
 #include "ChooseAccessTypeDlg.h"
 #include "OpenUrlDlg.h"
+#include "CommonEditDlg.h"
 #include "MiniImageDialog.h"
 #include "url_encoder.h"
 #include "twitter_util.h"
@@ -244,6 +245,10 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE, &CMZ3View::OnMenuTwitterFriendTimeline)
 	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS, &CMZ3View::OnMenuTwitterFriendTimelineWithOthers)
 	ON_COMMAND(ID_TABMENU_DELETE, &CMZ3View::OnTabmenuDelete)
+	ON_COMMAND_RANGE(ID_APPEND_MENU_BEGIN, ID_APPEND_MENU_END, &CMZ3View::OnAppendCategoryMenu)
+	ON_COMMAND(ID_REMOVE_CATEGORY_ITEM, &CMZ3View::OnRemoveCategoryItem)
+	ON_COMMAND(ID_EDIT_CATEGORY_ITEM, &CMZ3View::OnEditCategoryItem)
+	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -3597,7 +3602,7 @@ void CMZ3View::OnCheckCruise()
 	pCategory->m_bCruise = !pCategory->m_bCruise;
 
 	// グループ定義ファイルの保存
-	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+	theApp.SaveGroupData();
 }
 
 bool CMZ3View::CruiseToNextCategory(void)
@@ -4028,6 +4033,34 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}else{
 		pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
 	}
+
+	// 項目を追加
+	CMenu* pAppendMenu = pSubMenu->GetSubMenu(5);
+	if (pAppendMenu) {
+		// ダミーを削除
+		pAppendMenu->RemoveMenu( ID_APPEND_MENU_BEGIN, MF_BYCOMMAND );
+
+		Mz3GroupData template_data;
+		template_data.initForTopPage();
+		int menuId = ID_APPEND_MENU_BEGIN;
+		for (int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
+			CMenu subMenu;
+			subMenu.CreatePopupMenu();
+
+			CGroupItem& group = template_data.groups[groupIdx];
+
+			// subMenu にカテゴリ名を追加
+			for (int ic=0; ic<group.categories.size(); ic++) {
+				subMenu.AppendMenuW( MF_STRING, menuId, group.categories[ic].m_name );
+				menuId ++;
+			}
+
+			pAppendMenu->AppendMenuW( MF_POPUP, (UINT)subMenu.m_hMenu, group.name );
+		}
+	}
+
+	// 「項目を削除」の有効・無効
+	pSubMenu->CheckMenuItem( ID_REMOVE_CATEGORY_ITEM, MF_BYCOMMAND | (m_selGroup->getFocusedCategory()->bSaveToGroupFile ? MF_UNCHECKED : MF_CHECKED) );
 
 	// メニュー表示
 	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
@@ -4843,7 +4876,7 @@ void CMZ3View::OnTabmenuDelete()
 	}
 
 	// グループ定義ファイルの保存
-	Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+	theApp.SaveGroupData();
 }
 
 /**
@@ -4870,4 +4903,98 @@ bool CMZ3View::PopupTabMenu(POINT pt_, int flags_)
 	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
 
 	return true;
+}
+
+void CMZ3View::OnAppendCategoryMenu(UINT nID)
+{
+	int idx = nID - ID_APPEND_MENU_BEGIN;
+
+	Mz3GroupData template_data;
+	template_data.initForTopPage();
+
+	int idxCounter = 0;
+	for (int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
+		CGroupItem& group = template_data.groups[groupIdx];
+
+		for (int ic=0; ic<group.categories.size(); ic++) {
+			if (idxCounter==idx) {
+				// この項目を追加する
+				CCategoryItem item = group.categories[ic];
+
+				AppendCategoryList( item );
+
+				// グループ定義ファイルの保存
+				theApp.SaveGroupData();
+				return;
+			}
+
+			idxCounter ++;
+		}
+	}
+}
+
+/**
+ * カテゴリメニュー｜項目を削除
+ */
+void CMZ3View::OnRemoveCategoryItem()
+{
+	CCategoryItem* pCategoryItem = m_selGroup->getFocusedCategory();
+
+	if (pCategoryItem->bSaveToGroupFile) {
+		pCategoryItem->bSaveToGroupFile = false;
+
+		MessageBox( util::FormatString( L"[%s] は次回起動時に削除されます", (LPCTSTR)pCategoryItem->m_name ) );
+	} else {
+		pCategoryItem->bSaveToGroupFile = true;
+	}
+
+	// グループ定義ファイルの保存
+	theApp.SaveGroupData();
+}
+
+/**
+ * カテゴリメニュー｜変更
+ */
+void CMZ3View::OnEditCategoryItem()
+{
+	CCategoryItem* pCategoryItem = m_selGroup->getFocusedCategory();
+	
+	CCommonEditDlg dlg;
+	dlg.SetTitle( L"カテゴリのタイトル変更" );
+	dlg.SetMessage( L"カテゴリのタイトルを入力してください" );
+	dlg.mc_strEdit = pCategoryItem->m_name;
+	if (dlg.DoModal()==IDOK) {
+		pCategoryItem->m_name = dlg.mc_strEdit;
+		m_categoryList.SetItemText( m_selGroup->focusedCategory, 0, pCategoryItem->m_name );
+
+		// グループ定義ファイルの保存
+		theApp.SaveGroupData();
+	}
+}
+
+/**
+ * タブメニュー｜変更
+ */
+void CMZ3View::OnTabmenuEdit()
+{
+	CGroupItem* pGroupItem = m_selGroup;
+	
+	CCommonEditDlg dlg;
+	dlg.SetTitle( L"タブのタイトル変更" );
+	dlg.SetMessage( L"タブのタイトルを入力してください" );
+	dlg.mc_strEdit = pGroupItem->name;
+	if (dlg.DoModal()==IDOK) {
+		pGroupItem->name = dlg.mc_strEdit;
+
+		TCITEM tcItem;
+		TCHAR buffer[256] = {0};
+		tcItem.pszText = buffer;
+		tcItem.cchTextMax = 256;
+		tcItem.mask = TCIF_TEXT;
+		wcsncpy( tcItem.pszText, pGroupItem->name, 255 );
+		m_groupTab.SetItem(m_groupTab.GetCurSel(), &tcItem);
+
+		// グループ定義ファイルの保存
+		theApp.SaveGroupData();
+	}
 }

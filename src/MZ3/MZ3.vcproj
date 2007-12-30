@@ -2042,6 +2042,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CommonEditDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CommonSelectDlg.cpp"
 					>
 				</File>
@@ -2361,6 +2365,10 @@
 				</File>
 				<File
 					RelativePath=".\ChooseFontDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CommonEditDlg.h"
 					>
 				</File>
 				<File

@@ -350,6 +350,11 @@ public:
 	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTabmenuDelete();
 	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+
+	afx_msg void OnAppendCategoryMenu(UINT nID);
+	afx_msg void OnRemoveCategoryItem();
+	afx_msg void OnEditCategoryItem();
+	afx_msg void OnTabmenuEdit();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -174,7 +174,7 @@ BOOL CMZ3App::InitInstance()
 		// 初期化
 		MZ3LOGGER_INFO( L"タブ初期化" );
 		m_root.initForTopPage();
-		Mz3GroupDataWriter::save( theApp.m_root, theApp.m_filepath.groupfile );
+		theApp.SaveGroupData();
 	}
 
 	CSingleDocTemplate* pDocTemplate;
@@ -766,4 +766,12 @@ bool CMZ3App::LoadSkinSetting()
 	theApp.m_bgImageReportListCtrl.setImageFileName( m_skininfo.strReportListCtrlImageFileName );
 
 	return true;
+}
+
+/**
+ * グループ定義ファイルの保存
+ */
+bool CMZ3App::SaveGroupData(void)
+{
+	return Mz3GroupDataWriter::save( m_root, m_filepath.groupfile );
 }
