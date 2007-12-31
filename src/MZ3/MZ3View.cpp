@@ -644,6 +644,22 @@ void CMZ3View::MySetLayout(int cx, int cy)
 			pUpdateButton->ShowWindow(SW_HIDE);
 		}
 		break;
+	case VIEW_STYLE_IMAGE:
+		if (m_infoEdit.m_hWnd!=NULL) {
+			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
+		}
+		if (pStatusEdit!=NULL) {
+			pStatusEdit->ShowWindow(SW_HIDE);
+		}
+		if (pUpdateButton!=NULL) {
+			pUpdateButton->ShowWindow(SW_HIDE);
+		}
+#ifdef WINCE
+		hInfo = (int)(hInfoBase * 1.8);
+#else
+		hInfo = (int)(hInfoBase * 1.5);
+#endif
+		break;
 	case VIEW_STYLE_TWITTER:
 		if (m_infoEdit.m_hWnd!=NULL) {
 			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
@@ -688,6 +704,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, 0, y, cx, hInfo     );
 		y += hInfo;
 		break;
+	case VIEW_STYLE_IMAGE:
 	case VIEW_STYLE_TWITTER:
 		m_rectIcon.SetRect( 0, y, hInfo, y+hInfo );
 		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, hInfo, y, cx-hInfo, hInfo     );
@@ -4578,7 +4595,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 					if (pImageList != NULL &&
 						pImageList->m_hImageList == theApp.m_imageCache.GetImageList().m_hImageList)
 					{
-						return VIEW_STYLE_TWITTER;
+						return VIEW_STYLE_IMAGE;
 					}
 				}
 				break;
@@ -4723,6 +4740,7 @@ void CMZ3View::OnPaint()
 	switch (m_viewStyle) {
 	case VIEW_STYLE_DEFAULT:
 		break;
+	case VIEW_STYLE_IMAGE:
 	case VIEW_STYLE_TWITTER:
 		// ƒAƒCƒRƒ“•`‰æ
 		if (m_rectIcon.Width()>0 && m_rectIcon.Height()>0) {

@@ -100,8 +100,9 @@ public:
 	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
 	enum VIEW_STYLE {
-		VIEW_STYLE_DEFAULT = 0,			///< 標準
-		VIEW_STYLE_TWITTER = 1,			///< Twitter 用スタイル
+		VIEW_STYLE_DEFAULT = 0,			///< 標準スタイル
+		VIEW_STYLE_IMAGE   = 1,			///< 標準スタイル+ImageIcon
+		VIEW_STYLE_TWITTER = 2,			///< Twitter 用スタイル
 	};
 	VIEW_STYLE			m_viewStyle;	///< 表示スタイル
 
