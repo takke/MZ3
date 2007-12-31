@@ -522,7 +522,6 @@ bool CMZ3View::DoInitialize()
 	if (newStyle!=m_viewStyle) {
 		m_viewStyle = newStyle;
 		MySetLayout(0,0);
-//		ShowScrollBar( SB_BOTH, FALSE );
 	}
 
 	return true;
@@ -1386,8 +1385,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
 	if (bUseDefaultIcon) {
 		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
-	}
-	if (bUseExtendedIcon) {
+	} else if (bUseExtendedIcon) {
 		m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList(), LVSIL_SMALL);
 	}
 
@@ -1411,6 +1409,13 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 
 		// アイコンのインデックスを設定
 		util::MySetListCtrlItemImageIndex( m_bodyList, i, 0, iconIndex );
+	}
+
+	// スタイル変更
+	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
+	if (newStyle!=m_viewStyle) {
+		m_viewStyle = newStyle;
+		MySetLayout(0,0);
 	}
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
@@ -2830,8 +2835,6 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 	if (newStyle!=m_viewStyle) {
 		m_viewStyle = newStyle;
 		MySetLayout(0,0);
-//		OnSize(SIZE_RESTORED, 0, 0);
-//		ShowScrollBar( SB_BOTH, FALSE );
 	}
 
 	// 選択状態（赤）の変更
@@ -4570,6 +4573,14 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
 				return VIEW_STYLE_TWITTER;
 			default:
+				if (m_bodyList.IsEnableIcon()) {
+					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
+					if (pImageList != NULL &&
+						pImageList->m_hImageList == theApp.m_imageCache.GetImageList().m_hImageList)
+					{
+						return VIEW_STYLE_TWITTER;
+					}
+				}
 				break;
 			}
 		}
