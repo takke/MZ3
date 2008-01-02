@@ -356,6 +356,7 @@ public:
 	afx_msg void OnRemoveCategoryItem();
 	afx_msg void OnEditCategoryItem();
 	afx_msg void OnTabmenuEdit();
+	afx_msg void OnTabmenuAdd();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

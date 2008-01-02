@@ -249,6 +249,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_REMOVE_CATEGORY_ITEM, &CMZ3View::OnRemoveCategoryItem)
 	ON_COMMAND(ID_EDIT_CATEGORY_ITEM, &CMZ3View::OnEditCategoryItem)
 	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
+	ON_COMMAND(ID_TABMENU_ADD, &CMZ3View::OnTabmenuAdd)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1452,48 +1453,50 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 	// ヘッダの文字を変更
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-	LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi, pCategory->m_secondBodyColType );
-	switch (pCategory->m_mixi.GetAccessType()) {
-	case ACCESS_LIST_DIARY:
-	case ACCESS_LIST_NEW_COMMENT:
-	case ACCESS_LIST_COMMENT:
-	case ACCESS_LIST_CALENDAR:
-		m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_NEWS:
-		m_bodyList.SetHeader( _T("見出し"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_FAVORITE:
-		m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_FRIEND:
-		m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_COMMUNITY:
-		m_bodyList.SetHeader( _T("コミュニティ"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_MESSAGE_IN:
-	case ACCESS_LIST_MESSAGE_OUT:
-		m_bodyList.SetHeader( _T("件名"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_MYDIARY:
-		m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_NEW_BBS:
-	case ACCESS_LIST_NEW_BBS_COMMENT:
-	case ACCESS_LIST_BBS:
-	case ACCESS_LIST_BOOKMARK:
-		m_bodyList.SetHeader( _T("トピック"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_FOOTSTEP:
-		m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-		break;
-	case ACCESS_LIST_INTRO:
-		m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-		break;
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
-		break;
+	if (pCategory != NULL) {
+		LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi, pCategory->m_secondBodyColType );
+		switch (pCategory->m_mixi.GetAccessType()) {
+		case ACCESS_LIST_DIARY:
+		case ACCESS_LIST_NEW_COMMENT:
+		case ACCESS_LIST_COMMENT:
+		case ACCESS_LIST_CALENDAR:
+			m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_NEWS:
+			m_bodyList.SetHeader( _T("見出し"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_FAVORITE:
+			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_FRIEND:
+			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_COMMUNITY:
+			m_bodyList.SetHeader( _T("コミュニティ"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_MESSAGE_IN:
+		case ACCESS_LIST_MESSAGE_OUT:
+			m_bodyList.SetHeader( _T("件名"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_MYDIARY:
+			m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_NEW_BBS:
+		case ACCESS_LIST_NEW_BBS_COMMENT:
+		case ACCESS_LIST_BBS:
+		case ACCESS_LIST_BOOKMARK:
+			m_bodyList.SetHeader( _T("トピック"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_FOOTSTEP:
+			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
+			break;
+		case ACCESS_LIST_INTRO:
+			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
+			break;
+		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
+			break;
+		}
 	}
 
 	// アイテムの追加
@@ -2873,14 +2876,19 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 		m_preCategory = m_selGroup->selectedCategory;
 	}
 
-	// 選択項目が「未取得」なら、とりあえずファイルから取得する
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-	if( wcscmp( pCategory->GetAccessTimeString(), L"" ) == 0 ) {
-		MyLoadCategoryLogfile( *pCategory );
-	}
+	if (pCategory==NULL) {
+		CMixiDataList body;
+		SetBodyList( body );
+	} else {
+		// 選択項目が「未取得」なら、とりあえずファイルから取得する
+		if( wcscmp( pCategory->GetAccessTimeString(), L"" ) == 0 ) {
+			MyLoadCategoryLogfile( *pCategory );
+		}
 
-	// ボディリストに設定
-	SetBodyList( pCategory->GetBodyList() );
+		// ボディリストに設定
+		SetBodyList( pCategory->GetBodyList() );
+	}
 }
 
 /**
@@ -4029,29 +4037,35 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	CMenu* pSubMenu = menu.GetSubMenu(0);
 
 	// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
-	switch( m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() ) {
-	case ACCESS_LIST_NEW_BBS:
-	case ACCESS_LIST_NEWS:
-	case ACCESS_LIST_MESSAGE_IN:
-	case ACCESS_LIST_MESSAGE_OUT:
-	case ACCESS_LIST_DIARY:
-	case ACCESS_LIST_MYDIARY:
-	case ACCESS_LIST_BBS:
-//	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		// 巡回対象なので巡回メニューを無効化しない
-		break;
-	default:
-		// 巡回メニューを無効化する
+	CCategoryItem* pCategory = m_selGroup->getFocusedCategory();
+	if (pCategory != NULL) {
+		switch( pCategory->m_mixi.GetAccessType() ) {
+		case ACCESS_LIST_NEW_BBS:
+		case ACCESS_LIST_NEWS:
+		case ACCESS_LIST_MESSAGE_IN:
+		case ACCESS_LIST_MESSAGE_OUT:
+		case ACCESS_LIST_DIARY:
+		case ACCESS_LIST_MYDIARY:
+		case ACCESS_LIST_BBS:
+	//	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			// 巡回対象なので巡回メニューを無効化しない
+			break;
+		default:
+			// 巡回メニューを無効化する
+			pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+			pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
+			break;
+		}
+
+		// 巡回予約済みであればチェックを付ける。
+		if( pCategory->m_bCruise ) {
+			pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
+		}else{
+			pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
+		}
+	} else {
 		pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 		pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-		break;
-	}
-
-	// 巡回予約済みであればチェックを付ける。
-	if( m_selGroup->getFocusedCategory()->m_bCruise ) {
-		pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_CHECKED );
-	}else{
-		pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
 	}
 
 	// 項目を追加
@@ -4082,7 +4096,16 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}
 
 	// 「項目を削除」の有効・無効
-	pSubMenu->CheckMenuItem( ID_REMOVE_CATEGORY_ITEM, MF_BYCOMMAND | (m_selGroup->getFocusedCategory()->bSaveToGroupFile ? MF_UNCHECKED : MF_CHECKED) );
+	if (pCategory != NULL) {
+		pSubMenu->CheckMenuItem( ID_REMOVE_CATEGORY_ITEM, MF_BYCOMMAND | (pCategory->bSaveToGroupFile ? MF_UNCHECKED : MF_CHECKED) );
+	} else {
+		pSubMenu->RemoveMenu( ID_REMOVE_CATEGORY_ITEM, MF_BYCOMMAND );
+	}
+
+	// 「項目を変更」
+	if (pCategory == NULL) {
+		pSubMenu->RemoveMenu( ID_EDIT_CATEGORY_ITEM, MF_BYCOMMAND );
+	}
 
 	// メニュー表示
 	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
@@ -4951,8 +4974,12 @@ void CMZ3View::OnAppendCategoryMenu(UINT nID)
 			if (idxCounter==idx) {
 				// この項目を追加する
 				CCategoryItem item = group.categories[ic];
-
 				AppendCategoryList( item );
+
+				// カテゴリリスト中の「現在選択されている項目」を更新
+				m_hotList = &m_categoryList;
+				m_selGroup->selectedCategory = m_selGroup->categories.size()-1;
+				OnMySelchangedCategoryList();
 
 				// グループ定義ファイルの保存
 				theApp.SaveGroupData();
@@ -5024,6 +5051,39 @@ void CMZ3View::OnTabmenuEdit()
 		tcItem.mask = TCIF_TEXT;
 		wcsncpy( tcItem.pszText, pGroupItem->name, 255 );
 		m_groupTab.SetItem(m_groupTab.GetCurSel(), &tcItem);
+
+		// グループ定義ファイルの保存
+		theApp.SaveGroupData();
+	}
+}
+
+/**
+ * タブメニュー｜追加
+ */
+void CMZ3View::OnTabmenuAdd()
+{
+	CCommonEditDlg dlg;
+	dlg.SetTitle( L"タブの追加" );
+	dlg.SetMessage( L"タブのタイトルを入力してください" );
+	dlg.mc_strEdit = L"新しいタブ";
+	if (dlg.DoModal()==IDOK) {
+		// データ構造追加
+		CGroupItem group;
+		group.init( dlg.mc_strEdit, L"", ACCESS_GROUP_OTHERS );
+		theApp.m_root.groups.push_back( group );
+
+		// グループタブに追加
+		int tabIndex = m_groupTab.GetItemCount();
+		m_groupTab.InsertItem( tabIndex, dlg.mc_strEdit);
+
+		// 選択変更
+		m_groupTab.SetCurSel( tabIndex );
+
+		// 選択中のグループ項目の設定
+		m_selGroup = &theApp.m_root.groups[tabIndex];
+
+		// カテゴリーリストを初期化する
+		OnSelchangedGroupTab();
 
 		// グループ定義ファイルの保存
 		theApp.SaveGroupData();

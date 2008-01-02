@@ -275,6 +275,7 @@
 #define ID_REMOVE_CATEGORY_ITEM         34133
 #define ID_EDIT_CATEGORY_ITEM           34135
 #define ID_TABMENU_EDIT                 34137
+#define ID_TABMENU_ADD                  34139
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -286,7 +287,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        168
-#define _APS_NEXT_COMMAND_VALUE         34138
+#define _APS_NEXT_COMMAND_VALUE         34140
 #define _APS_NEXT_CONTROL_VALUE         1068
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
