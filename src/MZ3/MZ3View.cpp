@@ -2313,30 +2313,33 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		// 左ボタン。
 		// ショートカット移動。
 		{
-			int idxSel = m_selGroup->getSelectedCategory()->selectedBody;
-			int nItem = m_bodyList.GetItemCount();
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			if (pCategory != NULL) {
+				int idxSel = pCategory->selectedBody;
+				int nItem = m_bodyList.GetItemCount();
 
-			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
-			if( idxSel == 0 ) {
-				// 一番上 → 一番下
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-				m_bodyList.EnsureVisible( nItem-1, FALSE);
-				return TRUE;
-			}else if( idxSel == nItem-1 ) {
-				// 一番下     → 一番上
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-				m_bodyList.EnsureVisible( 0, FALSE );
-				return TRUE;
-			}else if( idxSel < nItem/2 ) {
-				// 半分より上 → 一番上
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-				m_bodyList.EnsureVisible( 0, FALSE );
-				return TRUE;
-			}else{
-				// 半分より下 → 一番下
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-				m_bodyList.EnsureVisible( nItem-1, FALSE);
-				return TRUE;
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
+				if( idxSel == 0 ) {
+					// 一番上 → 一番下
+					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+					m_bodyList.EnsureVisible( nItem-1, FALSE);
+					return TRUE;
+				}else if( idxSel == nItem-1 ) {
+					// 一番下     → 一番上
+					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+					m_bodyList.EnsureVisible( 0, FALSE );
+					return TRUE;
+				}else if( idxSel < nItem/2 ) {
+					// 半分より上 → 一番上
+					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+					m_bodyList.EnsureVisible( 0, FALSE );
+					return TRUE;
+				}else{
+					// 半分より下 → 一番下
+					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+					m_bodyList.EnsureVisible( nItem-1, FALSE);
+					return TRUE;
+				}
 			}
 		}
 		// カテゴリに移動
@@ -2484,19 +2487,22 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 	}else{
 		// 一番上ではない。
 		// 上に移動
-		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
-		m_selGroup->getSelectedCategory()->selectedBody --;
-		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, true );
+		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+		if (pCategory!=NULL) {
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, false );
+			pCategory->selectedBody --;
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, true );
 
-		// 移動先が非表示なら上方向にスクロール
-		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
-			m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			// 移動先が非表示なら上方向にスクロール
+			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
+				m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
 
-			// 再描画
-			if (theApp.m_optionMng.IsUseBgImage()) {
-				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
-				m_bodyList.UpdateWindow();
-				MoveMiniImageDlg();
+				// 再描画
+				if (theApp.m_optionMng.IsUseBgImage()) {
+					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+					m_bodyList.UpdateWindow();
+					MoveMiniImageDlg();
+				}
 			}
 		}
 		return TRUE;
@@ -2512,19 +2518,22 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 	}else{
 		// 一番下ではない。
 		// 下に移動
-		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, false );
-		m_selGroup->getSelectedCategory()->selectedBody ++;
-		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody, true );
+		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+		if (pCategory!=NULL) {
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, false );
+			pCategory->selectedBody ++;
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, true );
 
-		// 移動先が非表示なら下方向にスクロール
-		if( !util::IsVisibleOnListBox( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody ) ) {
-			m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			// 移動先が非表示なら下方向にスクロール
+			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
+				m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
 
-			// 再描画
-			if (theApp.m_optionMng.IsUseBgImage()) {
-				m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
-				m_bodyList.UpdateWindow();
-				MoveMiniImageDlg();
+				// 再描画
+				if (theApp.m_optionMng.IsUseBgImage()) {
+					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+					m_bodyList.UpdateWindow();
+					MoveMiniImageDlg();
+				}
 			}
 		}
 		return TRUE;
@@ -3043,6 +3052,9 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	// 状態に応じて、「表示項目」の変更を行う
 	// いわゆるトグル動作。
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory == NULL) {
+		return false;
+	}
 	switch (pCategory->m_mixi.GetAccessType()) {
 	case ACCESS_LIST_DIARY:
 	case ACCESS_LIST_NEW_COMMENT:
