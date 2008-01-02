@@ -289,6 +289,25 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				}
 				break;
 
+			case ACCESS_TWITTER_USER:
+				// Twitter 項目
+				{
+					// 選択項目と同じオーナーIDの項目を強調表示する。
+					int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
+					CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+					if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
+						const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
+						if (selectedData.GetOwnerID()==data->GetOwnerID()) {
+							// 同じオーナーID：強調表示
+							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						} else {
+							// 異なるオーナーID
+							clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+						}
+					}
+				}
+				break;
+
 			default:
 				// 色づけなし
 				// 黒にする

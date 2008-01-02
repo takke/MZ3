@@ -1602,14 +1602,22 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	if (pNMLV->uNewState != 3) {
 		return;
 	}
-	m_selGroup->getSelectedCategory()->selectedBody = pNMLV->iItem;
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	pCategory->selectedBody = pNMLV->iItem;
 
 	// 第1カラムに表示している内容を表示する。
 	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
+		MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_firstBodyColType, false) );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
+
+	// Twitter であれば同一オーナーIDの項目を再表示
+	if (pCategory->m_mixi.GetAccessType()==ACCESS_TWITTER_FRIENDS_TIMELINE) {
+		// 全件再描画する。
+		// 背景の再描画をやめれば少しはマシになるかも。
+		m_bodyList.Invalidate(FALSE);
+	}
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );
