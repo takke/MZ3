@@ -7,6 +7,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MixiParser.h"
+#include <set>
 
 /// Twitter 用パーサ
 namespace twitter {
@@ -31,6 +32,12 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 		return false;
 	}
 
+	// 重複防止用の id 一覧を生成。
+	std::set<int> id_set;
+	for (size_t i=0; i<out_.size(); i++) {
+		id_set.insert( out_[i].GetID() );
+	}
+
 	// status に対する処理
 	try {
 		const xml2stl::Node& statuses = root.getNode( L"statuses" );
@@ -52,6 +59,14 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strBody );
 				data.AddBody( strBody );
 
+				// source : status/source
+				// 子要素として追加
+				CString source = status.getNode(L"source").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( source );
+				CMixiData sourceData;
+				sourceData.AddBody( source );
+				data.AddChild( sourceData );
+
 				// name : status/user/screen_name
 				const xml2stl::Node& user = status.getNode( L"user" );
 				data.SetName( user.getNode(L"screen_name").getTextAll().c_str() );
@@ -68,7 +83,13 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 				data.SetTitle( strTitle );
 
 				// id : status/id
-				data.SetID( _wtoi( status.getNode(L"id").getTextAll().c_str() ) );
+				int id = _wtoi( status.getNode(L"id").getTextAll().c_str() );
+				data.SetID( id );
+
+				// 同一IDがあれば追加しない。
+				if (id_set.count(id)>0) {
+					continue;
+				}
 
 				// owner-id : status/user/id
 				data.SetOwnerID( _wtoi( user.getNode(L"id").getTextAll().c_str() ) );
@@ -89,8 +110,16 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 				// URL を抽出し、リンクにする
 				TwitterFriendsTimelineXmlParser::ExtractLinks( data );
 
-				// 完成したので追加する
-				out_.push_back( data );
+				// id が降順になるように追加する。
+				{
+					size_t j=0;
+					for (; j<out_.size(); j++) {
+						if (id > out_[j].GetID()) {
+							break;
+						}
+					}
+					out_.insert( out_.begin()+j, data );
+				}
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
 				break;
@@ -98,6 +127,12 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 		}
 	} catch (xml2stl::NodeNotFoundException& e) {
 		MZ3LOGGER_ERROR( util::FormatString( L"statuses not found... : %s", e.getMessage().c_str()) );
+	}
+
+	// 最大件数調整（末尾の余分なデータを削除する）
+	const size_t LIST_MAX_SIZE = 1000;
+	if (out_.size()>LIST_MAX_SIZE) {
+		out_.erase( out_.begin()+LIST_MAX_SIZE, out_.end() );
 	}
 
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() finished." );

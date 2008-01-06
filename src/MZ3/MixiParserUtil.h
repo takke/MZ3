@@ -337,21 +337,37 @@ public:
 		// </p> → 改行
 		while( line.Replace(_T("</p>"), _T("\r\n\r\n")) ) ;
 
-		while( line.Replace(_T("&quot;"), _T("\"")) ) ;
-		while( line.Replace(_T("&gt;"), _T(">")) ) ;
-		while( line.Replace(_T("&lt;"), _T("<")) ) ;
-		while( line.Replace(_T("&nbsp;"), _T(" ")) ) ;
+		// &quot; などの定義済み実体参照の文字化
+		ReplaceDefinedEntityReferenceToCharacter( line );
 
 		// &#xxxx; の実体参照の文字化
 		// 例）&#3642; → char(3642)
-		ReplaceEntityReferenceToCharacter( line );
+		ReplaceNumberEntityReferenceToCharacter( line );
+	}
+
+	static void ReplaceEntityReferenceToCharacter( CString& str )
+	{
+		ReplaceDefinedEntityReferenceToCharacter( str );
+		ReplaceNumberEntityReferenceToCharacter( str );
+	}
+
+	/**
+	 * &quot; などの定義済み実体参照の文字化
+	 */
+	static void ReplaceDefinedEntityReferenceToCharacter( CString& str )
+	{
+		while( str.Replace(_T("&quot;"), _T("\"")) ) ;
+		while( str.Replace(_T("&gt;"),   _T(">")) ) ;
+		while( str.Replace(_T("&lt;"),   _T("<")) ) ;
+		while( str.Replace(_T("&nbsp;"), _T(" ")) ) ;
+		while( str.Replace(_T("&amp;"),  _T("&")) ) ;
 	}
 
 	/**
 	 * &#xxxx; の実体参照の文字化
 	 * 例）&#3642; → char(3642)
 	 */
-	static void ReplaceEntityReferenceToCharacter( CString& str )
+	static void ReplaceNumberEntityReferenceToCharacter( CString& str )
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;

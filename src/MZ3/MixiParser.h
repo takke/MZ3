@@ -4614,8 +4614,18 @@ private:
 namespace mixi {
 
 /// リスト系HTMLの解析
-inline bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html )
+inline bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html )
 {
+	// リストの初期化
+	switch (aType) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// 初期化しない。
+		break;
+	default:
+		body.clear();
+		break;
+	}
+
 	switch (aType) {
 	case ACCESS_LIST_DIARY:					return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:			return mixi::NewCommentParser::parse( body, html );

@@ -1115,11 +1115,10 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// 保存先 body の取得。
 			CMixiDataList& body = m_selGroup->getSelectedCategory()->GetBodyList();
-			body.clear();
 
 			// HTML 解析
 			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
-			mixi::MyDoParseMixiHtml( aType, body, html );
+			mixi::MyDoParseMixiListHtml( aType, body, html );
 
 			// ボディ一覧の設定
 			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
@@ -2929,7 +2928,6 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 
 	{
 		CMixiDataList& body = category.GetBodyList();
-		body.clear();
 
 		CString msgHead;
 		msgHead.Format( L"%s : ", util::AccessType2Message(category.m_mixi.GetAccessType()) );
@@ -2941,7 +2939,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 
 		// HTML 解析
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 2/3") );
-		mixi::MyDoParseMixiHtml( category.m_mixi.GetAccessType(), body, html );
+		mixi::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), body, html );
 
 		// ボディ一覧の設定
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 3/3") );
@@ -4562,6 +4560,12 @@ void CMZ3View::OnMenuTwitterRead()
 	item.AppendFormat( L"%s\r\n", data.GetDate() );
 	item.AppendFormat( L"id : %d\r\n", data.GetID() );
 	item.AppendFormat( L"owner-id : %d\r\n", data.GetOwnerID() );
+
+	if (data.GetChildrenSize()>=1) {
+		CString source = data.GetChild(0).GetBody(0);
+		mixi::ParserUtil::StripAllTags( source );
+		item.AppendFormat( L"source : %s", source );
+	}
 
 	MessageBox( item, data.GetName() );
 }
