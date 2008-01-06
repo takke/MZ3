@@ -1470,12 +1470,29 @@ void CReportView::OnLoadUrl(UINT nID)
  */
 LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
-
 	TRACE(_T("InetAccess End\n"));
 	util::MySetInformationText( m_hWnd, _T("HTML解析中") );
 
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
+		return TRUE;
+	}
+
+	// ログインページ以外であれば、最初にログアウトチェックを行っておく
+	if (theApp.m_accessType != ACCESS_LOGIN && theApp.IsMixiLogout(theApp.m_accessType)) {
+		// ログアウト状態になっている
+		MZ3LOGGER_INFO(_T("再度ログインしてからデータを取得します。"));
+		util::MySetInformationText( m_hWnd, L"再度ログインしてからデータを取得します" );
+
+		// mixi データを保存（待避）
+		theApp.m_mixiBeforeRelogin = m_data;
+		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
+
+		// ログイン実行
+		theApp.m_accessType = ACCESS_LOGIN;
+		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
+
 		return TRUE;
 	}
 
@@ -1576,6 +1593,58 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				// イメージ・動画を再ダウンロード
 				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
 			}
+		}
+		break;
+
+	case ACCESS_LOGIN:
+		// ログインしたかどうかの確認
+		{
+			CHtmlArray html;
+			html.Load( theApp.m_filepath.temphtml );
+			if( mixi::HomeParser::IsLoginSucceeded(html) ) {
+				// ログイン成功
+				if (wcslen(theApp.m_loginMng.GetOwnerID()) != 0) {
+					MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
+				} else {
+					MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
+
+					((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
+					theApp.m_accessType = ACCESS_MAIN;
+					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
+					return TRUE;
+				}
+			} else {
+				// ログイン失敗
+				LPCTSTR msg = L"ログインに失敗しました";
+				util::MySetInformationText( m_hWnd, msg );
+				::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONERROR);
+
+				::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
+				return TRUE;
+			}
+		}
+		break;
+
+	case ACCESS_MAIN:
+		{
+			CHtmlArray html;
+			html.Load( theApp.m_filepath.temphtml );
+			mixi::HomeParser::parse( html );
+
+			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+				LPCTSTR msg = L"ログインに失敗しました(2)";
+				util::MySetInformationText( m_hWnd, msg );
+
+				MZ3LOGGER_ERROR( msg );
+
+				::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
+				return TRUE;
+			}
+
+			// データを待避データに戻す
+			m_data = theApp.m_mixiBeforeRelogin;
+			theApp.m_accessType = m_data.GetAccessType();
+			theApp.m_inet.DoGet(util::CreateMixiUrl(m_data.GetURL()), L"", CInetAccess::FILE_HTML );
 		}
 		break;
 

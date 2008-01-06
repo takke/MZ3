@@ -917,23 +917,12 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	ACCESS_TYPE aType = data->GetAccessType();
 
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
-	if (aType != ACCESS_LOGIN &&
-		util::IsMixiAccessType(aType))
-	{
+	if (aType != ACCESS_LOGIN) {
 		// HTML の取得
 
 		// ログアウトチェック
-		bool bLogout = false;
-		if (mixi::MixiParserBase::isLogout(theApp.m_filepath.temphtml) ) {
-			bLogout = true;
-		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetOwnerID())==0) {
-			// オーナーID未取得の場合もログアウトとみなす。
-			bLogout = true;
-		}
-
-		if (bLogout) {
+		if (theApp.IsMixiLogout(aType)) {
 			// ログアウト状態になっている
-//			MessageBox(_T("ログアウトしてます\n"));
 			MZ3LOGGER_INFO(_T("再度ログインしてからデータを取得します。"));
 			util::MySetInformationText( m_hWnd, L"再度ログインしてからデータを取得します" );
 

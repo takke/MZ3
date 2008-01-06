@@ -310,15 +310,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ログアウトチェック
-	bool bLogout = false;
-	if (mixi::MixiParserBase::isLogout(theApp.m_filepath.temphtml) ) {
-		bLogout = true;
-	} else if (wcslen(theApp.m_loginMng.GetOwnerID())==0) {
-		// オーナーID未取得の場合もログアウトとみなす。
-		bLogout = true;
-	}
-
-	if (bLogout) {
+	if (theApp.IsMixiLogout(theApp.m_accessType)) {
 		// ログアウト状態になっている
 		// ログイン処理実施
 		MZ3LOGGER_INFO(_T("ログインします。"));

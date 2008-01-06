@@ -181,6 +181,8 @@ public:
 	void InitPlatformFlags();
 	void InitResolutionFlags();
 	bool SaveGroupData(void);
+
+	bool IsMixiLogout( ACCESS_TYPE aType );
 };
 
 extern CMZ3App theApp;
