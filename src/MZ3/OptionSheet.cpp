@@ -51,6 +51,7 @@ void COptionSheet::SetPage()
 	AddPage( &m_tabGet );		// 取得タブ
 	AddPage( &m_tabLog );		// ログタブ
 	AddPage( &m_tabProxy );		// プロキシタブ
+	AddPage( &m_tabTwitter );	// Twitterタブ
 }
 
 void COptionSheet::OnDestroy()

@@ -4679,7 +4679,9 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// POST ÉpÉâÉÅÅ[É^Çê›íË
 	post.AppendPostBody( "status=" );
 	post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
-	post.AppendPostBody( util::FormatString(L" *%s*", MZ3_APP_NAME) );
+	if (theApp.m_optionMng.m_bAddSourceTextOnTwitterPost) {
+		post.AppendPostBody( L" *" MZ3_APP_NAME L"*" );
+	}
 	post.AppendPostBody( "&source=" );
 	post.AppendPostBody( MZ3_APP_NAME );
 

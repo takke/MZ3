@@ -16,6 +16,7 @@
 #include "OptionTabMainView.h"
 #include "OptionTabReport.h"
 #include "OptionTabLog.h"
+#include "OptionTabTwitter.h"
 
 // COptionSheet
 
@@ -42,6 +43,7 @@ private:
 	COptionTabGetPage	m_tabGet;		///< 取得タブ
 	COptionTabLog		m_tabLog;		///< ログタブ
 	COptionTabProxy		m_tabProxy;		///< PROXYタブ
+	COptionTabTwitter	m_tabTwitter;	///< Twitterタブ
 public:
 	afx_msg void OnDestroy();
 	int m_iLastPage;

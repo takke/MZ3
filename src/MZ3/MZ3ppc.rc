@@ -753,6 +753,15 @@ BEGIN
     PUSHBUTTON      "キャンセル",IDCANCEL,67,47,50,14
 END
 
+IDD_OPTIONTAB_TWITTER DIALOG  0, 0, 139, 148
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
+CAPTION "Twitter"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    CONTROL         "文末に *MZ3* マークをつける",IDC_ADD_SOURCE_TEXT_ON_POST_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,103,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -997,6 +1006,14 @@ BEGIN
         RIGHTMARGIN, 132
         TOPMARGIN, 7
         BOTTOMMARGIN, 61
+    END
+
+    IDD_OPTIONTAB_TWITTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
     END
 END
 #endif    // APSTUDIO_INVOKED

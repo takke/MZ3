@@ -105,6 +105,10 @@ private:
 	int				m_recvBufSize;				///< 受信バッファサイズ
 
 public:
+	//--- Twitter
+	bool			m_bAddSourceTextOnTwitterPost;	///< 文末に *MZ3* マークをつける
+
+public:
 	Option()
 		: m_GetPageType( GETPAGE_LATEST20 )
 		, m_bUseAutoConnection( true )
@@ -165,6 +169,7 @@ public:
 #endif
 		, m_bAutoLoadMiniImage( true )
 		, m_nMainViewMiniImageSize( 50 )
+		, m_bAddSourceTextOnTwitterPost( true )
 	{
 	}
 

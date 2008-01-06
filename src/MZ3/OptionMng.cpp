@@ -384,6 +384,17 @@ void Option::Load()
 		}
 	}
 
+	//--- Twitter
+	if (inifile.SectionExists("Twitter") != FALSE) {
+		// 文末に *MZ3* マークをつける
+		std::string s = inifile.GetValue("AddSourceTextOnTwitterPost", "Twitter");
+		if( s.empty() ) {
+			// 初期値をそのまま使う
+		}else{
+			m_bAddSourceTextOnTwitterPost = atoi( s.c_str() ) != 0;
+		}
+	}
+
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
 }
 
@@ -525,6 +536,9 @@ void Option::Save()
 
 	// 画像の自動取得
 	inifile.SetValue( "AutoLoadMiniImage", (LPCSTR)util::int2str_a(m_bAutoLoadMiniImage ? 1 : 0), "MainView");
+
+	//--- Twitter
+	inifile.SetValue( "AddSourceTextOnTwitterPost", (LPCSTR)util::int2str_a(m_bAddSourceTextOnTwitterPost ? 1 : 0), "Twitter");
 
 	// Save
 	inifile.Save( theApp.m_filepath.inifile, false );
