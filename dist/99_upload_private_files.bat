@@ -3,10 +3,16 @@
 @set DAT_FILE=99_upload_private_files.dat
 
 : スクリプトファイルの生成
-@echo cd /var/www/mz3/private   > %DAT_FILE%
-@echo put MZ3.%MZ3_VERSION%.CAB >> %DAT_FILE%
-@echo put MZ4.%MZ3_VERSION%.lzh >> %DAT_FILE%
-@echo bye                       >> %DAT_FILE%
+@echo cd /var/www/mz3/private            > %DAT_FILE%
+@echo put MZ3.%MZ3_VERSION%.CAB x.CAB    >> %DAT_FILE%
+@echo rm MZ3.%MZ3_VERSION%.CAB           >> %DAT_FILE%
+@echo rename x.CAB MZ3.%MZ3_VERSION%.CAB >> %DAT_FILE%
+@echo chmod 744 MZ3.%MZ3_VERSION%.CAB    >> %DAT_FILE%
+@echo put MZ4.%MZ3_VERSION%.lzh x.lzh    >> %DAT_FILE%
+@echo rm MZ4.%MZ3_VERSION%.lzh           >> %DAT_FILE%
+@echo rename x.lzh MZ4.%MZ3_VERSION%.lzh >> %DAT_FILE%
+@echo chmod 744 MZ4.%MZ3_VERSION%.lzh    >> %DAT_FILE%
+@echo bye                                >> %DAT_FILE%
 
 : スクリプト確認
 type %DAT_FILE%

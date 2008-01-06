@@ -1499,10 +1499,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OptionTabTwitter.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SimpleLogger.cpp"
 				>
 			</File>
@@ -2118,6 +2114,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\OptionTabTwitter.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\OptionTabUI.cpp"
 					>
 				</File>
@@ -2210,10 +2210,6 @@
 			</File>
 			<File
 				RelativePath=".\Mz3GroupData.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OptionTabTwitter.h"
 				>
 			</File>
 			<File
@@ -2445,6 +2441,10 @@
 				</File>
 				<File
 					RelativePath=".\OptionTabReport.h"
+					>
+				</File>
+				<File
+					RelativePath=".\OptionTabTwitter.h"
 					>
 				</File>
 				<File
