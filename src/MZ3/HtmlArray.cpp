@@ -148,7 +148,8 @@ BOOL CHtmlArray::IsPostSucceeded( WRITEVIEW_TYPE type )
 		switch( type ) {
 		case WRITEVIEW_TYPE_REPLYMESSAGE:
 		case WRITEVIEW_TYPE_NEWMESSAGE:
-			if (line.Find(_T("<td nowrap><b>送信完了</b>しました。</td>")) != -1) {
+			// <img src="http://img.mixi.jp/img/mail_send.gif" width="25" height="28" alt="" /> <b>送信完了</b>しました。
+			if (line.Find(_T("<b>送信完了</b>しました。")) != -1) {
 				return TRUE;
 			}
 			break;

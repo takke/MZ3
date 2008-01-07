@@ -491,6 +491,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
+	// 投稿完了チェック
 	if (html.IsPostSucceeded(m_writeViewType) != FALSE) {
 #ifdef	MZ3_DEBUG
 		// only for Release_MZ3 configuration
