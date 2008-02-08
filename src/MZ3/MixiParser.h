@@ -494,6 +494,42 @@ private:
 		return commentNum;
 	}
 
+	/**
+	 * 承認待ち数の解析、取得
+	 */
+	static int GetNewAcknowledgmentCount( const CHtmlArray& html, int sLine, int eLine, int& retIndex )
+	{
+		CString msg = _T("承認待ちが");
+
+		int messageNum = 0;
+
+		for (int i=sLine; i<eLine; i++) {
+			const CString& line = html.GetAt(i);
+
+			int pos;
+			if ((pos = line.Find(msg)) != -1) {
+				// 承認待ちあり
+				// 不要部分を削除
+				CString buf = line.Mid(pos + msg.GetLength());
+
+				pos = buf.Find(_T("件"));
+				// これより後ろを削除
+				buf = buf.Mid(0, pos);
+
+				TRACE(_T("承認待ち件数 = %s\n"), buf);
+
+				messageNum = _wtoi(buf);
+			}
+			else if (line.Find(_T("<!-- お知らせメッセージ ここまで -->")) != -1) {
+				retIndex = i;
+				break;
+			}
+		}
+
+		return messageNum;
+	}
+
+
 };
 
 
@@ -3020,12 +3056,12 @@ public:
 
 		/**
 		 * 方針：
-		 * - <td WIDTH=35 background=http://img.mixi.jp/img/bg_w.gif>...
+		 * - <table class=..
 		 *   が見つかればそこから項目開始とみなす
 		 * - そこから+18行目以降に
 		 *   <td ...><A HREF="view_news.pl?id=XXXXX&media_id=X"class="new_link">title</A>
 		 *   という形式で「URL」と「タイトル」が存在する。
-		 * - 次の4行後に
+		 * - 次の1行後に
 		 *   <td ...><A HREF="list_news_media.pl?id=2">提供会社</A></td>
 		 *   という形式で「提供会社」が存在する。
 		 * - 次の行に
@@ -3038,7 +3074,7 @@ public:
 
 		// 項目開始を探す
 		bool bInItems = false;	// 「注目のピックアップ」開始？
-		int iLine = 200;		// とりあえず読み飛ばす
+		int iLine = 250;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& str = html_.GetAt(iLine);
 
@@ -3052,13 +3088,13 @@ public:
 			}
 
 			if( !bInItems ) {
-				if( str.Find( L"<img" ) == -1 || str.Find( L"bg_w.gif" ) == -1 ) {
+				if( str.Find( L"<table class=" ) == -1 ) {
 					// 開始フラグ未発見
 					continue;
 				}
 				bInItems = true;
 			}
-			if( str.Find( L"<A" ) == -1 || str.Find( L"view_news.pl" ) == -1 ) {
+			if( str.Find( L"<a" ) == -1 || str.Find( L"view_news.pl" ) == -1 ) {
 				// 項目未発見
 				continue;
 			}
@@ -3073,7 +3109,7 @@ public:
 			{
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !util::CompileRegex( reg, L"\"(view_news.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</" ) ) {
+				if( !util::CompileRegex( reg, L"\"(view_news\.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</a" ) ) {
 					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 					return false;
 				}
@@ -3095,7 +3131,7 @@ public:
 
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !util::CompileRegex( reg, L"list_news_media.pl.+>([^<]+)</" ) ) {
+				if( !util::CompileRegex( reg, L"list_news_media\.pl.+>([^<]+)</a" ) ) {
 					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 					return false;
 				}
@@ -3209,11 +3245,7 @@ public:
 
 		/**
 		 * 方針：
-		 * - CLASS="h130"
-		 *   が見つかれば、その行に
-		 *   <td CLASS="h130">title</td>
-		 *   という形式で「タイトル」が存在する。
-		 * - <td CLASS="h150">
+		 * - <div class=\"article\">
 		 *   が見つかればそこから項目開始とみなす。
 		 * - 以降、
 		 *   </td></tr>
@@ -3221,12 +3253,12 @@ public:
 		 */
 		// 項目開始を探す
 		bool bInItems = false;
-		int iLine = 200;		// とりあえず読み飛ばす
+		int iLine = 250;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
 			if( !bInItems ) {
-				if( !util::LineHasStringsNoCase( line, L"<td CLASS=\"h150\">" ) ) {
+				if( !util::LineHasStringsNoCase( line, L"<div class=\"article\">" ) ) {
 					// 開始フラグ未発見
 					continue;
 				}
@@ -3240,8 +3272,8 @@ public:
 			}
 			
 			// 項目発見。
-			// 行頭に </td></tr> があれば終了。
-			LPCTSTR endTag = _T("</td></tr>");
+			// 行頭に <div class=\"bottomContents clearfix\">があれば終了。
+			LPCTSTR endTag = _T("<div class=\"bottomContents clearfix\">");
 			if( wcsncmp( line, endTag, wcslen(endTag) ) == 0 ) {
 				// 終了タグ発見
 				break;
