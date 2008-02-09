@@ -879,10 +879,8 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
-
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	MZ3LOGGER_DEBUG(_T("OnGetEndBinary end"));
 
@@ -982,8 +980,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 				m_access = FALSE;
 
-				// プログレスバーを非表示
-				mc_progressBar.ShowWindow( SW_HIDE );
+				// コントロール状態の変更
+				MyUpdateControlStatus();
+
 				util::MySetInformationText( m_hWnd, emsg );
 				return TRUE;
 			}
@@ -1026,8 +1025,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				util::MySetInformationText( m_hWnd, msg );
 
 				m_checkNewComment = false;
-
-				theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 
 				break;
 			} else {
@@ -1197,10 +1194,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
-
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -1210,9 +1205,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 */
 LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 {
-	// 中止ボタンを使用不可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-
 	CMixiData* pMixi = (CMixiData*)lParam;
 
 	if (pMixi->GetAccessType() == ACCESS_LOGIN) {
@@ -1233,8 +1225,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -1267,12 +1259,10 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	m_abort = TRUE;
 	m_cruise.stop();
 
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-
 	m_access = FALSE;
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	LPCTSTR msg = _T("中断しました");
 	util::MySetInformationText( m_hWnd, msg );
@@ -2795,12 +2785,12 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		break;
 	}
 
-	// 中止ボタンを使用可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-
 	// アクセス開始
 	m_access = TRUE;
 	m_abort = FALSE;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
 	theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
@@ -4407,15 +4397,15 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 
 				CString url = mixi.GetImage(0);
 
-				// 中止ボタンを使用可にする
-				theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-
 				// アクセス種別を設定
 				theApp.m_accessType = s_data.GetAccessType();
 
 				// アクセス開始
 				m_access = TRUE;
 				m_abort = FALSE;
+
+				// コントロール状態の変更
+				MyUpdateControlStatus();
 
 				theApp.m_inet.Initialize( m_hWnd, &s_data );
 				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
@@ -4692,15 +4682,15 @@ void CMZ3View::OnBnClickedUpdateButton()
 		return;
 	}
 
-	// 中止ボタンを使用可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-
 	// アクセス種別を設定
 	theApp.m_accessType = ACCESS_TWITTER_UPDATE;
 
 	// アクセス開始
 	m_access = TRUE;
 	m_abort = FALSE;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 	theApp.m_inet.DoPost(
@@ -4743,10 +4733,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// フォーカスを入力領域に移動
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
-
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -5102,5 +5090,27 @@ void CMZ3View::OnTabmenuAdd()
 
 		// グループ定義ファイルの保存
 		theApp.SaveGroupData();
+	}
+}
+
+/**
+ * 状態に応じたコントロール状態の変更
+ */
+void CMZ3View::MyUpdateControlStatus(void)
+{
+	// 中止ボタン
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, m_access ? TRUE : FALSE );
+
+	// プログレスバー
+	if (m_access) {
+		// 通信中は受信時に自動表示
+	} else {
+		mc_progressBar.ShowWindow( SW_HIDE );
+	}
+
+	// Twitter の更新ボタン
+	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
+	if (pUpdateButton!=NULL) {
+		pUpdateButton->EnableWindow( m_access ? FALSE : TRUE );
 	}
 }
