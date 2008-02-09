@@ -33,7 +33,7 @@
 				MPIAcceptFilter=""
 			/>
 			<DeploymentTool
-				DeploymentDevice="4118C335-430C-497f-BE48-11C3316B135Ed6518ffb-710f-11d3-99f2-00105a0df099"
+				DeploymentDevice="C2B0BA8B-9547-4740-9B68-C371C71045F9"
 			/>
 			<DebuggerTool
 				RemoteExecutable=""
@@ -292,7 +292,7 @@
 				MPIAcceptFilter=""
 			/>
 			<DeploymentTool
-				DeploymentDevice="69128d6a-9156-4472-88e7-d6476cfc36cf"
+				DeploymentDevice="a573bbb0-70cf-4466-91a7-5e4dbd1c1c41"
 			/>
 			<DebuggerTool
 				RemoteExecutable=""
