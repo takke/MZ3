@@ -138,6 +138,7 @@ bool CInetAccess::Open()
 		// インターネット自動接続。
 		// 接続が無かったらダイアルアップ処理を行う。
 		// また、グローバルプロキシの接続先を取得する。
+		util::MySetInformationText( m_hwnd, _T("自動接続中...") );
 		SP_EstablishInetConnProc( proxy );
 	}
 
