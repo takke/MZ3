@@ -3109,7 +3109,7 @@ public:
 			{
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !util::CompileRegex( reg, L"\"(view_news\.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</a" ) ) {
+				if( !util::CompileRegex( reg, L"\"(view_news\\.pl\\?id=[0-9]+\\&media_id=[0-9]+).+>(.+)</a" ) ) {
 					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 					return false;
 				}
@@ -3131,7 +3131,7 @@ public:
 
 				// 正規表現のコンパイル（一回のみ）
 				static MyRegex reg;
-				if( !util::CompileRegex( reg, L"list_news_media\.pl.+>([^<]+)</a" ) ) {
+				if( !util::CompileRegex( reg, L"list_news_media\\.pl.+>([^<]+)</a" ) ) {
 					MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 					return false;
 				}
