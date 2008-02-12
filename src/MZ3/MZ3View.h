@@ -97,6 +97,9 @@ public:
 	XcrawlCanceler		m_xcrawl;		///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 
+	bool				m_bReloadingGroupTabByThread;	///< スレッドによるタブ切り替え中か？
+	bool				m_bRetryReloadGroupTabByThread;	///<
+
 	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
 	enum VIEW_STYLE {

@@ -264,6 +264,8 @@ CMZ3View::CMZ3View()
 	, m_checkNewComment( false )
 	, m_viewStyle(VIEW_STYLE_DEFAULT)
 	, m_rectIcon(0,0,0,0)
+	, m_bReloadingGroupTabByThread(false)
+	, m_bRetryReloadGroupTabByThread(false)
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -1338,6 +1340,12 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
 		for (int i=0; i<count; i++) {
+
+			// タブ切り替えが行われればキャンセル
+			if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
+				return;
+			}
+
 			const CMixiData& mixi = body[i];
 			// icon
 			CMZ3BackgroundImage image(L"");
@@ -1482,6 +1490,11 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
+
+		// タブ切り替えが行われればキャンセル
+		if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
+			return;
+		}
 
 		// １カラム目
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
@@ -3194,18 +3207,19 @@ unsigned int CMZ3View::ReloadGroupTab_Thread( LPVOID This )
 {
 	CMZ3View* pView = (CMZ3View*)This;
 
-	static bool s_reloading = false;
-	if( s_reloading ) {
+	if( pView->m_bReloadingGroupTabByThread ) {
+		pView->m_bRetryReloadGroupTabByThread = true;
 		return 0;
 	}
 
-	s_reloading = true;
+	pView->m_bReloadingGroupTabByThread = true;
 	::Sleep( 10L );
 
 	// 処理前後で選択グループが変化していれば、再読込を行う
 	int selectedGroup = pView->m_groupTab.GetCurSel();
 	for(;;) {
 		// 選択変更時の処理を実行する
+		pView->m_bRetryReloadGroupTabByThread = false;
 		pView->OnSelchangedGroupTab();
 
 		if( selectedGroup == pView->m_groupTab.GetCurSel() ) {
@@ -3217,7 +3231,8 @@ unsigned int CMZ3View::ReloadGroupTab_Thread( LPVOID This )
 		}
 	}
 
-	s_reloading = false;
+	pView->m_bReloadingGroupTabByThread = false;
+	pView->m_bRetryReloadGroupTabByThread = false;
 
 	return 0;
 }
