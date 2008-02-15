@@ -380,8 +380,8 @@ class Ran2View : public CWnd
 	CPtrArray	ran2ImageArray;				// アニメGIFのインスタンス保持用
 	Graphics*	m_graphics;					// GDI+の描画ユーティリティ
 	bool		m_isAnime;					// アニメGIFが一枚でも含まれていればタイマー更新を行う
-	bool		m_isMomi2;					// 慣性スクロール中のフラグ
 #endif
+	bool		m_isMomi2;					// 慣性スクロール中のフラグ
 
 #ifdef DEBUG
 	CString			logStr;

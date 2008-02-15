@@ -217,7 +217,10 @@ Ran2View::Ran2View()
 	qBoldFont = NULL;
 	oldFont = NULL;
 	parsedRecord = NULL;
+#ifndef WINCE
 	m_isAnime = false;
+#endif
+	m_isMomi2 = false;
 
 	// ”Ä—pƒyƒ“‚Ìì¬
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
@@ -2036,9 +2039,12 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 
 		m_yAutoScrollMax = dyAutoScroll;
 
-	}else if( nIDEvent == TIMERID_ANIMEGIF && m_isAnime == true && m_isMomi2 != true ) {
+	}
+#ifndef WINCE
+	else if( nIDEvent == TIMERID_ANIMEGIF && m_isAnime == true && m_isMomi2 != true ) {
 		this->Invalidate(FALSE);
 	}
+#endif
 
 	CWnd::OnTimer(nIDEvent);
 }
