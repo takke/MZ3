@@ -62,5 +62,19 @@ public:
 		// 追加したインデックスを返す
 		return m_imageList.GetImageCount() -1;
 	}
+
+	/**
+	 * インデックスがどのパスを示すか返す。
+	 * 範囲外の場合は-1を返す。
+	 */
+	CString GetImagePath(int index){
+		CString iconFullPath = TEXT("");
+		if( index < 0 || m_imageListMap.GetSize() < index ){
+			return(iconFullPath);
+		}
+
+		iconFullPath = m_imageListMap.GetAt(index);
+		return(iconFullPath);
+	}
 };
 
