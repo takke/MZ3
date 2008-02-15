@@ -217,10 +217,8 @@ Ran2View::Ran2View()
 	qBoldFont = NULL;
 	oldFont = NULL;
 	parsedRecord = NULL;
+	m_isAnime = false;
 
-#ifndef WINCE 
-	isAnime = false;
-#endif
 	// 汎用ペンの作成
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
 
@@ -390,16 +388,6 @@ BOOL Ran2View::DestroyWindow()
 	}
 #endif
 
-/*
-	KillTimer(TIMERID_ANIMEGIF);
-	for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
-		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
-		logStr.Format(TEXT("DestroyWindow delete:%d\r\n"),cacheIndex);
-		OutputDebugString(logStr);
-		delete image;
-	}
-	ran2ImageArray.RemoveAll();
-*/
 	if( backDC != NULL ){
 		backDC->DeleteDC();
 		delete backDC;
@@ -1270,10 +1258,6 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 #ifndef WINCE
 	for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
 		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
-#ifdef DEBUG
-		logStr.Format(TEXT("DrawDetail delete:%d\r\n"),cacheIndex);
-		OutputDebugString(logStr);
-#endif
 		delete image;
 	}
 	ran2ImageArray.RemoveAll();
@@ -1339,7 +1323,8 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 	// 描画
 //	this->Invalidate(FALSE);
 #ifndef WINCE
-	SetTimer( TIMERID_ANIMEGIF, 30L, NULL );
+	// 慣性スクロールの1/3ぐらいの頻度の更新でおｋ？
+	SetTimer( TIMERID_ANIMEGIF, 100L, NULL );
 #endif
 
 	if (bForceDraw) {
@@ -1443,11 +1428,6 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		int ey = sy + (charHeight+charHeightOffset);
 
 		CRect drawRect = CRect(text->drawRect.left,sy,text->drawRect.right,ey);
-/*
-		logStr.Format(TEXT("[%s](L:%d,T:%d,R:%d,B:%d)\r\n"),
-			text->lineText,drawRect.left,drawRect.top,drawRect.right,drawRect.bottom);
-			OutputDebugString(logStr);
-*/
 		// アンダーラインの描画
 		if( text->isUnderLine == true ){ 
 			CPen* oldPen = NULL;
@@ -1510,7 +1490,7 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 					}
 					image->InitAnimation(m_graphics,CPoint(gaiji->drawRect.left, sy-baseLineOffset),charHeight);
 					if( image->IsAnimatedGIF() == true ){
-						isAnime = true;
+						m_isAnime = true;
 					}
 				}
 				ran2ImageArray.Add(image);
@@ -1557,11 +1537,6 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 	int readCount = 0;
 	for( int i=0 ; i<datArray->GetSize() ; i++ ){
 		CString lineStr = datArray->GetAt(i);
-		// 前後の空白を除去
-//		lineStr = lineStr.Trim();
-		//logStr.Format(TEXT("[Read:%d][%s]\r\n"),readCount,lineStr.GetBuffer(0));
-		//OutputDebugString(logStr);
-
 		// 要素がない場合はスキップ
 		if( lineStr.GetLength() <= 0 ){
 			continue;
@@ -1802,6 +1777,7 @@ void Ran2View::ResetDragOffset(void)
 {
 	KillTimer(TIMERID_AUTOSCROLL);
 
+	m_isMomi2 = false;
 	m_offsetPixelY = 0;
 }
 
@@ -1849,6 +1825,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 			// 自動スクロール開始
 			m_dwAutoScrollStartTick = GetTickCount();
 			m_yAutoScrollMax = 0;
+			m_isMomi2 = true;
 			SetTimer( TIMERID_AUTOSCROLL, 20L, NULL );
 		}
 
@@ -1936,6 +1913,7 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		m_dragStartLine = drawOffsetLine;
 		m_ptDragStart.y -= m_offsetPixelY;
 		m_offsetPixelY = 0;
+		m_isMomi2 = false;
 
 		// 自動スクロール停止
 		KillTimer( TIMERID_AUTOSCROLL );
@@ -2047,6 +2025,7 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 			(speed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
 			dt > 5 * 1000)
 		{
+			m_isMomi2 = false;
 			KillTimer(nIDEvent);
 		} else {
 			// dyAutoScroll 分だけ移動する。
@@ -2056,13 +2035,10 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 		}
 
 		m_yAutoScrollMax = dyAutoScroll;
-	}
 
-#ifndef WINCE
-	if( nIDEvent == TIMERID_ANIMEGIF && isAnime == true ) {
+	}else if( nIDEvent == TIMERID_ANIMEGIF && m_isAnime == true && m_isMomi2 != true ) {
 		this->Invalidate(FALSE);
 	}
-#endif
 
 	CWnd::OnTimer(nIDEvent);
 }

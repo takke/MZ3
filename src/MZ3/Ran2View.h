@@ -379,7 +379,8 @@ class Ran2View : public CWnd
 #ifndef WINCE
 	CPtrArray	ran2ImageArray;				// アニメGIFのインスタンス保持用
 	Graphics*	m_graphics;					// GDI+の描画ユーティリティ
-	bool		isAnime;					// アニメGIFが一枚でも含まれていればタイマー更新を行う
+	bool		m_isAnime;					// アニメGIFが一枚でも含まれていればタイマー更新を行う
+	bool		m_isMomi2;					// 慣性スクロール中のフラグ
 #endif
 
 #ifdef DEBUG
