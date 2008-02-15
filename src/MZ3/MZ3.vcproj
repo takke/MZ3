@@ -810,7 +810,7 @@
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 			/>
 			<Tool
@@ -1352,7 +1352,7 @@
 				StringPooling="false"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="2"
 				DebugInformationFormat="3"
 			/>
@@ -1370,6 +1370,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Gdiplus.lib"
 				OutputFile="$(OutDir)\MZ4.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
@@ -2126,6 +2127,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Ran2Image.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Ran2View.cpp"
 					>
 				</File>
@@ -2453,6 +2458,10 @@
 				</File>
 				<File
 					RelativePath=".\QuoteDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Ran2Image.h"
 					>
 				</File>
 				<File
