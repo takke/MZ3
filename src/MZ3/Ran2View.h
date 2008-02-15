@@ -7,6 +7,14 @@
 #if !defined(AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_)
 #define AFX_RAN2VIEW_H__185C28F5_417B_4C7B_8F56_3015E3F45645__INCLUDED_
 
+#ifndef WINCE
+	#include "MZ3.h"
+	#include <gdiplus.h>
+	using namespace Gdiplus;
+
+	#include "Ran2Image.h"	// アニメGIF描画クラス
+#endif
+
 #include <vector>
 
 namespace Ran2 {
@@ -368,7 +376,14 @@ class Ran2View : public CWnd
 
 	MainInfo*	parsedRecord;
 
+#ifndef WINCE
+	CPtrArray	ran2ImageArray;				// アニメGIFのインスタンス保持用
+	Graphics*	m_graphics;					// GDI+の描画ユーティリティ
+	bool		isAnime;					// アニメGIFが一枚でも含まれていればタイマー更新を行う
+#endif
+
 #ifdef DEBUG
+	CString			logStr;
 	MEMORYSTATUS	memState;			
 #endif
 public:

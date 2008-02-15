@@ -10,6 +10,11 @@
 #include "Ran2View.h"
 #include "resourceppc.h"
 
+#ifndef WINCE
+	#include <gdiplus.h>
+	using namespace Gdiplus;
+#endif
+
 IMPLEMENT_DYNAMIC(Ran2View, CWnd)
 
 // 汎用カラー(システムの純色だけどあとで調整できる様に定義しておく)
@@ -20,6 +25,9 @@ COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
 COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
 #define TIMERID_AUTOSCROLL	1
+#define TIMERID_ANIMEGIF	2
+
+const int emojiFixHeight = 16;	// いまのところ固定長の絵文字しかないのでこれでおｋ？
 
 // 各プロパティのコンストラクタ/デストラクタ
 MainInfo::MainInfo() : rowInfo(NULL)
@@ -210,6 +218,9 @@ Ran2View::Ran2View()
 	oldFont = NULL;
 	parsedRecord = NULL;
 
+#ifndef WINCE 
+	isAnime = false;
+#endif
 	// 汎用ペンの作成
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
 
@@ -304,6 +315,10 @@ BOOL Ran2View::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSty
 	memDC->SetBkMode(OPAQUE);	// 透過モードに設定
 	oldBMP = memDC->SelectObject(memBMP);
 
+#ifndef WINCE
+	m_graphics = new Graphics(memDC->m_hDC);
+#endif
+
 	CRect r = rect;
 	r.right = 100;
 	r.bottom = 100;
@@ -326,6 +341,11 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 		bmp.bmHeight < screenHeight*2) 
 	{
 		// 解放
+#ifndef WINCE
+		if( m_graphics != NULL ){
+			delete m_graphics;
+		}
+#endif
 		if( backDC != NULL ){
 			backDC->DeleteDC();
 		}
@@ -351,6 +371,11 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 		memDC->CreateCompatibleDC(&cdc);
 		memDC->SetBkMode(OPAQUE);	// 透過モードに設定
 		oldBMP = memDC->SelectObject(memBMP);
+
+#ifndef WINCE
+		m_graphics = new Graphics(memDC->m_hDC);
+#endif
+
 	}
 
 	CWnd::OnSize(nType, cx, cy);
@@ -358,6 +383,23 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 
 BOOL Ran2View::DestroyWindow()
 {
+#ifndef WINCE 
+	if( m_graphics != NULL ){
+		m_graphics->ReleaseHDC(memDC->m_hDC);
+		delete m_graphics;
+	}
+#endif
+
+/*
+	KillTimer(TIMERID_ANIMEGIF);
+	for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
+		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
+		logStr.Format(TEXT("DestroyWindow delete:%d\r\n"),cacheIndex);
+		OutputDebugString(logStr);
+		delete image;
+	}
+	ran2ImageArray.RemoveAll();
+*/
 	if( backDC != NULL ){
 		backDC->DeleteDC();
 		delete backDC;
@@ -608,7 +650,7 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 	charHeightOffset = lineVirtualHeightPixel;
 
 	// 外字のオフセット量
-	gaijiWidthOffset = lineVirtualHeightPixel;
+	gaijiWidthOffset = 1;
 //	charRealHeightOffset = realLineHeightPixel;
 
 	// VGA/WVGA対応機は固定値のピクセル数を2倍するのを忘れずに！
@@ -1009,7 +1051,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		newText->lineText = cutStr;
 
 		// 出力領域の設定
-		int sx = bigBridgeInfo->startWidth;
+		int sx = bigBridgeInfo->startWidth + gaijiWidthOffset;
 
 		// ワクがある場合は開始位置をずらす
 		if( bigBridgeInfo->frameNestLevel >= 0 ){
@@ -1058,27 +1100,35 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 	// 外字の設定
 	}else if( currentTag == Tag_gaiji ){
-		GaijiProperty* newGaiji = new GaijiProperty();
+		GaijiProperty* newGaiji = NULL;
 
-		// [m:xx] から xx を抽出し、リソースIDとする
-		newGaiji->resourceID = hashRecord->value.Mid(3,hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
 //		int blockWidth = charWidth;	// 文字幅と同一とする
-		int blockWidth = 16 +gaijiWidthOffset;	// 絵文字は16ピクセル固定（CImageListを利用するため）
+		int blockWidth = emojiFixHeight + gaijiWidthOffset;	// 絵文字は16ピクセル固定（CImageListを利用するため）
 
+#ifndef WINCE
+		// 文字の大きさに合わせて拡大(絵文字以下のフォントの場合はそのまんまなので重なるかもね)
+		if( emojiFixHeight < charHeight ){
+			double gaijiScale = (double)charHeight / (double)emojiFixHeight;
+			blockWidth *= gaijiScale;
+		}
+#endif
 		// 外字が幅に収まらない場合は改行して再チャレンジ支援
 		if( blockWidth > bigBridgeInfo->remainWidth ){
 			// 持ち越した場合は持ち越し分が完了するまで繰り返す
 			processState = ProcessState_FOL;
 		}else{
+			newGaiji = new GaijiProperty();
+			// [m:xx] から xx を抽出し、リソースIDとする
+			newGaiji->resourceID = hashRecord->value.Mid(3,hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
+
 			// 出力領域の設定
-			int sx = bigBridgeInfo->startWidth + (charSpacing);
+			int sx = bigBridgeInfo->startWidth + (gaijiWidthOffset);
 			CRect drawRect = CRect(sx,0,sx+blockWidth,0);	// Y座標は実行時に解釈されるので不要
 			newGaiji->drawRect = drawRect;
 
 			// 次のテキストの開始座標を更新(外字はカツカツなので文字のスペーシングを前後に入れる)
-			bigBridgeInfo->startWidth += (blockWidth + charSpacing);
-			bigBridgeInfo->remainWidth -= (blockWidth + charSpacing);
-
+			bigBridgeInfo->startWidth += (blockWidth + gaijiWidthOffset);
+			bigBridgeInfo->remainWidth -= (blockWidth + gaijiWidthOffset);
 			// 配列に追記
 			rowRecord->gaijiProperties->Add(newGaiji);
 		}
@@ -1104,8 +1154,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		bridgeInfo->pageAnchor = 0;
 	}else{
 		// それ以外のエラーの場合
-		logStr.Format(TEXT("Through tag!!(%s:%s)\r\n"),hashRecord->key,hashRecord->value);
-		OutputDebugString(logStr);
+		//logStr.Format(TEXT("Through tag!!(%s:%s)\r\n"),hashRecord->key,hashRecord->value);
+		//OutputDebugString(logStr);
 	}
 
 	return(processState);
@@ -1217,6 +1267,18 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 // 描画の入り口
 int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 {
+#ifndef WINCE
+	for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
+		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
+#ifdef DEBUG
+		logStr.Format(TEXT("DrawDetail delete:%d\r\n"),cacheIndex);
+		OutputDebugString(logStr);
+#endif
+		delete image;
+	}
+	ran2ImageArray.RemoveAll();
+#endif
+
 	if (startLine<0) {
 		return 0;
 	}
@@ -1276,6 +1338,9 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 
 	// 描画
 //	this->Invalidate(FALSE);
+#ifndef WINCE
+	SetTimer( TIMERID_ANIMEGIF, 30L, NULL );
+#endif
 
 	if (bForceDraw) {
 		// 強制的に描画する
@@ -1395,6 +1460,7 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		// 文字色とフォントの切り替え
 		memDC->SetTextColor(text->foregroundColor);
 		memDC->SetBkColor(text->backgroundColor);
+
 		if( text->isBold == true ){
 			if( text->isUpHanging == true || text->isDownHanging == true ){
 				oldFont = memDC->SelectObject(qBoldFont);
@@ -1431,8 +1497,24 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 			int imageIdx = _wtoi(gaiji->resourceID);
 			// 長さチェック
 			if (0 <= imageIdx && imageIdx < m_pImageList->GetImageCount()) {
-				// 描画
+#ifdef WINCE
 				m_pImageList->Draw( memDC, imageIdx, CPoint(gaiji->drawRect.left, sy), ILD_TRANSPARENT );
+#else
+				CString imagePath = theApp.m_imageCache.GetImagePath(imageIdx);
+				Ran2Image* image = new Ran2Image(imagePath); 
+				if( imagePath.GetLength() > 0 && image->GetWidth() > 0 && image->GetHeight()){
+					// 絵文字の高さが文字より大きい場合、ベースラインを変更する
+					int baseLineOffset = 0;
+					if( image->GetHeight() > charHeight ){
+						baseLineOffset = ((image->GetHeight()+charHeightOffset) - charHeight) / 2;
+					}
+					image->InitAnimation(m_graphics,CPoint(gaiji->drawRect.left, sy-baseLineOffset),charHeight);
+					if( image->IsAnimatedGIF() == true ){
+						isAnime = true;
+					}
+				}
+				ran2ImageArray.Add(image);
+#endif
 			}
 		}
 	}
@@ -1443,7 +1525,6 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 // ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
 MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 {
-
 	CString logStr;	// エラー出力用
 
 	MainInfo* newMainRecord = NULL;
@@ -1636,6 +1717,15 @@ void Ran2View::PurgeMainRecord()
 
 		delete parsedRecord;
 		parsedRecord = NULL;
+
+#ifndef WINCE
+		// Ran2Imageの破棄もここでやっとく
+		for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
+			Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
+			delete image;
+		}
+		ran2ImageArray.RemoveAll();
+#endif
 	}
 }
 
@@ -1711,6 +1801,7 @@ void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
 void Ran2View::ResetDragOffset(void)
 {
 	KillTimer(TIMERID_AUTOSCROLL);
+
 	m_offsetPixelY = 0;
 }
 
@@ -1966,6 +2057,12 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 
 		m_yAutoScrollMax = dyAutoScroll;
 	}
+
+#ifndef WINCE
+	if( nIDEvent == TIMERID_ANIMEGIF && isAnime == true ) {
+		this->Invalidate(FALSE);
+	}
+#endif
 
 	CWnd::OnTimer(nIDEvent);
 }
