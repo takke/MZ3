@@ -1,15 +1,9 @@
-#ifndef WINCE
 #include "stdafx.h"
+
+#ifndef WINCE
+
 #include "Ran2Image.h"
 #include <process.h>
-
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
 
 // ファイルからのコンストラクタ
 Ran2Image::Ran2Image(const wchar_t* fileName, BOOL isColorManagement) 
@@ -107,11 +101,8 @@ void Ran2Image::Initialize()
 	m_nFrameCount = 0;
 	lastResult = InvalidParameter;
 
-#ifdef INDIGO_CTRL_PROJECT
-	m_hInst = _Module.GetResourceInstance();
-#else
+//	m_hInst = _Module.GetResourceInstance();
 	m_hInst = AfxGetResourceHandle();
-#endif
 
 	m_bPause = false;
 	m_hExitEvent = ::CreateEvent(NULL,TRUE,FALSE,NULL);
