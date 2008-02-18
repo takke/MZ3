@@ -385,6 +385,9 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 BOOL Ran2View::DestroyWindow()
 {
 #ifndef WINCE 
+	m_isAnime = false;
+	KillTimer(TIMERID_ANIMEGIF);
+
 	if( m_graphics != NULL ){
 		m_graphics->ReleaseHDC(memDC->m_hDC);
 		delete m_graphics;
