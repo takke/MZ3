@@ -27,6 +27,11 @@
 #include "EmojiMap.h"
 #include "ImageCacheManager.h"
 
+#ifndef WINCE
+	#include "gdiplus.h"
+	using namespace Gdiplus;
+#endif
+
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
 #define MZ3LOGGER_ERROR(msg)			SIMPLELOGGER_ERROR(theApp.m_logger,msg)
@@ -159,6 +164,12 @@ public:
 
 	CMixiData			m_mixi4recv;			///< 受信時に利用する mixi データ
 	CInetAccess			m_inet;					///< ネット接続オブジェクト
+
+#ifndef WINCE
+	// GDI+初期化トークン
+	GdiplusStartupInput gdiSI;
+	ULONG_PTR			gdiToken;
+#endif
 
 public:
 	void ChangeView(CView*);

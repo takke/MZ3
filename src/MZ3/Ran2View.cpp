@@ -220,7 +220,6 @@ Ran2View::Ran2View()
 #ifndef WINCE
 	m_isAnime = false;
 #endif
-	m_isMomi2 = false;
 
 	// 汎用ペンの作成
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
@@ -376,7 +375,6 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 #ifndef WINCE
 		m_graphics = new Graphics(memDC->m_hDC);
 #endif
-
 	}
 
 	CWnd::OnSize(nType, cx, cy);
@@ -389,7 +387,7 @@ BOOL Ran2View::DestroyWindow()
 	KillTimer(TIMERID_ANIMEGIF);
 
 	if( m_graphics != NULL ){
-		m_graphics->ReleaseHDC(memDC->m_hDC);
+		//m_graphics->ReleaseHDC(memDC->m_hDC);
 		delete m_graphics;
 	}
 #endif
@@ -1254,6 +1252,10 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 	TRACE(TEXT("★LoadDetail終了時の残メモリ:%d Bytes\r\n"),memState.dwAvailPhys);
 #endif
 
+#ifndef WINCE
+	// GIFアニメは慣性スクロールの1/3ぐらいの頻度の更新でおｋ？
+	SetTimer( TIMERID_ANIMEGIF, 100L, NULL );
+#endif
 	return(rc);
 }
 
@@ -1262,7 +1264,7 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 {
 #ifndef WINCE
-	for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
+	for(int cacheIndex=0 ; cacheIndex < ran2ImageArray.GetSize() ; cacheIndex++){
 		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
 		delete image;
 	}
@@ -1328,11 +1330,6 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 
 	// 描画
 //	this->Invalidate(FALSE);
-#ifndef WINCE
-	// 慣性スクロールの1/3ぐらいの頻度の更新でおｋ？
-	SetTimer( TIMERID_ANIMEGIF, 100L, NULL );
-#endif
-
 	if (bForceDraw) {
 		// 強制的に描画する
 		CDC* pDC = GetDC();
@@ -1489,12 +1486,24 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 				CString imagePath = theApp.m_imageCache.GetImagePath(imageIdx);
 				Ran2Image* image = new Ran2Image(imagePath); 
 				if( imagePath.GetLength() > 0 && image->GetWidth() > 0 && image->GetHeight()){
+
+					// 文字の大きさに合わせて拡大(絵文字以下のフォントの場合はそのまんまなので重なるかもね)
+					int hmWidth = image->GetWidth();
+					int hmHeight = image->GetHeight();
+					if( hmWidth < charHeight ){
+						double gaijiScale = (double)charHeight / (double)hmHeight;
+						hmWidth *= gaijiScale;
+						hmHeight *= gaijiScale;
+					}
+
 					// 絵文字の高さが文字より大きい場合、ベースラインを変更する
 					int baseLineOffset = 0;
 					if( image->GetHeight() > charHeight ){
 						baseLineOffset = ((image->GetHeight()+charHeightOffset) - charHeight) / 2;
 					}
-					image->InitAnimation(m_graphics,CPoint(gaiji->drawRect.left, sy-baseLineOffset),charHeight);
+
+					//image->InitAnimation(m_graphics,CPoint(gaiji->drawRect.left, sy-baseLineOffset),charHeight);
+					m_graphics->DrawImage(image,gaiji->drawRect.left,sy-baseLineOffset,hmWidth,hmHeight);
 					if( image->IsAnimatedGIF() == true ){
 						m_isAnime = true;
 					}
@@ -1783,7 +1792,6 @@ void Ran2View::ResetDragOffset(void)
 {
 	KillTimer(TIMERID_AUTOSCROLL);
 
-	m_isMomi2 = false;
 	m_offsetPixelY = 0;
 }
 
@@ -1831,7 +1839,6 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 			// 自動スクロール開始
 			m_dwAutoScrollStartTick = GetTickCount();
 			m_yAutoScrollMax = 0;
-			m_isMomi2 = true;
 			SetTimer( TIMERID_AUTOSCROLL, 20L, NULL );
 		}
 
@@ -1919,7 +1926,6 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		m_dragStartLine = drawOffsetLine;
 		m_ptDragStart.y -= m_offsetPixelY;
 		m_offsetPixelY = 0;
-		m_isMomi2 = false;
 
 		// 自動スクロール停止
 		KillTimer( TIMERID_AUTOSCROLL );
@@ -2031,7 +2037,6 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 			(speed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
 			dt > 5 * 1000)
 		{
-			m_isMomi2 = false;
 			KillTimer(nIDEvent);
 		} else {
 			// dyAutoScroll 分だけ移動する。
@@ -2043,11 +2048,6 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 		m_yAutoScrollMax = dyAutoScroll;
 
 	}
-#ifndef WINCE
-	else if( nIDEvent == TIMERID_ANIMEGIF && m_isAnime == true && m_isMomi2 != true ) {
-		this->Invalidate(FALSE);
-	}
-#endif
 
 	CWnd::OnTimer(nIDEvent);
 }

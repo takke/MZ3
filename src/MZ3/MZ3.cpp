@@ -81,6 +81,9 @@ CMZ3App theApp;
 
 BOOL CMZ3App::InitInstance()
 {
+#ifndef WINCE 
+	::GdiplusStartup(&gdiToken, &gdiSI, NULL);
+#endif
 	// プラットフォーム判定
 	InitPlatformFlags();
 
@@ -415,6 +418,9 @@ void CMZ3App::InitResolutionFlags()
 
 int CMZ3App::ExitInstance()
 {
+#ifndef WINCE 
+	::GdiplusShutdown(gdiToken);
+#endif
 //	CString msg;
 //	msg.Format( L"ログファイルを\n%s\nに保存します", logfile );
 //	MessageBox( NULL, msg, 0, MB_OK );
