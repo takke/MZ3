@@ -1264,11 +1264,11 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 {
 #ifndef WINCE
-	for(int cacheIndex=0 ; cacheIndex < ran2ImageArray.GetSize() ; cacheIndex++){
-		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
-		delete image;
-	}
-	ran2ImageArray.RemoveAll();
+//	for(int cacheIndex=0 ; cacheIndex < ran2ImageArray.GetSize() ; cacheIndex++){
+//		Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
+//		delete image;
+//	}
+//	ran2ImageArray.RemoveAll();
 #endif
 
 	if (startLine<0) {
@@ -1484,7 +1484,24 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 				m_pImageList->Draw( memDC, imageIdx, CPoint(gaiji->drawRect.left, sy), ILD_TRANSPARENT );
 #else
 				CString imagePath = theApp.m_imageCache.GetImagePath(imageIdx);
-				Ran2Image* image = new Ran2Image(imagePath); 
+
+				// ran2ImageArray ‚©‚ç’Tõ
+				// ŠG•¶š‚Í‚X‚R‚O‚Oã‚È‚Ì‚Å‘SŒŸõ‚µ‚¿‚á‚¤
+				Ran2Image* targetImage = NULL;
+				for (int ran2ImageArrayIdx=0; ran2ImageArrayIdx<ran2ImageArray.GetCount(); ran2ImageArrayIdx++) {
+					Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(ran2ImageArrayIdx);
+					if (image->m_strFilename == imagePath) {
+						targetImage = image;
+						break;
+					}
+				}
+				if (targetImage==NULL) {
+					// V‹K¶¬
+					targetImage = new Ran2Image(imagePath);
+					ran2ImageArray.Add(targetImage);
+				}
+
+				Ran2Image* image = targetImage;
 				if( imagePath.GetLength() > 0 && image->GetWidth() > 0 && image->GetHeight()){
 
 					// •¶š‚Ì‘å‚«‚³‚É‡‚í‚¹‚ÄŠg‘å(ŠG•¶šˆÈ‰º‚ÌƒtƒHƒ“ƒg‚Ìê‡‚Í‚»‚Ì‚Ü‚ñ‚Ü‚È‚Ì‚Åd‚È‚é‚©‚à‚Ë)
@@ -1508,7 +1525,6 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 						m_isAnime = true;
 					}
 				}
-				ran2ImageArray.Add(image);
 #endif
 			}
 		}
@@ -1710,11 +1726,11 @@ void Ran2View::PurgeMainRecord()
 
 #ifndef WINCE
 		// Ran2Image‚Ì”jŠü‚à‚±‚±‚Å‚â‚Á‚Æ‚­
-		for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
-			Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
-			delete image;
-		}
-		ran2ImageArray.RemoveAll();
+//		for(int cacheIndex=0 ; cacheIndex<ran2ImageArray.GetSize() ; cacheIndex++){
+//			Ran2Image* image = (Ran2Image*)ran2ImageArray.GetAt(cacheIndex);
+//			delete image;
+//		}
+//		ran2ImageArray.RemoveAll();
 #endif
 	}
 }

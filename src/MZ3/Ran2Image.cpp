@@ -12,6 +12,8 @@ Ran2Image::Ran2Image(const wchar_t* fileName, BOOL isColorManagement)
 	Initialize();
 	m_isInitialized = true;
 	PrepareAnimation();
+
+	m_strFilename = fileName;
 }
 
 

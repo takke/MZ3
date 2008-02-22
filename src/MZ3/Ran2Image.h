@@ -32,6 +32,7 @@ public:
 
 	static UINT WINAPI _GoRan2Proc(LPVOID pParam);
 
+	CString			m_strFilename;
 	int				charHeight;
 	HANDLE			m_hThread;
 	HANDLE			m_hPause;
