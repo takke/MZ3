@@ -2284,9 +2284,13 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
-		case ACCESS_TWITTER_USER:
 			// メニュー表示
 			PopupBodyMenu();
+			break;
+
+		case ACCESS_TWITTER_USER:
+			// 全文表示
+			OnMenuTwitterRead();
 			break;
 
 		default:
