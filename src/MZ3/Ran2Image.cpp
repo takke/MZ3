@@ -55,8 +55,8 @@ bool Ran2Image::InitAnimation(Graphics* graphics, CPoint pt,int lineHeight)
 		// 文字の大きさに合わせて拡大(絵文字以下のフォントの場合はそのまんまなので重なるかもね)
 		if( hmWidth < charHeight ){
 			double gaijiScale = (double)charHeight / (double)hmWidth;
-			hmWidth *= gaijiScale;
-			hmHeight *= gaijiScale;
+			hmWidth  = (int)(hmWidth *gaijiScale);
+			hmHeight = (int)(hmHeight*gaijiScale);
 		}
 
 		if( m_graphics != NULL ){
@@ -137,8 +137,8 @@ bool Ran2Image::DrawFrameGIF()
 		// 文字の大きさに合わせて拡大(絵文字以下のフォントの場合はそのまんまなので重なるかもね)
 		if( hmWidth < charHeight ){
 			double gaijiScale = (double)charHeight / (double)hmWidth;
-			hmWidth *= gaijiScale;
-			hmHeight *= gaijiScale;
+			hmWidth  = (int)(hmWidth *gaijiScale);
+			hmHeight = (int)(hmHeight*gaijiScale);
 		}
 
 		m_graphics->DrawImage(this, m_pt.x, m_pt.y, hmWidth, hmHeight);

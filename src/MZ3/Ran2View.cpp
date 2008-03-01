@@ -1101,7 +1101,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		// 文字の大きさに合わせて拡大(絵文字以下のフォントの場合はそのまんまなので重なるかもね)
 		if( emojiFixHeight < charHeight ){
 			double gaijiScale = (double)charHeight / (double)emojiFixHeight;
-			blockWidth *= gaijiScale;
+			blockWidth = (int)(blockWidth*gaijiScale);
 		}
 #endif
 		// 外字が幅に収まらない場合は改行して再チャレンジ支援
@@ -1509,8 +1509,8 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 					int hmHeight = image->GetHeight();
 					if( hmWidth < charHeight ){
 						double gaijiScale = (double)charHeight / (double)hmHeight;
-						hmWidth *= gaijiScale;
-						hmHeight *= gaijiScale;
+						hmWidth  = (int)(hmWidth *gaijiScale);
+						hmHeight = (int)(hmHeight*gaijiScale);
 					}
 
 					// 絵文字の高さが文字より大きい場合、ベースラインを変更する
