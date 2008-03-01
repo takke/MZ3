@@ -4667,6 +4667,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
 
 	if (strStatus.IsEmpty()) {
+		// –¢“ü—Í‚È‚Ì‚ÅÅVæ“¾
+		RetrieveCategoryItem();
 		return;
 	}
 
