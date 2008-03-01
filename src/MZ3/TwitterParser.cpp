@@ -56,6 +56,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 
 				// text : status/text
 				CString strBody = status.getNode(L"text").getTextAll().c_str();
+				while( strBody.Replace(_T("&amp;"),  _T("&")) ) ;
 				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strBody );
 				data.AddBody( strBody );
 
@@ -119,7 +120,14 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 						}
 					}
 					out_.insert( out_.begin()+j, data );
-				}
+
+					// for performance tuning
+/*					if (out_.size()==1) {
+						for (int k=0; k<100; k++) {
+							out_.insert( out_.begin()+j, data );
+						}
+					}
+*/				}
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
 				break;
