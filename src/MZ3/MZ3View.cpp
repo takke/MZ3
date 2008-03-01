@@ -1007,23 +1007,27 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 				// 新着メッセージ、新着コメントの通知
 				CString msg;
+				CString msgTemp;
+
 				if( theApp.m_newMessageCount > 0 ) {
-					if( theApp.m_newCommentCount > 0 ) {
-						msg.Format(_T("新着メッセージ %d件、新着コメント %d 件"), 
-							theApp.m_newMessageCount, theApp.m_newCommentCount );
-					}else{
-						msg.Format(_T("新着メッセージ %d件"), 
-							theApp.m_newMessageCount);
-					}
+					msgTemp.Format(_T(" 新着メッセージ:%d件 "),theApp.m_newMessageCount);
+					msg = msgTemp;
 				}
-				else {
-					if( theApp.m_newCommentCount > 0 ) {
-						msg.Format(_T("新着コメント %d件"), 
-							theApp.m_newCommentCount);
-					}else{
-						msg = _T("新着メッセージ、コメントはありません");
-					}
+
+				if( theApp.m_newCommentCount > 0 ) {
+					msgTemp.Format(_T(" 新着コメント:%d件 "),theApp.m_newCommentCount);
+					msg = msg + msgTemp;
 				}
+
+				if( theApp.m_newApplyCount > 0 ) {
+					msgTemp.Format(_T(" 承認待ち:%d人"),theApp.m_newApplyCount);
+					msg = msg + msgTemp;
+				}
+
+				if( msg == "" ) {
+					msg = _T("新着メッセージ、コメントはありません");
+				}
+
 				util::MySetInformationText( m_hWnd, msg );
 
 				m_checkNewComment = false;

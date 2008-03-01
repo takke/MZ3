@@ -357,6 +357,7 @@ public:
 	 * <li>theApp.m_loginMng
 	 * <li>theApp.m_newMessageCount
 	 * <li>theApp.m_newCommentCount
+	 * <li>theApp.m_newApplyCount
 	 * </ul>
 	 */
 	static bool parse( const CHtmlArray& html_ )
@@ -368,7 +369,7 @@ public:
 		int index = 0;
 
 		// 新着メッセージ数の取得
-		int messageNum = GetNewMessageCount( html_, 100, count, index);
+		int messageNum = GetNewMessageCount( html_, 350, count, index);
 		if (messageNum != 0) {
 			theApp.m_newMessageCount = messageNum;
 
@@ -378,9 +379,15 @@ public:
 		}
 
 		// 新着コメント数の取得
-		int commentNum = GetNewCommentCount( html_, 100, count, index);
+		int commentNum = GetNewCommentCount( html_, 350, count, index);
 		if (commentNum != 0) {
 			theApp.m_newCommentCount = commentNum;
+		}
+
+		// 承認待ち数の取得
+		int applyNum = GetNewAcknowledgmentCount( html_, 350, count, index);
+		if (applyNum != 0) {
+			theApp.m_newApplyCount = applyNum;
 		}
 
 		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
@@ -443,7 +450,7 @@ private:
 
 				messageNum = _wtoi(buf);
 			}
-			else if (line.Find(_T("<!-- お知らせメッセージ ここまで -->")) != -1) {
+			else if (line.Find(_T("<div id=\"bodySide\">")) != -1) {
 				retIndex = i;
 				break;
 			}
@@ -485,7 +492,7 @@ private:
 
 				commentNum = _wtoi(result);
 			}
-			else if (line.Find(_T("<!-- お知らせメッセージ ここまで -->")) != -1) {
+			else if (line.Find(_T("<div id=\"bodySide\">")) != -1) {
 				retIndex = i;
 				break;
 			}
@@ -499,9 +506,9 @@ private:
 	 */
 	static int GetNewAcknowledgmentCount( const CHtmlArray& html, int sLine, int eLine, int& retIndex )
 	{
-		CString msg = _T("承認待ちが");
+		CString msg = _T("承認待ちの友人が");
 
-		int messageNum = 0;
+		int applyNum = 0;
 
 		for (int i=sLine; i<eLine; i++) {
 			const CString& line = html.GetAt(i);
@@ -512,21 +519,21 @@ private:
 				// 不要部分を削除
 				CString buf = line.Mid(pos + msg.GetLength());
 
-				pos = buf.Find(_T("件"));
+				pos = buf.Find(_T("名"));
 				// これより後ろを削除
 				buf = buf.Mid(0, pos);
 
 				TRACE(_T("承認待ち件数 = %s\n"), buf);
 
-				messageNum = _wtoi(buf);
+				applyNum = _wtoi(buf);
 			}
-			else if (line.Find(_T("<!-- お知らせメッセージ ここまで -->")) != -1) {
+			else if (line.Find(_T("<div id=\"bodySide\">")) != -1) {
 				retIndex = i;
 				break;
 			}
 		}
 
-		return messageNum;
+		return applyNum;
 	}
 
 
@@ -644,7 +651,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_diary.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -877,7 +884,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=new_friend_diary.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?new_friend_diary.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -1483,7 +1490,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=new_bbs.pl([?]page=[^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?new_bbs.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -1679,7 +1686,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_community.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_community.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -1846,7 +1853,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_bbs.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_bbs.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -3200,7 +3207,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_news_category.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_news_category.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -3580,7 +3587,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_friend.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_friend.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -3738,7 +3745,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=show_intro.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?show_intro.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
@@ -4134,7 +4141,7 @@ private:
 	{
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=list_bookmark.pl([?][^>]+)>([^<]+)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=[\"]?list_bookmark.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}

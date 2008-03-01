@@ -140,6 +140,7 @@ public:
 
 	int					m_newMessageCount;		///< 新着メッセージ数
 	int					m_newCommentCount;		///< 新着コメント数
+ 	int					m_newApplyCount;		///< 承認待ち数
 
 	FilePath			m_filepath;				///< MZ3 で利用しているファイルパス群
 
