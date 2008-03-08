@@ -22,13 +22,14 @@
 #include "WriteView.h"
 #include "util.h"
 #include "util_gui.h"
-#include "MixiParser.h"
 #include "ChooseAccessTypeDlg.h"
 #include "OpenUrlDlg.h"
 #include "CommonEditDlg.h"
 #include "MiniImageDialog.h"
 #include "url_encoder.h"
 #include "twitter_util.h"
+
+#include "MZ3Parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1110,7 +1111,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// HTML 解析
 			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
-			mixi::MyDoParseMixiListHtml( aType, body, html );
+			mz3parser::MyDoParseMixiListHtml( aType, body, html );
 
 			// ボディ一覧の設定
 			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
@@ -2957,7 +2958,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 
 		// HTML 解析
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 2/3") );
-		mixi::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), body, html );
+		mz3parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), body, html );
 
 		// ボディ一覧の設定
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 3/3") );
@@ -3041,7 +3042,7 @@ void CMZ3View::MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi)
 	html.Load( szHtmlfile );
 
 	// HTML 解析
-	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 }
 
@@ -3575,7 +3576,7 @@ void CMZ3View::MyShowHelp(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
 	mixi.SetTitle(MZ3_APP_NAME L" ヘルプ");
-	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***
@@ -3599,7 +3600,7 @@ void CMZ3View::MyShowHistory(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
 	mixi.SetTitle(MZ3_APP_NAME L" 改版履歴");
-	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***
@@ -3627,7 +3628,7 @@ void CMZ3View::MyShowErrorlog(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_ERRORLOG );
 	mixi.SetTitle(MZ3_APP_NAME L" エラーログ");
-	mixi::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***

@@ -21,7 +21,7 @@
 #include "DebugDlg.h"
 #include "url_encoder.h"
 #include "version.h"
-#include "MixiParser.h"
+#include "MZ3Parser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -789,7 +789,7 @@ bool CMZ3App::SaveGroupData(void)
 bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 {
 	if (util::IsMixiAccessType(aType)) {
-		if (mixi::MixiParserBase::isLogout(theApp.m_filepath.temphtml) ) {
+		if (mixi::MZ3ParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
 			return true;
 		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetOwnerID())==0) {
 			// オーナーID未取得の場合もログアウトとみなす。

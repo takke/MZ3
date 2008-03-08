@@ -6,7 +6,7 @@
  */
 #include "stdafx.h"
 #include "MZ3.h"
-#include "MixiParser.h"
+#include "TwitterParser.h"
 #include <set>
 
 /// Twitter 用パーサ

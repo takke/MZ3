@@ -1500,6 +1500,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MZ3Parser.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SimpleLogger.cpp"
 				>
 			</File>
@@ -2218,6 +2222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MZ3Parser.h"
+				>
+			</File>
+			<File
 				RelativePath=".\QuoteHelper.h"
 				>
 			</File>
@@ -2510,6 +2518,10 @@
 				>
 				<File
 					RelativePath=".\twitter_util.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TwitterParser.h"
 					>
 				</File>
 			</Filter>

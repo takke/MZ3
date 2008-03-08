@@ -18,7 +18,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "QuoteDlg.h"
-#include "MixiParser.h"
+#include "MZ3Parser.h"
 #include "ViewFilter.h"
 #include "CommonSelectDlg.h"
 
@@ -1656,7 +1656,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			html.Load( theApp.m_filepath.temphtml );
 
 			// HTML âêÕ
-			mixi::MyDoParseMixiHtml( m_data.GetAccessType(), m_data, html );
+			mz3parser::MyDoParseMixiHtml( m_data.GetAccessType(), m_data, html );
 			util::MySetInformationText( m_hWnd, _T("wait...") );
 
 			theApp.m_pReportView->SetData( m_data );
@@ -2116,7 +2116,7 @@ void CReportView::OnOpenProfileLog()
 	html.Load( strLogfilePath );
 
 	// HTML âêÕ
-	mixi::MyDoParseMixiHtml( s_mixi.GetAccessType(), s_mixi, html );
+	mz3parser::MyDoParseMixiHtml( s_mixi.GetAccessType(), s_mixi, html );
 	util::MySetInformationText( m_hWnd, L"äÆóπ" );
 
 	// URL ê›íË
