@@ -1234,6 +1234,15 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		// フォーカスを入力領域に移動
+		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+		break;
+	default:
+		break;
+	}
+
 	return TRUE;
 }
 
@@ -1273,6 +1282,15 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	LPCTSTR msg = _T("中断しました");
 	util::MySetInformationText( m_hWnd, msg );
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
+
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		// フォーカスを入力領域に移動
+		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+		break;
+	default:
+		break;
+	}
 
 	return TRUE;
 }
@@ -4663,6 +4681,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 		return;
 	}
 
+	// フォーカスを入力領域に移動
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+
+	// 入力文字列を取得
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
 
@@ -4671,6 +4693,9 @@ void CMZ3View::OnBnClickedUpdateButton()
 		RetrieveCategoryItem();
 		return;
 	}
+
+	// 入力領域を無効化
+	GetDlgItem( IDC_STATUS_EDIT )->EnableWindow( FALSE );
 
 	static CPostData post;
 	post.ClearPostBody();
@@ -4755,11 +4780,17 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		SetDlgItemText( IDC_STATUS_EDIT, L"" );
 	}
 
-	// フォーカスを入力領域に移動
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-
 	// コントロール状態の変更
 	MyUpdateControlStatus();
+
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		// フォーカスを入力領域に移動
+		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+		break;
+	default:
+		break;
+	}
 
 	return TRUE;
 }
@@ -5137,5 +5168,11 @@ void CMZ3View::MyUpdateControlStatus(void)
 	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
 	if (pUpdateButton!=NULL) {
 		pUpdateButton->EnableWindow( m_access ? FALSE : TRUE );
+	}
+
+	// Twitter の入力領域
+	CWnd* pStatusEdit = GetDlgItem( IDC_STATUS_EDIT );
+	if (pStatusEdit!=NULL) {
+		pStatusEdit->EnableWindow( m_access ? FALSE : TRUE );
 	}
 }
