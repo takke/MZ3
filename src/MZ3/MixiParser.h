@@ -1081,6 +1081,9 @@ public:
 		// 日記本文＆コメント解析
 		bool bStartDiary = false;	// 日記本文開始フラグ
 		bool bEndDiary   = false;	// 日記本文終了フラグ
+//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
+		int iDivLevel	= 0;		// <div>ネストレベル
+//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
 		for (int i=180; i<lastLine; i++) {
 			const CString& line = html_.GetAt(i);
 
@@ -1099,6 +1102,10 @@ public:
 				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) ) {
 					// 日記開始フラグ発見（日記本文発見）
 					bStartDiary = true;
+
+//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
+					iDivLevel	= 1;		// <div>ネストレベル初期化
+//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
 
 					// とりあえず改行出力
 					data_.AddBody(_T("\r\n"));
@@ -1145,6 +1152,9 @@ public:
 						// この１行で終わり
 						ParserUtil::AddBodyWithExtract( data_, before );
 						bEndDiary = true;
+//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
+						iDivLevel	= 0;		// <div>ネストレベルクリア（多分不要）
+//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
 					}else{
 						// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
 						if(! ParserUtil::ExtractVideoLinkFromScriptTag( data_, i, html_ ) ) {
@@ -1166,12 +1176,26 @@ public:
 				if (line.Find(_T("/viewDiaryBox")) != -1 ) {
 					bEndDiary = true;
 				}
+//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
+//（注）1行に1個ずつしか無いことを前提としている
+				if (line.Find(_T("<div")) != -1 ) {
+					iDivLevel++;
+				}
 
-				// 終了タグまでデータ取得
-				if (line.Find(_T("</div>")) != -1 ) {
+				if (line.Find(_T("</div")) != -1 ) {
+					iDivLevel--;
+				}
+
+				if (0 == iDivLevel ) {
 					bEndDiary = true;
 				}
 
+				//if (line.Find(_T("</div>")) != -1 ) {
+				//	bEndDiary = true;
+				//}
+//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
+
+				// 終了タグまでデータ取得
 				if( bEndDiary == false ) {
 					// 本文終了タグ未発見
 					// 日記本文解析
