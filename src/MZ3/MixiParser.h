@@ -475,6 +475,7 @@ public:
 		MZ3LOGGER_DEBUG( L"ViewDiaryParser.parse() start." );
 
 		data_.ClearAllList();
+		data_.ClearChildren();
 
 		// html_ の文字列化
 		std::vector<TCHAR> text;
@@ -565,16 +566,20 @@ public:
 				CString author;
 				for (size_t i=0; i<bodyMainArea.getChildrenCount(); i++) {
 					const xml2stl::Node& node = bodyMainArea.getNode(i);
-					const xml2stl::XML2STL_STRING& class_value = node.getProperty(L"class");
-					if (wcsstr(class_value.c_str(), L"diaryTitleFriend") != NULL) {
-						CString line = bodyMainArea.getNode(i).getTextAll().c_str();
-						util::GetBetweenSubString( line, L">", L"さんの日記<", author );
-						break;
-					}
-					if (wcsstr(class_value.c_str(), L"diaryTitle") != NULL) {
-						CString line = bodyMainArea.getNode(i).getTextAll().c_str();
-						util::GetBetweenSubString( line, L">", L"の日記<", author );
-						break;
+					try {
+						const xml2stl::XML2STL_STRING& class_value = node.getProperty(L"class");
+
+						if (wcsstr(class_value.c_str(), L"diaryTitleFriend") != NULL) {
+							CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+							util::GetBetweenSubString( line, L">", L"さんの日記<", author );
+							break;
+						}
+						if (wcsstr(class_value.c_str(), L"diaryTitle") != NULL) {
+							CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+							util::GetBetweenSubString( line, L">", L"の日記<", author );
+							break;
+						}
+					} catch (...) {
 					}
 				}
 
@@ -660,54 +665,101 @@ private:
 	static bool parseDiaryComment(CMixiData& data_, const xml2stl::Node& bodyMainArea)
 	{
 		try {
-			int comment_number = 1;
 			const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 												   .getNode(L"div", L"id=diaryComment")
 												   .getNode(L"div", L"class=diaryMainArea02");
 
-			size_t n = div.getChildrenCount();
-			for (size_t i=0; i<n; i++) {
-				const xml2stl::Node& divDiaryCommentBox = div.getNode(i);
+			try {
+				const xml2stl::Node& form = div.getNode(L"form");
+				// throw なし => form があるので、form 配下に div#diaryCommentbox 等がある（自分の日記）。
+				parseDiaryComment_sub(data_, form);
+			} catch(...) {
+				// throw あり => form がないので、div 配下に div#diaryComment 等がある。
+				parseDiaryComment_sub(data_, div);
+			}
+
+			// <form name="comment_form" ...> がある div 要素を探索する
+			const xml2stl::Node& divDiaryComment = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+															   .getNode(L"div", L"id=diaryComment");
+			for (size_t i=0; i<divDiaryComment.getChildrenCount(); i++) {
+				const xml2stl::Node& div2 = divDiaryComment.getNode(i);
+
 				try {
-					if (divDiaryCommentBox.getProperty(L"class") == L"diaryCommentbox" ||
-						divDiaryCommentBox.getProperty(L"class") == L"diaryCommentboxLast")
-					{
-						try {
-							const xml2stl::Node& dl = divDiaryCommentBox.getNode(L"dl");
-							
-							const xml2stl::Node& dt = dl.getNode(L"dt");
-							const xml2stl::Node& spanName = dt.getNode(L"span", L"class=commentTitleName");
-							const xml2stl::Node& spanDate = dt.getNode(L"span", L"class=commentTitleDate");
-							const xml2stl::Node& dd = dl.getNode(L"dd");
-
-							CMixiData comment_data;
-							
-							// コメント番号
-							comment_data.SetCommentIndex(comment_number++);
-
-							// 名前
-							ParserUtil::GetAuthor(spanName.getTextAll().c_str(), &comment_data);
-
-							// 時刻
-							ParserUtil::ParseDate(spanDate.getTextAll().c_str(), comment_data);
-
-							// コメント本文
-							comment_data.AddBody(_T("\r\n"));		// 改行出力
-							ParserUtil::AddBodyWithExtract(comment_data, dd.getTextAll().c_str());
-
-							data_.AddChild( comment_data );
-
-						} catch (xml2stl::NodeNotFoundException& e) {
-							MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
-						}
-					}
+					// div2 から form を探す
+					div2.getNode(L"form", L"name=comment_form");
+					// throw なし => 対象の form
 				} catch (...) {
+					// form なし
+
+					// 自分の日記の場合は、
+					// <div class="diaryMainArea02">
+					//  <div class="diaryCommentboxReply">
+					//   <form name="comment_form"
+					// となる。
+					try {
+						div2.getNode(L"div", L"class=diaryCommentboxReply");
+						// throw なし => 対象の div
+					} catch (...) {
+						// diaryCommentboxReply なし
+						continue;
+					}
 				}
+
+				CHtmlArray html;
+				html.Add( div2.getTextAll().c_str() );
+				parsePostURL( 0, data_, html );
 			}
 
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
 		}
+		return true;
+	}
+
+	static bool parseDiaryComment_sub(CMixiData& data_, const xml2stl::Node& div)
+	{
+		int comment_number = 1;
+
+		size_t n = div.getChildrenCount();
+		for (size_t i=0; i<n; i++) {
+			const xml2stl::Node& divDiaryCommentBox = div.getNode(i);
+			try {
+				if (divDiaryCommentBox.getProperty(L"class") == L"diaryCommentbox" ||
+					divDiaryCommentBox.getProperty(L"class") == L"diaryCommentboxLast")
+				{
+					try {
+						const xml2stl::Node& dl = divDiaryCommentBox.getNode(L"dl");
+						
+						const xml2stl::Node& dt = dl.getNode(L"dt");
+						const xml2stl::Node& spanName = dt.getNode(L"span", L"class=commentTitleName");
+						const xml2stl::Node& spanDate = dt.getNode(L"span", L"class=commentTitleDate");
+						const xml2stl::Node& dd = dl.getNode(L"dd");
+
+						CMixiData comment_data;
+						
+						// コメント番号
+						comment_data.SetCommentIndex(comment_number++);
+
+						// 名前
+						ParserUtil::GetAuthor(spanName.getTextAll().c_str(), &comment_data);
+
+						// 時刻
+						ParserUtil::ParseDate(spanDate.getTextAll().c_str(), comment_data);
+
+						// コメント本文
+						comment_data.AddBody(_T("\r\n"));		// 改行出力
+						ParserUtil::AddBodyWithExtract(comment_data, dd.getTextAll().c_str());
+
+						data_.AddChild( comment_data );
+
+					} catch (xml2stl::NodeNotFoundException& e) {
+						MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
+					}
+				}
+			} catch (...) {
+			}
+		}
+
 		return true;
 	}
 };

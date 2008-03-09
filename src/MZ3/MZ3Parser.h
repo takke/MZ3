@@ -172,7 +172,7 @@ public:
 					// ˆÈ~‚Ì‰ğÍ‚Í•s—vB
 					return;
 				}
-				continue;
+//				continue;
 			}
 			
 			// <input type="hidden" name="owner_id" value="yyy" />
