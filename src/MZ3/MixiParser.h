@@ -476,26 +476,33 @@ public:
 
 		data_.ClearAllList();
 
-		INT_PTR lastLine = html_.GetCount();
+		// html_ の文字列化
+		std::vector<TCHAR> text;
+		html_.TranslateToVectorBuffer( text );
 
-		// 自分の日記かどうかを判断する（名前の取得のため）
-		bool bMyDiary = true;
-		for( int i=170; i<min(100,lastLine); i++ ) {
-			const CString& line = html_.GetAt( i );
-			if( util::LineHasStringsNoCase( line, L"diaryTitleFriend" ) ) {
-				// 上記があるということは、自分の日記ではない。
-				bMyDiary = false;
-				break;
-			}
+		// XML 解析
+		xml2stl::Container root;
+		if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+			MZ3LOGGER_ERROR( L"XML 解析失敗" );
+			return false;
 		}
 
-		// 最初の10行目までを検索し、<title> タグを解析することで、
-		// タイトルを取得する
-		for( int i=3; i<min(10,lastLine); i++ ) {
-			const CString& line = html_.GetAt( i );
-			CString title;
-			if( util::GetBetweenSubString( line, L"<title>[mixi] ", L"</title>", title ) >= 0 ) {
-				// 発見。
+		try {
+			const xml2stl::Node& body = root.getNode( L"html" )
+											.getNode( L"body" );
+
+			const xml2stl::Node& bodyMainArea = body.getNode( L"div", L"id=bodyArea" )
+													.getNode( L"div", L"id=bodyMainArea" );
+
+			// <title> タグからタイトルを取得する
+			try {
+				// /html/head/title
+				const xml2stl::Node& titleNode = root.getNode(L"html")
+													 .getNode(L"head")
+													 .getNode(L"title");
+
+				CString title = titleNode.getTextAll().c_str();
+
 				// 自分の日記なら　　「<title>[mixi] タイトル</title>」
 				// 自分以外の日記なら「<title>[mixi] 名前 | タイトル</title>」
 				// という形式なので、タイトル部だけを抽出
@@ -507,201 +514,139 @@ public:
 					// 見つからなければ自分の日記と判断し、そのままタイトルに。
 				}
 				data_.SetTitle( title );
-			}
-		}
 
-		// 「最近の日記」の取得
-		bool bStartRecentDiary = false;
-		for( int iLine=300; iLine<lastLine; iLine++ ) {
-			// <h3>最近の日記</h3>
-			// があれば「最近の日記」開始とみなす。
-			const CString& line = html_.GetAt( iLine );
-			if( util::LineHasStringsNoCase( line, L"<h3>", L"最近の日記" ) ) {
-				bStartRecentDiary = true;
-				continue;
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"タイトル取得エラー : %s", e.getMessage().c_str()) );
 			}
 
-			if( bStartRecentDiary ) {
-				// </ul>
-				// があれば「最近の日記」終了とみなす。
-				if( util::LineHasStringsNoCase( line, L"</ul>" ) ) {
-					break;
-				}
+			// 「最近の日記」の取得
+			try {
+				// /html/body/div[2]/div/div[3]/div[2]/div[2]/ul
+				const xml2stl::Node& ul = bodyMainArea.getNode(L"div", L"id=bodyMainAreaSub")
+													  .getNode(L"div", L"class=newDiary")
+													  .getNode(L"div", L"class=contents")
+													  .getNode(L"ul");
 
-				// 解析
-				// 下記の形式で「最近の日記」リンクが存在する
-				// <li><a href="view_diary.pl?id=xxx&owner_id=xxx">たいとる</a></li>
-				if( util::LineHasStringsNoCase( line, L"view_diary.pl" ) ) {
-					CString url;
-					int idx = util::GetBetweenSubString( line, L"<a href=\"", L"\"", url );
-					if( idx >= 0 ) {
-						CString buf = line.Mid( idx );
-						// buf:
-						// >たいとる</a></li>
+				for (size_t i=0; i<ul.getChildrenCount(); i++) {
+					const xml2stl::Node& li = ul.getNode(i);
+					if (li.getName()==L"li") {
+						const xml2stl::Node& a = li.getNode(L"a");
+						CString title = a.getTextAll().c_str();
+						CString url   = a.getProperty(L"href").c_str();
 
-						// タイトル抽出
-						CString title;
-						if( util::GetBetweenSubString( buf, L">", L"<", title ) > 0 ) {
-							CMixiData::Link link( url, title );
-							data_.m_linkPage.push_back( link );
-						}
+						CMixiData::Link link( url, title );
+						data_.m_linkPage.push_back( link );
 					}
 				}
+
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"最近の日記 取得エラー : %s", e.getMessage().c_str()) );
 			}
-		}
 
-		// 日記本文＆コメント解析
-		bool bStartDiary = false;	// 日記本文開始フラグ
-		bool bEndDiary   = false;	// 日記本文終了フラグ
-//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
-		int iDivLevel	= 0;		// <div>ネストレベル
-//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
-		for (int i=180; i<lastLine; i++) {
-			const CString& line = html_.GetAt(i);
+			// 日時の取得
+			try {
+				// /html/body/div[2]/div/div[2]/div[2]/div/dl/dd
+				const xml2stl::Node& dd = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													  .getNode(L"div", L"class=viewDiaryBox")
+													  .getNode(L"div", L"class=listDiaryTitle")
+													  .getNode(L"dl")
+													  .getNode(L"dd");
 
-			if (bStartDiary == false) {
+				data_.SetDate( dd.getTextAll().c_str() );
 
-				//日時の抽出	
-				if( util::LineHasStringsNoCase( line, L"<dt>", L"<span>", L"edit_diary.pl" ) ) {
-					const CString& line2 = html_.GetAt( i+1 );
-					//<dd>2007年10月02日 22:22</dd>
-					CString date;
-					util::GetBetweenSubString( line2, L"<dd>", L"</dd>", date );
-					data_.SetDate( date );
-				}
-			
-				// 日記開始フラグを発見するまで廻す
-				if (util::LineHasStringsNoCase( line, L"<div id=\"diary_body\">" ) ) {
-					// 日記開始フラグ発見（日記本文発見）
-					bStartDiary = true;
-
-//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
-					iDivLevel	= 1;		// <div>ネストレベル初期化
-//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
-
-					// とりあえず改行出力
-					data_.AddBody(_T("\r\n"));
-
-					// 日記の著者
-					{
-						// フラグの５０行くらい前に、日記の著者があるはず。
-						//<div class="diaryTitle clearfix">
-						//<h2>たっけの日記</h2>
-						for( int iBack=-50; iBack<0; iBack++ ) {
-							const CString& line = html_.GetAt( i+iBack );
-							if (util::LineHasStringsNoCase(line, L"<h2>", L"</h2>")) {
-								// 自分の日記なら「XXXの日記」、自分以外なら「XXXさんの日記」のはず。
-								// この規則で著者を解析。
-								CString author;
-								if( bMyDiary ) {
-									util::GetBetweenSubString( line, L">", L"の日記<", author );
-								}else{
-									util::GetBetweenSubString( line, L">", L"さんの日記<", author );
-								}
-								// 著者設定
-								data_.SetAuthor( author );
-								data_.SetName( author );
-								break;
-							}
-						}
-					}
-
-					// 公開レベル
-					{
-						// フラグの５０行くらい前に、「友人まで公開」といった情報があるはず。
-						// <img src="http://img.mixi.jp/img/diary_icon1.gif" alt="友人まで公開" height="20" hspace="5" width="22"></td>
-					}
-
-					// 日記の添付画像取得
-					parseImageLink( data_, html_, i );
-
-					// "<div" の前を除去
-					CString str = line.Mid( line.Find(L"<div") );
-
-					// 現在の行を解析、追加。
-					CString before;
-					if( util::GetBeforeSubString( str, L"</div>", before ) > 0 ) {
-						// この１行で終わり
-						ParserUtil::AddBodyWithExtract( data_, before );
-						bEndDiary = true;
-//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
-						iDivLevel	= 0;		// <div>ネストレベルクリア（多分不要）
-//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
-					}else{
-						// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
-						if(! ParserUtil::ExtractVideoLinkFromScriptTag( data_, i, html_ ) ) {
-							// scriptタグ未発見なので、解析＆投入
-							ParserUtil::AddBodyWithExtract( data_, line );
-						}
-					}
-				}
-				else if (line.Find(_T("さんは外部ブログを使われています。")) != -1) {
-					// 外部ブログ解析
-					parseExternalBlog( data_, html_, i );
-					break;
-				}
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"日時の取得エラー : %s", e.getMessage().c_str()) );
 			}
-			else {
-				// 日記開始フラグ発見済み。
 
-				// 終了タグまでデータ取得
-				if (line.Find(_T("/viewDiaryBox")) != -1 ) {
-					bEndDiary = true;
-				}
-//+++++ #mo001 <div>タグ解析処理 +++++(B)+++++ moriyama 2008.03.08
-//（注）1行に1個ずつしか無いことを前提としている
-				if (line.Find(_T("<div")) != -1 ) {
-					iDivLevel++;
-				}
-
-				if (line.Find(_T("</div")) != -1 ) {
-					iDivLevel--;
-				}
-
-				if (0 == iDivLevel ) {
-					bEndDiary = true;
-				}
-
-				//if (line.Find(_T("</div>")) != -1 ) {
-				//	bEndDiary = true;
-				//}
-//+++++ #mo001 <div>タグ解析処理 +++++(E)+++++ moriyama 2008.03.08
-
-				// 終了タグまでデータ取得
-				if( bEndDiary == false ) {
-					// 本文終了タグ未発見
-					// 日記本文解析
-
-					// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
-					if(! ParserUtil::ExtractVideoLinkFromScriptTag( data_, i, html_ ) ) {
-						// scriptタグ未発見なので、解析＆投入
-						ParserUtil::AddBodyWithExtract( data_, line );
+			// 日記の著者
+			try {
+				// 自分の日記なら「XXXの日記」、自分以外なら「XXXさんの日記」のはず。
+				// この規則で著者を解析。
+				CString author;
+				for (size_t i=0; i<bodyMainArea.getChildrenCount(); i++) {
+					const xml2stl::Node& node = bodyMainArea.getNode(i);
+					const xml2stl::XML2STL_STRING& class_value = node.getProperty(L"class");
+					if (wcsstr(class_value.c_str(), L"diaryTitleFriend") != NULL) {
+						CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+						util::GetBetweenSubString( line, L">", L"さんの日記<", author );
+						break;
 					}
-
-				} else {
-					// 終了タグ発見
-					if (line.Find(_T("</div>")) != -1) {
-						ParserUtil::AddBodyWithExtract( data_, line );
-					}
-
-					// コメント取得
-					i += 10;
-					data_.ClearChildren();
-
-					int cmtNum = 0;		// コメント番号
-					int index = i;
-					while( index < lastLine ) {
-						cmtNum++;
-						index  = parseDiaryComment(index, lastLine, data_, html_, cmtNum);
-						if (index == -1) {
-							break;
-						}
-					}
-					if (index == -1 || index >= lastLine) {
+					if (wcsstr(class_value.c_str(), L"diaryTitle") != NULL) {
+						CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+						util::GetBetweenSubString( line, L">", L"の日記<", author );
 						break;
 					}
 				}
+
+				// 著者設定
+				data_.SetAuthor( author );
+				data_.SetName( author );
+
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"日記の著者の取得エラー : %s", e.getMessage().c_str()) );
 			}
+
+			// とりあえず改行出力
+			data_.AddBody(_T("\r\n"));
+
+			// 日記の添付写真
+			try {
+				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"class=viewDiaryBox")
+													   .getNode(L"div", L"class=txtconfirmArea")
+													   .getNode(L"div", L"class=diaryPhoto");
+
+				CString subHtml = div.getTextAll().c_str();
+				ParserUtil::AddBodyWithExtract( data_, subHtml );
+
+				// 改行
+				data_.AddBody(_T("\r\n"));
+			} catch (xml2stl::NodeNotFoundException& e) {
+				// 写真がなかったと判断する
+				MZ3LOGGER_INFO( util::FormatString( L"写真の取得エラー : %s", e.getMessage().c_str()) );
+			}
+
+			// 本文取得
+			try {
+				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"class=viewDiaryBox")
+													   .getNode(L"div", L"class=txtconfirmArea")
+													   .getNode(L"div", L"id=diary_body");
+
+				CString subHtml = div.getTextAll().c_str();
+
+				// script タグの除去
+				{
+					static MyRegex reg;
+					if( !util::CompileRegex( reg, L"<script.*?>" ) ) {
+						return false;
+					}
+					if( subHtml.Find( L"<script" ) != -1 ) 
+						reg.replaceAll( subHtml, L"" );
+				}
+				while( subHtml.Replace(_T("</script>"), _T("")) );
+
+				ParserUtil::AddBodyWithExtract( data_, subHtml );
+			} catch (xml2stl::NodeNotFoundException& e) {
+				// 外部ブログかもしれない
+				try {
+					const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"class=messageArea")
+														   .getNode(L"div", L"class=alertArea");
+					
+					CString subHtml = div.getTextAll().c_str();
+					ParserUtil::AddBodyWithExtract( data_, subHtml );
+
+				} catch (xml2stl::NodeNotFoundException& e) {
+					MZ3LOGGER_ERROR( util::FormatString( L"外部ブログの取得エラー : %s", e.getMessage().c_str()) );
+				}
+				MZ3LOGGER_ERROR( util::FormatString( L"本文の取得エラー : %s", e.getMessage().c_str()) );
+			}
+
+			// コメント取得
+			parseDiaryComment(data_, bodyMainArea);
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"body not found... : %s", e.getMessage().c_str()) );
+			return false;
 		}
 
 		MZ3LOGGER_DEBUG( L"ViewDiaryParser.parse() finished." );
@@ -709,160 +654,62 @@ public:
 	}
 
 private:
-	/// 外部ブログ解析
-	static bool parseExternalBlog( CMixiData& mixi_, const CHtmlArray& html_, int i )
+	/**
+	 * コメントの取得
+	 */
+	static bool parseDiaryComment(CMixiData& data_, const xml2stl::Node& bodyMainArea)
 	{
-		// 外部ブログフラグを立てる
-		mixi_.SetOtherDiary(TRUE);
+		try {
+			int comment_number = 1;
+			const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+												   .getNode(L"div", L"id=diaryComment")
+												   .getNode(L"div", L"class=diaryMainArea02");
 
-		// とりあえず改行
-		mixi_.AddBody(_T("\r\n"));
+			size_t n = div.getChildrenCount();
+			for (size_t i=0; i<n; i++) {
+				const xml2stl::Node& divDiaryCommentBox = div.getNode(i);
+				try {
+					if (divDiaryCommentBox.getProperty(L"class") == L"diaryCommentbox" ||
+						divDiaryCommentBox.getProperty(L"class") == L"diaryCommentboxLast")
+					{
+						try {
+							const xml2stl::Node& dl = divDiaryCommentBox.getNode(L"dl");
+							
+							const xml2stl::Node& dt = dl.getNode(L"dt");
+							const xml2stl::Node& spanName = dt.getNode(L"span", L"class=commentTitleName");
+							const xml2stl::Node& spanDate = dt.getNode(L"span", L"class=commentTitleDate");
+							const xml2stl::Node& dd = dl.getNode(L"dd");
 
-		// 本文解析
-		int lastLine = html_.GetCount();
-		for (; i<lastLine; i++ ) {
-			const CString& line = html_.GetAt(i);
+							CMixiData comment_data;
+							
+							// コメント番号
+							comment_data.SetCommentIndex(comment_number++);
 
-			if (util::LineHasStringsNoCase(line, L"</div>")) {
-				break;
+							// 名前
+							ParserUtil::GetAuthor(spanName.getTextAll().c_str(), &comment_data);
+
+							// 時刻
+							ParserUtil::ParseDate(spanDate.getTextAll().c_str(), comment_data);
+
+							// コメント本文
+							comment_data.AddBody(_T("\r\n"));		// 改行出力
+							ParserUtil::AddBodyWithExtract(comment_data, dd.getTextAll().c_str());
+
+							data_.AddChild( comment_data );
+
+						} catch (xml2stl::NodeNotFoundException& e) {
+							MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
+						}
+					}
+				} catch (...) {
+				}
 			}
 
-			// 本文追加
-			ParserUtil::AddBodyWithExtract(mixi_, line);
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
 		}
-
 		return true;
 	}
-
-	/// 日記の添付画像取得
-	static bool parseImageLink( CMixiData& data_, const CHtmlArray& html_, int iLine_ )
-	{
-		// フラグのN行前に画像リンクがあるかも。
-		int n_images_begin = -25;
-		int n_images_end   = -1;
-		bool bImageFound = false;
-		for( int iBack=n_images_begin; iBack<=n_images_end; iBack++ ) {
-			if( iLine_+iBack >= html_.GetCount() ) {
-				break;
-			}
-			CString line = html_.GetAt( iLine_ +iBack );
-			if (line.Find(_T("MM_openBrWindow('")) != -1) {
-				// 画像発見。
-				// 追加。
-
-				// 先頭のタブを削除するために "<" 以前を削除
-				int index = line.Find( L"<" );
-				if( index > 0 ) {
-					line = line.Mid( index );
-				}
-
-				ParserUtil::AddBodyWithExtract( data_, line );
-
-				bImageFound = true;
-			}
-		}
-		if( bImageFound ) {
-			// 画像があれば、その後ろに改行を追加しておく。
-			data_.AddBody(L"\r\n");
-		}
-		return bImageFound;
-	}
-
-	/**
-	 * コメント取得
-	 *
-	 * @param sIndex [in] 開始インデックス
-	 * @param eIndex [in] 終了インデックス
-	 * @param data   [in/out] CMixiData* データ
-	 * @param cmtNum [in] コメント番号
-	 */
-	static int parseDiaryComment(int sIndex, int eIndex, CMixiData& data_, const CHtmlArray& html_, int cmtNum)
-	{
-		CString name;
-		CString date;
-		CString comment;
-
-		CString str;
-
-		BOOL findFlag = FALSE;
-
-		int retIndex = eIndex;
-
-		CMixiData cmtData;		// コメントデータ
-
-		int index;
-		CString buf;
-
-		for (int i=sIndex; i<eIndex; i++) {
-			str = html_.GetAt(i);
-
-			if (findFlag == FALSE) {
-				if( util::LineHasStringsNoCase( str, L"add_comment.pl" ) ||	// コメントなし
-					util::LineHasStringsNoCase( str, L"<!--/comment-->" ) ) // コメント全体の終了タグ発見
-				{
-					parsePostURL( i, data_, html_ );
-					return -1;
-				}
-
-				if ((index = str.Find(_T("show_friend.pl"))) != -1) {
-					// コメントヘッダ取得
-
-					// ＩＤ
-					cmtData.SetCommentIndex(cmtNum);
-
-					// 名前
-					buf = str.Mid(index);
-					ParserUtil::GetAuthor(buf, &cmtData);
-
-					// 時刻
-					for (int j=i+3; j>0; j--) {
-						str = html_.GetAt(j);
-						if (str.Find(_T("日&nbsp;")) != -1) {
-							ParserUtil::ParseDate(str, cmtData);
-							break;
-						}
-					}
-
-					findFlag = TRUE;
-
-				}
-			}
-			else {
-
-				if (str.Find(_T("<dd>")) != -1) {
-					// コメント本文取得
-					i++;
-					str = html_.GetAt(i);
-
-					if (str.Find(_T("<dd>")) != 0) {
-						cmtData.AddBody(_T("\r\n"));
-					}
-
-					ParserUtil::AddBodyWithExtract( cmtData, str );
-
-					i++;
-					for( ; i<eIndex; i++ ) {
-						str = html_.GetAt(i);
-						if (str.Find(_T("</dd>")) != -1) {
-							// 終了タグが出てきたのでここで終わり
-							retIndex = i+5;
-							break;
-						}
-
-						ParserUtil::AddBodyWithExtract( cmtData, str );
-					}
-					break;
-				}
-			}
-
-		}
-
-		if( findFlag ) {
-			data_.AddChild(cmtData);
-		}
-		return retIndex;
-	}
-
 };
 
 

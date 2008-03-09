@@ -255,6 +255,25 @@ public:
 		throw NodeNotFoundException(stream.str());
 	}
 
+	/**
+	 * example : getNode( L"div", L"id=bodyArea" );
+	 */
+	const Node& getNode( const XML2STL_STRING& name, const XML2STL_STRING& prop_name_value ) const
+	{
+		XML2STL_STRING::size_type idxEq = prop_name_value.find( '=' );
+		if (idxEq==XML2STL_STRING::npos) {
+			std::wostringstream stream;
+			stream << L"internal error. at getNode, name[" << name << L"], prop_name_value[" << prop_name_value << L"]";
+			_dumpChildren(stream);
+			throw NodeNotFoundException(stream.str());
+		}
+
+		// ˆÏ÷
+		XML2STL_STRING prop_name  = prop_name_value.substr( 0, idxEq );
+		XML2STL_STRING prop_value = prop_name_value.substr( idxEq+1 );
+		return getNode( name, Property(prop_name, prop_value) );
+	}
+
 	const Node& getNode( const XML2STL_STRING& name, const Property& prop ) const
 	{
 		size_t n = children.size();
