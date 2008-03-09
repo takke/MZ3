@@ -7,6 +7,7 @@
 #pragma once
 
 #include "MZ3Parser.h"
+#include "xml2stl.h"
 
 /// mixi 用HTMLパーサ
 namespace mixi {

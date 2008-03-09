@@ -251,6 +251,7 @@ public:
 
 		std::wostringstream stream;
 		stream << L"node not found... name[" << name << L"], index[" << index << L"]";
+		_dumpChildren(stream);
 		throw NodeNotFoundException(stream.str());
 	}
 
@@ -270,8 +271,10 @@ public:
 				}
 			}
 		}
+
 		std::wostringstream stream;
 		stream << L"node not found... name[" << name << L"], property[" << prop.name + L"=" << prop.text << L"]";
+		_dumpChildren(stream);
 		throw NodeNotFoundException(stream.str());
 	}
 
@@ -279,6 +282,42 @@ public:
 //	{
 //		this->name_or_text = text;
 //	}
+
+private:
+	void _dumpChildren(std::wostringstream& stream) const
+	{
+		stream << L" children[";
+
+		bool bDumpFirst = true;
+		size_t n = children.size();
+		for (size_t i=0; i<n; i++) {
+			if (children[i].type == XML2STL_TYPE_NODE) {
+				if (!bDumpFirst) {
+					stream << L"\r\n";
+				}
+				stream << L"<";
+				stream << children[i].name_or_text;
+				if (!children[i].properties.empty()) {
+					stream << L" ";
+					size_t nProperties = children[i].properties.size();
+					for (size_t j=0; j<nProperties; j++) {
+						if (j>0) {
+							stream << L" ";
+						}
+						stream << children[i].properties[j].name.c_str();
+						stream << L"=\"";
+						stream << children[i].properties[j].text.c_str();
+						stream << L"\"";
+					}
+				}
+				stream << L">";
+
+				bDumpFirst = false;
+			}
+		}
+
+		stream << L"]";
+	}
 };
 
 inline void dump_nest( FILE* fp, int nest_level )

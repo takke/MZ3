@@ -8,6 +8,7 @@
 #include "MZ3.h"
 #include "TwitterParser.h"
 #include <set>
+#include "xml2stl.h"
 
 /// Twitter 用パーサ
 namespace twitter {

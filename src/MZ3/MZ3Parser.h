@@ -9,7 +9,6 @@
 #include "MyRegex.h"
 #include "HtmlArray.h"
 #include "MixiParserUtil.h"
-#include "xml2stl.h"
 
 /// MZ3用HTMLパーサ
 namespace mz3parser {
