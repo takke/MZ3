@@ -554,7 +554,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 									  szMethodName,	// メソッド
 									  m_strPath,
 									  szHttpVersion,// HTTP バージョン
-									  m_ref,		// 履歴なし
+									  m_ref,		// リファラ
 									  NULL,
 									  dwFlags,		// フラグ
 									  NULL);		// コンテキストなし
@@ -580,6 +580,11 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		return WM_MZ3_GET_ERROR;
 	}
 
+	// リファラ設定
+	if (!m_ref.IsEmpty()) {
+		CString referer = L"Referer: " + m_ref + L"\r\n";
+		HttpAddRequestHeaders( m_hRequest, referer, -1, HTTP_ADDREQ_FLAG_ADD );
+	}
 
 	// --------------------------------------------------
 	// 中断確認
