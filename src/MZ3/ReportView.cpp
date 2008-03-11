@@ -1297,6 +1297,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_EVENT_MEMBER:
 	case ACCESS_PROFILE:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
@@ -1338,7 +1339,10 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 		theApp.m_accessType = m_data.GetAccessType();
 		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
 		return true;
+
 	default:
+		m_infoEdit.ShowWindow(SW_SHOW);
+		util::MySetInformationText( m_hWnd, L"未サポートのURLです：" + link.url );
 		return false;
 	}
 

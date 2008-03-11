@@ -57,17 +57,18 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 {
 	switch (aType) {
-	case ACCESS_DIARY:		mixi::ViewDiaryParser::parse( mixi, html );		break;
-	case ACCESS_BBS:		mixi::ViewBbsParser::parse( mixi, html );		break;
-	case ACCESS_ENQUETE:	mixi::ViewEnqueteParser::parse( mixi, html );	break;
-	case ACCESS_EVENT:		mixi::ViewEventParser::parse( mixi, html );		break;
-	case ACCESS_PROFILE:	mixi::ShowFriendParser::parse( mixi, html );	break;
-	case ACCESS_MYDIARY:	mixi::ViewDiaryParser::parse( mixi, html );		break;
-	case ACCESS_MESSAGE:	mixi::ViewMessageParser::parse( mixi, html );	break;
-	case ACCESS_NEWS:		mixi::ViewNewsParser::parse( mixi, html );		break;
-	case ACCESS_HELP:		mixi::HelpParser::parse( mixi, html );			break;
-	case ACCESS_ERRORLOG:	mixi::ErrorlogParser::parse( mixi, html );		break;
-	case ACCESS_PLAIN:		mixi::PlainTextParser::parse( mixi, html );		break;
+	case ACCESS_DIARY:			mixi::ViewDiaryParser::parse( mixi, html );			break;
+	case ACCESS_BBS:			mixi::ViewBbsParser::parse( mixi, html );			break;
+	case ACCESS_ENQUETE:		mixi::ViewEnqueteParser::parse( mixi, html );		break;
+	case ACCESS_EVENT:			mixi::ViewEventParser::parse( mixi, html );			break;
+	case ACCESS_EVENT_MEMBER:	mixi::ListEventMemberParser::parse( mixi, html );	break;
+	case ACCESS_PROFILE:		mixi::ShowFriendParser::parse( mixi, html );		break;
+	case ACCESS_MYDIARY:		mixi::ViewDiaryParser::parse( mixi, html );			break;
+	case ACCESS_MESSAGE:		mixi::ViewMessageParser::parse( mixi, html );		break;
+	case ACCESS_NEWS:			mixi::ViewNewsParser::parse( mixi, html );			break;
+	case ACCESS_HELP:			mixi::HelpParser::parse( mixi, html );				break;
+	case ACCESS_ERRORLOG:		mixi::ErrorlogParser::parse( mixi, html );			break;
+	case ACCESS_PLAIN:			mixi::PlainTextParser::parse( mixi, html );			break;
 	}
 }
 
