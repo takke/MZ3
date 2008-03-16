@@ -748,10 +748,23 @@ alt="" /></a></td>
 			return;
 		}
 
+		static MyRegex reg2;
+		if( !util::CompileRegex( reg2, L"player\\.push\\(\\{([^\\)]+)\\}\\);" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+
+		static MyRegex reg3;
+		if( !util::CompileRegex( reg3, L"Event\\.observe\\(.*\\)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+
 		CString target = line;
 		line = L"";
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			if( !reg.exec(target) || reg.results.size() != 2 ) {
+			// player.push({云々});を探す
+			if( !reg2.exec(target) || reg2.results.size() != 2 ) {
 				// 未発見。
 				// 残りの文字列を代入して終了。
 				line += target;
@@ -759,27 +772,43 @@ alt="" /></a></td>
 			}
 
 			// 発見。
-			std::vector<MyRegex::Result>& results = reg.results;
+			std::vector<MyRegex::Result>& results2 = reg2.results;
 
 			// マッチ文字列全体の左側を出力
-			line.Append( target, results[0].start );
+			line.Append( target, results2[0].start );
 
-			CString text = L"<<動画>>";
+			// マッチ文字列の中で動画リンクをさがす
+			if( reg.exec( results2[1].str.c_str() ) && reg.results.size() == 2 ) {
+				// 発見
+				std::vector<MyRegex::Result>& results = reg.results;
 
-			// url を追加
-			LPCTSTR url = results[1].str.c_str();
-			
-			//動画を追加
-			data_.AddMovie( url );
+				CString text = L"<<動画>>";
 
-			// 置換
-			line.Append( text );
+				// url を追加
+				LPCTSTR url = results[1].str.c_str();
+				
+				//動画を追加
+				data_.AddMovie( url );
 
-			// とりあえず改行
-			line += _T("<br>");
+				// 置換ｆ
+				line.Append( text );
+
+				// とりあえず改行
+				line += _T("<br>");
+			}
 
 			// ターゲットを更新。
-			target.Delete( 0, results[0].end );
+			target.Delete( 0, results2[0].end );
+
+			// Event.observe(云々) があれば消す
+			if( reg3.exec(target) && reg3.results.size() != 0 ) {
+				// 発見。
+				std::vector<MyRegex::Result>& results3 = reg3.results;
+				// ターゲットを更新。
+				target.Delete( results3[0].start , results3[0].end );
+			}
+
+
 		}
 	}
 
