@@ -1332,7 +1332,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 			mixi.SetAccessType( estimatedAccessType );
 			
 			m_data = mixi;
-			m_data.SetBrowseUri(link.url);
+			m_data.SetBrowseUri(util::CreateMixiUrl(link.url));
 		}
 		theApp.m_inet.Initialize( m_hWnd, NULL );
 
