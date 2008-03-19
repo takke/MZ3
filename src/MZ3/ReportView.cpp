@@ -1397,6 +1397,9 @@ void CReportView::OnLoadUrl(UINT nID)
 	// mixi 内リンクであればここでロードする。
 	if (MyLoadMixiViewPage( m_currentData->m_linkList[idx] )) {
 		return;
+	} else {
+		// mixi内リンクでなければエラーが表示されているので隠す
+		m_infoEdit.ShowWindow(SW_HIDE);
 	}
 
 	LPCTSTR url  = m_currentData->m_linkList[idx].url;
