@@ -116,4 +116,63 @@ public:
 			target.Delete( 0, results[0].end );
 		}
 	}
+
+	/**
+	 * タグの変換
+	 * bodyArrayをサーチしてHTMLタグをらんらんビュータグに変換する
+	 */
+	static void ReplaceHTMLTagToRan2ImageTags( const CString fromTag, const CString toTag, CStringArray* bodyArray )
+	{
+
+		size_t taglen = fromTag.GetLength();
+
+		for( int i=0 ; i<= bodyArray->GetUpperBound() ; i++ ){
+			CString line;
+			line = bodyArray->GetAt( i );
+
+			int idx = 0;
+			do {
+				idx = line.Find( fromTag , idx );
+				if( idx < 0 ) {
+					break;
+				} else {
+					if( idx > 0 ){
+						bodyArray->InsertAt( i++ , line.Left( idx ) );
+						line.Delete( 0 , idx );
+					}
+					bodyArray->InsertAt( i++ , toTag );
+					line.Delete( 0 , taglen );
+					bodyArray->SetAt( i , line );
+					idx += taglen;
+				}
+			} while( idx>= 0 && idx <= line.GetLength() );
+		}
+	}
+
+	/**
+	 * タグの変換
+	 * blockquoteタグの前を強制的に改行する
+	 */
+	static void InsertBRTagToBeforeblockquoteTag( CStringArray* bodyArray )
+	{
+
+		CString lastline = TEXT("");
+
+		for( int i=0 ; i<= bodyArray->GetUpperBound() ; i++ ){
+			CString line;
+			line = bodyArray->GetAt( i );
+
+			if( line == TEXT("[blockquote]") ||
+				line == TEXT("[/blockquote]")) {
+				if( lastline != TEXT("[br]") ){
+					bodyArray->InsertAt( i++ , TEXT("[br]") );
+					lastline = TEXT("[br]");;
+					line = bodyArray->GetAt( i );
+				}
+			}
+
+			lastline = line;
+			
+		}
+	}
 };

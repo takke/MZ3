@@ -578,6 +578,15 @@ void CReportView::ShowCommentData(CMixiData* data)
 //	}
 //	TRACE( L"■---dump end---\r\n" );
 
+	// HTMLタグをらんらんビュータグに変換する
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<strong>") , TEXT("[b]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</strong>") , TEXT("[/b]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<blockquote>") , TEXT("[blockquote]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</blockquote>") , TEXT("[/blockquote]") , bodyStrArray );
+
+	// blockquoteの前に改行を入れる
+	ViewFilter::InsertBRTagToBeforeblockquoteTag( bodyStrArray );
+
 	// 描画開始
 	m_edit.ShowWindow(SW_HIDE);
 	m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());

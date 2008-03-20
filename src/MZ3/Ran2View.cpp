@@ -21,6 +21,7 @@ IMPLEMENT_DYNAMIC(Ran2View, CWnd)
 COLORREF solidBlack = COLORREF(RGB(0x00,0x00,0x00));
 COLORREF solidBlue = RGB(0x00,0x00,0xFF);
 COLORREF solidWhite = RGB(0xFF,0xFF,0xFF);
+COLORREF solidPink = RGB(0xFF,0xC0,0xCB);
 COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
 COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
@@ -757,10 +758,10 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		Tag_level0, Tag_level1,	Tag_level2,	
 		Tag_kakomi_blue, Tag_kakomi_gray, Tag_kakomi_gray2, 
 		Tag_kakomi_white, Tag_kakomi_white2,
-		Tag_bold,
+		Tag_bold, Tag_blockquote,
 	// 終了タグ
 		Tag_end_p, Tag_end_blue, Tag_end_underline,
-		Tag_end_sub, Tag_end_sup, Tag_end_b,
+		Tag_end_sub, Tag_end_sup, Tag_end_b, Tag_end_blockquote,
 		Tag_end_link, 
 		Tag_end_h1, Tag_end_h2, Tag_end_h3, 
 		Tag_end_kakomi_blue, Tag_end_kakomi_gray, Tag_end_kakomi_gray2, 
@@ -777,10 +778,10 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		TEXT("level0"), TEXT("level1"),	TEXT("level2"), 
 		TEXT("kakomi_blue"), TEXT("kakomi_gray"), TEXT("kakomi_gray2"), 
 		TEXT("kakomi_white"), TEXT("kakomi_white2"),
-		TEXT("b"),
+		TEXT("b"), TEXT("blockquote"),
 	// 終了タグ(15個)
 		TEXT("end_p"), TEXT("end_blue"), TEXT("end_underline"),
-		TEXT("end_sub"), TEXT("end_sup"), TEXT("end_b"), 
+		TEXT("end_sub"), TEXT("end_sup"), TEXT("end_b"), TEXT("end_blockquote"),
 		TEXT("end_link"), 
 		TEXT("end_h1"), TEXT("end_h2"), TEXT("end_h3"),	
 		TEXT("end_kakomi_blue"), TEXT("end_kakomi_gray"), TEXT("end_kakomi_gray2"), 
@@ -802,7 +803,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 				currentTag == Tag_h3 ||
 				currentTag == Tag_level0 ||
 				currentTag == Tag_level1 ||
-				currentTag == Tag_level2 )
+				currentTag == Tag_level2 ||
+				currentTag == Tag_blockquote )
 			{
 				processState = ProcessState_BOL;
 			}			
@@ -811,7 +813,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 			if( currentTag == Tag_end_p ||
 				currentTag == Tag_end_h1 || 
 				currentTag == Tag_end_h2 ||
-				currentTag == Tag_end_h3 )
+				currentTag == Tag_end_h3)
 			{
 				processState = ProcessState_EOL;
 			}
@@ -875,6 +877,16 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		bigBridgeInfo->frameProperty[nestLevel].backgroundColor = solidWhite;		// 背景色
 		bigBridgeInfo->frameProperty[nestLevel].penColor = solidBlue;				// 枠色
 		bigBridgeInfo->frameTopThrough = false;
+
+	// 囲みの設定([blockquote]:ワク線なし、背景がピンク)
+	}else if( currentTag == Tag_blockquote ){
+		bigBridgeInfo->frameNestLevel++;
+
+		int nestLevel = bigBridgeInfo->frameNestLevel;
+		bigBridgeInfo->frameProperty[nestLevel].frameType = FrameType_open;		// ワクの種別
+		bigBridgeInfo->frameProperty[nestLevel].backgroundColor = solidPink;		// 背景色
+		bigBridgeInfo->frameProperty[nestLevel].penColor = solidPink;				// 枠色
+		bigBridgeInfo->frameTopThrough = false;
 	}
 
 	// ワク情報の転記
@@ -886,7 +898,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 	// 囲みの終了(ワクあり)
 	if( currentTag == Tag_end_kakomi_gray2 || currentTag == Tag_end_kakomi_white ||
-			currentTag == Tag_end_kakomi_white2 ){
+			currentTag == Tag_end_kakomi_white2 || currentTag == Tag_end_blockquote ){
 
 		int currentlevel = bigBridgeInfo->frameNestLevel;
 		bigBridgeInfo->frameProperty[currentlevel].frameType = FrameType_stool;
@@ -896,7 +908,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 	// 囲みの終了(ワク無し)
 	}else if( currentTag == Tag_end_kakomi_blue || currentTag == Tag_end_kakomi_gray ||
 			currentTag == Tag_end_kakomi_gray2 || currentTag == Tag_end_kakomi_white ||
-			currentTag == Tag_end_kakomi_white2 || currentTag == Tag_end_h1 || currentTag == Tag_end_h2 ){
+			currentTag == Tag_end_kakomi_white2 || currentTag == Tag_end_h1 || 
+			currentTag == Tag_end_h2 ){
 
 		// ワク情報のクリア 
 		int currentlevel = bigBridgeInfo->frameNestLevel;
@@ -1162,6 +1175,10 @@ void Ran2View::AddNewRowProperty(CPtrArray* rowPropertyArray,bool forceNewRow)
 	newRowRecord->rowNumber = rowPropertyArray->GetSize(); // 行番号を設定
 	newRowRecord->breakLimitPixel = screenWidth - NormalWidthOffset - (leftOffset*2);
 
+	// framePropertyを初期化
+	newRowRecord->frameProperty[0].frameType = FrameType_nothing;
+	newRowRecord->frameProperty[1].frameType = FrameType_nothing;
+
 	rowPropertyArray->Add(newRowRecord);
 }
 
@@ -1312,11 +1329,11 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 		if( row != NULL ){
 //			TRACE(TEXT("%dの描画を開始します\r\n"), targetLine);
 			// フレームの描画。画像が設定されていたら描画しない
-/*
+
 			if( row->imageProperty.imageNumber == -1 ){
 				this->DrawFrameProperty(i,row);
 			}
-*/
+
 			// テキスト要素の出力(下線、リンク下線、セロハン含む)
 			this->DrawTextProperty(i,row->textProperties);
 
@@ -1353,7 +1370,8 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 		if(	rowProperty->frameProperty[i].frameType != FrameType_nothing ){
 			CRect drawRect;
 			// bottomの時以外に限って背景を描画
-			if( rowProperty->frameProperty[i].frameType != FrameType_stool ){ 
+			if( !(( rowProperty->frameProperty[i].frameType == FrameType_stool ) &&
+				( rowProperty->textProperties->GetCount() == 0)) ){ 
 				// 背景色の描画
 				CBrush backBrush(rowProperty->frameProperty[i].backgroundColor);
 				int sx = leftOffset + (i * frameOffset);
@@ -1383,12 +1401,26 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 			}else if( rowProperty->frameProperty[i].frameType == FrameType_stool ){
 				int sx = leftOffset + (i * frameOffset);
 				int ex = (screenWidth - NormalWidthOffset) - leftOffset - (i * frameOffset);
-				// 終行は次の行と連結されてしまうので-1行する
-				int sy = m_drawStartTopOffset + topOffset + ((line-1)*(charHeight+charHeightOffset));
+				int sy;
+				if( rowProperty->textProperties->GetCount() == 0 ){
+					// 終行は次の行と連結されてしまうので-1行する
+					sy = m_drawStartTopOffset + topOffset + ((line-1)*(charHeight+charHeightOffset));
+				} else {
+					// 終行にテキストがある場合はそのまま
+					sy = m_drawStartTopOffset + topOffset + ((line)*(charHeight+charHeightOffset));
+				}
 				int ey = sy + (charHeight+charHeightOffset);
 				CRect drawRect = CRect(sx,sy,ex,ey);
 
 				CPen* oldPen = memDC->SelectObject(&framePen);
+				if( rowProperty->textProperties->GetCount() != 0 ){
+					// 終行にテキストがある場合は左右の枠線を描画する
+					memDC->MoveTo(drawRect.left,drawRect.top);
+					memDC->LineTo(drawRect.left,drawRect.bottom);
+
+					memDC->MoveTo(drawRect.right,drawRect.top);
+					memDC->LineTo(drawRect.right,drawRect.bottom);
+				}
 				memDC->MoveTo(drawRect.left,drawRect.bottom-framePixel);
 				memDC->LineTo(drawRect.right,drawRect.bottom-framePixel);
 				memDC->SelectObject(oldPen);
@@ -1602,6 +1634,10 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 			hashRecord->key = TEXT("blue");
 		}else if( lineStr.Compare(TEXT("[/blue]")) == 0 ) {
 			hashRecord->key = TEXT("end_blue");
+		}else if( lineStr.Compare(TEXT("[blockquote]")) == 0 ) {
+			hashRecord->key = TEXT("blockquote");
+		}else if( lineStr.Compare(TEXT("[/blockquote]")) == 0 ) {
+			hashRecord->key = TEXT("end_blockquote");
 		}else{
 			hashRecord->key = TEXT("text");
 		}
