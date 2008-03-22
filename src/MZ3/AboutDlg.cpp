@@ -28,15 +28,9 @@ BOOL CAboutDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 #ifndef WINCE
-	// バージョン番号
-	CWnd* item = NULL;
-	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
-		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
 
-		CString version = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
-		version += util::GetSourceRevision();
-		item->SetWindowTextW( version );
-	}
+	// 定型文字列の置換
+	MyReplaceText();
 
 	// 総データ受信量
 	SetTotalBytes();
@@ -67,16 +61,8 @@ void CAboutDlg::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 						DRA::GetDisplayMode() != DRA::Portrait ? MAKEINTRESOURCE(IDD_ABOUTBOX_WIDE) : MAKEINTRESOURCE(IDD_ABOUTBOX));
 #endif
 
-	CWnd* item = NULL;
-
-	// バージョン番号
-	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
-		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
-
-		CString version = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
-		version += util::GetSourceRevision();
-		item->SetWindowTextW( version );
-	}
+	// 定型文字列の置換
+	MyReplaceText();
 
 	// 総データ受信量
 	SetTotalBytes();
@@ -141,4 +127,32 @@ BOOL CAboutDlg::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+/**
+ * 定型文字列の置換
+ */
+void CAboutDlg::MyReplaceText(void)
+{
+	// バージョン番号
+	CWnd* item = NULL;
+	if( (item=GetDlgItem( IDC_STATIC_2 )) != NULL ) {
+		// リビジョン文字列から番号のみを抽出し、バージョン番号に埋め込む
+
+		CString version = MZ3_APP_NAME L" " MZ3_VERSION_TEXT;
+		version += util::GetSourceRevision();
+		item->SetWindowTextW( version );
+	}
+
+	// 年表記
+	if( (item=GetDlgItem( IDC_STATIC_COPYRIGHT1 )) != NULL ) {
+		CString s;
+		item->GetWindowTextW( s );
+
+		CString year;
+		year = CStringA(__DATE__).Mid(7,4);	// "Mar 22 2008"
+
+		s.Replace( L"{YEAR}", year );
+		item->SetWindowTextW( s );
+	}
 }

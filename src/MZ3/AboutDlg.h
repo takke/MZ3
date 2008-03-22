@@ -40,5 +40,6 @@ public:
 	afx_msg void OnBnClickedResetTotalRecvBytesButton();
 	void SetTotalBytes(void);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	void MyReplaceText(void);
 };
 
