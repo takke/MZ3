@@ -710,16 +710,21 @@ void CMainFrame::OnEnableIntervalCheck()
 {
 	if (theApp.m_optionMng.m_bEnableIntervalCheck == false) {
 		// 有効になったので、メッセージを表示する
-		CString msg;
-		msg.Format( 
-			L"定期取得機能は、カテゴリの項目を定期的に取得する機能です。\n"
-			L"\n"
-//			L"・フォーカスがカテゴリリスト（メイン画面上側のリスト）にある場合のみ有効です。\n"
-			L"・メイン画面を開いている場合のみ有効です。\n"
-			L"・取得間隔はオプション画面で設定できます。\n"
-			L"　（現在の取得間隔は【%d秒】です）\n"
-			, theApp.m_optionMng.m_nIntervalCheckSec );
-		MessageBox( msg );
+		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) ||
+			(GetAsyncKeyState(VK_SHIFT) & 0x8000))
+		{
+			// Ctrl や Shift 押下時にはダイアログを出さない
+		} else {
+			CString msg;
+			msg.Format( 
+				L"定期取得機能は、カテゴリの項目を定期的に取得する機能です。\n"
+				L"\n"
+				L"・メイン画面を開いている場合のみ有効です。\n"
+				L"・取得間隔はオプション画面で設定できます。\n"
+				L"　（現在の取得間隔は【%d秒】です）"
+				, theApp.m_optionMng.m_nIntervalCheckSec );
+			MessageBox( msg );
+		}
 
 		// 設定する
 		theApp.m_pMainView->ResetIntervalTimer();
