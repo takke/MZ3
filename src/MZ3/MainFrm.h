@@ -48,6 +48,8 @@ protected:
 public:
 	afx_msg void OnBackButton();
 	afx_msg void OnForwardButton();
+	afx_msg void OnAutoReloadButton();
+
 	inline afx_msg void OnStopButton() {
 		::SendMessage(GetActiveView()->m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 	};
@@ -58,6 +60,7 @@ public:
 	void OnUpdateImageButton(CCmdUI*);
 	void OnUpdateWriteButton(CCmdUI*);
 	void OnUpdateBrowserButton(CCmdUI*);
+	void OnUpdateAutoReloadButton(CCmdUI*);
 
 	afx_msg void OnSettingGeneral();
 	afx_msg void OnMenuClose();

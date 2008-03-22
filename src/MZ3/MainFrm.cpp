@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
     ON_COMMAND(ID_BACK_BUTTON, OnBackButton)
     ON_COMMAND(ID_FORWARD_BUTTON, OnForwardButton)
+    ON_COMMAND(ID_AUTO_RELOAD_BUTTON, OnAutoReloadButton)
     ON_COMMAND(ID_STOP_BUTTON, OnStopButton)
 	ON_COMMAND(ID_SETTING_LOGIN, &CMainFrame::OnSettingLogin)
 	ON_COMMAND(ID_SETTING_GENERAL, &CMainFrame::OnSettingGeneral)
@@ -61,6 +62,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     ON_UPDATE_COMMAND_UI(ID_IMAGE_BUTTON, OnUpdateImageButton)
     ON_UPDATE_COMMAND_UI(ID_WRITE_BUTTON, OnUpdateWriteButton)
     ON_UPDATE_COMMAND_UI(ID_OPEN_BROWSER, OnUpdateBrowserButton)
+	ON_UPDATE_COMMAND_UI(ID_AUTO_RELOAD_BUTTON, OnUpdateAutoReloadButton)
 	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_ALL, &CMainFrame::OnUpdateGetpageAll)
 	ON_UPDATE_COMMAND_UI(IDM_GETPAGE_LATEST10, &CMainFrame::OnUpdateGetpageLatest10)
 	ON_UPDATE_COMMAND_UI(ID_MENU_BACK, &CMainFrame::OnUpdateMenuBack)
@@ -346,6 +348,15 @@ void CMainFrame::OnForwardButton()
 	}
 }
 
+/**
+ * 定期取得ボタン
+ */
+void CMainFrame::OnAutoReloadButton()
+{
+	// メニューのハンドラに委譲
+	OnEnableIntervalCheck();
+}
+
 // -----------------------------------------------------------------------------
 // ログイン設定ボタン
 // -----------------------------------------------------------------------------
@@ -436,6 +447,19 @@ void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 	}
 #else
 	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));
+#endif
+}
+
+// -----------------------------------------------------------------------------
+// 定期取得ボタンの制御
+// -----------------------------------------------------------------------------
+void CMainFrame::OnUpdateAutoReloadButton(CCmdUI* pCmdUI)
+{
+#ifdef WINCE
+	// WinCE は定期取得ボタンなし
+#else
+	pCmdUI->Enable();
+	pCmdUI->SetCheck( theApp.m_optionMng.m_bEnableIntervalCheck ? TRUE : FALSE );
 #endif
 }
 
@@ -1002,9 +1026,10 @@ BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 					lptip->lpszText = L"コメントを書く";
 				}
 				break;
-			case ID_IMAGE_BUTTON:	lptip->lpszText = L"画像を開く";		break;
-			case ID_OPEN_BROWSER:	lptip->lpszText = L"ブラウザで開く";	break;
-			case ID_APP_ABOUT:		lptip->lpszText = L"バージョン情報";	break;
+			case ID_IMAGE_BUTTON:		lptip->lpszText = L"画像を開く";		break;
+			case ID_OPEN_BROWSER:		lptip->lpszText = L"ブラウザで開く";	break;
+			case ID_AUTO_RELOAD_BUTTON:	lptip->lpszText = L"定期取得";			break;
+			case ID_APP_ABOUT:			lptip->lpszText = L"バージョン情報";	break;
 			}
 		}
 		break;
