@@ -138,7 +138,6 @@ bool CInetAccess::Open()
 		// インターネット自動接続。
 		// 接続が無かったらダイアルアップ処理を行う。
 		// また、グローバルプロキシの接続先を取得する。
-		util::MySetInformationText( m_hwnd, _T("自動接続中...") );
 		SP_EstablishInetConnProc( proxy );
 	}
 
@@ -342,6 +341,8 @@ inline bool my_append_buf( kfm::kf_buf_type& out_buf, char* pData, DWORD dwSize 
 HRESULT WINAPI CInetAccess::SP_EstablishInetConnProc( CString& proxy )
 {
 #ifdef WINCE
+	util::MySetInformationText( m_hwnd, _T("自動接続中...") );
+
 	CONNMGR_CONNECTIONINFO ci = {0};
 	PROXY_CONFIG pcProxy = {0};
 	DWORD dwStatus = 0;
