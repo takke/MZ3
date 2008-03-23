@@ -1204,6 +1204,20 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		switch (aType) {
+		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			// フォーカスを入力領域に移動
+			GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+			break;
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+
 	return TRUE;
 }
 
@@ -1826,6 +1840,10 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 				m_statusEdit.Undo();
 				return TRUE;
 			}
+			break;
+		case VK_RETURN:
+			// Enter 押下で投稿・再取得
+			OnBnClickedUpdateButton();
 			break;
 		}
 	}
