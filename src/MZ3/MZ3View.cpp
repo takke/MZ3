@@ -4104,6 +4104,9 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		case ACCESS_LIST_DIARY:
 		case ACCESS_LIST_MYDIARY:
 		case ACCESS_LIST_BBS:
+		case ACCESS_LIST_NEW_COMMENT:
+		case ACCESS_LIST_COMMENT:
+		case ACCESS_LIST_NEW_BBS_COMMENT:
 	//	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 			// „‰ñ‘ÎÛ‚È‚Ì‚Å„‰ñƒƒjƒ…[‚ð–³Œø‰»‚µ‚È‚¢
 			break;
