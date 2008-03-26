@@ -2595,7 +2595,7 @@ public:
 
 		// 項目開始を探す
 		bool bInItems = false;	// 「注目のピックアップ」開始？
-		int iLine = 250;		// とりあえず読み飛ばす
+		int iLine = 200;		// とりあえず読み飛ばす
 		for( ; iLine<count; iLine++ ) {
 			const CString& str = html_.GetAt(iLine);
 
