@@ -2774,7 +2774,7 @@ public:
 		 */
 		// €–ÚŠJn‚ğ’T‚·
 		bool bInItems = false;
-		int iLine = 250;		// ‚Æ‚è‚ ‚¦‚¸“Ç‚İ”ò‚Î‚·
+		int iLine = 200;		// ‚Æ‚è‚ ‚¦‚¸“Ç‚İ”ò‚Î‚·
 		for( ; iLine<count; iLine++ ) {
 			const CString& line = html_.GetAt(iLine);
 
