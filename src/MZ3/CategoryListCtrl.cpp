@@ -38,6 +38,10 @@ BEGIN_MESSAGE_MAP(CCategoryListCtrl, CListCtrl)
 	ON_WM_VSCROLL()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CCategoryListCtrl::OnLvnItemchanged)
 	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEWHEEL()
+#ifndef WINCE
+	ON_WM_MOUSEMOVE()
+#endif
 END_MESSAGE_MAP()
 
 
@@ -285,4 +289,21 @@ void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 #endif
 
 	CListCtrl::OnLButtonDown(nFlags, point);
+}
+
+#ifndef WINCE
+void CCategoryListCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+//	wprintf( L"CCategoryListCtrl::OnMouseMove\n" );
+	CListCtrl::OnMouseMove(nFlags, point);
+	// マウスジェスチャ処理のために親呼び出し
+//	return theApp.m_pMainView->OnMouseMove(nFlags, zDelta, pt);
+}
+#endif
+
+BOOL CCategoryListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+//	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+	// 右クリック＋マウスホイール処理のために親呼び出し
+	return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
 }

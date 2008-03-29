@@ -361,6 +361,8 @@ public:
 	afx_msg void OnTabmenuEdit();
 	afx_msg void OnTabmenuAdd();
 	void MyUpdateControlStatus(void);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -22,6 +22,7 @@
 #include "url_encoder.h"
 #include "version.h"
 #include "MZ3Parser.h"
+#include "MouseGestureManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -214,6 +215,8 @@ BOOL CMZ3App::InitInstance()
 	newContext.m_pLastView = NULL;
 	newContext.m_pCurrentFrame = NULL;
 	newContext.m_pCurrentDoc = pCurrentDoc;
+
+	m_pMouseGestureManager = new MouseGestureManager;
 
 	m_pMainView		= (CMZ3View*)((CFrameWnd*)m_pMainWnd)->GetActiveView();
 	m_pReportView	= new CReportView;

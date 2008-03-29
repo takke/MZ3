@@ -54,6 +54,7 @@ class CReportView;
 class CWriteView;
 class CDownloadView;
 class CMZ3BackgroundImage;
+class MouseGestureManager;
 
 // CMZ3App:
 // このクラスの実装については、MZ3.cpp を参照してください。
@@ -131,6 +132,8 @@ public:
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
 	CDownloadView*		m_pDownloadView;		///< ダウンロードビュー
+
+	MouseGestureManager* m_pMouseGestureManager;///< マウスジェスチャ管理
 
 	CMZ3SkinInfo		m_skininfo;				///< スキン情報
 

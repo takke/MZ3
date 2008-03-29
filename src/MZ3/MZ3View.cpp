@@ -9,26 +9,28 @@
 #include "stdafx.h"
 #include "version.h"
 #include "MZ3.h"
-
 #include "MZ3Doc.h"
-#include "MZ3View.h"
 
-#include "MixiData.h"
-#include "CategoryItem.h"
-#include "HtmlArray.h"
+// UI関連
+#include "MZ3View.h"
 #include "ReportView.h"
 #include "DownloadView.h"
 #include "MainFrm.h"
 #include "WriteView.h"
-#include "util.h"
-#include "util_gui.h"
 #include "ChooseAccessTypeDlg.h"
 #include "OpenUrlDlg.h"
 #include "CommonEditDlg.h"
 #include "MiniImageDialog.h"
+#include "MouseGestureManager.h"
+
+// ユーティリティ関連
+#include "HtmlArray.h"
+#include "MixiData.h"
+#include "CategoryItem.h"
+#include "util.h"
+#include "util_gui.h"
 #include "url_encoder.h"
 #include "twitter_util.h"
-
 #include "MZ3Parser.h"
 
 #ifdef _DEBUG
@@ -231,7 +233,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_CONTEXT_MENU, &CMZ3View::OnAcceleratorContextMenu)
 	ON_COMMAND(ID_ACCELERATOR_NEXT_TAB, &CMZ3View::OnAcceleratorNextTab)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
-	ON_WM_MOUSEWHEEL()
+//	ON_WM_MOUSEWHEEL()
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
 	ON_COMMAND(ID_MENU_TWITTER_READ, &CMZ3View::OnMenuTwitterRead)
@@ -251,6 +253,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_EDIT_CATEGORY_ITEM, &CMZ3View::OnEditCategoryItem)
 	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
 	ON_COMMAND(ID_TABMENU_ADD, &CMZ3View::OnTabmenuAdd)
+//	ON_WM_RBUTTONDOWN()
+//	ON_WM_RBUTTONUP()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -784,6 +788,10 @@ void CMZ3View::OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 	m_hotList = &m_categoryList;
+
+	if (lpnmlv->iItem<0) {
+		return;
+	}
 
 	// カレントデータを取得
 	int idx = (int)m_categoryList.GetItemData(lpnmlv->iItem);
@@ -1862,6 +1870,16 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 
 BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 {
+#ifdef DEBUG
+	switch (pMsg->message) {
+	case WM_MOUSEMOVE:		wprintf( L"PTM: WM_MOUSEMOVE\n" );		break;
+	case WM_MOUSEWHEEL:		wprintf( L"PTM: WM_MOUSEWHEEL\n" );		break;
+	case WM_RBUTTONDOWN:	wprintf( L"PTM: WM_RBUTTONDOWN\n" );	break;
+	case WM_RBUTTONUP:		wprintf( L"PTM: WM_RBUTTONUP\n" );		break;
+	}
+//	wprintf( L"pretranslatemessage : %d(0x%X)\n", pMsg->message, pMsg->message );
+#endif
+
 	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
 		// メッセージに応じて、定期取得のキャンセル処理を行う
 		switch (pMsg->message) {
@@ -1874,23 +1892,41 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	if (pMsg->message == WM_KEYUP) {
-		BOOL r = OnKeyUp( pMsg );
+	switch (pMsg->message) {
+	case WM_KEYUP:
+		{
+			BOOL r = OnKeyUp( pMsg );
 
-		// KEYDOWN リピート回数を初期化
-		m_nKeydownRepeatCount = 0;
+			// KEYDOWN リピート回数を初期化
+			m_nKeydownRepeatCount = 0;
 
-		if (r) {
-			return r;
+			if (r) {
+				return r;
+			}
 		}
-	}
-	else if (pMsg->message == WM_KEYDOWN) {
-		// KEYDOWN リピート回数をインクリメント
-		m_nKeydownRepeatCount ++;
+		break;
+	case WM_KEYDOWN:
+		{
+			// KEYDOWN リピート回数をインクリメント
+			m_nKeydownRepeatCount ++;
 
-		if (OnKeyDown( pMsg )) {
-			return TRUE;
+			if (OnKeyDown( pMsg )) {
+				return TRUE;
+			}
 		}
+		break;
+	case WM_RBUTTONDOWN:
+		OnRButtonDown( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
+	case WM_RBUTTONUP:
+		OnRButtonUp( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
+	case WM_MOUSEWHEEL:
+		OnMouseWheel( LOWORD(pMsg->wParam), HIWORD(pMsg->wParam), CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
+//	case WM_MOUSEMOVE:
+//		OnMouseMove( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+//		break;
 	}
 
 	return CFormView::PreTranslateMessage(pMsg);
@@ -4079,6 +4115,11 @@ void CMZ3View::OnLayoutCategoryMakeWide()
  */
 void CMZ3View::OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	if (theApp.m_pMouseGestureManager->IsProcessed()) {
+		// マウスジェスチャ処理が行われたためキャンセル
+		return;
+	}
+
 	// カテゴリリストでの右クリック
 	PopupCategoryMenu();
 
@@ -4185,6 +4226,11 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
  */
 void CMZ3View::OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	if (theApp.m_pMouseGestureManager->IsProcessed()) {
+		// マウスジェスチャ処理が行われたためキャンセル
+		return;
+	}
+
 	PopupBodyMenu();
 	*pResult = 0;
 }
@@ -4550,6 +4596,33 @@ void CMZ3View::OnAcceleratorPrevTab()
  */
 BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
+	if (theApp.m_pMouseGestureManager->IsGestureMode()) {
+		// Ctrl+ホイールで拡大・縮小
+		// 方向が逆になったらキャンセル
+		int& s_delta = theApp.m_pMouseGestureManager->m_delta;
+		if ((s_delta>0 && zDelta<0) || (s_delta<0 && zDelta>0)) {
+			s_delta = 0;
+		}
+		s_delta += zDelta;
+
+		if (s_delta>=WHEEL_DELTA) {
+			// 前のタブ
+			CommandSelectGroupTabBeforeItem();
+
+			// 右クリック処理キャンセルのため、処理済みフラグを設定する
+			theApp.m_pMouseGestureManager->SetProcessed();
+			s_delta -= WHEEL_DELTA;
+		} else if (s_delta<=-WHEEL_DELTA) {
+			// 次のタブ
+			CommandSelectGroupTabNextItem();
+
+			// 右クリック処理キャンセルのため、処理済みフラグを設定する
+			theApp.m_pMouseGestureManager->SetProcessed();
+			s_delta += WHEEL_DELTA;
+		}
+		return TRUE;
+	}
+
 	if (nFlags & MK_CONTROL) {
 		// Ctrl+ホイールで拡大・縮小
 		// 高解像度ホイール対応のため、delta 値を累積する。
@@ -4560,10 +4633,10 @@ BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		}
 		s_delta += zDelta;
 
-		if (s_delta>WHEEL_DELTA) {
+		if (s_delta>=WHEEL_DELTA) {
 			OnAcceleratorFontMagnify();
 			s_delta -= WHEEL_DELTA;
-		} else if (s_delta<-WHEEL_DELTA) {
+		} else if (s_delta<=-WHEEL_DELTA) {
 			OnAcceleratorFontShrink();
 			s_delta += WHEEL_DELTA;
 		}
@@ -5206,4 +5279,40 @@ void CMZ3View::MyUpdateControlStatus(void)
 	if (pStatusEdit!=NULL) {
 		pStatusEdit->EnableWindow( m_access ? FALSE : TRUE );
 	}
+}
+
+/**
+ * 右ボタン押下
+ */
+void CMZ3View::OnRButtonDown(UINT nFlags, CPoint point)
+{
+#ifdef DEBUG
+	wprintf( L"OnRButtonUp\n" );
+#endif
+
+	// ジェスチャ開始
+	theApp.m_pMouseGestureManager->StartGestureMode(point);
+
+	// マウスキャプチャ開始
+//	SetCapture();
+
+	CFormView::OnRButtonDown(nFlags, point);
+}
+
+/**
+ * 右ボタンリリース
+ */
+void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
+{
+#ifdef DEBUG
+	wprintf( L"OnRButtonUp\n" );
+#endif
+
+	// マウスキャプチャ終了
+//	ReleaseCapture();
+
+	// ジェスチャ終了
+	theApp.m_pMouseGestureManager->StopGestureMode();
+
+	CFormView::OnRButtonUp(nFlags, point);
 }

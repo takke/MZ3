@@ -485,7 +485,9 @@ BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		}
 	}
 
-	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+//	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+	// 右クリック＋マウスホイール処理のために親呼び出し
+	return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
 }
 
 #ifndef WINCE
