@@ -67,12 +67,13 @@ const enum FrameTypeEnum {
 	FrameType_stool, 
 };
 
-// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2
+// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2、mixiムービーリンク:3
 enum LinkType { 
 	LinkType_noLink = 0, 
 	LinkType_internal, 
 	LinkType_external, 
-	LinkType_picture, 
+	LinkType_picture,
+	LinkType_movie,
 };
 
 // 文字情報。背景色やフォント種別などか切り変わるまでを一つのブロックとして扱う。
@@ -134,6 +135,8 @@ class LinkProperty
 public:
 	LinkType	linkType;
 	unsigned int linkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
+	unsigned int imglinkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
+	unsigned int movlinkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
 	unsigned int jumpUID;		// 呼び出し先
 	unsigned int anchorIndex;	// 呼び出し先のページ内アンカー
 	CString		paramStr;		// 汎用パラメータ
@@ -230,6 +233,8 @@ public:
 	int					remainWidth;					// 描画に使える残り幅
 	int					startWidth;						// 出力開始位置のX座標
 	int					linkID;							// リンクの連番
+	int					imglinkID;						// 画像リンクの連番
+	int					movlinkID;						// 動画リンクの連番
 	FrameProperty		frameProperty[FrameNestLevel];	// 要素が最大2つなので固定の配列として持つ
 	bool				frameTopThrough;				// ワクの上端を描画完了が終わったらtrueになる
 	BigBridgeProperty();
@@ -317,6 +322,7 @@ class Ran2View : public CWnd
 	int								currentUIDNumber;	// 現在描画中のUID番号
 
 	CPen		underLinePen;			// 汎用の黒ペン
+	CPen		DarkBlueunderLinePen;		// アンカ用の青ペン
 	CBrush		blueBrush;				// 汎用の青ブラシ
 	CBrush*		oldBrush;				// 復帰用のポインタ
 

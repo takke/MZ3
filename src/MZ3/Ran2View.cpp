@@ -22,6 +22,7 @@ COLORREF solidBlack = COLORREF(RGB(0x00,0x00,0x00));
 COLORREF solidBlue = RGB(0x00,0x00,0xFF);
 COLORREF solidWhite = RGB(0xFF,0xFF,0xFF);
 COLORREF solidPink = RGB(0xFF,0xC0,0xCB);
+COLORREF solidDarkBlue = RGB(0x00,0x00,0x8B);
 COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
 COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
@@ -185,6 +186,8 @@ BigBridgeProperty::BigBridgeProperty()
 	remainStr = TEXT("");
 	frameNestLevel = -1;	// ワクがあるときは0～1の値をとる
 	linkID = 0;			// リンク連番の初期化
+	imglinkID = 0;		// 画像リンク連番の初期化
+	movlinkID = 0;		// 動画リンク連番の初期化
 	frameTopThrough = false;
 	for(int i=0 ; i<FrameNestLevel ; i++){
 		frameProperty[i].backgroundColor = solidWhite;
@@ -224,6 +227,7 @@ Ran2View::Ran2View()
 
 	// 汎用ペンの作成
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
+	DarkBlueunderLinePen.CreatePen(PS_SOLID,1,solidDarkBlue);
 
 	// 汎用ブラシの作成
 	blueBrush.CreateSolidBrush(solidBlue);
@@ -668,7 +672,7 @@ void Ran2View::OnPaint()
 void Ran2View::DrawToScreen(CDC* pDC)
 {
 	int y = -m_offsetPixelY;
-	
+	TRACE( L"m_drawStartTopOffset,m_offsetPixelY : %5d %5d\n", m_drawStartTopOffset,m_offsetPixelY );
 	pDC->BitBlt( 0, 0, screenWidth, screenHeight, memDC, 0, m_drawStartTopOffset +y, SRCCOPY );
 //	pDC->Rectangle(0, 0, screenWidth, screenHeight);
 }
@@ -753,7 +757,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		Tag_h1, Tag_h2, Tag_h3,	
 		Tag_p, Tag_blue, Tag_underline, 
 		Tag_sub, Tag_sup, Tag_text, 
-		Tag_entity, Tag_gaiji, Tag_img, 
+		Tag_entity, Tag_gaiji, Tag_img, Tag_mov, 
 		Tag_br, Tag_anchor,	Tag_link, 
 		Tag_level0, Tag_level1,	Tag_level2,	
 		Tag_kakomi_blue, Tag_kakomi_gray, Tag_kakomi_gray2, 
@@ -762,7 +766,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 	// 終了タグ
 		Tag_end_p, Tag_end_blue, Tag_end_underline,
 		Tag_end_sub, Tag_end_sup, Tag_end_b, Tag_end_blockquote,
-		Tag_end_link, 
+		Tag_end_link, Tag_end_img, Tag_end_mov,
 		Tag_end_h1, Tag_end_h2, Tag_end_h3, 
 		Tag_end_kakomi_blue, Tag_end_kakomi_gray, Tag_end_kakomi_gray2, 
 		Tag_end_kakomi_white, Tag_end_kakomi_white2, 
@@ -773,7 +777,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		TEXT("h1"), TEXT("h2"), TEXT("h3"), 
 		TEXT("p"), TEXT("blue"), TEXT("underline"), 
 		TEXT("sub"), TEXT("sup"), TEXT("text"), 
-		TEXT("entity"), TEXT("gaiji"), TEXT("img"), 
+		TEXT("entity"), TEXT("gaiji"), TEXT("img"), TEXT("mov"),
 		TEXT("br"), TEXT("anchor"), TEXT("link"), 
 		TEXT("level0"), TEXT("level1"),	TEXT("level2"), 
 		TEXT("kakomi_blue"), TEXT("kakomi_gray"), TEXT("kakomi_gray2"), 
@@ -782,7 +786,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 	// 終了タグ(15個)
 		TEXT("end_p"), TEXT("end_blue"), TEXT("end_underline"),
 		TEXT("end_sub"), TEXT("end_sup"), TEXT("end_b"), TEXT("end_blockquote"),
-		TEXT("end_link"), 
+		TEXT("end_link"), TEXT("end_img"), TEXT("end_mov"),
 		TEXT("end_h1"), TEXT("end_h2"), TEXT("end_h3"),	
 		TEXT("end_kakomi_blue"), TEXT("end_kakomi_gray"), TEXT("end_kakomi_gray2"), 
 		TEXT("end_kakomi_white"), TEXT("end_kakomi_white2"), 
@@ -1083,6 +1087,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 			// リンクがある場合はフラグを立ててタップ反応領域を登録
 			if( bridgeInfo->isLink == true ){
 				newText->isUnderLine = true;
+				newText->foregroundColor = solidDarkBlue;
 
 				LinkProperty* newLink = new LinkProperty();
 
@@ -1092,7 +1097,9 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 				newLink->anchorIndex = bridgeInfo->pageAnchor;
 
 				// リンク連番を登録時にインクリメント
-				newLink->linkID = bigBridgeInfo->linkID++;
+				newLink->linkID = bigBridgeInfo->linkID;
+				newLink->imglinkID = bigBridgeInfo->imglinkID;
+				newLink->movlinkID = bigBridgeInfo->movlinkID;
 
 				// 描画する領域をリンク情報として登録
 				CRect tapRect = CRect(sx,0,sx+blockWidth,0);	// Y座標は実行時に解釈されるので不要
@@ -1157,6 +1164,39 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		bridgeInfo->linkType = LinkType_noLink;
 		bridgeInfo->jumpID = 0;
 		bridgeInfo->pageAnchor = 0;
+		bigBridgeInfo->linkID++;
+	// 画像リンクの設定
+	}else if( currentTag == Tag_img ){
+		// リンクの領域登録はtextの領域作成時にまとめて行う
+		bridgeInfo->isLink = true;
+//		bridgeInfo->jumpID = 0;
+
+		bridgeInfo->linkType = LinkType_picture;
+
+		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+		// リンクタグの終了
+	}else if( currentTag == Tag_end_img ){
+		bridgeInfo->isLink = false;
+		bridgeInfo->linkType = LinkType_noLink;
+		bridgeInfo->jumpID = 0;
+		bridgeInfo->pageAnchor = 0;
+		bigBridgeInfo->imglinkID++;
+	// 動画リンクの設定
+	}else if( currentTag == Tag_mov ){
+		// リンクの領域登録はtextの領域作成時にまとめて行う
+		bridgeInfo->isLink = true;
+//		bridgeInfo->jumpID = 0;
+
+		bridgeInfo->linkType = LinkType_movie;
+
+		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+		// リンクタグの終了
+	}else if( currentTag == Tag_end_mov ){
+		bridgeInfo->isLink = false;
+		bridgeInfo->linkType = LinkType_noLink;
+		bridgeInfo->jumpID = 0;
+		bridgeInfo->pageAnchor = 0;
+		bigBridgeInfo->movlinkID++;
 	}else{
 		// それ以外のエラーの場合
 		//logStr.Format(TEXT("Through tag!!(%s:%s)\r\n"),hashRecord->key,hashRecord->value);
@@ -1288,14 +1328,17 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 //	ran2ImageArray.RemoveAll();
 #endif
 
-	if (startLine<0) {
-		return 0;
+	int istartLine = startLine;
+
+	if (istartLine<0) {
+		// 先頭より飛び出していれば引き戻す
+		istartLine = 0;
 	}
 	// どの行から描画したかを保存しておく
-	drawOffsetLine = startLine;
+	drawOffsetLine = istartLine;
 
 	// レコードの展開ミスや範囲外の指定は弾く
-	if( parsedRecord == NULL || startLine > parsedRecord->rowInfo->GetSize() ){
+	if( parsedRecord == NULL || istartLine > parsedRecord->rowInfo->GetSize() ){
 		return(0);
 	}
 
@@ -1313,7 +1356,7 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 	// オフセットスクロール用にN行余分に描画する。
 	const int N_OVER_OFFSET_LINES = 2;
 	for(int i=-N_OVER_OFFSET_LINES; i<=viewLineMax+N_OVER_OFFSET_LINES ; i++){
-		int targetLine = startLine + i;
+		int targetLine = istartLine + i;
 
 		if (targetLine < 0) {
 			continue;
@@ -1466,7 +1509,11 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		// アンダーラインの描画
 		if( text->isUnderLine == true ){ 
 			CPen* oldPen = NULL;
-			oldPen = memDC->SelectObject(&underLinePen);
+			if( text->foregroundColor == solidDarkBlue ){
+				oldPen = memDC->SelectObject(&DarkBlueunderLinePen);
+			} else {
+				oldPen = memDC->SelectObject(&underLinePen);
+			}
 			memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
 			memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
 			oldPen = memDC->SelectObject(oldPen);
@@ -1609,7 +1656,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		HtmlRecord*	hashRecord = new HtmlRecord();
 
 		// 文字、絵文字の振り分け
-		if( wcsncmp(lineStr, TEXT("[m:"), 2) == 0){
+		if( wcsncmp(lineStr, TEXT("[m:"), 3) == 0){
 			// 数値, インデックスチェックが通れば外字、それ以外はテキストとみなす
 			CString code = lineStr.Mid(3,lineStr.GetLength()-4);
 			for (int i=0; i<code.GetLength(); i++) {
@@ -1638,6 +1685,18 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 			hashRecord->key = TEXT("blockquote");
 		}else if( lineStr.Compare(TEXT("[/blockquote]")) == 0 ) {
 			hashRecord->key = TEXT("end_blockquote");
+		}else if( lineStr.Compare(TEXT("[a]")) == 0 ) {
+			hashRecord->key = TEXT("link");
+		}else if( lineStr.Compare(TEXT("[/a]")) == 0 ) {
+			hashRecord->key = TEXT("end_link");
+		}else if( lineStr.Compare(TEXT("[img]")) == 0 ) {
+			hashRecord->key = TEXT("img");
+		}else if( lineStr.Compare(TEXT("[/img]")) == 0 ) {
+			hashRecord->key = TEXT("end_img");
+		}else if( lineStr.Compare(TEXT("[mov]")) == 0 ) {
+			hashRecord->key = TEXT("mov");
+		}else if( lineStr.Compare(TEXT("[/mov]")) == 0 ) {
+			hashRecord->key = TEXT("end_mov");
 		}else{
 			hashRecord->key = TEXT("text");
 		}
@@ -1860,8 +1919,10 @@ void Ran2View::OnRButtonUp(UINT nFlags, CPoint point)
 // タップによるリンク位置の探索
 void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	CString logStr;
+
 	if (m_bDragging) {
-		m_bDragging = false;
+		//m_bDragging = false;		// ドラッグ中フラグは後の処理で判定に使う
 		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
 		ReleaseCapture();
 	}
@@ -1872,6 +1933,8 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		// ダブルクリック済みなのでクリアする
 		m_dwFirstLButtonUp = 0;
+		// ドラッグ中フラグもクリア
+		m_bDragging = false;		
 
 		// ダブルクリックとみなす
 		// 親の呼び出し
@@ -1884,15 +1947,63 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		// 自動スクロール
 		m_autoScrollInfo.push( GetTickCount(), point );
 		double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
-		TRACE( L"! speed   : %5.2f [px/msec]\n", speed );
+		TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
 
 		KillTimer( TIMERID_AUTOSCROLL );
-		if (speed != 0.0) {
-			// 自動スクロール開始
-			m_dwAutoScrollStartTick = GetTickCount();
-			m_yAutoScrollMax = 0;
-			SetTimer( TIMERID_AUTOSCROLL, 20L, NULL );
+		if ( fabs(speed) >= 0.01) {
+			if( m_bDragging ) {
+				// ドラッグ中ならば（と判定しないとスクロール不可能状態でタイマー処理が走る）
+				// 自動スクロール開始
+				m_dwAutoScrollStartTick = GetTickCount();
+				m_yAutoScrollMax = 0;
+				SetTimer( TIMERID_AUTOSCROLL, 20L, NULL );
+			}
+		} else {
+			// スクロールスピードが0の場合
+			// 左クリック扱いの処理を行う
+
+			// タップ位置の行番号を取得
+			int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
+
+			// Row配列からの取得位置を算出
+			int rowNumber = drawOffsetLine + tapLine;
+
+			// タップ位置が範囲内を越える場合は何もしない
+			if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
+				RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
+				for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
+					LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
+
+					logStr.Format(TEXT("リンク情報は[Type:%d][ID:%d][PA:%d][left:%d]～[right:%d]\r\n"),
+						linkInfo->linkType, linkInfo->jumpUID, linkInfo->anchorIndex,
+						linkInfo->grappleRect.left, linkInfo->grappleRect.right);
+					OutputDebugString(logStr);
+
+					// リンク表示範囲内であればリンク種別により親ウインドウを呼び出して開く
+					if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
+						if( linkInfo->linkType == LinkType_internal ){
+							// 内部（同一ユーザID？）リンク（現状未使用？）
+							break;
+						}else if( linkInfo->linkType == LinkType_external ){
+							// 外部リンク（mixiURL、http:、ttp:、YouTube）
+							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_URL_BASE + 1 + linkInfo->linkID , 0 ), (LPARAM)NULL );
+							break;
+						}else if( linkInfo->linkType == LinkType_picture ){
+							// 画像リンク（日記、コミュコメント、フォトアルバム）
+							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_IMAGE + 1 + linkInfo->imglinkID , 0 ), (LPARAM)NULL );
+							break;
+						}else if( linkInfo->linkType == LinkType_movie ){
+							// 動画リンク（mixi動画）
+							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_MOVIE + 1 + linkInfo->movlinkID , 0 ), (LPARAM)NULL );
+							break;
+						}
+					}
+				}
+			}
 		}
+
+		//ドラッグ処理停止
+		m_bDragging = false;
 
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
@@ -1906,6 +2017,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_bDragging) {
+		return;
 		m_bDragging = false;
 		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
 	}
@@ -1913,74 +2025,46 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 
 	CString logStr;
 	// タップ位置の行番号を取得
-	int tapLine = (point.y - topOffset) / (charHeightOffset + charHeight);
+	int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
 
 	// Row配列からの取得位置を算出
 	int rowNumber = drawOffsetLine + tapLine;
 
-	bool bProcessed = false;
+	bool bLinkArea = false;
 
-	// タップ位置が範囲内を越える場合は何もしない
-	if( parsedRecord->rowInfo->GetSize() > rowNumber ){
+	//リンク処理はOnLButtonUpで行う
+//	// タップ位置が範囲内を越える場合は何もしない
+	if( parsedRecord->rowInfo->GetSize() > rowNumber && rowNumber >= 0 ){
 		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
 		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
 			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
-/*
-			logStr.Format(TEXT("リンク情報は[Type:%d][ID:%d][PA:%d][left:%d]～[right:%d]\r\n"),
-				linkInfo->linkType, linkInfo->jumpUID, linkInfo->anchorIndex,
-				linkInfo->grappleRect.left, linkInfo->grappleRect.right);
-			OutputDebugString(logStr);
-*/
-			// リンク範囲の該当内部であれうばジャンプ処理を行う
+			// リンク範囲の該当内部であればフラグ
 			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
-				if( linkInfo->linkType == LinkType_internal ){
-/*
-					HistoryInfo* jumpInfo = new HistoryInfo();
-					jumpInfo->uid = linkInfo->jumpUID;
-					jumpInfo->pageAnchor = linkInfo->anchorIndex;
-					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
-					//logStr.Format(TEXT("アンカー[%d]へのリンクです"),linkInfo->anchorIndex);
-					//MessageBox(logStr,TEXT("ページ内アンカーの呼び出し"),MB_OK);
-*/
-					bProcessed = true;
-					break;
-				}else if( linkInfo->linkType == LinkType_external ){
-/*
-					HistoryInfo* jumpInfo = new HistoryInfo();
-					jumpInfo->uid = linkInfo->jumpUID;
-					jumpInfo->pageAnchor = linkInfo->anchorIndex;
-					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,(WPARAM)jumpInfo,0);
-*/
-					bProcessed = true;
-					break;
-				}else if( linkInfo->linkType == LinkType_picture ){
-/*					this->GetParent()->SendMessage(WM_HTML_NEXTITEM,linkInfo->jumpUID,1);
-					CString rcStr = app->GetImageNameByNumber(linkInfo->jumpUID);
-					logStr.Format(TEXT("画像名[%s]へのリンクです"),rcStr);
-					MessageBox(logStr,TEXT("画像の呼び出し"),MB_OK);
-*/					bProcessed = true;
-					break;
-				}
+				bLinkArea = true;
 			}
 		}
-	}
-	if (bProcessed) {
-		Default();
-		return;
 	}
 
 	// ドラッグ開始
 	if (GetAllLineCount()-GetViewLineMax() > 0) {
-		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
+		if( bLinkArea ) {
+			::SetCursor( ::LoadCursor(NULL, IDC_HAND) );
+		} else {
+			::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
+		}
 		SetCapture();
 		m_bDragging = true;
 		m_ptDragStart = point;
 		m_dragStartLine = drawOffsetLine;
 		m_ptDragStart.y -= m_offsetPixelY;
-		m_offsetPixelY = 0;
+		//m_offsetPixelY = 0;
 
 		// 自動スクロール停止
 		KillTimer( TIMERID_AUTOSCROLL );
+	} else {
+		if( bLinkArea ) {
+			::SetCursor( ::LoadCursor(NULL, IDC_HAND) );
+		}
 	}
 
 	// 自動スクロール情報
@@ -1993,6 +2077,7 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 
 void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 {
+	CString logStr;
 	// Nピクセル移動したらダブルクリックキャンセル
 	if (m_dwFirstLButtonUp!=0) {
 		int dx = point.x - m_ptFirstLButtonUp.x;
@@ -2015,6 +2100,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 	}
 
 	if (m_bDragging) {
+		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
 		// 自動スクロール情報収集
 		m_autoScrollInfo.push( GetTickCount(), point );
 
@@ -2022,10 +2108,39 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 		int dy = m_ptDragStart.y - point.y;
 		ScrollByMoveY( dy );
 	} else {
-		// スクロール可能であれば「パー」のカーソルに変更
-		if (GetAllLineCount()-GetViewLineMax() > 0) {
-			::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
+		bool bLinkArea = false;
+
+		// タップ位置の行番号を取得
+		int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
+
+		// Row配列からの取得位置を算出
+		int rowNumber = drawOffsetLine + tapLine;
+		// マウス位置が範囲内を越える場合は何もしない
+		if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
+			RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
+			for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
+				LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
+				// リンク表示範囲内であればフラグを立てる
+				if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
+					bLinkArea = true;
+
+					//logStr.Format(TEXT("座標[%d,%d][m_offsetPixelY:%d][charHeightOffset + charHeight:%d][tapLine:%d][drawOffsetLine:%d]\r\n"),
+					//	point.x , point.y , m_offsetPixelY,
+					//	charHeightOffset + charHeight, tapLine,drawOffsetLine);
+					//OutputDebugString(logStr);
+				}
+			}
 		}
+		// リンク表示範囲内なら指差しカーソルに変更
+		if( bLinkArea ) {
+			::SetCursor( ::LoadCursor(NULL, IDC_HAND) );
+		} else {
+			// スクロール可能であれば「パー」のカーソルに変更
+			if (GetAllLineCount()-GetViewLineMax() > 0) {
+				::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
+			}
+		}
+
 	}
 
 	CWnd::OnMouseMove(nFlags, point);
@@ -2045,18 +2160,31 @@ void Ran2View::ScrollByMoveY(int dy)
 		// ピクセルオフセット
 		// （0行目であれば上方向のスクロールは行わない）
 		m_offsetPixelY = -dy % (charHeight + charHeightOffset);
+		TRACE( L"dy,drawOffsetLine,m_offsetPixelY : %5d %5d %5d\n", dy,drawOffsetLine,m_offsetPixelY );
+	} else if( drawOffsetLine == 0 ) {
+		// 0行目ならば先頭位置を0調整
+		m_offsetPixelY = 0;
 	}
 
-	// 下の方にスクロール可能か確認する
-	if (parsedRecord != NULL &&
-		parsedRecord->rowInfo != NULL &&
-		(m_dragStartLine + d_line) <= parsedRecord->rowInfo->GetSize() - viewLineMax) 
-	{
-		DrawDetail(m_dragStartLine + d_line);
 
-		// スクロール位置が変化したかもしれないのでオーナーに通知
-		CPoint lastPoint = m_autoScrollInfo.getLastPoint();
-		::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(lastPoint.x, lastPoint.y+dy) );
+	if ( parsedRecord != NULL &&
+		parsedRecord->rowInfo != NULL ){
+		// 下にはみ出た場合最下端まで引き戻す
+		if ( m_dragStartLine + d_line > parsedRecord->rowInfo->GetSize() - viewLineMax ) {
+			 d_line = parsedRecord->rowInfo->GetSize() - viewLineMax - m_dragStartLine + 1 ;
+			m_offsetPixelY = (charHeight + charHeightOffset) - screenHeight % (charHeight + charHeightOffset);
+			TRACE( L"***dy,drawOffsetLine,m_offsetPixelY : %5d %5d %5d\n", dy,drawOffsetLine,m_offsetPixelY );
+		}
+
+		// 下の方にスクロール可能か確認する
+		if ((m_dragStartLine + d_line) <= parsedRecord->rowInfo->GetSize() - viewLineMax ) {
+			// スクロール可能ならばスクロールして表示
+			DrawDetail(m_dragStartLine + d_line);
+
+			// スクロール位置が変化したかもしれないのでオーナーに通知
+			CPoint lastPoint = m_autoScrollInfo.getLastPoint();
+			::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(lastPoint.x, lastPoint.y+dy) );
+		}
 	}
 }
 

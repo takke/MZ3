@@ -2467,7 +2467,7 @@ public:
 					// –{•¶‚É’Ç‰Á
 					ParserUtil::AddBodyWithExtract( diaryItem, util::FormatString(L" : %s", a.getTextAll().c_str()) );
 					diaryItem.AddBody( L"\r\n" );
-					ParserUtil::AddBodyWithExtract( diaryItem, util::FormatString(L" (%s)", link.url) );
+					ParserUtil::AddBodyWithExtract( diaryItem, util::FormatString(L" (<a>%s</a>)", link.url) );
 					diaryItem.AddBody( L"\r\n" );
 					diaryItem.AddBody( L"\r\n" );
 

@@ -583,6 +583,12 @@ void CReportView::ShowCommentData(CMixiData* data)
 	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</strong>") , TEXT("[/b]") , bodyStrArray );
 	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<blockquote>") , TEXT("[blockquote]") , bodyStrArray );
 	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</blockquote>") , TEXT("[/blockquote]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<a>") , TEXT("[a]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</a>") , TEXT("[/a]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<img>") , TEXT("[img]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</img>") , TEXT("[/img]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<mov>") , TEXT("[mov]") , bodyStrArray );
+	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</mov>") , TEXT("[/mov]") , bodyStrArray );
 
 	// blockquoteÇÃëOÇ…â¸çsÇì¸ÇÍÇÈ
 	ViewFilter::InsertBRTagToBeforeblockquoteTag( bodyStrArray );

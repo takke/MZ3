@@ -125,28 +125,42 @@ public:
 	{
 
 		size_t taglen = fromTag.GetLength();
+		//TRACE( L"ReplaceHTMLTagToRan2ImageTags: %s %s %d\r\n" , fromTag , toTag , taglen );
 
 		for( int i=0 ; i<= bodyArray->GetUpperBound() ; i++ ){
 			CString line;
+			//CString text;
 			line = bodyArray->GetAt( i );
 
 			int idx = 0;
-			do {
-				idx = line.Find( fromTag , idx );
+			while( idx>=0 ) {
+				idx = line.Find( fromTag , 0 );
 				if( idx < 0 ) {
 					break;
 				} else {
 					if( idx > 0 ){
 						bodyArray->InsertAt( i++ , line.Left( idx ) );
 						line.Delete( 0 , idx );
+						//text = bodyArray->GetAt( i - 1 );
+						//TRACE( L"InsertAt(i++,line.Left(idx));: %s\r\n" , text );
 					}
 					bodyArray->InsertAt( i++ , toTag );
 					line.Delete( 0 , taglen );
+					//TRACE( L"line.Delete(0,taglen);: %s\r\n" , line );
+					//text = bodyArray->GetAt( i - 1 );
+					//TRACE( L"InsertAt(i++,toTag);: %s\r\n" , text );
 					bodyArray->SetAt( i , line );
-					idx += taglen;
+					//text = bodyArray->GetAt( i );
+					//TRACE( L"SetAt(i,line);: %s\r\n" , text );
 				}
-			} while( idx>= 0 && idx <= line.GetLength() );
+			} 
 		}
+		//for( int i=0 ; i<= bodyArray->GetUpperBound() ; i++ ){
+		//	CString line;
+		//	line = bodyArray->GetAt( i );
+		//	TRACE( L"%5d: %s\r\n" , i , line );
+		//}
+
 	}
 
 	/**

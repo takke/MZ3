@@ -451,13 +451,14 @@ public:
 		}
 
 		// リンクの抽出
-		if (str.Find( L"href" ) != -1) {
+		if ( ( str.Find( L"href" ) != -1 ) ||
+			 (str.Find( L"ttp://" ) != -1) ) {
 			ExtractURI( str, *data );
 		}
 
 		// 2ch 形式のリンク抽出
 		if( str.Find( L"ttp://" ) != -1 ) {
-			Extract2chURL( str, *data );
+			//Extract2chURL( str, *data );
 		}
 	}
 
@@ -591,7 +592,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 
 #define REPLACE_ALBUMURL_STRING
 #ifdef  REPLACE_ALBUMURL_STRING
-			ret.AppendFormat( L"<<画像%02d(album)>>", data_.GetImageCount() );
+			ret.AppendFormat( L"<img><<画像%02d(album)>></img>", data_.GetImageCount() );
 #else
 			ret += url_image;
 #endif
@@ -661,7 +662,7 @@ alt="" /></a></td>
 				MZ3LOGGER_DEBUG( L"画像URL [" + url_image + L"]" );
 
 				// 画像リンクを置換する
-				line.AppendFormat( L"<<画像%02d>><br>", data_.GetImageCount() );
+				line.AppendFormat( L"<img><<画像%02d>></img><br>", data_.GetImageCount() );
 
 				// 次のサーチのために str を更新する
 				if( util::GetAfterSubString( target, L"</a>", target ) < 0 ) {
@@ -720,7 +721,7 @@ alt="" /></a></td>
 				data_.m_linkList.push_back( CMixiData::Link(url, text) );
 
 				// 置換
-				line.Append( text );
+				line.Append( L"<a>" + text + L"</a>" );
 
 				// とりあえず改行
 				line += _T("<br>");
@@ -791,7 +792,7 @@ alt="" /></a></td>
 				data_.AddMovie( url );
 
 				// 置換ｆ
-				line.Append( text );
+				line.Append( L"<mov>" + text + L"</mov>" );
 
 				// とりあえず改行
 				line += _T("<br>");
@@ -853,7 +854,7 @@ alt="" /></a></td>
 			data_.m_linkList.push_back( CMixiData::Link(url,url) );
 
 			// 置換
-			line.Append( text );
+			line.Append( L"<a>" + text + L"</a>" );
 
 			// とりあえず改行
 			line += _T("<br>");
@@ -867,6 +868,7 @@ public:
 	/**
 	 * 全てのリンク文字列（<a...>XXX</a>）を、文字列のみ（XXX）に変更する
 	 * また、href="url" を list_ に追加する。
+	 * さらに、2ch 形式のURL(ttp://...)も抽出し、正規化して data のリンクリストに追加する。
 	 */
 	static void ExtractURI( CString& str, std::vector<CMixiData::Link>& list_ )
 	{
@@ -892,19 +894,51 @@ public:
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
+		static MyRegex reg4;
+		if( !util::CompileRegex( reg4, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
 
 		CString target = str;
 		str = L"";
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
 			std::vector<MyRegex::Result>* pResults = NULL;
+			u_int offset = 0;
+			std::wstring url = L"";
+			std::wstring text = L"";
 			if( reg.exec(target) && reg.results.size() == 3 ) {
 				pResults = &reg.results;
+				offset = reg.results[0].start ;
+				url = reg.results[1].str;
+				text = reg.results[2].str;
 			}
-			if( pResults == NULL && reg2.exec(target) && reg2.results.size() == 3 ) {
-				pResults = &reg2.results;
+			if( reg2.exec(target) && reg2.results.size() == 3 ) {
+				if( pResults == NULL || ( reg2.results[0].start < offset ) ){
+					pResults = &reg2.results;
+					offset = reg2.results[0].start ;
+					url = reg2.results[1].str;
+					text = reg2.results[2].str;
+				}
 			}
-			if( pResults == NULL && reg3.exec(target) && reg3.results.size() == 3 ) {
-				pResults = &reg3.results;
+			if( reg3.exec(target) && reg3.results.size() == 3 ) {
+				if( pResults == NULL || ( reg3.results[0].start < offset ) ){
+					pResults = &reg3.results;
+					offset = reg3.results[0].start ;
+					url = reg3.results[1].str;
+					text = reg3.results[2].str;
+				}
+			}
+			if( reg4.exec(target) && reg4.results.size() == 2 ) {
+				// 2ch URL
+				if( pResults == NULL || ( reg4.results[0].start < offset ) ){
+					pResults = &reg4.results;
+					offset = reg4.results[0].start + 1;
+					// 2ch URL を正規化
+					url = L"h";
+					url += reg4.results[1].str;
+					text = reg4.results[1].str;
+				}
 			}
 			if( pResults == NULL ) {
 				// 未発見。
@@ -917,16 +951,16 @@ public:
 
 
 			// マッチ文字列全体の左側を出力
-			str += target.Left( results[0].start );
+			str += target.Left( offset );
 
 			// URL
-			const std::wstring& url = results[1].str;
 			TRACE( L"regex-match-URL  : %s\n", url.c_str() );
 
 			// 文字列
-			const std::wstring& text = results[2].str;
 			TRACE( L"regex-match-TEXT : %s\n", text.c_str() );
+			str += L"<a>";
 			str += text.c_str();
+			str += L"</a>";
 
 			// データに追加
 			list_.push_back( CMixiData::Link(url.c_str(),text.c_str()) );
@@ -948,7 +982,7 @@ private:
 	/**
 	 * 2ch 形式のURL(ttp://...)を抽出し、正規化して data のリンクリストに追加する。
 	 */
-	static void Extract2chURL( const CString& str, CMixiData& data_ )
+	static void Extract2chURL( CString& str, CMixiData& data_ )
 	{
 //		TRACE( L"Extract2chURL:str[%s]\n", (LPCTSTR)str );
 
@@ -960,17 +994,27 @@ private:
 		}
 
 		CString target = str;
+		str = L"";
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
 			if( reg.exec(target) == false || reg.results.size() != 2 ) {
-				// 未発見。終了。
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				str += target;
 				break;
 			}
 
 			// 発見。
 
+			// マッチ文字列全体の左側を出力
+			str += target.Left( reg.results[0].start + 1 );
+
 			// 2ch URL
 			const std::wstring& url_2ch = reg.results[1].str;
 			TRACE( L"regex-match-2chURL : %s\n", url_2ch.c_str() );
+
+			str += L"<a>";
+			str += url_2ch.c_str();
+			str += L"</a>";
 
 			// 2ch URL を正規化
 			std::wstring url = L"h";
