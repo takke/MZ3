@@ -1209,7 +1209,16 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		switch (aType) {
 		case ACCESS_TWITTER_FRIENDS_TIMELINE:
 			// フォーカスを入力領域に移動
-			GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+			// 但し、フォーカスがリストにある場合は移動しない。
+			{
+				CWnd* pFocus = GetFocus();
+				if (pFocus == NULL ||
+					(pFocus->m_hWnd != m_categoryList.m_hWnd &&
+					 pFocus->m_hWnd != m_bodyList.m_hWnd))
+				{
+					GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+				}
+			}
 			break;
 		default:
 			break;
