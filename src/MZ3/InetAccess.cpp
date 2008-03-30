@@ -672,7 +672,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			MZ3LOGGER_DEBUG( msg );
 			msg.Format( L"ref : %s", m_ref );
 			MZ3LOGGER_DEBUG( msg );
-			msg.Format( L"post-body : %s", CStringW(&buf[0], buf.size()) );
+			msg.Format( L"post-body : %s", buf.empty() ? L"" : CStringW(&buf[0], buf.size()) );
 			MZ3LOGGER_DEBUG( msg );
 		}
 
@@ -687,7 +687,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 					bRet = ::HttpSendRequest(m_hRequest,
 						pszContentType_Multi,
 						lstrlen(pszContentType_Multi),
-						&buf[0],
+						buf.empty() ? "" : &buf[0],
 						buf.size() );
 					if( bRet == FALSE ) {
 						// ヘッダ送信失敗
@@ -708,7 +708,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 					bRet = ::HttpSendRequest(m_hRequest,
 						pszContentType_UrlEncoded,
 						lstrlen(pszContentType_UrlEncoded),
-						&buf[0],
+						buf.empty() ? "" : &buf[0],
 						buf.size() );
 					if( bRet == FALSE ) {
 						// POSTメッセージ送信失敗

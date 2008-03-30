@@ -1074,94 +1074,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		// --------------------------------------------------
 		// カテゴリ項目の取得
 		// --------------------------------------------------
-		{
-			// ステータスコードチェック
-			LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
-			switch (aType) {
-			case ACCESS_TWITTER_FRIENDS_TIMELINE:
-				szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-				break;
-			}
-			if (szStatusErrorMessage!=NULL) {
-				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-				util::MySetInformationText( m_hWnd, msg );
-				MZ3LOGGER_ERROR( msg );
-				// 以降の処理を行わない。
-				break;
-			}
-
-			util::MySetInformationText( m_hWnd, _T("HTML解析中 : 1/3") );
-
-			// 巡回モード（リストモード）の場合は、巡回モードを終了する。
-			if( m_cruise.enable() && !m_cruise.isFetchListMode() ) {
-				// リストモード以外なので通信を終了する
-				// 例えばボディモードの最後の要素が「次へ」のような場合にはここに来る。
-				if( m_cruise.autoCruise ) {
-					// 予約巡回なので次に進む
-					m_cruise.targetCategoryIndex++;
-					CruiseToNextCategory();
-				}else{
-					// 一時巡回なのでここで終了。
-					m_cruise.finish();
-					MessageBox( L"巡回完了" );
-				}
-				break;
-			}
-
-			// HTML の取得
-			CHtmlArray html;
-			html.Load( theApp.m_filepath.temphtml );
-
-			theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-
-			// 保存先 body の取得。
-			CMixiDataList& body = m_selGroup->getSelectedCategory()->GetBodyList();
-
-			// HTML 解析
-			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
-			mz3parser::MyDoParseMixiListHtml( aType, body, html );
-
-			// ボディ一覧の設定
-			util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
-
-			// 取得時刻文字列の作成
-			SYSTEMTIME localTime;
-			GetLocalTime(&localTime);
-			m_selGroup->getSelectedCategory()->m_bFromLog = false;
-			m_selGroup->getSelectedCategory()->SetAccessTime( localTime );
-			CString timeStr = m_selGroup->getSelectedCategory()->GetAccessTimeString();
-			m_categoryList.SetItemText( m_selGroup->selectedCategory, 1, timeStr );
-			SetBodyList( body );		// ボディ一覧に表示
-
-			if( aType == ACCESS_LIST_BBS ) {
-				// コミュニティリストの場合は自動的にボディ一覧にフォーカスする
-				m_bodyList.SetFocus();
-			}
-
-			// 巡回モードなら、ボディ要素の取得を開始する
-			if( m_cruise.enable() ) {
-				// 巡回モード
-
-				// リストモードなのでボディモードに変更し、
-				// ボディの取得を開始する。
-				m_cruise.startBodyCruise();
-
-				// ボディの最初の要素を取得する
-
-				// ボディリストにフォーカスを移動する
-				CommandSetFocusBodyList();
-
-				// 選択解除
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
-
-				// 次の巡回項目へ。
-				if( DoNextBodyItemCruise() ) {
-					// 通信継続のためここで return する
-					return TRUE;
-				}
-			}
-
-			util::MySetInformationText( m_hWnd, L"完了" );
+		if (DoAccessEndProcForBody(aType)) {
+			return TRUE;
 		}
 		break;
 
@@ -2800,11 +2714,11 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		theApp.m_mixi4recv = *data;
 	}
 
-	CString uri;
-
 	// アクセス種別を設定
 	theApp.m_accessType = data->GetAccessType();
 
+	// URL 整形
+	CString uri;
 	switch (data->GetAccessType()) {
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
@@ -2812,9 +2726,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		switch( theApp.m_optionMng.GetPageType() ) {
 		case GETPAGE_LATEST20:
 			// 最新２０件取得
-			{
-				uri = a_url;
-			}
+			uri = a_url;
 			break;
 
 		case GETPAGE_ALL:
@@ -2895,8 +2807,25 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
+	// GET/POST 判定
+	bool bPost = false;	// デフォルトはGET
+	switch (data->GetAccessType()) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// タイムライン取得をPOSTにしてみる
+		bPost = true;
+		break;
+	}
+
+	// GET/POST 開始
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
-	theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
+	if (bPost) {
+		static CPostData post;
+		post.SetSuccessMessage( WM_MZ3_POST_END );
+		post.AppendAdditionalHeader(L"");
+		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, szUser, szPassword );
+	} else {
+		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
+	}
 }
 
 /// 右ソフトキーメニュー｜全部読む
@@ -4870,18 +4799,27 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// 現状はTwitterのみ対応。
-	// HTTPステータスチェックを行う。
-	LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-	if (szStatusErrorMessage!=NULL) {
-		CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-		util::MySetInformationText( m_hWnd, msg );
-		MZ3LOGGER_ERROR( msg );
-	} else {
-		util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+	ACCESS_TYPE aType = theApp.m_accessType;
+	switch (aType) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		DoAccessEndProcForBody(aType);
+		break;
 
-		// 入力値を消去
-		SetDlgItemText( IDC_STATUS_EDIT, L"" );
+	case ACCESS_TWITTER_UPDATE:
+		// Twitter投稿処理
+		// HTTPステータスチェックを行う。
+		LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
+		if (szStatusErrorMessage!=NULL) {
+			CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+			util::MySetInformationText( m_hWnd, msg );
+			MZ3LOGGER_ERROR( msg );
+		} else {
+			util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+
+			// 入力値を消去
+			SetDlgItemText( IDC_STATUS_EDIT, L"" );
+		}
+		break;
 	}
 
 	// コントロール状態の変更
@@ -5315,4 +5253,99 @@ void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 	theApp.m_pMouseGestureManager->StopGestureMode();
 
 	CFormView::OnRButtonUp(nFlags, point);
+}
+
+/**
+ * ボディ系項目の取得完了処理
+ *
+ * @return bool 後続の処理を行わない場合に true を返す。
+ */
+bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
+{
+	// ステータスコードチェック
+	LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
+	switch (aType) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
+		break;
+	}
+	if (szStatusErrorMessage!=NULL) {
+		CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+		util::MySetInformationText( m_hWnd, msg );
+		MZ3LOGGER_ERROR( msg );
+		// 以降の処理を行わない。
+		return false;
+	}
+
+	util::MySetInformationText( m_hWnd, _T("HTML解析中 : 1/3") );
+
+	// 巡回モード（リストモード）の場合は、巡回モードを終了する。
+	if( m_cruise.enable() && !m_cruise.isFetchListMode() ) {
+		// リストモード以外なので通信を終了する
+		// 例えばボディモードの最後の要素が「次へ」のような場合にはここに来る。
+		if( m_cruise.autoCruise ) {
+			// 予約巡回なので次に進む
+			m_cruise.targetCategoryIndex++;
+			CruiseToNextCategory();
+		}else{
+			// 一時巡回なのでここで終了。
+			m_cruise.finish();
+			MessageBox( L"巡回完了" );
+		}
+		return false;
+	}
+
+	// HTML の取得
+	CHtmlArray html;
+	html.Load( theApp.m_filepath.temphtml );
+
+	// 保存先 body の取得。
+	CMixiDataList& body = m_selGroup->getSelectedCategory()->GetBodyList();
+
+	// HTML 解析
+	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
+	mz3parser::MyDoParseMixiListHtml( aType, body, html );
+
+	// ボディ一覧の設定
+	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
+
+	// 取得時刻文字列の作成
+	SYSTEMTIME localTime;
+	GetLocalTime(&localTime);
+	m_selGroup->getSelectedCategory()->m_bFromLog = false;
+	m_selGroup->getSelectedCategory()->SetAccessTime( localTime );
+	CString timeStr = m_selGroup->getSelectedCategory()->GetAccessTimeString();
+	m_categoryList.SetItemText( m_selGroup->selectedCategory, 1, timeStr );
+	SetBodyList( body );		// ボディ一覧に表示
+
+	if( aType == ACCESS_LIST_BBS ) {
+		// コミュニティリストの場合は自動的にボディ一覧にフォーカスする
+		m_bodyList.SetFocus();
+	}
+
+	// 巡回モードなら、ボディ要素の取得を開始する
+	if( m_cruise.enable() ) {
+		// 巡回モード
+
+		// リストモードなのでボディモードに変更し、
+		// ボディの取得を開始する。
+		m_cruise.startBodyCruise();
+
+		// ボディの最初の要素を取得する
+
+		// ボディリストにフォーカスを移動する
+		CommandSetFocusBodyList();
+
+		// 選択解除
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
+
+		// 次の巡回項目へ。
+		if( DoNextBodyItemCruise() ) {
+			// 通信継続のためここで return する
+			return true;
+		}
+	}
+
+	util::MySetInformationText( m_hWnd, L"完了" );
+	return false;
 }
