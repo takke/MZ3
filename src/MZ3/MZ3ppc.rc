@@ -1078,6 +1078,8 @@ IDR_TOOLBAR_WIN32       BITMAP                  "res\\toolbar_win32.bmp"
 
 IDC_GRABBABLE_CURSOR    CURSOR                  "res\\grabbable_cursor.cur"
 IDC_GRABBING_CURSOR     CURSOR                  "res\\grabbing_cursor.cur"
+IDC_ARROW_LEFT_CURSOR   CURSOR                  "res\\arrow_left_cursor.cur"
+IDC_ARROW_RIGHT_CURSOR  CURSOR                  "res\\arrow_right_cursor.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //

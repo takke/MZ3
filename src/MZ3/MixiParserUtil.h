@@ -592,7 +592,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 
 #define REPLACE_ALBUMURL_STRING
 #ifdef  REPLACE_ALBUMURL_STRING
-			ret.AppendFormat( L"<img><<画像%02d(album)>></img>", data_.GetImageCount() );
+			ret.AppendFormat( L"<_img><<画像%02d(album)>></_img>", data_.GetImageCount() );
 #else
 			ret += url_image;
 #endif
@@ -662,7 +662,7 @@ alt="" /></a></td>
 				MZ3LOGGER_DEBUG( L"画像URL [" + url_image + L"]" );
 
 				// 画像リンクを置換する
-				line.AppendFormat( L"<img><<画像%02d>></img><br>", data_.GetImageCount() );
+				line.AppendFormat( L"<_img><<画像%02d>></_img><br>", data_.GetImageCount() );
 
 				// 次のサーチのために str を更新する
 				if( util::GetAfterSubString( target, L"</a>", target ) < 0 ) {
@@ -721,7 +721,7 @@ alt="" /></a></td>
 				data_.m_linkList.push_back( CMixiData::Link(url, text) );
 
 				// 置換
-				line.Append( L"<a>" + text + L"</a>" );
+				line.Append( L"<_a>" + text + L"</_a>" );
 
 				// とりあえず改行
 				line += _T("<br>");
@@ -792,7 +792,7 @@ alt="" /></a></td>
 				data_.AddMovie( url );
 
 				// 置換ｆ
-				line.Append( L"<mov>" + text + L"</mov>" );
+				line.Append( L"<_mov>" + text + L"</_mov>" );
 
 				// とりあえず改行
 				line += _T("<br>");
@@ -854,7 +854,7 @@ alt="" /></a></td>
 			data_.m_linkList.push_back( CMixiData::Link(url,url) );
 
 			// 置換
-			line.Append( L"<a>" + text + L"</a>" );
+			line.Append( L"<_a>" + text + L"</_a>" );
 
 			// とりあえず改行
 			line += _T("<br>");
@@ -895,7 +895,7 @@ public:
 			return;
 		}
 		static MyRegex reg4;
-		if( !util::CompileRegex( reg4, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+		if( !util::CompileRegex( reg4, L"([^h]|^)(ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -929,15 +929,15 @@ public:
 					text = reg3.results[2].str;
 				}
 			}
-			if( reg4.exec(target) && reg4.results.size() == 2 ) {
+			if( reg4.exec(target) && reg4.results.size() == 3 ) {
 				// 2ch URL
-				if( pResults == NULL || ( reg4.results[0].start < offset ) ){
+				if( pResults == NULL || ( reg4.results[2].start < offset ) ){
 					pResults = &reg4.results;
-					offset = reg4.results[0].start + 1;
+					offset = reg4.results[2].start;
 					// 2ch URL を正規化
 					url = L"h";
-					url += reg4.results[1].str;
-					text = reg4.results[1].str;
+					url += reg4.results[2].str;
+					text = reg4.results[2].str;
 				}
 			}
 			if( pResults == NULL ) {
@@ -958,9 +958,9 @@ public:
 
 			// 文字列
 			TRACE( L"regex-match-TEXT : %s\n", text.c_str() );
-			str += L"<a>";
+			str += L"<_a>";
 			str += text.c_str();
-			str += L"</a>";
+			str += L"</_a>";
 
 			// データに追加
 			list_.push_back( CMixiData::Link(url.c_str(),text.c_str()) );
@@ -1012,9 +1012,9 @@ private:
 			const std::wstring& url_2ch = reg.results[1].str;
 			TRACE( L"regex-match-2chURL : %s\n", url_2ch.c_str() );
 
-			str += L"<a>";
+			str += L"<_a>";
 			str += url_2ch.c_str();
-			str += L"</a>";
+			str += L"</_a>";
 
 			// 2ch URL を正規化
 			std::wstring url = L"h";

@@ -89,6 +89,9 @@ public:
 	bool			isDownHanging;			// 下付き有無(true:有り、false:無し)
 	bool			isUnderLine;			// 下線の有無(true:有り、false:無し)
 	CString			lineText;				// 行出力に使われるテキスト(400文字で足りる？)
+	int				linkID;					// リンクID
+	int				imglinkID;				// リンクID
+	int				movlinkID;				// リンクID
 	TextProperty();
 	~TextProperty();
 };
@@ -358,10 +361,17 @@ class Ran2View : public CWnd
 	CDC*		memDC;						// 裏画面DC
 	CBitmap*	memBMP;						// 裏画面バッファ
 	CBitmap*	oldBMP;						// 旧画面の情報
+	CDC*		memBackDC;					// パンスクロール用裏画面DC
+	CBitmap*	memBackBMP;					// パンスクロール用裏画面バッファ
+	CBitmap*	oldBackBMP;					// パンスクロール用旧画面の情報
 	int			viewLineMax;				// 現在のフォントで行表示可能な数
 	COLORREF	normalBkColor,reverseBkColor;	// 通常時背景色と反転時背景色
 	COLORREF	normalTextColor,reverseTextColor,markTextColor;	// 通常時文字色、反転時文字色、特殊マーク色
 	int			drawOffsetLine;				// 現在描画を行っている行位置
+
+	int			activeLinkID;				// アクティブなリンクのID
+	int			activeimgLinkID;			// アクティブなリンクのID
+	int			activemovLinkID;			// アクティブなリンクのID
 
 	CImageList*	m_pImageList;				// 画像キャッシュへのポインタ
 
@@ -370,6 +380,11 @@ class Ran2View : public CWnd
 	CPoint		m_ptDragStart;				// ドラッグ開始位置
 	int			m_dragStartLine;			// ドラッグ開始時の行番号
 	int			m_offsetPixelY;				// オフセットピクセル数
+	// パン関連情報
+	bool		m_bPanDragging;				// 横方向マウスドラッグ中
+	bool		m_bScrollDragging;			// スクロール中
+	int			m_offsetPixelX;				// 横方向オフセットピクセル数
+	int			m_dPxelX;					// 横方向単位時間移動量
 
 	// ダブルクリック判定情報
 	DWORD		m_dwFirstLButtonUp;			// 最初に左クリックされた時刻
@@ -379,6 +394,8 @@ class Ran2View : public CWnd
 
 	DWORD		m_dwAutoScrollStartTick;	// 自動スクロール開始時刻
 	int			m_yAutoScrollMax;			// 自動スクロール中の最大移動量
+
+	bool		bAutoScrolling;				// 自動スクロール中
 
 	MainInfo*	parsedRecord;
 
@@ -474,6 +491,7 @@ public:
 	void ResetDragOffset(void);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	void DrawToScreen(CDC* pDC);
+	void StartPanDraw(bool bForword);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void ScrollByMoveY(int dy);
 };

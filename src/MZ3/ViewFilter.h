@@ -120,6 +120,7 @@ public:
 	/**
 	 * タグの変換
 	 * bodyArrayをサーチしてHTMLタグをらんらんビュータグに変換する
+	 * 非効率版
 	 */
 	static void ReplaceHTMLTagToRan2ImageTags( const CString fromTag, const CString toTag, CStringArray* bodyArray )
 	{
@@ -189,4 +190,151 @@ public:
 			
 		}
 	}
+
+	/**
+	 * 絵文字コード [m:xx] の分離
+	 * および、HTMLタグをらんらんビュータグに変換
+	 * 性能対策版
+	 */
+	static void ReplaceHTMLTagToRan2Tags( CString& line, CStringArray& bodyArray, EmojiMapList& emojiMap, CWnd* pWnd )
+	{
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if (!util::CompileRegex( reg, L"(\\[m:[0-9]+?\\])" )) {
+			return;
+		}
+
+		// ((喫煙)) 形式に置換する
+		CString target = line;
+		line = L"";
+		for( int i=0; i<1000; i++ ) {	// 1000 は無限ループ防止
+			int emojioffset = -1;
+			int tagoffset = -1;
+			CString toTag = L"";
+			int taglen = 0;
+
+			// 絵文字検索
+			if( reg.exec(target) && reg.results.size() == 2 ) {
+				// 発見。
+				emojioffset = reg.results[0].start;
+			}
+
+			// タグ検索
+			tagoffset = target.Find( L"<" );
+			for( int j=0 ; j<1000 ; j++ ){	// 1000 は無限ループ防止
+				if( tagoffset < 0 ){
+					break;
+				}
+				if( emojioffset >=0 && tagoffset > emojioffset ) {
+					// 絵文字より後ろなら未発見扱い
+					tagoffset = -1;
+					break;
+				}
+				// タグの判定（これでいいのか？＞私
+				if( target.Mid( tagoffset , 8 ) == L"<strong>" ){
+					toTag = L"[b]";
+					taglen = 8;
+					break;
+				} else if( target.Mid( tagoffset , 9 ) == L"</strong>" ){
+					toTag = L"[/b]";
+					taglen = 9;
+					break;
+				} else if( target.Mid( tagoffset , 12 ) == L"<blockquote>" ){
+					toTag = L"[blockquote]";
+					taglen = 12;
+					break;
+				} else if( target.Mid( tagoffset ,13 ) == L"</blockquote>" ){
+					toTag = L"[/blockquote]";
+					taglen = 13;
+					break;
+				} else if( target.Mid( tagoffset , 4 ) == L"<_a>" ){
+					toTag = L"[a]";
+					taglen = 4;
+					break;
+				} else if( target.Mid( tagoffset , 5) == L"</_a>" ){
+					toTag = L"[/a]";
+					taglen = 5;
+					break;
+				} else if( target.Mid( tagoffset , 6) == L"<_img>" ){
+					toTag = L"[img]";
+					taglen = 6;
+					break;
+				} else if( target.Mid( tagoffset , 7 ) == L"</_img>" ){
+					toTag = L"[/img]";
+					taglen = 7;
+					break;
+				} else if( target.Mid( tagoffset , 6 ) == L"<_mov>" ){
+					toTag = L"[mov]";
+					taglen = 6;
+					break;
+				} else if( target.Mid( tagoffset , 7 ) == L"</_mov>" ){
+					toTag = L"[/mov]";
+					taglen = 7;
+					break;
+				} else {
+					tagoffset = target.Find( L"<" , tagoffset + 1 );
+				}
+			}
+
+			if( emojioffset < 0 && tagoffset < 0 ){
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				bodyArray.Add(target);
+				break;
+
+			} else if( tagoffset < 0 || ( emojioffset >=0 && emojioffset < tagoffset ) ){
+				// 絵文字を先に発見。
+				std::vector<MyRegex::Result>& results = reg.results;
+
+				// マッチ文字列全体の左側を出力
+				bodyArray.Add( CString( target, results[0].start ) );
+
+				// 絵文字を追加
+				const std::wstring& emoji_code = results[1].str;
+				size_t n = emojiMap.size();
+				for (size_t j=0; j<n; j++) {
+					if (emojiMap[j].code == emoji_code.c_str()) {
+						CString path = util::MakeImageLogfilePathFromUrl( emojiMap[j].url );
+						int imageIndex = theApp.m_imageCache.GetImageIndex(path);
+						if (imageIndex == -1) {
+							// 未ロードなのでロードする
+							CMZ3BackgroundImage image(L"");
+							if (!image.load( path )) {
+								// ロードエラー
+								break;
+							}
+
+							// 16x16 にリサイズする。
+							CMZ3BackgroundImage resizedImage(L"");
+							util::MakeResizedImage( pWnd, resizedImage, image );
+
+							// ビットマップの追加
+							CBitmap bm;
+							bm.Attach( resizedImage.getHandle() );
+							imageIndex = theApp.m_imageCache.Add( &bm, (CBitmap*)NULL, path );
+						}
+						bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );
+						break;
+					}
+				}
+				// ターゲットを更新。
+				target.Delete( 0, results[0].end );
+
+			} else {
+				// タグを先に発見
+				if( tagoffset > 0 ){
+					// タグの左側を文字列として追加
+					bodyArray.Add( target.Left( tagoffset ) );
+					target.Delete( 0 , tagoffset );
+				}
+				// 変換後のタグを追加
+				bodyArray.Add( toTag );
+
+				// ターゲットを更新。
+				target.Delete( 0 , taglen );
+
+			}
+		}
+	}
+
 };

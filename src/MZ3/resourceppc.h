@@ -46,6 +46,9 @@
 #define IDR_TWITTER_MENU                165
 #define IDR_TAB_MENU                    166
 #define IDD_COMMON_EDIT_DIALOG          167
+#define IDC_ARROW_LEFT_CURSOR           168
+#define IDC_ARROW_LEFT_CURSOR1          169
+#define IDC_ARROW_RIGHT_CURSOR          169
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -290,7 +293,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        168
+#define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         34142
 #define _APS_NEXT_CONTROL_VALUE         1070
 #define _APS_NEXT_SYMED_VALUE           117

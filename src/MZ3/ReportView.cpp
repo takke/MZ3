@@ -558,7 +558,8 @@ void CReportView::ShowCommentData(CMixiData* data)
 			}
 		} else {
 			// 絵文字用フィルタ
-			ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
+			//ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
+			ViewFilter::ReplaceHTMLTagToRan2Tags( target, *bodyStrArray, theApp.m_emoji, this );
 			LPCTSTR brLine = TEXT("[br]");
 			bodyStrArray->Add(brLine);
 		}
@@ -579,16 +580,16 @@ void CReportView::ShowCommentData(CMixiData* data)
 //	TRACE( L"■---dump end---\r\n" );
 
 	// HTMLタグをらんらんビュータグに変換する
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<strong>") , TEXT("[b]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</strong>") , TEXT("[/b]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<blockquote>") , TEXT("[blockquote]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</blockquote>") , TEXT("[/blockquote]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<a>") , TEXT("[a]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</a>") , TEXT("[/a]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<img>") , TEXT("[img]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</img>") , TEXT("[/img]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<mov>") , TEXT("[mov]") , bodyStrArray );
-	ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</mov>") , TEXT("[/mov]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<strong>") , TEXT("[b]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</strong>") , TEXT("[/b]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<blockquote>") , TEXT("[blockquote]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</blockquote>") , TEXT("[/blockquote]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_a>") , TEXT("[a]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_a>") , TEXT("[/a]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_img>") , TEXT("[img]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_img>") , TEXT("[/img]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_mov>") , TEXT("[mov]") , bodyStrArray );
+	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_mov>") , TEXT("[/mov]") , bodyStrArray );
 
 	// blockquoteの前に改行を入れる
 	ViewFilter::InsertBRTagToBeforeblockquoteTag( bodyStrArray );
@@ -728,7 +729,7 @@ BOOL CReportView::CommandMoveUpList()
 {
 	if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 		// 一番上の項目選択中なので、一番下に移動
-		return CommandMoveToLastList();
+		CommandMoveToLastList();
 	} else {
 		// 一番上ではないので、上に移動
 		int idx = m_list.GetSelectedItem();
@@ -750,6 +751,9 @@ BOOL CReportView::CommandMoveUpList()
 			}
 		}
 	}
+
+	m_detailView->StartPanDraw(true);
+
 	return TRUE;
 }
 
@@ -757,7 +761,7 @@ BOOL CReportView::CommandMoveDownList()
 {
 	if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下の項目選択中なので、一番上に移動
-		return CommandMoveToFirstList();
+		CommandMoveToFirstList();
 	} else {
 		// 一番下ではないので、下に移動
 		int idx = m_list.GetSelectedItem();
@@ -779,6 +783,9 @@ BOOL CReportView::CommandMoveDownList()
 			}
 		}
 	}
+
+	m_detailView->StartPanDraw(false);
+
 	return TRUE;
 }
 
@@ -1044,7 +1051,11 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				// 項目変更
 				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 					// 一番上の項目選択中なので、一番下に移動
-					return CommandMoveToLastList();
+					CommandMoveToLastList();
+
+					m_detailView->StartPanDraw(true);
+
+					return true;
 				} else {
 #ifdef WINCE
 					// デフォルト動作
@@ -1066,7 +1077,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 					// 一番下の項目選択中なので、一番上に移動
 					CommandMoveToFirstList();
-					
+
+					m_detailView->StartPanDraw(false);
+
 					return TRUE;
 				} else {
 #ifdef WINCE
