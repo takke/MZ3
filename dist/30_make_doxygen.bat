@@ -12,3 +12,4 @@
 @cd ..\doxygen
 doxygen
 @cd %dist_dir%
+pause
