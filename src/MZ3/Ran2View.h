@@ -19,15 +19,15 @@
 
 namespace Ran2 {
 
-const int framePixel = 1;					// ワク線の太さ(ピクセル数)
-const int lineVirtualHeightPixel = 3;		// 仮想行間の太さ
-const int charInfoBlockSize = 64;	// 行情報に踏めることのできる文字修飾情報の最大要素数
-const int lineTextLength = 512;		// 行単位の文字の最大の最大長
-const int FrameNestLevel = 2;		// ワク線は2段階までネスト可能とする
-const int PageAnchorMax = 16;		// ページ内リンクの最大数
-const int pictureNameLength = 16;	// 画像ファイルのID名の最大長
+const int framePixel = 1;				///< ワク線の太さ(ピクセル数)
+const int lineVirtualHeightPixel = 3;	///< 仮想行間の太さ
+const int charInfoBlockSize = 64;		///< 行情報に踏めることのできる文字修飾情報の最大要素数
+const int lineTextLength = 512;			///< 行単位の文字の最大の最大長
+const int FrameNestLevel = 2;			///< ワク線は2段階までネスト可能とする
+const int PageAnchorMax = 16;			///< ページ内リンクの最大数
+const int pictureNameLength = 16;		///< 画像ファイルのID名の最大長
 
-// Htmlタグを分解して情報を保存する
+/// Htmlタグを分解して情報を保存する
 class	HtmlRecord
 {
 public:
@@ -244,7 +244,7 @@ public:
 	~BigBridgeProperty();
 };
 
-// 自動スクロール情報
+/// 慣性スクロール情報
 struct MouseMoveInfo {
 	DWORD	tick;	///< 時刻
 	CPoint	pt;		///< 位置
@@ -255,14 +255,18 @@ struct MouseMoveInfo {
 	{
 	}
 };
-class AutoScrollInfo {
+
+/// 慣性スクロール管理クラス
+class AutoScrollManager {
 public:
 	std::vector<MouseMoveInfo> m_moveInfoList;	///< 移動情報のログ
 
+	/// 移動情報クリア
 	void clear() {
 		m_moveInfoList.clear();
 	}
 
+	/// 位置追加
 	void push( DWORD tick, const CPoint& pt ) {
 		m_moveInfoList.push_back( MouseMoveInfo(tick,pt) );
 		while (m_moveInfoList.size()>4) {
@@ -270,6 +274,7 @@ public:
 		}
 	}
 
+	/// 縦方向速度算出
 	double calcMouseMoveSpeedY() {
 		double speed = 0.0;
 
@@ -286,6 +291,7 @@ public:
 		return speed;
 	}
 
+	/// 縦方向加速度算出
 	double calcMouseMoveAccelY() {
 		double accel = 0.0;
 
@@ -302,6 +308,7 @@ public:
 		return accel;
 	}
 
+	/// 最終位置
 	CPoint getLastPoint()
 	{
 		if (m_moveInfoList.empty()) {
@@ -316,107 +323,111 @@ public:
 
 using namespace Ran2;
 
-// 絵文字対応描画コントロール「らんらん」
+/// 絵文字対応描画コントロール「らんらん」
 class Ran2View : public CWnd
 {
 	DECLARE_DYNAMIC(Ran2View)
-	int								CurrentDPI;
-	CString							uidStr;				// 現在描画中のUID名(テストでのみ使用)
-	int								currentUIDNumber;	// 現在描画中のUID番号
+	int			currentDPI;				///< DPI値
+	CString		uidStr;					///< 現在描画中のUID名(テストでのみ使用)
+	int			currentUIDNumber;		///< 現在描画中のUID番号
 
-	CPen		underLinePen;			// 汎用の黒ペン
-	CPen		DarkBlueunderLinePen;		// アンカ用の青ペン
-	CBrush		blueBrush;				// 汎用の青ブラシ
-	CBrush*		oldBrush;				// 復帰用のポインタ
+	CPen		underLinePen;			///< 汎用の黒ペン
+	CPen		DarkBlueunderLinePen;	///< アンカ用の青ペン
+	CBrush		blueBrush;				///< 汎用の青ブラシ
+	CBrush*		oldBrush;				///< 復帰用のポインタ
 
-	CFont*		normalFont;				// 通常フォント
-	CFont*		boldFont;				// 太字表示で使うフォント
-	CFont*		qFont;					// 上付き/下付きで使う1/4サイズのフォント
-	CFont*		qBoldFont;				// 上付き/下付きで使う1/4サイズの太字フォント
+	CFont*		normalFont;				///< 通常フォント
+	CFont*		boldFont;				///< 太字表示で使うフォント
+	CFont*		qFont;					///< 上付き/下付きで使う1/4サイズのフォント
+	CFont*		qBoldFont;				///< 上付き/下付きで使う1/4サイズの太字フォント
 
-	CFont*		oldFont;				// 切り替え前のフォント
-	int			m_drawStartTopOffset;	// 描画開始オフセット(ピクセル)
-	int			topOffset;				// 上端の余白(ピクセル)
-	int			leftOffset;				// 左端の余白(ピクセル)
-	int			frameOffset;			// ネストする枠線の余白(ピクセル)
-	int			NormalWidthOffset;		// タグ指定がないときの画面幅差分
+	CFont*		oldFont;				///< 切り替え前のフォント
+	int			m_drawStartTopOffset;	///< 描画開始オフセット(ピクセル)
+	int			topOffset;				///< 上端の余白(ピクセル)
+	int			leftOffset;				///< 左端の余白(ピクセル)
+	int			frameOffset;			///< ネストする枠線の余白(ピクセル)
+	int			NormalWidthOffset;		///< タグ指定がないときの画面幅差分
 
-	CRect		viewRect;				// 描画領域：矩形
-	int			screenWidth;			// 描画領域：横幅
-	int			screenHeight;			// 描画領域：縦幅
-	int			charHeightOffset;		// 行間のマージン
-	int			gaijiWidthOffset;		// 外字の文字間のマージン
+	CRect		viewRect;				///< 描画領域：矩形
+	int			screenWidth;			///< 描画領域：横幅
+	int			screenHeight;			///< 描画領域：縦幅
+	int			charHeightOffset;		///< 行間のマージン
+	int			gaijiWidthOffset;		///< 外字の文字間のマージン
 
-	int			charSpacing;			// 文字の前後スペース幅の総量(ABC幅のAとC)
-	int			charHeight;				// 通常文字の高さ
-	int			charWidth;				// 通常文字の幅(boldの太さに変更)
-	int			boldCharWidth;			// 太文字の幅
-	int			charQHeight;			// 1/4文字の高さ
-	int			charQWidth;				// 1/4文字の幅
-	int			currentCharWidth;		// 現在出力に使っている文字の幅(折り返し処理で使用)
+	int			charSpacing;			///< 文字の前後スペース幅の総量(ABC幅のAとC)
+	int			charHeight;				///< 通常文字の高さ
+	int			charWidth;				///< 通常文字の幅(boldの太さに変更)
+	int			boldCharWidth;			///< 太文字の幅
+	int			charQHeight;			///< 1/4文字の高さ
+	int			charQWidth;				///< 1/4文字の幅
+	int			currentCharWidth;		///< 現在出力に使っている文字の幅(折り返し処理で使用)
 
-	int			hangingOffset;				// 上付き、下付きの突き出し量
-	CDC*		backDC;						// 画像描画用DC
-	CDC*		dummyDC;					// 見積用
-	CDC*		memDC;						// 裏画面DC
-	CBitmap*	memBMP;						// 裏画面バッファ
-	CBitmap*	oldBMP;						// 旧画面の情報
-	CDC*		memBackDC;					// パンスクロール用裏画面DC
-	CBitmap*	memBackBMP;					// パンスクロール用裏画面バッファ
-	CBitmap*	oldBackBMP;					// パンスクロール用旧画面の情報
-	int			viewLineMax;				// 現在のフォントで行表示可能な数
-	COLORREF	normalBkColor,reverseBkColor;	// 通常時背景色と反転時背景色
-	COLORREF	normalTextColor,reverseTextColor,markTextColor;	// 通常時文字色、反転時文字色、特殊マーク色
-	int			drawOffsetLine;				// 現在描画を行っている行位置
+	int			hangingOffset;				///< 上付き、下付きの突き出し量
+	CDC*		backDC;						///< 画像描画用DC
+	CDC*		dummyDC;					///< 見積用
+	CDC*		memDC;						///< 裏画面DC
+	CBitmap*	memBMP;						///< 裏画面バッファ
+	CBitmap*	oldBMP;						///< 旧画面の情報
+	CDC*		memBackDC;					///< パンスクロール用裏画面DC
+	CBitmap*	memBackBMP;					///< パンスクロール用裏画面バッファ
+	CBitmap*	oldBackBMP;					///< パンスクロール用旧画面の情報
+	int			m_viewLineMax;				///< 現在のフォントで行表示可能な数
+	COLORREF	normalBkColor;				///< 通常時背景色
+	COLORREF	reverseBkColor;				///< 反転時背景色
+	COLORREF	normalTextColor;			///< 通常時文字色
+	COLORREF	reverseTextColor;			///< 反転時文字色
+	COLORREF	markTextColor;				///< 特殊マーク色
+	int			m_drawOffsetLine;			///< 現在描画を行っている行位置
 
-	int			activeLinkID;				// アクティブなリンクのID
-	int			activeimgLinkID;			// アクティブなリンクのID
-	int			activemovLinkID;			// アクティブなリンクのID
+	int			activeLinkID;				///< アクティブなリンクのID
+	int			activeimgLinkID;			///< アクティブなリンクのID
+	int			activemovLinkID;			///< アクティブなリンクのID
 
-	CImageList*	m_pImageList;				// 画像キャッシュへのポインタ
+	CImageList*	m_pImageList;				///< 画像キャッシュへのポインタ
 
 	// ドラッグ関連情報
-	bool		m_bDragging;				// マウスドラッグ中
-	CPoint		m_ptDragStart;				// ドラッグ開始位置
-	int			m_dragStartLine;			// ドラッグ開始時の行番号
-	int			m_offsetPixelY;				// オフセットピクセル数
+	bool		m_bDragging;				///< マウスドラッグ中
+	CPoint		m_ptDragStart;				///< ドラッグ開始位置
+	int			m_dragStartLine;			///< ドラッグ開始時の行番号
+	int			m_offsetPixelY;				///< オフセットピクセル数
 	// パン関連情報
-	bool		m_bPanDragging;				// 横方向マウスドラッグ中
-	bool		m_bScrollDragging;			// スクロール中
-	int			m_offsetPixelX;				// 横方向オフセットピクセル数
-	int			m_dPxelX;					// 横方向単位時間移動量
+	bool		m_bPanDragging;				///< 横方向マウスドラッグ中
+	bool		m_bScrollDragging;			///< スクロール中
+	int			m_offsetPixelX;				///< 横方向オフセットピクセル数
+	int			m_dPxelX;					///< 横方向単位時間移動量
 
 	// ダブルクリック判定情報
-	DWORD		m_dwFirstLButtonUp;			// 最初に左クリックされた時刻
-	CPoint		m_ptFirstLButtonUp;			// 最初に左クリックされた位置
+	DWORD		m_dwFirstLButtonUp;			///< 最初に左クリックされた時刻
+	CPoint		m_ptFirstLButtonUp;			///< 最初に左クリックされた位置
 
-	AutoScrollInfo	m_autoScrollInfo;		// 自動スクロール情報
+	AutoScrollManager	m_autoScrollInfo;	///< 慣性スクロール情報
 
-	DWORD		m_dwAutoScrollStartTick;	// 自動スクロール開始時刻
-	int			m_yAutoScrollMax;			// 自動スクロール中の最大移動量
+	DWORD		m_dwAutoScrollStartTick;	///< 慣性スクロール開始時刻
+	int			m_yAutoScrollMax;			///< 慣性スクロール中の最大移動量
 
-	bool		bAutoScrolling;				// 自動スクロール中
+	bool		m_bAutoScrolling;			///< 慣性スクロール中
 
 	MainInfo*	parsedRecord;
 
 #ifndef WINCE
-	CPtrArray	ran2ImageArray;				// アニメGIFのインスタンス保持用
-	Graphics*	m_graphics;					// GDI+の描画ユーティリティ
-	bool		m_isAnime;					// アニメGIFが一枚でも含まれていればタイマー更新を行う
+	CPtrArray	ran2ImageArray;				///< アニメGIFのインスタンス保持用
+	Graphics*	m_graphics;					///< GDI+の描画ユーティリティ
+	bool		m_isAnime;					///< アニメGIFが一枚でも含まれていればタイマー更新を行う
 #endif
-	bool		m_isMomi2;					// 慣性スクロール中のフラグ
+	bool		m_isMomi2;					///< 慣性スクロール中のフラグ
 
 #ifdef DEBUG
-	CString			logStr;
 	MEMORYSTATUS	memState;			
 #endif
+
 public:
 	Ran2View();
 	virtual ~Ran2View();
 
-	// 1画面で表示可能な行数
-	int		GetViewLineMax() { return(viewLineMax); }
-	// 全行数
+	/// 1画面で表示可能な行数
+	int		GetViewLineMax() { return m_viewLineMax; }
+	
+	/// 全行数
 	int		GetAllLineCount() {
 		if (parsedRecord != NULL &&
 			parsedRecord->rowInfo != NULL)
@@ -425,12 +436,14 @@ public:
 		}
 		return 0;
 	}
-	// 1行あたりのオフセットピクセル数
+	
+	/// 1行あたりのオフセットピクセル数
 	int		GetCharHeightOffset() {
 		return charHeightOffset;
 	}
 
-	void	PurgeMainRecord();	// mainRecordの破棄
+	/// mainRecordの破棄
+	void	PurgeMainRecord();
 
 	// クラス登録
 	static BOOL RegisterWndClass(HINSTANCE hInstance);
@@ -438,11 +451,14 @@ public:
 
 	int		ChangeViewFont(int newHeight, LPCTSTR szFontFace);
 	CString	CalcTextByWidth(CDC* dstDC,CString srcStr,int width);
-	int		GetDrawOffsetLine(){ return(drawOffsetLine); }	// 現在の描画開始位置の取得
+
+	int		MyGetScrollPos();
 
 	// 描画
-	int		DrawDetail(int startLine, bool bForceDraw=true);	// 任意の行から描画
-	void	Refresh();											// 現在位置を再描画
+	int		DrawDetail(int startLine, bool bForceDraw=true);
+
+	/// 現在位置を再描画
+	void	Refresh();
 
 	// データの読み込み
 	int		LoadDetail(CStringArray* bodyArray, CImageList* pImageList);
@@ -488,12 +504,23 @@ public:
 
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-	void ResetDragOffset(void);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	void DrawToScreen(CDC* pDC);
-	void StartPanDraw(bool bForword);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	void ScrollByMoveY(int dy);
+
+	void ResetDragOffset(void);
+	void DrawToScreen(CDC* pDC);
+
+	/// パンスクロールの方向定義
+	enum PAN_SCROLL_DIRECTION
+	{
+		PAN_SCROLL_DIRECTION_RIGHT,	///< 右方向
+		PAN_SCROLL_DIRECTION_LEFT,	///< 左方向
+	};
+	void StartPanDraw(PAN_SCROLL_DIRECTION direction);
+	bool ScrollByMoveY(int dy);
+
+private:
+	void MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy);
 };
 
 

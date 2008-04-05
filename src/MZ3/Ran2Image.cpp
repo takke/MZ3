@@ -126,8 +126,6 @@ UINT WINAPI Ran2Image::_GoRan2Proc(LPVOID pParam)
 // ÉpÉ^Å[ÉìÇÃï`âÊ
 bool Ran2Image::DrawFrameGIF()
 {
-	CString logStr;
-
 	::WaitForSingleObject(m_hPause, INFINITE);
 	GUID   pageGuid = FrameDimensionTime;
 	long hmWidth = GetWidth();

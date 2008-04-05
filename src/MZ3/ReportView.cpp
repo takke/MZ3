@@ -727,6 +727,11 @@ BOOL CReportView::CommandMoveToLastList()
 
 BOOL CReportView::CommandMoveUpList()
 {
+	// アイテム数が1以下であれば変更しない
+	if (m_list.GetItemCount()<=1) {
+		return TRUE;
+	}
+
 	if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 		// 一番上の項目選択中なので、一番下に移動
 		CommandMoveToLastList();
@@ -752,13 +757,18 @@ BOOL CReportView::CommandMoveUpList()
 		}
 	}
 
-	m_detailView->StartPanDraw(true);
+	m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
 
 	return TRUE;
 }
 
 BOOL CReportView::CommandMoveDownList()
 {
+	// アイテム数が1以下であれば変更しない
+	if (m_list.GetItemCount()<=1) {
+		return TRUE;
+	}
+
 	if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下の項目選択中なので、一番上に移動
 		CommandMoveToFirstList();
@@ -784,7 +794,7 @@ BOOL CReportView::CommandMoveDownList()
 		}
 	}
 
-	m_detailView->StartPanDraw(false);
+	m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
 
 	return TRUE;
 }
@@ -1049,11 +1059,14 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				}
 
 				// 項目変更
-				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE) {
+				if (m_list.GetItemState(0, LVIS_FOCUSED) != FALSE &&
+					// アイテム数が1以下であれば変更しない
+					m_list.GetItemCount()>1)
+				{
 					// 一番上の項目選択中なので、一番下に移動
 					CommandMoveToLastList();
 
-					m_detailView->StartPanDraw(true);
+					m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
 
 					return true;
 				} else {
@@ -1074,11 +1087,14 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				}
 
 				// 項目変更
-				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
+				if (m_list.GetItemState(m_list.GetItemCount()-1, LVIS_FOCUSED) != FALSE &&
+					// アイテム数が1以下であれば変更しない
+					m_list.GetItemCount()>1)
+				{
 					// 一番下の項目選択中なので、一番上に移動
 					CommandMoveToFirstList();
 
-					m_detailView->StartPanDraw(false);
+					m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
 
 					return TRUE;
 				} else {
@@ -2666,7 +2682,7 @@ void CReportView::OnLButtonUp(UINT nFlags, CPoint point)
 #ifdef USE_RAN2
 	// スクロール確定。
 	// スクロールバーの位置を変更。
-	m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
+	m_vScrollbar.SetScrollPos( m_detailView->MyGetScrollPos() );
 #endif
 
 	CFormView::OnLButtonUp(nFlags, point);
@@ -2676,7 +2692,7 @@ void CReportView::OnMouseMove(UINT nFlags, CPoint point)
 {
 #ifdef USE_RAN2
 	// スクロールバーの位置を変更。
-	m_vScrollbar.SetScrollPos( m_detailView->GetDrawOffsetLine() );
+	m_vScrollbar.SetScrollPos( m_detailView->MyGetScrollPos() );
 #endif
 
 	CFormView::OnMouseMove(nFlags, point);

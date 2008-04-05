@@ -1785,12 +1785,13 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 {
 #ifdef DEBUG
-	switch (pMsg->message) {
+/*	switch (pMsg->message) {
 	case WM_MOUSEMOVE:		wprintf( L"PTM: WM_MOUSEMOVE\n" );		break;
 	case WM_MOUSEWHEEL:		wprintf( L"PTM: WM_MOUSEWHEEL\n" );		break;
 	case WM_RBUTTONDOWN:	wprintf( L"PTM: WM_RBUTTONDOWN\n" );	break;
 	case WM_RBUTTONUP:		wprintf( L"PTM: WM_RBUTTONUP\n" );		break;
 	}
+*/
 //	wprintf( L"pretranslatemessage : %d(0x%X)\n", pMsg->message, pMsg->message );
 #endif
 
