@@ -4803,6 +4803,16 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	ACCESS_TYPE aType = theApp.m_accessType;
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+
+		// ログ保存
+		{
+			CString strLogfilePath = util::MakeLogfilePath( *(CMixiData*)lParam );
+			if(! strLogfilePath.IsEmpty() ) {
+				// 保存ファイルにコピー
+				CopyFile( theApp.m_filepath.temphtml, strLogfilePath, FALSE/*bFailIfExists, 上書き*/ );
+			}
+		}
+
 		DoAccessEndProcForBody(aType);
 		break;
 
