@@ -64,18 +64,28 @@ void CMixiData::SetAuthor(CString author)
 	m_author = author;
 }
 
-void CMixiData::SetDate(int year, int month, int day, int hour, int minute)
-{
-	if (year==0) {
-		SetDate(month, day, hour, minute);
+/**
+ * m_dateText ‚ª‚ ‚ê‚Î‚»‚ê‚ğ•Ô‚·B
+ * ‚È‚¯‚ê‚Î m_dateRaw ‚ğ•ÏŠ·‚µ‚Ä•Ô‚·B
+ */
+CString CMixiData::GetDate() {
+	if (!m_dateText.IsEmpty()) {
+		return m_dateText;
 	} else {
-		m_date.Format(_T("%04d/%02d/%02d %02d:%02d"), year, month, day, hour, minute);
+		// ‰Šú’l‚Å‚ ‚ê‚Î‚©‚ç•¶š—ñ‚ğ•Ô‚·
+		if (CTime() == m_dateRaw) {
+			return L"";
+		} else {
+			CString s;
+			s.Format(_T("%04d/%02d/%02d %02d:%02d"), 
+				m_dateRaw.GetYear(), 
+				m_dateRaw.GetMonth(), 
+				m_dateRaw.GetDay(), 
+				m_dateRaw.GetHour(), 
+				m_dateRaw.GetMinute());
+			return s;
+		}
 	}
-}
-
-void CMixiData::SetDate(int month, int day, int hour, int minute)
-{
-	m_date.Format(_T("%02d/%02d %02d:%02d"), month, day, hour, minute);
 }
 
 void CMixiData::ClearImage()

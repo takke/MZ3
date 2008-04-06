@@ -105,14 +105,14 @@ public:
 	 *                       "<td>10月08日</td></tr>"
 	 * @param mixi [out] 解析結果を SetDate で保存する。
 	 */
-	static void ParseDate(LPCTSTR line, CMixiData& mixi)
+	static bool ParseDate(LPCTSTR line, CMixiData& mixi)
 	{
 		// 汎用 形式
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
 			if( !util::CompileRegex( reg, L"([0-9]{2,4})?年?([0-9]{1,2}?)月([0-9]{1,2})日[^0-9]*([0-9]{1,2})?:?時?([0-9]{2})?" ) ) {
-				return;
+				return false;
 			}
 			// 検索
 			if( reg.exec(line) && reg.results.size() == 6 ) {
@@ -122,17 +122,43 @@ public:
 				int day    = _wtoi( reg.results[3].str.c_str() );
 				int hour   = _wtoi( reg.results[4].str.c_str() );
 				int minute = _wtoi( reg.results[5].str.c_str() );
-				mixi.SetDate(year, month, day, hour, minute);
-				return;
+				//mixi.SetDate(year, month, day, hour, minute);
+
+				if (year<1900) {
+					// CTime は year<1900 をサポートしていないので、文字列として登録する。
+					CString s;
+					s.Format(_T("%02d/%02d %02d:%02d"), month, day, hour, minute);
+					mixi.SetDate( s );
+				} else {
+					mixi.SetDate( CTime(year, month, day, hour, minute, 0) );
+				}
+				return true;
 			}
 		}
 
+		CTime t;
+		if (ParseDate(line, t)) {
+			// 解析成功
+			mixi.SetDate(t);
+			return true;
+		}
+
+		CString msg = L"文字列内に日付・時刻が見つかりません : [";
+		msg += line;
+		msg += L"]";
+		MZ3LOGGER_DEBUG( msg );
+		return false;
+	}
+
+
+	static bool ParseDate(LPCTSTR line, CTime& t_result)
+	{
 		// RSS 形式 (YYYY-MM-DDT00:00:00Z)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
 			if( !util::CompileRegex( reg, L"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z" ) ) {
-				return;
+				return false;
 			}
 			// 検索
 			if( reg.exec(line) && reg.results.size() == 7 ) {
@@ -146,8 +172,9 @@ public:
 				CTime t(year, month, day, hour, minute, 0);
 				t += CTimeSpan(0, 9, 0, 0);
 
-				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
-				return;
+				t_result = t;
+				//mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+				return true;
 			}
 		}
 
@@ -156,7 +183,7 @@ public:
 			// 正規表現のコンパイル
 			static MyRegex reg;
 			if( !util::CompileRegex( reg, L"([a-zA-Z]{3}) ([a-zA-Z]{3}) ([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) \\+([0-9]{4}) ([0-9]{4})" ) ) {
-				return;
+				return false;
 			}
 			// 検索
 			if( reg.exec(line) && reg.results.size() == 9 ) {
@@ -192,16 +219,12 @@ public:
 				CTime t(year, month, day, hour, minute, sec);
 				t += CTimeSpan(0, 9, 0, 0);
 
-				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
-				return;
+//				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+				t_result = t;
+				return true;
 			}
 		}
-
-		CString msg = L"文字列内に日付・時刻が見つかりません : [";
-		msg += line;
-		msg += L"]";
-		MZ3LOGGER_DEBUG( msg );
-		return;
+		return false;
 	}
 
 	/**

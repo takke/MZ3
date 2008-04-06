@@ -21,7 +21,8 @@ class CMixiData
 {
 protected:
 	ACCESS_TYPE		m_accessType;			///< アクセス種別（というよりもこのオブジェクトの種別）
-	CString			m_date;					///< 日付時刻
+	CString			m_dateText;				///< 日付時刻（文字列）：GetDate() で優先して返却される
+	CTime			m_dateRaw;				///< 日付時刻（メタ情報）
 	CString			m_name;					///< 名前
 	CString			m_author;				///< 投稿者名
 	int				m_authorId;				///< 投稿者のID（オーナーIDに設定される場合もある）
@@ -100,10 +101,10 @@ public:
 		m_linkPage.clear();
 	}
 
-	void SetDate(CString date)			{ m_date = date; }
-	void SetDate(int, int, int, int, int);
-	void SetDate(int, int, int, int);
-	CString GetDate()					{ return m_date; }
+	void SetDate(const CTime& t)		{ m_dateRaw = t; }
+	void SetDate(CString date)			{ m_dateText = date; }
+	CString GetDate();
+	const CTime& GetDateRaw() const		{ return m_dateRaw;	}
 
 	void SetName(CString name);
 	CString GetName()					{ return m_name; }

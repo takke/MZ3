@@ -100,10 +100,39 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		// メイン画面、ボディコントロールの外部ブログの文字色
 		clrMainBodyListExternalBlogText		= loadColorFromInifile( inifile, clrMainBodyListExternalBlogText, 
 																	"MainBodyListExternalBlogTextColor", SECTION_NAME );
+
+		// メイン画面、ボディコントロールの日付区切り線
+		clrMainBodyListDayBreakLine			= loadColorFromInifile( inifile, clrMainBodyListDayBreakLine, 
+																	"MainBodyListDayBreakLine", SECTION_NAME );
 	}
 
 	return true;
 }
+
+
+/**
+ * 初期値の設定
+ */
+bool CMZ3SkinInfo::setDefaultInfo()
+{
+	strSkinTitle = strSkinName;										// スキンタイトル
+	strMainBodyCtrlImageFileName		= L"body.jpg";				// メイン画面のボディコントロール用背景画像ファイル名
+	strMainCategoryCtrlImageFileName	= L"header.jpg";			// メイン画面のカテゴリコントロール用背景画像ファイル名
+	strReportListCtrlImageFileName		= L"report.jpg";			// レポート画面のリストコントロール用背景画像ファイル名
+
+	clrReportListText					= RGB(0x00, 0x00, 0x00);	// レポート画面、リストの文字色
+	clrMainCategoryListActiveText		= RGB(0xFF, 0x00, 0x00);	// メイン画面、カテゴリコントロールのアクティブ項目の文字色
+	clrMainCategoryListInactiveText		= RGB(0x00, 0x00, 0x00);	// メイン画面、カテゴリコントロールの非アクティブ項目の文字色
+	clrMainBodyListDefaultText			= RGB(0x00, 0x00, 0x00);	// メイン画面、ボディコントロールのデフォルト文字色
+	clrMainBodyListNonreadText			= RGB(0x00, 0x00, 0xFF);	// メイン画面、ボディコントロールの未読文字色
+	clrMainBodyListNewItemText			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの新着記事の文字色
+	clrMainBodyListFootprintMyMixiText	= RGB(0x00, 0x00, 0xFF);	// メイン画面、ボディコントロールのあしあとのマイミクの文字色
+	clrMainBodyListExternalBlogText		= RGB(0x80, 0x80, 0x80);	// メイン画面、ボディコントロールの外部ブログの文字色
+	clrMainBodyListDayBreakLine			= RGB(0xC0, 0xC0, 0xFF);	// メイン画面、ボディコントロールの日付区切り線
+
+	return true;
+}
+
 
 CString CMZ3SkinInfo::loadSkinTitle( LPCTSTR szSkinName )
 {

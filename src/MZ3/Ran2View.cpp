@@ -220,6 +220,7 @@ Ran2View::Ran2View()
 	, m_dwFirstLButtonUp(0)
 	, m_pImageList(NULL)
 	, m_drawStartTopOffset(0)
+	, m_viewLineMax(0)
 {
 	// ƒƒ“ƒo‚Ì‰Šú‰»
 	// ‰æ–Ê‰ğ‘œ“x‚ğæ“¾
