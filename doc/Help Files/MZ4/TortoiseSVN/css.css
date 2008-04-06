@@ -1,0 +1,131 @@
+/* è„ïîÇÃìÆÇ©Ç»Ç¢Ç†ÇÍ */
+#NoScroll{
+	padding: 6px 6px 7px 6px;
+	background: white;
+	vertical-align: top;
+	z-index: 2;
+	visibility: visible;
+	left: 0;
+	top: 0;
+	background-image: url(grade.jpg);
+	background-repeat: repeat-x;
+	width: 98%;
+	height: 48;
+	border-bottom: 1px solid Black;
+}
+
+
+img.backnaviimg{
+	border: none;
+}
+
+img.nextnaviimg{
+	border: none;
+}
+
+#NoScroll2{
+	padding: 6px 6px 7px 6px;
+	background: white;
+	vertical-align: top;
+	z-index: 2;
+	visibility: visible;
+	left: 0;
+	top: 0;
+	width: 100%;
+	background-image: url(grade.jpg);
+	background-repeat: repeat-x;
+	border-top: 1px solid Black;
+}
+
+#title2{
+	font-size: 140%;
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+
+#title1{
+	float: left;
+}
+
+#title4{
+	clear: both;
+}
+
+#title3{
+	float: right;
+}
+
+/* É{ÉfÉB */
+#Scroll{
+	left: 0px; 
+	top: 0px;
+	padding: 0px 10px 10px 10px;
+	z-index: 1;
+}
+
+/* Body */
+body {
+	padding: 0px;
+	margin: 0;
+}
+
+a {
+	color: blue;
+	text-decoration: none;
+}
+
+
+/*Text*/
+p {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h1 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h2 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h3 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h4 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h5 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+h6 {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+dl {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+table {
+	border: 1 solid Black;
+	margin-right: 15px;
+	margin-left: 15px;	
+}
+
+tr {
+	border: 1 solid Black;
+}
+
+td {
+	border: 1 solid Black;
+}
