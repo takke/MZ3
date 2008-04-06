@@ -39,7 +39,7 @@ COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
 const int emojiFixHeight = 16;	// いまのところ固定長の絵文字しかないのでこれでおｋ？
 
-// 各プロパティのコンストラクタ/デストラクタ
+/// プロパティのコンストラクタ
 MainInfo::MainInfo() : rowInfo(NULL)
 {
 	// アンカー位置は-1で初期化
@@ -49,6 +49,7 @@ MainInfo::MainInfo() : rowInfo(NULL)
 	rowInfo = new CPtrArray();
 }
 
+/// プロパティのデストラクタ
 MainInfo::~MainInfo()
 {
 	if( rowInfo !=NULL ){
@@ -60,6 +61,8 @@ MainInfo::~MainInfo()
 	}
 }
 
+
+/// プロパティのコンストラクタ
 RowProperty::RowProperty()
 {
 	rowNumber = 0;			// 描画上の行番号
@@ -75,6 +78,7 @@ RowProperty::RowProperty()
 
 }
 
+/// プロパティのデストラクタ
 RowProperty::~RowProperty()
 {
 	if( textProperties != NULL ){
@@ -103,51 +107,62 @@ RowProperty::~RowProperty()
 }
 
 
+/// プロパティのコンストラクタ
 ImageProperty::ImageProperty()
 {
 }
 
+/// プロパティのデストラクタ
 ImageProperty::~ImageProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 LinkProperty::LinkProperty()
 {
 }
 
+/// プロパティのデストラクタ
 LinkProperty::~LinkProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 FrameProperty::FrameProperty()
 {
 }
 
+/// プロパティのデストラクタ
 FrameProperty::~FrameProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 UnderLineProperty::UnderLineProperty()
 {
 }
 
+/// プロパティのデストラクタ
 UnderLineProperty::~UnderLineProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 GaijiProperty::GaijiProperty()
 {
 }
 
+/// プロパティのデストラクタ
 GaijiProperty::~GaijiProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 TextProperty::TextProperty()
 {
 	fontType = FontType_normal;
@@ -162,12 +177,13 @@ TextProperty::TextProperty()
 	movlinkID = -1;			// 動画リンク連番の初期化
 }
 
-
+/// プロパティのデストラクタ
 TextProperty::~TextProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 BridgeProperty::BridgeProperty()
 {
 	fontType = FontType_normal;	// フォントの種別
@@ -186,12 +202,13 @@ BridgeProperty::BridgeProperty()
 	picLine = 0;					// 画像の分割した行位置
 }
 
-
+/// プロパティのデストラクタ
 BridgeProperty::~BridgeProperty()
 {
 }
 
 
+/// プロパティのコンストラクタ
 BigBridgeProperty::BigBridgeProperty()
 {
 	remainStr = TEXT("");
@@ -207,12 +224,13 @@ BigBridgeProperty::BigBridgeProperty()
 	}
 }
 
+/// プロパティのデストラクタ
 BigBridgeProperty::~BigBridgeProperty()
 {
 }
 
 
-// 描画コントロール「らんらん」コンストラクタ
+/// 描画コントロール「らんらん」コンストラクタ
 Ran2View::Ran2View()
 	: m_bDragging(false)
 	, m_dragStartLine(0)
@@ -221,21 +239,32 @@ Ran2View::Ran2View()
 	, m_pImageList(NULL)
 	, m_drawStartTopOffset(0)
 	, m_viewLineMax(0)
+	, topOffset(0)		// 画面上部からの余白
+	, normalFont(NULL)
+	, boldFont(NULL)
+	, qFont(NULL)
+	, qBoldFont(NULL)
+	, oldFont(NULL)
+	, parsedRecord(NULL)
+#ifndef WINCE
+	, m_isAnime(false)
+#endif
+	// パンスクロール用
+	, m_offsetPixelX(0)				// 横スクロール表示オフセット値
+	, m_dPxelX(0)					// 横スクロール差分
+	, m_bPanDragging(false)			// 横ドラッグ中フラグ
+	, m_bScrollDragging(false)		// 縦ドラッグ中フラグ
+	
+	// 描画用メンバー
+	, m_graphics(NULL)
+	, m_memDC(NULL)
+	, m_memBMP(NULL)
+	, m_memPanDC(NULL)
+	, m_memPanBMP(NULL)
 {
 	// メンバの初期化
 	// 画面解像度を取得
 	currentDPI = this->GetScreenDPI();
-	topOffset = 0;	// 画面上部からの余白
-
-	normalFont = NULL;
-	boldFont = NULL;
-	qFont = NULL;
-	qBoldFont = NULL;
-	oldFont = NULL;
-	parsedRecord = NULL;
-#ifndef WINCE
-	m_isAnime = false;
-#endif
 
 	// 汎用ペンの作成
 	underLinePen.CreatePen(PS_SOLID,1,solidBlack);
@@ -243,15 +272,10 @@ Ran2View::Ran2View()
 
 	// 汎用ブラシの作成
 	blueBrush.CreateSolidBrush(solidBlue);
-
-	// パンスクロール用
-	m_offsetPixelX = 0;				// 横スクロール表示オフセット値
-	m_dPxelX = 0;					// 横スクロール差分
-	m_bPanDragging = false;			// 横ドラッグ中フラグ
-	m_bScrollDragging = false;		// 縦ドラッグ中フラグ
 }
 
 
+/// デストラクタ
 Ran2View::~Ran2View()
 {
 	if( parsedRecord != NULL ){
@@ -275,7 +299,6 @@ END_MESSAGE_MAP()
 
 BOOL Ran2View::RegisterWndClass(HINSTANCE hInstance)
 {
-
 	WNDCLASS			wc;
 	wc.lpszClassName	= TEXT("RAN2WND");
 	wc.hInstance		= hInstance;
@@ -297,14 +320,11 @@ BOOL Ran2View::RegisterWndClass(HINSTANCE hInstance)
 
 BOOL Ran2View::UnregisterWndClass(HINSTANCE hInstance)
 {
-
 	BOOL bRC = FALSE;
-	bRC = ::UnregisterClass(TEXT("DETAILWND"),hInstance);
+	bRC = ::UnregisterClass(TEXT("RAN2WND"), hInstance);
 
 	return(bRC);
 }
-
-
 
 
 // Ran2View メッセージ ハンドラ
@@ -318,42 +338,16 @@ BOOL Ran2View::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSty
 
 	CPaintDC	cdc(pParentWnd);	// ダイアログのクライアント領域をベースとする。
 
-	screenWidth = rect.right - rect.left;
+	screenWidth  = rect.right - rect.left;
 	screenHeight = rect.bottom - rect.top;
 
-	backDC = new CDC();
-	backDC->CreateCompatibleDC(&cdc);
-	backDC->SetBkMode(OPAQUE);	// 透過モードに設定
+	m_memDC = new CDC();
+	m_memPanDC = new CDC();
 
-	memBMP = new CBitmap();
-	// 画面の高さをn倍して余裕をもたせてみた
-	if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE ){
-		MessageBox(TEXT("CreateCompatibelBitmap error!"));
-		return(FALSE);
+	// バックバッファの生成
+	if (!MyMakeBackBuffers(cdc)) {
+		return FALSE;
 	}
-	m_drawStartTopOffset = screenHeight/2;
-
-	memDC = new CDC();
-	memDC->CreateCompatibleDC(&cdc);
-	memDC->SetBkMode(OPAQUE);	// 透過モードに設定
-	oldBMP = memDC->SelectObject(memBMP);
-
-	// パンスクロール用バッファの確保
-	memBackBMP = new CBitmap();
-	// 画面の大きさ分だけ確保する
-	if( memBackBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE ){
-		MessageBox(TEXT("CreateCompatibelBitmap error!"));
-		return(FALSE);
-	}
-
-	memBackDC = new CDC();
-	memBackDC->CreateCompatibleDC(&cdc);
-	memBackDC->SetBkMode(OPAQUE);	// 透過モードに設定
-	oldBackBMP = memBackDC->SelectObject(memBackBMP);
-
-#ifndef WINCE
-	m_graphics = new Graphics(memDC->m_hDC);
-#endif
 
 	CRect r = rect;
 	r.right = 100;
@@ -370,6 +364,12 @@ BOOL Ran2View::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSty
 	return CWnd::Create(lpszClassName, lpszWindowName, dwStyle, r, pParentWnd, nID, pContext);
 }
 
+
+/**
+ * サイズ変更イベント
+ *
+ * 内部データの再構築
+ */
 void Ran2View::OnSize(UINT nType, int cx, int cy)
 {
 	screenWidth = cx;
@@ -385,71 +385,88 @@ void Ran2View::OnSize(UINT nType, int cx, int cy)
 
 	// バックバッファのサイズが小さい場合は再生成
 	BITMAP bmp;
-	GetObject(memBMP->m_hObject, sizeof(BITMAP), &bmp);
+	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
 	if (bmp.bmWidth < screenWidth ||
 		bmp.bmHeight < screenHeight*2) 
 	{
-		// 解放
-#ifndef WINCE
-		if( m_graphics != NULL ){
-			delete m_graphics;
-		}
-#endif
-		if( backDC != NULL ){
-			backDC->DeleteDC();
-		}
-
-		if( memDC != NULL ){
-			memDC->DeleteDC();
-		}
-
-		if( memBMP != NULL ){
-			memBMP->DeleteObject();
-			delete memBMP;
-			memBMP = new CBitmap();
-		}
-
-		// パンスクロール用バッファの解放
-		if( memBackDC != NULL ){
-			memBackDC->DeleteDC();
-		}
-
-		if( memBackBMP != NULL ){
-			memBackBMP->DeleteObject();
-			delete memBackBMP;
-			memBackBMP = new CBitmap();
-		}
-
-		// バックバッファ生成
 		CPaintDC	cdc(GetParent());	// ダイアログのクライアント領域をベースとする。
-		if( memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE ){
-			MessageBox(TEXT("CreateCompatibelBitmap error!"));
-			return;
-		}
-		m_drawStartTopOffset = screenHeight/2;
-
-		memDC->CreateCompatibleDC(&cdc);
-		memDC->SetBkMode(OPAQUE);	// 透過モードに設定
-		oldBMP = memDC->SelectObject(memBMP);
-
-		// パンスクロール用バッファの確保
-		if( memBackBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE ){
-			MessageBox(TEXT("CreateCompatibelBitmap error!"));
-			return;
-		}
-
-		memBackDC->CreateCompatibleDC(&cdc);
-		memBackDC->SetBkMode(OPAQUE);	// 透過モードに設定
-		oldBackBMP = memBackDC->SelectObject(memBackBMP);
-
-#ifndef WINCE
-		m_graphics = new Graphics(memDC->m_hDC);
-#endif
+		MyMakeBackBuffers(cdc);
 	}
 
 	CWnd::OnSize(nType, cx, cy);
 }
 
+
+/**
+ * バックバッファの生成
+ */
+bool Ran2View::MyMakeBackBuffers(CPaintDC& cdc)
+{
+	//--- 解放
+#ifndef WINCE
+	if( m_graphics != NULL ){
+		delete m_graphics;
+	}
+#endif
+
+	// バックバッファの解放
+	if( m_memDC != NULL ){
+		m_memDC->DeleteDC();
+	}
+
+	if( m_memBMP != NULL ){
+		m_memBMP->DeleteObject();
+		delete m_memBMP;
+	}
+	m_memBMP = new CBitmap();
+
+	// パンスクロール用バッファの解放
+	if( m_memPanDC != NULL ){
+		m_memPanDC->DeleteDC();
+	}
+
+	if( m_memPanBMP != NULL ){
+		m_memPanBMP->DeleteObject();
+		delete m_memPanBMP;
+	}
+	m_memPanBMP = new CBitmap();
+
+	
+	//--- バッファ生成
+	// バックバッファの確保
+	// 画面の高さをn倍して余裕をもたせてみた
+	if (m_memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE) {
+		MessageBox(TEXT("CreateCompatibelBitmap error!"));
+		return false;
+	}
+	m_drawStartTopOffset = screenHeight/2;
+
+	m_memDC->CreateCompatibleDC(&cdc);
+	m_memDC->SetBkMode(OPAQUE);	// 透過モードに設定
+	m_oldBMP = m_memDC->SelectObject(m_memBMP);
+
+	// パンスクロール用バッファの確保
+	// 画面の大きさ分だけ確保する
+	if (m_memPanBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE) {
+		MessageBox(TEXT("CreateCompatibelBitmap error!"));
+		return false;
+	}
+
+	m_memPanDC->CreateCompatibleDC(&cdc);
+	m_memPanDC->SetBkMode(OPAQUE);	// 透過モードに設定
+	m_oldPanBMP = m_memPanDC->SelectObject(m_memPanBMP);
+
+#ifndef WINCE
+	m_graphics = new Graphics(m_memDC->m_hDC);
+#endif
+
+	return true;
+}
+
+
+/**
+ * ウィンドウ破棄イベント
+ */
 BOOL Ran2View::DestroyWindow()
 {
 #ifndef WINCE 
@@ -457,35 +474,30 @@ BOOL Ran2View::DestroyWindow()
 	KillTimer(TIMERID_ANIMEGIF);
 
 	if( m_graphics != NULL ){
-		//m_graphics->ReleaseHDC(memDC->m_hDC);
+		//m_graphics->ReleaseHDC(m_memDC->m_hDC);
 		delete m_graphics;
 	}
 #endif
 
-	if( backDC != NULL ){
-		backDC->DeleteDC();
-		delete backDC;
+	if( m_memDC != NULL ){
+		m_memDC->DeleteDC();
+		delete m_memDC;
 	}
 
-	if( memDC != NULL ){
-		memDC->DeleteDC();
-		delete memDC;
-	}
-
-	if( memBMP != NULL ){
-		memBMP->DeleteObject();
-		delete memBMP;
+	if( m_memBMP != NULL ){
+		m_memBMP->DeleteObject();
+		delete m_memBMP;
 	}
 
 	// パンスクロール用バッファの解放
-	if( memBackDC != NULL ){
-		memBackDC->DeleteDC();
-		delete memBackDC;
+	if( m_memPanDC != NULL ){
+		m_memPanDC->DeleteDC();
+		delete m_memPanDC;
 	}
 
-	if( memBackBMP != NULL ){
-		memBackBMP->DeleteObject();
-		delete memBackBMP;
+	if( m_memPanBMP != NULL ){
+		m_memPanBMP->DeleteObject();
+		delete m_memPanBMP;
 	}
 
 	if( normalFont != NULL ){
@@ -517,15 +529,17 @@ BOOL Ran2View::DestroyWindow()
 }
 
 
-
-// 表示カラムの変更
-// 引数：	newHeight	新フォントの文字高
-// 戻り値：	変更後フォントの文字高
+/**
+ * 表示カラムの変更
+ *
+ * @param newHeight	新フォントの文字高
+ * @return 変更後フォントの文字高
+ */
 int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 {
 	// 既にフォントが選択済みなら戻す。
 	if( oldFont != NULL ){
-		memDC->SelectObject(oldFont);
+		m_memDC->SelectObject(oldFont);
 		oldFont = NULL;
 		delete normalFont;
 		delete boldFont;
@@ -679,33 +693,33 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 
 #endif
 	// 1/4フォントの文字幅と高さを規定
-	oldFont = memDC->SelectObject(qFont);
-	CSize	charQSize = memDC->GetTextExtent(CString(TEXT("W"))); 
+	oldFont = m_memDC->SelectObject(qFont);
+	CSize	charQSize = m_memDC->GetTextExtent(CString(TEXT("W"))); 
 	charQHeight = charQSize.cy;
-	charQSize = memDC->GetTextExtent(CString(TEXT("●"))); 
+	charQSize = m_memDC->GetTextExtent(CString(TEXT("●"))); 
 	charQWidth = charQSize.cx;
 
 	// Boldの幅を取得する
-	oldFont = memDC->SelectObject(boldFont);
+	oldFont = m_memDC->SelectObject(boldFont);
 
 	// 「●」を規定の文字として文字幅と高さを規定
-	CSize	charSize = memDC->GetTextExtent(CString(TEXT("W"))); 
+	CSize	charSize = m_memDC->GetTextExtent(CString(TEXT("W"))); 
 	charHeight = charSize.cy;
-	charSize = memDC->GetTextExtent(CString(TEXT("●"))); 
+	charSize = m_memDC->GetTextExtent(CString(TEXT("●"))); 
 	boldCharWidth = charSize.cx;
 
 	// 通常サイズのフォントを設定
-	oldFont = memDC->SelectObject(normalFont);
+	oldFont = m_memDC->SelectObject(normalFont);
 	// 「●」を規定の文字として文字幅と高さを規定
-	charSize = memDC->GetTextExtent(CString(TEXT("W"))); 
+	charSize = m_memDC->GetTextExtent(CString(TEXT("W"))); 
 	charHeight = charSize.cy;
-	charSize = memDC->GetTextExtent(CString(TEXT("●"))); 
+	charSize = m_memDC->GetTextExtent(CString(TEXT("●"))); 
 	charWidth = charSize.cx;
 	currentCharWidth = charWidth;
 
 	// スペーシング幅の取得
 	ABC	abcInfo;
-	memDC->GetCharABCWidths(TEXT('■'),TEXT('■'),&abcInfo);
+	m_memDC->GetCharABCWidths(TEXT('■'),TEXT('■'),&abcInfo);
 	charSpacing = abcInfo.abcA + abcInfo.abcC;
 
 	// 画面右側の余白量の設定
@@ -737,6 +751,9 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 }
 
 
+/**
+ * 描画イベント
+ */
 void Ran2View::OnPaint()
 {
 	CPaintDC dc(this); // 描画用のデバイス コンテキスト
@@ -744,51 +761,12 @@ void Ran2View::OnPaint()
 	DrawToScreen(&dc);
 }
 
+
 /**
- * パンスクロール開始
+ * 描画
  *
- * スクロール方向（direction）に従いオフセット値と差分を設定してタイマーを起動する
+ * オフスクリーンから物理デバイスへの転送
  */
-void Ran2View::StartPanDraw(PAN_SCROLL_DIRECTION direction)
-{
-	KillTimer( TIMERID_PANSCROLL );
-
-	switch (direction) {
-	case PAN_SCROLL_DIRECTION_RIGHT:
-		// 右方向へスクロール
-		
-		// 左へ一画面ずれたところから開始
-		m_offsetPixelX = - screenWidth;
-		// WMの場合は差分をふやして移動ステップを減らす
-#ifndef WINCE
-		m_dPxelX = screenWidth / 15 ;
-#else
-		m_dPxelX = screenWidth / 5 ;
-#endif
-		break;
-
-	case PAN_SCROLL_DIRECTION_LEFT:
-		// 左方向へスクロール
-
-		// 右へ一画面ずれたところから開始
-		m_offsetPixelX = screenWidth;
-		// WMの場合は差分をふやして移動ステップを減らす
-#ifndef WINCE
-		m_dPxelX = -screenWidth / 15 ;
-#else
-		m_dPxelX = -screenWidth / 5 ;
-#endif
-		break;
-	}
-
-	// パンスクロール中フラグ設定
-	m_bAutoScrolling = true;
-
-	// パンスクロール開始
-	SetTimer( TIMERID_PANSCROLL, TIMER_INTERVAL_PANSCROLL, NULL );
-}
-
-
 void Ran2View::DrawToScreen(CDC* pDC)
 {
 	int sx = 0;
@@ -803,7 +781,7 @@ void Ran2View::DrawToScreen(CDC* pDC)
 		wid = screenWidth - m_offsetPixelX;
 
 		// 変更前画面を左側に表示する
-		pDC->BitBlt( 0 , 0 , m_offsetPixelX , screenHeight , memBackDC , wid , 0 , SRCCOPY );
+		pDC->BitBlt( 0 , 0 , m_offsetPixelX , screenHeight , m_memPanDC , wid , 0 , SRCCOPY );
 
 		// 移動がわかるように縦線を引く
 		pDC->MoveTo( m_offsetPixelX - 1 , 0);
@@ -815,7 +793,7 @@ void Ran2View::DrawToScreen(CDC* pDC)
 		wid = screenWidth + m_offsetPixelX;
 
 		// 変更前画面を右側に表示する
-		pDC->BitBlt( wid , 0 , sx , screenHeight , memBackDC , 0 , 0 , SRCCOPY );
+		pDC->BitBlt( wid , 0 , sx , screenHeight , m_memPanDC , 0 , 0 , SRCCOPY );
 
 		// 移動がわかるように縦線を引く
 		pDC->MoveTo( wid + 1 , 0);
@@ -830,15 +808,18 @@ void Ran2View::DrawToScreen(CDC* pDC)
 
 	// 変更後画面をオフセットに合わせて表示する
 //	TRACE( L"m_drawStartTopOffset,m_offsetPixelY : %5d %5d\n", m_drawStartTopOffset,m_offsetPixelY );
-	pDC->BitBlt( dx, 0, wid, screenHeight, memDC, sx, m_drawStartTopOffset -m_offsetPixelY, SRCCOPY );
+	pDC->BitBlt( dx, 0, wid, screenHeight, m_memDC, sx, m_drawStartTopOffset -m_offsetPixelY, SRCCOPY );
 //	pDC->Rectangle(0, 0, screenWidth, screenHeight);
 }
 
 
-// 表示幅一杯まで何文字入るかを再計算し続ける。
-// 引数	srcStr	... 対象の文字列
-//		width	... 表示幅
-// 戻り値 ... 表示幅内に収まる長さの文字列
+/**
+ * 表示幅一杯まで何文字入るかを再計算し続ける。
+ *
+ * @param srcStr 対象の文字列
+ * @param width	 表示幅
+ * @return 表示幅内に収まる長さの文字列
+ */
 CString	Ran2View::CalcTextByWidth(CDC* dstDC,CString srcStr,int width)
 {
 	int	length = 2;	// 先頭からの文字数
@@ -872,19 +853,6 @@ CString	Ran2View::CalcTextByWidth(CDC* dstDC,CString srcStr,int width)
 	}
 
 	return(dstStr);
-}
-
-
-void Ran2View::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
-{
-//	CWnd::OnVScroll(nSBCode, nPos, pScrollBar);
-}
-
-
-
-LRESULT Ran2View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	return CWnd::WindowProc(message, wParam, lParam);
 }
 
 
@@ -1161,11 +1129,11 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 				else
 					newText->isDownHanging = true;
 
-				oldFont = memDC->SelectObject(qBoldFont);
+				oldFont = m_memDC->SelectObject(qBoldFont);
 				currentCharWidth = charQWidth;
 				newText->fontType = FontType_quarter;
 			}else{
-				oldFont = memDC->SelectObject(boldFont);
+				oldFont = m_memDC->SelectObject(boldFont);
 				currentCharWidth = boldCharWidth;
 			}
 		}else{
@@ -1176,15 +1144,15 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 				else
 					newText->isDownHanging = true;
 
-				oldFont = memDC->SelectObject(qFont);
+				oldFont = m_memDC->SelectObject(qFont);
 				currentCharWidth = charQWidth;
 				newText->fontType = FontType_quarter;
 			}else{
-				oldFont = memDC->SelectObject(normalFont);
+				oldFont = m_memDC->SelectObject(normalFont);
 				currentCharWidth = charWidth;
 			}
 		}
-		CString cutStr = this->CalcTextByWidth(memDC,srcStr,remainWidth);
+		CString cutStr = this->CalcTextByWidth(m_memDC,srcStr,remainWidth);
 
 		// 一行に収まらない場合は持ち越し
 		if( cutStr.GetLength() < srcStr.GetLength() ){
@@ -1208,11 +1176,11 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		}
 
 		// 一行に収まる場合は出力に消費した文字列の長さを限界から差し引く
-		int blockWidth = memDC->GetTextExtent(cutStr).cx;
+		int blockWidth = m_memDC->GetTextExtent(cutStr).cx;
 		bigBridgeInfo->remainWidth -= blockWidth;
 
 		// 文字幅を計算したのでフォントを戻す
-		memDC->SelectObject(oldFont);
+		m_memDC->SelectObject(oldFont);
 
 		// 対象文字列の転記
 		newText->lineText = cutStr;
@@ -1453,7 +1421,9 @@ void Ran2View::ChangeFrameProperty(BigBridgeProperty* bigBridgeInfo)
 }
 
 
-/// DATファイルからのデータ構築
+/**
+ * DATファイルからのデータ構築
+ */
 int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 {
 #ifdef DEBUG
@@ -1469,8 +1439,8 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 	m_offsetPixelX = 0;			// 横スクロールオフセットを初期化
 
 	// パンスクロール用に直前の表示状態のコピーを取る（一画面分）
-	//memBackDC->FillSolidRect( 0 , 0 , screenWidth , screenHeight , RGB(128,128,128) );
-	memBackDC->BitBlt( 0 , 0 , screenWidth , screenHeight , memDC , 0 , m_drawStartTopOffset , SRCCOPY );
+	//m_memPanDC->FillSolidRect( 0 , 0 , screenWidth , screenHeight , RGB(128,128,128) );
+	m_memPanDC->BitBlt( 0 , 0 , screenWidth , screenHeight , m_memDC , 0 , m_drawStartTopOffset , SRCCOPY );
 
 	if( bodyArray != NULL ){
 		PurgeMainRecord();
@@ -1527,15 +1497,15 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 	}
 
 	//// パンスクロール用に直前の表示状態のコピーを取る（一画面分）
-	////memBackDC->FillSolidRect( 0 , 0 , screenWidth , screenHeight , RGB(128,128,128) );
-	//memBackDC->BitBlt( 0 , 0 , screenWidth , screenHeight , memDC , 0 , m_drawStartTopOffset , SRCCOPY );
+	////m_memPanDC->FillSolidRect( 0 , 0 , screenWidth , screenHeight , RGB(128,128,128) );
+	//m_memPanDC->BitBlt( 0 , 0 , screenWidth , screenHeight , m_memDC , 0 , m_drawStartTopOffset , SRCCOPY );
 
 	// 塗りつぶす
-//	memDC->PatBlt( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, WHITENESS );
-//	memDC->FillSolidRect( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, RGB(255,255,255) );
+//	m_memDC->PatBlt( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, WHITENESS );
+//	m_memDC->FillSolidRect( 0, 0, screenWidth, screenHeight+(charHeight+charHeightOffset)*N_OVER_OFFSET_LINES, RGB(255,255,255) );
 	BITMAP bmp;
-	GetObject(memBMP->m_hObject, sizeof(BITMAP), &bmp);
-	memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
+	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
+	m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
 
 //	TRACE( L"[DrawRect]\n" );
 //	TRACE( L" %dx%d\n", bmp.bmWidth, bmp.bmHeight );
@@ -1573,7 +1543,7 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 
 		TRACE( L" line : %d\n", targetLine );
 	}
-	memDC->Rectangle( 0, 0, 10, 10 );
+	m_memDC->Rectangle( 0, 0, 10, 10 );
 
 	// 描画
 //	this->Invalidate(FALSE);
@@ -1612,24 +1582,24 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 				int sy = m_drawStartTopOffset + topOffset + (line*(charHeight+charHeightOffset));
 				int ey = sy + (charHeight+charHeightOffset);
 				drawRect = CRect(sx,sy,ex,ey);
-				memDC->FillRect(drawRect,&backBrush);
+				m_memDC->FillRect(drawRect,&backBrush);
 			}
 
 			CPen framePen(PS_SOLID,1,rowProperty->frameProperty[i].penColor);
 			// 上端と左右を描画
 			if( rowProperty->frameProperty[i].frameType == FrameType_roof ){
 
-				CPen* oldPen = memDC->SelectObject(&framePen);
-				memDC->MoveTo(drawRect.left,drawRect.top);
-				memDC->LineTo(drawRect.right,drawRect.top);
+				CPen* oldPen = m_memDC->SelectObject(&framePen);
+				m_memDC->MoveTo(drawRect.left,drawRect.top);
+				m_memDC->LineTo(drawRect.right,drawRect.top);
 
-				memDC->MoveTo(drawRect.left,drawRect.top);
-				memDC->LineTo(drawRect.left,drawRect.bottom);
+				m_memDC->MoveTo(drawRect.left,drawRect.top);
+				m_memDC->LineTo(drawRect.left,drawRect.bottom);
 
-				memDC->MoveTo(drawRect.right,drawRect.top);
-				memDC->LineTo(drawRect.right,drawRect.bottom);
+				m_memDC->MoveTo(drawRect.right,drawRect.top);
+				m_memDC->LineTo(drawRect.right,drawRect.bottom);
 
-				memDC->SelectObject(oldPen);
+				m_memDC->SelectObject(oldPen);
 			// 末端を遡って描画
 			}else if( rowProperty->frameProperty[i].frameType == FrameType_stool ){
 				int sx = leftOffset + (i * frameOffset);
@@ -1645,30 +1615,30 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 				int ey = sy + (charHeight+charHeightOffset);
 				CRect drawRect = CRect(sx,sy,ex,ey);
 
-				CPen* oldPen = memDC->SelectObject(&framePen);
+				CPen* oldPen = m_memDC->SelectObject(&framePen);
 				if( rowProperty->textProperties->GetCount() != 0 ){
 					// 終行にテキストがある場合は左右の枠線を描画する
-					memDC->MoveTo(drawRect.left,drawRect.top);
-					memDC->LineTo(drawRect.left,drawRect.bottom);
+					m_memDC->MoveTo(drawRect.left,drawRect.top);
+					m_memDC->LineTo(drawRect.left,drawRect.bottom);
 
-					memDC->MoveTo(drawRect.right,drawRect.top);
-					memDC->LineTo(drawRect.right,drawRect.bottom);
+					m_memDC->MoveTo(drawRect.right,drawRect.top);
+					m_memDC->LineTo(drawRect.right,drawRect.bottom);
 				}
-				memDC->MoveTo(drawRect.left,drawRect.bottom-framePixel);
-				memDC->LineTo(drawRect.right,drawRect.bottom-framePixel);
-				memDC->SelectObject(oldPen);
+				m_memDC->MoveTo(drawRect.left,drawRect.bottom-framePixel);
+				m_memDC->LineTo(drawRect.right,drawRect.bottom-framePixel);
+				m_memDC->SelectObject(oldPen);
 
 			// 左右の枠線だけ描画
 			}else if( rowProperty->frameProperty[i].frameType == FrameType_follow ){
 
-				CPen* oldPen = memDC->SelectObject(&framePen);
-				memDC->MoveTo(drawRect.left,drawRect.top);
-				memDC->LineTo(drawRect.left,drawRect.bottom);
+				CPen* oldPen = m_memDC->SelectObject(&framePen);
+				m_memDC->MoveTo(drawRect.left,drawRect.top);
+				m_memDC->LineTo(drawRect.left,drawRect.bottom);
 
-				memDC->MoveTo(drawRect.right,drawRect.top);
-				memDC->LineTo(drawRect.right,drawRect.bottom);
+				m_memDC->MoveTo(drawRect.right,drawRect.top);
+				m_memDC->LineTo(drawRect.right,drawRect.bottom);
 
-				memDC->SelectObject(oldPen);
+				m_memDC->SelectObject(oldPen);
 			}
 
 		}
@@ -1677,10 +1647,12 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 }
 
 
-
-// 行内のテキストプロパティの配列を描画する
-// line: 描画したい行
-// textProperties: textPropertyをまとめた配列
+/**
+ * 行内のテキストプロパティの配列を描画する
+ *
+ * @param line 描画したい行
+ * @param textProperties textPropertyをまとめた配列
+ */
 void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 {
 	bool bReverse = false;
@@ -1705,56 +1677,59 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		CRect drawRect = CRect(text->drawRect.left,sy,text->drawRect.right,ey);
 		if( bReverse ){
 			// 反転表示用に黒く塗りつぶす
-			memDC->FillSolidRect( &drawRect , solidBlack );
+			m_memDC->FillSolidRect( &drawRect , solidBlack );
 		}
 
 		// アンダーラインの描画
 		if( text->isUnderLine == true ){ 
 			CPen* oldPen = NULL;
 			if( text->foregroundColor == solidDarkBlue ){
-				oldPen = memDC->SelectObject(&DarkBlueunderLinePen);
+				oldPen = m_memDC->SelectObject(&DarkBlueunderLinePen);
 			} else {
-				oldPen = memDC->SelectObject(&underLinePen);
+				oldPen = m_memDC->SelectObject(&underLinePen);
 			}
-			memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
-			memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
-			oldPen = memDC->SelectObject(oldPen);
+			m_memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
+			m_memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
+			oldPen = m_memDC->SelectObject(oldPen);
 		}
 
 		// 文字色とフォントの切り替え
 		if( bReverse ) {
 			// 反転表示用 文字色＝白、背景色＝黒
-			memDC->SetTextColor(solidWhite);
-			memDC->SetBkColor(solidBlack);
+			m_memDC->SetTextColor(solidWhite);
+			m_memDC->SetBkColor(solidBlack);
 		} else {
 			// ノーマル表示用 テキスト情報から色を取得
-			memDC->SetTextColor(text->foregroundColor);
-			memDC->SetBkColor(text->backgroundColor);
+			m_memDC->SetTextColor(text->foregroundColor);
+			m_memDC->SetBkColor(text->backgroundColor);
 		}
 
 		if( text->isBold == true ){
 			if( text->isUpHanging == true || text->isDownHanging == true ){
-				oldFont = memDC->SelectObject(qBoldFont);
+				oldFont = m_memDC->SelectObject(qBoldFont);
 			}else{
-				oldFont = memDC->SelectObject(boldFont);
+				oldFont = m_memDC->SelectObject(boldFont);
 			}
 		}else{
 			if( text->isUpHanging == true || text->isDownHanging == true ){
-				oldFont = memDC->SelectObject(qFont);
+				oldFont = m_memDC->SelectObject(qFont);
 			}else{
-				oldFont = memDC->SelectObject(normalFont);
+				oldFont = m_memDC->SelectObject(normalFont);
 			}
 		}
 
-		memDC->DrawText(text->lineText,-1,drawRect,DT_LEFT | DT_NOPREFIX);
-		memDC->SelectObject(oldFont);
+		m_memDC->DrawText(text->lineText,-1,drawRect,DT_LEFT | DT_NOPREFIX);
+		m_memDC->SelectObject(oldFont);
 	}
 }
 
 
-// 行内のテキストプロパティの配列を描画する
-// line: 描画したい行
-// textProperties: textPropertyをまとめた配列
+/**
+ * 行内のテキストプロパティの配列を描画する
+ *
+ * @param line 描画したい行
+ * @param textProperties textPropertyをまとめた配列
+ */
 void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 {
 	// 外字の描画(後で関数にする)
@@ -1768,7 +1743,7 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 			// 長さチェック
 			if (0 <= imageIdx && imageIdx < m_pImageList->GetImageCount()) {
 #ifdef WINCE
-				m_pImageList->Draw( memDC, imageIdx, CPoint(gaiji->drawRect.left, sy), ILD_TRANSPARENT );
+				m_pImageList->Draw( m_memDC, imageIdx, CPoint(gaiji->drawRect.left, sy), ILD_TRANSPARENT );
 #else
 				CString imagePath = theApp.m_imageCache.GetImagePath(imageIdx);
 
@@ -1819,8 +1794,11 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 }
 
 
-// datファイルから実行時クラスへの変換その2(Unicodeに変換されている事が前提)
-// ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
+/**
+ * datファイルから実行時クラスへの変換その2(Unicodeに変換されている事が前提)
+ *
+ * ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
+ */
 MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 {
 	MainInfo* newMainRecord = NULL;
@@ -2012,8 +1990,9 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 }
 
 
-
-// mainRecordの破棄
+/**
+ * mainRecordの破棄
+ */
 void Ran2View::PurgeMainRecord()
 {
 	// 行情報の破棄
@@ -2045,7 +2024,6 @@ void Ran2View::PurgeMainRecord()
 }
 
 
-
 // 現在位置を再描画
 void Ran2View::Refresh()
 {
@@ -2065,6 +2043,7 @@ bool Ran2View::IsPoratrait()
 
 	return(fPoratrait);
 }
+
 
 bool Ran2View::IsVGA()
 {
@@ -2106,6 +2085,76 @@ int Ran2View::GetScreenDPI()
 }
 
 
+//-------------------------------------------------------------------------------------------------
+// 以下、User I/F (Behavior) 関連
+//-------------------------------------------------------------------------------------------------
+
+
+/**
+ * ウィンドウプロシージャ
+ *
+ * 特に処理なし
+ */
+LRESULT Ran2View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	return CWnd::WindowProc(message, wParam, lParam);
+}
+
+
+/**
+ * パンスクロール開始
+ *
+ * スクロール方向（direction）に従いオフセット値と差分を設定してタイマーを起動する
+ */
+void Ran2View::StartPanDraw(PAN_SCROLL_DIRECTION direction)
+{
+	KillTimer( TIMERID_PANSCROLL );
+
+	switch (direction) {
+	case PAN_SCROLL_DIRECTION_RIGHT:
+		// 右方向へスクロール
+		
+		// 左へ一画面ずれたところから開始
+		m_offsetPixelX = - screenWidth;
+		// WMの場合は差分をふやして移動ステップを減らす
+#ifndef WINCE
+		m_dPxelX = screenWidth / 15 ;
+#else
+		m_dPxelX = screenWidth / 5 ;
+#endif
+		break;
+
+	case PAN_SCROLL_DIRECTION_LEFT:
+		// 左方向へスクロール
+
+		// 右へ一画面ずれたところから開始
+		m_offsetPixelX = screenWidth;
+		// WMの場合は差分をふやして移動ステップを減らす
+#ifndef WINCE
+		m_dPxelX = -screenWidth / 15 ;
+#else
+		m_dPxelX = -screenWidth / 5 ;
+#endif
+		break;
+	}
+
+	// パンスクロール中フラグ設定
+	m_bAutoScrolling = true;
+
+	// パンスクロール開始
+	SetTimer( TIMERID_PANSCROLL, TIMER_INTERVAL_PANSCROLL, NULL );
+}
+
+
+/**
+ * 縦スクロールイベント
+ */
+void Ran2View::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+//	CWnd::OnVScroll(nSBCode, nPos, pScrollBar);
+}
+
+
 /**
  * 左ダブルクリックイベント
  */
@@ -2115,6 +2164,9 @@ void Ran2View::OnLButtonDblClk(UINT nFlags, CPoint point)
 }
 
 
+/**
+ * 自動ドラッグ処理（慣性スクロール、パンスクロール）の停止
+ */
 void Ran2View::ResetDragOffset(void)
 {
 	// 慣性スクロール停止
@@ -2200,12 +2252,12 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				// 左方向
 				CBrush brs;
 				brs.CreateSolidBrush( lightGray );
-				CBrush * oldbrs = memDC->SelectObject( &brs );
-				memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
-				memDC->SelectObject( &oldbrs );
+				CBrush * oldbrs = m_memDC->SelectObject( &brs );
+				m_memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
+				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 				brs.CreateSolidBrush( RGB( 32 , 32 , 32 ) );
-				oldbrs = memDC->SelectObject( &brs );
+				oldbrs = m_memDC->SelectObject( &brs );
 				CPoint pts[3];
 				pts[0].x = screenWidth * 5 / 8;
 				pts[0].y = m_drawStartTopOffset + screenHeight * 3 / 8;
@@ -2213,8 +2265,8 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				pts[1].y = m_drawStartTopOffset + screenHeight * 5 / 8;
 				pts[2].x = screenWidth * 3 / 8;
 				pts[2].y = m_drawStartTopOffset + screenHeight / 2;
-				memDC->Polygon( pts , 3 );
-				memDC->SelectObject( &oldbrs );
+				m_memDC->Polygon( pts , 3 );
+				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 
 				OnPaint();
@@ -2224,12 +2276,12 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				// 右方向
 				CBrush brs;
 				brs.CreateSolidBrush( lightGray );
-				CBrush * oldbrs = memDC->SelectObject( &brs );
-				memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
-				memDC->SelectObject( &oldbrs );
+				CBrush * oldbrs = m_memDC->SelectObject( &brs );
+				m_memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
+				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 				brs.CreateSolidBrush( RGB( 32 , 32 , 32 ) );
-				oldbrs = memDC->SelectObject( &brs );
+				oldbrs = m_memDC->SelectObject( &brs );
 				CPoint pts[3];
 				pts[0].x = screenWidth * 3 / 8;
 				pts[0].y = m_drawStartTopOffset + screenHeight * 3 / 8;
@@ -2237,8 +2289,8 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				pts[1].y = m_drawStartTopOffset + screenHeight * 5 / 8;
 				pts[2].x = screenWidth * 5 / 7;
 				pts[2].y = m_drawStartTopOffset + screenHeight / 2;
-				memDC->Polygon( pts , 3 );
-				memDC->SelectObject( &oldbrs );
+				m_memDC->Polygon( pts , 3 );
+				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 
 				OnPaint();
@@ -2446,6 +2498,7 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 //	CWnd::OnLButtonDown(nFlags, point);
 }
 
+
 /**
  * 現在のスクロール位置の取得
  */
@@ -2458,6 +2511,7 @@ int Ran2View::MyGetScrollPos()
 		return m_drawOffsetLine;
 	}
 }
+
 
 /**
  * マウス移動イベント
@@ -2627,7 +2681,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 
 
 /**
- * dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定する
+ * dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定し、変数を設定する
  *
  * ドラッグ開始時は m_bPanDragging, m_bScrollDragging を設定する
  */

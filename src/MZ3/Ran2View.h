@@ -17,6 +17,7 @@
 
 #include <vector>
 
+/// らんらんビュー用各種データ定義
 namespace Ran2 {
 
 const int framePixel = 1;				///< ワク線の太さ(ピクセル数)
@@ -31,73 +32,73 @@ const int pictureNameLength = 16;		///< 画像ファイルのID名の最大長
 class	HtmlRecord
 {
 public:
-	CString	key;			// タグ名
-	CString value;			// 値
-	CString	parameter;		// オプション値(セロハン値、リンク先アンカーなど)
+	CString	key;			///< タグ名
+	CString value;			///< 値
+	CString	parameter;		///< オプション値(セロハン値、リンク先アンカーなど)
 };
 
 
-// SetRowPropertyが返す処理中の状態
-//	BOL:(BeginOfLine)	開始タグ。新行の作成が必要。
-//	EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
-//	FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
-//	FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
+/// SetRowPropertyが返す処理中の状態
 const enum ProcessStateEnum { 
-	ProcessState_BOL=0, 
-	ProcessState_EOL, 
-	ProcessState_FBL, 
-	ProcessState_FOL, 
+	ProcessState_BOL=0,		///< BOL:(BeginOfLine)	開始タグ。新行の作成が必要。
+	ProcessState_EOL,		///< EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
+	ProcessState_FBL,		///< FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
+	ProcessState_FOL,		///< FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
 	ProcessState_through, 
 	ProcessState_error, 
 };
 
-// 通常、太字、1/4サイズの定義
+
+/// 通常、太字、1/4サイズの定義
 const enum FontTypeEnum {
-	FontType_normal=0, 
-	FontType_bold, 
-	FontType_quarter, 
+	FontType_normal=0,		///< 通常
+	FontType_bold,			///< 太字
+	FontType_quarter,		///< 1/4 サイズ
 };
 
-// ワク線の描画種別(nothing:描画しない、open:ワク無し、roof:開始行、follow:継続行、stool:終了行
+
+/// ワク線の描画種別
 const enum FrameTypeEnum {
-	FrameType_nothing=-1, 
-	FrameType_open=0, 
-	FrameType_roof, 
-	FrameType_follow, 
-	FrameType_stool, 
+	FrameType_nothing=-1,	///< 描画しない
+	FrameType_open=0,		///< ワク無し
+	FrameType_roof,			///< 開始行
+	FrameType_follow,		///< 継続行
+	FrameType_stool,		///< 終了行
 };
 
-// リンクの種別(ページ内部リンク:0、ページ外部リンク:1、画像拡大リンク:2、mixiムービーリンク:3
+
+/// リンクの種別
 enum LinkType { 
-	LinkType_noLink = 0, 
-	LinkType_internal, 
-	LinkType_external, 
-	LinkType_picture,
-	LinkType_movie,
+	LinkType_noLink = 0,	///< リンクなし
+	LinkType_internal,		///< ページ内部リンク
+	LinkType_external,		///< ページ外部リンク
+	LinkType_picture,		///< 画像拡大リンク
+	LinkType_movie,			///< mixiムービーリンク
 };
 
-// 文字情報。背景色やフォント種別などか切り変わるまでを一つのブロックとして扱う。
+
+/// 文字情報。背景色やフォント種別などか切り変わるまでを一つのブロックとして扱う。
 class TextProperty
 {
 public:
-	CRect			drawRect;				// 描画領域(実行時に設定される)
-	FontTypeEnum	fontType;				// フォントの種別
-	bool			isBold;					// 太字の有無(true:有り、false:無し)
-	COLORREF		foregroundColor;		// 文字色
-	COLORREF		backgroundColor;		// 背景色
-	bool			isUpHanging;			// 上付き有無(true:有り、false:無し)
-	bool			isDownHanging;			// 下付き有無(true:有り、false:無し)
-	bool			isUnderLine;			// 下線の有無(true:有り、false:無し)
-	CString			lineText;				// 行出力に使われるテキスト(400文字で足りる？)
-	int				linkID;					// リンクID
-	int				imglinkID;				// リンクID
-	int				movlinkID;				// リンクID
+	CRect			drawRect;				///< 描画領域(実行時に設定される)
+	FontTypeEnum	fontType;				///< フォントの種別
+	bool			isBold;					///< 太字の有無(true:有り、false:無し)
+	COLORREF		foregroundColor;		///< 文字色
+	COLORREF		backgroundColor;		///< 背景色
+	bool			isUpHanging;			///< 上付き有無(true:有り、false:無し)
+	bool			isDownHanging;			///< 下付き有無(true:有り、false:無し)
+	bool			isUnderLine;			///< 下線の有無(true:有り、false:無し)
+	CString			lineText;				///< 行出力に使われるテキスト(400文字で足りる？)
+	int				linkID;					///< リンクID
+	int				imglinkID;				///< リンクID
+	int				movlinkID;				///< リンクID
 	TextProperty();
 	~TextProperty();
 };
 
 
-// 外字情報。一行に収まる小さな画像の出力範囲とリソース番号(ファイル名)を扱う。
+/// 外字情報。一行に収まる小さな画像の出力範囲とリソース番号(ファイル名)を扱う。
 class GaijiProperty
 {
 public:
@@ -108,138 +109,152 @@ public:
 };
 
 
-// 下線情報。文字修飾としてリンクとは明示的に区別する場合に作ったけど現在は未使用。
+/// 下線情報。文字修飾としてリンクとは明示的に区別する場合に作ったけど現在は未使用。
 class UnderLineProperty
 {
 public:
-	CPoint		drawPoint;	// 下線描画位置
-	int			width;		// 描画幅
-	COLORREF	penColor;	// 描画ペン色
+	CPoint		drawPoint;		///< 下線描画位置
+	int			width;			///< 描画幅
+	COLORREF	penColor;		///< 描画ペン色
 	UnderLineProperty();
 	~UnderLineProperty();
 };
 
 
-// 枠線、背景色の指定。
-class FrameProperty{
+/// 枠線、背景色の指定。
+class FrameProperty
+{
 public:
-	FrameTypeEnum	frameType;		// ワクの種別
-	COLORREF	backgroundColor;	// 背景色
-	COLORREF	penColor;			// 枠色
+	FrameTypeEnum	frameType;			///< ワクの種別
+	COLORREF		backgroundColor;	///< 背景色
+	COLORREF		penColor;			///< 枠色
 	FrameProperty();
 	~FrameProperty();
 };
 
 
-// リンク情報。
-// 下線を引いた範囲でひとつのグラップルを担当するので、行をまたぐ場合は同一のリンク情報が複数個作成される事もある。
+/**
+ * リンク情報。
+ *
+ * 下線を引いた範囲でひとつのグラップルを担当するので、行をまたぐ場合は同一のリンク情報が複数個作成される事もある。
+ */
 class LinkProperty
 {
 public:
 	LinkType	linkType;
-	unsigned int linkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
-	unsigned int imglinkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
-	unsigned int movlinkID;		// 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
-	unsigned int jumpUID;		// 呼び出し先
-	unsigned int anchorIndex;	// 呼び出し先のページ内アンカー
-	CString		paramStr;		// 汎用パラメータ
-	CRect		grappleRect;	// タップに反応する矩形領域
+	unsigned int linkID;		///< 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
+	unsigned int imglinkID;		///< 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
+	unsigned int movlinkID;		///< 画面の先頭から右に向かって順番に振られるID。キー操作で次のリンクへの移動時に使用。
+	unsigned int jumpUID;		///< 呼び出し先
+	unsigned int anchorIndex;	///< 呼び出し先のページ内アンカー
+	CString		paramStr;		///< 汎用パラメータ
+	CRect		grappleRect;	///< タップに反応する矩形領域
 	LinkProperty();
 	~LinkProperty();
 };
 
 
-// 画像情報。インライン描画する際の縮小表示するための情報を保持。
+/**
+ * 画像情報
+ *
+ * インライン描画する際の縮小表示するための情報を保持。
+ */
 class ImageProperty{
 public:
 	CRect	drawRect;
-	int		imageNumber;	// 画像番号
-	int		width;			// 画像幅
-	int		height;			// 画像高さ
-	int		rowNumber;		// 画像を行分割したときの位置
+	int		imageNumber;	///< 画像番号
+	int		width;			///< 画像幅
+	int		height;			///< 画像高さ
+	int		rowNumber;		///< 画像を行分割したときの位置
 	ImageProperty();
 	~ImageProperty();
 };
 
 
-// 行情報。各種Propertyを取りまとめる。
+/// 行情報。各種Propertyを取りまとめる。
 class RowProperty
 {
 public:
 // 一行にひとつだけでおｋな情報
-	unsigned int rowNumber;			// 描画上の行番号
-	unsigned int anchorIndex;		// ページ内アンカーの通し番号
-	int			indentLevel;		// インデントの階層(-1:インデントなし、0:レベル0指定、1:レベル2指定)
-	int			breakLimitPixel;	// 折り返し位置のピクセル数
-	bool		isPicture;			// 画像フラグ
+	unsigned int rowNumber;			///< 描画上の行番号
+	unsigned int anchorIndex;		///< ページ内アンカーの通し番号
+	int			indentLevel;		///< インデントの階層(-1:インデントなし、0:レベル0指定、1:レベル2指定)
+	int			breakLimitPixel;	///< 折り返し位置のピクセル数
+	bool		isPicture;			///< 画像フラグ
 
 // 要素数の個数だけ準備される情報
 	CPtrArray*			textProperties;
 	CPtrArray*			gaijiProperties;
 	CPtrArray*			linkProperties;
 
-	FrameProperty		frameProperty[FrameNestLevel];	// 要素が最大2つなので固定の配列として持つ
-	ImageProperty		imageProperty;					// 画像は一行に一つなので配列にしない
+	FrameProperty		frameProperty[FrameNestLevel];	///< 要素が最大2つなので固定の配列として持つ
+	ImageProperty		imageProperty;					///< 画像は一行に一つなので配列にしない
 	RowProperty();
 	~RowProperty();
 };
 
 
-
-// ページ情報。行情報とページ内リンクを取りまとめる。
+/**
+ * ページ情報
+ *
+ * 行情報とページ内リンクを取りまとめる。
+ */
 class MainInfo
 {
 public:
 	unsigned long uid;
-	CString uidName;			// 元ファイル名
-	CString	recordName;			// 項目名は127文字まで
-	int		anchorIndex[PageAnchorMax];	// ページ内リンクの情報(最大48個まで)
-	int		propertyCount;				// lineInfoに保持される行情報の件数
-	CPtrArray*	rowInfo;				// 行情報
+	CString uidName;					///< 元ファイル名
+	CString	recordName;					///< 項目名は127文字まで
+	int		anchorIndex[PageAnchorMax];	///< ページ内リンクの情報(最大48個まで)
+	int		propertyCount;				///< lineInfoに保持される行情報の件数
+	CPtrArray*	rowInfo;				///< 行情報
 	MainInfo();
 	~MainInfo();
 };
 
 
-
-// 次行へ持ち越されるかもしれない情報
+/**
+ * 次行へ持ち越されるかもしれない情報
+ */
 class BridgeProperty
 {
 public:	
-	bool			isBold;					// 太字
-	FontTypeEnum	fontType;				// フォントの種別
-	COLORREF		foregroundColor;		// 文字色
-	COLORREF		backgroundColor;		// 背景色
-	bool			isUpHanging;			// 上付き有り？(true:有り、false:無し)
-	bool			isDownHanging;			// 下付き有り？(true:有り、false:無し)
-	bool			isUnderLine;			// 下線有り？(true:有り、false:無し)
-	bool			isLink;					// リンク有り？(true:有り、false:無し)
-	LinkType		linkType;				// リンクの種別
-	int				jumpID;					// リンクの飛び先ID
-	int				pageAnchor;				// リンクの飛び先IDのページ内アンカー
-	int				indentLevel;			// インデントの位置
-	int				picLine;				// 画像の分割した行位置
-	int				inPageAnchor;			// 現在ページ内のアンカー
+	bool			isBold;					///< 太字
+	FontTypeEnum	fontType;				///< フォントの種別
+	COLORREF		foregroundColor;		///< 文字色
+	COLORREF		backgroundColor;		///< 背景色
+	bool			isUpHanging;			///< 上付き有り？(true:有り、false:無し)
+	bool			isDownHanging;			///< 下付き有り？(true:有り、false:無し)
+	bool			isUnderLine;			///< 下線有り？(true:有り、false:無し)
+	bool			isLink;					///< リンク有り？(true:有り、false:無し)
+	LinkType		linkType;				///< リンクの種別
+	int				jumpID;					///< リンクの飛び先ID
+	int				pageAnchor;				///< リンクの飛び先IDのページ内アンカー
+	int				indentLevel;			///< インデントの位置
+	int				picLine;				///< 画像の分割した行位置
+	int				inPageAnchor;			///< 現在ページ内のアンカー
 	BridgeProperty();
 	~BridgeProperty();
 };
 
 
 
-// p,h1,h2,h3でも跨がなければならない情報
+/**
+ * p,h1,h2,h3でも跨がなければならない情報
+ */
 class BigBridgeProperty
 {
 public:	
-	CString				remainStr;						// 出力できなくて持ち越した文字列
-	int					frameNestLevel;					// 枠情報のネスト位置
-	int					screenWidth;					// 画面の幅
-	int					remainWidth;					// 描画に使える残り幅
-	int					startWidth;						// 出力開始位置のX座標
-	int					linkID;							// リンクの連番
-	int					imglinkID;						// 画像リンクの連番
-	int					movlinkID;						// 動画リンクの連番
-	FrameProperty		frameProperty[FrameNestLevel];	// 要素が最大2つなので固定の配列として持つ
-	bool				frameTopThrough;				// ワクの上端を描画完了が終わったらtrueになる
+	CString			remainStr;						///< 出力できなくて持ち越した文字列
+	int				frameNestLevel;					///< 枠情報のネスト位置
+	int				screenWidth;					///< 画面の幅
+	int				remainWidth;					///< 描画に使える残り幅
+	int				startWidth;						///< 出力開始位置のX座標
+	int				linkID;							///< リンクの連番
+	int				imglinkID;						///< 画像リンクの連番
+	int				movlinkID;						///< 動画リンクの連番
+	FrameProperty	frameProperty[FrameNestLevel];	///< 要素が最大2つなので固定の配列として持つ
+	bool			frameTopThrough;				///< ワクの上端を描画完了が終わったらtrueになる
 	BigBridgeProperty();
 	~BigBridgeProperty();
 };
@@ -319,7 +334,8 @@ public:
 	}
 };
 
-}
+}// namespace Ran2
+
 
 using namespace Ran2;
 
@@ -363,14 +379,15 @@ class Ran2View : public CWnd
 	int			currentCharWidth;		///< 現在出力に使っている文字の幅(折り返し処理で使用)
 
 	int			hangingOffset;				///< 上付き、下付きの突き出し量
-	CDC*		backDC;						///< 画像描画用DC
-	CDC*		dummyDC;					///< 見積用
-	CDC*		memDC;						///< 裏画面DC
-	CBitmap*	memBMP;						///< 裏画面バッファ
-	CBitmap*	oldBMP;						///< 旧画面の情報
-	CDC*		memBackDC;					///< パンスクロール用裏画面DC
-	CBitmap*	memBackBMP;					///< パンスクロール用裏画面バッファ
-	CBitmap*	oldBackBMP;					///< パンスクロール用旧画面の情報
+
+	CDC*		m_memDC;					///< 裏画面DC
+	CBitmap*	m_memBMP;					///< 裏画面バッファ
+	CBitmap*	m_oldBMP;					///< 旧画面の情報
+
+	CDC*		m_memPanDC;					///< パンスクロール用裏画面DC
+	CBitmap*	m_memPanBMP;				///< パンスクロール用裏画面バッファ
+	CBitmap*	m_oldPanBMP;				///< パンスクロール用旧画面の情報
+
 	int			m_viewLineMax;				///< 現在のフォントで行表示可能な数
 	COLORREF	normalBkColor;				///< 通常時背景色
 	COLORREF	reverseBkColor;				///< 反転時背景色
@@ -480,7 +497,7 @@ public:
 
 	// ハッシュから行情報の振り分け
 	ProcessStateEnum SetRowProperty(HtmlRecord* hashRecord,RowProperty* rowRecord,BridgeProperty* bridgeInfo,BigBridgeProperty* bigBridgeInfo);
-	bool SetMainRecordData(HtmlRecord* hashRecord,MainInfo* mainRecord);	// MainInfoをオンメモリで作っちゃった場合の出力(テスト用)
+	//bool SetMainRecordData(HtmlRecord* hashRecord,MainInfo* mainRecord);	// MainInfoをオンメモリで作っちゃった場合の出力(テスト用)
 	MainInfo* ParseDatData2(CStringArray* datArray,int width);				// MainInfoのCStringArrayからの構築
 
 	// 解像度の判別など
@@ -521,6 +538,7 @@ public:
 
 private:
 	void MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy);
+	bool MyMakeBackBuffers(CPaintDC& cdc);
 };
 
 
