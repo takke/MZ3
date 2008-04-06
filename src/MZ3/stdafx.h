@@ -27,6 +27,10 @@
 #define _AFX_ALL_WARNINGS
 
 #ifdef WINCE
+#define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA
+#endif
+
+#ifdef WINCE
 # include <ceconfig.h>
 #endif
 
