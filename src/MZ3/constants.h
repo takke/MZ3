@@ -12,7 +12,7 @@
 
 // CHM ヘルプファイルパス
 #ifndef WINCE
-#define MZ3_CHM_HELPFILENAME		L"MZ3 for Windows.chm"
+#define MZ3_CHM_HELPFILENAME		L"MZ4.chm"
 #endif
 
 // Window メッセージ
