@@ -13,8 +13,9 @@
 #include "InetAccess.h"
 #include "HtmlArray.h"
 #include "XcrawlCanceler.h"
-#include "Ran2View.h"
 #include "ReportScrollBar.h"
+
+class Ran2View;
 
 // CReportView フォーム ビュー
 

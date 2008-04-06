@@ -256,7 +256,9 @@ Ran2View::Ran2View()
 	, m_bScrollDragging(false)		// 縦ドラッグ中フラグ
 	
 	// 描画用メンバー
+#ifndef WINCE
 	, m_graphics(NULL)
+#endif
 	, m_memDC(NULL)
 	, m_memBMP(NULL)
 	, m_memPanDC(NULL)

@@ -15,6 +15,7 @@
 #include "WriteView.h"
 #include "DownloadView.h"
 #include "MZ3View.h"
+#include "Ran2View.h"
 #include "UserDlg.h"
 #include "util.h"
 #include "util_gui.h"

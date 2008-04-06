@@ -389,12 +389,13 @@ class Ran2View : public CWnd
 	CBitmap*	m_oldPanBMP;				///< パンスクロール用旧画面の情報
 
 	int			m_viewLineMax;				///< 現在のフォントで行表示可能な数
+	int			m_drawOffsetLine;			///< 現在描画を行っている行位置
+
 	COLORREF	normalBkColor;				///< 通常時背景色
 	COLORREF	reverseBkColor;				///< 反転時背景色
 	COLORREF	normalTextColor;			///< 通常時文字色
 	COLORREF	reverseTextColor;			///< 反転時文字色
 	COLORREF	markTextColor;				///< 特殊マーク色
-	int			m_drawOffsetLine;			///< 現在描画を行っている行位置
 
 	int			activeLinkID;				///< アクティブなリンクのID
 	int			activeimgLinkID;			///< アクティブなリンクのID
@@ -411,7 +412,7 @@ class Ran2View : public CWnd
 	bool		m_bPanDragging;				///< 横方向マウスドラッグ中
 	bool		m_bScrollDragging;			///< スクロール中
 	int			m_offsetPixelX;				///< 横方向オフセットピクセル数
-	int			m_dPxelX;					///< 横方向単位時間移動量
+	int			m_dPxelX;					///< 横方向単位時間移動量 [pixels/10msec]
 
 	// ダブルクリック判定情報
 	DWORD		m_dwFirstLButtonUp;			///< 最初に左クリックされた時刻

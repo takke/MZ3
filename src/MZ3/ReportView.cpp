@@ -21,6 +21,7 @@
 #include "MZ3Parser.h"
 #include "ViewFilter.h"
 #include "CommonSelectDlg.h"
+#include "Ran2View.h"
 
 #define MASK_COLOR RGB(255,0,255);
 
