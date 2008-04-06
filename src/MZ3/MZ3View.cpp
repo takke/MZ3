@@ -1126,28 +1126,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	switch (m_viewStyle) {
-	case VIEW_STYLE_TWITTER:
-		switch (aType) {
-		case ACCESS_TWITTER_FRIENDS_TIMELINE:
-			// フォーカスを入力領域に移動
-			// 但し、フォーカスがリストにある場合は移動しない。
-			{
-				CWnd* pFocus = GetFocus();
-				if (pFocus == NULL ||
-					(pFocus->m_hWnd != m_categoryList.m_hWnd &&
-					 pFocus->m_hWnd != m_bodyList.m_hWnd))
-				{
-					GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	default:
-		break;
-	}
+	// フォーカスの変更
+	MyUpdateFocus();
 
 	return TRUE;
 }
@@ -1180,14 +1160,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	switch (m_viewStyle) {
-	case VIEW_STYLE_TWITTER:
-		// フォーカスを入力領域に移動
-		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-		break;
-	default:
-		break;
-	}
+	// フォーカスの変更
+	MyUpdateFocus();
 
 	return TRUE;
 }
@@ -1229,14 +1203,8 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	util::MySetInformationText( m_hWnd, msg );
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
-	switch (m_viewStyle) {
-	case VIEW_STYLE_TWITTER:
-		// フォーカスを入力領域に移動
-		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-		break;
-	default:
-		break;
-	}
+	// フォーカスの変更
+	MyUpdateFocus();
 
 	return TRUE;
 }
@@ -4836,14 +4804,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	switch (m_viewStyle) {
-	case VIEW_STYLE_TWITTER:
-		// フォーカスを入力領域に移動
-		GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-		break;
-	default:
-		break;
-	}
+	// フォーカスの変更
+	MyUpdateFocus();
 
 	return TRUE;
 }
@@ -4923,7 +4885,7 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
 	CCategoryItem categoryItem;
 	categoryItem.init( 
 		// 名前
-		util::FormatString( L"+%sのタイムライン", bodyItem.GetName() ),
+		util::FormatString( L"@%sのタイムライン", bodyItem.GetName() ),
 		util::FormatString( L"http://twitter.com/statuses/user_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
@@ -4949,7 +4911,7 @@ void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 	CCategoryItem categoryItem;
 	categoryItem.init( 
 		// 名前
-		util::FormatString( L"+%sのタイムライン", bodyItem.GetName() ),
+		util::FormatString( L"@%sのタイムライン", bodyItem.GetName() ),
 		util::FormatString( L"http://twitter.com/statuses/friends_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
@@ -5359,4 +5321,36 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 	util::MySetInformationText( m_hWnd, L"完了" );
 	return false;
+}
+
+/**
+ * ビューの状態に応じてフォーカスを標準位置に戻す
+ *
+ * 主に通信完了時の復帰処理に用いる
+ */
+void CMZ3View::MyUpdateFocus(void)
+{
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		switch (theApp.m_accessType) {
+		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		case ACCESS_TWITTER_UPDATE:
+			// フォーカスを入力領域に移動
+			// 但し、フォーカスがリストにある場合は移動しない。
+			{
+				CWnd* pFocus = GetFocus();
+				if (pFocus == NULL ||
+					(pFocus->m_hWnd != m_categoryList.m_hWnd &&
+					 pFocus->m_hWnd != m_bodyList.m_hWnd))
+				{
+					GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	default:
+		break;
+	}
 }
