@@ -1,8 +1,0 @@
-[Info]
-Name=ヘルプ
-KeyWord=ヘルプ
-Context=IDH_HELP48
-[Date]
-<P><FONT face="ＭＳ ゴシック">* ヘルプ</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　ヘルプやデバッグ情報などを表示します</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　●MZ4ヘルプ<BR>　　本ヘルプを表示します<BR>　●改版履歴<BR>　　MZ3.i / MZ4 の改版履歴 ( ChangeLog.txt ) を表示します<BR>　●バージョン情報<BR>　　MZ4 のバージョン, ライセンス情報などを確認できます<BR>　　reset ボタンを押下することで今までの総受信バイト数をクリアできます<BR>　●デバッグ情報<BR>　　・デバッグ情報<BR>　　　気にしないで下さい<BR>　　・エラーログを開く<BR>　　　出力されたエラーログ ( mz3log.txt ) を MZ4 上で閲覧します<BR></FONT></P>

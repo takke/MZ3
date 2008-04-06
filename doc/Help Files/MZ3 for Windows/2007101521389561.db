@@ -1,7 +1,0 @@
-[Info]
-Name=上部ペインに xxx が表示されない
-KeyWord=上部ペインに xxx が表示されない
-Context=IDH_HELP31
-[Date]
-<P><FONT face="ＭＳ ゴシック">　Q.上部ペインに xxx が表示されない</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　A.toppage_group.ini が壊れている可能性があります <BR>　　メニュー | 設定 | 一般 より「タブの初期化」を行ってみてください</FONT></P>

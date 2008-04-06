@@ -1,7 +1,0 @@
-[Info]
-Name=背景スキンを変更する
-KeyWord=背景スキンを変更する
-Context=IDH_HELP42
-[Date]
-<P><FONT face="ＭＳ ゴシック">　●背景スキンを変更する<BR>　　\MZ3\skin 内に<BR>　　　body.xxx<BR>　　　header.xxx<BR>　　　report.xxx<BR>　　の名称で保存すれば既定以外のものも使用できます<BR>　　\MZ3\skin 以下に適当なディレクトリを作成し, その中に<BR>　　上記名称で保存したファイルを格納することでスキン切り替えの対象となります<BR>　　自作スキンを用意する場合は ini ファイル編集の「skin.ini」を参照してください</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　　また, 下記トピックス<BR>　　【公開】こんなスキン作りました！<BR>　　</FONT><A href="http://mixi.jp/view_bbs.pl?id=22212014&amp;comm_id=1198460"><FONT face="ＭＳ ゴシック">http://mixi.jp/view_bbs.pl?id=22212014&amp;comm_id=1198460</FONT></A><BR><FONT face="ＭＳ ゴシック">　　にてオリジナルのスキンを募集・公開しています<BR>　　自作スキンを作られた方は是非投稿してください</FONT></P>
