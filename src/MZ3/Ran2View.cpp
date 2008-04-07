@@ -18,13 +18,13 @@
 IMPLEMENT_DYNAMIC(Ran2View, CWnd)
 
 // 汎用カラー(システムの純色だけどあとで調整できる様に定義しておく)
-COLORREF solidBlack = COLORREF(RGB(0x00,0x00,0x00));
-COLORREF solidBlue = RGB(0x00,0x00,0xFF);
-COLORREF solidWhite = RGB(0xFF,0xFF,0xFF);
-COLORREF solidPink = RGB(0xFF,0xC0,0xCB);
-COLORREF solidDarkBlue = RGB(0x00,0x00,0x8B);
-COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
-COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
+const static COLORREF solidBlack = COLORREF(RGB(0x00,0x00,0x00));
+const static COLORREF solidBlue = RGB(0x00,0x00,0xFF);
+const static COLORREF solidWhite = RGB(0xFF,0xFF,0xFF);
+const static COLORREF solidPink = RGB(0xFF,0xC0,0xCB);
+const static COLORREF solidDarkBlue = RGB(0x00,0x00,0x8B);
+const static COLORREF lightBlue = COLORREF(RGB(0x94,0xD2,0xF1));
+const static COLORREF lightGray = COLORREF(RGB(0xD0,0xD0,0xD0));
 
 // タイマーID
 #define TIMERID_AUTOSCROLL	1
@@ -263,6 +263,9 @@ Ran2View::Ran2View()
 	, m_memBMP(NULL)
 	, m_memPanDC(NULL)
 	, m_memPanBMP(NULL)
+
+	// パンスクロール中フラグ
+	, m_bAutoScrolling(false)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -354,14 +357,6 @@ BOOL Ran2View::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwSty
 	CRect r = rect;
 	r.right = 100;
 	r.bottom = 100;
-
-	// リンク表示用
-	activeLinkID = -1;			// ポイント中のリンク連番
-	activeimgLinkID = -1;		// ポイント中の画像リンク連番
-	activemovLinkID = -1;		// ポイント中の動画リンク連番
-
-	// パンスクロール中フラグ
-	m_bAutoScrolling = false;
 
 	return CWnd::Create(lpszClassName, lpszWindowName, dwStyle, r, pParentWnd, nID, pContext);
 }
@@ -861,105 +856,59 @@ CString	Ran2View::CalcTextByWidth(CDC* dstDC,CString srcStr,int width)
 /**
  * 行情報の設定
  *
+ * ParseDatData2 から呼び出される
+ *
  * @param hashRecord    振り分けるタグ情報
  * @param rowRecord     振り分け対象先
  * @param bridgeInfo    行末記号(p,h1,h2,h2,h3の終了)でリセットされる文字修飾情報
  * @param bigBridgeInfo end記号(end_kakomi_hoge)でリセットされる行修飾情報(いまのところ枠線のみ)
  *
- * @return EOL:[EndOfLine]閉じタグで行が終了 <br>
- *         follow:情報を継続して次行 <br>
- *         forceBR:情報を継続して改行 <br>
- *         BOL:(BeginOfLine)開始タグで新行が必要 <br>
- *         EOL:(EndOfLine)閉じタグで行が終了 <br>
- *         follow:情報を継続して次行 <br>
+ * @return ProcessState_EndOfLine:      閉じタグで行が終了 <br>
+ *         ProcessState_BeginOfLine:    開始タグで新行が必要 <br>
+ *         follow:                      情報を継続して次行 <br>
+ *         ProcessState_ForceBreakLine: 情報を継続して改行 <br>
  */
-ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* rowRecord,BridgeProperty* bridgeInfo,BigBridgeProperty* bigBridgeInfo)
+ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord, 
+										  RowProperty* rowRecord,
+										  BridgeProperty* bridgeInfo,
+										  BigBridgeProperty* bigBridgeInfo)
 {
 	static int imageDummyLineCount = 0; // 画像の空行出力計測用
 	ProcessStateEnum processState = ProcessState_through; 
 	bool isBreak = false;		// 行単位の処理が終わる度にレコードを書き出すフラグ
 
 	// タグ情報の振り分け
-	const enum tagStatus { 
-	// 開始タグ
-		Tag_nothing=0, 
-		Tag_h1, Tag_h2, Tag_h3,	
-		Tag_p, Tag_blue, Tag_underline, 
-		Tag_sub, Tag_sup, Tag_text, 
-		Tag_entity, Tag_gaiji, Tag_img, Tag_mov, 
-		Tag_br, Tag_anchor,	Tag_link, 
-		Tag_level0, Tag_level1,	Tag_level2,	
-		Tag_kakomi_blue, Tag_kakomi_gray, Tag_kakomi_gray2, 
-		Tag_kakomi_white, Tag_kakomi_white2,
-		Tag_bold, Tag_blockquote,
-	// 終了タグ
-		Tag_end_p, Tag_end_blue, Tag_end_underline,
-		Tag_end_sub, Tag_end_sup, Tag_end_b, Tag_end_blockquote,
-		Tag_end_link, Tag_end_img, Tag_end_mov,
-		Tag_end_h1, Tag_end_h2, Tag_end_h3, 
-		Tag_end_kakomi_blue, Tag_end_kakomi_gray, Tag_end_kakomi_gray2, 
-		Tag_end_kakomi_white, Tag_end_kakomi_white2, 
-	};
-	const wchar_t* tagText[] = { 
-	// 開始タグ(27個)
-		TEXT("dummy"), 
-		TEXT("h1"), TEXT("h2"), TEXT("h3"), 
-		TEXT("p"), TEXT("blue"), TEXT("underline"), 
-		TEXT("sub"), TEXT("sup"), TEXT("text"), 
-		TEXT("entity"), TEXT("gaiji"), TEXT("img"), TEXT("mov"),
-		TEXT("br"), TEXT("anchor"), TEXT("link"), 
-		TEXT("level0"), TEXT("level1"),	TEXT("level2"), 
-		TEXT("kakomi_blue"), TEXT("kakomi_gray"), TEXT("kakomi_gray2"), 
-		TEXT("kakomi_white"), TEXT("kakomi_white2"),
-		TEXT("b"), TEXT("blockquote"),
-	// 終了タグ(18個)
-		TEXT("end_p"), TEXT("end_blue"), TEXT("end_underline"),
-		TEXT("end_sub"), TEXT("end_sup"), TEXT("end_b"), TEXT("end_blockquote"),
-		TEXT("end_link"), TEXT("end_img"), TEXT("end_mov"),
-		TEXT("end_h1"), TEXT("end_h2"), TEXT("end_h3"),	
-		TEXT("end_kakomi_blue"), TEXT("end_kakomi_gray"), TEXT("end_kakomi_gray2"), 
-		TEXT("end_kakomi_white"), TEXT("end_kakomi_white2"), 
-		NULL,
-	};
+	TAG_TYPE currentTag = hashRecord->type;
 
-	tagStatus currentTag = (tagStatus)0;	// 振り分けできないタグはエラー扱いとする
+	switch (currentTag) {
+	case Tag_p:
+	case Tag_h1:
+	case Tag_h2:
+	case Tag_h3:
+	case Tag_level0:
+	case Tag_level1:
+	case Tag_level2:
+	case Tag_blockquote:
+		// 開始タグ
+		processState = ProcessState_BeginOfLine;
+		break;
 
-	// タグの一時振り分け
-	for(int i=0; tagText[i]!=NULL; i++) {
-		if( hashRecord->key.Compare(tagText[i]) == 0 ){
-			currentTag = (tagStatus)i;
+	case Tag_end_p:
+	case Tag_end_h1:
+	case Tag_end_h2:
+	case Tag_end_h3:
+		// 終了タグ
+		processState = ProcessState_EndOfLine;
+		break;
 
-			switch (currentTag) {
-			case Tag_p:
-			case Tag_h1:
-			case Tag_h2:
-			case Tag_h3:
-			case Tag_level0:
-			case Tag_level1:
-			case Tag_level2:
-			case Tag_blockquote:
-				// 開始タグ
-				processState = ProcessState_BOL;
-				break;
+	case Tag_br:
+		// 改行とかがあった時
+		processState = ProcessState_ForceBreakLine;
+		break;
 
-			case Tag_end_p:
-			case Tag_end_h1:
-			case Tag_end_h2:
-			case Tag_end_h3:
-				// 終了タグ
-				processState = ProcessState_EOL;
-				break;
-
-			case Tag_br:
-				// 改行とかがあった時
-				processState = ProcessState_FBL;
-				break;
-
-			case Tag_nothing:
-				// エラータグの場合はここでスキップ
-				return(ProcessState_error);
-			}
-		}
+	case Tag_nothing:
+		// エラータグの場合はここでスキップ
+		return(ProcessState_error);
 	}
 
 	// 行を跨いでも変わらない情報から処理
@@ -1092,7 +1041,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		bridgeInfo->isUpHanging = false;
 
 	// 太字の終了
-	}else if( currentTag == Tag_end_b ){
+	}else if( currentTag == Tag_end_bold ){
 		bridgeInfo->isBold = false;
 
 	// 文字色の設定終了
@@ -1105,7 +1054,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 	// 文字列の設定
 	}else if( currentTag == Tag_text || currentTag == Tag_entity ||  bigBridgeInfo->remainStr.GetLength() > 0){
-//		processState = ProcessState_FBL;	// 基本は一行単位で改行する
+//		processState = ProcessState_ForceBreakLine;	// 基本は一行単位で改行する
 		processState = ProcessState_through;	// 基本は改行なしとする。
 
 		TextProperty* newText = new TextProperty();
@@ -1162,7 +1111,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 			if( bigBridgeInfo->remainStr.GetLength() > 0 ){
 				// 持ち越した場合は持ち越し分が完了するまで繰り返す
-				processState = ProcessState_FOL;
+				processState = ProcessState_FollowOfLine;
 			}
 	
 		}else{
@@ -1274,11 +1223,11 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 		// 外字が幅に収まらない場合は改行して再チャレンジ支援
 		if( blockWidth > bigBridgeInfo->remainWidth ){
 			// 持ち越した場合は持ち越し分が完了するまで繰り返す
-			processState = ProcessState_FOL;
+			processState = ProcessState_FollowOfLine;
 		}else{
 			newGaiji = new GaijiProperty();
 			// [m:xx] から xx を抽出し、リソースIDとする
-			newGaiji->resourceID = hashRecord->value.Mid(3,hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
+			newGaiji->resourceID = hashRecord->value.Mid(3, hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
 
 			// 出力領域の設定
 			int sx = bigBridgeInfo->startWidth + (gaijiWidthOffset);
@@ -1304,7 +1253,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 			bridgeInfo->linkType = LinkType_external;	// リンクタイプ＝外部リンク
 		//}
 
-		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+//		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+		bridgeInfo->pageAnchor = 0;
 	// リンクタグの終了
 	}else if( currentTag == Tag_end_link ){
 		bridgeInfo->isLink = false;
@@ -1320,7 +1270,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 		bridgeInfo->linkType = LinkType_picture;		// リンクタイプ＝画像リンク
 
-		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+//		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+		bridgeInfo->pageAnchor = 0;
 	// 画像リンクタグの終了
 	}else if( currentTag == Tag_end_img ){
 		bridgeInfo->isLink = false;
@@ -1336,7 +1287,8 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,RowProperty* ro
 
 		bridgeInfo->linkType = LinkType_movie;			// リンクタイプ＝動画リンク
 
-		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+//		bridgeInfo->pageAnchor = _wtol(hashRecord->parameter);
+		bridgeInfo->pageAnchor = 0;
 	// 動画リンクタグの終了
 	}else if( currentTag == Tag_end_mov ){
 		bridgeInfo->isLink = false;
@@ -1382,7 +1334,7 @@ void Ran2View::ResetBigBridgeProperty(BigBridgeProperty* bigBridgeInfo,BridgePro
 	bigBridgeInfo->startWidth = leftOffset;
 
 	// BOLだけ先頭の突き出し分オフセットするので注意！
-	if( mode == ProcessState_BOL ){
+	if( mode == ProcessState_BeginOfLine ){
 		// インデントが設定されている時は突き出し量を設定
 		if( bridgeInfo->indentLevel != -1 ){
 			// 開始行だけ突き出して出力する(開始位置が一文字左)
@@ -1565,6 +1517,8 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 /**
  * 行内のテキストプロパティの配列を描画する
  *
+ * DrawDetail から呼び出される
+ *
  * line: 描画したい行
  * rowProperty: 行の情報
  */
@@ -1652,6 +1606,8 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 /**
  * 行内のテキストプロパティの配列を描画する
  *
+ * DrawDetail から呼び出される
+ *
  * @param line 描画したい行
  * @param textProperties textPropertyをまとめた配列
  */
@@ -1669,11 +1625,12 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		int ey = sy + (charHeight+charHeightOffset);
 
 		bReverse = false;
-		if( ((activeLinkID >=0) && (activeLinkID == text->linkID) ) ||
-			((activeimgLinkID >=0) && (activeimgLinkID == text->imglinkID) ) ||
-			((activemovLinkID >=0) && (activemovLinkID == text->movlinkID) ) ){
-				// ポイントしているリンク連番がテキスト情報のものと一致していれば反転フラグを設定
-				bReverse = true;
+		if( ((m_activeLinkID.anchor >=0) && (m_activeLinkID.anchor == text->linkID) ) ||
+			((m_activeLinkID.image >=0) && (m_activeLinkID.image == text->imglinkID) ) ||
+			((m_activeLinkID.movie >=0) && (m_activeLinkID.movie == text->movlinkID) ) )
+		{
+			// ポイントしているリンク連番がテキスト情報のものと一致していれば反転フラグを設定
+			bReverse = true;
 		}
 
 		CRect drawRect = CRect(text->drawRect.left,sy,text->drawRect.right,ey);
@@ -1698,8 +1655,8 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 		// 文字色とフォントの切り替え
 		if( bReverse ) {
 			// 反転表示用 文字色＝白、背景色＝黒
-			m_memDC->SetTextColor(solidWhite);
-			m_memDC->SetBkColor(solidBlack);
+			m_memDC->SetTextColor(text->backgroundColor);
+			m_memDC->SetBkColor(text->foregroundColor);
 		} else {
 			// ノーマル表示用 テキスト情報から色を取得
 			m_memDC->SetTextColor(text->foregroundColor);
@@ -1728,6 +1685,8 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 
 /**
  * 行内のテキストプロパティの配列を描画する
+ *
+ * DrawDetail から呼び出される
  *
  * @param line 描画したい行
  * @param textProperties textPropertyをまとめた配列
@@ -1799,12 +1758,14 @@ void Ran2View::DrawGaijiProperty(int line,CPtrArray* gaijiProperties)
 /**
  * datファイルから実行時クラスへの変換その2(Unicodeに変換されている事が前提)
  *
+ * LoadDetail から呼び出される
+ *
  * ファイルをCArchiveで一行づつ読むのではなく、一括で読み込んでCStringArrayへ分割してから処理を行う
  */
 MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 {
-	MainInfo* newMainRecord = NULL;
-	newMainRecord = new MainInfo();
+	// 返却値
+	MainInfo* newMainRecord = new MainInfo();
 
 	// 実ライン情報の一時保存先
 	CPtrArray*	rowPropertyArray = newMainRecord->rowInfo;
@@ -1820,7 +1781,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 	BigBridgeProperty	bigBridgeInfo;	// 行をまたぐ修飾情報(新行でもリセットされない)
 
 	// 跨ぎ情報のリセット
-	this->ResetBigBridgeProperty(&bigBridgeInfo,&bridgeInfo,ProcessState_BOL,width);
+	this->ResetBigBridgeProperty(&bigBridgeInfo,&bridgeInfo,ProcessState_BeginOfLine,width);
 
 	// CFileArchiveでファイルの終末までループさせる
 	// 一番最初の行をからっぽで追加
@@ -1852,47 +1813,47 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 			}
 			if (code.IsEmpty()) {
 				// 非外字
-				hashRecord->key = TEXT("text");
+				hashRecord->type = Tag_text;
 			} else {
 				// 外字
-				hashRecord->key = TEXT("gaiji");
+				hashRecord->type = Tag_gaiji;
 			}
 		}else if( lineStr.Compare(TEXT("[br]")) == 0 ) {
-			hashRecord->key = TEXT("br");
+			hashRecord->type = Tag_br;
 		}else if( lineStr.Compare(TEXT("[b]")) == 0 ) {
-			hashRecord->key = TEXT("b");
+			hashRecord->type = Tag_bold;
 		}else if( lineStr.Compare(TEXT("[/b]")) == 0 ) {
-			hashRecord->key = TEXT("end_b");
+			hashRecord->type = Tag_end_bold;
 		}else if( lineStr.Compare(TEXT("[blue]")) == 0 ) {
-			hashRecord->key = TEXT("blue");
+			hashRecord->type = Tag_blue;
 		}else if( lineStr.Compare(TEXT("[/blue]")) == 0 ) {
-			hashRecord->key = TEXT("end_blue");
+			hashRecord->type = Tag_end_blue;
 		}else if( lineStr.Compare(TEXT("[blockquote]")) == 0 ) {
 			// 引用開始
-			hashRecord->key = TEXT("blockquote");
+			hashRecord->type = Tag_blockquote;
 		}else if( lineStr.Compare(TEXT("[/blockquote]")) == 0 ) {
 			// 引用終了
-			hashRecord->key = TEXT("end_blockquote");
+			hashRecord->type = Tag_end_blockquote;
 		}else if( lineStr.Compare(TEXT("[a]")) == 0 ) {
 			// リンク開始
-			hashRecord->key = TEXT("link");
+			hashRecord->type = Tag_link;
 		}else if( lineStr.Compare(TEXT("[/a]")) == 0 ) {
 			// リンク終了
-			hashRecord->key = TEXT("end_link");
+			hashRecord->type = Tag_end_link;
 		}else if( lineStr.Compare(TEXT("[img]")) == 0 ) {
 			// 画像リンク開始
-			hashRecord->key = TEXT("img");
+			hashRecord->type = Tag_img;
 		}else if( lineStr.Compare(TEXT("[/img]")) == 0 ) {
 			// 画像リンク終了
-			hashRecord->key = TEXT("end_img");
+			hashRecord->type = Tag_end_img;
 		}else if( lineStr.Compare(TEXT("[mov]")) == 0 ) {
 			// 動画リンク開始
-			hashRecord->key = TEXT("mov");
+			hashRecord->type = Tag_mov;
 		}else if( lineStr.Compare(TEXT("[/mov]")) == 0 ) {
 			// 動画リンク終了
-			hashRecord->key = TEXT("end_mov");
+			hashRecord->type = Tag_end_mov;
 		}else{
-			hashRecord->key = TEXT("text");
+			hashRecord->type = Tag_text;
 		}
 		hashRecord->value = lineStr;
 
@@ -1908,7 +1869,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		}
 
 		// 行情報の振り分け処理
-		ProcessStateEnum rc = this->SetRowProperty(hashRecord,currentRowRecord,&bridgeInfo,&bigBridgeInfo);
+		ProcessStateEnum rc = this->SetRowProperty(hashRecord, currentRowRecord, &bridgeInfo, &bigBridgeInfo);
 
 		// ページ内アンカーの行位置をキャッシュする
 		if( bridgeInfo.inPageAnchor != -1 ){
@@ -1916,14 +1877,14 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		}
 
 		// 開始タグはインデント位置の再設定だけ
-		if( rc == ProcessState_BOL ){
+		if( rc == ProcessState_BeginOfLine ){
 
 			// 大またぎ情報をリセット
-			this->ResetBigBridgeProperty(&bigBridgeInfo,&bridgeInfo,ProcessState_BOL);
+			this->ResetBigBridgeProperty(&bigBridgeInfo,&bridgeInfo,ProcessState_BeginOfLine);
 		// 持ち越し情報の繰り返し処理の場合 
-		}else if( rc == ProcessState_FOL ){
+		}else if( rc == ProcessState_FollowOfLine ){
 			// 持ち越しじゃなくなるまで繰り返し
-			while( rc == ProcessState_FOL ){
+			while( rc == ProcessState_FollowOfLine ){
 				//TRACE(TEXT(" 繰越中[%d]\r\n"),rowPropertyArray->GetSize());
 				// 新行情報の追加
 				this->AddNewRowProperty(rowPropertyArray);
@@ -1942,7 +1903,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 				// ワクのtop/bottomの状態を差し替える
 				this->ChangeFrameProperty(&bigBridgeInfo);
 				// 折り返し行を繰り返し描画
-				rc = this->SetRowProperty(hashRecord,currentRowRecord,&bridgeInfo,&bigBridgeInfo);
+				rc = this->SetRowProperty(hashRecord, currentRowRecord, &bridgeInfo, &bigBridgeInfo);
 			}
 
 			// 新行情報の追加
@@ -1954,7 +1915,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 
 			//TRACE(TEXT(" 繰越終了[%d]\r\n"),rowPropertyArray->GetSize());
 		// 強制改行は新規レコードをNewして追記 
-		}else if( rc == ProcessState_FBL ){
+		}else if( rc == ProcessState_ForceBreakLine ){
 			// 新行情報の追加
 			this->AddNewRowProperty(rowPropertyArray);
 			// 大またぎ情報をリセット
@@ -1963,7 +1924,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 			this->ChangeFrameProperty(&bigBridgeInfo);
 
 		// 終了タグは新しいレコードをNewして追記後に行またぎ情報をリセット
-		}else if( rc == ProcessState_EOL ){
+		}else if( rc == ProcessState_EndOfLine ){
 			// 新行情報の追加
 			this->AddNewRowProperty(rowPropertyArray);
 			// 行またぎ情報をリセット
@@ -1984,6 +1945,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		
 		delete hashRecord;
 	}
+
 	// MainInfo、RowPropertyの順番でメモリの内容をファイルへダンプ
 	newMainRecord->propertyCount = rowPropertyArray->GetSize();
 
@@ -2032,7 +1994,7 @@ void Ran2View::Refresh()
 	this->DrawDetail(m_drawOffsetLine);
 }
 
-
+/*
 bool Ran2View::IsPoratrait()
 {
     bool fPoratrait;
@@ -2045,6 +2007,7 @@ bool Ran2View::IsPoratrait()
 
 	return(fPoratrait);
 }
+*/
 
 
 bool Ran2View::IsVGA()
@@ -2228,9 +2191,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		m_bDragging = false;		
 		m_bPanDragging = false;
 		m_bScrollDragging = false;
-		activeLinkID = -1;
-		activeimgLinkID = -1;
-		activemovLinkID = -1;
+		m_activeLinkID.clear();
 
 		// ダブルクリックとみなす
 		// 親の呼び出し
@@ -2316,9 +2277,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				SetTimer( TIMERID_AUTOSCROLL, TIMER_INTERVAL_AUTOSCROLL, NULL );
 			} else {
 				// リンク情報をクリアして再表示する
-				activeLinkID = -1;
-				activeimgLinkID = -1;
-				activemovLinkID = -1;
+				m_activeLinkID.clear();
 				DrawDetail( m_drawOffsetLine , true );
 			}
 		} else {
@@ -2371,9 +2330,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 			// リンク情報をクリアして再表示する
 			if( !m_bAutoScrolling ){
-				activeLinkID = -1;
-				activeimgLinkID = -1;
-				activemovLinkID = -1;
+				m_activeLinkID.clear();
 				DrawDetail( m_drawOffsetLine , true );
 			}
 		}
@@ -2382,9 +2339,7 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		m_bDragging = false;
 		m_bPanDragging = false;
 		m_bScrollDragging = false;
-		activeLinkID = -1;
-		activeimgLinkID = -1;
-		activemovLinkID = -1;
+		m_activeLinkID.clear();
 		
 		// 親の呼び出し
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
@@ -2407,9 +2362,7 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBABLE_CURSOR) );
 	}
 
-	int lastLinkID = activeLinkID;
-	int lastimgLinkID = activeimgLinkID;
-	int lastmovLinkID = activemovLinkID;
+	LinkID lastLinkID = m_activeLinkID;
 
 	// タップ位置の行番号を取得
 	int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
@@ -2422,9 +2375,7 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 	//リンク処理はOnLButtonUpで行う
 //	// タップ位置が範囲内を越える場合は何もしない
 	// リンク連番クリア
-	activeLinkID = -1;
-	activeimgLinkID = -1;
-	activemovLinkID = -1;
+	m_activeLinkID.clear();
 	if( parsedRecord->rowInfo->GetSize() > rowNumber && rowNumber >= 0 ){
 		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
 		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
@@ -2437,13 +2388,13 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 					// ドラッグ中でなければリンクタイプに合わせてリンク連番を設定する
 					switch( linkInfo->linkType ){
 						case LinkType_external:
-							activeLinkID = linkInfo->linkID;
+							m_activeLinkID.anchor = linkInfo->linkID;
 							break;
 						case LinkType_picture:
-							activeimgLinkID = linkInfo->imglinkID;
+							m_activeLinkID.image = linkInfo->imglinkID;
 							break;
 						case LinkType_movie:
-							activemovLinkID = linkInfo->movlinkID;
+							m_activeLinkID.movie = linkInfo->movlinkID;
 							break;
 					}
 				}
@@ -2451,9 +2402,9 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
-	if( lastLinkID != activeLinkID ||
-		lastimgLinkID != activeimgLinkID ||
-		lastmovLinkID != activemovLinkID)
+	if( lastLinkID.anchor != m_activeLinkID.anchor ||
+		lastLinkID.image  != m_activeLinkID.image ||
+		lastLinkID.movie  != m_activeLinkID.movie)
 	{
 		// リンクポイント状態に変化があれば
 		// リンク反転表示用に一画面再描画→効率悪い！
@@ -2524,9 +2475,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 //	wprintf( L"OnMouseMove\n" );
 #endif
 
-	int lastLinkID    = activeLinkID;
-	int lastimgLinkID = activeimgLinkID;
-	int lastmovLinkID = activemovLinkID;
+	LinkID lastLinkID    = m_activeLinkID;
 
 	// Nピクセル移動したらダブルクリックキャンセル
 	if (m_dwFirstLButtonUp!=0) {
@@ -2558,9 +2507,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 	int rowNumber = m_drawOffsetLine + tapLine;
 	// マウス位置が範囲内を越える場合は何もしない
 	// リンク連番クリア
-	activeLinkID = -1;
-	activeimgLinkID = -1;
-	activemovLinkID = -1;
+	m_activeLinkID.clear();
 	if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
 		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
 		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
@@ -2573,13 +2520,13 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 					// ドラッグ中でなければリンクタイプに合わせてリンク連番を設定する
 					switch( linkInfo->linkType ){
 						case LinkType_external:
-							activeLinkID = linkInfo->linkID;
+							m_activeLinkID.anchor = linkInfo->linkID;
 							break;
 						case LinkType_picture:
-							activeimgLinkID = linkInfo->imglinkID;
+							m_activeLinkID.image = linkInfo->imglinkID;
 							break;
 						case LinkType_movie:
-							activemovLinkID = linkInfo->movlinkID;
+							m_activeLinkID.movie = linkInfo->movlinkID;
 							break;
 					}
 				}
@@ -2640,9 +2587,9 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 				}
 			}
 			if( !m_bScrollDragging ) {
-				if( lastLinkID != activeLinkID ||
-					lastimgLinkID != activeimgLinkID ||
-					lastmovLinkID != activemovLinkID)
+				if (lastLinkID.anchor != m_activeLinkID.anchor ||
+					lastLinkID.image != m_activeLinkID.image ||
+					lastLinkID.movie != m_activeLinkID.movie)
 				{
 					// リンクポイント状態に変化があれば
 					// リンク反転表示用に一画面再描画→効率悪い！
@@ -2667,9 +2614,9 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		// オートスクロール中でなければリンク反転表示用に再描画→効率悪い！
 		if( !m_bAutoScrolling ) {
-			if( lastLinkID != activeLinkID ||
-				lastimgLinkID != activeimgLinkID ||
-				lastmovLinkID != activemovLinkID)
+			if (lastLinkID.anchor != m_activeLinkID.anchor ||
+				lastLinkID.image != m_activeLinkID.image ||
+				lastLinkID.movie != m_activeLinkID.movie)
 			{
 				// リンクポイント状態に変化があれば
 				// リンク反転表示用に一画面再描画→効率悪い！

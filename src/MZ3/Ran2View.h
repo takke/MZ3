@@ -22,28 +22,47 @@ namespace Ran2 {
 
 const int framePixel = 1;				///< ワク線の太さ(ピクセル数)
 const int lineVirtualHeightPixel = 3;	///< 仮想行間の太さ
-const int charInfoBlockSize = 64;		///< 行情報に踏めることのできる文字修飾情報の最大要素数
-const int lineTextLength = 512;			///< 行単位の文字の最大の最大長
 const int FrameNestLevel = 2;			///< ワク線は2段階までネスト可能とする
 const int PageAnchorMax = 16;			///< ページ内リンクの最大数
-const int pictureNameLength = 16;		///< 画像ファイルのID名の最大長
 
-/// Htmlタグを分解して情報を保存する
+/// HTML タグの種別
+const enum TAG_TYPE { 
+// 開始タグ
+	Tag_nothing=0, 
+	Tag_h1, Tag_h2, Tag_h3,	
+	Tag_p, Tag_blue, Tag_underline, 
+	Tag_sub, Tag_sup, Tag_text, 
+	Tag_entity, Tag_gaiji, Tag_img, Tag_mov, 
+	Tag_br, Tag_anchor,	Tag_link, 
+	Tag_level0, Tag_level1,	Tag_level2,	
+	Tag_kakomi_blue, Tag_kakomi_gray, Tag_kakomi_gray2, 
+	Tag_kakomi_white, Tag_kakomi_white2,
+	Tag_bold, Tag_blockquote,
+// 終了タグ
+	Tag_end_p, Tag_end_blue, Tag_end_underline,
+	Tag_end_sub, Tag_end_sup, Tag_end_bold, Tag_end_blockquote,
+	Tag_end_link, Tag_end_img, Tag_end_mov,
+	Tag_end_h1, Tag_end_h2, Tag_end_h3, 
+	Tag_end_kakomi_blue, Tag_end_kakomi_gray, Tag_end_kakomi_gray2, 
+	Tag_end_kakomi_white, Tag_end_kakomi_white2, 
+};
+
+/// HTMLタグを分解して情報を保存する
 class	HtmlRecord
 {
 public:
-	CString	key;			///< タグ名
-	CString value;			///< 値
-	CString	parameter;		///< オプション値(セロハン値、リンク先アンカーなど)
+	TAG_TYPE type;			///< タグ種別
+	CString  value;			///< 値
+//	CString	 parameter;		///< オプション値(セロハン値、リンク先アンカーなど)
 };
 
 
 /// SetRowPropertyが返す処理中の状態
 const enum ProcessStateEnum { 
-	ProcessState_BOL=0,		///< BOL:(BeginOfLine)	開始タグ。新行の作成が必要。
-	ProcessState_EOL,		///< EOL:(EndOfLine)		閉じタグ。行の終了として扱う。
-	ProcessState_FBL,		///< FBL:(ForceBreakLine)強制的な改行。行またぎ情報を保持するのでEOLとは区別して扱う。
-	ProcessState_FOL,		///< FOL:(FollowOfLine)	処理の継続。行をまたぐ情報を保持してEOLまで繰り返す。
+	ProcessState_BeginOfLine=0,		///< 開始タグ。新行の作成が必要。
+	ProcessState_EndOfLine,			///< 閉じタグ。行の終了として扱う。
+	ProcessState_ForceBreakLine,	///< 強制的な改行。行またぎ情報を保持するのでEndOfLineとは区別して扱う。
+	ProcessState_FollowOfLine,		///< 処理の継続。行をまたぐ情報を保持してEndOfLineまで繰り返す。
 	ProcessState_through, 
 	ProcessState_error, 
 };
@@ -339,9 +358,12 @@ public:
 
 using namespace Ran2;
 
-/// 絵文字対応描画コントロール「らんらん」
+/**
+ * 絵文字対応描画コントロール「らんらん」
+ */
 class Ran2View : public CWnd
 {
+private:
 	DECLARE_DYNAMIC(Ran2View)
 	int			currentDPI;				///< DPI値
 	CString		uidStr;					///< 現在描画中のUID名(テストでのみ使用)
@@ -397,9 +419,26 @@ class Ran2View : public CWnd
 	COLORREF	reverseTextColor;			///< 反転時文字色
 	COLORREF	markTextColor;				///< 特殊マーク色
 
-	int			activeLinkID;				///< アクティブなリンクのID
-	int			activeimgLinkID;			///< アクティブなリンクのID
-	int			activemovLinkID;			///< アクティブなリンクのID
+	/// リンクID管理クラス
+	class LinkID {
+	public:
+		int anchor;		///< アンカーリンクのID
+		int image;		///< 画像リンクのID
+		int movie;		///< 動画リンクのID
+
+		/// コンストラクタ
+		LinkID() {
+			clear();
+		}
+
+		/// 初期化
+		void clear() {
+			anchor = -1;
+			image = -1;
+			movie = -1;
+		}
+	};
+	LinkID		m_activeLinkID;				///< アクティブなリンクのID
 
 	CImageList*	m_pImageList;				///< 画像キャッシュへのポインタ
 
@@ -442,6 +481,10 @@ public:
 	Ran2View();
 	virtual ~Ran2View();
 
+	// クラス登録
+	static BOOL RegisterWndClass(HINSTANCE hInstance);
+	static BOOL UnregisterWndClass(HINSTANCE hInstance);
+
 	/// 1画面で表示可能な行数
 	int		GetViewLineMax() { return m_viewLineMax; }
 	
@@ -460,16 +503,7 @@ public:
 		return charHeightOffset;
 	}
 
-	/// mainRecordの破棄
-	void	PurgeMainRecord();
-
-	// クラス登録
-	static BOOL RegisterWndClass(HINSTANCE hInstance);
-	static BOOL UnregisterWndClass(HINSTANCE hInstance);
-
 	int		ChangeViewFont(int newHeight, LPCTSTR szFontFace);
-	CString	CalcTextByWidth(CDC* dstDC,CString srcStr,int width);
-
 	int		MyGetScrollPos();
 
 	// 描画
@@ -481,6 +515,23 @@ public:
 	// データの読み込み
 	int		LoadDetail(CStringArray* bodyArray, CImageList* pImageList);
 
+	/// パンスクロールの方向定義
+	enum PAN_SCROLL_DIRECTION
+	{
+		PAN_SCROLL_DIRECTION_RIGHT,	///< 右方向
+		PAN_SCROLL_DIRECTION_LEFT,	///< 左方向
+	};
+	void	StartPanDraw(PAN_SCROLL_DIRECTION direction);
+
+	void	ResetDragOffset(void);
+
+private:
+	void	MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy);
+	void	PurgeMainRecord();
+	bool	MyMakeBackBuffers(CPaintDC& cdc);
+
+	CString	CalcTextByWidth(CDC* dstDC,CString srcStr,int width);
+
 	// 小分けした描画関数
 	void	DrawTextProperty(int line,CPtrArray* textProperties);
 	void	DrawGaijiProperty(int line,CPtrArray* gaijiProperties);
@@ -491,23 +542,31 @@ public:
 	void	ChangeFrameProperty(BigBridgeProperty* bigBridgeInfo);
 
 	// 大跨ぎ情報のリセット
-	void	ResetBigBridgeProperty(BigBridgeProperty* bigBridgeInfo,BridgeProperty* bridgeInfo,ProcessStateEnum mode=ProcessState_through,int width=0);
+	void	ResetBigBridgeProperty(BigBridgeProperty* bigBridgeInfo,
+								   BridgeProperty* bridgeInfo,
+								   ProcessStateEnum mode=ProcessState_through,
+								   int width=0);
 
 	// 新行情報の追加
-	void	AddNewRowProperty(CPtrArray* rowPropertyArray,bool forceNewRow=false);
+	void	AddNewRowProperty(CPtrArray* rowPropertyArray, bool forceNewRow=false);
 
 	// ハッシュから行情報の振り分け
-	ProcessStateEnum SetRowProperty(HtmlRecord* hashRecord,RowProperty* rowRecord,BridgeProperty* bridgeInfo,BigBridgeProperty* bigBridgeInfo);
-	//bool SetMainRecordData(HtmlRecord* hashRecord,MainInfo* mainRecord);	// MainInfoをオンメモリで作っちゃった場合の出力(テスト用)
-	MainInfo* ParseDatData2(CStringArray* datArray,int width);				// MainInfoのCStringArrayからの構築
+	ProcessStateEnum SetRowProperty(HtmlRecord* hashRecord,
+									RowProperty* rowRecord,
+									BridgeProperty* bridgeInfo,
+									BigBridgeProperty* bigBridgeInfo);
+
+	// MainInfoのCStringArrayからの構築
+	MainInfo* ParseDatData2(CStringArray* datArray,int width);
+
+	void	DrawToScreen(CDC* pDC);
+	bool	ScrollByMoveY(int dy);
 
 	// 解像度の判別など
 	int		GetScreenDPI();
 	bool	IsVGA();
-	bool	IsPoratrait();
+//	bool	IsPoratrait();
 
-	// 指定のUIDから構築CStringArrayを構築
-	CStringArray* PrepareDatArray(int uidNumber);
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -524,22 +583,6 @@ public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-
-	void ResetDragOffset(void);
-	void DrawToScreen(CDC* pDC);
-
-	/// パンスクロールの方向定義
-	enum PAN_SCROLL_DIRECTION
-	{
-		PAN_SCROLL_DIRECTION_RIGHT,	///< 右方向
-		PAN_SCROLL_DIRECTION_LEFT,	///< 左方向
-	};
-	void StartPanDraw(PAN_SCROLL_DIRECTION direction);
-	bool ScrollByMoveY(int dy);
-
-private:
-	void MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy);
-	bool MyMakeBackBuffers(CPaintDC& cdc);
 };
 
 
