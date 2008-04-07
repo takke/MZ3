@@ -518,12 +518,10 @@ void CReportView::ShowCommentData(CMixiData* data)
 	CStringArray* bodyStrArray = new CStringArray();
 
 	// 書体を変更して1行目を描画
-//	bodyStrArray->Add(L"[b]");
-	bodyStrArray->Add(L"[blue]");
+	bodyStrArray->Add(L"<blue>");
 	bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
-	bodyStrArray->Add(L"[/blue]");
-//	bodyStrArray->Add(L"[/b]");
-	bodyStrArray->Add(L"[br]");
+	bodyStrArray->Add(L"</blue>");
+	bodyStrArray->Add(L"<br>");
 
 //	TRACE( L"■---xdump start---\r\n" );
 //	for (int i=0; i<data->GetBodySize(); i++) {
@@ -554,14 +552,14 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 		if( target.GetLength() == 0 ) {
 			if (idxCrlf != -1) {
-				LPCTSTR brLine = TEXT("[br]");
+				LPCTSTR brLine = TEXT("<br>");
 				bodyStrArray->Add(brLine);
 			}
 		} else {
 			// 絵文字用フィルタ
 			//ViewFilter::ReplaceEmojiCodeToRan2ImageTags( target, *bodyStrArray, theApp.m_emoji, this );
 			ViewFilter::ReplaceHTMLTagToRan2Tags( target, *bodyStrArray, theApp.m_emoji, this );
-			LPCTSTR brLine = TEXT("[br]");
+			LPCTSTR brLine = TEXT("<br>");
 			bodyStrArray->Add(brLine);
 		}
 
@@ -572,25 +570,13 @@ void CReportView::ShowCommentData(CMixiData* data)
 	}
 
 	// 最後に１行入れて見やすくする
-	bodyStrArray->Add(_T("[br]"));
+	bodyStrArray->Add(_T("<br>"));
 
 //	TRACE( L"■---dump start---\r\n" );
 //	for (int i=0; i<bodyStrArray->GetCount(); i++) {
 //		TRACE( L"{%d}%s|\r\n", bodyStrArray->GetAt(i).GetLength(), bodyStrArray->GetAt(i) );
 //	}
 //	TRACE( L"■---dump end---\r\n" );
-
-	// HTMLタグをらんらんビュータグに変換する
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<strong>") , TEXT("[b]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</strong>") , TEXT("[/b]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<blockquote>") , TEXT("[blockquote]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</blockquote>") , TEXT("[/blockquote]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_a>") , TEXT("[a]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_a>") , TEXT("[/a]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_img>") , TEXT("[img]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_img>") , TEXT("[/img]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("<_mov>") , TEXT("[mov]") , bodyStrArray );
-	//ViewFilter::ReplaceHTMLTagToRan2ImageTags( TEXT("</_mov>") , TEXT("[/mov]") , bodyStrArray );
 
 	// blockquoteの前に改行を入れる
 	ViewFilter::InsertBRTagToBeforeblockquoteTag( bodyStrArray );

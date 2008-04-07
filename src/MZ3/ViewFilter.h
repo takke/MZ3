@@ -179,9 +179,9 @@ public:
 
 			if( line == TEXT("[blockquote]") ||
 				line == TEXT("[/blockquote]")) {
-				if( lastline != TEXT("[br]") ){
-					bodyArray->InsertAt( i++ , TEXT("[br]") );
-					lastline = TEXT("[br]");;
+				if( lastline != TEXT("<br>") ){
+					bodyArray->InsertAt( i++ , TEXT("<br>") );
+					lastline = TEXT("<br>");;
 					line = bodyArray->GetAt( i );
 				}
 			}
@@ -232,43 +232,43 @@ public:
 				}
 				// タグの判定（これでいいのか？＞私
 				if( target.Mid( tagoffset , 8 ) == L"<strong>" ){
-					toTag = L"[b]";
+					toTag = L"<b>";
 					taglen = 8;
 					break;
 				} else if( target.Mid( tagoffset , 9 ) == L"</strong>" ){
-					toTag = L"[/b]";
+					toTag = L"</b>";
 					taglen = 9;
 					break;
 				} else if( target.Mid( tagoffset , 12 ) == L"<blockquote>" ){
-					toTag = L"[blockquote]";
+					toTag = L"<blockquote>";
 					taglen = 12;
 					break;
 				} else if( target.Mid( tagoffset ,13 ) == L"</blockquote>" ){
-					toTag = L"[/blockquote]";
+					toTag = L"</blockquote>";
 					taglen = 13;
 					break;
 				} else if( target.Mid( tagoffset , 4 ) == L"<_a>" ){
-					toTag = L"[a]";
+					toTag = L"<a>";
 					taglen = 4;
 					break;
 				} else if( target.Mid( tagoffset , 5) == L"</_a>" ){
-					toTag = L"[/a]";
+					toTag = L"</a>";
 					taglen = 5;
 					break;
 				} else if( target.Mid( tagoffset , 6) == L"<_img>" ){
-					toTag = L"[img]";
+					toTag = L"<img>";
 					taglen = 6;
 					break;
 				} else if( target.Mid( tagoffset , 7 ) == L"</_img>" ){
-					toTag = L"[/img]";
+					toTag = L"</img>";
 					taglen = 7;
 					break;
 				} else if( target.Mid( tagoffset , 6 ) == L"<_mov>" ){
-					toTag = L"[mov]";
+					toTag = L"<mov>";
 					taglen = 6;
 					break;
 				} else if( target.Mid( tagoffset , 7 ) == L"</_mov>" ){
-					toTag = L"[/mov]";
+					toTag = L"</mov>";
 					taglen = 7;
 					break;
 				} else {

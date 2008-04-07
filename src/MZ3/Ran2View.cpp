@@ -959,7 +959,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,
 		bigBridgeInfo->frameProperty[nestLevel].penColor = solidBlue;				// 枠色
 		bigBridgeInfo->frameTopThrough = false;
 
-	// 囲みの設定([blockquote]:ワク線なし、背景がピンク)
+	// 囲みの設定(<blockquote>:ワク線なし、背景がピンク)
 	}else if( currentTag == Tag_blockquote ){
 		bigBridgeInfo->frameNestLevel++;
 
@@ -1818,38 +1818,38 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 				// 外字
 				hashRecord->type = Tag_gaiji;
 			}
-		}else if( lineStr.Compare(TEXT("[br]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<br>")) == 0 ) {
 			hashRecord->type = Tag_br;
-		}else if( lineStr.Compare(TEXT("[b]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<b>")) == 0 ) {
 			hashRecord->type = Tag_bold;
-		}else if( lineStr.Compare(TEXT("[/b]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</b>")) == 0 ) {
 			hashRecord->type = Tag_end_bold;
-		}else if( lineStr.Compare(TEXT("[blue]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<blue>")) == 0 ) {
 			hashRecord->type = Tag_blue;
-		}else if( lineStr.Compare(TEXT("[/blue]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</blue>")) == 0 ) {
 			hashRecord->type = Tag_end_blue;
-		}else if( lineStr.Compare(TEXT("[blockquote]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<blockquote>")) == 0 ) {
 			// 引用開始
 			hashRecord->type = Tag_blockquote;
-		}else if( lineStr.Compare(TEXT("[/blockquote]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</blockquote>")) == 0 ) {
 			// 引用終了
 			hashRecord->type = Tag_end_blockquote;
-		}else if( lineStr.Compare(TEXT("[a]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<a>")) == 0 ) {
 			// リンク開始
 			hashRecord->type = Tag_link;
-		}else if( lineStr.Compare(TEXT("[/a]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</a>")) == 0 ) {
 			// リンク終了
 			hashRecord->type = Tag_end_link;
-		}else if( lineStr.Compare(TEXT("[img]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<img>")) == 0 ) {
 			// 画像リンク開始
 			hashRecord->type = Tag_img;
-		}else if( lineStr.Compare(TEXT("[/img]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</img>")) == 0 ) {
 			// 画像リンク終了
 			hashRecord->type = Tag_end_img;
-		}else if( lineStr.Compare(TEXT("[mov]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("<mov>")) == 0 ) {
 			// 動画リンク開始
 			hashRecord->type = Tag_mov;
-		}else if( lineStr.Compare(TEXT("[/mov]")) == 0 ) {
+		}else if( lineStr.Compare(TEXT("</mov>")) == 0 ) {
 			// 動画リンク終了
 			hashRecord->type = Tag_end_mov;
 		}else{
