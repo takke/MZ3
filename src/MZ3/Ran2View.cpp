@@ -795,7 +795,6 @@ void Ran2View::DrawToScreen(CDC* pDC)
 		// 移動がわかるように縦線を引く
 		pDC->MoveTo( wid + 1 , 0);
 		pDC->LineTo( wid + 1 , screenHeight );
-
 	}
 
 	// オフセットが一画面分あれば表示不要
@@ -1425,28 +1424,24 @@ int Ran2View::LoadDetail(CStringArray* bodyArray, CImageList* pImageList)
 
 
 /**
- * 任意の行から描画
- *
- * 描画の入り口
+ * 任意の行からオフスクリーンに描画する
  */
 int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 {
 #ifdef DEBUG
-	wprintf( L"DrawDetail: %5d\n" , startLine);
+//	wprintf( L"DrawDetail: %5d line, force[%s]\n", startLine, bForceDraw ? L"true" : L"false");
 #endif
 
-	// 描画開始ラインを保存する
-	int istartLine = startLine;
-
-	if (istartLine<0) {
+	if (startLine<0) {
 		// 先頭より飛び出していれば0に引き戻す
-		istartLine = 0;
+		startLine = 0;
 	}
+
 	// どの行から描画したかを保存しておく
-	m_drawOffsetLine = istartLine;
+	m_drawOffsetLine = startLine;
 
 	// レコードの展開ミスや範囲外の指定は弾く
-	if( parsedRecord == NULL || istartLine > parsedRecord->rowInfo->GetSize() ){
+	if( parsedRecord == NULL || startLine > parsedRecord->rowInfo->GetSize() ){
 		return(0);
 	}
 
@@ -1468,7 +1463,7 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 	// オフセットスクロール用にN行余分に描画する。
 	const int N_OVER_OFFSET_LINES = 2;
 	for(int i=-N_OVER_OFFSET_LINES; i<=m_viewLineMax+N_OVER_OFFSET_LINES ; i++){
-		int targetLine = istartLine + i;
+		int targetLine = startLine + i;
 
 		if (targetLine < 0) {
 			continue;
@@ -2679,80 +2674,117 @@ void Ran2View::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
  */
 bool Ran2View::ScrollByMoveY(int dy)
 {
-	bool bLimitOver = false;
-	int d_line = dy / (charHeight + charHeightOffset);
-
 #ifdef DEBUG
-	if (false) {
-		wprintf( L"---\n" );
-		wprintf( L"m_dragStartLine + d_line : %5d\n", m_dragStartLine + d_line );
-		wprintf( L"dy               : %5d\n", dy );
-		wprintf( L"m_offsetPixelY   : %5d\n", m_offsetPixelY );
-		wprintf( L"m_viewLineMax    : %5d\n", m_viewLineMax );
-		wprintf( L"m_dragStartLine  : %5d\n", m_dragStartLine );
-	}
+# define DEBUG_ScrollByMoveY
 #endif
 
-	if (-dy % (charHeight + charHeightOffset) <=0 || m_drawOffsetLine > 0) {
+	if (parsedRecord == NULL && parsedRecord->rowInfo == NULL ) {
+		// 描画対象データがないためエラーとする
+		return true;
+	}
+
+	bool bLimitOver = false;
+	const int lineHeightPixel = (charHeight + charHeightOffset);	// 1行当たりのピクセル数
+	int offsetLine = dy / lineHeightPixel;	// ドラッグ開始行からのオフセット行
+
+#ifdef DEBUG_ScrollByMoveY
+	wprintf( L"---\n" );
+	wprintf( L"m_dragStartLine + offsetLine : %5d\n", m_dragStartLine + offsetLine );
+	wprintf( L"dy               : %5d\n", dy );
+	wprintf( L"m_offsetPixelY   : %5d\n", m_offsetPixelY );
+	wprintf( L"m_viewLineMax    : %5d\n", m_viewLineMax );
+	wprintf( L"m_dragStartLine  : %5d\n", m_dragStartLine );
+#endif
+
+	if (-dy % lineHeightPixel <=0 || m_dragStartLine + offsetLine > 0) {
 		// ピクセルオフセット
 		// （0行目であれば上方向のスクロールは行わない）
-		m_offsetPixelY = -dy % (charHeight + charHeightOffset);
+		m_offsetPixelY = -dy % lineHeightPixel;
 
-#ifdef DEBUG
-		if (false) {
-			wprintf( L"Yピクセルオフセット再計算：%d\n", m_offsetPixelY );
-		}
+#ifdef DEBUG_ScrollByMoveY
+		wprintf( L"Yピクセルオフセット再計算：%d\n", m_offsetPixelY );
 #endif
-//		TRACE( L"dy,m_drawOffsetLine,m_offsetPixelY : %5d %5d %5d\n", dy,m_drawOffsetLine,m_offsetPixelY );
-	} else if( m_drawOffsetLine == 0 ) {
+	} else if( m_dragStartLine + offsetLine == 0 ) {
 		// 0行目ならば先頭位置を0調整
 		m_offsetPixelY = 0;
 
-#ifdef DEBUG
-		if (false) {
-			wprintf( L"0行目のためYピクセルオフセット初期化\n" );
-		}
+#ifdef DEBUG_ScrollByMoveY
+		wprintf( L"0行目のためYピクセルオフセット初期化\n" );
 #endif
 		bLimitOver = true;
 	}
 
-	if (parsedRecord != NULL && parsedRecord->rowInfo != NULL ) {
-		int nAllLine = GetAllLineCount();
-#ifdef DEBUG
-		if (false) {
-			wprintf( L"nAllLine : %5d\n", nAllLine );
-			wprintf( L"m_dragStartLine +m_viewLineMax +d_line : %5d\n", m_dragStartLine +m_viewLineMax +d_line );
-		}
+	int nAllLine = GetAllLineCount();
+
+#ifdef DEBUG_ScrollByMoveY
+	wprintf( L"nAllLine : %5d\n", nAllLine );
+	wprintf( L"m_dragStartLine +offsetLine +m_viewLineMax : %5d\n", m_dragStartLine +offsetLine +m_viewLineMax );
+	wprintf( L"m_offsetPixelY : %5d\n", m_offsetPixelY );
+	wprintf( L"screenHeight %% lineHeightPixel : %5d\n", screenHeight % lineHeightPixel );
 #endif
-		
-		if (// 行数超過
-			(m_dragStartLine +m_viewLineMax +d_line > nAllLine) ||	
-			// 最終行かつ下方向ピクセルオフセットあり
-			(m_dragStartLine +m_viewLineMax +d_line == nAllLine && 
-			 m_offsetPixelY < screenHeight % (charHeight + charHeightOffset))
-			)
+
+	// nAllLine        : データの全行数 [line]
+	// m_dragStartLine : ドラッグ開始行 [line]
+	// offsetLine      : ドラッグ開始行からのオフセット行数 [line]
+	// m_viewLineMax   : 1画面で表示可能な行数 [line]
+	// screenHeight    : 1画面の高さ [px]
+	// lineHeightPixel : 1行当たりのピクセル数 [px]
+	// m_offsetPixelY  : オフセットピクセル [px]
+
+	bool bBottomLimitOver = false;
+	if (m_offsetPixelY>=0) {
+		if (m_dragStartLine +offsetLine +m_viewLineMax > nAllLine) {
+			// 行数超過
+#ifdef DEBUG_ScrollByMoveY
+			wprintf( L"行数超過(1)\n" );
+#endif
+			bBottomLimitOver = true;
+		} else if (m_dragStartLine +offsetLine +m_viewLineMax == nAllLine && 
+		           m_offsetPixelY <= screenHeight % lineHeightPixel)
 		{
-			// 下にはみ出た場合最下端まで引き戻す
-			d_line = nAllLine - m_viewLineMax - m_dragStartLine;
-			m_offsetPixelY = screenHeight % (charHeight + charHeightOffset);
-#ifdef DEBUG
-			if (false) {
-				wprintf( L"下にはみでたため、再下端まで戻す\n" );
-			}
+			// 最終行かつ下方向ピクセルオフセットあり
+#ifdef DEBUG_ScrollByMoveY
+			wprintf( L"最終行かつ下方向ピクセルオフセットあり(1)\n" );
 #endif
-			bLimitOver = true;
+			bBottomLimitOver = true;
 		}
-
-		// 下の方にスクロール可能か確認する
-		if ((m_dragStartLine + d_line) <= nAllLine - m_viewLineMax ) {
-			// スクロール可能ならばスクロールして表示
-			DrawDetail(m_dragStartLine + d_line , true);
-
-			// スクロール位置が変化したかもしれないのでオーナーに通知
-			CPoint lastPoint = m_autoScrollInfo.getLastPoint();
-			::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(lastPoint.x, lastPoint.y+dy) );
+	} else {
+		// m_offsetPixelY <0 の場合：
+		if (m_dragStartLine +offsetLine +m_viewLineMax+1 > nAllLine) {
+			// 行数超過
+#ifdef DEBUG_ScrollByMoveY
+			wprintf( L"行数超過(2)\n" );
+#endif
+			bBottomLimitOver = true;
+		} else if (m_dragStartLine +offsetLine +m_viewLineMax+1 == nAllLine && 
+				   m_offsetPixelY <= -(lineHeightPixel -screenHeight % lineHeightPixel))
+		{
+			// 最終行かつ下方向ピクセルオフセットあり
+#ifdef DEBUG_ScrollByMoveY
+			wprintf( L"最終行かつ下方向ピクセルオフセットあり(2)\n" );
+#endif
+			bBottomLimitOver = true;
 		}
 	}
+	if (bBottomLimitOver) {
+#ifdef DEBUG_ScrollByMoveY
+		wprintf( L"... 下にはみでたため、再下端まで戻す\n" );
+#endif
+		// 下にはみ出た場合最下端まで引き戻す
+		offsetLine     = nAllLine - m_viewLineMax - m_dragStartLine;
+		m_offsetPixelY = screenHeight % lineHeightPixel;
+		bLimitOver = true;
+	}
+
+	// 描画
+#ifdef DEBUG_ScrollByMoveY
+	wprintf( L"DrawDetail, from %d [line], offset %d [pixel]\n", m_dragStartLine + offsetLine, m_offsetPixelY );
+#endif
+	DrawDetail(m_dragStartLine + offsetLine, true);
+
+	// スクロール位置が変化したかもしれないのでオーナーに通知
+	CPoint lastPoint = m_autoScrollInfo.getLastPoint();
+	::SendMessage( GetParent()->GetSafeHwnd(), WM_MOUSEMOVE, (WPARAM)0, (LPARAM)MAKELPARAM(lastPoint.x, lastPoint.y+dy) );
 
 	return bLimitOver;
 }
@@ -2783,13 +2815,17 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 		int dyByVelocity = (int)(dt * speed);				// 初速による移動	
 		int dyAutoScroll = dyByAccel + dyByVelocity;		// LButtonUp からの移動量
 
-		TRACE( L" dt : %5d, speed : %5.2f, accel : %5.2f, dy : %5d (%5d,%5d)\n", 
+#if 0
+		wprintf( L" dt : %5d, speed : %5.2f, accel : %5.6f, dy : %5d (%5d,%5d)\n", 
 			dt, speed, accel, dyAutoScroll, dyByAccel, dyByVelocity );
-
-		// 最大位置より戻った（極点を超えた）、またはN秒経過したなら終了
+#endif
+		// 最大位置より戻った（極点を超えた）、
+		// 加速度がしきい値より小さい、
+		// またはN秒経過したなら終了
 		if (speed == 0.0 ||
 			(speed < 0 && dyAutoScroll > m_yAutoScrollMax) ||
 			(speed > 0 && dyAutoScroll < m_yAutoScrollMax) ||
+			(fabs(accel)<0.00005) ||
 			dt > 5 * 1000)
 		{
 			KillTimer(nIDEvent);
