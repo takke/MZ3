@@ -23,6 +23,7 @@
 #include "version.h"
 #include "MZ3Parser.h"
 #include "MouseGestureManager.h"
+#include "MZ3FileCacheManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -134,6 +135,15 @@ BOOL CMZ3App::InitInstance()
 
 	// オプションによってファイルパス群を再生成
 	m_filepath.init_logpath();
+
+	// 古いキャッシュの削除
+	{
+		int nDeleted = 0;	// 削除済みファイル数
+		int nTargetFileLastWriteDaysBack = 30*2;	// 2ヶ月以上前のファイルを削除対象とする
+		MZ3FileCacheManager cacheManager;
+		cacheManager.DeleteFiles( m_filepath.deleteTargetFolders, &nDeleted, nTargetFileLastWriteDaysBack );
+		MZ3LOGGER_INFO( util::FormatString(L"古いキャッシュファイルを削除しました：%d個", nDeleted) );
+	}
 
 	// ログイン情報の読み込み
 	m_loginMng.Read();
@@ -645,6 +655,7 @@ void CMZ3App::FilePath::init()
 void CMZ3App::FilePath::init_logpath()
 {
 	//--- フォルダ
+	deleteTargetFolders.RemoveAll();
 
 	// ログ用フォルダ
 	// オプションで指定されていればそれを使う。
@@ -658,6 +669,8 @@ void CMZ3App::FilePath::init_logpath()
 	// データ用フォルダの作成
 	downloadFolder.Format(_T("%s\\download"), logFolder);
 	CreateDirectory( downloadFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(downloadFolder);
 
 	// ダウンロード済み画像ファイル用フォルダ
 	imageFolder.Format(_T("%s\\image"), logFolder );
@@ -666,34 +679,50 @@ void CMZ3App::FilePath::init_logpath()
 	// 日記のログ用フォルダのパス
 	diaryFolder.Format(_T("%s\\diary"), logFolder );
 	CreateDirectory( diaryFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(diaryFolder);
 
 	// コミュニティ書き込みのログ用フォルダのパス
 	bbsFolder.Format(_T("%s\\bbs"), logFolder );
 	CreateDirectory( bbsFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(bbsFolder);
 
 	// アンケートのログ用フォルダのパス
 	enqueteFolder.Format(_T("%s\\enquete"), logFolder );
 	CreateDirectory( enqueteFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(enqueteFolder);
 
 	// イベントのログ用フォルダのパス
 	eventFolder.Format(_T("%s\\event"), logFolder );
 	CreateDirectory( eventFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(eventFolder);
 
 	// プロフィールのログ用フォルダのパス
 	profileFolder.Format(_T("%s\\profile"), logFolder );
 	CreateDirectory( profileFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(profileFolder);
 
 	// メッセージのログ用フォルダのパス
 	messageFolder.Format(_T("%s\\message"), logFolder );
 	CreateDirectory( messageFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(messageFolder);
 
 	// ニュースのログ用フォルダのパス
 	newsFolder.Format(_T("%s\\news"), logFolder );
 	CreateDirectory( newsFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(newsFolder);
 
 	// Twitterのログ用フォルダのパス
 	twitterFolder.Format(_T("%s\\twitter"), logFolder );
 	CreateDirectory( twitterFolder, NULL/*always null*/ );
+	// クリーンアップ対象フォルダに追加
+	deleteTargetFolders.Add(twitterFolder);
 
 }
 

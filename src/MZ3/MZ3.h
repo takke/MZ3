@@ -92,6 +92,8 @@ public:
 		CString		newsFolder;		///< ニュースのログ用フォルダのパス
 		CString		twitterFolder;	///< Twitterのログ用フォルダのパス
 
+		CStringArray deleteTargetFolders;	///< 定期クリーンアップ対象フォルダリスト
+
 		void init();
 		void init_logpath();
 	};

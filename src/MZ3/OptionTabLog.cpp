@@ -12,6 +12,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "OptionTabLog.h"
+#include "MZ3FileCacheManager.h"
 
 #ifndef SMARTPHONE2003_UI_MODEL
 
@@ -129,64 +130,18 @@ void COptionTabLog::OnBnClickedChangeLogFolderButton()
 
 }
 
-/// CountupCallback 用のデータ構造
-struct CountupData
-{
-	int nFiles;		///< ファイル数
-	DWORD dwSize;	///< ファイルサイズ
-	CountupData() : nFiles(0), dwSize(0) {}
-};
-
-/**
- * ファイル数のカウントアップ用コールバック関数
- */
-int CountupCallback( const TCHAR* szDirectory,
-                     const WIN32_FIND_DATA* data,
-                     CountupData* pData)
-{
-	pData->nFiles ++;
-	pData->dwSize += (data->nFileSizeHigh * MAXDWORD) + data->nFileSizeLow;
-
-	return TRUE;
-}
-
-/**
- * ファイルの削除用コールバック関数
- */
-int DeleteCallback( const TCHAR* szDirectory,
-                    const WIN32_FIND_DATA* data,
-                    int* pnDeleted)
-{
-	std::basic_string< TCHAR > strFile = szDirectory + std::basic_string< TCHAR >(data->cFileName);
-
-	if( (data->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY ) {
-		// ディレクトリ
-		if( RemoveDirectory( strFile.c_str() ) ) {
-			(*pnDeleted) ++;
-		}
-	}else{
-		// ファイル
-		if( DeleteFile( strFile.c_str() ) ) {
-			(*pnDeleted) ++;
-		}
-	}
-
-	return TRUE;
-}
-
 /**
  * ログの削除
  */
 void COptionTabLog::OnBnClickedCleanLogButton()
 {
-	CountupData cd;		// ファイル数, ファイルサイズ
-	int nDepthMax = 10;	// 最大再帰深度
-	
-	LPCTSTR szDeleteFilePattern = L"*";
-	CString strLogFolder = theApp.m_filepath.logFolder + L"\\";
+	MZ3FileCacheManager::CountupResult cd;		// ファイル数, ファイルサイズ
+
+	int nTargetFileLastWriteDaysBack = 0;		// 更新日付条件：全てのファイルを対象とする
 
 	// ログファイル数カウント
-	util::FindFileCallback( strLogFolder, szDeleteFilePattern, CountupCallback, &cd, nDepthMax );
+	MZ3FileCacheManager cacheManager;
+	cacheManager.GetTargetFileCount( theApp.m_filepath.deleteTargetFolders, &cd, nTargetFileLastWriteDaysBack );
 
 	if( cd.nFiles == 0 ) {
 		MessageBox( L"削除対象ファイルがありません" );
@@ -200,14 +155,14 @@ void COptionTabLog::OnBnClickedCleanLogButton()
 		L"・[%s]以下の全てのファイルを消去します\n\n"
 		L"ファイル数：%d\n"
 		L"総ファイルサイズ：%s Bytes"
-		, (LPCTSTR)strLogFolder, cd.nFiles, util::int2comma_str(cd.dwSize) );
+		, (LPCTSTR)theApp.m_filepath.logFolder, cd.nFiles, util::int2comma_str(cd.dwSize) );
 	if( MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION ) != IDYES ) {
 		return;
 	}
 
 	// 削除実行
 	int nDeleted = 0;	// 削除済みファイル数
-	util::FindFileCallback( strLogFolder, szDeleteFilePattern, DeleteCallback, &nDeleted, nDepthMax );
+	cacheManager.DeleteFiles( theApp.m_filepath.deleteTargetFolders, &nDeleted, nTargetFileLastWriteDaysBack );
 
 	msg.Format( 
 		L"%d 個のファイルを削除しました。\n"
