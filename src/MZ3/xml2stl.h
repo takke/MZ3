@@ -547,17 +547,16 @@ private:
 			if (node.getName()==L"img") {
 				return true;
 			}
-		}
-
-		if (node.getName()==L"script") {
-			// script タグ専用解析。
-			// "</script>" まで読み飛ばす
-			return parse_until_target( node, reader, L"</script>" );
-		}
-		if (node.getName()==L"style") {
-			// style タグ専用解析。
-			// "</style>" まで読み飛ばす
-			return parse_until_target( node, reader, L"</style>" );
+			if (node.getName()==L"script") {
+				// script タグ専用解析。
+				// "</script>" まで読み飛ばす
+				return parse_until_target( node, reader, L"</script>" );
+			}
+			if (node.getName()==L"style") {
+				// style タグ専用解析。
+				// "</style>" まで読み飛ばす
+				return parse_until_target( node, reader, L"</style>" );
+			}
 		}
 
 		xml2stl::XML2STL_STRING node_name;
