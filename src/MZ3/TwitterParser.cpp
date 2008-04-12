@@ -15,6 +15,7 @@ namespace twitter {
 
 /**
  * [list] タイムライン用パーサ
+ *
  * 【タイムライン】
  * http://twitter.com/statuses/friends_timeline.xml
  */
