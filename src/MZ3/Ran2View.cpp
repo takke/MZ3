@@ -1476,7 +1476,7 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 
 		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(targetLine);
 		if( row != NULL ){
-			TRACE(TEXT("%d‚Ì•`‰æ‚ğŠJn‚µ‚Ü‚·\r\n"), targetLine);
+			//TRACE(TEXT("%d‚Ì•`‰æ‚ğŠJn‚µ‚Ü‚·\r\n"), targetLine);
 
 			// ƒtƒŒ[ƒ€‚Ì•`‰æB‰æ‘œ‚ªİ’è‚³‚ê‚Ä‚¢‚½‚ç•`‰æ‚µ‚È‚¢
 			if( row->imageProperty.imageNumber == -1 ){
@@ -1490,7 +1490,7 @@ int	Ran2View::DrawDetail(int startLine, bool bForceDraw)
 			this->DrawGaijiProperty(i, row->gaijiProperties);
 		}
 
-		TRACE( L" line : %d\n", targetLine );
+		//TRACE( L" line : %d\n", targetLine );
 	}
 	m_memDC->Rectangle( 0, 0, 10, 10 );
 
@@ -1523,18 +1523,14 @@ void Ran2View::DrawFrameProperty(int line,RowProperty* rowProperty)
 		// ƒƒN‚Ì•`‰æ‚ªİ’è‚³‚ê‚Ä‚¢‚é‚Ì‚İ•`‰æ
 		if(	rowProperty->frameProperty[i].frameType != FrameType_nothing ){
 			CRect drawRect;
-			// bottom‚ÌˆÈŠO‚ÉŒÀ‚Á‚Ä”wŒi‚ğ•`‰æ
-			if( !(( rowProperty->frameProperty[i].frameType == FrameType_stool ) &&
-				( rowProperty->textProperties->GetCount() == 0)) ){ 
-				// ”wŒiF‚Ì•`‰æ
-				CBrush backBrush(rowProperty->frameProperty[i].backgroundColor);
-				int sx = leftOffset + (i * frameOffset);
-				int ex = (screenWidth - NormalWidthOffset) - leftOffset - (i * frameOffset);
-				int sy = m_drawStartTopOffset + topOffset + (line*(charHeight+charHeightOffset));
-				int ey = sy + (charHeight+charHeightOffset);
-				drawRect = CRect(sx,sy,ex,ey);
-				m_memDC->FillRect(drawRect,&backBrush);
-			}
+			// ”wŒiF‚Ì•`‰æ
+			CBrush backBrush(rowProperty->frameProperty[i].backgroundColor);
+			int sx = leftOffset + (i * frameOffset);
+			int ex = (screenWidth - NormalWidthOffset) - leftOffset - (i * frameOffset);
+			int sy = m_drawStartTopOffset + topOffset + (line*(charHeight+charHeightOffset));
+			int ey = sy + (charHeight+charHeightOffset);
+			drawRect = CRect(sx,sy,ex,ey);
+			m_memDC->FillRect(drawRect,&backBrush);
 
 			CPen framePen(PS_SOLID,1,rowProperty->frameProperty[i].penColor);
 			// ã’[‚Æ¶‰E‚ğ•`‰æ

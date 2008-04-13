@@ -177,9 +177,16 @@ public:
 			CString line;
 			line = bodyArray->GetAt( i );
 
-			if( line == TEXT("[blockquote]") ||
-				line == TEXT("[/blockquote]")) {
+			if( line == TEXT("<blockquote>") ||
+				line == TEXT("</blockquote>")) {
 				if( lastline != TEXT("<br>") ){
+					bodyArray->InsertAt( i++ , TEXT("<br>") );
+					lastline = TEXT("<br>");;
+					line = bodyArray->GetAt( i );
+				}
+			}
+			if( lastline == TEXT("</blockquote>") ) {
+				if( line != TEXT("<br>") ) {
 					bodyArray->InsertAt( i++ , TEXT("<br>") );
 					lastline = TEXT("<br>");;
 					line = bodyArray->GetAt( i );
