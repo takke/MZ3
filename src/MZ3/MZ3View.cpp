@@ -496,7 +496,12 @@ unsigned int CMZ3View::Initialize_Thread( LPVOID This )
  */
 bool CMZ3View::DoInitialize()
 {
+	// 古いキャッシュファイルの削除
+	util::MySetInformationText( m_hWnd, L"古いログファイルを削除しています..." );
+	theApp.DeleteOldCacheFiles();
+
 	// 初期データ設定
+	util::MySetInformationText( m_hWnd, L"画面を作成しています..." );
 	InsertInitialData();
 
 	m_hotList = &m_categoryList;

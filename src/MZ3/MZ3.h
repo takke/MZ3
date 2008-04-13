@@ -200,6 +200,7 @@ public:
 	bool SaveGroupData(void);
 
 	bool IsMixiLogout( ACCESS_TYPE aType );
+	bool DeleteOldCacheFiles(void);
 };
 
 extern CMZ3App theApp;

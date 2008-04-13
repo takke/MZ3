@@ -136,15 +136,6 @@ BOOL CMZ3App::InitInstance()
 	// オプションによってファイルパス群を再生成
 	m_filepath.init_logpath();
 
-	// 古いキャッシュの削除
-	{
-		int nDeleted = 0;	// 削除済みファイル数
-		int nTargetFileLastWriteDaysBack = 30*2;	// 2ヶ月以上前のファイルを削除対象とする
-		MZ3FileCacheManager cacheManager;
-		cacheManager.DeleteFiles( m_filepath.deleteTargetFolders, &nDeleted, nTargetFileLastWriteDaysBack );
-		MZ3LOGGER_INFO( util::FormatString(L"古いキャッシュファイルを削除しました：%d個", nDeleted) );
-	}
-
 	// ログイン情報の読み込み
 	m_loginMng.Read();
 
@@ -829,4 +820,18 @@ bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 		}
 	}
 	return false;
+}
+
+/**
+ * 古いキャッシュファイルの削除
+ */
+bool CMZ3App::DeleteOldCacheFiles(void)
+{
+	int nDeleted = 0;	// 削除済みファイル数
+	int nTargetFileLastWriteDaysBack = 30*2;	// 2ヶ月以上前のファイルを削除対象とする
+	MZ3FileCacheManager cacheManager;
+	cacheManager.DeleteFiles( m_filepath.deleteTargetFolders, &nDeleted, nTargetFileLastWriteDaysBack );
+	MZ3LOGGER_INFO( util::FormatString(L"古いキャッシュファイルを削除しました：%d個", nDeleted) );
+
+	return true;
 }
