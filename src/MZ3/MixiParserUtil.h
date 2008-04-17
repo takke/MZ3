@@ -469,13 +469,14 @@ public:
 		//<embed src="http://www.youtube.com/v/xxx" type="application/x-shockwave-flash" wmode="transparent" 
 		//width="450" height="373"></embed></object></div>');
 #define LINE_HAS_YOUTUBE_LINK(line)		util::LineHasStringsNoCase( line, L"<embed", L"src=", L"youtube.com" )
-		if (LINE_HAS_YOUTUBE_LINK(str)) {
-			ExtractYoutubeVideoLink( str, *data );
-		}
+		//if (LINE_HAS_YOUTUBE_LINK(str)) {
+		//	ExtractYoutubeVideoLink( str, *data );
+		//}
 
 		// リンクの抽出
 		if ( ( str.Find( L"href" ) != -1 ) ||
-			 (str.Find( L"ttp://" ) != -1) ) {
+			 (str.Find( L"ttp://" ) != -1) ||
+			 LINE_HAS_YOUTUBE_LINK(str)) {
 			ExtractURI( str, *data );
 		}
 
@@ -841,6 +842,7 @@ alt="" /></a></td>
 	 *
 	 * line から動画リンクを抽出し、そのリンクを data に追加する。
 	 * また、line から該当する動画リンクを削除する。
+	 * → ExtractURI()に吸収
 	 */
 	static void ExtractYoutubeVideoLink(CString& line, CMixiData& data_)
 	{
@@ -892,6 +894,7 @@ public:
 	 * 全てのリンク文字列（<a...>XXX</a>）を、文字列のみ（XXX）に変更する
 	 * また、href="url" を list_ に追加する。
 	 * さらに、2ch 形式のURL(ttp://...)も抽出し、正規化して data のリンクリストに追加する。
+	 * YouTube動画リンクも抽出する
 	 */
 	static void ExtractURI( CString& str, std::vector<CMixiData::Link>& list_ )
 	{
@@ -903,22 +906,27 @@ public:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href='([^']+)'[^>]*>([^<]*)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href='([^']+)'[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg2;
-		if( !util::CompileRegex( reg2, L"<a href=\"([^\"]+)\"[^>]*>([^<]*)</a>" ) ) {
+		if( !util::CompileRegex( reg2, L"<a href=\"([^\"]+)\"[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg3;
-		if( !util::CompileRegex( reg3, L"<a href=([^>]+)>([^<]*)</a>" ) ) {
+		if( !util::CompileRegex( reg3, L"<a href=([^>]+)>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg4;
 		if( !util::CompileRegex( reg4, L"([^h]|^)(ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+		static MyRegex reg5;
+		if( !util::CompileRegex( reg5, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -930,6 +938,7 @@ public:
 			u_int offset = 0;
 			std::wstring url = L"";
 			std::wstring text = L"";
+			bool bCrLf = false;
 			if( reg.exec(target) && reg.results.size() == 3 ) {
 				pResults = &reg.results;
 				offset = reg.results[0].start ;
@@ -963,6 +972,16 @@ public:
 					text = reg4.results[2].str;
 				}
 			}
+			if( reg5.exec(target) && reg5.results.size() == 2 ) {
+				if( pResults == NULL || ( reg5.results[0].start < offset ) ){
+					// YouTube動画リンク
+					pResults = &reg5.results;
+					offset = reg5.results[0].start ;
+					url = reg5.results[1].str;
+					text = L"<<Youtube動画>>";
+					bCrLf = true;					// YouTubeリンクの場合は改行する
+				}
+			}
 			if( pResults == NULL ) {
 				// 未発見。
 				// 残りの文字列を代入して終了。
@@ -987,6 +1006,11 @@ public:
 
 			// データに追加
 			list_.push_back( CMixiData::Link(url.c_str(),text.c_str()) );
+
+			// 改行
+			if( bCrLf ){
+				str += L"<br>";
+			}
 
 			// ターゲットを更新。
 			target = target.Mid( results[0].end );

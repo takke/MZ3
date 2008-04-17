@@ -2374,6 +2374,9 @@ public:
 			LPCTSTR url = img.getProperty( L"src" ).c_str();
 			mixi.m_linkList.push_back( CMixiData::Link( url, L"ユーザ画像" ) );
 
+			// プロフィール画面にユーザ画像リンクを表示する
+			mixi.AddBody(_T("<_a><<ユーザ画像>></_a>"));
+
 			MZ3LOGGER_DEBUG( util::FormatString( L"user image : [%s]", url ) );
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( util::FormatString( L"img not found... : %s", e.getMessage().c_str()) );
