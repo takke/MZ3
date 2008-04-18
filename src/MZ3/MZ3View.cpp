@@ -1534,6 +1534,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	if (pNMLV->uNewState != 3) {
 		return;
 	}
+
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 	pCategory->selectedBody = pNMLV->iItem;
 
@@ -1546,9 +1547,32 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// Twitter であれば同一オーナーIDの項目を再表示
 	if (pCategory->m_mixi.GetAccessType()==ACCESS_TWITTER_FRIENDS_TIMELINE) {
-		// 全件再描画する。
-		// 背景の再描画をやめれば少しはマシになるかも。
-		m_bodyList.Invalidate(FALSE);
+		static int s_lastSelectedBody = 0;
+
+		// 現在選択中の項目のオーナーID、前回選択中だった項目のオーナーIDと同一のオーナーIDを持つ項目のみ、再描画する。
+		if (0 <= pCategory->selectedBody && pCategory->selectedBody < (int)pCategory->m_body.size() &&
+			0 <= s_lastSelectedBody && s_lastSelectedBody < (int)pCategory->m_body.size()) 
+		{
+			int selectedOwnerID = pCategory->m_body[ pCategory->selectedBody ].GetOwnerID();
+			int lastOwnerID     = pCategory->m_body[ s_lastSelectedBody ].GetOwnerID();
+
+			for (size_t i=0; i<pCategory->m_body.size(); i++) {
+				int ownerID = pCategory->m_body[ i ].GetOwnerID();
+				if (ownerID == selectedOwnerID ||
+					ownerID == lastOwnerID)
+				{
+					CRect rectItem;
+					m_bodyList.GetItemRect(i, &rectItem, LVIR_BOUNDS);
+					m_bodyList.InvalidateRect(rectItem, FALSE);
+					wprintf( L"RedrawItems : %d\n", i );
+				}
+			}
+		} else {
+			// 全件再描画する。
+			m_bodyList.Invalidate(FALSE);
+		}
+
+		s_lastSelectedBody = pCategory->selectedBody;
 	}
 
 	// アイコン再描画
