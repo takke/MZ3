@@ -906,17 +906,17 @@ public:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href='([^']+)'[^>]*>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a .*?href='([^']+)'[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg2;
-		if( !util::CompileRegex( reg2, L"<a href=\"([^\"]+)\"[^>]*>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg2, L"<a .*?href=\"([^\"]+)\"[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg3;
-		if( !util::CompileRegex( reg3, L"<a href=([^>]+)>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg3, L"<a .*?href=([^>]+)>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -927,6 +927,12 @@ public:
 		}
 		static MyRegex reg5;
 		if( !util::CompileRegex( reg5, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+
+		static MyRegex regs;
+		if( !util::CompileRegex( regs, L"<span[^>]*>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -1005,7 +1011,15 @@ public:
 			str += L"</_a>";
 
 			// データに追加
-			list_.push_back( CMixiData::Link(url.c_str(),text.c_str()) );
+			// span,strong タグの除去
+			CString csText = text.c_str();
+			if( csText.Find( L"<span" ) != -1 ) 
+				regs.replaceAll( csText, L"" );
+			while( csText.Replace(_T("</span>"), _T("")) );
+			while( csText.Replace(_T("<strong>"), _T("")) );
+			while( csText.Replace(_T("</strong>"), _T("")) );
+
+			list_.push_back( CMixiData::Link(url.c_str(),csText) );
 
 			// 改行
 			if( bCrLf ){
