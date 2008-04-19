@@ -102,12 +102,20 @@ public:
 
 	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
 
+	/// 表示スタイル
 	enum VIEW_STYLE {
 		VIEW_STYLE_DEFAULT = 0,			///< 標準スタイル
 		VIEW_STYLE_IMAGE   = 1,			///< 標準スタイル+ImageIcon
 		VIEW_STYLE_TWITTER = 2,			///< Twitter 用スタイル
 	};
 	VIEW_STYLE			m_viewStyle;	///< 表示スタイル
+
+	/// Twitter 用送信種別
+	enum TWITTER_STYLE_POST_MODE {
+		TWITTER_STYLE_POST_MODE_UPDATE,	///< タイムライン用発言入力中
+		TWITTER_STYLE_POST_MODE_DM,		///< DM入力中
+	};
+	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
 
 	CRect				m_rectIcon;		///< アイコン表示領域のRECT
 
@@ -365,6 +373,7 @@ public:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
 	void MyUpdateFocus(void);
+	afx_msg void OnMenuTwitterNewDm();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

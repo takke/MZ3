@@ -376,6 +376,7 @@ BEGIN
         MENUITEM "全文を読む...",                    ID_MENU_TWITTER_READ
         MENUITEM "つぶやく",                        ID_MENU_TWITTER_UPDATE
         MENUITEM "言い返す",                        ID_MENU_TWITTER_REPLY
+        MENUITEM "メッセージ送信",                     ID_MENU_TWITTER_NEW_DM
         MENUITEM SEPARATOR
         MENUITEM "友達のタイムライン",                   ID_MENU_TWITTER_FRIEND_TIMELINE
         MENUITEM "友達のタイムライン(with others)",      ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS

@@ -96,6 +96,8 @@ bool Mz3GroupData::initForTopPage()
 	{
 		appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
 		appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
+		appendCategoryByIniData( group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
+		appendCategoryByIniData( group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
 	}
 	this->groups.push_back( group );
 
@@ -239,6 +241,13 @@ bool Mz3GroupData::appendCategoryByIniData(
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 		// タイムライン
 		default_category_url = L"http://twitter.com/statuses/friends_timeline.xml";
+		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
+		break;
+
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
+		// ダイレクトメッセージ
+		default_category_url = L"http://twitter.com/direct_messages.xml";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		break;

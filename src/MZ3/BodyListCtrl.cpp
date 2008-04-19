@@ -384,7 +384,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		{
 			CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
 			CMixiDataList& list = pCategory->GetBodyList();
-			if (list.size()>nItem) {
+			if (list.size()>(size_t)nItem) {
 				// “ú•tŽæ“¾
 				CTime t0 = list[nItem-1].GetDateRaw();
 				CTime t1 = list[nItem  ].GetDateRaw();

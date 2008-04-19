@@ -93,6 +93,7 @@ inline bool IsMixiAccessType( ACCESS_TYPE type )
 {
 	switch (type) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		return false;
 	default:
 		return true;
@@ -396,6 +397,26 @@ inline CString MakeLogfilePath( const CMixiData& data )
 				filename = L"friends_timeline.xml";
 			} else {
 				after.Replace( L"/", L"_" );
+				filename = after;
+			}
+
+			return theApp.m_filepath.twitterFolder + L"\\" + filename;
+		}
+
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
+		{
+			// http://twitter.com/direct_messages.xml
+			// => twitter/recv.xml
+			// http://twitter.com/direct_messages/sent.xml
+			// => twitter/sent.xml
+
+			CString filename;
+			CString after;
+			if (util::GetAfterSubString( data.GetURL(), L"direct_messages", after )<0) {
+				// default
+				filename = L"recv.xml";
+			} else {
+				after.Replace( L"/", L"" );
 				filename = after;
 			}
 

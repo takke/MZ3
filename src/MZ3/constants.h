@@ -108,12 +108,14 @@ enum ACCESS_TYPE {
 	ACCESS_POST_ENTRY_NEWDIARY,			///< コメント投稿（書き込み画面）
 
 	//--- Twitter GET 系
-	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< friends_timeline
+	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< friends_timeline.xml
+	ACCESS_TWITTER_DIRECT_MESSAGES,		///< direct_messages.xml
 
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
 	//--- Twitter POST 系
 	ACCESS_TWITTER_UPDATE,				///< ステータス更新
+	ACCESS_TWITTER_NEW_DM,				///< DM送信
 
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ

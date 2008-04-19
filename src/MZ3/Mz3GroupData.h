@@ -123,6 +123,7 @@ private:
 		category_string2type[ L"CALENDAR"    ] = ACCESS_LIST_CALENDAR;  //icchu’Ç‰Á
 		// Twitter
 		category_string2type[ L"TWITTER_FRIENDS_TIMELINE" ] = ACCESS_TWITTER_FRIENDS_TIMELINE;
+		category_string2type[ L"TWITTER_DIRECT_MESSAGES" ] = ACCESS_TWITTER_DIRECT_MESSAGES;
 
 		category_type2string.RemoveAll();
 		category_type2string.InitHashTable( 20 );
@@ -144,6 +145,7 @@ private:
 		category_type2string[ ACCESS_LIST_CALENDAR    ] = L"CALENDAR";  //icchu’Ç‰Á
 		// Twitter
 		category_type2string[ ACCESS_TWITTER_FRIENDS_TIMELINE ] = L"TWITTER_FRIENDS_TIMELINE";
+		category_type2string[ ACCESS_TWITTER_DIRECT_MESSAGES ] = L"TWITTER_DIRECT_MESSAGES";
 	}
 
 public:

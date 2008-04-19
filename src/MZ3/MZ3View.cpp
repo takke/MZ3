@@ -162,6 +162,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 		return _T("時刻");
 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		switch( bodyIndicateType ) {
 		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
 			return _T("名前>>");
@@ -233,7 +234,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_CONTEXT_MENU, &CMZ3View::OnAcceleratorContextMenu)
 	ON_COMMAND(ID_ACCELERATOR_NEXT_TAB, &CMZ3View::OnAcceleratorNextTab)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
-//	ON_WM_MOUSEWHEEL()
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
 	ON_COMMAND(ID_MENU_TWITTER_READ, &CMZ3View::OnMenuTwitterRead)
@@ -253,8 +253,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_EDIT_CATEGORY_ITEM, &CMZ3View::OnEditCategoryItem)
 	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
 	ON_COMMAND(ID_TABMENU_ADD, &CMZ3View::OnTabmenuAdd)
-//	ON_WM_RBUTTONDOWN()
-//	ON_WM_RBUTTONUP()
+	ON_COMMAND(ID_MENU_TWITTER_NEW_DM, &CMZ3View::OnMenuTwitterNewDm)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -895,6 +894,9 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
+	// Twitter送信モードを「更新」に戻す
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
@@ -1076,6 +1078,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_BBS:
 	case ACCESS_LIST_CALENDAR:
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// --------------------------------------------------
 		// カテゴリ項目の取得
 		// --------------------------------------------------
@@ -1128,6 +1131,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
+	// Twitter送信モードを「更新」に戻す
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
@@ -1161,6 +1167,9 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	MZ3LOGGER_ERROR( msg );
 
 	m_access = FALSE;
+
+	// Twitter送信モードを「更新」に戻す
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1200,6 +1209,9 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	m_cruise.stop();
 
 	m_access = FALSE;
+
+	// Twitter送信モードを「更新」に戻す
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1423,6 +1435,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		case ACCESS_TWITTER_FRIENDS_TIMELINE:
 			m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
 			break;
+		case ACCESS_TWITTER_DIRECT_MESSAGES:
+			m_bodyList.SetHeader( _T("メッセージ"), szHeaderTitle2 );
+			break;
 		}
 	}
 
@@ -1546,7 +1561,9 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	MoveMiniImageDlg();
 
 	// Twitter であれば同一オーナーIDの項目を再表示
-	if (pCategory->m_mixi.GetAccessType()==ACCESS_TWITTER_FRIENDS_TIMELINE) {
+	switch (pCategory->m_mixi.GetAccessType()) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		static int s_lastSelectedBody = 0;
 
 		// 現在選択中の項目のオーナーID、前回選択中だった項目のオーナーIDと同一のオーナーIDを持つ項目のみ、再描画する。
@@ -1573,6 +1590,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		s_lastSelectedBody = pCategory->selectedBody;
+		break;
 	}
 
 	// アイコン再描画
@@ -2776,6 +2794,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		break;
 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// Twitter API => UTF-8
 		encoding = CInetAccess::ENCODING_UTF8;
 		break;
@@ -2786,6 +2805,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	LPCTSTR szPassword = NULL;
 	switch (data->GetAccessType()) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// Twitter API => Basic 認証
 		szUser     = theApp.m_loginMng.GetTwitterId();
 		szPassword = theApp.m_loginMng.GetTwitterPassword();
@@ -3095,6 +3115,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		}
 		break;
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// 「日付」と「名前」
 		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_DATE ) {
 			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
@@ -4613,9 +4634,12 @@ void CMZ3View::OnMenuTwitterRead()
 	item.AppendFormat( L"owner-id : %d\r\n", data.GetOwnerID() );
 
 	if (data.GetChildrenSize()>=1) {
-		CString source = data.GetChild(0).GetBody(0);
-		mixi::ParserUtil::StripAllTags( source );
-		item.AppendFormat( L"source : %s", source );
+		// その他の情報を追加
+		for (size_t i=0; i<data.GetChildrenSize(); i++) {
+			CString s = data.GetChild(i).GetBody(0);
+			mixi::ParserUtil::StripAllTags( s );
+			item.Append( s );
+		}
 	}
 
 	MessageBox( item, data.GetName() );
@@ -4626,6 +4650,12 @@ void CMZ3View::OnMenuTwitterRead()
  */
 void CMZ3View::OnMenuTwitterReply()
 {
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
 	// 入力領域にユーザのスクリーン名を追加。
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
@@ -4638,9 +4668,24 @@ void CMZ3View::OnMenuTwitterReply()
 	// フォーカス移動。
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 
-	// End
+	// End へ移動
 	keybd_event( VK_END, 0, 0, 0 );
 	keybd_event( VK_END, 0, KEYEVENTF_KEYUP, 0 );
+}
+
+/**
+ * Twitter | メッセージ送信
+ */
+void CMZ3View::OnMenuTwitterNewDm()
+{
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_DM;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
 
 /**
@@ -4648,6 +4693,12 @@ void CMZ3View::OnMenuTwitterReply()
  */
 void CMZ3View::OnMenuTwitterUpdate()
 {
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
 	// フォーカス移動。
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
@@ -4686,6 +4737,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 		if (pCategory!=NULL) {
 			switch (pCategory->m_mixi.GetAccessType()) {
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			case ACCESS_TWITTER_DIRECT_MESSAGES:
 				return VIEW_STYLE_TWITTER;
 			default:
 				if (m_bodyList.IsEnableIcon()) {
@@ -4712,18 +4764,54 @@ void CMZ3View::OnBnClickedUpdateButton()
 		return;
 	}
 
-	// フォーカスを入力領域に移動
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-
 	// 入力文字列を取得
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
 
+	// 未入力時の処理
 	if (strStatus.IsEmpty()) {
-		// 未入力なので最新取得
-		RetrieveCategoryItem();
-		return;
+		switch (m_twitterPostMode) {
+		case TWITTER_STYLE_POST_MODE_DM:
+			// 未入力はNG
+			return;
+
+		case TWITTER_STYLE_POST_MODE_UPDATE:
+		default:
+			// 未入力なので最新取得
+			RetrieveCategoryItem();
+			return;
+		}
 	}
+
+	// DMモードであれば、送信先確認
+	int	twitterDirectMessageRecipientId;	// DM送信先ユーザID
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_DM:
+		{
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			CMixiData& data = pCategory->GetSelectedBody();
+			CString msg;
+			msg.Format( 
+				L"%s さんに以下のメッセージを送信します。\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"よろしいですか？", 
+				data.GetName(), strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+
+			twitterDirectMessageRecipientId = data.GetOwnerID();
+		}
+		break;
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+	default:
+		break;
+	}
+
+	// フォーカスを入力領域に移動
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 
 	// 入力領域を無効化
 	GetDlgItem( IDC_STATUS_EDIT )->EnableWindow( FALSE );
@@ -4737,19 +4825,40 @@ void CMZ3View::OnBnClickedUpdateButton()
 	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-Version: %s", MZ3_VERSION_TEXT_SHORT ) );
 
 	// POST パラメータを設定
-	post.AppendPostBody( "status=" );
-	post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
-	if (theApp.m_optionMng.m_bAddSourceTextOnTwitterPost) {
-		post.AppendPostBody( L" *" MZ3_APP_NAME L"*" );
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_DM:
+		post.AppendPostBody( "text=" );
+		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+		post.AppendPostBody( "&user=" );
+		post.AppendPostBody( util::int2str(twitterDirectMessageRecipientId) );
+		break;
+
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+	default:
+		post.AppendPostBody( "status=" );
+		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+		if (theApp.m_optionMng.m_bAddSourceTextOnTwitterPost) {
+			post.AppendPostBody( L" *" MZ3_APP_NAME L"*" );
+		}
+		post.AppendPostBody( "&source=" );
+		post.AppendPostBody( MZ3_APP_NAME );
+		break;
 	}
-	post.AppendPostBody( "&source=" );
-	post.AppendPostBody( MZ3_APP_NAME );
-
 	post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
-
 	post.SetSuccessMessage( WM_MZ3_POST_END );
 
-	CString url = L"http://twitter.com/statuses/update.xml";
+	// POST先URL設定
+	CString url;
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_DM:
+		url = L"http://twitter.com/direct_messages/new.xml";
+		break;
+
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+	default:
+		url = L"http://twitter.com/statuses/update.xml";
+		break;
+	}
 
 	// Twitter API => Basic 認証
 	LPCTSTR szUser = NULL;
@@ -4764,7 +4873,16 @@ void CMZ3View::OnBnClickedUpdateButton()
 	}
 
 	// アクセス種別を設定
-	theApp.m_accessType = ACCESS_TWITTER_UPDATE;
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_DM:
+		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+	default:
+		theApp.m_accessType = ACCESS_TWITTER_UPDATE;
+		break;
+	}
 
 	// アクセス開始
 	m_access = TRUE;
@@ -4800,6 +4918,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	ACCESS_TYPE aType = theApp.m_accessType;
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 
 		// ログ保存
 		{
@@ -4814,6 +4933,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		break;
 
 	case ACCESS_TWITTER_UPDATE:
+	case ACCESS_TWITTER_NEW_DM:
 		// Twitter投稿処理
 		// HTTPステータスチェックを行う。
 		LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
@@ -4822,7 +4942,15 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			util::MySetInformationText( m_hWnd, msg );
 			MZ3LOGGER_ERROR( msg );
 		} else {
-			util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+			switch (aType) {
+			case ACCESS_TWITTER_NEW_DM:
+				util::MySetInformationText( m_hWnd, L"メッセージ送信終了" );
+				break;
+			case ACCESS_TWITTER_UPDATE:
+			default:
+				util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+				break;
+			}
 
 			// 入力値を消去
 			SetDlgItemText( IDC_STATUS_EDIT, L"" );
@@ -5219,6 +5347,25 @@ void CMZ3View::MyUpdateControlStatus(void)
 	if (pStatusEdit!=NULL) {
 		pStatusEdit->EnableWindow( m_access ? FALSE : TRUE );
 	}
+
+	// Twitterスタイルならボタンの名称をモードにより変更する
+	switch (m_viewStyle) {
+	case VIEW_STYLE_TWITTER:
+		switch (m_twitterPostMode) {
+		case TWITTER_STYLE_POST_MODE_DM:
+			if (pUpdateButton!=NULL) {
+				pUpdateButton->SetWindowTextW( L"送信" );
+			}
+			break;
+		case TWITTER_STYLE_POST_MODE_UPDATE:
+		default:
+			if (pUpdateButton!=NULL) {
+				pUpdateButton->SetWindowTextW( L"更新" );
+			}
+			break;
+		}
+		break;
+	}
 }
 
 /**
@@ -5268,6 +5415,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
 		break;
 	}
@@ -5363,6 +5511,7 @@ void CMZ3View::MyUpdateFocus(void)
 	case VIEW_STYLE_TWITTER:
 		switch (theApp.m_accessType) {
 		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		case ACCESS_TWITTER_DIRECT_MESSAGES:
 		case ACCESS_TWITTER_UPDATE:
 			// フォーカスを入力領域に移動
 			// 但し、フォーカスがリストにある場合は移動しない。
