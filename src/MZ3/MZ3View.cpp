@@ -4958,6 +4958,9 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
+	// Twitter送信モードを「更新」に戻す
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
