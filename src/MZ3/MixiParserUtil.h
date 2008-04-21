@@ -791,39 +791,71 @@ alt="" /></a></td>
 			// player.push({云々});を探す
 			if( !reg2.exec(target) || reg2.results.size() != 2 ) {
 				// 未発見。
-				// 残りの文字列を代入して終了。
-				line += target;
-				break;
+				// 文字列の中で動画リンクをさがす
+				if( reg.exec( target ) && reg.results.size() == 2 ) {
+					// 発見
+					std::vector<MyRegex::Result>& results = reg.results;
+
+					// マッチ文字列全体の左側を出力
+					line.Append( target, results[0].start );
+
+					// 動画リンクの表示
+					CString text = L"<<動画>>";
+
+					// url を追加
+					LPCTSTR url = results[1].str.c_str();
+					
+					//動画を追加
+					data_.AddMovie( url );
+
+					// 置換ｆ
+					line.Append( L"<_mov>" + text + L"</_mov>" );
+
+					// とりあえず改行
+					line += _T("<br>");
+
+					// ターゲットを更新。
+					target.Delete( 0, results[0].end );
+				} else {
+					// 未発見
+					line += target;
+					break;
+				}
+
+			} else {
+				// 発見。
+				std::vector<MyRegex::Result>& results2 = reg2.results;
+
+				// マッチ文字列全体の左側を出力
+				line.Append( target, results2[0].start );
+
+				// マッチ文字列の中で動画リンクをさがす
+				if( reg.exec( results2[1].str.c_str() ) && reg.results.size() == 2 ) {
+					// 発見
+					std::vector<MyRegex::Result>& results = reg.results;
+
+					// 動画リンクの表示
+					CString text = L"<<動画>>";
+
+					// url を追加
+					LPCTSTR url = results[1].str.c_str();
+					
+					//動画を追加
+					data_.AddMovie( url );
+
+					// 置換ｆ
+					line.Append( L"<_mov>" + text + L"</_mov>" );
+
+					// とりあえず改行
+					line += _T("<br>");
+				} else {
+					// 未発見
+					line += results2[1].str.c_str();
+				}
+
+				// ターゲットを更新。
+				target.Delete( 0, results2[0].end );
 			}
-
-			// 発見。
-			std::vector<MyRegex::Result>& results2 = reg2.results;
-
-			// マッチ文字列全体の左側を出力
-			line.Append( target, results2[0].start );
-
-			// マッチ文字列の中で動画リンクをさがす
-			if( reg.exec( results2[1].str.c_str() ) && reg.results.size() == 2 ) {
-				// 発見
-				std::vector<MyRegex::Result>& results = reg.results;
-
-				CString text = L"<<動画>>";
-
-				// url を追加
-				LPCTSTR url = results[1].str.c_str();
-				
-				//動画を追加
-				data_.AddMovie( url );
-
-				// 置換ｆ
-				line.Append( L"<_mov>" + text + L"</_mov>" );
-
-				// とりあえず改行
-				line += _T("<br>");
-			}
-
-			// ターゲットを更新。
-			target.Delete( 0, results2[0].end );
 
 			// Event.observe(云々) があれば消す
 			if( reg3.exec(target) && reg3.results.size() != 0 ) {
