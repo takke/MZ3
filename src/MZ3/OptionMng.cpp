@@ -16,154 +16,185 @@
 /// オプションデータ
 namespace option {
 
-
-
 // Option メンバ関数
 
-void Option::Load()
+/**
+ * ini ファイルの同期(bool)
+ */
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, bool& targetValue, const char* key, const char* section, bool defaultValue)
 {
-	MZ3LOGGER_DEBUG( L"オプション設定読み込み開始" );
+	if (bSave) {
+		inifile.SetValue(key, (LPCSTR)util::int2str_a(targetValue ? 1 : 0), section);
+	} else {
+		std::string s = inifile.GetValue(key, section).c_str();
+		if (s.empty()) {
+			// 初期値
+			targetValue = defaultValue;
+		} else {
+			targetValue = atoi( s.c_str() ) ? true : false;
+		}
+	}
+}
 
-	const CString& fileName = theApp.m_filepath.inifile;
+/**
+ * ini ファイルの同期(CString)
+ */
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, CString& targetValue, const char* key, const char* section, const CString defaultValue)
+{
+	if (bSave) {
+		inifile.SetValue(util::my_mbstowcs(key).c_str(), targetValue, section);
+	} else {
+		std::string s = inifile.GetValue(key, section).c_str();
+		if (s.empty()) {
+			// 初期値
+			targetValue = defaultValue;
+		} else {
+			targetValue = util::my_mbstowcs( s.c_str() ).c_str();
+		}
+	}
+}
 
+/**
+ * ini ファイルの同期(int)
+ */
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, int& targetValue, const char* key, const char* section, int defaultValue)
+{
+	if (bSave) {
+		inifile.SetValue(key, (LPCSTR)util::int2str_a(targetValue), section);
+	} else {
+		std::string s = inifile.GetValue(key, section).c_str();
+		if (s.empty()) {
+			// 初期値
+			targetValue = defaultValue;
+		} else {
+			targetValue = atoi( s.c_str() );
+		}
+	}
+}
+void SyncIniValue(inifile::IniFile& inifile, bool bSave, bool& targetValue, const char* key, const char* section)
+{
+	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
+}
+void SyncIniValue(inifile::IniFile& inifile, bool bSave, CString& targetValue, const char* key, const char* section)
+{
+	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
+}
+void SyncIniValue(inifile::IniFile& inifile, bool bSave, int& targetValue, const char* key, const char* section)
+{
+	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
+}
+
+/**
+ * 保存/読込処理
+ */
+void Option::Sync(bool bSave)
+{
 	inifile::IniFile inifile;
 
-	CFileStatus rStatus;
-	if (CFile::GetStatus(fileName, rStatus) == FALSE) {
-		inifile::StaticMethod::Create( util::my_wcstombs((LPCTSTR)fileName).c_str() );
+	// 初期処理
+	if (bSave) {
+		// 保存時の初期処理
+	} else {
+		// 読込時の初期処理
+		const CString& fileName = theApp.m_filepath.inifile;
+
+		CFileStatus rStatus;
+		if (CFile::GetStatus(fileName, rStatus) == FALSE) {
+			inifile::StaticMethod::Create( util::my_wcstombs((LPCTSTR)fileName).c_str() );
+		}
+
+		if(! inifile.Load( theApp.m_filepath.inifile ) ) {
+	//		return;
+		}
 	}
 
-	if(! inifile.Load( theApp.m_filepath.inifile ) ) {
-//		return;
+	//--- Proxy
+	SyncIniValue(inifile, bSave, m_bUseProxy,		"Use",			  "Proxy");
+	SyncIniValue(inifile, bSave, m_bUseGlobalProxy, "UseGlobalProxy", "Proxy");
+
+	SyncIniValue(inifile, bSave, m_proxyServer,     "Server",		  "Proxy");
+	SyncIniValue(inifile, bSave, m_proxyPort,       "Port",		      "Proxy");
+	SyncIniValue(inifile, bSave, m_proxyUser,       "User",		      "Proxy");
+	SyncIniValue(inifile, bSave, m_proxyPassword,   "Password",		  "Proxy");
+
+	//--- Page
+	SyncIniValue(inifile, bSave, (int&)m_GetPageType, "GetType", "Page");
+
+	//--- Boot
+	SyncIniValue(inifile, bSave, m_bBootCheckMnC, "CheckMnC", "Boot");
+
+	//--- General
+	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
+
+	//--- UI
+	// 背景画像の有無
+	SyncIniValue(inifile, bSave, m_bUseBgImage, "UseBgImage", "UI");
+
+	// フォントサイズ
+	if (!bSave) {
+		// 初期値設定
+		switch( theApp.GetDisplayMode() ) {
+		case SR_VGA:		m_fontHeight = 24; break;
+		case SR_QVGA:
+		default:			m_fontHeight = 12; break;
+		}
 	}
+	SyncIniValue(inifile, bSave, m_fontHeight, "FontHeight", "UI");
 
-	if (inifile.SectionExists("Proxy") != FALSE) {
-		// プロキシセクションがあった場合
-		m_bUseProxy       = atoi( inifile.GetValue("Use", "Proxy").c_str() ) ? true : false;
-		m_bUseGlobalProxy = atoi( inifile.GetValue("Use", "GlobalProxy").c_str() ) ? true : false;
-
-		m_proxyServer   = util::my_mbstowcs( inifile.GetValue("Server", "Proxy") ).c_str();
-		m_proxyPort     = atoi( inifile.GetValue("Port", "Proxy").c_str() );
-		m_proxyUser     = util::my_mbstowcs( inifile.GetValue("User", "Proxy") ).c_str();
-		m_proxyPassword = util::my_mbstowcs( inifile.GetValue("Password", "Proxy") ).c_str();
-
+	// フォントサイズ（大）
+	if (!bSave) {
+		// 初期値設定
+		switch( theApp.GetDisplayMode() ) {
+		case SR_VGA:		m_fontHeightBig = 28; break;
+		case SR_QVGA:
+		default:			m_fontHeightBig = 14; break;
+		}
 	}
+	SyncIniValue(inifile, bSave, m_fontHeightBig, "FontHeight_Big", "UI");
 
-	if (inifile.SectionExists("Page") != FALSE) {
-		m_GetPageType = (GETPAGE_TYPE)atoi( inifile.GetValue("GetType", "Page").c_str() );
+	// フォントサイズ（中）
+	if (!bSave) {
+		// 初期値設定
+		m_fontHeightMedium = m_fontHeight;
 	}
+	SyncIniValue(inifile, bSave, m_fontHeightMedium, "FontHeight_Medium", "UI");
 
-	if (inifile.SectionExists("Boot") != FALSE) {
-		m_bBootCheckMnC = (BOOL)atoi(inifile.GetValue("CheckMnC", "Boot").c_str());
+	// フォントサイズ（小）
+	if (!bSave) {
+		// 初期値設定
+		// 初期値
+		switch( theApp.GetDisplayMode() ) {
+		case SR_VGA:		m_fontHeightSmall = 18; break;
+		case SR_QVGA:
+		default:			m_fontHeightSmall = 10; break;
+		}
 	}
+	SyncIniValue(inifile, bSave, m_fontHeightSmall, "FontHeight_Small", "UI");
 
-	if (inifile.SectionExists("General") != FALSE) {
-		m_bConvertUrlForMixiMobile
-			= (atoi(inifile.GetValue("ConvertUrlForMixiMobile", "General").c_str()) != 0) ? true : false;
-	}
+	// フォント名
+	SyncIniValue(inifile, bSave, m_fontFace, "FontFace", "UI");
 
-//	if (inifile.SectionExists("UI") != FALSE) {
-	{
-		// UI セクション
+	// 左ソフトキー有効？
+	SyncIniValue(inifile, bSave, m_bUseLeftSoftKey, "UseLeftSoftKey", "UI" );
 
-		// 背景画像の利用
-		std::string s;
-		s = inifile.GetValue("UseBgImage", "UI");
-		if( s.empty() ) {
-			// 初期値
-			m_bUseBgImage = TRUE;
-		}else{
-			m_bUseBgImage = (BOOL)atoi(s.c_str());
-		}
+	// Xcrawl 誤動作防止機能
+	SyncIniValue(inifile, bSave, m_bUseXcrawlExtension, "UseXcrawlCanceler", "UI" );
 
-		// フォントサイズ
-		s = inifile.GetValue("FontHeight", "UI");
-		if( s.empty() ) {
-			// 初期値
-//			m_fontHeight = 0;
-			switch( theApp.GetDisplayMode() ) {
-			case SR_VGA:		m_fontHeight = 24; break;
-			case SR_QVGA:
-			default:			m_fontHeight = 12; break;
-			}
-		}else{
-			m_fontHeight = (BOOL)atoi(s.c_str());
-		}
+	// ダウンロード後の実行確認画面を表示する？
+	SyncIniValue(inifile, bSave, m_bUseRunConfirmDlg, "UseRunConfirmDlg", "UI" );
 
-		// フォントサイズ（大）
-		s = inifile.GetValue("FontHeight_Big", "UI");
-		if( s.empty() ) {
-			// 初期値
-//			m_fontHeightBig = 28;
-			switch( theApp.GetDisplayMode() ) {
-			case SR_VGA:		m_fontHeightBig = 28; break;
-			case SR_QVGA:
-			default:			m_fontHeightBig = 14; break;
-			}
-		}else{
-			m_fontHeightBig = atoi(s.c_str());
-		}
+	// 長押し判定時間
+	SyncIniValue(inifile, bSave, m_longReturnRangeMSec, "LongReturnRangeMSec", "UI" );
 
-		// フォントサイズ（中）
-		s = inifile.GetValue("FontHeight_Medium", "UI");
-		if( s.empty() ) {
-			// 初期値
-			m_fontHeightMedium = m_fontHeight;
-		}else{
-			m_fontHeightMedium = atoi(s.c_str());
-		}
-
-		// フォントサイズ（小）
-		s = inifile.GetValue("FontHeight_Small", "UI");
-		if( s.empty() ) {
-			// 初期値
-//			m_fontHeightSmall = 18;
-			switch( theApp.GetDisplayMode() ) {
-			case SR_VGA:		m_fontHeightSmall = 18; break;
-			case SR_QVGA:
-			default:			m_fontHeightSmall = 10; break;
-			}
-		}else{
-			m_fontHeightSmall = atoi(s.c_str());
-		}
-
-		// フォント名
-		m_fontFace = inifile.GetValue("FontFace", "UI").c_str();
-
-		// 左ソフトキー有効？
-		s = inifile.GetValue( "UseLeftSoftKey", "UI" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bUseLeftSoftKey = (s == "1");
-		}
-
-		// Xcrawl 誤動作防止機能
-		s = inifile.GetValue( "UseXcrawlCanceler", "UI" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bUseXcrawlExtension = (s == "1");
-		}
-
-		// ダウンロード後の実行確認画面を表示する？
-		s = inifile.GetValue( "UseRunConfirmDlg", "UI" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bUseRunConfirmDlg = (s == "1");
-		}
-
-		// 長押し判定時間
-		s = inifile.GetValue( "LongReturnRangeMSec", "UI" );
-		if( s.empty() ) {
-			// 初期値
-		}else{
-			m_longReturnRangeMSec = normalizeLongReturnRangeMSec( atoi(s.c_str()) );
-		}
-
+	// 引用符号
+	if (bSave) {
 		// 引用符号
-		s = inifile.GetValue( "QuoteMark", "UI" );
+		// 末尾の半角スペースを保存するため、
+		// "/" で囲む形で保存する
+		inifile.SetValue( L"QuoteMark", L"/" + m_quoteMark + L"/", "UI" );
+	} else {
+		// 引用符号
+		std::string s = inifile.GetValue( "QuoteMark", "UI" );
 		if( s.empty() ) {
 			// 初期値をそのまま使う
 		}else{
@@ -176,224 +207,176 @@ void Option::Load()
 				m_quoteMark.Delete( m_quoteMark.GetLength()-1 );
 			}
 		}
+	}
 
-		// リストの高さ（比率）
-		const int RATIO_MAX = 1000;
-		s = inifile.GetValue( "MainViewCategoryListHeightRatio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewCategoryListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "MainViewBodyListHeightRatio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewBodyListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "ReportViewListHeightRatio", "UI" );
-		if(! s.empty() ) {
-			m_nReportViewListHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "ReportViewBodyHeightRatio", "UI" );
-		if(! s.empty() ) {
-			m_nReportViewBodyHeightRatio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
+	//--- UI 系
+	// リストの高さ（比率）
+	const int RATIO_MAX = 1000;
+	SyncIniValue(inifile, bSave, m_nMainViewCategoryListHeightRatio, "MainViewCategoryListHeightRatio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewCategoryListHeightRatio = normalizeRange(m_nMainViewCategoryListHeightRatio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nMainViewBodyListHeightRatio, "MainViewBodyListHeightRatio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewBodyListHeightRatio = normalizeRange( m_nMainViewBodyListHeightRatio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nReportViewListHeightRatio, "ReportViewListHeightRatio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nReportViewListHeightRatio = normalizeRange( m_nReportViewListHeightRatio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nReportViewBodyHeightRatio, "ReportViewBodyHeightRatio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nReportViewBodyHeightRatio = normalizeRange( m_nReportViewBodyHeightRatio, 1, RATIO_MAX );
+	}
 
-		// リストのカラム幅（比率）
-		s = inifile.GetValue( "MainViewBodyListCol1Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewBodyListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "MainViewBodyListCol2Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewBodyListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "MainViewCategoryListCol1Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewCategoryListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "MainViewCategoryListCol2Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nMainViewCategoryListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "ReportViewListCol1Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nReportViewListCol1Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "ReportViewListCol2Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nReportViewListCol2Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
-		s = inifile.GetValue( "ReportViewListCol3Ratio", "UI" );
-		if(! s.empty() ) {
-			m_nReportViewListCol3Ratio = normalizeRange( atoi(s.c_str()), 1, RATIO_MAX );
-		}
+	// リストのカラム幅（比率）
+	SyncIniValue(inifile, bSave, m_nMainViewBodyListCol1Ratio, "MainViewBodyListCol1Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewBodyListCol1Ratio = normalizeRange( m_nMainViewBodyListCol1Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nMainViewBodyListCol2Ratio, "MainViewBodyListCol2Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewBodyListCol2Ratio = normalizeRange( m_nMainViewBodyListCol2Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nMainViewCategoryListCol1Ratio, "MainViewCategoryListCol1Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewCategoryListCol1Ratio = normalizeRange( m_nMainViewCategoryListCol1Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nMainViewCategoryListCol2Ratio, "MainViewCategoryListCol2Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nMainViewCategoryListCol2Ratio = normalizeRange( m_nMainViewCategoryListCol2Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nReportViewListCol1Ratio, "ReportViewListCol1Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nReportViewListCol1Ratio = normalizeRange( m_nReportViewListCol1Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nReportViewListCol2Ratio, "ReportViewListCol2Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nReportViewListCol2Ratio = normalizeRange( m_nReportViewListCol2Ratio, 1, RATIO_MAX );
+	}
+	SyncIniValue(inifile, bSave, m_nReportViewListCol3Ratio, "ReportViewListCol3Ratio", "UI" );
+	if (!bSave) {
+		// normalize
+		m_nReportViewListCol3Ratio = normalizeRange( m_nReportViewListCol3Ratio, 1, RATIO_MAX );
+	}
 
-		// レポート画面のスクロールタイプ
-		s = inifile.GetValue( "ReportScrollType", "UI" );
-		if(! s.empty() ) {
-			int type = atoi(s.c_str());
-			switch( type ) {
-			case option::Option::REPORT_SCROLL_TYPE_LINE:
-			case option::Option::REPORT_SCROLL_TYPE_PAGE:
-				m_reportScrollType = (option::Option::REPORT_SCROLL_TYPE) type;
-				break;
-			default:
-				MZ3LOGGER_ERROR( L"ReportScrollType が規定値以外です" );
-				break;
-			}
+	// レポート画面のスクロールタイプ
+	SyncIniValue(inifile, bSave, (int&)m_reportScrollType, "ReportScrollType", "UI" );
+	if (!bSave) {
+		// check
+		switch (m_reportScrollType) {
+		case option::Option::REPORT_SCROLL_TYPE_LINE:
+		case option::Option::REPORT_SCROLL_TYPE_PAGE:
+			break;
+		default:
+			MZ3LOGGER_ERROR( L"ReportScrollType が規定値以外です" );
+			m_reportScrollType = option::Option::REPORT_SCROLL_TYPE_LINE;
+			break;
 		}
+	}
 
-		// レポート画面のスクロール行数
-		s = inifile.GetValue( "ReportScrollLine", "UI" );
-		if(! s.empty() ) {
-			m_reportScrollLine = normalizeRange( atoi(s.c_str()), 1, 100 );
-		}
+	// レポート画面のスクロール行数
+	SyncIniValue(inifile, bSave, m_reportScrollLine, "ReportScrollLine", "UI" );
+	if (!bSave) {
+		// normalize
+		m_reportScrollLine = normalizeRange( m_reportScrollLine, 1, 100 );
+	}
 
-		// スキン名
-		s = inifile.GetValue( "SkinName", "UI" );
-		if(! s.empty() ) {
-			m_strSkinname = s.c_str();
-		}
+	// スキン名
+	SyncIniValue(inifile, bSave, m_strSkinname, "SkinName", "UI" );
 
 #ifndef WINCE
-		// ウィンドウ位置・サイズ
-		s = inifile.GetValue( "WindowPos", "UI" );
-		if(! s.empty() ) {
-			m_strWindowPos = s.c_str();
-		}
+	// ウィンドウ位置・サイズ
+	SyncIniValue(inifile, bSave, m_strWindowPos, "WindowPos", "UI" );
 #endif
 
-		// 定期取得間隔
-		s = inifile.GetValue( "IntervalCheckSec", "UI" );
-		if(! s.empty() ) {
-			m_nIntervalCheckSec = normalizeIntervalCheckSec(atoi(s.c_str()));
-		}
-
-		// 前回終了時のタブのインデックス
-		s = inifile.GetValue( "LastTopPageTabIndex", "UI" );
-		if(! s.empty() ) {
-			m_lastTopPageTabIndex = atoi(s.c_str());
-		}
-
-		// 前回終了時のカテゴリのインデックス
-		s = inifile.GetValue( "LastTopPageCategoryIndex", "UI" );
-		if(! s.empty() ) {
-			m_lastTopPageCategoryIndex = atoi(s.c_str());
-		}
-
-		// Treo用の画面節約モード::ペインのラベル非表示
-		s = inifile.GetValue( "KillPaneLabel", "UI" );
-		if(! s.empty() ) {
-			m_killPaneLabel = atoi(s.c_str()) != 0 ? true : false;
-		}
+	// 定期取得間隔
+	SyncIniValue(inifile, bSave, m_nIntervalCheckSec, "IntervalCheckSec", "UI" );
+	if(!bSave) {
+		// normalize
+		m_nIntervalCheckSec = normalizeIntervalCheckSec(m_nIntervalCheckSec);
 	}
 
-	if (inifile.SectionExists("Log") != FALSE) {
-		// Log セクション
+	// 前回終了時のタブのインデックス
+	SyncIniValue(inifile, bSave, m_lastTopPageTabIndex, "LastTopPageTabIndex", "UI" );
 
-		// 保存フラグ
-		std::string s = inifile.GetValue( "SaveLog", "Log" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bSaveLog = (s == "1");
-		}
+	// 前回終了時のカテゴリのインデックス
+	SyncIniValue(inifile, bSave, m_lastTopPageCategoryIndex, "LastTopPageCategoryIndex", "UI" );
 
-		// ログフォルダ
-		m_logFolder = inifile.GetValue("LogFolder", "Log").c_str();
+	// Treo用の画面節約モード::ペインのラベル非表示
+	SyncIniValue(inifile, bSave, m_killPaneLabel, "KillPaneLabel", "UI" );
 
-		// デバッグモード フラグ
-		s = inifile.GetValue( "DebugMode", "Log" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bDebugMode = (s == "1");
-		}
-	}
+	//--- Log 関連
+	// 保存フラグ
+	SyncIniValue(inifile, bSave, m_bSaveLog, "SaveLog", "Log" );
 
-	if (inifile.SectionExists("Net") != FALSE) {
-		// 受信バッファサイズ
-		m_recvBufSize = atoi( inifile.GetValue("RecvBufferSize", "Net").c_str() );
+	// ログフォルダ
+	SyncIniValue(inifile, bSave, m_logFolder, "LogFolder", "Log" );
 
-		// 自動接続
-		std::string s = inifile.GetValue("AutoConnect", "Net");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bUseAutoConnection = atoi( s.c_str() ) != 0;
-		}
+	// デバッグモード フラグ
+	SyncIniValue(inifile, bSave, m_bDebugMode, "DebugMode", "Log" );
 
-		// 総データ受信量
-		m_totalRecvBytes = atoi( inifile.GetValue("TotalRecvBytes", "Net").c_str() );
+	//--- Net
+	// 受信バッファサイズ
+	SyncIniValue(inifile, bSave, m_recvBufSize, "RecvBufferSize", "Net");
 
-		// User-Agent
-		s = inifile.GetValue( "UserAgent", "Net" );
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_strUserAgent = s.c_str();
-		}
-	}
+	// 自動接続
+	SyncIniValue(inifile, bSave, m_bUseAutoConnection, "AutoConnect", "Net");
+
+	// 総データ受信量
+	SyncIniValue(inifile, bSave, m_totalRecvBytes, "TotalRecvBytes", "Net");
+
+	// User-Agent
+	SyncIniValue(inifile, bSave, m_strUserAgent, "UserAgent", "Net" );
 
 	//--- メイン画面
-	if (inifile.SectionExists("MainView") != FALSE) {
-		// トピック等にアイコンを表示する？
-		std::string s = inifile.GetValue("ShowMainViewIcon", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bShowMainViewIcon = atoi( s.c_str() ) != 0;
-		}
+	// トピック等にアイコンを表示する？
+	SyncIniValue(inifile, bSave, m_bShowMainViewIcon, "ShowMainViewIcon", "MainView");
 
-		// ユーザやコミュニティの画像を表示する？
-		s = inifile.GetValue("ShowMainViewMiniImage", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bShowMainViewMiniImage = atoi( s.c_str() ) != 0;
-		}
+	// ユーザやコミュニティの画像を表示する？
+	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImage, "ShowMainViewMiniImage", "MainView");
+	
+	// 別画面で表示する？
+	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImageDlg, "ShowMainViewMiniImageDlg", "MainView");
 
-		// 別画面で表示する？
-		s = inifile.GetValue("ShowMainViewMiniImageDlg", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bShowMainViewMiniImageDlg = atoi( s.c_str() ) != 0;
-		}
+	// マウスオーバーで表示する？
+	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImageOnMouseOver, "ShowMainViewMiniImageOnMouseOver", "MainView");
 
-		// マウスオーバーで表示する？
-		s = inifile.GetValue("ShowMainViewMiniImageOnMouseOver", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bShowMainViewMiniImageOnMouseOver = atoi( s.c_str() ) != 0;
-		}
-
-		// mini画面サイズ
-		s = inifile.GetValue("MainViewMiniImageSize", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_nMainViewMiniImageSize = normalizeRange( atoi( s.c_str() ), 25, 200 );
-		}
-
-		// 画像の自動取得
-		s = inifile.GetValue("AutoLoadMiniImage", "MainView");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bAutoLoadMiniImage = atoi( s.c_str() ) != 0;
-		}
+	// mini画面サイズ
+	SyncIniValue(inifile, bSave, m_nMainViewMiniImageSize, "MainViewMiniImageSize", "MainView");
+	if (!bSave) {
+		// normalize
+		m_nMainViewMiniImageSize = normalizeRange( m_nMainViewMiniImageSize, 25, 200 );
 	}
+
+	// 画像の自動取得
+	SyncIniValue(inifile, bSave, m_bAutoLoadMiniImage, "AutoLoadMiniImage", "MainView");
 
 	//--- Twitter
-	if (inifile.SectionExists("Twitter") != FALSE) {
-		// 文末に *MZ3* マークをつける
-		std::string s = inifile.GetValue("AddSourceTextOnTwitterPost", "Twitter");
-		if( s.empty() ) {
-			// 初期値をそのまま使う
-		}else{
-			m_bAddSourceTextOnTwitterPost = atoi( s.c_str() ) != 0;
-		}
+	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
+
+	// 終了処理
+	if (bSave) {
+		// Save
+		inifile.Save( theApp.m_filepath.inifile, false );
 	}
+}
+
+void Option::Load()
+{
+	MZ3LOGGER_DEBUG( L"オプション設定読み込み開始" );
+
+	Sync(false);
 
 	MZ3LOGGER_DEBUG( L"オプション設定読み込み完了" );
 }
@@ -404,144 +387,7 @@ void Option::Save()
 
 	inifile::IniFile inifile;
 
-	//--- 全般
-	inifile.SetValue( 
-		"ConvertUrlForMixiMobile", 
-		(LPCSTR)util::int2str_a( m_bConvertUrlForMixiMobile ? 1 : 0 ),
-		"General" );
-
-	//--- Proxy
-	inifile.SetValue("Use", (LPCSTR)util::int2str_a(m_bUseProxy), "Proxy");
-	inifile.SetValue("UseGlobalProxy", (LPCSTR)util::int2str_a(m_bUseGlobalProxy), "Proxy");
-
-	inifile.SetValue(L"Server", m_proxyServer, "Proxy");
-	inifile.SetValue("Port", (LPCSTR)util::int2str_a(m_proxyPort), "Proxy");
-	inifile.SetValue(L"User", m_proxyUser, "Proxy");
-	inifile.SetValue(L"Password", m_proxyPassword, "Proxy");
-
-	inifile.SetValue("GetType", (LPCSTR)util::int2str_a(m_GetPageType), "Page");
-	inifile.SetValue("CheckMnC", (LPCSTR)util::int2str_a(m_bBootCheckMnC), "Boot");
-
-	//--- UI 系
-	CStringA s;
-
-	// 背景画像の利用
-	inifile.SetValue( "UseBgImage", (LPCSTR)util::int2str_a(m_bUseBgImage), "UI");
-
-	// フォントサイズ
-	inifile.SetValue( "FontHeight", (LPCSTR)util::int2str_a(m_fontHeight), "UI");
-
-	// フォントサイズ（大）
-	inifile.SetValue( "FontHeight_Big", (LPCSTR)util::int2str_a(m_fontHeightBig), "UI");
-	// フォントサイズ（中）
-	inifile.SetValue( "FontHeight_Medium", (LPCSTR)util::int2str_a(m_fontHeightMedium), "UI");
-	// フォントサイズ（小）
-	inifile.SetValue( "FontHeight_Small", (LPCSTR)util::int2str_a(m_fontHeightSmall), "UI");
-
-	// フォント名
-	inifile.SetValue( L"FontFace", m_fontFace, "UI");
-	// 左ソフトキー有効？
-	inifile.SetValue( "UseLeftSoftKey", m_bUseLeftSoftKey ? "1" : "0", "UI" );
-
-	// Xcrawl 誤動作防止機能
-	inifile.SetValue( "UseXcrawlCanceler", m_bUseXcrawlExtension ? "1" : "0", "UI" );
-
-	// ダウンロード後の実行確認画面を表示する？
-	inifile.SetValue( "UseRunConfirmDlg", m_bUseRunConfirmDlg ? "1" : "0", "UI" );
-
-	// 長押し判定時間
-	inifile.SetValue( "LongReturnRangeMSec", (LPCSTR)util::int2str_a(m_longReturnRangeMSec), "UI" );
-
-	// 引用符号
-	// 末尾の半角スペースを保存するため、
-	// "/" で囲む形で保存する
-	inifile.SetValue( L"QuoteMark", L"/" + m_quoteMark + L"/", "UI" );
-
-	// リストの高さ（比率）
-	inifile.SetValue( "MainViewCategoryListHeightRatio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListHeightRatio), "UI" );
-	inifile.SetValue( "MainViewBodyListHeightRatio",     (LPCSTR)util::int2str_a(m_nMainViewBodyListHeightRatio), "UI" );
-	inifile.SetValue( "ReportViewListHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewListHeightRatio), "UI" );
-	inifile.SetValue( "ReportViewBodyHeightRatio", (LPCSTR)util::int2str_a(m_nReportViewBodyHeightRatio), "UI" );
-
-	// リストのカラム幅（比率）
-	inifile.SetValue( "MainViewBodyListCol1Ratio", (LPCSTR)util::int2str_a(m_nMainViewBodyListCol1Ratio), "UI" );
-	inifile.SetValue( "MainViewBodyListCol2Ratio", (LPCSTR)util::int2str_a(m_nMainViewBodyListCol2Ratio), "UI" );
-	inifile.SetValue( "MainViewCategoryListCol1Ratio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListCol1Ratio), "UI" );
-	inifile.SetValue( "MainViewCategoryListCol2Ratio", (LPCSTR)util::int2str_a(m_nMainViewCategoryListCol2Ratio), "UI" );
-
-	inifile.SetValue( "ReportViewListCol1Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol1Ratio), "UI" );
-	inifile.SetValue( "ReportViewListCol2Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol2Ratio), "UI" );
-	inifile.SetValue( "ReportViewListCol3Ratio", (LPCSTR)util::int2str_a(m_nReportViewListCol3Ratio), "UI" );
-
-	// レポート画面のスクロールタイプ
-	inifile.SetValue( "ReportScrollType", (LPCSTR)util::int2str_a(m_reportScrollType), "UI" );
-
-	// レポート画面のスクロール行数
-	inifile.SetValue( "ReportScrollLine", (LPCSTR)util::int2str_a(m_reportScrollLine), "UI" );
-
-	// スキン名
-	inifile.SetValue( L"SkinName", (LPCTSTR)m_strSkinname, "UI" );
-
-#ifndef WINCE
-	// ウィンドウ位置・サイズ
-	inifile.SetValue( L"WindowPos", (LPCTSTR)m_strWindowPos, "UI" );
-#endif
-
-	// 定期取得間隔
-	inifile.SetValue( "IntervalCheckSec", (LPCSTR)util::int2str_a(m_nIntervalCheckSec), "UI" );
-
-	// 前回終了時のタブのインデックス
-	inifile.SetValue( "LastTopPageTabIndex", (LPCSTR)util::int2str_a(m_lastTopPageTabIndex), "UI" );
-
-	// 前回終了時のカテゴリのインデックス
-	inifile.SetValue( "LastTopPageCategoryIndex", (LPCSTR)util::int2str_a(m_lastTopPageCategoryIndex), "UI" );
-
-	//--- Log 関連
-	// 保存フラグ
-	inifile.SetValue( "SaveLog", m_bSaveLog ? "1" : "0", "Log" );
-
-	// 保存先フォルダ
-	inifile.SetValue( L"LogFolder", m_logFolder, "Log");
-
-	// デバッグモード
-	inifile.SetValue( "DebugMode", m_bDebugMode ? "1" : "0", "Log" );
-
-	// 受信バッファサイズ
-	inifile.SetValue( "RecvBufferSize", (LPCSTR)util::int2str_a(m_recvBufSize), "Net" );
-
-	// 自動接続
-	inifile.SetValue( "AutoConnect", (LPCSTR)util::int2str_a(m_bUseAutoConnection ? 1 : 0), "Net" );
-
-	// 総データ受信量
-	inifile.SetValue( "TotalRecvBytes", (LPCSTR)util::int2str_a(m_totalRecvBytes), "Net" );
-
-	// User-Agent
-	inifile.SetValue( L"UserAgent", m_strUserAgent, "Net" );
-
-	//--- メイン画面
-	// トピック等にアイコンを表示する？
-	inifile.SetValue( "ShowMainViewIcon", (LPCSTR)util::int2str_a(m_bShowMainViewIcon ? 1 : 0), "MainView");
-
-	// ユーザやコミュニティの画像を表示する？
-	inifile.SetValue( "ShowMainViewMiniImage", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImage ? 1 : 0), "MainView");
-	
-	// 別画面で表示する？
-	inifile.SetValue( "ShowMainViewMiniImageDlg", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImageDlg ? 1 : 0), "MainView");
-	
-	// マウスオーバーで表示する？
-	inifile.SetValue( "ShowMainViewMiniImageOnMouseOver", (LPCSTR)util::int2str_a(m_bShowMainViewMiniImageOnMouseOver ? 1 : 0), "MainView");
-
-	// mini画面サイズ
-	inifile.SetValue( "MainViewMiniImageSize", (LPCSTR)util::int2str_a(m_nMainViewMiniImageSize), "MainView");
-
-	// 画像の自動取得
-	inifile.SetValue( "AutoLoadMiniImage", (LPCSTR)util::int2str_a(m_bAutoLoadMiniImage ? 1 : 0), "MainView");
-
-	//--- Twitter
-	inifile.SetValue( "AddSourceTextOnTwitterPost", (LPCSTR)util::int2str_a(m_bAddSourceTextOnTwitterPost ? 1 : 0), "Twitter");
-
-	// Save
-	inifile.Save( theApp.m_filepath.inifile, false );
+	Sync(true);
 
 	MZ3LOGGER_DEBUG( L"オプション設定保存完了" );
 }

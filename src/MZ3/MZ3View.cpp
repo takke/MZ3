@@ -524,7 +524,7 @@ bool CMZ3View::DoInitialize()
 	}
 
 	// 新着メッセージ確認
-	if (theApp.m_optionMng.IsBootCheckMnC() != FALSE) {
+	if (theApp.m_optionMng.IsBootCheckMnC() != false) {
 		// 新着メッセージ確認
 		DoNewCommentCheck();
 	}

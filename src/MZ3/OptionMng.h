@@ -33,7 +33,7 @@ private:
 
 	GETPAGE_TYPE	m_GetPageType;			///< ページ取得種別
 
-	BOOL			m_bBootCheckMnC;		///< 起動時のメッセージ確認
+	bool			m_bBootCheckMnC;		///< 起動時のメッセージ確認
 	CString			m_quoteMark;			///< 引用符号
 
 	BOOL			m_bUseBgImage;			///< 背景に画像を表示するかどうか
@@ -114,7 +114,7 @@ public:
 		, m_bUseAutoConnection( true )
 		, m_bUseProxy( false )
 		, m_bUseGlobalProxy( true )
-		, m_bBootCheckMnC( FALSE )
+		, m_bBootCheckMnC( false )
 		, m_bUseBgImage( TRUE )
 		, m_fontHeight( 24 )				// 初期値は Load() 内で設定される
 		, m_fontHeightBig( 28 )				// 初期値は Load() 内で設定される
@@ -189,6 +189,10 @@ public:
 		return value;
 	}
 
+private:
+	void Sync(bool bSave);
+
+public:
 	void Load();
 	void Save();
 
@@ -219,8 +223,8 @@ public:
 	GETPAGE_TYPE GetPageType() { return m_GetPageType; }
 	void SetPageType(GETPAGE_TYPE value) { m_GetPageType = value; }
 
-	BOOL IsBootCheckMnC()			{ return m_bBootCheckMnC; }			///< 起動時のチェック
-	void SetBootCheckMnC(BOOL flag) { m_bBootCheckMnC = flag; }			///< 起動時のチェックの設定
+	bool IsBootCheckMnC()			{ return m_bBootCheckMnC; }			///< 起動時のチェック
+	void SetBootCheckMnC(bool flag) { m_bBootCheckMnC = flag; }			///< 起動時のチェックの設定
 
 	LPCTSTR GetQuoteMark()				{ return m_quoteMark; }			///< 引用符号の取得
 	void SetQuoteMark( LPCTSTR mark )	{ m_quoteMark = mark; }			///< 引用符号の設定

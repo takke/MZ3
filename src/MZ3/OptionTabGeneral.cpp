@@ -63,7 +63,7 @@ void COptionTabGeneral::OnOK()
 {
 	// 起動時の新着チェック
 	theApp.m_optionMng.SetBootCheckMnC(
-		IsDlgButtonChecked( IDC_BOOT_MNC_CHECK ) == BST_CHECKED ? TRUE : FALSE );
+		IsDlgButtonChecked( IDC_BOOT_MNC_CHECK ) == BST_CHECKED ? true : false );
 
 	// 引用符号
 	CString mark;
