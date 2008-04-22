@@ -18,6 +18,18 @@ public:
 	Mz3GroupData() {
 	}
 
+	struct InitializeType
+	{
+		bool bUseMixi;		///< mixi
+		bool bUseTwitter;	///< Twitter
+
+		InitializeType(bool a_bUseMixi=true, bool a_bUseTwitter=true)
+			: bUseMixi(a_bUseMixi)
+			, bUseTwitter(a_bUseTwitter)
+		{
+		}
+	};
+
 public:
 	/// groups から指定されたリスト種別の項目を探し、その項目を返す。
 	/// 見つからなければ NULL を返す。
@@ -46,7 +58,7 @@ public:
 		}
 	}
 
-	bool initForTopPage();
+	bool initForTopPage(const InitializeType initType);
 
 	bool appendCategoryByIniData( CGroupItem& group, const std::string& category_name, ACCESS_TYPE category_type, const char* category_url=NULL, bool bCruise=false );
 };

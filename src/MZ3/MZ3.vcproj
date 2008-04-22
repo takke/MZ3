@@ -2044,6 +2044,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ChooseClientTypeDlg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\ChooseFontDlg.cpp"
 					>
 				</File>
@@ -2383,6 +2387,10 @@
 				</File>
 				<File
 					RelativePath=".\ChooseAccessTypeDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ChooseClientTypeDlg.h"
 					>
 				</File>
 				<File

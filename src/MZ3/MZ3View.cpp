@@ -4132,8 +4132,10 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		// ダミーを削除
 		pAppendMenu->RemoveMenu( ID_APPEND_MENU_BEGIN, MF_BYCOMMAND );
 
+		// フルテンプレート生成
 		Mz3GroupData template_data;
-		template_data.initForTopPage();
+		template_data.initForTopPage(Mz3GroupData::InitializeType());
+
 		static CArray<CMenu, CMenu> subMenu;
 		subMenu.RemoveAll();
 		subMenu.SetSize( template_data.groups.size() );
@@ -5197,8 +5199,9 @@ void CMZ3View::OnAppendCategoryMenu(UINT nID)
 {
 	int idx = nID - ID_APPEND_MENU_BEGIN;
 
+	// フルテンプレート生成
 	Mz3GroupData template_data;
-	template_data.initForTopPage();
+	template_data.initForTopPage(Mz3GroupData::InitializeType());
 
 	int idxCounter = 0;
 	for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {

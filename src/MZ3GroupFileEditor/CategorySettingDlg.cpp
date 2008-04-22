@@ -90,8 +90,9 @@ void CCategorySettingDlg::OnBnClickedTemplateButton()
 	CMenu menu;
 	menu.LoadMenu(IDR_CATEGORY_TEMPLATE_MENU);
 
+	// フルテンプレート生成
 	Mz3GroupData template_data;
-	template_data.initForTopPage();
+	template_data.initForTopPage(Mz3GroupData::InitializeType());
 
 	// メニュー生成
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
@@ -121,8 +122,9 @@ void CCategorySettingDlg::OnTemplateMenuItems(UINT nID)
 {
 	int idx = nID - ID_CATEGORY_TEMPLATE_START;
 
+	// フルテンプレート生成
 	Mz3GroupData template_data;
-	template_data.initForTopPage();
+	template_data.initForTopPage(Mz3GroupData::InitializeType());
 
 	int idxCounter = 0;
 	for (int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {

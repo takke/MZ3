@@ -69,6 +69,7 @@
 #define IDC_STATIC_9                    209
 #define IDD_OPTIONTAB_TWITTER           209
 #define IDC_STATIC_10                   210
+#define IDD_CHOOSE_CLIENT_TYPE_DIALOG   210
 #define IDC_STATIC_11                   211
 #define IDC_STATIC_12                   212
 #define IDC_STATIC_13                   213
@@ -122,8 +123,10 @@
 #define IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK 1035
 #define IDC_USE_AUTOCONNECTION_CHECK    1035
 #define IDC_CONTINUE_CHECK              1035
+#define IDC_SERVICE_TYPE_MIXI_CHECK     1035
 #define IDC_USE_LEFTSOFTKEY_CHECK       1036
 #define IDC_DEBUG_MODE_CHECK            1036
+#define IDC_SERVICE_TYPE_TWITTER_CHECK  1036
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
@@ -296,7 +299,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         34144
-#define _APS_NEXT_CONTROL_VALUE         1070
-#define _APS_NEXT_SYMED_VALUE           117
+#define _APS_NEXT_CONTROL_VALUE         1071
+#define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

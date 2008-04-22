@@ -14,92 +14,96 @@
  *
  * グループリストとその配下のリストの生成。
  */
-bool Mz3GroupData::initForTopPage()
+bool Mz3GroupData::initForTopPage(const InitializeType initType)
 {
 	this->groups.clear();
 
 	static CGroupItem group;
 
-	// 日記グループ
-	group.init( L"日記", L"list_diary.pl", ACCESS_GROUP_MYDIARY );
-	{
-		appendCategoryByIniData( group, "最近の日記", ACCESS_LIST_MYDIARY );
-		appendCategoryByIniData( group, "最近のコメント", ACCESS_LIST_COMMENT );
-		appendCategoryByIniData( group, "マイミク最新日記", ACCESS_LIST_DIARY );
-		appendCategoryByIniData( group, "日記コメント記入履歴", ACCESS_LIST_NEW_COMMENT );
-	}
-	this->groups.push_back( group );
-
-	// コミュニティグループ
-	group.init( L"コミュニティ", L"", ACCESS_GROUP_COMMUNITY );
-	{
-		appendCategoryByIniData( group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
-		appendCategoryByIniData( group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
-		appendCategoryByIniData( group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
-	}
-	this->groups.push_back( group );
-
-	// ニュースグループ
-	group.init( L"ニュース", L"", ACCESS_GROUP_NEWS );
-	{
-		//--- カテゴリ群の追加
-
-		struct NEWS_CATEGORY
+	if (initType.bUseMixi) {
+		// 日記グループ
+		group.init( L"日記", L"list_diary.pl", ACCESS_GROUP_MYDIARY );
 		{
-			LPCSTR title;
-			LPCSTR url;
-		};
-		NEWS_CATEGORY news_list[] = {
-			{"注目のピックアップ",    "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn"	},
-			{"国内",				  "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1"	},
-			{"政治",				  "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1"	},
-			{"経済",				  "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1"	},
-			{"地域",				  "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1"	},
-			{"海外",				  "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1"	},
-			{"スポーツ",			  "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1"	},
-			{"エンターテインメント",  "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1"	},
-			{"IT",					  "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1"	},
-			{"ゲーム・アニメ",		  "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1"	},
-			{"コラム",				  "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1"	},
-			{NULL, NULL}
-		};
-
-		for( int i=0; news_list[i].title != NULL; i++ ) {
-			appendCategoryByIniData( group, news_list[i].title, ACCESS_LIST_NEWS, news_list[i].url );
+			appendCategoryByIniData( group, "最近の日記", ACCESS_LIST_MYDIARY );
+			appendCategoryByIniData( group, "最近のコメント", ACCESS_LIST_COMMENT );
+			appendCategoryByIniData( group, "マイミク最新日記", ACCESS_LIST_DIARY );
+			appendCategoryByIniData( group, "日記コメント記入履歴", ACCESS_LIST_NEW_COMMENT );
 		}
-	}
-	this->groups.push_back( group );
+		this->groups.push_back( group );
 
-	// メッセージグループ
-	group.init( L"メッセージ", L"", ACCESS_GROUP_MESSAGE );
-	{
-		appendCategoryByIniData( group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
-		appendCategoryByIniData( group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
-	}
-	this->groups.push_back( group );
+		// コミュニティグループ
+		group.init( L"コミュニティ", L"", ACCESS_GROUP_COMMUNITY );
+		{
+			appendCategoryByIniData( group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
+			appendCategoryByIniData( group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
+			appendCategoryByIniData( group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
+		}
+		this->groups.push_back( group );
 
-	// その他グループ
-	group.init( L"その他", L"", ACCESS_GROUP_OTHERS );
-	{
-		appendCategoryByIniData( group, "マイミク一覧", ACCESS_LIST_FRIEND );
-		appendCategoryByIniData( group, "紹介文", ACCESS_LIST_INTRO );
-		appendCategoryByIniData( group, "足あと", ACCESS_LIST_FOOTSTEP );
-		appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
-		appendCategoryByIniData( group, "ブックマーク", ACCESS_LIST_BOOKMARK );
-		appendCategoryByIniData( group, "お気に入りユーザー", ACCESS_LIST_FAVORITE, "list_bookmark.pl" );
-		appendCategoryByIniData( group, "お気に入りコミュ", ACCESS_LIST_FAVORITE, "list_bookmark.pl?kind=community" );
-	}
-	this->groups.push_back( group );
+		// ニュースグループ
+		group.init( L"ニュース", L"", ACCESS_GROUP_NEWS );
+		{
+			//--- カテゴリ群の追加
 
-	// Twitterグループ
-	group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
-	{
-		appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
-		appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
-		appendCategoryByIniData( group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
-		appendCategoryByIniData( group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
+			struct NEWS_CATEGORY
+			{
+				LPCSTR title;
+				LPCSTR url;
+			};
+			NEWS_CATEGORY news_list[] = {
+				{"注目のピックアップ",    "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn"	},
+				{"国内",				  "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1"	},
+				{"政治",				  "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1"	},
+				{"経済",				  "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1"	},
+				{"地域",				  "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1"	},
+				{"海外",				  "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1"	},
+				{"スポーツ",			  "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1"	},
+				{"エンターテインメント",  "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1"	},
+				{"IT",					  "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1"	},
+				{"ゲーム・アニメ",		  "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1"	},
+				{"コラム",				  "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1"	},
+				{NULL, NULL}
+			};
+
+			for( int i=0; news_list[i].title != NULL; i++ ) {
+				appendCategoryByIniData( group, news_list[i].title, ACCESS_LIST_NEWS, news_list[i].url );
+			}
+		}
+		this->groups.push_back( group );
+
+		// メッセージグループ
+		group.init( L"メッセージ", L"", ACCESS_GROUP_MESSAGE );
+		{
+			appendCategoryByIniData( group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
+			appendCategoryByIniData( group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
+		}
+		this->groups.push_back( group );
+
+		// その他グループ
+		group.init( L"その他", L"", ACCESS_GROUP_OTHERS );
+		{
+			appendCategoryByIniData( group, "マイミク一覧", ACCESS_LIST_FRIEND );
+			appendCategoryByIniData( group, "紹介文", ACCESS_LIST_INTRO );
+			appendCategoryByIniData( group, "足あと", ACCESS_LIST_FOOTSTEP );
+			appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
+			appendCategoryByIniData( group, "ブックマーク", ACCESS_LIST_BOOKMARK );
+			appendCategoryByIniData( group, "お気に入りユーザー", ACCESS_LIST_FAVORITE, "list_bookmark.pl" );
+			appendCategoryByIniData( group, "お気に入りコミュ", ACCESS_LIST_FAVORITE, "list_bookmark.pl?kind=community" );
+		}
+		this->groups.push_back( group );
 	}
-	this->groups.push_back( group );
+
+	if (initType.bUseTwitter) {
+		// Twitterグループ
+		group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
+		{
+			appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
+			appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
+			appendCategoryByIniData( group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
+			appendCategoryByIniData( group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
+		}
+		this->groups.push_back( group );
+	}
 
 	return true;
 }

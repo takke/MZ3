@@ -71,15 +71,15 @@ inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, int& targetValue
 		}
 	}
 }
-void SyncIniValue(inifile::IniFile& inifile, bool bSave, bool& targetValue, const char* key, const char* section)
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, bool& targetValue, const char* key, const char* section)
 {
 	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
 }
-void SyncIniValue(inifile::IniFile& inifile, bool bSave, CString& targetValue, const char* key, const char* section)
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, CString& targetValue, const char* key, const char* section)
 {
 	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
 }
-void SyncIniValue(inifile::IniFile& inifile, bool bSave, int& targetValue, const char* key, const char* section)
+inline void SyncIniValue(inifile::IniFile& inifile, bool bSave, int& targetValue, const char* key, const char* section)
 {
 	SyncIniValue(inifile, bSave, targetValue, key, section, targetValue);
 }
@@ -91,7 +91,7 @@ void Option::Sync(bool bSave)
 {
 	inifile::IniFile inifile;
 
-	// èâä˙èàóù
+	//--- èâä˙èàóù
 	if (bSave) {
 		// ï€ë∂éûÇÃèâä˙èàóù
 	} else {
@@ -108,6 +108,10 @@ void Option::Sync(bool bSave)
 		}
 	}
 
+	//--- General
+	SyncIniValue(inifile, bSave, (int&)m_StartupMessageDoneType, "StartupMessageDoneType", "General" );
+	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
+
 	//--- Proxy
 	SyncIniValue(inifile, bSave, m_bUseProxy,		"Use",			  "Proxy");
 	SyncIniValue(inifile, bSave, m_bUseGlobalProxy, "UseGlobalProxy", "Proxy");
@@ -122,9 +126,6 @@ void Option::Sync(bool bSave)
 
 	//--- Boot
 	SyncIniValue(inifile, bSave, m_bBootCheckMnC, "CheckMnC", "Boot");
-
-	//--- General
-	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
 
 	//--- UI
 	// îwåiâÊëúÇÃóLñ≥

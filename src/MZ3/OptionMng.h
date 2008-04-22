@@ -16,6 +16,15 @@ namespace option {
  */
 class Option
 {
+public:
+	/// 起動時のメッセージの表示済みフラグ
+	enum STARTUP_MESSAGE_DONE_TYPE
+	{
+		STARTUP_MESSAGE_DONE_TYPE_NONE = 0,				///< 何も表示していない
+		STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED = 1,	///< Twitterモード追加時のメッセージ表示済
+	};
+	STARTUP_MESSAGE_DONE_TYPE	m_StartupMessageDoneType;	///< 起動時のメッセージの表示済みフラグ
+
 private:
 	bool			m_bDebugMode;			///< デバッグモード
 	bool			m_bUseAutoConnection;	///< 自動接続を使う？
@@ -170,6 +179,7 @@ public:
 		, m_bAutoLoadMiniImage( true )
 		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
+		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
 	{
 	}
 

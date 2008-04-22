@@ -763,6 +763,18 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,103,10
 END
 
+IDD_CHOOSE_CLIENT_TYPE_DIALOG DIALOGEX 0, 0, 187, 116
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "クライアントタイプの選択"
+FONT 9, "ＭＳ Ｐゴシック"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,74,95,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,130,95,50,14
+    LTEXT           "MZ3/4は下記のサービスに対応しています。\r\n利用したいサービスを選んでOKボタンを押して下さい。\r\n\r\n注意：これまでに設定していたタブの設定が初期化されるのでご注意下さい。",IDC_STATIC,7,7,173,48
+    CONTROL         "mixi",IDC_SERVICE_TYPE_MIXI_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,60,28,10
+    CONTROL         "Twitter",IDC_SERVICE_TYPE_TWITTER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,74,37,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1015,6 +1027,14 @@ BEGIN
         RIGHTMARGIN, 132
         TOPMARGIN, 7
         BOTTOMMARGIN, 141
+    END
+
+    IDD_CHOOSE_CLIENT_TYPE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 109
     END
 END
 #endif    // APSTUDIO_INVOKED

@@ -24,6 +24,7 @@
 #include "MZ3Parser.h"
 #include "MouseGestureManager.h"
 #include "MZ3FileCacheManager.h"
+#include "ChooseClientTypeDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -179,8 +180,37 @@ BOOL CMZ3App::InitInstance()
 
 		// 初期化
 		MZ3LOGGER_INFO( L"タブ初期化" );
-		m_root.initForTopPage();
+		// クライアント選択画面を表示
+		CChooseClientTypeDlg dlg;
+		if (dlg.DoModal()==IDOK) {
+			// 設定された内容で初期化
+			m_root.initForTopPage(dlg.m_initType);
+		}
+
 		theApp.SaveGroupData();
+	}
+
+	// 移行処理（タブの初期化）
+	switch (m_optionMng.m_StartupMessageDoneType) {
+	case option::Option::STARTUP_MESSAGE_DONE_TYPE_NONE:
+		{
+			// クライアント選択画面を表示
+			CChooseClientTypeDlg dlg;
+			if (dlg.DoModal()==IDOK) {
+				// 設定された内容で初期化
+				m_root.initForTopPage(dlg.m_initType);
+			}
+
+			// 次回以降は表示しない
+			m_optionMng.m_StartupMessageDoneType = option::Option::STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED;
+			theApp.SaveGroupData();
+		}
+		break;
+
+	case option::Option::STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED:
+	default:
+		// 最新のため移行処理なし
+		break;
 	}
 
 	CSingleDocTemplate* pDocTemplate;

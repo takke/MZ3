@@ -13,6 +13,7 @@
 #include "ReportView.h"
 #include "ChooseFontDlg.h"
 #include "util.h"
+#include "ChooseClientTypeDlg.h"
 
 #ifndef SMARTPHONE2003_UI_MODEL
 
@@ -103,7 +104,13 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 	}
 
 	// 初期化
-	theApp.m_root.initForTopPage();
+//	theApp.m_root.initForTopPage();
+	// クライアント選択画面を表示
+	CChooseClientTypeDlg dlg;
+	if (dlg.DoModal()==IDOK) {
+		// 設定された内容で初期化
+		theApp.m_root.initForTopPage(dlg.m_initType);
+	}
 
 	// グループ定義ファイルの保存
 	theApp.SaveGroupData();
