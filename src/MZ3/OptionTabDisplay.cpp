@@ -110,6 +110,8 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 	if (dlg.DoModal()==IDOK) {
 		// 設定された内容で初期化
 		theApp.m_root.initForTopPage(dlg.m_initType);
+	} else {
+		return;
 	}
 
 	// グループ定義ファイルの保存
