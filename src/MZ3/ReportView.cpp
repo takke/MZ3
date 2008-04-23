@@ -464,6 +464,10 @@ void CReportView::SetData(const CMixiData& data)
 		m_list.SetItem(idx, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
 		// Date 列 : 先頭項目には初期版から表示していない。必要であれば、下記をコメントアウトすること。
 //		m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetDate(), 0, 0, 0, 0);
+		if( !m_data.GetopeningRange().IsEmpty() ) {
+			m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetopeningRange() , 0, 0, 0, 0);
+		}
+
 		// ItemData に CMixiData* を与える
 		m_list.SetItemData(0, (DWORD_PTR)&m_data);
 	}
@@ -519,7 +523,10 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 	// 書体を変更して1行目を描画
 	bodyStrArray->Add(L"<blue>");
-	bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate());
+	bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate() );
+	if( !data->GetopeningRange().IsEmpty() ) {
+		bodyStrArray->Add( L"　【" + data->GetopeningRange() + L"】" );
+	}
 	bodyStrArray->Add(L"</blue>");
 	bodyStrArray->Add(L"<br>");
 

@@ -559,6 +559,22 @@ public:
 				MZ3LOGGER_ERROR( util::FormatString( L"日時の取得エラー : %s", e.getMessage().c_str()) );
 			}
 
+			// 公開範囲の取得
+			try {
+				// /html/body/div[2]/div/div[2]/div[2]/div/dl/dd
+				const xml2stl::Node& img = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													  .getNode(L"div", L"class=viewDiaryBox")
+													  .getNode(L"div", L"class=listDiaryTitle")
+													  .getNode(L"dl")
+													  .getNode(L"dt")
+													  .getNode(L"img");
+
+				data_.SetopeningRange( img.getProperty(L"alt").c_str() );
+
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"公開範囲の取得エラー : %s", e.getMessage().c_str()) );
+			}
+
 			// 日記の著者
 			try {
 				// 自分の日記なら「XXXの日記」、自分以外なら「XXXさんの日記」のはず。
@@ -623,7 +639,7 @@ public:
 				// script タグの除去
 				{
 					static MyRegex reg;
-					if( !util::CompileRegex( reg, L"<script.*?>" ) ) {
+					if( !util::CompileRegex( reg, L"<script *type=\"[^\"]*\">" ) ) {
 						return false;
 					}
 					if( subHtml.Find( L"<script" ) != -1 ) 

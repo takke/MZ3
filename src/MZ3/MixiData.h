@@ -33,6 +33,7 @@ protected:
 	int				m_commentIndex;			///< コメント番号
 	int				m_commentCount;			///< コメントの数
 	CONTENT_TYPE	m_contentType;			///< Content-Type
+	CString			m_openingRange;			///< 公開範囲
 
 	int				m_ownerId;				///< オーナーID（投稿者IDに設定される場合もある）
 
@@ -167,6 +168,9 @@ public:
 	void	AddBody(CString str)		{ m_bodyArray.push_back(str); }
 	LPCTSTR GetBody(int idx) const		{ return m_bodyArray[idx]; }
 	size_t	GetBodySize() const			{ return m_bodyArray.size(); }
+
+	void SetopeningRange(CString range)	{ m_openingRange = range; }
+	CString GetopeningRange()			{ return m_openingRange; }
 
 	//--- 子要素操作
 	void	AddChild(const CMixiData& child)
