@@ -469,21 +469,30 @@ public:
 		//<embed src="http://www.youtube.com/v/xxx" type="application/x-shockwave-flash" wmode="transparent" 
 		//width="450" height="373"></embed></object></div>');
 #define LINE_HAS_YOUTUBE_LINK(line)		util::LineHasStringsNoCase( line, L"<embed", L"src=", L"youtube.com" )
-		//if (LINE_HAS_YOUTUBE_LINK(str)) {
-		//	ExtractYoutubeVideoLink( str, *data );
-		//}
+		// GoogleMapの抽出(下記が複数行で存在する)
+		//map.push({
+		//  map_id : "map_1",
+		//	size   : { width : 480, height : 480 },
+		//  url    : { embed : "http://maps.google.co.jp/maps?spn=xxxx,xxxx&ie=UTF8&ll=xx,xx&output=embed&z=15&s=xx", link : "http://maps.google.co.jp/maps?source=embed&spn=xxx,xxx&ie=UTF8&ll=xxx,xxx&z=15" }
+		//});
+#define LINE_HAS_GOOGLEMAP_LINK(line)	util::LineHasStringsNoCase( line, L"url", L"embed", L"maps.google.co.jp" )
+		// ニコニコ動画リンクの抽出(下記が1行で存在する)
+		//<script type="text/javascript" src="http://ext.nicovideo.jp/thumb_watch/smxxxxxxxx?w=450&h=357&n=1" charset="utf-8"></script>
+#define LINE_HAS_NICOVIDEO_LINK(line)	util::LineHasStringsNoCase( line, L"<script", L"src=", L"ext.nicovideo.jp" )
 
 		// リンクの抽出
 		if ( ( str.Find( L"href" ) != -1 ) ||
 			 (str.Find( L"ttp://" ) != -1) ||
-			 LINE_HAS_YOUTUBE_LINK(str)) {
+			 LINE_HAS_YOUTUBE_LINK(str) ||
+			 LINE_HAS_GOOGLEMAP_LINK(str) ||
+			 LINE_HAS_NICOVIDEO_LINK(str)) {
 			ExtractURI( str, *data );
 		}
 
 		// 2ch 形式のリンク抽出
-		if( str.Find( L"ttp://" ) != -1 ) {
-			//Extract2chURL( str, *data );
-		}
+		//if( str.Find( L"ttp://" ) != -1 ) {
+		//	//Extract2chURL( str, *data );
+		//}
 	}
 
 	/**
@@ -876,50 +885,50 @@ alt="" /></a></td>
 	 * また、line から該当する動画リンクを削除する。
 	 * → ExtractURI()に吸収
 	 */
-	static void ExtractYoutubeVideoLink(CString& line, CMixiData& data_)
-	{
+	//static void ExtractYoutubeVideoLink(CString& line, CMixiData& data_)
+	//{
 
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
-			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-			return;
-		}
+	//	// 正規表現のコンパイル（一回のみ）
+	//	static MyRegex reg;
+	//	if( !util::CompileRegex( reg, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
+	//		MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+	//		return;
+	//	}
 
-		CString target = line;
-		line = L"";
-		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			if( !reg.exec(target) || reg.results.size() != 2 ) {
-				// 未発見。
-				// 残りの文字列を代入して終了。
-				line += target;
-				break;
-			}
+	//	CString target = line;
+	//	line = L"";
+	//	for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+	//		if( !reg.exec(target) || reg.results.size() != 2 ) {
+	//			// 未発見。
+	//			// 残りの文字列を代入して終了。
+	//			line += target;
+	//			break;
+	//		}
 
-			// 発見。
-			std::vector<MyRegex::Result>& results = reg.results;
+	//		// 発見。
+	//		std::vector<MyRegex::Result>& results = reg.results;
 
-			// マッチ文字列全体の左側を出力
-			line.Append( target, results[0].start );
+	//		// マッチ文字列全体の左側を出力
+	//		line.Append( target, results[0].start );
 
-			CString text = L"<<Youtube動画>>";
+	//		CString text = L"<<Youtube動画>>";
 
-			// url を追加
-			LPCTSTR url = results[1].str.c_str();
-			
-			//動画を追加
-			data_.m_linkList.push_back( CMixiData::Link(url,url) );
+	//		// url を追加
+	//		LPCTSTR url = results[1].str.c_str();
+	//		
+	//		//動画を追加
+	//		data_.m_linkList.push_back( CMixiData::Link(url,url) );
 
-			// 置換
-			line.Append( L"<_a>" + text + L"</_a>" );
+	//		// 置換
+	//		line.Append( L"<_a>" + text + L"</_a>" );
 
-			// とりあえず改行
-			line += _T("<br>");
+	//		// とりあえず改行
+	//		line += _T("<br>");
 
-			// ターゲットを更新。
-			target.Delete( 0, results[0].end );
-		}
-	}
+	//		// ターゲットを更新。
+	//		target.Delete( 0, results[0].end );
+	//	}
+	//}
 
 public:
 	/**
@@ -927,6 +936,7 @@ public:
 	 * また、href="url" を list_ に追加する。
 	 * さらに、2ch 形式のURL(ttp://...)も抽出し、正規化して data のリンクリストに追加する。
 	 * YouTube動画リンクも抽出する
+	 * GoogleMapリンクも抽出する
 	 */
 	static void ExtractURI( CString& str, std::vector<CMixiData::Link>& list_ )
 	{
@@ -952,17 +962,42 @@ public:
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
+		// 2ch形式リンク抽出用
 		static MyRegex reg4;
 		if( !util::CompileRegex( reg4, L"([^h]|^)(ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
+		// YouTube動画リンク抽出用
 		static MyRegex reg5;
 		if( !util::CompileRegex( reg5, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
+		// GoogleMapリンク抽出用
+		static MyRegex reg6;
+		if( !util::CompileRegex( reg6, L".*url *: \\{ embed : \"([^\"]+)\", *link *: \"([^\"]+)\" *\\}" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+		static MyRegex reg7;
+		if( !util::CompileRegex( reg7, L"map\\.push\\(\\{([^\\)]+)\\}\\);" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+		static MyRegex reg8;
+		if( !util::CompileRegex( reg8, L"Event\\.observe\\(.*\\)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+		// ニコニコ動画リンク抽出用
+		static MyRegex reg9;
+		if( !util::CompileRegex( reg9, L"<script *type=\"text/javascript\" *src=\"http://ext\\.nicovideo\\.jp/thumb_watch/([a-z0-9]*)\\?.*?\".*?>" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
 
+		// <span>タグ抽出用
 		static MyRegex regs;
 		if( !util::CompileRegex( regs, L"<span[^>]*>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
@@ -972,64 +1007,118 @@ public:
 		CString target = str;
 		str = L"";
 		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			std::vector<MyRegex::Result>* pResults = NULL;
-			u_int offset = 0;
+			int offset = -1;
+			u_int offsetend = 0;
 			std::wstring url = L"";
 			std::wstring text = L"";
 			bool bCrLf = false;
-			if( reg.exec(target) && reg.results.size() == 3 ) {
-				pResults = &reg.results;
-				offset = reg.results[0].start ;
-				url = reg.results[1].str;
-				text = reg.results[2].str;
-			}
-			if( reg2.exec(target) && reg2.results.size() == 3 ) {
-				if( pResults == NULL || ( reg2.results[0].start < offset ) ){
-					pResults = &reg2.results;
-					offset = reg2.results[0].start ;
-					url = reg2.results[1].str;
-					text = reg2.results[2].str;
+			bool bEventObserve = false;
+
+			CString regtarget = target;
+			// <a href=xx>
+			if( regtarget.Find( L"href" ) != -1 ) {
+				if( reg.exec(regtarget) && reg.results.size() == 3 ) {
+					offset = reg.results[0].start ;
+					offsetend = reg.results[0].end;
+					url = reg.results[1].str;
+					text = reg.results[2].str;
+					regtarget = regtarget.Left(offset);				// 次のサーチ範囲を限定する
+				}
+				if( reg2.exec(regtarget) && reg2.results.size() == 3 ) {
+					if( offset < 0 || ( reg2.results[0].start < offset ) ){
+						offset = reg2.results[0].start ;
+						offsetend = reg2.results[0].end;
+						url = reg2.results[1].str;
+						text = reg2.results[2].str;
+						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					}
+				}
+				if( reg3.exec(regtarget) && reg3.results.size() == 3 ) {
+					if( offset < 0 || ( reg3.results[0].start < offset ) ){
+						offset = reg3.results[0].start ;
+						offsetend = reg3.results[0].end;
+						url = reg3.results[1].str;
+						text = reg3.results[2].str;
+						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					}
 				}
 			}
-			if( reg3.exec(target) && reg3.results.size() == 3 ) {
-				if( pResults == NULL || ( reg3.results[0].start < offset ) ){
-					pResults = &reg3.results;
-					offset = reg3.results[0].start ;
-					url = reg3.results[1].str;
-					text = reg3.results[2].str;
+			// 2ch URL
+			if( regtarget.Find( L"ttp://" ) != -1 ) {
+				if( reg4.exec(regtarget) && reg4.results.size() == 3 ) {
+					// 2ch URL
+					if( offset < 0 || ( reg4.results[2].start < offset ) ){
+						offset = reg4.results[2].start;
+						offsetend = reg4.results[0].end;
+						// 2ch URL を正規化
+						url = L"h";
+						url += reg4.results[2].str;
+						text = reg4.results[2].str;
+						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					}
 				}
 			}
-			if( reg4.exec(target) && reg4.results.size() == 3 ) {
-				// 2ch URL
-				if( pResults == NULL || ( reg4.results[2].start < offset ) ){
-					pResults = &reg4.results;
-					offset = reg4.results[2].start;
-					// 2ch URL を正規化
-					url = L"h";
-					url += reg4.results[2].str;
-					text = reg4.results[2].str;
+			// YouTube動画リンク
+			if( LINE_HAS_YOUTUBE_LINK(regtarget) ) {
+				if( reg5.exec(regtarget) && reg5.results.size() == 2 ) {
+					if( offset < 0 || ( reg5.results[0].start < offset ) ){
+						// YouTube動画リンク
+						offset = reg5.results[0].start ;
+						offsetend = reg5.results[0].end;
+						url = reg5.results[1].str;
+						text = L"<<Youtube動画>>";
+						bCrLf = true;					// YouTubeリンクの場合は改行する
+						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					}
 				}
 			}
-			if( reg5.exec(target) && reg5.results.size() == 2 ) {
-				if( pResults == NULL || ( reg5.results[0].start < offset ) ){
-					// YouTube動画リンク
-					pResults = &reg5.results;
-					offset = reg5.results[0].start ;
-					url = reg5.results[1].str;
-					text = L"<<Youtube動画>>";
-					bCrLf = true;					// YouTubeリンクの場合は改行する
+			// GoogleMapリンク
+			if( LINE_HAS_GOOGLEMAP_LINK(regtarget) ) {
+				if( reg7.exec(regtarget) && reg7.results.size() == 2 ) {
+					// 発見。
+					if( offset < 0 || ( reg7.results[0].start < offset ) ){
+						// マッチ文字列の中でGoogleMapリンクをさがす
+						if( reg6.exec( reg7.results[1].str.c_str() ) && reg6.results.size() == 3 ) {
+							// 発見
+							// GoogleMapリンク
+							offset = reg7.results[0].start ;
+							offsetend = reg7.results[0].end ;
+#ifndef WINCE
+							// Win32はlink:からURLを取得
+							url = reg6.results[2].str;
+#else
+							// WMはembed:からURLを取得
+							url = reg6.results[1].str;
+#endif
+							text = L"<<Googleマップ>>";
+							bCrLf = true;					// GoogleMapリンクの場合は改行する
+							bEventObserve = true;			// Event.Observeがあれば消す指示
+							regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+						}
+					}
 				}
 			}
-			if( pResults == NULL ) {
+			// ニコニコ動画リンク
+			if( LINE_HAS_NICOVIDEO_LINK(regtarget) ) {
+				if( reg9.exec(regtarget) && reg9.results.size() == 2 ) {
+					if( offset < 0 || ( reg9.results[0].start < offset ) ){
+						// ニコニコ動画リンク
+						offset = reg9.results[0].start ;
+						offsetend = reg9.results[0].end;
+						url = L"http://www.nicovideo.jp/watch/" + reg9.results[1].str;
+						text = L"<<ニコニコ動画>>";
+						bCrLf = true;					// ニコニコ動画リンクの場合は改行する
+						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					}
+				}
+			}
+			if( offset < 0 ) {
 				// 未発見。
 				// 残りの文字列を代入して終了。
 				str += target;
 				break;
 			}
 			// 発見。
-			std::vector<MyRegex::Result>& results = *pResults;
-
-
 			// マッチ文字列全体の左側を出力
 			str += target.Left( offset );
 
@@ -1059,7 +1148,16 @@ public:
 			}
 
 			// ターゲットを更新。
-			target = target.Mid( results[0].end );
+			target = target.Mid( offsetend );
+
+			if( bEventObserve ) {
+				// Event.observe(云々) があれば消す
+				if( reg8.exec(target) && reg8.results.size() != 0 ) {
+					// 発見。
+					// ターゲットを更新。
+					target.Delete( reg8.results[0].start , reg8.results[0].end );
+				}
+			}
 		}
 	}
 
@@ -1074,52 +1172,53 @@ private:
 
 	/**
 	 * 2ch 形式のURL(ttp://...)を抽出し、正規化して data のリンクリストに追加する。
+	 * → ExtractURI()に吸収
 	 */
-	static void Extract2chURL( CString& str, CMixiData& data_ )
-	{
-//		TRACE( L"Extract2chURL:str[%s]\n", (LPCTSTR)str );
-
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
-			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-			return;
-		}
-
-		CString target = str;
-		str = L"";
-		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
-			if( reg.exec(target) == false || reg.results.size() != 2 ) {
-				// 未発見。
-				// 残りの文字列を代入して終了。
-				str += target;
-				break;
-			}
-
-			// 発見。
-
-			// マッチ文字列全体の左側を出力
-			str += target.Left( reg.results[0].start + 1 );
-
-			// 2ch URL
-			const std::wstring& url_2ch = reg.results[1].str;
-			TRACE( L"regex-match-2chURL : %s\n", url_2ch.c_str() );
-
-			str += L"<_a>";
-			str += url_2ch.c_str();
-			str += L"</_a>";
-
-			// 2ch URL を正規化
-			std::wstring url = L"h";
-			url += url_2ch;
-
-			// データに追加
-			data_.m_linkList.push_back( CMixiData::Link(url.c_str(), url_2ch.c_str()) );
-
-			// ターゲットを更新。
-			target = target.Mid( reg.results[0].end );
-		}
-	}
+//	static void Extract2chURL( CString& str, CMixiData& data_ )
+//	{
+////		TRACE( L"Extract2chURL:str[%s]\n", (LPCTSTR)str );
+//
+//		// 正規表現のコンパイル（一回のみ）
+//		static MyRegex reg;
+//		if( !util::CompileRegex( reg, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+//			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+//			return;
+//		}
+//
+//		CString target = str;
+//		str = L"";
+//		for( int i=0; i<100; i++ ) {	// 100 は無限ループ防止
+//			if( reg.exec(target) == false || reg.results.size() != 2 ) {
+//				// 未発見。
+//				// 残りの文字列を代入して終了。
+//				str += target;
+//				break;
+//			}
+//
+//			// 発見。
+//
+//			// マッチ文字列全体の左側を出力
+//			str += target.Left( reg.results[0].start + 1 );
+//
+//			// 2ch URL
+//			const std::wstring& url_2ch = reg.results[1].str;
+//			TRACE( L"regex-match-2chURL : %s\n", url_2ch.c_str() );
+//
+//			str += L"<_a>";
+//			str += url_2ch.c_str();
+//			str += L"</_a>";
+//
+//			// 2ch URL を正規化
+//			std::wstring url = L"h";
+//			url += url_2ch;
+//
+//			// データに追加
+//			data_.m_linkList.push_back( CMixiData::Link(url.c_str(), url_2ch.c_str()) );
+//
+//			// ターゲットを更新。
+//			target = target.Mid( reg.results[0].end );
+//		}
+//	}
 };
 
 }

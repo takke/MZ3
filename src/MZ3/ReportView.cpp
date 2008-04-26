@@ -1456,7 +1456,15 @@ void CReportView::OnLoadUrl(UINT nID)
 	dlg.SetTitle( L"オープン方法の選択" );
 	dlg.SetMessage( msg );
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT1, L"ブラウザで開く" );
+#ifndef WINCE
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, MZ3_APP_NAME L"でダウンロード" );
+#else
+	if( _tcsstr( url , L"maps.google.co.jp" ) == NULL ){
+		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, MZ3_APP_NAME L"でダウンロード" );
+	} else {
+		dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_SELECT2, L"Google Mapsで開く" );
+	}
+#endif
 	dlg.SetButtonText( CCommonSelectDlg::BUTTONCODE_CANCEL,  L"キャンセル" );
 	if( dlg.DoModal() != IDOK ) {
 		return;
@@ -1485,6 +1493,39 @@ void CReportView::OnLoadUrl(UINT nID)
 		}
 		break;
 	case CCommonSelectDlg::BUTTONCODE_SELECT2:
+#ifdef WINCE
+		if( _tcsstr( url , L"maps.google.co.jp" ) != NULL && _tcsstr( url , L"ll=" ) != NULL ) {
+			// Google Mapsで開く
+			static MyRegex reg;
+			if( util::CompileRegex( reg, L"[&|\\?]ll=(\\-?[0-9\\.]*,\\-?[0-9\\.]*)" ) ) {
+				if( reg.exec(url) && reg.results.size() == 2 ) {
+					CString commandline = L"/Program Files/GoogleMaps/GoogleMaps.exe";
+					CString commandparam =  L"-URL \"?action=locn";
+					if( _tcsstr( url , L"t=h" ) ){
+						commandparam += "&view=satv";
+					} else {
+						commandparam += "&view=mapv";
+					}
+					commandparam += "&a=@latlon:";
+					commandparam += reg.results[1].str.c_str();
+					commandparam += L"\"";
+
+					// Google Mapsを起動
+					SHELLEXECUTEINFO sei;
+					sei.cbSize       = sizeof(sei);
+					sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
+					sei.hwnd         = 0;
+					sei.lpVerb       = _T("open");
+					sei.lpFile       = commandline;
+					sei.lpParameters = commandparam;
+					sei.lpDirectory  = NULL;
+					sei.nShow        = SW_NORMAL;
+					ShellExecuteEx(&sei);
+					break;
+				}
+			}
+		}
+#endif
 		// MZ3でダウンロード
 		{
 			m_access = TRUE;
