@@ -452,6 +452,7 @@ private:
 	bool		m_bScrollDragging;			///< スクロール中
 	int			m_offsetPixelX;				///< 横方向オフセットピクセル数
 	int			m_dPxelX;					///< 横方向単位時間移動量 [pixels/10msec]
+	DWORD		m_dwPanScrollLastTick;		///< パンスクロール開始時刻
 
 	// ダブルクリック判定情報
 	DWORD		m_dwFirstLButtonUp;			///< 最初に左クリックされた時刻

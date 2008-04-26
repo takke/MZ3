@@ -254,6 +254,7 @@ Ran2View::Ran2View()
 	, m_dPxelX(0)					// 横スクロール差分
 	, m_bPanDragging(false)			// 横ドラッグ中フラグ
 	, m_bScrollDragging(false)		// 縦ドラッグ中フラグ
+	, m_dwPanScrollLastTick(0)		// パンスクロール開始時刻
 	
 	// 描画用メンバー
 #ifndef WINCE
@@ -2072,11 +2073,11 @@ void Ran2View::StartPanDraw(PAN_SCROLL_DIRECTION direction)
 		
 		// 左へ一画面ずれたところから開始
 		m_offsetPixelX = - screenWidth;
-		// WMの場合は差分をふやして移動ステップを減らす
+		// 移動差分
 #ifndef WINCE
-		m_dPxelX = screenWidth / 15 ;
+		m_dPxelX = screenWidth / 10 ;
 #else
-		m_dPxelX = screenWidth / 5 ;
+		m_dPxelX = screenWidth / 18 ;
 #endif
 		break;
 
@@ -2085,17 +2086,20 @@ void Ran2View::StartPanDraw(PAN_SCROLL_DIRECTION direction)
 
 		// 右へ一画面ずれたところから開始
 		m_offsetPixelX = screenWidth;
-		// WMの場合は差分をふやして移動ステップを減らす
+		// 移動差分
 #ifndef WINCE
-		m_dPxelX = -screenWidth / 15 ;
+		m_dPxelX = - screenWidth / 10 ;
 #else
-		m_dPxelX = -screenWidth / 5 ;
+		m_dPxelX = - screenWidth / 18 ;
 #endif
 		break;
 	}
 
 	// パンスクロール中フラグ設定
 	m_bAutoScrolling = true;
+
+	// パンスクロール開始時刻
+	m_dwPanScrollLastTick = GetTickCount();
 
 	// パンスクロール開始
 	SetTimer( TIMERID_PANSCROLL, TIMER_INTERVAL_PANSCROLL, NULL );
@@ -2223,7 +2227,12 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 
-				OnPaint();
+				// 強制的に描画する
+				// 今のままでは次のコメントが無くても描画されてしまうので保留
+				// （実はWM_PAINTが来たら見えてしまうのは秘密だ）
+				//CDC* pDC = GetDC();
+				//DrawToScreen(pDC);
+				//ReleaseDC(pDC);
 				// 次のコメントを表示
 				::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM( 10 , 1000 ));
 			} else {
@@ -2247,7 +2256,12 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				m_memDC->SelectObject( &oldbrs );
 				brs.DeleteObject();
 
-				OnPaint();
+				// 強制的に描画する
+				// 今のままでは次のコメントが無くても描画されてしまうので保留
+				// （実はWM_PAINTが来たら見えてしまうのは秘密だ）
+				//CDC* pDC = GetDC();
+				//DrawToScreen(pDC);
+				//ReleaseDC(pDC);
 				// 前のコメントを表示
 				::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM( 10 , 0 ));
 			}
@@ -2829,6 +2843,9 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 #ifdef DEBUG
 		wprintf( L"OnTimer, TIMERID_PANSCROLL\n" );
 #endif
+		int dwDt = GetTickCount() - m_dwPanScrollLastTick;
+		m_dwPanScrollLastTick = GetTickCount();
+
 		if( m_dPxelX == 0 ) {
 			// 移動量ゼロなら無限ループ防止のため中止
 			m_offsetPixelX = 0;
@@ -2836,7 +2853,10 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(nIDEvent);
 		} else {
 			// 移動処理
-			m_offsetPixelX += m_dPxelX;
+			m_offsetPixelX += dwDt * m_dPxelX / 10;
+#ifdef DEBUG
+			wprintf( L"m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
+#endif
 			// 終了判定
 			if( m_dPxelX > 0 ){
 				if( m_offsetPixelX > 0 ){
