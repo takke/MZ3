@@ -344,4 +344,23 @@ public:
 		}
 	}
 
+	/**
+	 * タグの変換
+	 * らんらんビュータグを削除する
+	 */
+	static void RemoveRan2ViewTag( CString& string )
+	{
+		// らんらんビュータグを消去
+		while( string.Replace( L"<_a>" , L"" ) );
+		while( string.Replace( L"</_a>" , L"" ) );
+		while( string.Replace( L"<_img>" , L"" ) );
+		while( string.Replace( L"</_img>" , L"" ) );
+		while( string.Replace( L"<_mov>" , L"" ) );
+		while( string.Replace( L"</_mov>" , L"" ) );
+		while( string.Replace( L"<blockquote>" , L"" ) );
+		while( string.Replace( L"</blockquote>" , L"" ) );
+		while( string.Replace( L"<strong>" , L"" ) );
+		while( string.Replace( L"</strong>" , L"" ) );
+	}
+
 };

@@ -2024,6 +2024,9 @@ void CReportView::OnWriteComment()
 	if( quoteType != quote::QUOTETYPE_INVALID && data != NULL ) {
 		CString str = quote::MakeQuoteString( *data, quoteType );
 
+		// らんらんビュータグを消去
+		ViewFilter::RemoveRan2ViewTag( str );
+
 		((CEdit*)pWriteView->GetDlgItem(IDC_WRITE_BODY_EDIT))->SetWindowText(str);
 	}
 

@@ -12,6 +12,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "QuoteDlg.h"
+#include "ViewFilter.h"
 
 
 // CQuoteDlg ダイアログ
@@ -159,6 +160,9 @@ void CQuoteDlg::OnLbnSelchangeTypeList()
 
 	m_quoteType = (quote::QuoteType)m_typeList.GetItemData( m_typeList.GetCurSel() );
 	CString strQuote = quote::MakeQuoteString( *m_pMixi, m_quoteType );
+
+	// らんらんビュータグを消去
+	ViewFilter::RemoveRan2ViewTag( strQuote );
 
 	m_sampleEdit.SetWindowTextW( strQuote );
 }
