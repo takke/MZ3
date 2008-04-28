@@ -651,6 +651,9 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 
 		// 通知領域
 		pView->m_infoEdit.SetFont( &theApp.m_font );
+
+		// 公開範囲コンボボックス
+		pView->m_viewlimitCombo.SetFont( &theApp.m_font );
 	}
 
 	// サイズ変更

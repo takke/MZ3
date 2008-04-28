@@ -159,6 +159,7 @@ public:
 	CButton m_cancelButton;		///< キャンセルボタン
 	CWriteEdit m_bodyEdit;		///< 本文エディット
 	CEdit m_titleEdit;			///< タイトルエディット
+	CComboBox m_viewlimitCombo;	///< 公開範囲コンボボックス
 
 private:
 	BOOL m_abort;

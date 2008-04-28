@@ -170,6 +170,7 @@
 #define IDC_UPDATE_BUTTON               1067
 #define IDC_ADD_SOURCE_TEXT_ON_POST_CHECK 1068
 #define IDC_STATIC_COPYRIGHT1           1069
+#define IDC_WRITE_VIEWLIMIT_COMBO       1072
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_SETTING_LOGIN                32775
@@ -299,7 +300,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        169
 #define _APS_NEXT_COMMAND_VALUE         34144
-#define _APS_NEXT_CONTROL_VALUE         1071
+#define _APS_NEXT_CONTROL_VALUE         1073
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

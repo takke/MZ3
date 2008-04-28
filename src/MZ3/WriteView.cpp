@@ -56,6 +56,7 @@ void CWriteView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_WRITE_CANCEL_BUTTON, m_cancelButton);
 	DDX_Control(pDX, IDC_WRITE_BODY_EDIT, m_bodyEdit);
 	DDX_Control(pDX, IDC_WRITE_TITLE_EDIT, m_titleEdit);
+	DDX_Control(pDX, IDC_WRITE_VIEWLIMIT_COMBO, m_viewlimitCombo);
 }
 
 BEGIN_MESSAGE_MAP(CWriteView, CFormView)
@@ -131,6 +132,9 @@ void CWriteView::OnInitialUpdate()
 
 		// 通知領域
 		m_infoEdit.SetFont( &theApp.m_font );
+
+		// 公開範囲コンボボックス
+		m_viewlimitCombo.SetFont( &theApp.m_font );
 	}
 }
 
@@ -150,6 +154,20 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 	CFormView::OnSize(nType, cx, cy);
 
 	int hEdit = theApp.GetInfoRegionHeight(theApp.m_optionMng.m_fontHeight);
+
+	// コンボボックスの高さを取得する
+	int hCombo ;
+	if( m_viewlimitCombo.m_hWnd ) {				// 初期化前に呼ばれたりするので判定
+		// コンボボックスがある
+		// コンボボックスのサイズは自動的に決まるのでそれを取ってくる
+		RECT rct;
+		m_viewlimitCombo.GetWindowRect( &rct );
+		hCombo = rct.bottom - rct.top ;
+	} else {
+		// コンボボックスがない
+		// しょうがないのでエディットボックスの高さを採用する
+		hCombo = hEdit;
+	}
 	int yBtn  = 144;
 
 	switch( theApp.GetDisplayMode() ) {
@@ -162,13 +180,13 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 		break;
 	}
 
-	util::MoveDlgItemWindow( this, IDC_WRITE_TITLE_EDIT,       0,        0,   cx, hEdit);
-	util::MoveDlgItemWindow( this, IDC_WRITE_BODY_EDIT,        0,    hEdit,   cx, cy-hEdit*2);
-	util::MoveDlgItemWindow( this, IDC_WRITE_INFO_EDIT,        0, cy-hEdit,   cx, hEdit);
-	util::MoveDlgItemWindow( this, IDC_WRITE_SEND_BUTTON,      0, cy-hEdit, yBtn, hEdit);
-	util::MoveDlgItemWindow( this, IDC_WRITE_CANCEL_BUTTON, yBtn, cy-hEdit, yBtn, hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_TITLE_EDIT,       0,              0,   cx,             hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_VIEWLIMIT_COMBO,  0,          hEdit,   cx,            hCombo);
+	util::MoveDlgItemWindow( this, IDC_WRITE_BODY_EDIT,        0, hEdit + hCombo,   cx, cy-hEdit*2-hCombo);
+	util::MoveDlgItemWindow( this, IDC_WRITE_INFO_EDIT,        0,       cy-hEdit,   cx,             hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_SEND_BUTTON,      0,       cy-hEdit, yBtn,             hEdit);
+	util::MoveDlgItemWindow( this, IDC_WRITE_CANCEL_BUTTON, yBtn,       cy-hEdit, yBtn,             hEdit);
 }
-
 // -----------------------------------------------------------------------------
 // 書き込みボタン押下時の処理
 // -----------------------------------------------------------------------------
@@ -403,8 +421,18 @@ void CWriteView::StartEntryPost()
 			CString title;
 			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
 
+			// 公開範囲を取得する
+			CString viewlimit = L"0";
+			int iIndex = m_viewlimitCombo.GetCurSel() ;
+			if( iIndex >= 0 ) {
+				viewlimit.Format( L"%d" , m_viewlimitCombo.GetItemData( iIndex ) ); 
+#ifdef DEBUG
+				wprintf( L"viewlimit = %s\n" , viewlimit);
+#endif
+			}
+
 			// 電文の生成
-			if( !mixi::EntryDiaryGenerator::generate( *m_postData, title ) ) {
+			if( !mixi::EntryDiaryGenerator::generate( *m_postData, title , viewlimit ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -910,10 +938,12 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 {
 	m_data = pMixi;
 	m_access = FALSE;
+	int iComboIndex;
 
 	// 内容をクリア
 	SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"" );
 	SetDlgItemText( IDC_WRITE_BODY_EDIT, L"" );
+	m_viewlimitCombo.ResetContent();
 
 	// 種別を保存
 	m_writeViewType = writeViewType;
@@ -931,6 +961,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 			SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
 		}
 
+		// 公開範囲コンボボックス
+		m_viewlimitCombo.EnableWindow( false );
+
 		// フォーカス：本文から開始
 		m_bodyEdit.SetFocus();
 		break;
@@ -938,6 +971,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 	case WRITEVIEW_TYPE_NEWMESSAGE:
 		// タイトル変更：有効
 		m_titleEdit.SetReadOnly(FALSE);
+
+		// 公開範囲コンボボックス
+		m_viewlimitCombo.EnableWindow( false );
 
 		// フォーカス：タイトルから開始
 		m_titleEdit.SetFocus();
@@ -952,6 +988,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 			SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
 		}
 
+		// 公開範囲コンボボックス
+		m_viewlimitCombo.EnableWindow( false );
+
 		// フォーカス：本文から開始
 		m_bodyEdit.SetFocus();
 		break;
@@ -959,6 +998,20 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 	case WRITEVIEW_TYPE_NEWDIARY:
 		// タイトル変更：有効
 		m_titleEdit.SetReadOnly(FALSE);
+
+		// 公開範囲コンボボックス
+		iComboIndex = m_viewlimitCombo.AddString( L"標準の公開設定" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 0 );
+		iComboIndex = m_viewlimitCombo.AddString( L"非公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 1 );
+		iComboIndex = m_viewlimitCombo.AddString( L"友人まで公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 2 );
+		iComboIndex = m_viewlimitCombo.AddString( L"友人の友人まで公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 3 );
+		iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 4 );
+		m_viewlimitCombo.SetCurSel( 0 );
+		m_viewlimitCombo.EnableWindow( true );
 
 		// フォーカス：タイトルから開始
 		m_titleEdit.SetFocus();

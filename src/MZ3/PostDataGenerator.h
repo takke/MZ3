@@ -312,7 +312,7 @@ public:
 	 * @param post				CPostData オブジェクト
 	 * @param title				タイトル文字列(wchar_t)
 	 */
-	static bool generate( CPostData& post, LPCTSTR title )
+	static bool generate( CPostData& post, LPCTSTR title , LPCTSTR viewlimit)
 	{
 		// POST 電文の生成
 		post.ClearPostBody();
@@ -329,6 +329,8 @@ public:
 		post.AppendPostBody( "&diary_body=" );
 		post.AppendPostBody( post.GetComment() );
 		post.AppendPostBody( "&news_title=&news_url=&movie_id=&movie_title=&movie_url=" );
+		post.AppendPostBody( "&tag_id=" );
+		post.AppendPostBody( viewlimit );
 
 		// Content-Type: application/x-www-form-urlencoded
 		post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
