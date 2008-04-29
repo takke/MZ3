@@ -107,15 +107,23 @@ enum ACCESS_TYPE {
 	ACCESS_POST_CONFIRM_NEWDIARY,		///< 日記投稿（確認画面）
 	ACCESS_POST_ENTRY_NEWDIARY,			///< コメント投稿（書き込み画面）
 
-	//--- Twitter GET 系
-	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< friends_timeline.xml
-	ACCESS_TWITTER_DIRECT_MESSAGES,		///< direct_messages.xml
-
+	//--- Twitter Timeline 系
+	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
+	ACCESS_TWITTER_UPDATE,				///< [POST] ステータス更新
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
-	//--- Twitter POST 系
-	ACCESS_TWITTER_UPDATE,				///< ステータス更新
-	ACCESS_TWITTER_NEW_DM,				///< DM送信
+	//--- Twitter DM 系
+	ACCESS_TWITTER_DIRECT_MESSAGES,		///< [GET/POST] direct_messages.xml
+	ACCESS_TWITTER_NEW_DM,				///< [POST] DM送信
+
+	//--- Twitter Favorites 系
+	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] お気に入り取得
+	ACCESS_TWITTER_FAVOURINGS_CREATE,	///< お気に入り登録
+	ACCESS_TWITTER_FAVOURINGS_DESTROY,	///< お気に入りから外す
+
+	//--- Twitter Friend 系
+	ACCESS_TWITTER_FRIENDSHIPS_CREATE,	///< add
+	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
 	//--- その他
 	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ

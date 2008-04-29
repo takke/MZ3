@@ -374,6 +374,8 @@ public:
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
 	void MyUpdateFocus(void);
 	afx_msg void OnMenuTwitterNewDm();
+	afx_msg void OnMenuTwitterCreateFavourings();
+	afx_msg void OnMenuTwitterDestroyFavourings();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

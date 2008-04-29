@@ -99,6 +99,7 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
 		{
 			appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
 			appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
+			appendCategoryByIniData( group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
 			appendCategoryByIniData( group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
 			appendCategoryByIniData( group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
 		}
@@ -245,6 +246,13 @@ bool Mz3GroupData::appendCategoryByIniData(
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 		// タイムライン
 		default_category_url = L"http://twitter.com/statuses/friends_timeline.xml";
+		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
+		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
+		break;
+
+	case ACCESS_TWITTER_FAVORITES:
+		// お気に入り
+		default_category_url = L"http://twitter.com/favorites.xml";
 		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
 		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
 		break;

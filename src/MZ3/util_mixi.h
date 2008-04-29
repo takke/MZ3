@@ -160,11 +160,15 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 
 	// Twitter 系
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	text = L"タイムライン";	break;
+	case ACCESS_TWITTER_FAVORITES:			text = L"お気に入り";	break;
 	case ACCESS_TWITTER_DIRECT_MESSAGES:	text = L"メッセージ";	break;
 	case ACCESS_TWITTER_UPDATE:				text = L"更新";			break;
 
 	case ACCESS_TWITTER_USER:				text = L"Twitter発言";	break;
 	case ACCESS_TWITTER_NEW_DM:				text = L"メッセージ送信";	break;
+
+	case ACCESS_TWITTER_FAVOURINGS_CREATE:	text = L"お気に入り登録";	break;
+	case ACCESS_TWITTER_FAVOURINGS_DESTROY:	text = L"お気に入り削除";	break;
 
 
 	case ACCESS_INVALID:			text = L"<invalid>";			break;

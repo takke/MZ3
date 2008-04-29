@@ -162,6 +162,7 @@ LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDI
 		return _T("時刻");
 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_FAVORITES:
 	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		switch( bodyIndicateType ) {
 		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
@@ -254,6 +255,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
 	ON_COMMAND(ID_TABMENU_ADD, &CMZ3View::OnTabmenuAdd)
 	ON_COMMAND(ID_MENU_TWITTER_NEW_DM, &CMZ3View::OnMenuTwitterNewDm)
+	ON_COMMAND(ID_MENU_TWITTER_CREATE_FAVOURINGS, &CMZ3View::OnMenuTwitterCreateFavourings)
+	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FAVOURINGS, &CMZ3View::OnMenuTwitterDestroyFavourings)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1078,6 +1081,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_BBS:
 	case ACCESS_LIST_CALENDAR:
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_FAVORITES:
 	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// --------------------------------------------------
 		// カテゴリ項目の取得
@@ -1433,6 +1437,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
 			break;
 		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		case ACCESS_TWITTER_FAVORITES:
 			m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
 			break;
 		case ACCESS_TWITTER_DIRECT_MESSAGES:
@@ -1561,9 +1566,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	MoveMiniImageDlg();
 
 	// Twitter であれば同一オーナーIDの項目を再表示
-	switch (pCategory->m_mixi.GetAccessType()) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
 		static int s_lastSelectedBody = 0;
 
 		// 現在選択中の項目のオーナーID、前回選択中だった項目のオーナーIDと同一のオーナーIDを持つ項目のみ、再描画する。
@@ -1590,7 +1593,6 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		s_lastSelectedBody = pCategory->selectedBody;
-		break;
 	}
 
 	// アイコン再描画
@@ -2793,19 +2795,18 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		encoding = CInetAccess::ENCODING_UTF8;
 		break;
 
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-		// Twitter API => UTF-8
-		encoding = CInetAccess::ENCODING_UTF8;
+	default:
+		if (util::IsTwitterAccessType(data->GetAccessType())) {
+			// Twitter API => UTF-8
+			encoding = CInetAccess::ENCODING_UTF8;
+		}
 		break;
 	}
 
 	// 認証情報の設定
 	LPCTSTR szUser = NULL;
 	LPCTSTR szPassword = NULL;
-	switch (data->GetAccessType()) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	if (util::IsTwitterAccessType(data->GetAccessType())) {
 		// Twitter API => Basic 認証
 		szUser     = theApp.m_loginMng.GetTwitterId();
 		szPassword = theApp.m_loginMng.GetTwitterPassword();
@@ -2815,7 +2816,6 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
 			return;
 		}
-		break;
 	}
 
 	// アクセス開始
@@ -2828,8 +2828,9 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// GET/POST 判定
 	bool bPost = false;	// デフォルトはGET
 	switch (data->GetAccessType()) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		// タイムライン取得をPOSTにしてみる
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:		// タイムライン取得をPOSTにしてみる
+	case ACCESS_TWITTER_FAVOURINGS_CREATE:
+	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
 		bPost = true;
 		break;
 	}
@@ -3115,6 +3116,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		}
 		break;
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_FAVORITES:
 	case ACCESS_TWITTER_DIRECT_MESSAGES:
 		// 「日付」と「名前」
 		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_DATE ) {
@@ -3469,6 +3471,27 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
 					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
 				}
+			}
+
+			ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
+
+			// 「お気に入り」以外であれば「外す」メニューを無効化
+			if (categoryType != ACCESS_TWITTER_FAVORITES) {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
+			} else {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
+			}
+			// 「お気に入り」であれば「ふぁぼる」メニューを無効化
+			if (categoryType == ACCESS_TWITTER_FAVORITES) {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
+			} else {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
+			}
+			// URL が空であれば「友達のサイト」を無効化
+			if (GetSelectedBodyItem().GetURL().IsEmpty()) {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_GRAYED | MF_BYCOMMAND );
+			} else {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_ENABLED | MF_BYCOMMAND );
 			}
 
 			// メニューを開く
@@ -4105,7 +4128,6 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		case ACCESS_LIST_NEW_COMMENT:
 		case ACCESS_LIST_COMMENT:
 		case ACCESS_LIST_NEW_BBS_COMMENT:
-	//	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 			// 巡回対象なので巡回メニューを無効化しない
 			break;
 		default:
@@ -4737,11 +4759,9 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
-			switch (pCategory->m_mixi.GetAccessType()) {
-			case ACCESS_TWITTER_FRIENDS_TIMELINE:
-			case ACCESS_TWITTER_DIRECT_MESSAGES:
+			if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
 				return VIEW_STYLE_TWITTER;
-			default:
+			} else {
 				if (m_bodyList.IsEnableIcon()) {
 					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
 					if (pImageList != NULL &&
@@ -4750,7 +4770,6 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 						return VIEW_STYLE_IMAGE;
 					}
 				}
-				break;
 			}
 		}
 	}
@@ -4920,6 +4939,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	ACCESS_TYPE aType = theApp.m_accessType;
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_FAVORITES:
 	case ACCESS_TWITTER_DIRECT_MESSAGES:
 
 		// ログ保存
@@ -4936,6 +4956,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 	case ACCESS_TWITTER_UPDATE:
 	case ACCESS_TWITTER_NEW_DM:
+	case ACCESS_TWITTER_FAVOURINGS_CREATE:
+	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
 		// Twitter投稿処理
 		// HTTPステータスチェックを行う。
 		LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
@@ -4947,6 +4969,12 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			switch (aType) {
 			case ACCESS_TWITTER_NEW_DM:
 				util::MySetInformationText( m_hWnd, L"メッセージ送信終了" );
+				break;
+			case ACCESS_TWITTER_FAVOURINGS_CREATE:
+				util::MySetInformationText( m_hWnd, L"ふぁぼった！" );
+				break;
+			case ACCESS_TWITTER_FAVOURINGS_DESTROY:
+				util::MySetInformationText( m_hWnd, L"ふぁぼるのやめた！" );
 				break;
 			case ACCESS_TWITTER_UPDATE:
 			default:
@@ -5140,6 +5168,50 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	m_bodyList.Invalidate( FALSE );
 
 	return true;
+}
+
+/// お気に入り追加
+void CMZ3View::OnMenuTwitterCreateFavourings()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	static CMixiData s_data;
+	s_data.SetAccessType( ACCESS_TWITTER_FAVOURINGS_CREATE );
+
+	// URL 設定
+	CString url;
+	int id = GetSelectedBodyItem().GetID();
+	url.Format( L"http://twitter.com/favourings/create/%d.xml", id );
+	s_data.SetURL( url );
+	s_data.SetBrowseUri( url );
+
+	// 通信開始
+	AccessProc( &s_data, s_data.GetURL() );
+}
+
+/// お気に入り削除
+void CMZ3View::OnMenuTwitterDestroyFavourings()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	static CMixiData s_data;
+	s_data.SetAccessType( ACCESS_TWITTER_FAVOURINGS_DESTROY );
+
+	// URL 設定
+	CString url;
+	int id = GetSelectedBodyItem().GetID();
+	url.Format( L"http://twitter.com/favourings/destroy/%d.xml", id );
+	s_data.SetURL( url );
+	s_data.SetBrowseUri( url );
+
+	// 通信開始
+	AccessProc( &s_data, s_data.GetURL() );
 }
 
 /**
@@ -5419,11 +5491,8 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 {
 	// ステータスコードチェック
 	LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
-	switch (aType) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	if (util::IsTwitterAccessType(aType)) {
 		szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-		break;
 	}
 	if (szStatusErrorMessage!=NULL) {
 		CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);

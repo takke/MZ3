@@ -87,17 +87,31 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 }
 
 /**
+ * Twitter 用アクセス種別かどうかを返す
+ */
+inline bool IsTwitterAccessType( ACCESS_TYPE type )
+{
+	switch (type) {
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_TWITTER_FAVORITES:
+	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	case ACCESS_TWITTER_FAVOURINGS_CREATE:
+	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
+		return true;
+	default:
+		return false;
+	}
+}
+
+/**
  * mixi 用アクセス種別かどうかを返す
  */
 inline bool IsMixiAccessType( ACCESS_TYPE type )
 {
-	switch (type) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	if (IsTwitterAccessType(type)) {
 		return false;
-	default:
-		return true;
 	}
+	return true;
 }
 
 /**
@@ -395,6 +409,25 @@ inline CString MakeLogfilePath( const CMixiData& data )
 			if (util::GetAfterSubString( data.GetURL(), L"statuses/", after )<0) {
 				// default
 				filename = L"friends_timeline.xml";
+			} else {
+				after.Replace( L"/", L"_" );
+				filename = after;
+			}
+
+			return theApp.m_filepath.twitterFolder + L"\\" + filename;
+		}
+
+	case ACCESS_TWITTER_FAVORITES:
+		{
+			// http://twitter.com/favorites.xml
+			// http://twitter.com/favorites/takke.xml
+			// => twitter/favorites_takke.xml
+
+			CString filename;
+			CString after;
+			if (util::GetAfterSubString( data.GetURL(), L"favorites/", after )<0) {
+				// default
+				filename = L"favorites.xml";
 			} else {
 				after.Replace( L"/", L"_" );
 				filename = after;
