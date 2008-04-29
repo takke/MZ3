@@ -454,9 +454,9 @@ public:
 		}
 
 		// その他の画像リンクの変換
-		if( util::LineHasStringsNoCase( str, L"<img", L"src=" ) ) {
-			ExtractGeneralImageLink( str, *data );
-		}
+		//if( util::LineHasStringsNoCase( str, L"<img", L"src=" ) ) {
+		//	ExtractGeneralImageLink( str, *data );
+		//}
 
 		// 動画ファイルの抽出
 		if (str.Find( L".flv" ) != -1) {
@@ -485,7 +485,8 @@ public:
 			 (str.Find( L"ttp://" ) != -1) ||
 			 LINE_HAS_YOUTUBE_LINK(str) ||
 			 LINE_HAS_GOOGLEMAP_LINK(str) ||
-			 LINE_HAS_NICOVIDEO_LINK(str)) {
+			 LINE_HAS_NICOVIDEO_LINK(str) ||
+			 ( util::LineHasStringsNoCase( str, L"<img", L"src=" ) ) ) {
 			ExtractURI( str, *data );
 		}
 
@@ -719,52 +720,53 @@ alt="" /></a></td>
 	 *
 	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
 	 * また、str から該当する画像リンクを削除する。
+ 	 * → ExtractURI()に吸収
 	 */
-	static void ExtractGeneralImageLink(CString& line, CMixiData& data_)
-	{
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<img[^>]*src=\"([^\"]+)\" [^>]*>" ) ) {
-			return;
-		}
+	//static void ExtractGeneralImageLink(CString& line, CMixiData& data_)
+	//{
+	//	// 正規表現のコンパイル（一回のみ）
+	//	static MyRegex reg;
+	//	if( !util::CompileRegex( reg, L"<img[^>]*src=\"([^\"]+)\" [^>]*>" ) ) {
+	//		return;
+	//	}
 
-		CString target = line;
-		line = L"";
-		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-			if( !reg.exec(target) || reg.results.size() != 2 ) {
-				// 未発見。
-				// 残りの文字列を代入して終了。
-				line += target;
-				break;
-			}
+	//	CString target = line;
+	//	line = L"";
+	//	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
+	//		if( !reg.exec(target) || reg.results.size() != 2 ) {
+	//			// 未発見。
+	//			// 残りの文字列を代入して終了。
+	//			line += target;
+	//			break;
+	//		}
 
-			// 発見。
-			std::vector<MyRegex::Result>& results = reg.results;
+	//		// 発見。
+	//		std::vector<MyRegex::Result>& results = reg.results;
 
-			// マッチ文字列全体の左側を出力
-			line.Append( target, results[0].start );
+	//		// マッチ文字列全体の左側を出力
+	//		line.Append( target, results[0].start );
 
-			// class="emoji" が含まれていれば、絵文字と判断し、無視する。
-			if( util::LineHasStringsNoCase( results[0].str.c_str(), L"class=\"emoji\"" ) ) {
-				line.Append( results[0].str.c_str() );
-			} else {
-				CString text = L"<<画像>>";
-				// url を追加
-				LPCTSTR url = results[1].str.c_str();
-				data_.m_linkList.push_back( CMixiData::Link(url, text) );
+	//		// class="emoji" が含まれていれば、絵文字と判断し、無視する。
+	//		if( util::LineHasStringsNoCase( results[0].str.c_str(), L"class=\"emoji\"" ) ) {
+	//			line.Append( results[0].str.c_str() );
+	//		} else {
+	//			CString text = L"<<画像>>";
+	//			// url を追加
+	//			LPCTSTR url = results[1].str.c_str();
+	//			data_.m_linkList.push_back( CMixiData::Link(url, text) );
 
-				// 置換
-				line.Append( L"<_a>" + text + L"</_a>" );
+	//			// 置換
+	//			line.Append( L"<_a>" + text + L"</_a>" );
 
-				// とりあえず改行
-				line += _T("<br>");
-			}
+	//			// とりあえず改行
+	//			line += _T("<br>");
+	//		}
 
-			// ターゲットを更新。
-			target.Delete( 0, results[0].end );
-		}
+	//		// ターゲットを更新。
+	//		target.Delete( 0, results[0].end );
+	//	}
 
-	}
+	//}
 
 	/**
 	 * 動画変換。
@@ -937,6 +939,7 @@ public:
 	 * さらに、2ch 形式のURL(ttp://...)も抽出し、正規化して data のリンクリストに追加する。
 	 * YouTube動画リンクも抽出する
 	 * GoogleMapリンクも抽出する
+	 * <img>タグからの画像リンクも抽出する
 	 */
 	static void ExtractURI( CString& str, std::vector<CMixiData::Link>& list_ )
 	{
@@ -997,6 +1000,12 @@ public:
 			return;
 		}
 
+		// <img>タグ抽出用
+		static MyRegex reg10;
+		if( !util::CompileRegex( reg10, L"<img[^>]*src=\"([^\"]+)\"[^>]*>" ) ) {
+			return;
+		}
+
 		// <span>タグ抽出用
 		static MyRegex regs;
 		if( !util::CompileRegex( regs, L"<span[^>]*>" ) ) {
@@ -1011,6 +1020,8 @@ public:
 			u_int offsetend = 0;
 			std::wstring url = L"";
 			std::wstring text = L"";
+			std::wstring url2 = L"";
+			std::wstring text2 = L"";
 			bool bCrLf = false;
 			bool bEventObserve = false;
 
@@ -1025,29 +1036,29 @@ public:
 					regtarget = regtarget.Left(offset);				// 次のサーチ範囲を限定する
 				}
 				if( reg2.exec(regtarget) && reg2.results.size() == 3 ) {
-					if( offset < 0 || ( reg2.results[0].start < offset ) ){
+					//if( offset < 0 || ( reg2.results[0].start < offset ) ){
 						offset = reg2.results[0].start ;
 						offsetend = reg2.results[0].end;
 						url = reg2.results[1].str;
 						text = reg2.results[2].str;
 						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
-					}
+					//}
 				}
 				if( reg3.exec(regtarget) && reg3.results.size() == 3 ) {
-					if( offset < 0 || ( reg3.results[0].start < offset ) ){
+					//if( offset < 0 || ( reg3.results[0].start < offset ) ){
 						offset = reg3.results[0].start ;
 						offsetend = reg3.results[0].end;
 						url = reg3.results[1].str;
 						text = reg3.results[2].str;
 						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
-					}
+					//}
 				}
 			}
 			// 2ch URL
 			if( regtarget.Find( L"ttp://" ) != -1 ) {
 				if( reg4.exec(regtarget) && reg4.results.size() == 3 ) {
 					// 2ch URL
-					if( offset < 0 || ( reg4.results[2].start < offset ) ){
+					//if( offset < 0 || ( reg4.results[2].start < offset ) ){
 						offset = reg4.results[2].start;
 						offsetend = reg4.results[0].end;
 						// 2ch URL を正規化
@@ -1055,13 +1066,13 @@ public:
 						url += reg4.results[2].str;
 						text = reg4.results[2].str;
 						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
-					}
+					//}
 				}
 			}
 			// YouTube動画リンク
 			if( LINE_HAS_YOUTUBE_LINK(regtarget) ) {
 				if( reg5.exec(regtarget) && reg5.results.size() == 2 ) {
-					if( offset < 0 || ( reg5.results[0].start < offset ) ){
+					//if( offset < 0 || ( reg5.results[0].start < offset ) ){
 						// YouTube動画リンク
 						offset = reg5.results[0].start ;
 						offsetend = reg5.results[0].end;
@@ -1069,14 +1080,14 @@ public:
 						text = L"<<Youtube動画>>";
 						bCrLf = true;					// YouTubeリンクの場合は改行する
 						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
-					}
+					//}
 				}
 			}
 			// GoogleMapリンク
 			if( LINE_HAS_GOOGLEMAP_LINK(regtarget) ) {
 				if( reg7.exec(regtarget) && reg7.results.size() == 2 ) {
 					// 発見。
-					if( offset < 0 || ( reg7.results[0].start < offset ) ){
+					//if( offset < 0 || ( reg7.results[0].start < offset ) ){
 						// マッチ文字列の中でGoogleMapリンクをさがす
 						if( reg6.exec( reg7.results[1].str.c_str() ) && reg6.results.size() == 3 ) {
 							// 発見
@@ -1095,13 +1106,13 @@ public:
 							bEventObserve = true;			// Event.Observeがあれば消す指示
 							regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
 						}
-					}
+					//}
 				}
 			}
 			// ニコニコ動画リンク
 			if( LINE_HAS_NICOVIDEO_LINK(regtarget) ) {
 				if( reg9.exec(regtarget) && reg9.results.size() == 2 ) {
-					if( offset < 0 || ( reg9.results[0].start < offset ) ){
+					//if( offset < 0 || ( reg9.results[0].start < offset ) ){
 						// ニコニコ動画リンク
 						offset = reg9.results[0].start ;
 						offsetend = reg9.results[0].end;
@@ -1109,6 +1120,46 @@ public:
 						text = L"<<ニコニコ動画>>";
 						bCrLf = true;					// ニコニコ動画リンクの場合は改行する
 						regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+					//}
+				}
+			}
+			// <img>画像リンク
+			if( regtarget.Find( L"<img" ) != -1 ) {
+				if( reg10.exec(regtarget) && reg10.results.size() == 2 ) {
+					//if( offset < 0 || ( reg10.results[0].start < offset ) ){
+						// class="emoji" が含まれていれば、絵文字と判断し、無視する。
+						if( util::LineHasStringsNoCase( reg10.results[0].str.c_str(), L"class=\"emoji\"" ) ) {
+						} else {
+							// <img>画像リンク
+							offset = reg10.results[0].start ;
+							offsetend = reg10.results[0].end;
+							url = reg10.results[1].str;
+							CString csWork;
+							csWork.Format( L"<<link%02d(画像)>>" , list_.size() + 1 );
+							text = csWork;
+							bCrLf = true;					// <img>画像リンクの場合は改行する
+							regtarget = regtarget.Left(offset);			// 次のサーチ範囲を限定する
+						}
+					//}
+				}
+			}
+			// リンクテキストの中に<img>があれば抽出する
+			{
+				regtarget = text.c_str();
+				if( regtarget.Find( L"<img" ) != -1 ) {
+					if( reg10.exec(regtarget) && reg10.results.size() == 2 ) {
+						// class="emoji" が含まれていれば、絵文字と判断し、無視する。
+						if( util::LineHasStringsNoCase( reg10.results[0].str.c_str(), L"class=\"emoji\"" ) ) {
+						} else {
+							// <img>画像リンク
+							CString csWork;
+							csWork.Format( L"<<link%02d>>" , list_.size() + 1 );
+							text = csWork;
+							csWork.Format( L"<<link%02d(link%02dの画像)>>" , list_.size() + 2 , list_.size() + 1 );
+							url2 = reg10.results[1].str;
+							text2 = csWork;
+							bCrLf = true;					// <img>画像リンクの場合は改行する
+						}
 					}
 				}
 			}
@@ -1132,15 +1183,28 @@ public:
 			str += L"</_a>";
 
 			// データに追加
-			// span,strong タグの除去
+			// span,strong,br タグの除去
 			CString csText = text.c_str();
 			if( csText.Find( L"<span" ) != -1 ) 
 				regs.replaceAll( csText, L"" );
 			while( csText.Replace(_T("</span>"), _T("")) );
 			while( csText.Replace(_T("<strong>"), _T("")) );
 			while( csText.Replace(_T("</strong>"), _T("")) );
+			while( csText.Replace(_T("<br>"), _T("")) );
+			while( csText.Replace(_T("<br />"), _T("")) );
 
 			list_.push_back( CMixiData::Link(url.c_str(),csText) );
+
+			// リンク内に画像リンクがあればデータに追加
+			if( url2 != L"" ){
+				// 文字列
+				str += L":<_a>";
+				str += text2.c_str();
+				str += L"</_a>";
+
+				// データに追加
+				list_.push_back( CMixiData::Link(url2.c_str(),text2.c_str() ) );
+			}
 
 			// 改行
 			if( bCrLf ){
