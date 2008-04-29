@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "../MZ3/constants.h"
 #include "../MZ3/MyRegex.h"
 #include "../MZ3/xml2stl.h"
 
