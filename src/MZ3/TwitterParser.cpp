@@ -27,7 +27,7 @@ bool TwitterParserBase::ExtractLinks(CMixiData &data_)
 		target.Append( data_.GetBody(i) );
 	}
 
-	for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–hŽ~
+	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 		if( reg.exec(target) == false || reg.results.size() != 2 ) {
 			// –¢”­Œ©BI—¹B
 			break;

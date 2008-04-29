@@ -97,7 +97,7 @@ public:
 		std::wstring rest = target;
 		target = L"";
 
-		for( int i=0; i<10000; i++ ) {	// 10000 は無限ループ防止
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
 			if( !this->exec(rest.c_str()) ) {
 				// 未発見。
 				// 残りの文字列を追加して終了。

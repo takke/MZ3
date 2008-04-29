@@ -26,7 +26,7 @@ public:
 		// ((‹i‰Œ)) Œ`Ž®‚É’uŠ·‚·‚é
 		CString target = line;
 		line = L"";
-		for( int i=0; i<1000; i++ ) {	// 1000 ‚Í–³ŒÀƒ‹[ƒv–hŽ~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 			if( !reg.exec(target) || reg.results.size() != 2 ) {
 				// –¢”­Œ©B
 				// Žc‚è‚Ì•¶Žš—ñ‚ð‘ã“ü‚µ‚ÄI—¹B
@@ -69,7 +69,7 @@ public:
 		// ((‹i‰Œ)) Œ`Ž®‚É’uŠ·‚·‚é
 		CString target = line;
 		line = L"";
-		for( int i=0; i<1000; i++ ) {	// 1000 ‚Í–³ŒÀƒ‹[ƒv–hŽ~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 			if( !reg.exec(target) || reg.results.size() != 2 ) {
 				// –¢”­Œ©B
 				// Žc‚è‚Ì•¶Žš—ñ‚ð‘ã“ü‚µ‚ÄI—¹B
@@ -214,7 +214,7 @@ public:
 		// ((‹i‰Œ)) Œ`Ž®‚É’uŠ·‚·‚é
 		CString target = line;
 		line = L"";
-		for( int i=0; i<1000; i++ ) {	// 1000 ‚Í–³ŒÀƒ‹[ƒv–hŽ~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 			int emojioffset = -1;
 			int tagoffset = -1;
 			CString toTag = L"";
@@ -228,7 +228,7 @@ public:
 
 			// ƒ^ƒOŒŸõ
 			tagoffset = target.Find( L"<" );
-			for( int j=0 ; j<1000 ; j++ ){	// 1000 ‚Í–³ŒÀƒ‹[ƒv–hŽ~
+			for( int j=0 ; j<MZ3_INFINITE_LOOP_MAX_COUNT; j++ ){	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 				if( tagoffset < 0 ){
 					break;
 				}

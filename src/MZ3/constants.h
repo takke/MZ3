@@ -154,3 +154,6 @@ enum CONTENT_TYPE {
 
 /// Smartphone/Standard Edition の場合のツールバー調整分
 #define MZ3_TOOLBAR_HEIGHT	26
+
+/// 無限ループ防止用ループ最大値
+#define MZ3_INFINITE_LOOP_MAX_COUNT	100000

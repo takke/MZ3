@@ -400,7 +400,7 @@ public:
 
 		CString target = str;
 		str = L"";
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 			std::vector<MyRegex::Result>* pResults = NULL;
 			if( reg.exec(target) == false || reg.results.size() != 2 )
 			{
@@ -600,7 +600,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 		}
 
 		CString buf = str.Mid( pos );
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 
 			// ƒ^ƒOŠJn‘O‚Ü‚Å‚ğ’Ç‰Á
 			CString left;
@@ -669,7 +669,7 @@ alt="" /></a></td>
 		// ‚Æ‚è‚ ‚¦‚¸“üo—Í•¶š—ñ‚ğ‹ó‚É‚·‚éB
 		line = L"";
 
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 			if( LINE_HAS_DIARY_IMAGE(target) ) {
 
 				// ¶‘¤‚ğ‚Æ‚è‚ ‚¦‚¸o—Í
@@ -730,7 +730,7 @@ alt="" /></a></td>
 
 		CString target = line;
 		line = L"";
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 			if( !reg.exec(target) || reg.results.size() != 2 ) {
 				// –¢”­Œ©B
 				// c‚è‚Ì•¶š—ñ‚ğ‘ã“ü‚µ‚ÄI—¹B
@@ -796,7 +796,7 @@ alt="" /></a></td>
 
 		CString target = line;
 		line = L"";
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 			// player.push({‰]X});‚ğ’T‚·
 			if( !reg2.exec(target) || reg2.results.size() != 2 ) {
 				// –¢”­Œ©B
@@ -897,7 +897,7 @@ alt="" /></a></td>
 
 	//	CString target = line;
 	//	line = L"";
-	//	for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+	//	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 	//		if( !reg.exec(target) || reg.results.size() != 2 ) {
 	//			// –¢”­Œ©B
 	//			// c‚è‚Ì•¶š—ñ‚ğ‘ã“ü‚µ‚ÄI—¹B
@@ -1006,7 +1006,7 @@ public:
 
 		CString target = str;
 		str = L"";
-		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 			int offset = -1;
 			u_int offsetend = 0;
 			std::wstring url = L"";
@@ -1187,7 +1187,7 @@ private:
 //
 //		CString target = str;
 //		str = L"";
-//		for( int i=0; i<100; i++ ) {	// 100 ‚Í–³ŒÀƒ‹[ƒv–h~
+//		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–h~
 //			if( reg.exec(target) == false || reg.results.size() != 2 ) {
 //				// –¢”­Œ©B
 //				// c‚è‚Ì•¶š—ñ‚ğ‘ã“ü‚µ‚ÄI—¹B
