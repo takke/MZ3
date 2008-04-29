@@ -376,6 +376,8 @@ public:
 	afx_msg void OnMenuTwitterNewDm();
 	afx_msg void OnMenuTwitterCreateFavourings();
 	afx_msg void OnMenuTwitterDestroyFavourings();
+	afx_msg void OnMenuTwitterCreateFriendships();
+	afx_msg void OnMenuTwitterDestroyFriendships();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -170,6 +170,9 @@ inline LPCTSTR AccessType2Message( ACCESS_TYPE type )
 	case ACCESS_TWITTER_FAVOURINGS_CREATE:	text = L"お気に入り登録";	break;
 	case ACCESS_TWITTER_FAVOURINGS_DESTROY:	text = L"お気に入り削除";	break;
 
+	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:	text = L"フォロー登録";	break;
+	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:text = L"フォロー解除";	break;
+
 
 	case ACCESS_INVALID:			text = L"<invalid>";			break;
 	default:						text = L"<unknown>";			break;

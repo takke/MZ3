@@ -380,6 +380,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "お気に入り登録（ふぁぼる）",               ID_MENU_TWITTER_CREATE_FAVOURINGS
         MENUITEM "お気に入り削除",                     ID_MENU_TWITTER_DESTROY_FAVOURINGS
+        MENUITEM "フォローする",                      ID_MENU_TWITTER_CREATE_FRIENDSHIPS
+        MENUITEM "フォローやめる",                     ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
         MENUITEM SEPARATOR
         MENUITEM "友達のタイムライン",                   ID_MENU_TWITTER_FRIEND_TIMELINE
         MENUITEM "友達のタイムライン(with others)",      ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS

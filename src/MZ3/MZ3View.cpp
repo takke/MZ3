@@ -257,6 +257,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_NEW_DM, &CMZ3View::OnMenuTwitterNewDm)
 	ON_COMMAND(ID_MENU_TWITTER_CREATE_FAVOURINGS, &CMZ3View::OnMenuTwitterCreateFavourings)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FAVOURINGS, &CMZ3View::OnMenuTwitterDestroyFavourings)
+	ON_COMMAND(ID_MENU_TWITTER_CREATE_FRIENDSHIPS, &CMZ3View::OnMenuTwitterCreateFriendships)
+	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FRIENDSHIPS, &CMZ3View::OnMenuTwitterDestroyFriendships)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -2831,6 +2833,8 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:		// タイムライン取得をPOSTにしてみる
 	case ACCESS_TWITTER_FAVOURINGS_CREATE:
 	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
+	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
+	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
 		bPost = true;
 		break;
 	}
@@ -3475,17 +3479,17 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 
 			ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
 
-			// 「お気に入り」以外であれば「外す」メニューを無効化
-			if (categoryType != ACCESS_TWITTER_FAVORITES) {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
-			} else {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
-			}
-			// 「お気に入り」であれば「ふぁぼる」メニューを無効化
+			// 「お気に入り」であれば「外す」メニューを有効化
 			if (categoryType == ACCESS_TWITTER_FAVORITES) {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
 			} else {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
+			}
+			// 「ステータス」であれば「ふぁぼる」メニューを無効化
+			if (categoryType == ACCESS_TWITTER_FRIENDS_TIMELINE) {
 				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
+			} else {
+				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
 			}
 			// URL が空であれば「友達のサイト」を無効化
 			if (GetSelectedBodyItem().GetURL().IsEmpty()) {
@@ -4958,6 +4962,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_TWITTER_NEW_DM:
 	case ACCESS_TWITTER_FAVOURINGS_CREATE:
 	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
+	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
+	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
 		// Twitter投稿処理
 		// HTTPステータスチェックを行う。
 		LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
@@ -4975,6 +4981,12 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				break;
 			case ACCESS_TWITTER_FAVOURINGS_DESTROY:
 				util::MySetInformationText( m_hWnd, L"ふぁぼるのやめた！" );
+				break;
+			case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
+				util::MySetInformationText( m_hWnd, L"フォローした！" );
+				break;
+			case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
+				util::MySetInformationText( m_hWnd, L"フォローやめた！" );
 				break;
 			case ACCESS_TWITTER_UPDATE:
 			default:
@@ -5207,6 +5219,62 @@ void CMZ3View::OnMenuTwitterDestroyFavourings()
 	CString url;
 	int id = GetSelectedBodyItem().GetID();
 	url.Format( L"http://twitter.com/favourings/destroy/%d.xml", id );
+	s_data.SetURL( url );
+	s_data.SetBrowseUri( url );
+
+	// 通信開始
+	AccessProc( &s_data, s_data.GetURL() );
+}
+
+/// フォローする
+void CMZ3View::OnMenuTwitterCreateFriendships()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	static CMixiData s_data;
+	s_data.SetAccessType( ACCESS_TWITTER_FRIENDSHIPS_CREATE );
+
+	CMixiData& item = GetSelectedBodyItem();
+	CString msg = util::FormatString(L"%s さんをフォローします。よろしいですか？", (LPCTSTR)item.GetName());
+	if (MessageBox(msg, NULL, MB_YESNO)!=IDYES) {
+		return;
+	}
+
+	// URL 設定
+	CString url;
+	int id = item.GetOwnerID();
+	url.Format( L"http://twitter.com/friendships/create/%d.xml", id );
+	s_data.SetURL( url );
+	s_data.SetBrowseUri( url );
+
+	// 通信開始
+	AccessProc( &s_data, s_data.GetURL() );
+}
+
+/// フォローやめる
+void CMZ3View::OnMenuTwitterDestroyFriendships()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	static CMixiData s_data;
+	s_data.SetAccessType( ACCESS_TWITTER_FRIENDSHIPS_DESTROY );
+
+	CMixiData& item = GetSelectedBodyItem();
+	CString msg = util::FormatString(L"%s さんのフォローを解除します。よろしいですか？", (LPCTSTR)item.GetName());
+	if (MessageBox(msg, NULL, MB_YESNO)!=IDYES) {
+		return;
+	}
+
+	// URL 設定
+	CString url;
+	int id = item.GetOwnerID();
+	url.Format( L"http://twitter.com/friendships/destroy/%d.xml", id );
 	s_data.SetURL( url );
 	s_data.SetBrowseUri( url );
 
@@ -5607,3 +5675,4 @@ void CMZ3View::MyUpdateFocus(void)
 		break;
 	}
 }
+
