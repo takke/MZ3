@@ -45,7 +45,6 @@ BOOL COpenUrlDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  ここに初期化を追加してください
 	int idx = 0;
 	idx = mc_comboEncoding.InsertString( idx, L"UTF-8" );
 	mc_comboEncoding.SetItemData( idx++, CInetAccess::ENCODING_UTF8 );
@@ -62,7 +61,6 @@ BOOL COpenUrlDlg::OnInitDialog()
 
 void COpenUrlDlg::OnOK()
 {
-	// TODO: ここに特定なコードを追加するか、もしくは基本クラスを呼び出してください。
 	m_encoding = mc_comboEncoding.GetItemData( mc_comboEncoding.GetCurSel() );
 
 	CDialog::OnOK();
