@@ -378,6 +378,8 @@ public:
 	afx_msg void OnMenuTwitterDestroyFavourings();
 	afx_msg void OnMenuTwitterCreateFriendships();
 	afx_msg void OnMenuTwitterDestroyFriendships();
+	void MyOpenLocalFile(void);
+	void MyOpenUrl(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

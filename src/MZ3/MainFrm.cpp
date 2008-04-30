@@ -17,6 +17,7 @@
 #include "MZ3View.h"
 #include "Ran2View.h"
 #include "UserDlg.h"
+
 #include "util.h"
 #include "util_gui.h"
 #include "url_encoder.h"
@@ -74,6 +75,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_DESTROY()
 	ON_WM_MOVE()
 	ON_COMMAND(ID_DOWNLOAD_MANAGER_VIEW, &CMainFrame::OnDownloadManagerView)
+	ON_COMMAND(ID_MENU_OPEN_URL, &CMainFrame::OnMenuOpenUrl)
+	ON_COMMAND(ID_MENU_OPEN_LOCAL_FILE, &CMainFrame::OnMenuOpenLocalFile)
 END_MESSAGE_MAP()
 
 
@@ -1123,4 +1126,28 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 #endif
 
 	return CFrameWnd::PreTranslateMessage(pMsg);
+}
+
+/**
+ * 任意のURLを開く
+ */
+void CMainFrame::OnMenuOpenUrl()
+{
+	// メインビュー表示
+	theApp.ChangeView(theApp.m_pMainView);
+
+	// 委譲
+	theApp.m_pMainView->MyOpenUrl();
+}
+
+/**
+ * 任意のローカルファイルを開く
+ */
+void CMainFrame::OnMenuOpenLocalFile()
+{
+	// メインビュー表示
+	theApp.ChangeView(theApp.m_pMainView);
+
+	// 委譲
+	theApp.m_pMainView->MyOpenLocalFile();
 }

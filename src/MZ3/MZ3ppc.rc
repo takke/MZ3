@@ -132,10 +132,12 @@ BEGIN
             MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
             MENUITEM "改版履歴",                        ID_HISTORY_MENU
             MENUITEM "バージョン情報...",                  ID_APP_ABOUT
-            POPUP "デバッグ情報"
+            POPUP "デバッグツール"
             BEGIN
                 MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
                 MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
+                MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
+                MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
             END
         END
         MENUITEM SEPARATOR
@@ -361,10 +363,12 @@ BEGIN
         MENUITEM "MZ4 ヘルプ",                     ID_HELP_MENU
         MENUITEM "改版履歴",                        ID_HISTORY_MENU
         MENUITEM "バージョン情報...",                  ID_APP_ABOUT
-        POPUP "デバッグ情報"
+        POPUP "デバッグツール"
         BEGIN
             MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
             MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
+            MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
+            MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
         END
     END
 END

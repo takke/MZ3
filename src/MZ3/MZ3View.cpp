@@ -17,11 +17,11 @@
 #include "DownloadView.h"
 #include "MainFrm.h"
 #include "WriteView.h"
-#include "ChooseAccessTypeDlg.h"
-#include "OpenUrlDlg.h"
 #include "CommonEditDlg.h"
 #include "MiniImageDialog.h"
 #include "MouseGestureManager.h"
+#include "OpenUrlDlg.h"
+#include "ChooseAccessTypeDlg.h"
 
 // ユーティリティ関連
 #include "HtmlArray.h"
@@ -1655,62 +1655,16 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	case 'D':
 		// Ctrl+Alt+D
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
-			WCHAR szFile[MAX_PATH] = L"\0";
-
-			OPENFILENAME ofn;
-			memset( &(ofn), 0, sizeof(ofn) );
-			ofn.lStructSize = sizeof(ofn);
-			ofn.hwndOwner = m_hWnd;
-			ofn.lpstrFile = szFile;
-			ofn.nMaxFile = MAX_PATH; 
-			ofn.lpstrTitle = L"HTMLﾌｧｲﾙを開く...";
-			ofn.lpstrFilter = L"HTMLﾌｧｲﾙ (*.htm;*.html)\0*.htm;*.html\0\0";
-			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
-			ofn.lpstrInitialDir = L"";
-
-			if (GetOpenFileName(&ofn) == IDOK) {
-				CString strLogfilePath = szFile;
-
-				// アクセス種別の選択
-				CChooseAccessTypeDlg dlg;
-				if (dlg.DoModal() == IDOK) {
-					// 解析
-					static CMixiData s_mixi;
-					s_mixi.SetAccessType( dlg.m_selectedAccessType );
-					MyParseMixiHtml( strLogfilePath, s_mixi );
-
-					// URL 設定
-					s_mixi.SetBrowseUri( util::CreateMixiUrl(s_mixi.GetURL()) );
-
-					// 表示
-					MyShowReportView( s_mixi );
-				}
-			}
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			pMainFrame->OnMenuOpenLocalFile();
 		}
 		break;
 
 	case 'U':
 		// Ctrl+Alt+U
 		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(VK_MENU) & 0x8000)) {
-			COpenUrlDlg dlg;
-			if (dlg.DoModal() == IDOK) {
-
-				CInetAccess::ENCODING encoding = (CInetAccess::ENCODING)dlg.m_encoding;
-
-				// アクセス種別の選択
-				CChooseAccessTypeDlg dlg1;
-				if (dlg1.DoModal() == IDOK) {
-					static CMixiData s_mixi;
-					s_mixi.SetAccessType( dlg1.m_selectedAccessType );
-
-					// URL 設定
-					s_mixi.SetURL( dlg.mc_strUrl );
-					s_mixi.SetBrowseUri( dlg.mc_strUrl );
-
-					// 通信開始
-					AccessProc( &s_mixi, s_mixi.GetURL(), encoding );
-				}
-			}
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			pMainFrame->OnMenuOpenUrl();
 		}
 		break;
 
@@ -5676,3 +5630,66 @@ void CMZ3View::MyUpdateFocus(void)
 	}
 }
 
+/**
+ * 任意のURLを開く
+ */
+void CMZ3View::MyOpenUrl(void)
+{
+	COpenUrlDlg dlg;
+	if (dlg.DoModal() == IDOK) {
+
+		CInetAccess::ENCODING encoding = (CInetAccess::ENCODING)dlg.m_encoding;
+
+		// アクセス種別の選択
+		CChooseAccessTypeDlg dlg1;
+		if (dlg1.DoModal() == IDOK) {
+			static CMixiData s_mixi;
+			s_mixi.SetAccessType( dlg1.m_selectedAccessType );
+
+			// URL 設定
+			s_mixi.SetURL( dlg.mc_strUrl );
+			s_mixi.SetBrowseUri( dlg.mc_strUrl );
+
+			// 通信開始
+			AccessProc( &s_mixi, s_mixi.GetURL(), encoding );
+		}
+	}
+}
+
+/**
+ * 任意のローカルファイルを開く
+ */
+void CMZ3View::MyOpenLocalFile(void)
+{
+	WCHAR szFile[MAX_PATH] = L"\0";
+
+	OPENFILENAME ofn;
+	memset( &(ofn), 0, sizeof(ofn) );
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = m_hWnd;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = MAX_PATH; 
+	ofn.lpstrTitle = L"HTMLﾌｧｲﾙを開く...";
+	ofn.lpstrFilter = L"HTMLﾌｧｲﾙ (*.htm;*.html)\0*.htm;*.html\0\0";
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
+	ofn.lpstrInitialDir = L"";
+
+	if (GetOpenFileName(&ofn) == IDOK) {
+		CString strLogfilePath = szFile;
+
+		// アクセス種別の選択
+		CChooseAccessTypeDlg dlg;
+		if (dlg.DoModal() == IDOK) {
+			// 解析
+			static CMixiData s_mixi;
+			s_mixi.SetAccessType( dlg.m_selectedAccessType );
+			MyParseMixiHtml( strLogfilePath, s_mixi );
+
+			// URL 設定
+			s_mixi.SetBrowseUri( util::CreateMixiUrl(s_mixi.GetURL()) );
+
+			// 表示
+			MyShowReportView( s_mixi );
+		}
+	}
+}
