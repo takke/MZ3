@@ -83,7 +83,9 @@ void Login::Write()
 	// ----------------------------------------
 	// エンコード処理
 	// ----------------------------------------
-	if (m_loginMail.GetLength() == 0 && m_loginPwd.GetLength() == 0) {
+	if (m_loginMail.GetLength() == 0 && m_loginPwd.GetLength() == 0 &&
+		m_twitterId.GetLength() == 0 && m_twitterPwd.GetLength() == 0)
+	{
 		return;
 	}
 

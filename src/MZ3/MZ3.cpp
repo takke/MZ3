@@ -300,8 +300,9 @@ BOOL CMZ3App::InitInstance()
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
-	if( wcslen(m_loginMng.GetEmail()) == 0 ||
-		wcslen(m_loginMng.GetPassword()) == 0 )
+	if ((wcslen(m_loginMng.GetEmail()) == 0 && wcslen(m_loginMng.GetPassword()) == 0) &&
+		(wcslen(m_loginMng.GetTwitterId()) == 0 && wcslen(m_loginMng.GetTwitterPassword()) == 0)
+		)
 	{
 		CString msg;
 		msg += MZ3_APP_NAME;
