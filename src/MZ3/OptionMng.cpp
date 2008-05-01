@@ -299,6 +299,12 @@ void Option::Sync(bool bSave)
 	// らんらんビューのパンスクロール
 	SyncIniValue(inifile, bSave, m_bUseRan2PanScrollAnimation, "UseRan2PanScrollAnimation", "UI" );
 
+	// 横ドラッグでの項目移動
+	SyncIniValue(inifile, bSave, m_bUseRan2HorizontalDragMove, "UseRan2HorizontalDragMove", "UI" );
+
+	// ダブルクリックでの項目移動
+	SyncIniValue(inifile, bSave, m_bUseRan2DoubleClickMove, "UseRan2DoubleClickMove", "UI" );
+
 	// スキン名
 	SyncIniValue(inifile, bSave, m_strSkinname, "SkinName", "UI" );
 

@@ -106,6 +106,8 @@ public:
 	int				m_reportScrollLine;			///< レポート画面のスクロール行数
 	
 	bool			m_bUseRan2PanScrollAnimation;	///< らんらんビューのパンスクロールアニメーション
+	bool			m_bUseRan2HorizontalDragMove;	///< 横ドラッグでの項目移動
+	bool			m_bUseRan2DoubleClickMove;		///< ダブルクリックでの項目移動
 
 	//--- メイン画面
 	bool			m_bShowMainViewIcon;		///< トピック等にアイコンを表示する？
@@ -177,10 +179,12 @@ public:
 		, m_bShowMainViewMiniImage( true )
 		, m_bShowMainViewMiniImageDlg( false )
 		, m_bShowMainViewMiniImageOnMouseOver( false )
+		, m_bUseRan2DoubleClickMove( false )
 #else
 		, m_bShowMainViewMiniImage( true )
 		, m_bShowMainViewMiniImageDlg( true )
 		, m_bShowMainViewMiniImageOnMouseOver( true )
+		, m_bUseRan2DoubleClickMove( true )
 #endif
 		, m_bAutoLoadMiniImage( true )
 		, m_nMainViewMiniImageSize( 50 )
@@ -188,6 +192,7 @@ public:
 		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
 		, m_nTwitterStatusLineCount(2)
 		, m_bUseRan2PanScrollAnimation( true )
+		, m_bUseRan2HorizontalDragMove( true )
 		, m_bAutoDownloadEmojiImageFiles( true )
 	{
 	}

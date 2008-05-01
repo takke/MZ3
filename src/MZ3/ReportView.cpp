@@ -602,6 +602,8 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 	// らんらんビューオプション設定
 	m_detailView->m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
+	m_detailView->m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
+	m_detailView->m_bUseDoubleClickMove = theApp.m_optionMng.m_bUseRan2DoubleClickMove;
 
 	// スクロールバーが不要な時は隠す
 	m_vScrollbar.ShowWindow(SW_HIDE);

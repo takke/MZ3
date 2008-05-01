@@ -367,6 +367,8 @@ public:
 	//--- 外部から変更可能なオプション
 	//--- TODO: アクセッサを用意すべき
 	bool		m_bUsePanScrollAnimation;		///< パンスクロール時のアニメーション
+	bool		m_bUseHorizontalDragMove;	///< 横ドラッグでの項目移動
+	bool		m_bUseDoubleClickMove;		///< ダブルクリックでの項目移動
 
 private:
 	DECLARE_DYNAMIC(Ran2View)

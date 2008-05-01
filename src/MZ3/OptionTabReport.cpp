@@ -67,6 +67,12 @@ BOOL COptionTabReport::OnInitDialog()
 	// らんらんビューのパンスクロール
 	CheckDlgButton( IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK, theApp.m_optionMng.m_bUseRan2PanScrollAnimation ? BST_CHECKED : BST_UNCHECKED );
 
+	// 横ドラッグでの項目移動
+	CheckDlgButton( IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2HorizontalDragMove ? BST_CHECKED : BST_UNCHECKED );
+
+	// ダブルクリックでの項目移動
+	CheckDlgButton( IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2DoubleClickMove ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -93,6 +99,12 @@ void COptionTabReport::OnOK()
 
 	// らんらんビューのパンスクロール
 	theApp.m_optionMng.m_bUseRan2PanScrollAnimation = (IsDlgButtonChecked(IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK) == BST_CHECKED) ? true : false;
+
+	// 横ドラッグでの項目移動
+	theApp.m_optionMng.m_bUseRan2HorizontalDragMove = (IsDlgButtonChecked(IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK) == BST_CHECKED) ? true : false;
+
+	// ダブルクリックでの項目移動
+	theApp.m_optionMng.m_bUseRan2DoubleClickMove = (IsDlgButtonChecked(IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK) == BST_CHECKED) ? true : false;
 
 	CPropertyPage::OnOK();
 }

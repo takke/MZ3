@@ -655,6 +655,10 @@ BEGIN
     GROUPBOX        "スクロール",IDC_STATIC,7,7,125,46
     CONTROL         "項目切り替え時にアニメーションする",IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,122,10
+    CONTROL         "左右スライドで項目を切り替える",IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,79,125,14
+    CONTROL         "ダブルクリックで項目を切り替える",IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,125,12
 END
 
 IDD_COMMON_SELECT_DIALOG DIALOG  0, 0, 137, 132

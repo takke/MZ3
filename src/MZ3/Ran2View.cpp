@@ -2198,12 +2198,15 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
 	} else {
 		// ドラッグ完了
-#ifndef WINCE
-		m_dwFirstLButtonUp = GetTickCount();
-#else
-		// WMの場合ダブルクリック判定しない
-		m_dwFirstLButtonUp = 0;
-#endif
+
+		if( m_bUseDoubleClickMove ) {
+			// オプションがonならばダブルクリック判定
+			m_dwFirstLButtonUp = GetTickCount();
+		} else {
+			// オプションがoffの場合ダブルクリック判定しない
+			m_dwFirstLButtonUp = 0;
+		}
+
 		m_ptFirstLButtonUp = point;
 
 		if( m_bPanDragging ){ 
@@ -2666,7 +2669,8 @@ void Ran2View::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 
 	} else {
 		// ドラッグ方向が確定していない
-		if( abs(dx) > abs(dy) && abs(dx) > screenWidth / 3) {
+		if( m_bUseHorizontalDragMove &&
+			( abs(dx) > abs(dy) && abs(dx) > screenWidth / 3 ) ) {
 			// 横方向の移動量が大きくて移動量が画面の1/3以上の場合
 			// 横ドラッグ開始
 			m_bPanDragging = true;
