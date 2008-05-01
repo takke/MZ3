@@ -365,6 +365,11 @@ void Option::Sync(bool bSave)
 
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
+	SyncIniValue(inifile, bSave, m_nTwitterStatusLineCount, "TwitterStatusLineCount", "Twitter");
+	if (!bSave) {
+		// normalize
+		m_nTwitterStatusLineCount = normalizeTwitterStatusLineCount(m_nTwitterStatusLineCount);
+	}
 
 	// èIóπèàóù
 	if (bSave) {

@@ -116,6 +116,7 @@ private:
 public:
 	//--- Twitter
 	bool			m_bAddSourceTextOnTwitterPost;	///< 文末に *MZ3* マークをつける
+	int				m_nTwitterStatusLineCount;		///< Twitterモード時のステータス行数
 
 public:
 	Option()
@@ -180,6 +181,7 @@ public:
 		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
+		, m_nTwitterStatusLineCount(2)
 	{
 	}
 
@@ -286,6 +288,11 @@ public:
 	/// 定期取得間隔の正規化
 	static int normalizeIntervalCheckSec( int sec ) {
 		return normalizeRange( sec, 10, 600 );
+	}
+
+	/// Twitterモード時のステータス行数
+	static int normalizeTwitterStatusLineCount( int n ) {
+		return normalizeRange( n, 2, 3 );
 	}
 };
 

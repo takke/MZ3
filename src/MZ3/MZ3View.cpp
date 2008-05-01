@@ -690,9 +690,9 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		}
 		hPost = rectUpdateButton.Height();
 #ifdef WINCE
-		hInfo = (int)(hInfoBase * 1.8);
+		hInfo = (int)(hInfoBase * (1+0.8*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #else
-		hInfo = (int)(hInfoBase * 1.5);
+		hInfo = (int)(hInfoBase * (1+0.5*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #endif
 		break;
 	}
