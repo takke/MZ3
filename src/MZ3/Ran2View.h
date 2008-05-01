@@ -363,6 +363,11 @@ using namespace Ran2;
  */
 class Ran2View : public CWnd
 {
+public:
+	//--- 外部から変更可能なオプション
+	//--- TODO: アクセッサを用意すべき
+	bool		m_bUsePanScrollAnimation;		///< パンスクロール時のアニメーション
+
 private:
 	DECLARE_DYNAMIC(Ran2View)
 	int			currentDPI;				///< DPI値

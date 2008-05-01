@@ -293,6 +293,9 @@ void Option::Sync(bool bSave)
 		m_reportScrollLine = normalizeRange( m_reportScrollLine, 1, 100 );
 	}
 
+	// らんらんビューのパンスクロール
+	SyncIniValue(inifile, bSave, m_bUseRan2PanScrollAnimation, "UseRan2PanScrollAnimation", "UI" );
+
 	// スキン名
 	SyncIniValue(inifile, bSave, m_strSkinname, "SkinName", "UI" );
 

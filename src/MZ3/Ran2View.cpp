@@ -2065,6 +2065,11 @@ LRESULT Ran2View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
  */
 void Ran2View::StartPanDraw(PAN_SCROLL_DIRECTION direction)
 {
+	if (!m_bUsePanScrollAnimation) {
+		// オプションでオフになっているので無視する
+		return;
+	}
+
 	KillTimer( TIMERID_PANSCROLL );
 
 	switch (direction) {

@@ -600,6 +600,9 @@ void CReportView::ShowCommentData(CMixiData* data)
 	bodyStrArray->RemoveAll();
 	delete bodyStrArray;
 
+	// らんらんビューオプション設定
+	m_detailView->m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
+
 	// スクロールバーが不要な時は隠す
 	m_vScrollbar.ShowWindow(SW_HIDE);
 	int viewLineCount = m_detailView->GetViewLineMax();
@@ -751,7 +754,9 @@ BOOL CReportView::CommandMoveUpList()
 		}
 	}
 
-	m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
+	if (theApp.m_optionMng.m_bUseRan2PanScrollAnimation) {
+		m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
+	}
 
 	return TRUE;
 }
@@ -788,7 +793,9 @@ BOOL CReportView::CommandMoveDownList()
 		}
 	}
 
-	m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
+	if (theApp.m_optionMng.m_bUseRan2PanScrollAnimation) {
+		m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
+	}
 
 	return TRUE;
 }
@@ -1060,7 +1067,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					// 一番上の項目選択中なので、一番下に移動
 					CommandMoveToLastList();
 
-					m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
+					if (theApp.m_optionMng.m_bUseRan2PanScrollAnimation) {
+						m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_RIGHT);
+					}
 
 					return true;
 				} else {
@@ -1088,7 +1097,9 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 					// 一番下の項目選択中なので、一番上に移動
 					CommandMoveToFirstList();
 
-					m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
+					if (theApp.m_optionMng.m_bUseRan2PanScrollAnimation) {
+						m_detailView->StartPanDraw(Ran2View::PAN_SCROLL_DIRECTION_LEFT);
+					}
 
 					return TRUE;
 				} else {

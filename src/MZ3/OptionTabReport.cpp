@@ -64,6 +64,9 @@ BOOL COptionTabReport::OnInitDialog()
 	// スクロール行数
 	SetDlgItemText( IDC_SCROLL_LINE_EDIT, (LPCTSTR)util::int2str(theApp.m_optionMng.m_reportScrollLine) );
 
+	// らんらんビューのパンスクロール
+	CheckDlgButton( IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK, theApp.m_optionMng.m_bUseRan2PanScrollAnimation ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -87,6 +90,9 @@ void COptionTabReport::OnOK()
 	// スクロール行数
 	theApp.m_optionMng.m_reportScrollLine
 		= option::Option::normalizeRange( GetDlgItemInt( IDC_SCROLL_LINE_EDIT ), 1, 100 );
+
+	// らんらんビューのパンスクロール
+	theApp.m_optionMng.m_bUseRan2PanScrollAnimation = (IsDlgButtonChecked(IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK) == BST_CHECKED) ? true : false;
 
 	CPropertyPage::OnOK();
 }
