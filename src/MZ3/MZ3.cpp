@@ -348,21 +348,29 @@ BOOL CMZ3App::InitInstance()
 		}
 	}
 	// 未ダウンロードファイルがあればダウンロードマネージャに登録、起動
-	bool bHasNoDownloadedEmojiFile = false;
-	for (size_t i=0; i<m_emoji.size(); i++) {
-		EmojiMap& emoji = m_emoji[i];
-		CString path = util::MakeImageLogfilePathFromUrl( emoji.url );
-		if (!util::ExistFile(path)) {
-			DownloadItem item( emoji.url, emoji.text, path, true );
-			m_pDownloadView->AppendDownloadItem( item );
-			bHasNoDownloadedEmojiFile = true;
+	if (theApp.m_optionMng.m_bAutoDownloadEmojiImageFiles) {
+		bool bHasNoDownloadedEmojiFile = false;
+		for (size_t i=0; i<m_emoji.size(); i++) {
+			EmojiMap& emoji = m_emoji[i];
+			CString path = util::MakeImageLogfilePathFromUrl( emoji.url );
+			if (!util::ExistFile(path)) {
+				DownloadItem item( emoji.url, emoji.text, path, true );
+				m_pDownloadView->AppendDownloadItem( item );
+				bHasNoDownloadedEmojiFile = true;
+			}
 		}
-	}
-	if (bHasNoDownloadedEmojiFile) {
-		CString msg;
-		msg += "絵文字ファイルをダウンロードしますか？";
-		if (MessageBox( m_pMainView->GetSafeHwnd(), msg, MZ3_APP_NAME, MB_YESNO ) == IDYES) {
-			ChangeView( m_pDownloadView );
+		if (bHasNoDownloadedEmojiFile) {
+			CString msg;
+			msg += "絵文字ファイルをダウンロードしますか？";
+			if (MessageBox( m_pMainView->GetSafeHwnd(), msg, MZ3_APP_NAME, MB_YESNO ) == IDYES) {
+				ChangeView( m_pDownloadView );
+			} else {
+				msg = L"次回起動時に絵文字ファイルをダウンロードしますか？";
+				if (MessageBox( m_pMainView->GetSafeHwnd(), msg, MZ3_APP_NAME, MB_YESNO ) != IDYES) {
+					theApp.m_optionMng.m_bAutoDownloadEmojiImageFiles = false;
+					theApp.m_optionMng.Save();
+				}
+			}
 		}
 	}
 

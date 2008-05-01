@@ -95,6 +95,8 @@ public:
 	int				m_lastTopPageTabIndex;		///< 前回終了時のタブのインデックス
 	int				m_lastTopPageCategoryIndex;	///< 前回終了時のカテゴリのインデックス
 
+	bool			m_bAutoDownloadEmojiImageFiles;		///< 起動時に絵文字ファイルを自動取得する
+
 	//--- レポート画面
 	enum REPORT_SCROLL_TYPE {
 		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
@@ -186,6 +188,7 @@ public:
 		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
 		, m_nTwitterStatusLineCount(2)
 		, m_bUseRan2PanScrollAnimation( true )
+		, m_bAutoDownloadEmojiImageFiles( true )
 	{
 	}
 

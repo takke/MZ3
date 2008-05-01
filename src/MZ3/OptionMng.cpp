@@ -112,6 +112,9 @@ void Option::Sync(bool bSave)
 	SyncIniValue(inifile, bSave, (int&)m_StartupMessageDoneType, "StartupMessageDoneType", "General" );
 	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
 
+	// 起動時に絵文字ファイルを自動取得する
+	SyncIniValue(inifile, bSave, m_bAutoDownloadEmojiImageFiles, "AutoDownloadEmojiImageFiles", "General" );
+
 	//--- Proxy
 	SyncIniValue(inifile, bSave, m_bUseProxy,		"Use",			  "Proxy");
 	SyncIniValue(inifile, bSave, m_bUseGlobalProxy, "UseGlobalProxy", "Proxy");
