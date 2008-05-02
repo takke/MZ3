@@ -4,7 +4,7 @@ KeyWord=必須設定項目
 Context=IDH_HELP71
 [Date]
 <P>* MZ4 を使うには</P>
-<P>&nbsp; MZ4 は <A href="httm://mixi.jp">mixi</A> 及び <A href="http://twitter.com/">Twitter</A> 用の専用ブラウザです<BR>&nbsp; そのため，本アプリを使用するには mixi か Twitter のアカウントが必要になります<BR>&nbsp; mixi を利用するには既存の利用者からの招待が必要です<BR>&nbsp; Twitter は自己登録制ですので，いつでもアカウントを取得することができます<BR>&nbsp; <A href="https://twitter.com/signup">こちら</A>から取得してください</P>
+<P>&nbsp; MZ4 は <A href="http://mixi.jp/">mixi</A> 及び <A href="http://twitter.com/">Twitter</A> 用の専用ブラウザです<BR>&nbsp; そのため，本アプリを使用するには mixi か Twitter のアカウントが必要になります<BR>&nbsp; mixi を利用するには既存の利用者からの招待が必要です<BR>&nbsp; Twitter は自己登録制ですので，いつでもアカウントを取得することができます<BR>&nbsp; <A href="https://twitter.com/signup">こちら</A>から取得してください</P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/61_ClientType_Select.jpg"><IMG height=200 src="Capture/61_ClientType_Select.jpg"></FONT></A></P>
 <P>&nbsp; 初回起動時に上記画面が表示されます<BR>&nbsp; mixi，Twitter 共に使用する場合はそのまま OK を，<BR>&nbsp; 使用しないものがある場合は該当サービスのチェックを外して OK を押下してください</P>
 <P>&nbsp; 次にチェックしたサービスのアカウント登録を行います</P>
@@ -19,6 +19,6 @@ Context=IDH_HELP71
 <P>&nbsp; 連続DL にチェックをしたまま「開始」を押下するとリスト上の全てのファイルをダウンロードします<BR>&nbsp; チェックを外した場合は選択されている項目のみをダウンロードします</P>
 <P>&nbsp; また，ダウンロード確認画面で「いいえ」を選んだ場合は以下の画面が表示されます</P>
 <P><IMG src="Capture/43_ダウンローダ_次回絵文字.jpg"></P>
-<P>&nbsp; ここで「はい」を選んだ場合，次回起動時に再びダウンロード確認の画面が表示されます<BR>&nbsp; 「いいえ」を選んだ場合は以後確認画面は表示されなくなります</P>
+<P>&nbsp; ここで「はい」を選んだ場合，次回起動時に再びダウンロード確認の画面が表示されます<BR>&nbsp; 「いいえ」を選んだ場合は以後確認画面は表示されなくなります<BR>&nbsp; ※ ここで「いいえ」選び，絵文字ファイルをダウンロードしない場合，MZ4 上で絵文字の表示ができません<BR>&nbsp;&nbsp;&nbsp;&nbsp; また，「いいえ」を選んだ後に絵文字ファイルをダウンロードするには ini の編集が必要になります<BR>&nbsp;&nbsp;&nbsp;&nbsp; 編集方法は <A href="20071015212038156.htm">mz3.ini 編集</A>の【AutoDownloadEmojiImageFiles】を参照してください</P>
 <P>&nbsp; これで初期設定は終了です<BR>&nbsp; 細かい設定については<A href="20071015204230561.htm">こちら</A>をご覧ください</P>
 <P>&nbsp;</P>
