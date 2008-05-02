@@ -2398,6 +2398,31 @@ public:
 			MZ3LOGGER_ERROR( util::FormatString( L"img not found... : %s", e.getMessage().c_str()) );
 		}
 
+		// 友人関係
+		// /html/body/div[2]/div/div/div/p
+		try {
+			const xml2stl::Node& friendPath = root.getNode( L"html" )
+										   .getNode( L"body" )
+										   .getNode( L"div", 1 )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"p" , xml2stl::Property(L"class", L"friendPath"));
+			CString path = friendPath.getTextAll().c_str();
+
+			if( path != L"" ) {
+				// とりあえず改行
+				mixi.AddBody(_T("\r\n"));
+
+				// プロフィール画面に友人関係を表示する
+				ParserUtil::AddBodyWithExtract( mixi, path );
+
+				MZ3LOGGER_DEBUG( util::FormatString( L"user path : [%s]", path ) );
+			}
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"user path not found... : %s", e.getMessage().c_str()) );
+		}
+
 		// プロフィールを全て取得し、本文に設定する。
 		// /html/body/div[2]/div/div#bodyContents/div#profile/ul
 		try {
