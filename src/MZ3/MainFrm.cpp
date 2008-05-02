@@ -1008,9 +1008,11 @@ void CMainFrame::OnDestroy()
 	// 終了時の位置・サイズを保存
 	WINDOWPLACEMENT    wp;
     if (GetWindowPlacement(&wp)) {
+		CRect rc;
+		SystemParametersInfo(SPI_GETWORKAREA,0,&rc,0);
 		CString    cb;
 		cb.Format( L"%04d %04d %04d %04d", 
-			wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right, wp.rcNormalPosition.bottom);
+			rc.left + wp.rcNormalPosition.left, rc.top + wp.rcNormalPosition.top, rc.left + wp.rcNormalPosition.right, rc.top + wp.rcNormalPosition.bottom);
 		theApp.m_optionMng.m_strWindowPos = cb;
 	}
 #endif
