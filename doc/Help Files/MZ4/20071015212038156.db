@@ -11,4 +11,7 @@ Context=IDH_HELP19
 <P><FONT face="ＭＳ ゴシック">　 　・メイン画面下部ペインの列幅です<BR>　 　　MainViewBodyListCol1Ratio - タイトル<BR>　 　　MainViewBodyListCol2Ratio - 日時 (コミュニティ名など)</FONT></P>
 <P><FONT face="ＭＳ ゴシック">　 　・レポート画面のペイン幅です<BR>　 　　ReportViewBodyHeightRatio - 上部ペイン<BR>　 　　ReportViewListHeightRatio - 下部ペイン</FONT></P>
 <P><FONT face="ＭＳ ゴシック">　 　メイン画面のペイン幅です<BR>　 　　MainViewBodyListHeightRatio&nbsp;&nbsp;&nbsp;&nbsp; - 上部ペイン<BR>　 　　MainViewCategoryListHeightRatio - 下部ペイン</FONT></P>
-<P><FONT face="ＭＳ ゴシック">　 【UserAgent - ユーザエージェント】<BR>　 　UserAgent の変更を行います<BR>　 　標準では<BR>　 　　UserAgent=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)<BR>　 　となっています<BR></FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp;&nbsp; 【UserAgent - ユーザエージェント】<BR>&nbsp;&nbsp;&nbsp;&nbsp; UserAgent の変更を行います<BR>&nbsp;&nbsp;&nbsp;&nbsp; 標準では<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UserAgent=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)<BR>&nbsp;&nbsp;&nbsp;&nbsp; となっています</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp;&nbsp; 【AutoDownloadEmojiImageFiles】<BR>&nbsp;&nbsp;&nbsp;&nbsp; MZ4 更新時に出てくる絵文字ダウンロードの確認ダイアログ<BR>&nbsp;&nbsp;&nbsp;&nbsp; 「次回起動時に絵文字ファイルをダウンロードしますか？」で「いいえ」を選んだ場合，<BR>&nbsp;&nbsp;&nbsp;&nbsp; 通常では以降絵文字ファイルのダウンロードはできなくなります</FONT></P>
+<P><A href="Capture/43_ダウンローダ_次回絵文字.jpg"><IMG src="Capture/43_ダウンローダ_次回絵文字.jpg"></A></P>
+<P><FONT face="ＭＳ ゴシック"><BR>&nbsp;&nbsp;&nbsp;&nbsp; 上記のように選択した後に絵文字ファイルをダウンロードする場合は<BR>&nbsp;&nbsp;&nbsp;&nbsp; [General] 以下の AutoDownloadEmojiImageFiles を =1 と書き換えてください<BR>&nbsp;&nbsp;&nbsp;&nbsp; また，再度この値を =0 にすることでダウンロード確認をしなくなります</FONT></P>

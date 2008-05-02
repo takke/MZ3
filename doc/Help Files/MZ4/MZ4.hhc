@@ -29,6 +29,11 @@
 <param name="Local" value="20071015202046918.htm">
 </object>
 <LI><OBJECT type="text/sitemap">
+<param name="Name" value="MZ4 を使うには">
+<param name="ImageNumber" value="24">
+<param name="Local" value="200852175314779.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
 <param name="Name" value="画面上での操作">
 <param name="ImageNumber" value="1">
 </object>
@@ -285,11 +290,6 @@
 <param name="Local" value="2007126173141994.htm">
 </object>
 </UL>
-<LI><OBJECT type="text/sitemap">
-<param name="Name" value="既知のバグ">
-<param name="ImageNumber" value="9">
-<param name="Local" value="20071015215259966.htm">
-</object>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="Twitter">
 <param name="ImageNumber" value="3">
