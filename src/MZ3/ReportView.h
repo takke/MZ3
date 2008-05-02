@@ -121,6 +121,9 @@ private:
 	}
 	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 
+	afx_msg LRESULT OnMoveDownList(WPARAM, LPARAM);
+	afx_msg LRESULT OnMoveUpList(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetListItemCount(WPARAM, LPARAM);
 
 	CProgressCtrl mc_progressBar;
 	BOOL m_abort;

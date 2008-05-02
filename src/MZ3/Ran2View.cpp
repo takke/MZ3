@@ -267,6 +267,8 @@ Ran2View::Ran2View()
 
 	// パンスクロール中フラグ
 	, m_bAutoScrolling(false)
+	// リスト項目移動可能フラグ
+	, m_bCanMoveList(false)
 {
 	// メンバの初期化
 	// 画面解像度を取得
@@ -2236,13 +2238,11 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				brs.DeleteObject();
 
 				// 強制的に描画する
-				// 今のままでは次のコメントが無くても描画されてしまうので保留
-				// （実はWM_PAINTが来たら見えてしまうのは秘密だ）
-				//CDC* pDC = GetDC();
-				//DrawToScreen(pDC);
-				//ReleaseDC(pDC);
+				CDC* pDC = GetDC();
+				DrawToScreen(pDC);
+				ReleaseDC(pDC);
 				// 次のコメントを表示
-				::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM( 10 , 1000 ));
+				::SendMessage( GetParent()->GetSafeHwnd(), WM_MZ3_MOVE_DOWN_LIST, (WPARAM)0, (LPARAM)0);
 			} else {
 				// 右方向
 				CBrush brs;
@@ -2265,13 +2265,11 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				brs.DeleteObject();
 
 				// 強制的に描画する
-				// 今のままでは次のコメントが無くても描画されてしまうので保留
-				// （実はWM_PAINTが来たら見えてしまうのは秘密だ）
-				//CDC* pDC = GetDC();
-				//DrawToScreen(pDC);
-				//ReleaseDC(pDC);
+				CDC* pDC = GetDC();
+				DrawToScreen(pDC);
+				ReleaseDC(pDC);
 				// 前のコメントを表示
-				::SendMessage( GetParent()->GetSafeHwnd(), WM_LBUTTONDBLCLK, (WPARAM)nFlags, (LPARAM)MAKELPARAM( 10 , 0 ));
+				::SendMessage( GetParent()->GetSafeHwnd(), WM_MZ3_MOVE_UP_LIST, (WPARAM)0, (LPARAM)0);
 			}
 		} else if( m_bScrollDragging ) {
 			// 縦方向にドラッグ
@@ -2452,6 +2450,12 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 	// まだドラッグ方向は確定していない
 	m_bPanDragging = false;
 	m_bScrollDragging = false;
+	// リスト項目移動可能かチェック
+	if( (UINT)::SendMessage( GetParent()->GetSafeHwnd(), WM_MZ3_GET_LIST_ITEM_COUNT, (WPARAM)0, (LPARAM)0) > 1 ){
+		m_bCanMoveList = true;
+	} else {
+		m_bCanMoveList = false;
+	}
 
 	// 慣性スクロール停止
 	KillTimer( TIMERID_AUTOSCROLL );
@@ -2669,7 +2673,8 @@ void Ran2View::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 
 	} else {
 		// ドラッグ方向が確定していない
-		if( m_bUseHorizontalDragMove &&
+		if( m_bCanMoveList &&
+			m_bUseHorizontalDragMove &&
 			( abs(dx) > abs(dy) && abs(dx) > screenWidth / 3 ) ) {
 			// 横方向の移動量が大きくて移動量が画面の1/3以上の場合
 			// 横ドラッグ開始

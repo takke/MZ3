@@ -115,6 +115,10 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONUP()
 	ON_WM_MOUSEWHEEL()
+
+	ON_MESSAGE(WM_MZ3_MOVE_DOWN_LIST, OnMoveDownList)
+	ON_MESSAGE(WM_MZ3_MOVE_UP_LIST, OnMoveUpList)
+	ON_MESSAGE(WM_MZ3_GET_LIST_ITEM_COUNT, OnGetListItemCount)
 END_MESSAGE_MAP()
 
 
@@ -2846,4 +2850,28 @@ BOOL CReportView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	return TRUE;
 
 //	return CFormView::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+/**
+ * 次のコメントへ移動
+ */
+LRESULT CReportView::OnMoveDownList(WPARAM dwLoaded, LPARAM dwLength)
+{
+	return CommandMoveDownList();
+}
+
+/**
+ * 前のコメントへ移動
+ */
+LRESULT CReportView::OnMoveUpList(WPARAM dwLoaded, LPARAM dwLength)
+{
+	return CommandMoveUpList();
+}
+
+/**
+ * コメントリストのアイテム数を取得
+ */
+LRESULT CReportView::OnGetListItemCount(WPARAM dwLoaded, LPARAM dwLength)
+{
+	return (LRESULT)m_list.GetItemCount();
 }

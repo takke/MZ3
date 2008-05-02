@@ -40,6 +40,13 @@
 /// データ受信量
 #define WM_MZ3_ACCESS_LOADED		WM_APP + 19
 
+/// コメント移動
+#define WM_MZ3_MOVE_DOWN_LIST		WM_APP + 21
+#define WM_MZ3_MOVE_UP_LIST			WM_APP + 22
+
+/// コメントリストのアイテム数を取得
+#define WM_MZ3_GET_LIST_ITEM_COUNT	WM_APP + 23
+
 /// 中断
 #define WM_MZ3_ABORT				WM_APP + 26
 /// 画面再構成

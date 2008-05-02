@@ -13,6 +13,8 @@
 	using namespace Gdiplus;
 
 	#include "Ran2Image.h"	// アニメGIF描画クラス
+#else
+	#include "constants.h"
 #endif
 
 #include <vector>
@@ -460,6 +462,7 @@ private:
 	int			m_offsetPixelX;				///< 横方向オフセットピクセル数
 	int			m_dPxelX;					///< 横方向単位時間移動量 [pixels/10msec]
 	DWORD		m_dwPanScrollLastTick;		///< パンスクロール開始時刻
+	bool		m_bCanMoveList;				///< リスト移動可能
 
 	// ダブルクリック判定情報
 	DWORD		m_dwFirstLButtonUp;			///< 最初に左クリックされた時刻
