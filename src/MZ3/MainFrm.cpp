@@ -213,7 +213,12 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// 前回のサイズを復帰する
 	if (theApp.m_optionMng.m_strWindowPos.GetLength() > 16) {
 		LPCTSTR strrc = theApp.m_optionMng.m_strWindowPos;
-		CRect    rc(_wtoi(strrc), _wtoi(strrc+5), _wtoi(strrc+10), _wtoi(strrc+15));
+		CRect rc(_wtoi(strrc), _wtoi(strrc+5), _wtoi(strrc+10), _wtoi(strrc+15));
+		// タスクバーの位置による調整を行う
+		CRect desktoprct;
+		SystemParametersInfo(SPI_GETWORKAREA,0,&desktoprct,0);
+		rc.OffsetRect( desktoprct.left , desktoprct.top );
+
 		cs.cx = rc.Width();
 		cs.cy = rc.Height();
 
@@ -1008,11 +1013,9 @@ void CMainFrame::OnDestroy()
 	// 終了時の位置・サイズを保存
 	WINDOWPLACEMENT    wp;
     if (GetWindowPlacement(&wp)) {
-		CRect rc;
-		SystemParametersInfo(SPI_GETWORKAREA,0,&rc,0);
 		CString    cb;
 		cb.Format( L"%04d %04d %04d %04d", 
-			rc.left + wp.rcNormalPosition.left, rc.top + wp.rcNormalPosition.top, rc.left + wp.rcNormalPosition.right, rc.top + wp.rcNormalPosition.bottom);
+			wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right, wp.rcNormalPosition.bottom);
 		theApp.m_optionMng.m_strWindowPos = cb;
 	}
 #endif
