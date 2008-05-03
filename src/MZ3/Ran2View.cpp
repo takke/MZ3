@@ -1627,30 +1627,49 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 			bReverse = true;
 		}
 
+		// リンクの反転表示
+		//   テキスト色：GetSysColor(COLOR_HIGHLIGHTTEXT)
+		//   背景色：GetSysColor(COLOR_HIGHLIGHT)
+		// とする、途中で変更されても言いようにリアルタイムに取得する
+		// →いずれ、変更されたときに取得するようにすべき
+
 		CRect drawRect = CRect(text->drawRect.left,sy,text->drawRect.right,ey);
 		if( bReverse ){
-			// 反転表示用に黒く塗りつぶす
-			m_memDC->FillSolidRect( &drawRect , solidBlack );
+			// 反転表示用にCOLOR_HIGHLIGHTで塗りつぶす
+			m_memDC->FillSolidRect( &drawRect , GetSysColor(COLOR_HIGHLIGHT) );
 		}
 
 		// アンダーラインの描画
 		if( text->isUnderLine == true ){ 
 			CPen* oldPen = NULL;
-			if( text->foregroundColor == solidDarkBlue ){
-				oldPen = m_memDC->SelectObject(&DarkBlueunderLinePen);
+			if( bReverse ) {
+				// 反転表示用 線の色=COLOR_HIGHLIGHTTEXT
+				CPen newPen(PS_SOLID,1,GetSysColor(COLOR_HIGHLIGHTTEXT));
+				oldPen = m_memDC->SelectObject(&newPen);
+				m_memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
+				m_memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
+				oldPen = m_memDC->SelectObject(oldPen);
+				newPen.DeleteObject();
 			} else {
-				oldPen = m_memDC->SelectObject(&underLinePen);
+				// ノーマル表示
+				if( text->foregroundColor == solidDarkBlue ){
+					// リンクなら（この判定はいかがなものか） ダークブルー
+					oldPen = m_memDC->SelectObject(&DarkBlueunderLinePen);
+				} else {
+					// リンクでないなら デフォルト
+					oldPen = m_memDC->SelectObject(&underLinePen);
+				}
+				m_memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
+				m_memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
+				oldPen = m_memDC->SelectObject(oldPen);
 			}
-			m_memDC->MoveTo(drawRect.left, drawRect.bottom-charHeightOffset);
-			m_memDC->LineTo(drawRect.right, drawRect.bottom-charHeightOffset);
-			oldPen = m_memDC->SelectObject(oldPen);
 		}
 
 		// 文字色とフォントの切り替え
 		if( bReverse ) {
-			// 反転表示用 文字色＝白、背景色＝黒
-			m_memDC->SetTextColor(text->backgroundColor);
-			m_memDC->SetBkColor(text->foregroundColor);
+			// 反転表示用 文字色＝COLOR_HIGHLIGHTTEXT、背景色＝COLOR_HIGHLIGHT
+			m_memDC->SetTextColor(GetSysColor(COLOR_HIGHLIGHTTEXT));
+			m_memDC->SetBkColor(GetSysColor(COLOR_HIGHLIGHT));
 		} else {
 			// ノーマル表示用 テキスト情報から色を取得
 			m_memDC->SetTextColor(text->foregroundColor);
@@ -2421,6 +2440,24 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 		// リンク反転表示用に一画面再描画→効率悪い！
 		DrawDetail( m_drawOffsetLine , true );
 	}
+
+#ifdef WINCE
+	// タップ長押しでソフトキーメニュー表示
+	SHRGINFO RGesture;
+	RGesture.cbSize     = sizeof(SHRGINFO);
+	RGesture.hwndClient = m_hWnd;
+	RGesture.ptDown     = point;
+	RGesture.dwFlags    = SHRG_RETURNCMD;
+	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		if( bLinkArea ) {
+			// TODO あとでリンク専用メニューを開くようにしたい
+			::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+		} else {
+			::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+		}
+		return;
+	}
+#endif
 
 	// ドラッグ開始
 	// マウスカーソル設定
