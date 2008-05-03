@@ -224,6 +224,12 @@ private:
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;
 
+	CProgressCtrl mc_progressBar;
+	DWORD m_dwIntervalTimerStartMsec;			///< 定期取得用タイマーの開始時刻
+	CMenu*			m_pCategorySubMenuList;		///< カテゴリ用メニュー
+
+private:
+
 	afx_msg void OnEnSetfocusInfoEdit();
 	afx_msg void OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -294,7 +300,6 @@ public:
 		}
 		return pSelectedCategory->GetSelectedBody();
 	}
-	CProgressCtrl mc_progressBar;
 	afx_msg void OnOpenBrowserUser();
 	afx_msg void OnOpenIntro();
 	afx_msg void OnOpenSelfintro();
@@ -327,7 +332,6 @@ public:
 
 	bool RetrieveCategoryItem(void);
 public:
-	DWORD m_dwIntervalTimerStartMsec;			///< 定期取得用タイマーの開始時刻
 	void ResetIntervalTimer(void);
 protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);

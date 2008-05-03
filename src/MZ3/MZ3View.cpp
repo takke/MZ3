@@ -275,6 +275,7 @@ CMZ3View::CMZ3View()
 	, m_rectIcon(0,0,0,0)
 	, m_bReloadingGroupTabByThread(false)
 	, m_bRetryReloadGroupTabByThread(false)
+	, m_pCategorySubMenuList(NULL)
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -291,6 +292,10 @@ CMZ3View::CMZ3View()
  */
 CMZ3View::~CMZ3View()
 {
+	// サブメニューの解放
+	if (m_pCategorySubMenuList != NULL) {
+		delete[] m_pCategorySubMenuList;
+	}
 }
 
 void CMZ3View::DoDataExchange(CDataExchange* pDX)
@@ -4096,32 +4101,39 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}
 
 	// 項目を追加
-	CMenu* pAppendMenu = pSubMenu->GetSubMenu(5);
-	if (pAppendMenu) {
-		// ダミーを削除
-		pAppendMenu->RemoveMenu( ID_APPEND_MENU_BEGIN, MF_BYCOMMAND );
+	if (pSubMenu->GetMenuItemCount()<=5) {
+		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
+	} else {
+		CMenu* pAppendMenu = pSubMenu->GetSubMenu(5);
+		if (pAppendMenu) {
+			// ダミーを削除
+			pAppendMenu->RemoveMenu( ID_APPEND_MENU_BEGIN, MF_BYCOMMAND );
 
-		// フルテンプレート生成
-		Mz3GroupData template_data;
-		template_data.initForTopPage(Mz3GroupData::InitializeType());
+			// フルテンプレート生成
+			Mz3GroupData template_data;
+			template_data.initForTopPage(Mz3GroupData::InitializeType());
 
-		static CArray<CMenu, CMenu> subMenu;
-		subMenu.RemoveAll();
-		subMenu.SetSize( template_data.groups.size() );
-
-		int menuId = ID_APPEND_MENU_BEGIN;
-		for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
-			subMenu[groupIdx].CreatePopupMenu();
-
-			CGroupItem& group = template_data.groups[groupIdx];
-
-			// subMenu にカテゴリ名を追加
-			for (unsigned int ic=0; ic<group.categories.size(); ic++) {
-				subMenu[groupIdx].AppendMenuW( MF_STRING, menuId, group.categories[ic].m_name );
-				menuId ++;
+			// サブメニューの初期化
+			if (m_pCategorySubMenuList != NULL) {
+				delete[] m_pCategorySubMenuList;
 			}
+			m_pCategorySubMenuList = new CMenu[template_data.groups.size()];
 
-			pAppendMenu->AppendMenuW( MF_POPUP, (UINT)subMenu[groupIdx].m_hMenu, group.name );
+			int menuId = ID_APPEND_MENU_BEGIN;
+			for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
+				m_pCategorySubMenuList[groupIdx].CreatePopupMenu();
+
+				CGroupItem& group = template_data.groups[groupIdx];
+
+				// m_pCategorySubMenuList[groupIdx] にカテゴリ名を追加
+				for (unsigned int ic=0; ic<group.categories.size(); ic++) {
+					m_pCategorySubMenuList[groupIdx].AppendMenuW( MF_STRING, menuId, group.categories[ic].m_name );
+					menuId ++;
+				}
+
+				pAppendMenu->AppendMenuW( MF_POPUP, (UINT)m_pCategorySubMenuList[groupIdx].m_hMenu, group.name );
+				m_pCategorySubMenuList[groupIdx].Detach();
+			}
 		}
 	}
 
