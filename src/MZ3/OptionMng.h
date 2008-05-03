@@ -190,7 +190,7 @@ public:
 		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
-		, m_nTwitterStatusLineCount(2)
+		, m_nTwitterStatusLineCount(3)
 		, m_bUseRan2PanScrollAnimation( true )
 		, m_bUseRan2HorizontalDragMove( true )
 		, m_bAutoDownloadEmojiImageFiles( true )
