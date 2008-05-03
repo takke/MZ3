@@ -58,9 +58,14 @@ public:
 		}
 	}
 
-	bool initForTopPage(const InitializeType initType);
+	bool initForTopPage(AccessTypeInfo& accessTypeInfo, const InitializeType initType);
 
-	bool appendCategoryByIniData( CGroupItem& group, const std::string& category_name, ACCESS_TYPE category_type, const char* category_url=NULL, bool bCruise=false );
+	bool appendCategoryByIniData( AccessTypeInfo& accessTypeInfo, 
+								  CGroupItem& group, 
+								  const std::string& category_name, 
+								  ACCESS_TYPE category_type, 
+								  const char* category_url=NULL, 
+								  bool bCruise=false );
 };
 
 /// Mz3GroupData とグループ定義ファイルとのデータ交換用データ構造
@@ -127,7 +132,8 @@ private:
 		category_string2type[ L"COMMENT"     ] = ACCESS_LIST_COMMENT;
 		category_string2type[ L"NEWS"        ] = ACCESS_LIST_NEWS;
 		category_string2type[ L"BOOKMARK"    ] = ACCESS_LIST_BOOKMARK;
-		category_string2type[ L"FAVORITE"    ] = ACCESS_LIST_FAVORITE;
+		category_string2type[ L"FAVORITE"    ] = ACCESS_LIST_FAVORITE_USER;
+		category_string2type[ L"FAVORITE_COMMUNITY" ] = ACCESS_LIST_FAVORITE_COMMUNITY;
 		category_string2type[ L"FRIEND"      ] = ACCESS_LIST_FRIEND;
 		category_string2type[ L"INTRO"       ] = ACCESS_LIST_INTRO;
 		category_string2type[ L"COMMUNITY"   ] = ACCESS_LIST_COMMUNITY;
@@ -150,7 +156,8 @@ private:
 		category_type2string[ ACCESS_LIST_COMMENT     ] = L"COMMENT";
 		category_type2string[ ACCESS_LIST_NEWS        ] = L"NEWS";
 		category_type2string[ ACCESS_LIST_BOOKMARK    ] = L"BOOKMARK";
-		category_type2string[ ACCESS_LIST_FAVORITE    ] = L"FAVORITE";
+		category_type2string[ ACCESS_LIST_FAVORITE_USER ] = L"FAVORITE";
+		category_type2string[ ACCESS_LIST_FAVORITE_COMMUNITY ] = L"FAVORITE_COMMUNITY";
 		category_type2string[ ACCESS_LIST_FRIEND      ] = L"FRIEND";
 		category_type2string[ ACCESS_LIST_INTRO       ] = L"INTRO";
 		category_type2string[ ACCESS_LIST_COMMUNITY   ] = L"COMMUNITY";
@@ -271,6 +278,6 @@ public:
 /// Mz3GroupData をグループ定義ファイルから構築するクラス
 class Mz3GroupDataReader {
 public:
-	static bool load( Mz3GroupData& target, const CString& inifilename );
+	static bool load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& target, const CString& inifilename );
 };
 

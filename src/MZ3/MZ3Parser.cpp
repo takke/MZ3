@@ -40,7 +40,8 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	case ACCESS_LIST_MESSAGE_IN:			return mixi::ListMessageParser::parse( body, html );
 	case ACCESS_LIST_MESSAGE_OUT:			return mixi::ListMessageParser::parse( body, html );
 	case ACCESS_LIST_NEWS:					return mixi::ListNewsCategoryParser::parse( body, html );
-	case ACCESS_LIST_FAVORITE:				return mixi::ListBookmarkParser::parse( body, html );
+	case ACCESS_LIST_FAVORITE_USER:			return mixi::ListBookmarkParser::parse( body, html );
+	case ACCESS_LIST_FAVORITE_COMMUNITY:	return mixi::ListBookmarkParser::parse( body, html );
 	case ACCESS_LIST_FRIEND:				return mixi::ListFriendParser::parse( body, html );
 	case ACCESS_LIST_COMMUNITY:				return mixi::ListCommunityParser::parse( body, html );
 	case ACCESS_LIST_INTRO:					return mixi::ShowIntroParser::parse( body, html );

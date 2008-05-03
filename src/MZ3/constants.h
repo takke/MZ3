@@ -86,23 +86,24 @@ enum ACCESS_TYPE {
 	ACCESS_GROUP_TWITTER,		///< Twitter グループ
 
 	//--- LIST 系：カテゴリリストの項目。
-	ACCESS_LIST_MYDIARY,		///< 自分の日記一覧
-	ACCESS_LIST_DIARY,			///< マイミク最新日記一覧
-	ACCESS_LIST_NEW_COMMENT,	///< 最新コメント一覧
-	ACCESS_LIST_NEW_BBS,		///< コミュニティ書き込み一覧(new_bbs.pl)
-	ACCESS_LIST_MESSAGE_IN,		///< メッセージ一覧（受信箱）
-	ACCESS_LIST_MESSAGE_OUT,	///< メッセージ一覧（受信箱）
-	ACCESS_LIST_FOOTSTEP,		///< 足跡
-	ACCESS_LIST_COMMENT,		///< コメント一覧
-	ACCESS_LIST_NEWS,			///< ニュース一覧
-	ACCESS_LIST_BOOKMARK,		///< ブックマーク
-	ACCESS_LIST_FAVORITE,		///< お気に入り
-	ACCESS_LIST_FRIEND,			///< マイミク一覧
-	ACCESS_LIST_COMMUNITY,		///< コミュニティ一覧
-	ACCESS_LIST_INTRO,			///< 紹介文(show_intro.pl)
-	ACCESS_LIST_BBS,			///< トピック一覧(list_bbs.pl)
-	ACCESS_LIST_NEW_BBS_COMMENT,///< コミュニティコメント記入履歴
-	ACCESS_LIST_CALENDAR,		///< カレンダー  //icchu追加
+	ACCESS_LIST_MYDIARY,			///< 自分の日記一覧
+	ACCESS_LIST_DIARY,				///< マイミク最新日記一覧
+	ACCESS_LIST_NEW_COMMENT,		///< 最新コメント一覧
+	ACCESS_LIST_NEW_BBS,			///< コミュニティ書き込み一覧(new_bbs.pl)
+	ACCESS_LIST_MESSAGE_IN,			///< メッセージ一覧（受信箱）
+	ACCESS_LIST_MESSAGE_OUT,		///< メッセージ一覧（受信箱）
+	ACCESS_LIST_FOOTSTEP,			///< 足跡
+	ACCESS_LIST_COMMENT,			///< コメント一覧
+	ACCESS_LIST_NEWS,				///< ニュース一覧
+	ACCESS_LIST_BOOKMARK,			///< ブックマーク
+	ACCESS_LIST_FAVORITE_USER,		///< お気に入りユーザ
+	ACCESS_LIST_FAVORITE_COMMUNITY,	///< お気に入りコミュ
+	ACCESS_LIST_FRIEND,				///< マイミク一覧
+	ACCESS_LIST_COMMUNITY,			///< コミュニティ一覧
+	ACCESS_LIST_INTRO,				///< 紹介文(show_intro.pl)
+	ACCESS_LIST_BBS,				///< トピック一覧(list_bbs.pl)
+	ACCESS_LIST_NEW_BBS_COMMENT,	///< コミュニティコメント記入履歴
+	ACCESS_LIST_CALENDAR,			///< カレンダー  //icchu追加
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 	ACCESS_POST_CONFIRM_COMMENT,		///< コメント投稿（確認画面）
@@ -133,8 +134,8 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
 	//--- その他
-	ACCESS_HELP,				///< Readme.txt 専用の特殊タイプ
-	ACCESS_ERRORLOG,			///< mz3log.txt 専用の特殊タイプ
+	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ
+	ACCESS_ERRORLOG,					///< mz3log.txt 専用の特殊タイプ
 };
 
 /**

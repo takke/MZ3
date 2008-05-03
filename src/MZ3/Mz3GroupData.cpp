@@ -5,16 +5,16 @@
  * 2 of the License, or (at your option) any later version.
  */
 #include "stdafx.h"
-#include "Mz3.h"
 #include "Mz3GroupData.h"
-#include "util.h"
+#include "util_base.h"
+#include "inifile.h"
 
 /**
  * トップページ用の初期化
  *
  * グループリストとその配下のリストの生成。
  */
-bool Mz3GroupData::initForTopPage(const InitializeType initType)
+bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const InitializeType initType)
 {
 	this->groups.clear();
 
@@ -24,19 +24,19 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
 		// 日記グループ
 		group.init( L"日記", L"list_diary.pl", ACCESS_GROUP_MYDIARY );
 		{
-			appendCategoryByIniData( group, "最近の日記", ACCESS_LIST_MYDIARY );
-			appendCategoryByIniData( group, "最近のコメント", ACCESS_LIST_COMMENT );
-			appendCategoryByIniData( group, "マイミク最新日記", ACCESS_LIST_DIARY );
-			appendCategoryByIniData( group, "日記コメント記入履歴", ACCESS_LIST_NEW_COMMENT );
+			appendCategoryByIniData( accessTypeInfo, group, "最近の日記", ACCESS_LIST_MYDIARY );
+			appendCategoryByIniData( accessTypeInfo, group, "最近のコメント", ACCESS_LIST_COMMENT );
+			appendCategoryByIniData( accessTypeInfo, group, "マイミク最新日記", ACCESS_LIST_DIARY );
+			appendCategoryByIniData( accessTypeInfo, group, "日記コメント記入履歴", ACCESS_LIST_NEW_COMMENT );
 		}
 		this->groups.push_back( group );
 
 		// コミュニティグループ
 		group.init( L"コミュニティ", L"", ACCESS_GROUP_COMMUNITY );
 		{
-			appendCategoryByIniData( group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
-			appendCategoryByIniData( group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
-			appendCategoryByIniData( group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
+			appendCategoryByIniData( accessTypeInfo, group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
+			appendCategoryByIniData( accessTypeInfo, group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
+			appendCategoryByIniData( accessTypeInfo, group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
 		}
 		this->groups.push_back( group );
 
@@ -66,7 +66,7 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
 			};
 
 			for( int i=0; news_list[i].title != NULL; i++ ) {
-				appendCategoryByIniData( group, news_list[i].title, ACCESS_LIST_NEWS, news_list[i].url );
+				appendCategoryByIniData( accessTypeInfo, group, news_list[i].title, ACCESS_LIST_NEWS, news_list[i].url );
 			}
 		}
 		this->groups.push_back( group );
@@ -74,21 +74,21 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
 		// メッセージグループ
 		group.init( L"メッセージ", L"", ACCESS_GROUP_MESSAGE );
 		{
-			appendCategoryByIniData( group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
-			appendCategoryByIniData( group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
+			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
+			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
 		}
 		this->groups.push_back( group );
 
 		// その他グループ
 		group.init( L"その他", L"", ACCESS_GROUP_OTHERS );
 		{
-			appendCategoryByIniData( group, "マイミク一覧", ACCESS_LIST_FRIEND );
-			appendCategoryByIniData( group, "紹介文", ACCESS_LIST_INTRO );
-			appendCategoryByIniData( group, "足あと", ACCESS_LIST_FOOTSTEP );
-			appendCategoryByIniData( group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
-			appendCategoryByIniData( group, "ブックマーク", ACCESS_LIST_BOOKMARK );
-			appendCategoryByIniData( group, "お気に入りユーザー", ACCESS_LIST_FAVORITE, "list_bookmark.pl" );
-			appendCategoryByIniData( group, "お気に入りコミュ", ACCESS_LIST_FAVORITE, "list_bookmark.pl?kind=community" );
+			appendCategoryByIniData( accessTypeInfo, group, "マイミク一覧", ACCESS_LIST_FRIEND );
+			appendCategoryByIniData( accessTypeInfo, group, "紹介文", ACCESS_LIST_INTRO );
+			appendCategoryByIniData( accessTypeInfo, group, "足あと", ACCESS_LIST_FOOTSTEP );
+			appendCategoryByIniData( accessTypeInfo, group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
+			appendCategoryByIniData( accessTypeInfo, group, "ブックマーク", ACCESS_LIST_BOOKMARK );
+			appendCategoryByIniData( accessTypeInfo, group, "お気に入りユーザー", ACCESS_LIST_FAVORITE_USER, "list_bookmark.pl" );
+			appendCategoryByIniData( accessTypeInfo, group, "お気に入りコミュ", ACCESS_LIST_FAVORITE_COMMUNITY, "list_bookmark.pl?kind=community" );
 		}
 		this->groups.push_back( group );
 	}
@@ -97,11 +97,11 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
 		// Twitterグループ
 		group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
 		{
-			appendCategoryByIniData( group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
-			appendCategoryByIniData( group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
-			appendCategoryByIniData( group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
-			appendCategoryByIniData( group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
-			appendCategoryByIniData( group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
+			appendCategoryByIniData( accessTypeInfo, group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
+			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
+			appendCategoryByIniData( accessTypeInfo, group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
+			appendCategoryByIniData( accessTypeInfo, group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
+			appendCategoryByIniData( accessTypeInfo, group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
 		}
 		this->groups.push_back( group );
 	}
@@ -116,157 +116,30 @@ bool Mz3GroupData::initForTopPage(const InitializeType initType)
  * カテゴリ種別に応じたカラムタイプを指定する。
  */
 bool Mz3GroupData::appendCategoryByIniData( 
+	AccessTypeInfo& accessTypeInfo, 
 	CGroupItem& group, const std::string& category_name, ACCESS_TYPE category_type, const char* category_url, bool bCruise )
 {
 	// デフォルトURL（category_url が未指定の場合に用いるURL）
-	LPCTSTR default_category_url = L"";
+	LPCTSTR default_category_url = accessTypeInfo.getDefaultCategoryURL(category_type);
 
-	CCategoryItem::BODY_INDICATE_TYPE firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-	CCategoryItem::BODY_INDICATE_TYPE secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
+	BODY_INDICATE_TYPE firstColType  = accessTypeInfo.getBodyHeaderCol1Type(category_type);
+	BODY_INDICATE_TYPE secondColType = accessTypeInfo.getBodyHeaderCol2TypeA(category_type);
 
-	switch( category_type ) {
-
-	// 日記系
-	case ACCESS_LIST_MYDIARY:
-		// 最近の日記
-		default_category_url = L"list_diary.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	case ACCESS_LIST_COMMENT:
-		// 最近のコメント
-		default_category_url = L"list_comment.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case ACCESS_LIST_DIARY:
-		// マイミク最新日記
-		default_category_url = L"new_friend_diary.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case ACCESS_LIST_NEW_COMMENT:
-		// 日記コメント記入履歴
-		default_category_url = L"new_comment.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	// コミュニティ系
-	case ACCESS_LIST_NEW_BBS:
-		// 最新書き込み一覧
-		default_category_url = L"new_bbs.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	// コミュニティコメント記入履歴
-	case ACCESS_LIST_NEW_BBS_COMMENT:
-		default_category_url = L"new_bbs_comment.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	// コミュニティ一覧
-	case ACCESS_LIST_COMMUNITY:
-		default_category_url = L"list_community.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	// ニュース系
-	case ACCESS_LIST_NEWS:
-		// ニュース
-		default_category_url = L"";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	// メッセージ系
-	case ACCESS_LIST_MESSAGE_IN:
-		// メッセージ（受信箱）
-		default_category_url = L"list_message.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case  ACCESS_LIST_MESSAGE_OUT:
-		// メッセージ（送信箱）
-		default_category_url = L"list_message.pl?box=outbox";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	// その他
-	case ACCESS_LIST_FRIEND:
-		// マイミク一覧
-		default_category_url = L"list_friend.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	case ACCESS_LIST_INTRO:
-		// 紹介文
-		default_category_url = L"show_intro.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_BODY;
-		break;
-
-	case ACCESS_LIST_FOOTSTEP:
-		// 足あと
-		default_category_url = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	case ACCESS_LIST_FAVORITE:
-		// お気に入り
-		default_category_url = L"list_bookmark.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	case ACCESS_LIST_BOOKMARK:
-		// ブックマーク
-		default_category_url = L"";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case ACCESS_LIST_CALENDAR: //icchu追加
-		// カレンダー
-		default_category_url = L"show_calendar.pl";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_TITLE;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		break;
-
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		// タイムライン
-		default_category_url = L"http://twitter.com/statuses/friends_timeline.xml";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case ACCESS_TWITTER_FAVORITES:
-		// お気に入り
-		default_category_url = L"http://twitter.com/favorites.xml";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-		// ダイレクトメッセージ
-		default_category_url = L"http://twitter.com/direct_messages.xml";
-		firstColType  = CCategoryItem::BODY_INDICATE_TYPE_BODY;
-		secondColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		break;
-
-	default:
-		// サポート外カテゴリタイプなので追加せず終了。
+	if (firstColType==BODY_INDICATE_TYPE_NONE || secondColType==BODY_INDICATE_TYPE_NONE) {
+		// サポート外のため追加せず終了
+//		MZ3LOGGER_ERROR(L"サポート外のため追加しません。");
 		return false;
+	}
+
+	// アクセス種別分離に伴う移行処理
+	switch( category_type ) {
+	case ACCESS_LIST_FAVORITE_USER:
+		// お気に入りユーザ
+		if (category_url != NULL && strstr(category_url, "kind=community")!=NULL) {
+			// 「お気に入りコミュ」として処理する
+			category_type = ACCESS_LIST_FAVORITE_COMMUNITY;
+		}
+		break;
 	}
 
 	// 追加。
@@ -298,7 +171,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 /**
  * ini ファイル（グループ定義ファイル）から Mz3GroupData を生成する。
  */
-bool Mz3GroupDataReader::load( Mz3GroupData& target, const CString& inifilename )
+bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& target, const CString& inifilename )
 {
 	target.groups.clear();
 
@@ -400,7 +273,7 @@ bool Mz3GroupDataReader::load( Mz3GroupData& target, const CString& inifilename 
 			}
 
 			// カテゴリ追加。
-			target.appendCategoryByIniData( group, category_name, category_type, category_url, bCruise );
+			target.appendCategoryByIniData( accessTypeInfo, group, category_name, category_type, category_url, bCruise );
 		}
 
 		// カテゴリが１つ以上なら、groups に追加。

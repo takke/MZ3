@@ -9,6 +9,7 @@
 // CCategoryItem コマンド ターゲット
 
 #include "MixiData.h"
+#include "AccessTypeInfo.h"
 
 class CCategoryItem;
 typedef std::vector<CCategoryItem> CCategoryItemList;
@@ -26,15 +27,6 @@ public:
 
 	CString			m_name;					///< リストに表示する名称
 
-	/// ボディに CMixiData 内のどの項目を表示するかの識別子
-	enum BODY_INDICATE_TYPE
-	{
-		BODY_INDICATE_TYPE_DATE,			///< 日付を表示する
-		BODY_INDICATE_TYPE_TITLE,			///< タイトルを表示する
-		BODY_INDICATE_TYPE_NAME,			///< 名前を表示する
-		BODY_INDICATE_TYPE_BODY,			///< 本文を表示する
-		BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
-	};
 	BODY_INDICATE_TYPE m_firstBodyColType;	///< １つ目のカラムに表示する項目の識別子
 	BODY_INDICATE_TYPE m_secondBodyColType;	///< ２つ目のカラムに表示する項目の識別子
 

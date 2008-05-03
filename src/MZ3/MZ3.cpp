@@ -166,8 +166,8 @@ BOOL CMZ3App::InitInstance()
 
 	// トップページ用の初期化
 	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
-	bool bExistGroupFile = util::ExistFile( theApp.m_filepath.groupfile );
-	if( Mz3GroupDataReader::load( m_root, theApp.m_filepath.groupfile ) ) {
+	bool bExistGroupFile = util::ExistFile( m_filepath.groupfile );
+	if( Mz3GroupDataReader::load( m_accessTypeInfo, m_root, m_filepath.groupfile ) ) {
 		MZ3LOGGER_INFO( L"タブ設定ファイル読み込み成功" );
 	}else{
 		MZ3LOGGER_INFO( L"タブ設定ファイル読み込み失敗" );
@@ -192,7 +192,7 @@ BOOL CMZ3App::InitInstance()
 		CChooseClientTypeDlg dlg;
 		if (dlg.DoModal()==IDOK) {
 			// 設定された内容で初期化
-			m_root.initForTopPage(dlg.m_initType);
+			m_root.initForTopPage(m_accessTypeInfo, dlg.m_initType);
 		}
 
 		theApp.SaveGroupData();
@@ -206,7 +206,7 @@ BOOL CMZ3App::InitInstance()
 			CChooseClientTypeDlg dlg;
 			if (dlg.DoModal()==IDOK) {
 				// 設定された内容で初期化
-				m_root.initForTopPage(dlg.m_initType);
+				m_root.initForTopPage(m_accessTypeInfo, dlg.m_initType);
 			}
 
 			// 次回以降は表示しない

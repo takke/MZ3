@@ -3705,7 +3705,7 @@ private:
 		}
 
 		return parseNextBackLinkBase( nextLink, backLink, str,
-			reg, L"list_bookmark.pl", ACCESS_LIST_FAVORITE );
+			reg, L"list_bookmark.pl", ACCESS_LIST_FAVORITE_USER );	// TODO ‚¨‹C‚É“ü‚èƒRƒ~ƒ…‚Ìˆ—‚ğÀ‘•‚·‚é‚±‚Æ
 	}
 };
 

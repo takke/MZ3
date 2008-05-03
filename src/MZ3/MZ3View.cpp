@@ -39,21 +39,21 @@
 
 #define TIMERID_INTERVAL_CHECK	101
 
-inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
+inline CString MyGetItemByBodyColType( CMixiData* data, BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
 {
 	CString item;
 
 	switch( bodyColType ) {
-	case CCategoryItem::BODY_INDICATE_TYPE_DATE:
+	case BODY_INDICATE_TYPE_DATE:
 		item = data->GetDate();
 		break;
-	case CCategoryItem::BODY_INDICATE_TYPE_NAME:
+	case BODY_INDICATE_TYPE_NAME:
 		item = data->GetName();
 		break;
-	case CCategoryItem::BODY_INDICATE_TYPE_TITLE:
+	case BODY_INDICATE_TYPE_TITLE:
 		item = data->GetTitle();
 		break;
-	case CCategoryItem::BODY_INDICATE_TYPE_BODY:
+	case BODY_INDICATE_TYPE_BODY:
 		// 本文を1行に変換して割り当て。
 		for( u_int i=0; i<data->GetBodySize(); i++ ) {
 			CString line = data->GetBody(i);
@@ -79,99 +79,24 @@ inline CString MyGetItemByBodyColType( CMixiData* data, CCategoryItem::BODY_INDI
 	}
 }
 
-/// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
-LPCTSTR MyGetBodyHeaderColName2( const CMixiData& mixi, CCategoryItem::BODY_INDICATE_TYPE bodyIndicateType )
+/// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
+LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
 {
-	ACCESS_TYPE accessType = mixi.GetAccessType();
+	return theApp.m_accessTypeInfo.getBodyHeaderCol1Name(accessType);
+}
 
-	switch (accessType) {
-	case ACCESS_LIST_DIARY:
-	case ACCESS_LIST_NEW_COMMENT:
-	case ACCESS_LIST_COMMENT:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("名前>>");
-		default:
-			return _T("日時>>");
-		}
-		break;
-	case ACCESS_LIST_NEWS:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("配給元>>");
-		default:
-			return _T("配信時刻>>");
-		}
-		break;
-	case ACCESS_LIST_FAVORITE:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_DATE:
-			// お気に入りの種別（ユーザーorコミュニティ）に応じて変更
-			if( mixi.GetURL().Find( L"kind=community" ) != -1 ) {
-				return _T("人数>>");
-			}else{
-				return _T("最終ログイン>>");
-			}
-		default:
-			// お気に入りの種別（ユーザーorコミュニティ）に応じて変更
-			if( mixi.GetURL().Find( L"kind=community" ) != -1 ) {
-				return _T("説明>>");
-			}else{
-				return _T("自己紹介>>");
-			}
-		}
-		break;
-	case ACCESS_LIST_FRIEND:
-		return _T("ログイン時刻");
-	case ACCESS_LIST_COMMUNITY:
-		return _T("人数");
-	case ACCESS_LIST_INTRO:
-		return L"紹介文";
-	case ACCESS_LIST_NEW_BBS:
-	case ACCESS_LIST_NEW_BBS_COMMENT:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("コミュニティ>>");
-		default:
-			return _T("日時>>");
-		}
-		break;
-	case ACCESS_LIST_CALENDAR:
-	case ACCESS_LIST_BBS:
-		return L"日付";
-	case ACCESS_LIST_BOOKMARK:
-		return _T("コミュニティ");
-	case ACCESS_LIST_MYDIARY:
-		return _T("日時");
-	case ACCESS_LIST_MESSAGE_IN:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("差出人>>");
-		default:
-			return _T("日付>>");
-		}
-	case ACCESS_LIST_MESSAGE_OUT:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("宛先>>");
-		default:
-			return _T("日付>>");
-		}
+/// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
+LPCTSTR MyGetBodyHeaderColName2( ACCESS_TYPE accessType, BODY_INDICATE_TYPE bodyIndicateType )
+{
+	BODY_INDICATE_TYPE typeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(accessType);
+	BODY_INDICATE_TYPE typeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(accessType);
 
-	case ACCESS_LIST_FOOTSTEP:
-		return _T("時刻");
-
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_FAVORITES:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-		switch( bodyIndicateType ) {
-		case CCategoryItem::BODY_INDICATE_TYPE_NAME:
-			return _T("名前>>");
-		default:
-			return _T("日付>>");
-		}
-
-	default:
+	if (bodyIndicateType==typeA) {
+		return theApp.m_accessTypeInfo.getBodyHeaderCol2NameA(accessType);
+	} else if (bodyIndicateType==typeB) {
+		return theApp.m_accessTypeInfo.getBodyHeaderCol2NameB(accessType);
+	} else {
+		// 未定義
 		return L"";
 	}
 }
@@ -1075,7 +1000,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	case ACCESS_LIST_NEW_COMMENT:
 	case ACCESS_LIST_COMMENT:
 	case ACCESS_LIST_NEWS:
-	case ACCESS_LIST_FAVORITE:
+	case ACCESS_LIST_FAVORITE_USER:
+	case ACCESS_LIST_FAVORITE_COMMUNITY:
 	case ACCESS_LIST_FRIEND:
 	case ACCESS_LIST_COMMUNITY:
 	case ACCESS_LIST_NEW_BBS:
@@ -1404,53 +1330,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	// ヘッダの文字を変更
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 	if (pCategory != NULL) {
-		LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi, pCategory->m_secondBodyColType );
-		switch (pCategory->m_mixi.GetAccessType()) {
-		case ACCESS_LIST_DIARY:
-		case ACCESS_LIST_NEW_COMMENT:
-		case ACCESS_LIST_COMMENT:
-		case ACCESS_LIST_CALENDAR:
-			m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_NEWS:
-			m_bodyList.SetHeader( _T("見出し"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_FAVORITE:
-			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_FRIEND:
-			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_COMMUNITY:
-			m_bodyList.SetHeader( _T("コミュニティ"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_MESSAGE_IN:
-		case ACCESS_LIST_MESSAGE_OUT:
-			m_bodyList.SetHeader( _T("件名"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_MYDIARY:
-			m_bodyList.SetHeader( _T("タイトル"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_NEW_BBS:
-		case ACCESS_LIST_NEW_BBS_COMMENT:
-		case ACCESS_LIST_BBS:
-		case ACCESS_LIST_BOOKMARK:
-			m_bodyList.SetHeader( _T("トピック"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_FOOTSTEP:
-			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-			break;
-		case ACCESS_LIST_INTRO:
-			m_bodyList.SetHeader( _T("名前"), szHeaderTitle2 );
-			break;
-		case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		case ACCESS_TWITTER_FAVORITES:
-			m_bodyList.SetHeader( _T("発言"), szHeaderTitle2 );
-			break;
-		case ACCESS_TWITTER_DIRECT_MESSAGES:
-			m_bodyList.SetHeader( _T("メッセージ"), szHeaderTitle2 );
-			break;
-		}
+		LPCTSTR szHeaderTitle1 = MyGetBodyHeaderColName1( pCategory->m_mixi.GetAccessType() );
+		LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi.GetAccessType(), pCategory->m_secondBodyColType );
+		m_bodyList.SetHeader( szHeaderTitle1, szHeaderTitle2 );
 	}
 
 	// アイテムの追加
@@ -3054,55 +2936,29 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	if (pCategory == NULL) {
 		return false;
 	}
-	switch (pCategory->m_mixi.GetAccessType()) {
-	case ACCESS_LIST_DIARY:
-	case ACCESS_LIST_NEW_COMMENT:
-	case ACCESS_LIST_COMMENT:
-	case ACCESS_LIST_NEWS:
-	case ACCESS_LIST_NEW_BBS:
-	case ACCESS_LIST_MESSAGE_IN:
-	case ACCESS_LIST_MESSAGE_OUT:
-	case ACCESS_LIST_NEW_BBS_COMMENT:
-		// 「名前」と「時刻」
-		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_NAME ) {
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		}else{
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		}
-		break;
-	case ACCESS_LIST_FAVORITE:
-		// 「日付」と「本文」
-		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_BODY ) {
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		}else{
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_BODY;
-		}
-		break;
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_FAVORITES:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-		// 「日付」と「名前」
-		if( pCategory->m_secondBodyColType == CCategoryItem::BODY_INDICATE_TYPE_DATE ) {
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_NAME;
-		}else{
-			pCategory->m_secondBodyColType = CCategoryItem::BODY_INDICATE_TYPE_DATE;
-		}
-		break;
-	case ACCESS_LIST_FRIEND:
-	case ACCESS_LIST_COMMUNITY:
-	case ACCESS_LIST_FOOTSTEP:
-	case ACCESS_LIST_BOOKMARK:
-	case ACCESS_LIST_MYDIARY:
-	case ACCESS_LIST_INTRO:
-	case ACCESS_LIST_CALENDAR:
-	default:
-		// それ以外では変更しないので終了。
+
+	BODY_INDICATE_TYPE colTypeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(pCategory->m_mixi.GetAccessType());
+	BODY_INDICATE_TYPE colTypeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(pCategory->m_mixi.GetAccessType());
+	if (colTypeB==BODY_INDICATE_TYPE_NONE) {
+		// 変更先タイプがないため変更せず終了
 		return false;
+	}
+
+	// トグル動作
+	if (pCategory->m_secondBodyColType==colTypeA) {
+		// A to B
+		pCategory->m_secondBodyColType = colTypeB;
+	} else if (pCategory->m_secondBodyColType==colTypeB) {
+		// B to A
+		pCategory->m_secondBodyColType = colTypeA;
+	} else {
+		// ? to A
+		pCategory->m_secondBodyColType = colTypeA;
 	}
 
 	// ヘッダー文字列の変更（第２カラムのみ）
 	m_bodyList.SetHeader( NULL, 
-		MyGetBodyHeaderColName2(pCategory->m_mixi, pCategory->m_secondBodyColType) );
+		MyGetBodyHeaderColName2(pCategory->m_mixi.GetAccessType(), pCategory->m_secondBodyColType) );
 
 	// アイテムの更新
 	INT_PTR count = pCategory->GetBodyList().size();
@@ -3110,7 +2966,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		CMixiData& data = pCategory->GetBodyList()[i];
 		// ２カラム目
 		m_bodyList.SetItem( i, 1, LVIF_TEXT, 
-			MyGetItemByBodyColType(&data,pCategory->m_secondBodyColType), 0, 0, 0, 0 );
+			MyGetItemByBodyColType(&data, pCategory->m_secondBodyColType), 0, 0, 0, 0 );
 	}
 
 	// 第1カラムに表示している内容を表示する。
@@ -3380,11 +3236,11 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	case ACCESS_PROFILE:
 		// プロフィールなら、カテゴリ項目に応じて処理を変更する。（暫定）
 		switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
-		case ACCESS_LIST_INTRO:			// 紹介文
-		case ACCESS_LIST_FAVORITE:		// お気に入り
-		case ACCESS_LIST_FOOTSTEP:		// 足あと
-		case ACCESS_LIST_FRIEND:		// マイミク一覧
-		case ACCESS_LIST_CALENDAR:		// カレンダー
+		case ACCESS_LIST_INTRO:				// 紹介文
+		case ACCESS_LIST_FAVORITE_USER:		// お気に入り
+		case ACCESS_LIST_FOOTSTEP:			// 足あと
+		case ACCESS_LIST_FRIEND:			// マイミク一覧
+		case ACCESS_LIST_CALENDAR:			// カレンダー
 			// 操作をメニューで選択
 			{
 				CMenu menu;
@@ -3394,7 +3250,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
 
 				// お気に入り以外では「自己紹介」を削除。
-				if( categoryType != ACCESS_LIST_FAVORITE ) {
+				if( categoryType != ACCESS_LIST_FAVORITE_USER ) {
 					pSubMenu->DeleteMenu( ID_OPEN_SELFINTRO, MF_BYCOMMAND );
 				}
 
@@ -3482,8 +3338,8 @@ bool CMZ3View::PrepareViewBbsList(void)
 	name.Format( L"└%s", bodyItem.GetName() );
 	CCategoryItem categoryItem;
 	categoryItem.init( name, url, ACCESS_LIST_BBS, m_selGroup->categories.size(),
-		CCategoryItem::BODY_INDICATE_TYPE_TITLE,
-		CCategoryItem::BODY_INDICATE_TYPE_DATE,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_LIST_BBS),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_LIST_BBS),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 
 	return AppendCategoryList(categoryItem);
@@ -4111,7 +3967,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 
 			// フルテンプレート生成
 			Mz3GroupData template_data;
-			template_data.initForTopPage(Mz3GroupData::InitializeType());
+			template_data.initForTopPage(theApp.m_accessTypeInfo, Mz3GroupData::InitializeType());
 
 			// サブメニューの初期化
 			if (m_pCategorySubMenuList != NULL) {
@@ -5047,8 +4903,8 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
 		util::FormatString( L"http://twitter.com/statuses/user_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
-		CCategoryItem::BODY_INDICATE_TYPE_BODY,
-		CCategoryItem::BODY_INDICATE_TYPE_NAME,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 	AppendCategoryList(categoryItem);
 
@@ -5073,8 +4929,8 @@ void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 		util::FormatString( L"http://twitter.com/statuses/friends_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
-		CCategoryItem::BODY_INDICATE_TYPE_BODY,
-		CCategoryItem::BODY_INDICATE_TYPE_NAME,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 	AppendCategoryList(categoryItem);
 
@@ -5297,7 +5153,7 @@ void CMZ3View::OnAppendCategoryMenu(UINT nID)
 
 	// フルテンプレート生成
 	Mz3GroupData template_data;
-	template_data.initForTopPage(Mz3GroupData::InitializeType());
+	template_data.initForTopPage(theApp.m_accessTypeInfo, Mz3GroupData::InitializeType());
 
 	int idxCounter = 0;
 	for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {

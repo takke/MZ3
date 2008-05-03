@@ -160,7 +160,7 @@ BOOL CMZ3GroupFileEditorDlg::OnInitDialog()
 	LPCTSTR inifilename = L"toppage_group.ini";
 	if (util::ExistFile(inifilename)) {
 		theApp.m_strGroupInifilePath = inifilename;
-		Mz3GroupDataReader::load( theApp.m_group_info, theApp.m_strGroupInifilePath);
+		Mz3GroupDataReader::load( theApp.m_accessTypeInfo, theApp.m_group_info, theApp.m_strGroupInifilePath);
 
 		MyReloadTabs();
 	}
@@ -245,7 +245,7 @@ void CMZ3GroupFileEditorDlg::OnOpenFile()
 		theApp.m_strGroupInifilePath = dlg.GetPathName();
 //		MessageBox(filepath);
 
-		Mz3GroupDataReader::load( theApp.m_group_info, theApp.m_strGroupInifilePath);
+		Mz3GroupDataReader::load( theApp.m_accessTypeInfo, theApp.m_group_info, theApp.m_strGroupInifilePath);
 
 		MyReloadTabs();
 	}

@@ -14,11 +14,12 @@
 #endif
 
 #include "resource.h"		// メイン シンボル
-#include "../MZ3/Mz3GroupData.h"
-#include "../MZ3/AccessTypeInfo.h"
 
 // NOP
 #define MZ3LOGGER_ERROR(msg) ;
+
+#include "../MZ3/Mz3GroupData.h"
+#include "../MZ3/AccessTypeInfo.h"
 
 // CMZ3GroupFileEditorApp:
 // このクラスの実装については、MZ3GroupFileEditor.cpp を参照してください。

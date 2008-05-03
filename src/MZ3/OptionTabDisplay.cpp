@@ -109,7 +109,7 @@ void COptionTabDisplay::OnBnClickedResetTabButton()
 	CChooseClientTypeDlg dlg;
 	if (dlg.DoModal()==IDOK) {
 		// ê›íËÇ≥ÇÍÇΩì‡óeÇ≈èâä˙âª
-		theApp.m_root.initForTopPage(dlg.m_initType);
+		theApp.m_root.initForTopPage(theApp.m_accessTypeInfo, dlg.m_initType);
 	} else {
 		return;
 	}

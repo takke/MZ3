@@ -177,7 +177,8 @@ inline CString MakeLogfilePath( const CMixiData& data )
 			return path;
 		}
 
-	case ACCESS_LIST_FAVORITE:
+	case ACCESS_LIST_FAVORITE_USER:
+	case ACCESS_LIST_FAVORITE_COMMUNITY:
 		{
 			// url(1) : http://mixi.jp/list_bookmark.pl
 			// url(2) : http://mixi.jp/list_bookmark.pl?page=2&kind=friend

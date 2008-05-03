@@ -9,6 +9,16 @@
 #include "constants.h"
 #include <map>
 
+/// ボディに CMixiData 内のどの項目を表示するかの識別子
+enum BODY_INDICATE_TYPE
+{
+	BODY_INDICATE_TYPE_DATE,			///< 日付を表示する
+	BODY_INDICATE_TYPE_TITLE,			///< タイトルを表示する
+	BODY_INDICATE_TYPE_NAME,			///< 名前を表示する
+	BODY_INDICATE_TYPE_BODY,			///< 本文を表示する
+	BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
+};
+
 /**
  * アクセス種別に対するMZ3/4の振る舞いを管理するクラス
  */
@@ -26,22 +36,44 @@ public:
 	class Data
 	{
 	public:
-		std::string		serviceType;	///< 対象とするサービスの種別（"mixi", "Twitter"など）
-		std::wstring	shortText;		///< 説明文字列
-		REQUEST_METHOD	requestType;	///< リクエスト種別
-		bool			bCruiseTarget;	///< 巡回対象とするか？
+		std::string			serviceType;		///< 対象とするサービスの種別（"mixi", "Twitter"など）
+		std::wstring		shortText;			///< 説明文字列
+		REQUEST_METHOD		requestType;		///< リクエスト種別
 
-		Data(const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType, bool a_bCruiseTarget)
+		//--- リスト系のみが持つ項目
+		bool				bCruiseTarget;		///< 巡回対象とするか？
+		std::wstring		defaultCategoryURL;	///< カテゴリのURL
+		std::wstring		bodyHeaderCol1Name;	///< ボディリストのヘッダー1のカラム名
+		std::wstring		bodyHeaderCol2NameA;///< ボディリストのヘッダー2のカラム名A
+		std::wstring		bodyHeaderCol2NameB;///< ボディリストのヘッダー2のカラム名B
+		BODY_INDICATE_TYPE	bodyHeaderCol1Type;	///< ボディリストのヘッダー1のカラム種別
+		BODY_INDICATE_TYPE	bodyHeaderCol2TypeA;///< ボディリストのヘッダー2のカラム種別A（Bとトグル）
+		BODY_INDICATE_TYPE	bodyHeaderCol2TypeB;///< ボディリストのヘッダー2のカラム種別B（Aとトグル）
+
+		Data(const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
 			: serviceType(a_serviceType)
 			, shortText(a_shortText)
 			, requestType(a_requestType)
-			, bCruiseTarget(a_bCruiseTarget)
+			, defaultCategoryURL(L"")
+			, bodyHeaderCol1Name(L"")
+			, bodyHeaderCol2NameA(L"")
+			, bodyHeaderCol2NameB(L"")
+			, bodyHeaderCol1Type(BODY_INDICATE_TYPE_NONE)
+			, bodyHeaderCol2TypeA(BODY_INDICATE_TYPE_NONE)
+			, bodyHeaderCol2TypeB(BODY_INDICATE_TYPE_NONE)
 		{}
 		Data()
 			: serviceType("")
 			, shortText(L"<unknown>")
 			, requestType(REQUEST_METHOD_INVALID)
 			, bCruiseTarget(false)
+			, defaultCategoryURL(L"")
+			, bodyHeaderCol1Name(L"")
+			, bodyHeaderCol2NameA(L"")
+			, bodyHeaderCol2NameB(L"")
+			, bodyHeaderCol1Type(BODY_INDICATE_TYPE_NONE)
+			, bodyHeaderCol2TypeA(BODY_INDICATE_TYPE_NONE)
+			, bodyHeaderCol2TypeB(BODY_INDICATE_TYPE_NONE)
 		{}
 	};
 
@@ -86,4 +118,68 @@ public:
 		}
 		return it->second.bCruiseTarget;
 	}
+
+	/// ボディリストのヘッダー1のカラム名
+	const wchar_t* getBodyHeaderCol1Name( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.bodyHeaderCol1Name.c_str();
+	}
+
+	/// ボディリストのヘッダー2のカラム名A
+	const wchar_t* getBodyHeaderCol2NameA( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.bodyHeaderCol2NameA.c_str();
+	}
+
+	/// ボディリストのヘッダー2のカラム名B
+	const wchar_t* getBodyHeaderCol2NameB( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.bodyHeaderCol2NameB.c_str();
+	}
+
+	/// ボディリストのヘッダー1のカラム種別
+	BODY_INDICATE_TYPE getBodyHeaderCol1Type( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return BODY_INDICATE_TYPE_NONE;
+		}
+		return it->second.bodyHeaderCol1Type;
+	}
+
+	/// ボディリストのヘッダー2のカラム種別A
+	BODY_INDICATE_TYPE getBodyHeaderCol2TypeA( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return BODY_INDICATE_TYPE_NONE;
+		}
+		return it->second.bodyHeaderCol2TypeA;
+	}
+
+	/// ボディリストのヘッダー2のカラム種別B
+	BODY_INDICATE_TYPE getBodyHeaderCol2TypeB( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return BODY_INDICATE_TYPE_NONE;
+		}
+		return it->second.bodyHeaderCol2TypeB;
+	}
+
+	/// デフォルトURL
+	const wchar_t* getDefaultCategoryURL( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.defaultCategoryURL.c_str();
+	}
+
 };

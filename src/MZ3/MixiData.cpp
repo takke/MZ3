@@ -8,7 +8,6 @@
 //
 
 #include "stdafx.h"
-#include "MZ3.h"
 #include "MixiData.h"
 
 

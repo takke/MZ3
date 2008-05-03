@@ -10,369 +10,519 @@
 /// 初期化
 bool AccessTypeInfo::init()
 {
-	// グループ系
+	//------------------------------------------------------------------
+	//--- グループ系
 	m_map[ACCESS_GROUP_COMMUNITY] = AccessTypeInfo::Data(
 		""
 		, L"コミュニティG"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_GROUP_MESSAGE] = AccessTypeInfo::Data(
 		""
 		, L"メッセージG"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_GROUP_MYDIARY] = AccessTypeInfo::Data(
 		""
 		, L"日記G"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_GROUP_NEWS] = AccessTypeInfo::Data(
 		""
 		, L"ニュースG"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_GROUP_OTHERS] = AccessTypeInfo::Data(
 		""
 		, L"その他G"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_GROUP_TWITTER] = AccessTypeInfo::Data(
 		""
 		, L"TwitterG"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
+	//------------------------------------------------------------------
+	//--- mixi,リスト系
+	ACCESS_TYPE type;
+	
+	type = ACCESS_LIST_INTRO;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"紹介文"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"show_intro.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol1Name = _T("名前");
+	m_map[type].bodyHeaderCol2NameA = L"紹介文";
+
+	type = ACCESS_LIST_DIARY;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"日記一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"new_friend_diary.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("タイトル");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日時>>");
+
+	type = ACCESS_LIST_NEW_COMMENT;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"新着コメント一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"new_comment.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("タイトル");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日時>>");
+
+	type = ACCESS_LIST_COMMENT;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"コメント一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"list_comment.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("タイトル");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日時>>");
+
+	type = ACCESS_LIST_NEWS;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"ニュース一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol1Name = _T("見出し");
+	m_map[type].bodyHeaderCol2NameA = _T("配信時刻>>");
+	m_map[type].bodyHeaderCol2NameB = _T("配給元>>");
+
+	type = ACCESS_LIST_FAVORITE_USER;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"お気に入りユーザ"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"list_bookmark.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol1Name = _T("名前");
+	m_map[type].bodyHeaderCol2NameA = _T("最終ログイン>>");
+	m_map[type].bodyHeaderCol2NameB = _T("自己紹介>>");
+
+	type = ACCESS_LIST_FAVORITE_COMMUNITY;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"お気に入りコミュ"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"list_bookmark.pl?kind=community";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol1Name = _T("コミュニティ");
+	m_map[type].bodyHeaderCol2NameA = _T("人数>>");
+	m_map[type].bodyHeaderCol2NameB = _T("説明>>");
+
+	type = ACCESS_LIST_FRIEND;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"マイミク一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"list_friend.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("名前");
+	m_map[type].bodyHeaderCol2NameA = _T("ログイン時刻");
+
+	type = ACCESS_LIST_COMMUNITY;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"コミュニティ一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"list_community.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("コミュニティ");
+	m_map[type].bodyHeaderCol2NameA = _T("人数");
+
+	type = ACCESS_LIST_NEW_BBS_COMMENT;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"コミュコメント記入履歴"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"new_bbs_comment.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("トピック");
+	m_map[type].bodyHeaderCol2NameA = _T("コミュニティ>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日時>>");
+
+	type = ACCESS_LIST_NEW_BBS;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"コミュ書込一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"new_bbs.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("トピック");
+	m_map[type].bodyHeaderCol2NameA = _T("コミュニティ>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日時>>");
+
+	type = ACCESS_LIST_BBS;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"トピック一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	// 動的に生成されるためデフォルトURLは不要
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("トピック");
+	m_map[type].bodyHeaderCol2NameA = L"日付";
+
+	type = ACCESS_LIST_MYDIARY;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"日記一覧"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"list_diary.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("タイトル");
+	m_map[type].bodyHeaderCol2NameA = _T("日時");
+
+	type = ACCESS_LIST_FOOTSTEP;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"足あと"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("名前");
+	m_map[type].bodyHeaderCol2NameA = _T("時刻");
+
+	type = ACCESS_LIST_MESSAGE_IN;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"メッセージ(受信箱)"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"list_message.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("件名");
+	m_map[type].bodyHeaderCol2NameA = _T("差出人>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日付>>");
+
+	type = ACCESS_LIST_MESSAGE_OUT;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"メッセージ(送信箱)"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].bCruiseTarget = true;
+	m_map[type].defaultCategoryURL = L"list_message.pl?box=outbox";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("件名");
+	m_map[type].bodyHeaderCol2NameA = _T("宛先>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日付>>");
+
+	type = ACCESS_LIST_BOOKMARK;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"ブックマーク"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol1Name = _T("トピック");
+	m_map[type].bodyHeaderCol2NameA = _T("コミュニティ");
+
+	type = ACCESS_LIST_CALENDAR;
+	m_map[type] = AccessTypeInfo::Data(
+		"mixi"
+		, L"カレンダー"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].defaultCategoryURL = L"show_calendar.pl";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_TITLE;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("タイトル");
+	m_map[type].bodyHeaderCol2NameA = L"日付";
+
+	//------------------------------------------------------------------
+	//--- mixi,一般
 	m_map[ACCESS_LOGIN] = AccessTypeInfo::Data(
 		"mixi"
 		, L"ログイン"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_MAIN] = AccessTypeInfo::Data(
 		"mixi"
 		, L"メイン"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_DIARY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"日記内容"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_NEWS] = AccessTypeInfo::Data(
 		"mixi"
 		, L"ニュース"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_BBS] = AccessTypeInfo::Data(
 		"mixi"
 		, L"コミュ書込"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_ENQUETE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"アンケート"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_EVENT] = AccessTypeInfo::Data(
 		"mixi"
 		, L"イベント"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_EVENT_MEMBER] = AccessTypeInfo::Data(
 		"mixi"
 		, L"イベント参加者一覧"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_MYDIARY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"日記"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_ADDDIARY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"日記投稿"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_MESSAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_IMAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"画像"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_MOVIE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"動画"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_DOWNLOAD] = AccessTypeInfo::Data(
 		"mixi"
 		, L"ダウンロード"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_PROFILE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"プロフィール"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_COMMUNITY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"コミュニティ"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_PLAIN] = AccessTypeInfo::Data(
 		"mixi"
 		, L"汎用URL"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_INTRO] = AccessTypeInfo::Data(
-		"mixi"
-		, L"紹介文"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_DIARY] = AccessTypeInfo::Data(
-		"mixi"
-		, L"日記一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_NEW_COMMENT] = AccessTypeInfo::Data(
-		"mixi"
-		, L"新着コメント一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_COMMENT] = AccessTypeInfo::Data(
-		"mixi"
-		, L"コメント一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_NEWS] = AccessTypeInfo::Data(
-		"mixi"
-		, L"ニュース一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_FAVORITE] = AccessTypeInfo::Data(
-		"mixi"
-		, L"お気に入り"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_FRIEND] = AccessTypeInfo::Data(
-		"mixi"
-		, L"マイミク一覧"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_COMMUNITY] = AccessTypeInfo::Data(
-		"mixi"
-		, L"コミュニティ一覧"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_NEW_BBS_COMMENT] = AccessTypeInfo::Data(
-		"mixi"
-		, L"コミュコメント記入履歴"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_NEW_BBS] = AccessTypeInfo::Data(
-		"mixi"
-		, L"コミュ書込一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_BBS] = AccessTypeInfo::Data(
-		"mixi"
-		, L"トピック一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_MYDIARY] = AccessTypeInfo::Data(
-		"mixi"
-		, L"日記一覧"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_FOOTSTEP] = AccessTypeInfo::Data(
-		"mixi"
-		, L"足あと"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_MESSAGE_IN] = AccessTypeInfo::Data(
-		"mixi"
-		, L"メッセージ(受信箱)"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_MESSAGE_OUT] = AccessTypeInfo::Data(
-		"mixi"
-		, L"メッセージ(送信箱)"
-		, REQUEST_METHOD_GET
-		, true	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_BOOKMARK] = AccessTypeInfo::Data(
-		"mixi"
-		, L"ブックマーク"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
-		);
-	m_map[ACCESS_LIST_CALENDAR] = AccessTypeInfo::Data(
-		"mixi"
-		, L"カレンダー"
-		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
-	// POST 系
+	//------------------------------------------------------------------
+	//--- mixi,POST 系
 	m_map[ACCESS_POST_CONFIRM_COMMENT] = AccessTypeInfo::Data(
 		"mixi"
 		, L"コメント投稿（確認）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_ENTRY_COMMENT] = AccessTypeInfo::Data(
 		"mixi"
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_CONFIRM_REPLYMESSAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"メッセージ返信（確認）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_ENTRY_REPLYMESSAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"メッセージ返信（書込）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_CONFIRM_NEWMESSAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"新規メッセージ（確認）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_ENTRY_NEWMESSAGE] = AccessTypeInfo::Data(
 		"mixi"
 		, L"新規メッセージ（書込）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_CONFIRM_NEWDIARY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"日記投稿（確認）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 	m_map[ACCESS_POST_ENTRY_NEWDIARY] = AccessTypeInfo::Data(
 		"mixi"
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
-	// Twitter 系
-	m_map[ACCESS_TWITTER_FRIENDS_TIMELINE] = AccessTypeInfo::Data(
+	//------------------------------------------------------------------
+	//--- Twitter 系
+	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"タイムライン"
 		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_FAVORITES] = AccessTypeInfo::Data(
+	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("発言");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日付>>");
+
+	type = ACCESS_TWITTER_FAVORITES;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"お気に入り"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_DIRECT_MESSAGES] = AccessTypeInfo::Data(
+	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("発言");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日付>>");
+
+	type = ACCESS_TWITTER_DIRECT_MESSAGES;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_UPDATE] = AccessTypeInfo::Data(
+	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
+	m_map[type].bodyHeaderCol1Type = BODY_INDICATE_TYPE_BODY;
+	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
+	m_map[type].bodyHeaderCol2TypeB = BODY_INDICATE_TYPE_DATE;
+	m_map[type].bodyHeaderCol1Name = _T("メッセージ");
+	m_map[type].bodyHeaderCol2NameA = _T("名前>>");
+	m_map[type].bodyHeaderCol2NameB = _T("日付>>");
+
+	type = ACCESS_TWITTER_UPDATE;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"更新"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
-	m_map[ACCESS_TWITTER_USER] = AccessTypeInfo::Data(
+	type = ACCESS_TWITTER_USER;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"Twitter発言"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_NEW_DM] = AccessTypeInfo::Data(
+
+	type = ACCESS_TWITTER_NEW_DM;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"メッセージ送信"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
-	m_map[ACCESS_TWITTER_FAVOURINGS_CREATE] = AccessTypeInfo::Data(
+	type = ACCESS_TWITTER_FAVOURINGS_CREATE;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"お気に入り登録"
 		, REQUEST_METHOD_POST
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_FAVOURINGS_DESTROY] = AccessTypeInfo::Data(
+
+	type = ACCESS_TWITTER_FAVOURINGS_DESTROY;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"お気に入り削除"
 		, REQUEST_METHOD_POST
-		, false	// bCruiseTarget
 		);
 
-	m_map[ACCESS_TWITTER_FRIENDSHIPS_CREATE] = AccessTypeInfo::Data(
+	type = ACCESS_TWITTER_FRIENDSHIPS_CREATE;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"フォロー登録"
 		, REQUEST_METHOD_POST
-		, false	// bCruiseTarget
 		);
-	m_map[ACCESS_TWITTER_FRIENDSHIPS_DESTROY] = AccessTypeInfo::Data(
+
+	type = ACCESS_TWITTER_FRIENDSHIPS_DESTROY;
+	m_map[type] = AccessTypeInfo::Data(
 		"Twitter"
 		, L"フォロー解除"
 		, REQUEST_METHOD_POST
-		, false	// bCruiseTarget
 		);
 
+	//------------------------------------------------------------------
+	//--- その他
 	m_map[ACCESS_INVALID] = AccessTypeInfo::Data(
 		""
 		, L"<invalid>"
 		, REQUEST_METHOD_GET
-		, false	// bCruiseTarget
 		);
 
 	return true;
