@@ -63,7 +63,7 @@ BOOL CDebugDlg::OnInitDialog()
 	CMixiData* data = m_data;
 
 	m_List.InsertItem( idx, L"アクセス種別" );
-	m_List.SetItemText( idx, 1, util::AccessType2Message( data->GetAccessType() ) );
+	m_List.SetItemText( idx, 1, theApp.m_accessTypeInfo.getShortText( data->GetAccessType() ) );
 	idx++;
 
 	m_List.InsertItem( idx, L"Date" );

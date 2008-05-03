@@ -15,6 +15,7 @@
 
 #include "resource.h"		// メイン シンボル
 #include "../MZ3/Mz3GroupData.h"
+#include "../MZ3/AccessTypeInfo.h"
 
 // NOP
 #define MZ3LOGGER_ERROR(msg) ;
@@ -35,6 +36,7 @@ public:
 public:
 	Mz3GroupData m_group_info;
 	CString		 m_strGroupInifilePath;
+	AccessTypeInfo	m_accessTypeInfo;	///< アクセス種別毎のMZ3/4の振る舞いを定義する情報
 
 // 実装
 

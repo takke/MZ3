@@ -27,7 +27,7 @@ inline void MySetInformationText( HWND hWnd, LPCTSTR szMessage )
 	CString text;
 	if( theApp.m_inet.IsConnecting() ) {
 		// 通信中なので、アクセス種別を頭に付ける
-		text = AccessType2Message(theApp.m_accessType);
+		text = theApp.m_accessTypeInfo.getShortText(theApp.m_accessType);
 
 		// リダイレクト回数が１回以上なら、それも表示しておく
 		int nRedirect = theApp.m_inet.GetRedirectCount();
@@ -91,16 +91,10 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
  */
 inline bool IsTwitterAccessType( ACCESS_TYPE type )
 {
-	switch (type) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_FAVORITES:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-	case ACCESS_TWITTER_FAVOURINGS_CREATE:
-	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
-	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
-	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
+	const char* serviceType = theApp.m_accessTypeInfo.getServiceType(type);
+	if (strcmp(serviceType, "Twitter")==0) {
 		return true;
-	default:
+	} else {
 		return false;
 	}
 }

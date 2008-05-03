@@ -26,6 +26,7 @@
 #include "MZ3SkinInfo.h"
 #include "EmojiMap.h"
 #include "ImageCacheManager.h"
+#include "AccessTypeInfo.h"
 
 #ifndef WINCE
 	#include "gdiplus.h"
@@ -63,6 +64,8 @@ class MouseGestureManager;
 class CMZ3App : public CWinApp
 {
 public:
+	AccessTypeInfo	m_accessTypeInfo;	///< アクセス種別毎のMZ3/4の振る舞いを定義する情報
+
 	/// MZ3 で利用しているファイルのパス
 	class FilePath {
 	public:

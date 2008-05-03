@@ -56,6 +56,7 @@ CMZ3App::CMZ3App()
 	, m_bWinMoFiveOh(FALSE)
 	, m_bWinMo2003(FALSE)
 	, m_bWinMo2003_SE(FALSE)
+	, m_pMouseGestureManager(NULL)
 {
 }
 
@@ -75,6 +76,10 @@ CMZ3App::~CMZ3App()
 //		delete m_pWriteView;
 //		m_pWriteView = NULL;
 //	}
+	if (m_pMouseGestureManager != NULL) {
+		delete m_pMouseGestureManager;
+		m_pMouseGestureManager = NULL;
+	}
 }
 
 // 唯一の CMZ3App オブジェクトです。
@@ -92,6 +97,9 @@ BOOL CMZ3App::InitInstance()
 
 	// 解像度/DPI判定
 	InitResolutionFlags();
+
+	// アクセス種別毎の振る舞い定義を初期化
+	m_accessTypeInfo.init();
 
 	// CAPEDIT および SIPPREF のような Windows Mobile 特有のコントロールを初期化するには、アプリケーションの
 	// 初期化中に SHInitExtraControls を一度呼び出す必要があります。

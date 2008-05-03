@@ -60,7 +60,7 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 	};
 
 	for (int i=0; accessTypeList[i] != ACCESS_INVALID; i++ ) {
-		int idx = mc_listAccessType.InsertString( i, util::AccessType2Message(accessTypeList[i]) );
+		int idx = mc_listAccessType.InsertString( i, theApp.m_accessTypeInfo.getShortText(accessTypeList[i]) );
 		mc_listAccessType.SetItemData( i, accessTypeList[i] );
 	}
 	mc_listAccessType.SetCurSel(0);

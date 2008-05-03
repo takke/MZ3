@@ -2783,13 +2783,13 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 	// GET/POST 判定
 	bool bPost = false;	// デフォルトはGET
-	switch (data->GetAccessType()) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:		// タイムライン取得をPOSTにしてみる
-	case ACCESS_TWITTER_FAVOURINGS_CREATE:
-	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
-	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
-	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
+	switch (theApp.m_accessTypeInfo.getRequestMethod(data->GetAccessType())) {
+	case AccessTypeInfo::REQUEST_METHOD_POST:
 		bPost = true;
+		break;
+	case AccessTypeInfo::REQUEST_METHOD_GET:
+	case AccessTypeInfo::REQUEST_METHOD_INVALID:
+	default:
 		break;
 	}
 
@@ -2918,7 +2918,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 		CMixiDataList& body = category.GetBodyList();
 
 		CString msgHead;
-		msgHead.Format( L"%s : ", util::AccessType2Message(category.m_mixi.GetAccessType()) );
+		msgHead.Format( L"%s : ", theApp.m_accessTypeInfo.getShortText(category.m_mixi.GetAccessType()));
 
 		// HTML の取得
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 1/3") );
@@ -2968,7 +2968,7 @@ void CMZ3View::OnViewLog()
 		// 未サポートなので終了する
 		{
 			CString msg = L"この形式のログはサポートしていません : ";
-			msg += util::AccessType2Message(mixi.GetAccessType());
+			msg += theApp.m_accessTypeInfo.getShortText(mixi.GetAccessType());
 			MZ3LOGGER_INFO( msg );
 
 			util::MySetInformationText( m_hWnd, msg );
@@ -4075,24 +4075,12 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
 	CCategoryItem* pCategory = m_selGroup->getFocusedCategory();
 	if (pCategory != NULL) {
-		switch( pCategory->m_mixi.GetAccessType() ) {
-		case ACCESS_LIST_NEW_BBS:
-		case ACCESS_LIST_NEWS:
-		case ACCESS_LIST_MESSAGE_IN:
-		case ACCESS_LIST_MESSAGE_OUT:
-		case ACCESS_LIST_DIARY:
-		case ACCESS_LIST_MYDIARY:
-		case ACCESS_LIST_BBS:
-		case ACCESS_LIST_NEW_COMMENT:
-		case ACCESS_LIST_COMMENT:
-		case ACCESS_LIST_NEW_BBS_COMMENT:
+		if (theApp.m_accessTypeInfo.isCruiseTarget(pCategory->m_mixi.GetAccessType())) {
 			// 巡回対象なので巡回メニューを無効化しない
-			break;
-		default:
+		} else {
 			// 巡回メニューを無効化する
 			pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 			pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
-			break;
 		}
 
 		// 巡回予約済みであればチェックを付ける。
@@ -4102,6 +4090,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 			pSubMenu->CheckMenuItem( IDM_CHECK_CRUISE, MF_UNCHECKED );
 		}
 	} else {
+		// 巡回メニューを無効化する
 		pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 		pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 	}
@@ -4119,6 +4108,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		static CArray<CMenu, CMenu> subMenu;
 		subMenu.RemoveAll();
 		subMenu.SetSize( template_data.groups.size() );
+
 		int menuId = ID_APPEND_MENU_BEGIN;
 		for (unsigned int groupIdx=0; groupIdx<template_data.groups.size(); groupIdx++) {
 			subMenu[groupIdx].CreatePopupMenu();

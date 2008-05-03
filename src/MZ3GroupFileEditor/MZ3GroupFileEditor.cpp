@@ -45,6 +45,8 @@ BOOL CMZ3GroupFileEditorApp::InitInstance()
 	// Win32 用にロケールを設定
 	setlocale( LC_ALL, "Japanese" ); 
 
+	m_accessTypeInfo.init();
+
 	// アプリケーション マニフェストが visual スタイルを有効にするために、
 	// ComCtl32.dll Version 6 以降の使用を指定する場合は、
 	// Windows XP に InitCommonControlsEx() が必要です。さもなければ、ウィンドウ作成はすべて失敗します。
