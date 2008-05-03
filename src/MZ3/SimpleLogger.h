@@ -205,9 +205,20 @@ public:
 
 private:
 
+	/**
+	 * メッセージ出力
+	 */
 	bool outputMessage( CATEGORY category, LPCTSTR message, LPCTSTR strSourceFilename, int line ) {
+		bool rval = outputMessage( m_fp, category, message, strSourceFilename, line );
+#ifdef DEBUG
+		rval = outputMessage( stdout, category, message, strSourceFilename, line );
+#endif
+		return rval;
+	}
 
-		if( m_fp == NULL ) {
+	static bool outputMessage( FILE* fp, CATEGORY category, LPCTSTR message, LPCTSTR strSourceFilename, int line ) {
+
+		if( fp == NULL ) {
 			return false;
 		}
 
@@ -218,7 +229,7 @@ private:
 		__time64_t now = _time64(NULL);
 		struct tm newtime;
 		_localtime64_s( &newtime, &now );
-		fwprintf( m_fp, L"[%04d/%02d/%02d %02d:%02d:%02d] ",
+		fwprintf( fp, L"[%04d/%02d/%02d %02d:%02d:%02d] ",
 			newtime.tm_year + 1900,
 			newtime.tm_mon + 1,
 			newtime.tm_mday,
@@ -229,14 +240,14 @@ private:
 		if( strSourceFilename != NULL ) {
 			if( line >= 0 ) {
 				// 行番号まで指定されているので、ソースファイル名と行番号を出力する
-				fwprintf( m_fp, L"%5s %s [%s:%d]\n", categoryText, message, strSourceFilename, line );
+				fwprintf( fp, L"%5s %s [%s:%d]\n", categoryText, message, strSourceFilename, line );
 			}else{
 				// ソースファイル名のみ指定されているので、ソースファイル名を出力する
-				fwprintf( m_fp, L"%5s %s [%s]\n", categoryText, message, strSourceFilename );
+				fwprintf( fp, L"%5s %s [%s]\n", categoryText, message, strSourceFilename );
 			}
 		}else{
 			// ソースファイル名が指定されていないので、メッセージを出力する
-			fwprintf( m_fp, L"%5s %s\n", categoryText, message );
+			fwprintf( fp, L"%5s %s\n", categoryText, message );
 		}
 
 		return true;
@@ -245,7 +256,7 @@ private:
 	/**
 	 * カテゴリ定数を文字列に変換する。文字列は常に 5文字。
 	 */
-	LPCTSTR category2text( CATEGORY category ) {
+	static LPCTSTR category2text( CATEGORY category ) {
 		switch( category ) {
 		case CATEGORY_FATAL:	return L"FATAL";
 		case CATEGORY_ERROR:	return L"ERROR";
