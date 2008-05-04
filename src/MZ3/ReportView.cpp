@@ -2824,6 +2824,9 @@ afx_msg void CReportView::OnEditCopy()
 		str += m_currentData->GetBody(i);
 	}
 
+	// らんらんビュータグを消去
+	ViewFilter::RemoveRan2ViewTag( str );
+
 	util::SetClipboardDataTextW( str );
 #else
 	m_edit.Copy();
