@@ -406,6 +406,14 @@ BEGIN
     END
 END
 
+IDR_RSS_MENU MENU 
+BEGIN
+    POPUP "RssContextMenu"
+    BEGIN
+        MENUITEM "‘S•¶‚ð“Ç‚Þ...",                    ID_MENU_RSS_READ
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

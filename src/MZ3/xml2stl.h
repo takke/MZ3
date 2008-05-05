@@ -511,7 +511,7 @@ private:
 			wint_t c = reader.get_char();
 
 			if (temp.empty()) {
-				if (c=='<') {
+				if (c==target[0]) {
 					temp.push_back(c);
 				} else {
 					node_text.push_back( c );
@@ -650,12 +650,44 @@ private:
 					}
 					break;
 				case '!':
-					// 1文字目であれば、DTD 宣言とみなし、読み飛ばす。
+					// 1文字目であれば、DTD 宣言or CDATA とみなし、読み飛ばす。
+					/*
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<![CDATA[  
+<center>...</center>
+]]>
+					*/
 					if (node_name.size()==0) {
-						// DTD 宣言。
-						// '>' が現れるまでパースし、継続。
-						while( !reader.is_eof() ) {
+						// DTD 宣言 or CDATA
+						// DTD : '>' が現れるまでパースし、継続。
+						// CDATA : ]]> が現れるまでパースし、要素化。
+						for (int xpos=0; !reader.is_eof(); xpos++) {
 							wint_t c = reader.get_char();
+
+							if (xpos==0 && c=='[') {
+								// CDATA
+								node_text = L"";
+								node_name = L"";
+								// [ まで読み飛ばす
+								while (!reader.is_eof()) {
+									wint_t c = reader.get_char();
+									if (c=='[') {
+										break;
+									}
+								}
+
+								// ]]> まで読み飛ばす
+								parse_until_target( node, reader, L"]]>" );
+
+								// clear state
+								state = PARSE_STATE_SEARCHING;
+								node_name = L"";
+								node_text = L"";
+
+								break;
+							}
 							if (c=='>') {
 								state = PARSE_STATE_SEARCHING;
 								node_name = L"";

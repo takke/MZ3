@@ -597,6 +597,7 @@ class RssParser : public mixi::MixiContentParser
 {
 public:
 	static bool parse( CMixiDataList& mixi, const CHtmlArray& html_ );
+	static void setDescriptionTitle( CMixiData& data, CString description, CString title );
 };
 
 }//namespace mz3parser

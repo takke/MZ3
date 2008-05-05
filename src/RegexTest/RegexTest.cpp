@@ -78,10 +78,13 @@ int test_xml2stl()
 	{
 		Container root;
 
-		xml2stl::SimpleXmlParser::loadFromFile( root, L"C:\\Users\\takke\\Desktop\\temp\\show_friend2.html" );
+//		xml2stl::SimpleXmlParser::loadFromFile( root, L"C:\\Users\\takke\\Desktop\\temp\\show_friend2.html" );
+		xml2stl::SimpleXmlParser::loadFromFile( root, L"E:\\work\\xml2stl.xml" );
 
 		// dump
-//		dump_container( root, stdout );
+		dump_container( root, stdout );
+
+		return 1;
 
 		try {
 			const xml2stl::Node& x  = root.getNode( L"dd" );

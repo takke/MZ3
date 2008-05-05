@@ -178,6 +178,31 @@ public:
 			}
 		}
 
+		// RSS 形式 (YYYY-MM-DDT00:00:00+09:00)
+		{
+			// 正規表現のコンパイル
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})\\+([0-9]{2}):([0-9]{2})" ) ) {
+				return false;
+			}
+			// 検索
+			if( reg.exec(line) && reg.results.size() == 9 ) {
+				// 抽出
+				int year   = _wtoi( reg.results[1].str.c_str() );
+				int month  = _wtoi( reg.results[2].str.c_str() );
+				int day    = _wtoi( reg.results[3].str.c_str() );
+				int hour   = _wtoi( reg.results[4].str.c_str() );
+				int minute = _wtoi( reg.results[5].str.c_str() );
+
+				CTime t(year, month, day, hour, minute, 0);
+//				t += CTimeSpan(0, 9, 0, 0);
+
+				t_result = t;
+				//mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
+				return true;
+			}
+		}
+
 		// RSS 形式 (Sun Dec 16 09:00:00 +0000 2007)
 		{
 			// 正規表現のコンパイル

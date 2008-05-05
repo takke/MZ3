@@ -384,6 +384,7 @@ public:
 	afx_msg void OnMenuTwitterDestroyFriendships();
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
+	afx_msg void OnMenuRssRead();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -115,8 +115,9 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 
 	// RSS 1.0 判定
 	try {
-		root.getNode( L"rdf:RDF" ).getNode(L"channel");
-		root.getNode( L"rdf:RDF" ).getNode(L"item");
+		const xml2stl::Node& rdf = root.getNode( L"rdf:RDF" );
+		rdf.getNode(L"channel");
+		rdf.getNode(L"item");
 
 		// OK.
 		rss_type = RSS_TYPE_1_0;
@@ -138,18 +139,20 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	case RSS_TYPE_1_0:
 //		parseRss1(out_, root);
 		// rdf:RDF/channel に対する処理
-		try {
+
+		// Feed 自体の情報を取得する場合は下記のコードを参考に。
+/*		try {
 			const xml2stl::Node& channel = root.getNode( L"rdf:RDF" ).getNode(L"channel");
 
-//			CString s = channel.getNode(L"title").getTextAll().c_str();
-//			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-//			out_.SetTitle( s );
-//			out_.SetAuthor( s );
+			CString s = channel.getNode(L"title").getTextAll().c_str();
+			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+			out_.SetTitle( s );
+			out_.SetAuthor( s );
 
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
 		}
-
+*/
 		// rdf:RDF/item に対する処理
 		try {
 			const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
@@ -161,24 +164,19 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				}
 
 				CMixiData data;
-				// title
-				CString s = item.getNode(L"title").getTextAll().c_str();
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-				data.SetTitle( s );
-				data.SetAuthor( s );
 
-				// description
-				s = item.getNode(L"description").getTextAll().c_str();
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-				data.AddBody(L"\r\n");
-				data.AddBody(s);
+				// description, title の取得
+				CString title = item.getNode(L"title").getTextAll().c_str();
+				CString description = item.getNode(L"description").getTextAll().c_str();
 
-				// rdf:about
-				s = item.getProperty(L"rdf:about").c_str();
+				// 整形して格納する
+				RssParser::setDescriptionTitle(data, description, title);
+
+				// link = rdf:about
+				CString s = item.getProperty(L"rdf:about").c_str();
 				data.m_linkList.push_back(CMixiData::Link(s, data.GetTitle().Left(20)));
 
 				data.SetAccessType(ACCESS_RSS_READER_ITEM);
-
 				out_.push_back(data);
 			}
 
@@ -194,20 +192,6 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 			const xml2stl::Node& rss = root.getNode( L"rss", xml2stl::Property(L"version", L"2.0") );
 			const xml2stl::Node& channel = rss.getNode(L"channel");
 
-			CString s;
-//			CString s = channel.getNode(L"title").getTextAll().c_str();
-//			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-//			out_.SetTitle( s );
-//			out_.SetAuthor( s );
-
-//			try {
-//				s = channel.getNode(L"description").getTextAll().c_str();
-//				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-//				out_.AddBody(L"\r\n");
-//				out_.AddBody( s );
-//			} catch (xml2stl::NodeNotFoundException& e) {
-//			}
-
 			for (int i=0; i<channel.getChildrenCount(); i++) {
 				const xml2stl::Node& item = channel.getNode(i);
 				if (item.getName() != L"item") {
@@ -215,32 +199,28 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				}
 
 				CMixiData data;
-				// title
-				CString s = item.getNode(L"title").getTextAll().c_str();
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-				data.SetTitle( s );
-				data.SetAuthor( s );
 
-				// description
-				s = item.getNode(L"description").getTextAll().c_str();
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-				data.AddBody(L"\r\n");
-				data.AddBody(s);
+				// description, title の取得
+				CString description = item.getNode(L"description").getTextAll().c_str();
+				CString title = item.getNode(L"title").getTextAll().c_str();
+
+				// 整形して格納する
+				RssParser::setDescriptionTitle(data, description, title);
 
 				// link
-				s = item.getNode(L"link").getTextAll().c_str();
-				data.m_linkList.push_back(CMixiData::Link(s, data.GetTitle().Left(20)));
+				CString link = item.getNode(L"link").getTextAll().c_str();
+				data.m_linkList.push_back(CMixiData::Link(link, data.GetTitle().Left(20)));
 
 				// pubDate
 				try {
-					s = item.getNode(L"pubDate").getTextAll().c_str();
+					CString s = item.getNode(L"pubDate").getTextAll().c_str();
 					mixi::ParserUtil::ParseDate(s, data);
 				} catch (xml2stl::NodeNotFoundException&) {
 				}
 
 				// dc:date
 				try {
-					s = item.getNode(L"dc:date").getTextAll().c_str();
+					CString s = item.getNode(L"dc:date").getTextAll().c_str();
 					mixi::ParserUtil::ParseDate(s, data);
 				} catch (xml2stl::NodeNotFoundException&) {
 				}
@@ -263,5 +243,27 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	MZ3LOGGER_DEBUG( L"RssParser.parse() finished." );
 	return true;
 }
+
+void RssParser::setDescriptionTitle( CMixiData& data, CString description, CString title )
+{
+	// description の整形
+	mixi::ParserUtil::ReplaceEntityReferenceToCharacter( description );
+	description = description.Trim();
+
+	// body として description の no-tag 版を設定する
+	mixi::ParserUtil::StripAllTags(description);
+	description = description.Trim();
+	data.AddBody(description);
+
+	// title = title+description
+	mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
+	if (!title.IsEmpty()) {
+		title += L"\r\n";
+	}
+	title += description;
+	title = title.Trim();
+	data.SetTitle( title );
+}
+
 
 }//namespace mixi

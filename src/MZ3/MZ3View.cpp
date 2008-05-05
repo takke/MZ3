@@ -184,6 +184,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FAVOURINGS, &CMZ3View::OnMenuTwitterDestroyFavourings)
 	ON_COMMAND(ID_MENU_TWITTER_CREATE_FRIENDSHIPS, &CMZ3View::OnMenuTwitterCreateFriendships)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FRIENDSHIPS, &CMZ3View::OnMenuTwitterDestroyFriendships)
+	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1399,7 +1400,7 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	case ACCESS_RSS_READER_ITEM:
 		// ダブルクリックの場合は詳細表示
-		// TODO
+		OnMenuRssRead();
 		return;
 	}
 
@@ -2134,7 +2135,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		case ACCESS_RSS_READER_ITEM:
 			// ダブルクリックの場合は詳細表示
-			// TODO
+			OnMenuRssRead();
 			break;
 
 		default:
@@ -3294,6 +3295,29 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_GRAYED | MF_BYCOMMAND );
 			} else {
 				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_ENABLED | MF_BYCOMMAND );
+			}
+
+			// メニューを開く
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		}
+		break;
+
+	case ACCESS_RSS_READER_ITEM:
+		{
+			CMenu menu;
+			menu.LoadMenu( IDR_RSS_MENU );
+			CMenu* pSubMenu = menu.GetSubMenu(0);	// メニューはidx=0
+
+			// リンク
+			int n = (int)bodyItem.m_linkList.size();
+			if( n > 0 ) {
+				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+				for( int i=0; i<n; i++ ) {
+					// 追加
+					CString s;
+					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				}
 			}
 
 			// メニューを開く
@@ -4565,6 +4589,11 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 			if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
 				return VIEW_STYLE_TWITTER;
 			} else {
+				if (strcmp(theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType()), "RSS")==0) {
+					// 仮
+					return VIEW_STYLE_IMAGE;
+				}
+
 				if (m_bodyList.IsEnableIcon()) {
 					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
 					if (pImageList != NULL &&
@@ -5540,4 +5569,24 @@ void CMZ3View::MyOpenLocalFile(void)
 			MyShowReportView( s_mixi );
 		}
 	}
+}
+
+/**
+ * RSS | 全文を読む
+ */
+void CMZ3View::OnMenuRssRead()
+{
+	CMixiData& data = GetSelectedBodyItem();
+
+	CString item;
+	item = data.GetTitle();
+
+	// 日付があれば追加
+	if (!data.GetDate().IsEmpty()) {
+		item.Append( L"\r\n" );
+		item.Append( L"----\r\n" );
+		item.AppendFormat( L"%s\r\n", data.GetDate() );
+	}
+
+	MessageBox( item, data.GetName() );
 }

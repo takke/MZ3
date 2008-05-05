@@ -570,14 +570,14 @@ bool AccessTypeInfo::init()
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
 		, "RSS"
-		, L"RSS FEED"
+		, L"RSS Feed"
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;
 	m_map[type].serializeKey = "RSS_FEED";
 	m_map[type].defaultCategoryURL = L"";
-	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"内容");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE,  L"タイトル>>");
+	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
+	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY,  L"内容>>");
 	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
 
 	type = ACCESS_RSS_READER_ITEM;
