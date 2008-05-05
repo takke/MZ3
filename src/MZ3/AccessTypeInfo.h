@@ -32,10 +32,21 @@ public:
 		REQUEST_METHOD_POST = 1,		///< POST メソッド
 	};
 
+	/// データ自体の種別
+	enum INFO_TYPE {
+		INFO_TYPE_INVALID = -1,			///< 未定義
+		INFO_TYPE_GROUP,				///< グループ系
+		INFO_TYPE_CATEGORY,				///< カテゴリ系
+		INFO_TYPE_BODY,					///< ボディ項目系
+		INFO_TYPE_POST,					///< POST系
+		INFO_TYPE_OTHER,				///< その他
+	};
+
 	/// 各アクセス種別の振る舞いを定義するデータ構造
 	class Data
 	{
 	public:
+		INFO_TYPE			infoType;			///< データ自体の種別（何に利用されるアクセス種別か？）
 		std::string			serviceType;		///< 対象とするサービスの種別（"mixi", "Twitter"など）
 		std::wstring		shortText;			///< 説明文字列
 		REQUEST_METHOD		requestType;		///< リクエスト種別
@@ -50,8 +61,9 @@ public:
 		BODY_INDICATE_TYPE	bodyHeaderCol2TypeA;///< ボディリストのヘッダー2のカラム種別A（Bとトグル）
 		BODY_INDICATE_TYPE	bodyHeaderCol2TypeB;///< ボディリストのヘッダー2のカラム種別B（Aとトグル）
 
-		Data(const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
-			: serviceType(a_serviceType)
+		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
+			: infoType(a_infoType)
+			, serviceType(a_serviceType)
 			, shortText(a_shortText)
 			, requestType(a_requestType)
 			, defaultCategoryURL(L"")
@@ -63,7 +75,8 @@ public:
 			, bodyHeaderCol2TypeB(BODY_INDICATE_TYPE_NONE)
 		{}
 		Data()
-			: serviceType("")
+			: infoType(INFO_TYPE_INVALID)
+			, serviceType("")
 			, shortText(L"<unknown>")
 			, requestType(REQUEST_METHOD_INVALID)
 			, bCruiseTarget(false)
@@ -180,6 +193,15 @@ public:
 			return L"";
 		}
 		return it->second.defaultCategoryURL.c_str();
+	}
+
+	/// データ種別
+	INFO_TYPE getInfoType( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return INFO_TYPE_INVALID;
+		}
+		return it->second.infoType;
 	}
 
 };

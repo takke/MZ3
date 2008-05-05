@@ -982,8 +982,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				util::MySetInformationText( m_hWnd, msg );
 
 				m_checkNewComment = false;
-
-				break;
 			} else {
 				// 新着メッセージ以外なので、ログインのための取得だった。
 
@@ -995,74 +993,49 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				return TRUE;
 			}
 		}
-
-	case ACCESS_LIST_DIARY:
-	case ACCESS_LIST_NEW_COMMENT:
-	case ACCESS_LIST_COMMENT:
-	case ACCESS_LIST_NEWS:
-	case ACCESS_LIST_FAVORITE_USER:
-	case ACCESS_LIST_FAVORITE_COMMUNITY:
-	case ACCESS_LIST_FRIEND:
-	case ACCESS_LIST_COMMUNITY:
-	case ACCESS_LIST_NEW_BBS:
-	case ACCESS_LIST_NEW_BBS_COMMENT:
-	case ACCESS_LIST_MYDIARY:
-	case ACCESS_LIST_FOOTSTEP:
-	case ACCESS_LIST_MESSAGE_IN:
-	case ACCESS_LIST_MESSAGE_OUT:
-	case ACCESS_LIST_INTRO:
-	case ACCESS_LIST_BBS:
-	case ACCESS_LIST_CALENDAR:
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_FAVORITES:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
-		// --------------------------------------------------
-		// カテゴリ項目の取得
-		// --------------------------------------------------
-		if (DoAccessEndProcForBody(aType)) {
-			return TRUE;
-		}
-		break;
-
-	case ACCESS_DIARY:
-	case ACCESS_BBS:
-	case ACCESS_ENQUETE:
-	case ACCESS_EVENT:
-	case ACCESS_MYDIARY:
-	case ACCESS_MESSAGE:
-	case ACCESS_NEWS:
-	case ACCESS_PLAIN:
-	case ACCESS_PROFILE:
-		// --------------------------------------------------
-		// ボディ項目の取得
-		// --------------------------------------------------
-
-		// 巡回モードなら（解析せずに）次の巡回対象に移動する
-		if( m_cruise.enable() ) {
-			// 次の巡回対象があれば取得する
-			// なければ終了する
-			m_cruise.targetBodyItem++;
-
-			// 選択解除
-			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
-
-			if( DoNextBodyItemCruise() ) {
-				// 通信継続のためここで return する
-				return TRUE;
-			}
-		}else{
-			// 巡回モードでないので、解析してレポート画面を開く
-			static CMixiData mixi;
-			mixi = *data;
-			MyParseMixiHtml( theApp.m_filepath.temphtml, mixi );
-			MyShowReportView( mixi );
-		}
-
 		break;
 
 	default:
-		util::MySetInformationText( m_hWnd, L"完了（アクセス種別不明）" );
-		break;
+		switch (theApp.m_accessTypeInfo.getInfoType(aType)) {
+		case AccessTypeInfo::INFO_TYPE_CATEGORY:
+			// --------------------------------------------------
+			// カテゴリ項目の取得
+			// --------------------------------------------------
+			if (DoAccessEndProcForBody(aType)) {
+				return TRUE;
+			}
+			break;
+
+		case AccessTypeInfo::INFO_TYPE_BODY:
+			// --------------------------------------------------
+			// ボディ項目の取得
+			// --------------------------------------------------
+
+			// 巡回モードなら（解析せずに）次の巡回対象に移動する
+			if( m_cruise.enable() ) {
+				// 次の巡回対象があれば取得する
+				// なければ終了する
+				m_cruise.targetBodyItem++;
+
+				// 選択解除
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, m_selGroup->getSelectedCategory()->selectedBody,  false );
+
+				if( DoNextBodyItemCruise() ) {
+					// 通信継続のためここで return する
+					return TRUE;
+				}
+			}else{
+				// 巡回モードでないので、解析してレポート画面を開く
+				static CMixiData mixi;
+				mixi = *data;
+				MyParseMixiHtml( theApp.m_filepath.temphtml, mixi );
+				MyShowReportView( mixi );
+			}
+			break;
+		default:
+			util::MySetInformationText( m_hWnd, L"完了（アクセス種別不明）" );
+			break;
+		}
 	}
 
 	// 通信完了（フラグを下げる）
