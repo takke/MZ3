@@ -183,8 +183,8 @@ public:
 		return Access::Save( &filename_mbs[0], contents_ );
 	}
 
-	string GetValue(string KeyName, string SectionName);
-	bool   SetValue(string KeyName, string Value, string SectionName);
+	string GetValue(const string& KeyName, const string& SectionName);
+	bool   SetValue(const string& KeyName, const string& Value, const string& SectionName);
 	bool   SetValue(const wchar_t* wKeyName, const wchar_t* wValue, const char* SectionName) {
 
 		static std::vector<char> value( 256 );
@@ -201,8 +201,8 @@ public:
 	bool   RecordExists(string KeyName, string SectionName);
 
 	vector<string> GetSectionNames();
-	vector<Record> GetSection(string SectionName);
-	bool SectionExists(string SectionName);
+	vector<Record> GetSection(const string& SectionName);
+	bool SectionExists(const string& SectionName);
 
 	bool DeleteRecord(string KeyName, string SectionName);
 

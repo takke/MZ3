@@ -628,7 +628,7 @@ bool CMZ3GroupFileEditorDlg::MyMoveCategoryItemToOtherTab(int idxTab, int idxTab
  */
 void CMZ3GroupFileEditorDlg::OnAcceleratorSave()
 {
-	Mz3GroupDataWriter::save( theApp.m_group_info, theApp.m_strGroupInifilePath );
+	Mz3GroupDataWriter::save( theApp.m_accessTypeInfo, theApp.m_group_info, theApp.m_strGroupInifilePath );
 }
 
 void CMZ3GroupFileEditorDlg::OnFileSave()

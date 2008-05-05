@@ -171,6 +171,46 @@ bool Mz3GroupData::appendCategoryByIniData(
 }
 
 /**
+ * 下記のマップを生成する。
+ *
+ * グループ種別文字列 ←→ グループ種別
+ * カテゴリ種別文字列 ←→ カテゴリ種別
+ */
+void Mz3GroupDataInifileHelper::InitMap(AccessTypeInfo& accessTypeInfo) {
+	group_string2type.RemoveAll();
+	group_string2type.InitHashTable( 10 );
+	category_string2type.RemoveAll();
+	category_string2type.InitHashTable( 20 );
+
+	// AccessTypeInfo のシリアライズキーから各種ハッシュテーブルを構築する
+	AccessTypeInfo::MYMAP::iterator it;
+	for (it=accessTypeInfo.m_map.begin(); it!=accessTypeInfo.m_map.end(); it++) {
+		ACCESS_TYPE accessType = it->first;
+		AccessTypeInfo::Data& data = it->second;
+
+		switch (data.infoType) {
+		case AccessTypeInfo::INFO_TYPE_GROUP:
+			// group_string2type の構築
+			if (!data.serializeKey.empty()) {
+				group_string2type[ data.serializeKey.c_str() ] = accessType;
+			}
+			break;
+
+		case AccessTypeInfo::INFO_TYPE_CATEGORY:
+			// category_string2type の構築
+			if (!data.serializeKey.empty()) {
+				category_string2type[ data.serializeKey.c_str() ] = accessType;
+			}
+			break;
+
+		default:
+			// nothing to do.
+			break;
+		}
+	}
+}
+
+/**
  * ini ファイル（グループ定義ファイル）から Mz3GroupData を生成する。
  */
 bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& target, const CString& inifilename )
@@ -178,7 +218,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 	target.groups.clear();
 
 	inifile::IniFile inifile;
-	Mz3GroupDataInifileHelper helper;
+	Mz3GroupDataInifileHelper helper(accessTypeInfo);
 
 	// グループ定義ファイルのロード
 	if(! inifile.Load( inifilename ) ) {
@@ -217,7 +257,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 
 		// "Type" の値を取得し、グループ種別とする。
 		// グループ種別名→グループ種別変換を行う。
-		std::wstring type_value = util::my_mbstowcs( inifile.GetValue( "Type", section_name ) );
+		std::string type_value = inifile.GetValue( "Type", section_name );
 		ACCESS_TYPE group_type = helper.GroupString2Type( type_value.c_str() );
 		if( group_type == ACCESS_INVALID ) {
 			continue;
@@ -255,7 +295,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 
 			// 文字列リストの第2要素をカテゴリ種別とする。
 			// カテゴリ種別名→カテゴリ種別変換を行う。
-			ACCESS_TYPE category_type = helper.CategoryString2Type( util::my_mbstowcs(values[1]).c_str() );
+			ACCESS_TYPE category_type = helper.CategoryString2Type( values[1].c_str() );
 			if( category_type == ACCESS_INVALID ) {
 				continue;
 			}
@@ -295,10 +335,9 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 /**
  * Mz3GroupData オブジェクトを ini ファイル（グループ定義ファイル）化する。
  */
-bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifilename )
+bool Mz3GroupDataWriter::save( AccessTypeInfo& accessTypeInfo, const Mz3GroupData& target, const CString& inifilename )
 {
 	inifile::IniFile inifile;
-	Mz3GroupDataInifileHelper helper;
 
 	const int n = target.groups.size();
 	for( int i=0; i<n; i++ ) {
@@ -315,10 +354,8 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 		// Name 出力
 		inifile.SetValue( L"Name", group.name, strSectionName );
 
-//		MessageBox( NULL, group.name, L"", MB_OK );
-
 		// Type 出力
-		inifile.SetValue( L"Type", helper.GroupType2String(group.mixi.GetAccessType()), strSectionName );
+		inifile.SetValue( "Type", accessTypeInfo.getSerializeKey(group.mixi.GetAccessType()), (LPCSTR)strSectionName );
 
 		// Url 出力
 		inifile.SetValue( L"Url", group.mixi.GetURL(), strSectionName );
@@ -334,8 +371,8 @@ bool Mz3GroupDataWriter::save( const Mz3GroupData& target, const CString& inifil
 			// 右辺値生成
 			// 右辺値は順に、「カテゴリ名称」、「カテゴリ種別文字列」、「URL」
 			const CCategoryItem& item = group.categories[j];
-			LPCTSTR categoryString = helper.CategoryType2String(item.m_mixi.GetAccessType());
-			if (categoryString == NULL || item.bSaveToGroupFile==false) 
+			CString categoryString = util::my_mbstowcs(accessTypeInfo.getSerializeKey(item.m_mixi.GetAccessType())).c_str();
+			if (categoryString.IsEmpty() || item.bSaveToGroupFile==false) 
 				continue;
 
 			CString value;

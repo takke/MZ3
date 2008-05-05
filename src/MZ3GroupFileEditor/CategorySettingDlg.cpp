@@ -51,8 +51,7 @@ BOOL CCategorySettingDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	Mz3GroupDataInifileHelper helper;
-	std::vector<ACCESS_TYPE> types = helper.GetCategoryTypeList();
+	std::vector<ACCESS_TYPE> types = theApp.m_accessTypeInfo.getCategoryTypeList();
 	for (int i=0; i<types.size(); i++) {
 		int idx = mc_comboType.InsertString( i, theApp.m_accessTypeInfo.getShortText(types[i]) );
 

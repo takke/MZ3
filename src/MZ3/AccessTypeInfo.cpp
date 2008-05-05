@@ -10,49 +10,66 @@
 /// 初期化
 bool AccessTypeInfo::init()
 {
+	ACCESS_TYPE type;
+
 	//------------------------------------------------------------------
 	//--- グループ系
-	m_map[ACCESS_GROUP_COMMUNITY] = AccessTypeInfo::Data(
+	type = ACCESS_GROUP_COMMUNITY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"コミュニティG"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_GROUP_MESSAGE] = AccessTypeInfo::Data(
+	m_map[type].serializeKey = "COMMUNITY";
+
+	type = ACCESS_GROUP_MESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"メッセージG"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_GROUP_MYDIARY] = AccessTypeInfo::Data(
+	m_map[type].serializeKey = "MESSAGE";
+
+	type = ACCESS_GROUP_MYDIARY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"日記G"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_GROUP_NEWS] = AccessTypeInfo::Data(
+	m_map[type].serializeKey = "MYDIARY";
+
+	type = ACCESS_GROUP_NEWS;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"ニュースG"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_GROUP_OTHERS] = AccessTypeInfo::Data(
+	m_map[type].serializeKey = "NEWS";
+
+	type = ACCESS_GROUP_OTHERS;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"その他G"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_GROUP_TWITTER] = AccessTypeInfo::Data(
+	m_map[type].serializeKey = "OTHERS";
+
+	type = ACCESS_GROUP_TWITTER;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP,
 		""
 		, L"TwitterG"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "TWITTER";
 
 	//------------------------------------------------------------------
 	//--- mixi,リスト系
-	ACCESS_TYPE type;
-	
 	type = ACCESS_LIST_INTRO;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY,
@@ -60,6 +77,7 @@ bool AccessTypeInfo::init()
 		, L"紹介文"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "INTRO";
 	m_map[type].defaultCategoryURL = L"show_intro.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_BODY;
@@ -73,6 +91,7 @@ bool AccessTypeInfo::init()
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "DIARY";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_friend_diary.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -89,6 +108,7 @@ bool AccessTypeInfo::init()
 		, L"新着コメント一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "NEW_COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_comment.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -105,6 +125,7 @@ bool AccessTypeInfo::init()
 		, L"コメント一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_comment.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -121,6 +142,7 @@ bool AccessTypeInfo::init()
 		, L"ニュース一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "NEWS";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -137,6 +159,7 @@ bool AccessTypeInfo::init()
 		, L"お気に入りユーザ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "FAVORITE";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -152,6 +175,7 @@ bool AccessTypeInfo::init()
 		, L"お気に入りコミュ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "FAVORITE_COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl?kind=community";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -167,6 +191,7 @@ bool AccessTypeInfo::init()
 		, L"マイミク一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "FRIEND";
 	m_map[type].defaultCategoryURL = L"list_friend.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -180,6 +205,7 @@ bool AccessTypeInfo::init()
 		, L"コミュニティ一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_community.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -193,6 +219,7 @@ bool AccessTypeInfo::init()
 		, L"コミュコメント記入履歴"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "NEW_BBS_COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs_comment.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -209,6 +236,7 @@ bool AccessTypeInfo::init()
 		, L"コミュ書込一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "BBS";	// 本当は "NEW_BBS" だな
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -225,6 +253,7 @@ bool AccessTypeInfo::init()
 		, L"トピック一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "TOPIC";	// 本当は "BBS" だな
 	m_map[type].bCruiseTarget = true;
 	// 動的に生成されるためデフォルトURLは不要
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -239,6 +268,7 @@ bool AccessTypeInfo::init()
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MYDIARY";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_diary.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -253,6 +283,7 @@ bool AccessTypeInfo::init()
 		, L"足あと"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "FOOTSTEP";
 	m_map[type].defaultCategoryURL = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_NAME;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -266,6 +297,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ(受信箱)"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MESSAGE_IN";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -282,6 +314,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ(送信箱)"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MESSAGE_OUT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl?box=outbox";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
@@ -298,6 +331,7 @@ bool AccessTypeInfo::init()
 		, L"ブックマーク"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "BOOKMARK";
 	m_map[type].defaultCategoryURL = L"";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
@@ -311,6 +345,7 @@ bool AccessTypeInfo::init()
 		, L"カレンダー"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "CALENDAR";
 	m_map[type].defaultCategoryURL = L"show_calendar.pl";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_TITLE;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_DATE;
@@ -476,6 +511,7 @@ bool AccessTypeInfo::init()
 		, L"タイムライン"
 		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
 		);
+	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_BODY;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
@@ -491,6 +527,7 @@ bool AccessTypeInfo::init()
 		, L"お気に入り"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "TWITTER_FAVORITES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_BODY;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
@@ -506,6 +543,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "TWITTER_DIRECT_MESSAGES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
 	m_map[type].bodyHeaderCol1Type  = BODY_INDICATE_TYPE_BODY;
 	m_map[type].bodyHeaderCol2TypeA = BODY_INDICATE_TYPE_NAME;
@@ -578,6 +616,8 @@ bool AccessTypeInfo::init()
 		, L"<invalid>"
 		, REQUEST_METHOD_GET
 		);
+
+	// TODO 必須項目のテスト
 
 	return true;
 }

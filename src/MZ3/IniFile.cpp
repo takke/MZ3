@@ -530,7 +530,7 @@ vector<Record> IniFile::GetRecord(string KeyName, string SectionName)
 	return data;															// Return the Record
 }
 
-string IniFile::GetValue(string KeyName, string SectionName)
+string IniFile::GetValue(const string& KeyName, const string& SectionName)
 {
 	vector<Record> data = GetRecord(KeyName,SectionName);					// Get the Record
 
@@ -540,7 +540,7 @@ string IniFile::GetValue(string KeyName, string SectionName)
 	return "";																// No value was found
 }
 
-bool IniFile::SetValue(string KeyName, string Value, string SectionName)
+bool IniFile::SetValue(const string& KeyName, const string& Value, const string& SectionName)
 {
 	if(!SectionExists(SectionName))										// If the Section doesn't exist
 	{
@@ -572,7 +572,7 @@ bool IniFile::SetValue(string KeyName, string Value, string SectionName)
 	return true;
 }
 
-bool IniFile::SectionExists(string SectionName)
+bool IniFile::SectionExists(const string& SectionName)
 {
 	vector<Record>::iterator iter = std::find_if(
 		contents_.begin(), 
@@ -607,7 +607,7 @@ vector<string> IniFile::GetSectionNames()
 	return data;															// Return the data
 }
 
-vector<Record> IniFile::GetSection(string SectionName)
+vector<Record> IniFile::GetSection(const string& SectionName)
 {
 	vector<Record> data;													// Holds the return data
 	vector<Record> content;													// Holds the current record													// Holds the current record

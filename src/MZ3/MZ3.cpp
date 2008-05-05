@@ -850,7 +850,7 @@ bool CMZ3App::LoadSkinSetting()
  */
 bool CMZ3App::SaveGroupData(void)
 {
-	return Mz3GroupDataWriter::save( m_root, m_filepath.groupfile );
+	return Mz3GroupDataWriter::save( m_accessTypeInfo, m_root, m_filepath.groupfile );
 }
 
 /**

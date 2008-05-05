@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include <map>
+#include <vector>
 
 /**
  * アクセス種別に対するMZ3/4の振る舞いを管理するクラス
@@ -15,13 +16,6 @@
 class AccessTypeInfo
 {
 public:
-	/// リクエスト種別
-	enum REQUEST_METHOD {
-		REQUEST_METHOD_INVALID = -1,	///< 未定義
-		REQUEST_METHOD_GET = 0,			///< GET メソッド
-		REQUEST_METHOD_POST = 1,		///< POST メソッド
-	};
-
 	/// データ自体の種別
 	enum INFO_TYPE {
 		INFO_TYPE_INVALID = -1,			///< 未定義
@@ -30,6 +24,13 @@ public:
 		INFO_TYPE_BODY,					///< ボディ項目系
 		INFO_TYPE_POST,					///< POST系
 		INFO_TYPE_OTHER,				///< その他
+	};
+
+	/// リクエスト種別
+	enum REQUEST_METHOD {
+		REQUEST_METHOD_INVALID = -1,	///< 未定義
+		REQUEST_METHOD_GET = 0,			///< GET メソッド
+		REQUEST_METHOD_POST = 1,		///< POST メソッド
 	};
 
 	/// ボディに CMixiData 内のどの項目を表示するかの識別子
@@ -51,7 +52,10 @@ public:
 		std::wstring		shortText;			///< 説明文字列
 		REQUEST_METHOD		requestType;		///< リクエスト種別
 
-		//--- リスト系のみが持つ項目
+		//--- グループ系、カテゴリ系のみが持つ項目
+		std::string			serializeKey;		///< Mz3GroupData を ini ファイルにシリアライズする際のキー
+
+		//--- カテゴリ系のみが持つ項目
 		bool				bCruiseTarget;		///< 巡回対象とするか？
 		std::wstring		defaultCategoryURL;	///< カテゴリのURL
 		std::wstring		bodyHeaderCol1Name;	///< ボディリストのヘッダー1のカラム名
@@ -66,6 +70,8 @@ public:
 			, serviceType(a_serviceType)
 			, shortText(a_shortText)
 			, requestType(a_requestType)
+			, serializeKey("")
+			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
 			, bodyHeaderCol1Name(L"")
 			, bodyHeaderCol2NameA(L"")
@@ -79,6 +85,7 @@ public:
 			, serviceType("")
 			, shortText(L"<unknown>")
 			, requestType(REQUEST_METHOD_INVALID)
+			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
 			, bodyHeaderCol1Name(L"")
@@ -95,6 +102,17 @@ public:
 
 public:
 	bool init();
+
+	/// カテゴリ系種別一覧の生成
+	std::vector<ACCESS_TYPE> getCategoryTypeList() {
+		std::vector<ACCESS_TYPE> types;
+		for (MYMAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
+			if (it->second.infoType==INFO_TYPE_CATEGORY) {
+				types.push_back(it->first);
+			}
+		}
+		return types;
+	}
 
 	/// データ種別
 	INFO_TYPE getInfoType( ACCESS_TYPE t ) {
@@ -130,6 +148,15 @@ public:
 			return L"<unknown>";
 		}
 		return it->second.shortText.c_str();
+	}
+
+	/// シリアライズキーの取得
+	const char* getSerializeKey( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return "";
+		}
+		return it->second.serializeKey.c_str();
 	}
 
 	/// 巡回対象とするか？（巡回予約可能か？）
