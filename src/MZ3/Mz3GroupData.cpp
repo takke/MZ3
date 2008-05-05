@@ -192,14 +192,14 @@ void Mz3GroupDataInifileHelper::InitMap(AccessTypeInfo& accessTypeInfo) {
 		case AccessTypeInfo::INFO_TYPE_GROUP:
 			// group_string2type の構築
 			if (!data.serializeKey.empty()) {
-				group_string2type[ data.serializeKey.c_str() ] = accessType;
+				group_string2type[ util::my_mbstowcs(data.serializeKey.c_str()).c_str() ] = accessType;
 			}
 			break;
 
 		case AccessTypeInfo::INFO_TYPE_CATEGORY:
 			// category_string2type の構築
 			if (!data.serializeKey.empty()) {
-				category_string2type[ data.serializeKey.c_str() ] = accessType;
+				category_string2type[ util::my_mbstowcs(data.serializeKey.c_str()).c_str() ] = accessType;
 			}
 			break;
 
@@ -257,7 +257,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 
 		// "Type" の値を取得し、グループ種別とする。
 		// グループ種別名→グループ種別変換を行う。
-		std::string type_value = inifile.GetValue( "Type", section_name );
+		std::wstring type_value = util::my_mbstowcs(inifile.GetValue( "Type", section_name )).c_str();
 		ACCESS_TYPE group_type = helper.GroupString2Type( type_value.c_str() );
 		if( group_type == ACCESS_INVALID ) {
 			continue;
@@ -268,7 +268,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 
 		// グループ作成
 		CGroupItem group;
-		group.init( util::my_mbstowcs(group_name).c_str(), util::my_mbstowcs(url.c_str()).c_str(), group_type );
+		group.init( util::my_mbstowcs(group_name).c_str(), util::my_mbstowcs(url).c_str(), group_type );
 
 		// "CategoryXX" の値を取得し、処理する。XX は [01,20] とする。
 		for( int j=0; j<20; j++ ) {
@@ -295,7 +295,7 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 
 			// 文字列リストの第2要素をカテゴリ種別とする。
 			// カテゴリ種別名→カテゴリ種別変換を行う。
-			ACCESS_TYPE category_type = helper.CategoryString2Type( values[1].c_str() );
+			ACCESS_TYPE category_type = helper.CategoryString2Type( util::my_mbstowcs(values[1]).c_str() );
 			if( category_type == ACCESS_INVALID ) {
 				continue;
 			}

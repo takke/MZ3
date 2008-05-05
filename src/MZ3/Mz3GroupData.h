@@ -73,10 +73,10 @@ class Mz3GroupDataInifileHelper {
 
 private:
 	/// グループ種別文字列 → グループ種別 マップ
-	CMap<CStringA,LPCSTR,ACCESS_TYPE,ACCESS_TYPE> group_string2type;
+	CMap<CString,LPCTSTR,ACCESS_TYPE,ACCESS_TYPE> group_string2type;
 
 	/// カテゴリ種別文字列 → カテゴリ種別 マップ
-	CMap<CStringA,LPCSTR,ACCESS_TYPE,ACCESS_TYPE> category_string2type;
+	CMap<CString,LPCTSTR,ACCESS_TYPE,ACCESS_TYPE> category_string2type;
 
 public:
 	/**
@@ -96,7 +96,7 @@ public:
 	/**
 	 * グループ種別文字列 → グループ種別 変換
 	 */
-	ACCESS_TYPE GroupString2Type( LPCSTR group_string ) {
+	ACCESS_TYPE GroupString2Type( LPCTSTR group_string ) {
 		// 要素がなければ ACCESS_INVALID を返す。
 		ACCESS_TYPE value;
 		if( group_string2type.Lookup( group_string, value ) == FALSE ) {
@@ -110,7 +110,7 @@ public:
 	/**
 	 * カテゴリ種別文字列 → カテゴリ種別 変換
 	 */
-	ACCESS_TYPE CategoryString2Type( LPCSTR category_string ) {
+	ACCESS_TYPE CategoryString2Type( LPCTSTR category_string ) {
 		// 要素がなければ ACCESS_INVALID を返す。
 		ACCESS_TYPE value;
 		if( category_string2type.Lookup( category_string, value ) == FALSE ) {
