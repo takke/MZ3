@@ -36,18 +36,24 @@ public:
 	/// ボディに CMixiData 内のどの項目を表示するかの識別子
 	enum BODY_INDICATE_TYPE
 	{
-		BODY_INDICATE_TYPE_DATE,			///< 日付を表示する
-		BODY_INDICATE_TYPE_TITLE,			///< タイトルを表示する
-		BODY_INDICATE_TYPE_NAME,			///< 名前を表示する
-		BODY_INDICATE_TYPE_BODY,			///< 本文を表示する
-		BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
+		BODY_INDICATE_TYPE_DATE,		///< 日付を表示する
+		BODY_INDICATE_TYPE_TITLE,		///< タイトルを表示する
+		BODY_INDICATE_TYPE_NAME,		///< 名前を表示する
+		BODY_INDICATE_TYPE_BODY,		///< 本文を表示する
+		BODY_INDICATE_TYPE_NONE,		///< 何も表示しない
+	};
+
+	enum ENCODING {
+		ENCODING_SJIS = 0,
+		ENCODING_EUC  = 1,
+		ENCODING_UTF8 = 2,
 	};
 
 	/// ボディのカラム用データ
 	class BodyHeaderColumn {
 	public:
-		BODY_INDICATE_TYPE type;	///< どの項目を表示するか
-		std::wstring	   title;	///< カラムに表示する文字列
+		BODY_INDICATE_TYPE type;		///< どの項目を表示するか
+		std::wstring	   title;		///< カラムに表示する文字列
 
 		/// コンストラクタ
 		BodyHeaderColumn() : type(BODY_INDICATE_TYPE_NONE), title(L"") {}
@@ -64,21 +70,24 @@ public:
 		std::wstring		shortText;			///< 説明文字列
 		REQUEST_METHOD		requestType;		///< リクエスト種別
 
+		ENCODING			requestEncoding;	///< 取得時のエンコーディングタイプ
+
 		//--- グループ系、カテゴリ系のみが持つ項目
 		std::string			serializeKey;		///< Mz3GroupData を ini ファイルにシリアライズする際のキー
 
 		//--- カテゴリ系のみが持つ項目
 		bool				bCruiseTarget;		///< 巡回対象とするか？
 		std::wstring		defaultCategoryURL;	///< カテゴリのURL
-		BodyHeaderColumn	bodyHeaderCol1;	///< ボディリストのヘッダー1のカラム
-		BodyHeaderColumn	bodyHeaderCol2A;///< ボディリストのヘッダー2のカラムA
-		BodyHeaderColumn	bodyHeaderCol2B;///< ボディリストのヘッダー2のカラムB
+		BodyHeaderColumn	bodyHeaderCol1;		///< ボディリストのヘッダー1のカラム
+		BodyHeaderColumn	bodyHeaderCol2A;	///< ボディリストのヘッダー2のカラムA
+		BodyHeaderColumn	bodyHeaderCol2B;	///< ボディリストのヘッダー2のカラムB
 
 		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
 			: infoType(a_infoType)
 			, serviceType(a_serviceType)
 			, shortText(a_shortText)
 			, requestType(a_requestType)
+			, requestEncoding(ENCODING_EUC)
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
@@ -88,6 +97,7 @@ public:
 			, serviceType("")
 			, shortText(L"<unknown>")
 			, requestType(REQUEST_METHOD_INVALID)
+			, requestEncoding(ENCODING_EUC)
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
@@ -226,6 +236,15 @@ public:
 			return L"";
 		}
 		return it->second.defaultCategoryURL.c_str();
+	}
+
+	/// エンコーディング
+	ENCODING getRequestEncoding( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return ENCODING_EUC;
+		}
+		return it->second.requestEncoding;
 	}
 
 };

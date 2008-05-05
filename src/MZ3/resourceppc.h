@@ -108,6 +108,7 @@
 #define IDC_WRITE_BODY_EDIT             1028
 #define IDC_FONT_MEDIUM_EDIT            1028
 #define IDC_MESSAGE_EDIT                1028
+#define IDC_EDIT2                       1028
 #define IDC_WRITE_TITLE_EDIT            1029
 #define IDC_FONT_SMALL_EDIT             1029
 #define IDC_WRITE_SEND_BUTTON           1030
@@ -311,7 +312,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        169
-#define _APS_NEXT_COMMAND_VALUE         34158
+#define _APS_NEXT_COMMAND_VALUE         34160
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

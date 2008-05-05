@@ -132,6 +132,10 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_FRIENDSHIPS_CREATE,	///< add
 	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
+	//--- RSS Reader
+	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
+	ACCESS_RSS_READER_ITEM,				///< RSS Reader Item
+
 	//--- その他
 	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ
 	ACCESS_ERRORLOG,					///< mz3log.txt 専用の特殊タイプ

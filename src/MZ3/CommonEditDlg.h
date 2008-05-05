@@ -27,7 +27,9 @@ protected:
 public:
 	CString m_strTitle;
 	CString mc_strEdit;
+	CString mc_strEdit2;
 	CString mc_strMessage;
+
 	afx_msg void OnBnClickedOk();
 	void SetTitle(LPCTSTR szTitle);
 	void SetMessage(LPCTSTR szMessage);

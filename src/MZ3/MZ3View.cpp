@@ -1396,6 +1396,11 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		// ダブルクリックの場合は全文表示
 		OnMenuTwitterRead();
 		return;
+
+	case ACCESS_RSS_READER_ITEM:
+		// ダブルクリックの場合は詳細表示
+		// TODO
+		return;
 	}
 
 	AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
@@ -2127,6 +2132,11 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			OnMenuTwitterRead();
 			break;
 
+		case ACCESS_RSS_READER_ITEM:
+			// ダブルクリックの場合は詳細表示
+			// TODO
+			break;
+
 		default:
 			// 特殊な要素以外なので、通信処理開始。
 			AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
@@ -2605,17 +2615,16 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	data->SetBrowseUri(uri);
 
 	// encoding 指定
-	switch (data->GetAccessType()) {
-	case ACCESS_LIST_FOOTSTEP:
-		// mixi API => UTF-8
+	switch (theApp.m_accessTypeInfo.getRequestEncoding(data->GetAccessType())) {
+	case AccessTypeInfo::ENCODING_SJIS:
+		encoding = CInetAccess::ENCODING_SJIS;
+		break;
+	case AccessTypeInfo::ENCODING_UTF8:
 		encoding = CInetAccess::ENCODING_UTF8;
 		break;
-
+	case AccessTypeInfo::ENCODING_EUC:
 	default:
-		if (util::IsTwitterAccessType(data->GetAccessType())) {
-			// Twitter API => UTF-8
-			encoding = CInetAccess::ENCODING_UTF8;
-		}
+		encoding = CInetAccess::ENCODING_EUC;
 		break;
 	}
 
@@ -4068,13 +4077,17 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	if (item==NULL) {
 		return false;
 	}
-	if (item->m_mixi.GetAccessType() == ACCESS_LIST_BOOKMARK) {
-		// ブックマークはアクセスなし
+	switch (item->m_mixi.GetAccessType()) {
+	case ACCESS_LIST_BOOKMARK:
+		// ブックマーク：アクセスなし（ローカルストレージ）
 		SetBodyList( item->GetBodyList() );
-	} else {
+		break;
+
+	default:
 		// インターネットにアクセス
 		m_hotList = &m_bodyList;
 		AccessProc( &item->m_mixi, util::CreateMixiUrl(item->m_mixi.GetURL()));
+		break;
 	}
 
 	return true;
@@ -5189,10 +5202,12 @@ void CMZ3View::OnEditCategoryItem()
 	
 	CCommonEditDlg dlg;
 	dlg.SetTitle( L"カテゴリのタイトル変更" );
-	dlg.SetMessage( L"カテゴリのタイトルを入力してください" );
-	dlg.mc_strEdit = pCategoryItem->m_name;
+	dlg.SetMessage( L"カテゴリのタイトル/URLを入力してください" );
+	dlg.mc_strEdit  = pCategoryItem->m_name;
+	dlg.mc_strEdit2 = pCategoryItem->m_mixi.GetURL();
 	if (dlg.DoModal()==IDOK) {
 		pCategoryItem->m_name = dlg.mc_strEdit;
+		pCategoryItem->m_mixi.SetURL( dlg.mc_strEdit2 );
 		m_categoryList.SetItemText( m_selGroup->focusedCategory, 0, pCategoryItem->m_name );
 
 		// グループ定義ファイルの保存

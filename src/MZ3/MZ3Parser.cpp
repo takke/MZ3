@@ -51,7 +51,14 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_TWITTER_FAVORITES:			return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );	// 暫定
 	case ACCESS_TWITTER_DIRECT_MESSAGES:	return twitter::TwitterDirectMessagesXmlParser::parse( body, html );
+	case ACCESS_RSS_READER_FEED:			return mz3parser::RssParser::parse( body, html );
 	default:
+		{
+			CString msg;
+			msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
+			MZ3LOGGER_ERROR(msg);
+			MessageBox(NULL, msg, NULL, MB_OK);
+		}
 		return false;
 	}
 }
@@ -72,7 +79,189 @@ void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_HELP:			mixi::HelpParser::parse( mixi, html );				break;
 	case ACCESS_ERRORLOG:		mixi::ErrorlogParser::parse( mixi, html );			break;
 	case ACCESS_PLAIN:			mixi::PlainTextParser::parse( mixi, html );			break;
+	default:
+		{
+			CString msg;
+			msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
+			MZ3LOGGER_ERROR(msg);
+			MessageBox(NULL, msg, NULL, MB_OK);
+		}
+		break;
 	}
+}
+
+bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
+{
+	MZ3LOGGER_DEBUG( L"RssParser.parse() start." );
+
+	// html_ の文字列化
+	std::vector<TCHAR> text;
+	html_.TranslateToVectorBuffer( text );
+
+	// XML 解析
+	xml2stl::Container root;
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+		MZ3LOGGER_ERROR( L"XML 解析失敗" );
+		return false;
+	}
+
+	// RSS バージョン判別
+	enum RSS_TYPE {
+		RSS_TYPE_INVALID,
+		RSS_TYPE_1_0,
+		RSS_TYPE_2_0,
+	};
+	RSS_TYPE rss_type = RSS_TYPE_INVALID;
+
+	// RSS 1.0 判定
+	try {
+		root.getNode( L"rdf:RDF" ).getNode(L"channel");
+		root.getNode( L"rdf:RDF" ).getNode(L"item");
+
+		// OK.
+		rss_type = RSS_TYPE_1_0;
+	} catch (xml2stl::NodeNotFoundException&) {
+	}
+
+	// RSS 2.0 判定
+	try {
+		const xml2stl::Node& rss = root.getNode( L"rss", xml2stl::Property(L"version", L"2.0") );
+		const xml2stl::Node& channel = rss.getNode(L"channel");
+		channel.getNode(L"item");
+
+		// OK.
+		rss_type = RSS_TYPE_2_0;
+	} catch (xml2stl::NodeNotFoundException&) {
+	}
+
+	switch (rss_type) {
+	case RSS_TYPE_1_0:
+//		parseRss1(out_, root);
+		// rdf:RDF/channel に対する処理
+		try {
+			const xml2stl::Node& channel = root.getNode( L"rdf:RDF" ).getNode(L"channel");
+
+//			CString s = channel.getNode(L"title").getTextAll().c_str();
+//			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+//			out_.SetTitle( s );
+//			out_.SetAuthor( s );
+
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+		}
+
+		// rdf:RDF/item に対する処理
+		try {
+			const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
+			
+			for (int i=0; i<rdf.getChildrenCount(); i++) {
+				const xml2stl::Node& item = rdf.getNode(i);
+				if (item.getName() != L"item") {
+					continue;
+				}
+
+				CMixiData data;
+				// title
+				CString s = item.getNode(L"title").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+				data.SetTitle( s );
+				data.SetAuthor( s );
+
+				// description
+				s = item.getNode(L"description").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+				data.AddBody(L"\r\n");
+				data.AddBody(s);
+
+				// rdf:about
+				s = item.getProperty(L"rdf:about").c_str();
+				data.m_linkList.push_back(CMixiData::Link(s, data.GetTitle().Left(20)));
+
+				data.SetAccessType(ACCESS_RSS_READER_ITEM);
+
+				out_.push_back(data);
+			}
+
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+		}
+		break;
+
+	case RSS_TYPE_2_0:
+//		parseRss2(out_, root);
+		// rdf:RDF/channel に対する処理
+		try {
+			const xml2stl::Node& rss = root.getNode( L"rss", xml2stl::Property(L"version", L"2.0") );
+			const xml2stl::Node& channel = rss.getNode(L"channel");
+
+			CString s;
+//			CString s = channel.getNode(L"title").getTextAll().c_str();
+//			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+//			out_.SetTitle( s );
+//			out_.SetAuthor( s );
+
+//			try {
+//				s = channel.getNode(L"description").getTextAll().c_str();
+//				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+//				out_.AddBody(L"\r\n");
+//				out_.AddBody( s );
+//			} catch (xml2stl::NodeNotFoundException& e) {
+//			}
+
+			for (int i=0; i<channel.getChildrenCount(); i++) {
+				const xml2stl::Node& item = channel.getNode(i);
+				if (item.getName() != L"item") {
+					continue;
+				}
+
+				CMixiData data;
+				// title
+				CString s = item.getNode(L"title").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+				data.SetTitle( s );
+				data.SetAuthor( s );
+
+				// description
+				s = item.getNode(L"description").getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
+				data.AddBody(L"\r\n");
+				data.AddBody(s);
+
+				// link
+				s = item.getNode(L"link").getTextAll().c_str();
+				data.m_linkList.push_back(CMixiData::Link(s, data.GetTitle().Left(20)));
+
+				// pubDate
+				try {
+					s = item.getNode(L"pubDate").getTextAll().c_str();
+					mixi::ParserUtil::ParseDate(s, data);
+				} catch (xml2stl::NodeNotFoundException&) {
+				}
+
+				// dc:date
+				try {
+					s = item.getNode(L"dc:date").getTextAll().c_str();
+					mixi::ParserUtil::ParseDate(s, data);
+				} catch (xml2stl::NodeNotFoundException&) {
+				}
+
+				data.SetAccessType(ACCESS_RSS_READER_ITEM);
+				out_.push_back(data);
+			}
+
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+		}
+
+		break;
+
+	default:
+		MZ3LOGGER_ERROR(L"未サポートのRSSです");
+		break;
+	}
+
+	MZ3LOGGER_DEBUG( L"RssParser.parse() finished." );
+	return true;
 }
 
 }//namespace mixi

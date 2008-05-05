@@ -20,6 +20,7 @@ CCommonEditDlg::CCommonEditDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CCommonEditDlg::IDD, pParent)
 	, mc_strEdit(_T(""))
 	, mc_strMessage(_T(""))
+	, mc_strEdit2(_T(""))
 {
 
 }
@@ -32,6 +33,7 @@ void CCommonEditDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT1, mc_strEdit);
+	DDX_Text(pDX, IDC_EDIT2, mc_strEdit2);
 	DDX_Text(pDX, IDC_MESSAGE_STATIC, mc_strMessage);
 }
 
@@ -63,6 +65,11 @@ void CCommonEditDlg::SetMessage(LPCTSTR szMessage)
 BOOL CCommonEditDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	// mc_strEdit2 ‚ª–¢Ý’è‚Å‚ ‚ê‚Î IDC_EDIT2 ‚ð”ñ•\Ž¦‰»
+	if (mc_strEdit2.IsEmpty()) {
+		GetDlgItem(IDC_EDIT2)->ShowWindow( SW_HIDE );
+	}
 
 	SetWindowText( m_strTitle );
 

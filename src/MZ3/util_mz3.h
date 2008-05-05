@@ -104,10 +104,12 @@ inline bool IsTwitterAccessType( ACCESS_TYPE type )
  */
 inline bool IsMixiAccessType( ACCESS_TYPE type )
 {
-	if (IsTwitterAccessType(type)) {
+	const char* serviceType = theApp.m_accessTypeInfo.getServiceType(type);
+	if (strcmp(serviceType, "mixi")==0) {
+		return true;
+	} else {
 		return false;
 	}
-	return true;
 }
 
 /**

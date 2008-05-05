@@ -17,7 +17,7 @@ namespace mz3parser {
 bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html );
 void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html );
 
-}//namespace mixi
+}//namespace mz3parser
 
 
 //--- 以下は本来は実装のみ cpp に記述したい。。。
@@ -587,3 +587,16 @@ public:
 };
 
 }//namespace mixi
+
+namespace mz3parser {
+
+/**
+ * [content] RSS パーサ
+ */
+class RssParser : public mixi::MixiContentParser
+{
+public:
+	static bool parse( CMixiDataList& mixi, const CHtmlArray& html_ );
+};
+
+}//namespace mz3parser

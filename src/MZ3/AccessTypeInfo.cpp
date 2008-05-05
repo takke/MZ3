@@ -16,8 +16,8 @@ bool AccessTypeInfo::init()
 	//--- グループ系
 	type = ACCESS_GROUP_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"コミュニティG"
 		, REQUEST_METHOD_GET
 		);
@@ -25,8 +25,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_GROUP_MESSAGE;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"メッセージG"
 		, REQUEST_METHOD_GET
 		);
@@ -34,8 +34,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_GROUP_MYDIARY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"日記G"
 		, REQUEST_METHOD_GET
 		);
@@ -43,8 +43,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_GROUP_NEWS;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"ニュースG"
 		, REQUEST_METHOD_GET
 		);
@@ -52,8 +52,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_GROUP_OTHERS;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"その他G"
 		, REQUEST_METHOD_GET
 		);
@@ -61,8 +61,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_GROUP_TWITTER;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP,
-		""
+		INFO_TYPE_GROUP
+		, ""
 		, L"TwitterG"
 		, REQUEST_METHOD_GET
 		);
@@ -72,8 +72,8 @@ bool AccessTypeInfo::init()
 	//--- mixi,リスト系
 	type = ACCESS_LIST_INTRO;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"紹介文"
 		, REQUEST_METHOD_GET
 		);
@@ -84,8 +84,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_DIARY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -98,8 +98,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_NEW_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"新着コメント一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -112,8 +112,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"コメント一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -126,8 +126,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_NEWS;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"ニュース一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -140,8 +140,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_FAVORITE_USER;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"お気に入りユーザ"
 		, REQUEST_METHOD_GET
 		);
@@ -153,8 +153,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_FAVORITE_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"お気に入りコミュ"
 		, REQUEST_METHOD_GET
 		);
@@ -166,8 +166,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_FRIEND;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"マイミク一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -178,8 +178,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"コミュニティ一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -190,8 +190,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_NEW_BBS_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"コミュコメント記入履歴"
 		, REQUEST_METHOD_GET
 		);
@@ -204,8 +204,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_NEW_BBS;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"コミュ書込一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -218,8 +218,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_BBS;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"トピック一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -231,8 +231,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_MYDIARY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
@@ -244,11 +244,12 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_FOOTSTEP;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"足あと"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// mixi API => UTF-8
 	m_map[type].serializeKey = "FOOTSTEP";
 	m_map[type].defaultCategoryURL = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
@@ -256,8 +257,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_MESSAGE_IN;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"メッセージ(受信箱)"
 		, REQUEST_METHOD_GET
 		);
@@ -270,8 +271,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_MESSAGE_OUT;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"メッセージ(送信箱)"
 		, REQUEST_METHOD_GET
 		);
@@ -284,10 +285,10 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_BOOKMARK;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"ブックマーク"
-		, REQUEST_METHOD_GET
+		, REQUEST_METHOD_INVALID
 		);
 	m_map[type].serializeKey = "BOOKMARK";
 	m_map[type].defaultCategoryURL = L"";
@@ -296,8 +297,8 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_LIST_CALENDAR;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"mixi"
+		INFO_TYPE_CATEGORY
+		, "mixi"
 		, L"カレンダー"
 		, REQUEST_METHOD_GET
 		);
@@ -309,98 +310,98 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi,一般
 	m_map[ACCESS_LOGIN] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"mixi"
+		INFO_TYPE_OTHER
+		, "mixi"
 		, L"ログイン"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_MAIN] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"mixi"
+		INFO_TYPE_OTHER
+		, "mixi"
 		, L"メイン"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_DIARY] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"日記内容"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_NEWS] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"ニュース"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_BBS] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"コミュ書込"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_ENQUETE] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"アンケート"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_EVENT] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"イベント"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_EVENT_MEMBER] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,		// v0.9.1 時点ではReportViewの[ページ]からの遷移のみサポート
-		"mixi"
+		INFO_TYPE_BODY		// v0.9.1 時点ではReportViewの[ページ]からの遷移のみサポート
+		, "mixi"
 		, L"イベント参加者一覧"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_MYDIARY] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"日記"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_MESSAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_IMAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"mixi"
+		INFO_TYPE_OTHER
+		, "mixi"
 		, L"画像"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_MOVIE] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"mixi"
+		INFO_TYPE_OTHER
+		, "mixi"
 		, L"動画"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_DOWNLOAD] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"mixi"
+		INFO_TYPE_OTHER
+		, "mixi"
 		, L"ダウンロード"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_PROFILE] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"プロフィール"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_COMMUNITY] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,		// 本来はコミュニティトップページ。v0.9.1 時点ではトピック一覧にCMZ3View内で切り替えている
-		"mixi"
+		INFO_TYPE_BODY		// 本来はコミュニティトップページ。v0.9.1 時点ではCMZ3View内でトピック一覧に切り替えている
+		, "mixi"
 		, L"コミュニティ"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_PLAIN] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY,
-		"mixi"
+		INFO_TYPE_BODY
+		, "mixi"
 		, L"汎用URL"
 		, REQUEST_METHOD_GET
 		);
@@ -408,50 +409,50 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi,POST 系
 	m_map[ACCESS_POST_CONFIRM_COMMENT] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"コメント投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_ENTRY_COMMENT] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_CONFIRM_REPLYMESSAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"メッセージ返信（確認）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_ENTRY_REPLYMESSAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"メッセージ返信（書込）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_CONFIRM_NEWMESSAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"新規メッセージ（確認）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_ENTRY_NEWMESSAGE] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"新規メッセージ（書込）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_CONFIRM_NEWDIARY] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"日記投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[ACCESS_POST_ENTRY_NEWDIARY] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"mixi"
+		INFO_TYPE_POST
+		, "mixi"
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
@@ -460,11 +461,12 @@ bool AccessTypeInfo::init()
 	//--- Twitter 系
 	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"Twitter"
+		INFO_TYPE_CATEGORY
+		, "Twitter"
 		, L"タイムライン"
 		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
@@ -473,11 +475,12 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_TWITTER_FAVORITES;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"Twitter"
+		INFO_TYPE_CATEGORY
+		, "Twitter"
 		, L"お気に入り"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_FAVORITES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
@@ -486,11 +489,12 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_TWITTER_DIRECT_MESSAGES;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY,
-		"Twitter"
+		INFO_TYPE_CATEGORY
+		, "Twitter"
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_DIRECT_MESSAGES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"メッセージ");
@@ -499,65 +503,97 @@ bool AccessTypeInfo::init()
 
 	type = ACCESS_TWITTER_UPDATE;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"更新"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_USER;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER,
-		"Twitter"
+		INFO_TYPE_OTHER
+		, "Twitter"
 		, L"Twitter発言"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_NEW_DM;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"メッセージ送信"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_FAVOURINGS_CREATE;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"お気に入り登録"
 		, REQUEST_METHOD_POST
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_FAVOURINGS_DESTROY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"お気に入り削除"
 		, REQUEST_METHOD_POST
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_FRIENDSHIPS_CREATE;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"フォロー登録"
 		, REQUEST_METHOD_POST
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	type = ACCESS_TWITTER_FRIENDSHIPS_DESTROY;
 	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST,
-		"Twitter"
+		INFO_TYPE_POST
+		, "Twitter"
 		, L"フォロー解除"
 		, REQUEST_METHOD_POST
 		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
+
+	//------------------------------------------------------------------
+	//--- RSS Reader
+	type = ACCESS_RSS_READER_FEED;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_CATEGORY
+		, "RSS"
+		, L"RSS FEED"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].requestEncoding = ENCODING_UTF8;
+	m_map[type].serializeKey = "RSS_FEED";
+	m_map[type].defaultCategoryURL = L"";
+	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"内容");
+	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE,  L"タイトル>>");
+	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
+
+	type = ACCESS_RSS_READER_ITEM;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "RSS"
+		, L"RSS Item"
+		, REQUEST_METHOD_INVALID
+		);
+	m_map[type].requestEncoding = ENCODING_UTF8;
 
 	//------------------------------------------------------------------
 	//--- その他
 	m_map[ACCESS_INVALID] = AccessTypeInfo::Data(
-		INFO_TYPE_INVALID,
-		""
+		INFO_TYPE_INVALID
+		, ""
 		, L"<invalid>"
 		, REQUEST_METHOD_GET
 		);

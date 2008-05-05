@@ -106,6 +106,21 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		this->groups.push_back( group );
 	}
 
+//	if (initType.bUseRss) {
+	{
+		// RSSグループ
+		group.init( L"RSS", L"", ACCESS_GROUP_OTHERS );
+		{
+			appendCategoryByIniData( accessTypeInfo, group, 
+				"はてブ 最近の人気エントリー", ACCESS_RSS_READER_FEED, "http://b.hatena.ne.jp/hotentry?mode=rss");
+//			appendCategoryByIniData( accessTypeInfo, group, 
+//				"しょこたん☆ぶろぐ", ACCESS_RSS_READER_FEED, "http://blog.excite.co.jp/shokotan/index.xml");
+			appendCategoryByIniData( accessTypeInfo, group, 
+				"CNET Japan ", ACCESS_RSS_READER_FEED, "http://japan.cnet.com/rss/index.rdf");
+		}
+		this->groups.push_back( group );
+	}
+
 	return true;
 }
 
