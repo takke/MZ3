@@ -4727,10 +4727,11 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	m_access = FALSE;
 
 	ACCESS_TYPE aType = theApp.m_accessType;
-	switch (aType) {
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:
-	case ACCESS_TWITTER_FAVORITES:
-	case ACCESS_TWITTER_DIRECT_MESSAGES:
+	switch (theApp.m_accessTypeInfo.getInfoType(aType)) {
+	case AccessTypeInfo::INFO_TYPE_CATEGORY:
+		// --------------------------------------------------
+		// カテゴリ項目の取得
+		// --------------------------------------------------
 
 		// ログ保存
 		{
@@ -4744,45 +4745,51 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		DoAccessEndProcForBody(aType);
 		break;
 
-	case ACCESS_TWITTER_UPDATE:
-	case ACCESS_TWITTER_NEW_DM:
-	case ACCESS_TWITTER_FAVOURINGS_CREATE:
-	case ACCESS_TWITTER_FAVOURINGS_DESTROY:
-	case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
-	case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
-		// Twitter投稿処理
-		// HTTPステータスチェックを行う。
-		LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-		if (szStatusErrorMessage!=NULL) {
-			CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-			util::MySetInformationText( m_hWnd, msg );
-			MZ3LOGGER_ERROR( msg );
-		} else {
-			switch (aType) {
-			case ACCESS_TWITTER_NEW_DM:
-				util::MySetInformationText( m_hWnd, L"メッセージ送信終了" );
-				break;
-			case ACCESS_TWITTER_FAVOURINGS_CREATE:
-				util::MySetInformationText( m_hWnd, L"ふぁぼった！" );
-				break;
-			case ACCESS_TWITTER_FAVOURINGS_DESTROY:
-				util::MySetInformationText( m_hWnd, L"ふぁぼるのやめた！" );
-				break;
-			case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
-				util::MySetInformationText( m_hWnd, L"フォローした！" );
-				break;
-			case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
-				util::MySetInformationText( m_hWnd, L"フォローやめた！" );
-				break;
-			case ACCESS_TWITTER_UPDATE:
-			default:
-				util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
-				break;
-			}
+	case AccessTypeInfo::INFO_TYPE_POST:
+		// --------------------------------------------------
+		// 投稿処理
+		// --------------------------------------------------
+		if (util::IsTwitterAccessType(aType)) {
+			// Twitter投稿処理
+			// HTTPステータスチェックを行う。
+			LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
+			if (szStatusErrorMessage!=NULL) {
+				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+				util::MySetInformationText( m_hWnd, msg );
+				MZ3LOGGER_ERROR( msg );
+			} else {
+				switch (aType) {
+				case ACCESS_TWITTER_NEW_DM:
+					util::MySetInformationText( m_hWnd, L"メッセージ送信終了" );
+					break;
+				case ACCESS_TWITTER_FAVOURINGS_CREATE:
+					util::MySetInformationText( m_hWnd, L"ふぁぼった！" );
+					break;
+				case ACCESS_TWITTER_FAVOURINGS_DESTROY:
+					util::MySetInformationText( m_hWnd, L"ふぁぼるのやめた！" );
+					break;
+				case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
+					util::MySetInformationText( m_hWnd, L"フォローした！" );
+					break;
+				case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
+					util::MySetInformationText( m_hWnd, L"フォローやめた！" );
+					break;
+				case ACCESS_TWITTER_UPDATE:
+				default:
+					util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
+					break;
+				}
 
-			// 入力値を消去
-			SetDlgItemText( IDC_STATUS_EDIT, L"" );
+				// 入力値を消去
+				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+			}
+		} else {
+			// アクセス種別不明
 		}
+		break;
+
+	default:
+		// アクセス種別不明
 		break;
 	}
 
@@ -5438,25 +5445,19 @@ void CMZ3View::MyUpdateFocus(void)
 {
 	switch (m_viewStyle) {
 	case VIEW_STYLE_TWITTER:
-		switch (theApp.m_accessType) {
-		case ACCESS_TWITTER_FRIENDS_TIMELINE:
-		case ACCESS_TWITTER_DIRECT_MESSAGES:
-		case ACCESS_TWITTER_UPDATE:
-			// フォーカスを入力領域に移動
+		if (util::IsTwitterAccessType(theApp.m_accessType)) {
+			// Twitter関連のPOSTが完了したので、フォーカスを入力領域に移動する。
 			// 但し、フォーカスがリストにある場合は移動しない。
+			CWnd* pFocus = GetFocus();
+			if (pFocus == NULL ||
+				(pFocus->m_hWnd != m_categoryList.m_hWnd &&
+				 pFocus->m_hWnd != m_bodyList.m_hWnd))
 			{
-				CWnd* pFocus = GetFocus();
-				if (pFocus == NULL ||
-					(pFocus->m_hWnd != m_categoryList.m_hWnd &&
-					 pFocus->m_hWnd != m_bodyList.m_hWnd))
-				{
-					GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-				}
+				GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 			}
-			break;
-		default:
-			break;
 		}
+		break;
+
 	default:
 		break;
 	}
