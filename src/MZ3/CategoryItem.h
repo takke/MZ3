@@ -27,8 +27,8 @@ public:
 
 	CString			m_name;					///< リストに表示する名称
 
-	BODY_INDICATE_TYPE m_firstBodyColType;	///< １つ目のカラムに表示する項目の識別子
-	BODY_INDICATE_TYPE m_secondBodyColType;	///< ２つ目のカラムに表示する項目の識別子
+	AccessTypeInfo::BODY_INDICATE_TYPE m_firstBodyColType;	///< １つ目のカラムに表示する項目の識別子
+	AccessTypeInfo::BODY_INDICATE_TYPE m_secondBodyColType;	///< ２つ目のカラムに表示する項目の識別子
 
 	bool			m_bCruise;				///< 巡回対象かどうかを表すフラグ
 
@@ -58,7 +58,7 @@ public:
 	/// 初期化
 	void init( LPCTSTR name,
 			   LPCTSTR url, ACCESS_TYPE accessType, int index, 
-			   BODY_INDICATE_TYPE firstColType, BODY_INDICATE_TYPE secondColType,
+			   AccessTypeInfo::BODY_INDICATE_TYPE firstColType, AccessTypeInfo::BODY_INDICATE_TYPE secondColType,
 			   SAVE_TO_GROUPFILE saveToGroupFile=SAVE_TO_GROUPFILE_YES )
 	{
 		m_name = name;

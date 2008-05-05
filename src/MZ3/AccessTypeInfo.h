@@ -9,16 +9,6 @@
 #include "constants.h"
 #include <map>
 
-/// ボディに CMixiData 内のどの項目を表示するかの識別子
-enum BODY_INDICATE_TYPE
-{
-	BODY_INDICATE_TYPE_DATE,			///< 日付を表示する
-	BODY_INDICATE_TYPE_TITLE,			///< タイトルを表示する
-	BODY_INDICATE_TYPE_NAME,			///< 名前を表示する
-	BODY_INDICATE_TYPE_BODY,			///< 本文を表示する
-	BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
-};
-
 /**
  * アクセス種別に対するMZ3/4の振る舞いを管理するクラス
  */
@@ -40,6 +30,16 @@ public:
 		INFO_TYPE_BODY,					///< ボディ項目系
 		INFO_TYPE_POST,					///< POST系
 		INFO_TYPE_OTHER,				///< その他
+	};
+
+	/// ボディに CMixiData 内のどの項目を表示するかの識別子
+	enum BODY_INDICATE_TYPE
+	{
+		BODY_INDICATE_TYPE_DATE,			///< 日付を表示する
+		BODY_INDICATE_TYPE_TITLE,			///< タイトルを表示する
+		BODY_INDICATE_TYPE_NAME,			///< 名前を表示する
+		BODY_INDICATE_TYPE_BODY,			///< 本文を表示する
+		BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
 	};
 
 	/// 各アクセス種別の振る舞いを定義するデータ構造
@@ -95,6 +95,15 @@ public:
 
 public:
 	bool init();
+
+	/// データ種別
+	INFO_TYPE getInfoType( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return INFO_TYPE_INVALID;
+		}
+		return it->second.infoType;
+	}
 
 	/// サービス種別の取得
 	const char* getServiceType( ACCESS_TYPE t ) {
@@ -193,15 +202,6 @@ public:
 			return L"";
 		}
 		return it->second.defaultCategoryURL.c_str();
-	}
-
-	/// データ種別
-	INFO_TYPE getInfoType( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
-		if (it==m_map.end()) {
-			return INFO_TYPE_INVALID;
-		}
-		return it->second.infoType;
 	}
 
 };

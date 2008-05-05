@@ -39,21 +39,21 @@
 
 #define TIMERID_INTERVAL_CHECK	101
 
-inline CString MyGetItemByBodyColType( CMixiData* data, BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
+inline CString MyGetItemByBodyColType( CMixiData* data, AccessTypeInfo::BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
 {
 	CString item;
 
 	switch( bodyColType ) {
-	case BODY_INDICATE_TYPE_DATE:
+	case AccessTypeInfo::BODY_INDICATE_TYPE_DATE:
 		item = data->GetDate();
 		break;
-	case BODY_INDICATE_TYPE_NAME:
+	case AccessTypeInfo::BODY_INDICATE_TYPE_NAME:
 		item = data->GetName();
 		break;
-	case BODY_INDICATE_TYPE_TITLE:
+	case AccessTypeInfo::BODY_INDICATE_TYPE_TITLE:
 		item = data->GetTitle();
 		break;
-	case BODY_INDICATE_TYPE_BODY:
+	case AccessTypeInfo::BODY_INDICATE_TYPE_BODY:
 		// 本文を1行に変換して割り当て。
 		for( u_int i=0; i<data->GetBodySize(); i++ ) {
 			CString line = data->GetBody(i);
@@ -86,10 +86,10 @@ LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
 }
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
-LPCTSTR MyGetBodyHeaderColName2( ACCESS_TYPE accessType, BODY_INDICATE_TYPE bodyIndicateType )
+LPCTSTR MyGetBodyHeaderColName2( ACCESS_TYPE accessType, AccessTypeInfo::BODY_INDICATE_TYPE bodyIndicateType )
 {
-	BODY_INDICATE_TYPE typeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(accessType);
-	BODY_INDICATE_TYPE typeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(accessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE typeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(accessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE typeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(accessType);
 
 	if (bodyIndicateType==typeA) {
 		return theApp.m_accessTypeInfo.getBodyHeaderCol2NameA(accessType);
@@ -2910,9 +2910,11 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		return false;
 	}
 
-	BODY_INDICATE_TYPE colTypeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(pCategory->m_mixi.GetAccessType());
-	BODY_INDICATE_TYPE colTypeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(pCategory->m_mixi.GetAccessType());
-	if (colTypeB==BODY_INDICATE_TYPE_NONE) {
+	ACCESS_TYPE categoryAccessType = pCategory->m_mixi.GetAccessType();
+
+	AccessTypeInfo::BODY_INDICATE_TYPE colTypeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(categoryAccessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE colTypeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(categoryAccessType);
+	if (colTypeB==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) {
 		// 変更先タイプがないため変更せず終了
 		return false;
 	}
@@ -2930,8 +2932,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	}
 
 	// ヘッダー文字列の変更（第２カラムのみ）
-	m_bodyList.SetHeader( NULL, 
-		MyGetBodyHeaderColName2(pCategory->m_mixi.GetAccessType(), pCategory->m_secondBodyColType) );
+	m_bodyList.SetHeader( NULL, MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_secondBodyColType) );
 
 	// アイテムの更新
 	INT_PTR count = pCategory->GetBodyList().size();
