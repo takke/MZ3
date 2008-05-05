@@ -43,6 +43,18 @@ public:
 		BODY_INDICATE_TYPE_NONE,			///< 何も表示しない
 	};
 
+	/// ボディのカラム用データ
+	class BodyHeaderColumn {
+	public:
+		BODY_INDICATE_TYPE type;	///< どの項目を表示するか
+		std::wstring	   title;	///< カラムに表示する文字列
+
+		/// コンストラクタ
+		BodyHeaderColumn() : type(BODY_INDICATE_TYPE_NONE), title(L"") {}
+		/// コンストラクタ
+		BodyHeaderColumn(BODY_INDICATE_TYPE a_type, const wchar_t* a_title) : type(a_type), title(a_title) {}
+	};
+
 	/// 各アクセス種別の振る舞いを定義するデータ構造
 	class Data
 	{
@@ -58,12 +70,9 @@ public:
 		//--- カテゴリ系のみが持つ項目
 		bool				bCruiseTarget;		///< 巡回対象とするか？
 		std::wstring		defaultCategoryURL;	///< カテゴリのURL
-		std::wstring		bodyHeaderCol1Name;	///< ボディリストのヘッダー1のカラム名
-		std::wstring		bodyHeaderCol2NameA;///< ボディリストのヘッダー2のカラム名A
-		std::wstring		bodyHeaderCol2NameB;///< ボディリストのヘッダー2のカラム名B
-		BODY_INDICATE_TYPE	bodyHeaderCol1Type;	///< ボディリストのヘッダー1のカラム種別
-		BODY_INDICATE_TYPE	bodyHeaderCol2TypeA;///< ボディリストのヘッダー2のカラム種別A（Bとトグル）
-		BODY_INDICATE_TYPE	bodyHeaderCol2TypeB;///< ボディリストのヘッダー2のカラム種別B（Aとトグル）
+		BodyHeaderColumn	bodyHeaderCol1;	///< ボディリストのヘッダー1のカラム
+		BodyHeaderColumn	bodyHeaderCol2A;///< ボディリストのヘッダー2のカラムA
+		BodyHeaderColumn	bodyHeaderCol2B;///< ボディリストのヘッダー2のカラムB
 
 		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
 			: infoType(a_infoType)
@@ -73,12 +82,6 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
-			, bodyHeaderCol1Name(L"")
-			, bodyHeaderCol2NameA(L"")
-			, bodyHeaderCol2NameB(L"")
-			, bodyHeaderCol1Type(BODY_INDICATE_TYPE_NONE)
-			, bodyHeaderCol2TypeA(BODY_INDICATE_TYPE_NONE)
-			, bodyHeaderCol2TypeB(BODY_INDICATE_TYPE_NONE)
 		{}
 		Data()
 			: infoType(INFO_TYPE_INVALID)
@@ -88,12 +91,6 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
-			, bodyHeaderCol1Name(L"")
-			, bodyHeaderCol2NameA(L"")
-			, bodyHeaderCol2NameB(L"")
-			, bodyHeaderCol1Type(BODY_INDICATE_TYPE_NONE)
-			, bodyHeaderCol2TypeA(BODY_INDICATE_TYPE_NONE)
-			, bodyHeaderCol2TypeB(BODY_INDICATE_TYPE_NONE)
 		{}
 	};
 
@@ -174,7 +171,7 @@ public:
 		if (it==m_map.end()) {
 			return L"";
 		}
-		return it->second.bodyHeaderCol1Name.c_str();
+		return it->second.bodyHeaderCol1.title.c_str();
 	}
 
 	/// ボディリストのヘッダー2のカラム名A
@@ -183,7 +180,7 @@ public:
 		if (it==m_map.end()) {
 			return L"";
 		}
-		return it->second.bodyHeaderCol2NameA.c_str();
+		return it->second.bodyHeaderCol2A.title.c_str();
 	}
 
 	/// ボディリストのヘッダー2のカラム名B
@@ -192,7 +189,7 @@ public:
 		if (it==m_map.end()) {
 			return L"";
 		}
-		return it->second.bodyHeaderCol2NameB.c_str();
+		return it->second.bodyHeaderCol2B.title.c_str();
 	}
 
 	/// ボディリストのヘッダー1のカラム種別
@@ -201,7 +198,7 @@ public:
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
-		return it->second.bodyHeaderCol1Type;
+		return it->second.bodyHeaderCol1.type;
 	}
 
 	/// ボディリストのヘッダー2のカラム種別A
@@ -210,7 +207,7 @@ public:
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
-		return it->second.bodyHeaderCol2TypeA;
+		return it->second.bodyHeaderCol2A.type;
 	}
 
 	/// ボディリストのヘッダー2のカラム種別B
@@ -219,7 +216,7 @@ public:
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
-		return it->second.bodyHeaderCol2TypeB;
+		return it->second.bodyHeaderCol2B.type;
 	}
 
 	/// デフォルトURL
