@@ -119,6 +119,10 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_MESSAGE(WM_MZ3_MOVE_DOWN_LIST, OnMoveDownList)
 	ON_MESSAGE(WM_MZ3_MOVE_UP_LIST, OnMoveUpList)
 	ON_MESSAGE(WM_MZ3_GET_LIST_ITEM_COUNT, OnGetListItemCount)
+
+	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
+	ON_COMMAND_RANGE(ID_REPORT_COPY_IMAGE+1, ID_REPORT_COPY_IMAGE+50, OnCopyClipboardImage)
+	ON_COMMAND_RANGE(ID_REPORT_COPY_MOVIE+1, ID_REPORT_COPY_MOVIE+50, OnCopyClipboardMovie)
 END_MESSAGE_MAP()
 
 
@@ -2315,7 +2319,16 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		idxPage = idxPage-1;
 	}
 
-	// 「ページ」の追加
+	// 「ページ」および「URLをコピー」の追加
+
+	// URLコピーサブメニュー
+	CMenu* pcEditSubItem = NULL;
+	CMenu cEditCopyURLSubItem;
+
+	cEditCopyURLSubItem.CreatePopupMenu();
+
+	bool bSubLinkAppended = false;
+
 	// ページリンクがあれば追加。
 	if( !m_data.m_linkPage.empty() ) {
 		// リンクがあるので追加。
@@ -2332,11 +2345,15 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	// 画像
 	if (m_currentData != NULL) {
 		if (m_currentData->GetImageCount() > 0) {
+			// セパレータを追加
 			pcThisMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_IMAGE, _T("-"));
 			for (int i=0; i<m_currentData->GetImageCount(); i++) {
 				CString imageName;
 				imageName.Format(_T("画像%02d"), i+1);
 				pcThisMenu->AppendMenu(MF_STRING, ID_REPORT_IMAGE+i+1, imageName);
+				// サブメニューに画像リンクコピーメニューを追加
+				cEditCopyURLSubItem.AppendMenu(MF_STRING, ID_REPORT_COPY_IMAGE+i+1, imageName);
+				bSubLinkAppended = true;
 			}
 		}
 	}
@@ -2345,10 +2362,17 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	if (m_currentData != NULL) {
 		if (m_currentData->GetMovieCount() > 0) {
 			pcThisMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_MOVIE, _T("-"));
+			if( bSubLinkAppended ){
+				// サブメニューにセパレータを追加
+				cEditCopyURLSubItem.AppendMenu(MF_SEPARATOR, ID_REPORT_COPY_MOVIE, _T("-"));
+			}
 			for (int i=0; i<m_currentData->GetMovieCount(); i++) {
 				CString MovieName;
 				MovieName.Format(_T("動画%02d"), i+1);
 				pcThisMenu->AppendMenu(MF_STRING, ID_REPORT_MOVIE+i+1, MovieName);
+				// サブメニューに動画リンクコピーメニューを追加
+				cEditCopyURLSubItem.AppendMenu(MF_STRING, ID_REPORT_COPY_MOVIE+i+1, MovieName);
+				bSubLinkAppended = true;
 			}
 		}
 	}
@@ -2358,12 +2382,38 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		int n = (int)m_currentData->m_linkList.size();
 		if( n > 0 ) {
 			pcThisMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+			if( bSubLinkAppended ){
+				// サブメニューにセパレータを追加
+				cEditCopyURLSubItem.AppendMenu(MF_SEPARATOR, ID_REPORT_COPY_URL_BASE, _T("-"));
+			}
 			for( int i=0; i<n; i++ ) {
 				// 追加
 				CString s;
 				s.Format( L"link : %s", m_currentData->m_linkList[i].text );
 				pcThisMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				// サブメニューにリンクコピーメニューを追加
+				cEditCopyURLSubItem.AppendMenu( MF_STRING, ID_REPORT_COPY_URL_BASE+(i+1), s);
+				bSubLinkAppended = true;
 			}
+		}
+	}
+
+	// リンクサブメニューをメニューに追加
+	if( bSubLinkAppended ){
+		// 「編集」-「コピー」サブメニューを探す
+		for( UINT idxMenu = 0 ; idxMenu < pcThisMenu->GetMenuItemCount() ; idxMenu++ ){
+			pcEditSubItem = pcThisMenu->GetSubMenu( idxMenu );
+			if( pcEditSubItem ) {
+				if( pcEditSubItem->GetMenuItemID( 0 ) == ID_EDIT_COPY ) {
+					break;
+				}
+			}
+			pcEditSubItem = NULL;
+		}
+		// 「コピー」の下に「URLをコピー」サブメニューを追加する
+		if( pcEditSubItem ) {
+			pcEditSubItem->AppendMenu( MF_SEPARATOR, ID_REPORT_COPY_IMAGE, _T("-"));
+			pcEditSubItem->AppendMenu( MF_POPUP , (UINT_PTR)cEditCopyURLSubItem.m_hMenu , _T("URLをコピー"));
 		}
 	}
 
@@ -2877,4 +2927,54 @@ LRESULT CReportView::OnMoveUpList(WPARAM dwLoaded, LPARAM dwLength)
 LRESULT CReportView::OnGetListItemCount(WPARAM dwLoaded, LPARAM dwLength)
 {
 	return (LRESULT)m_list.GetItemCount();
+}
+/**
+ * リンクのURLをクリップボードにコピー
+ */
+void CReportView::OnCopyClipboardUrl(UINT nID)
+{
+	if (m_currentData==NULL) {
+		return;
+	}
+
+	UINT idx = nID - (ID_REPORT_COPY_URL_BASE+1);
+	if( idx > m_currentData->m_linkList.size() ) {
+		return;
+	}
+
+	util::SetClipboardDataTextW( m_currentData->m_linkList[idx].url );
+}
+
+/**
+ * 画像のURLをクリップボードにコピー
+ */
+void CReportView::OnCopyClipboardImage(UINT nID)
+{
+	if (m_currentData==NULL) {
+		return;
+	}
+
+	UINT idx = nID - (ID_REPORT_COPY_IMAGE+1);
+	if( (int)idx > m_currentData->GetImageCount() ) {
+		return;
+	}
+
+	util::SetClipboardDataTextW( m_currentData->GetImage(idx) );
+}
+
+/**
+ * 動画のURLをクリップボードにコピー
+ */
+void CReportView::OnCopyClipboardMovie(UINT nID)
+{
+	if (m_currentData==NULL) {
+		return;
+	}
+
+	UINT idx = nID - (ID_REPORT_COPY_MOVIE+1);
+	if( (int)idx > m_currentData->GetMovieCount() ) {
+		return;
+	}
+
+	util::SetClipboardDataTextW( m_currentData->GetMovie(idx) );
 }

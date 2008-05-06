@@ -431,6 +431,7 @@ private:
 	/// リンクID管理クラス
 	class LinkID {
 	public:
+		LinkType linkType; ///< リンクタイプ
 		int anchor;		///< アンカーリンクのID
 		int image;		///< 画像リンクのID
 		int movie;		///< 動画リンクのID
@@ -442,10 +443,25 @@ private:
 
 		/// 初期化
 		void clear() {
+			linkType = LinkType_noLink ;
 			anchor = -1;
 			image = -1;
 			movie = -1;
 		}
+		/// 比較
+		inline bool operator==(const LinkID target) const {
+			return ( linkType == target.linkType &&
+				anchor == target.anchor &&
+				image == target.image &&
+				movie == target.movie);
+		}
+		inline bool operator!=(const LinkID target) const {
+			return ( linkType != target.linkType ||
+				anchor != target.anchor ||
+				image != target.image ||
+				movie != target.movie);
+		}
+
 	};
 	LinkID		m_activeLinkID;				///< アクティブなリンクのID
 
@@ -578,9 +594,14 @@ private:
 	bool	IsVGA();
 //	bool	IsPoratrait();
 
+	// pointの示すマウス位置に対応したリンクIDを判断する
+	bool MySetLinkIDbyMousePoint( const CPoint point );
+
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
+	void MyPopupURLLinkMenu(POINT pt_=CPoint(0,0), int flags_=0);
+
 	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
 	virtual BOOL DestroyWindow();
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -594,6 +615,9 @@ public:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	afx_msg void OnURLLinkCopy();
+	afx_msg void OnURLLinkOpen();
 };
 
 

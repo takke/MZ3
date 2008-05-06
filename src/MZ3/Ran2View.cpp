@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "Ran2View.h"
 #include "resourceppc.h"
+#include "util_gui.h"
 
 #ifndef WINCE
 	#include <gdiplus.h>
@@ -302,6 +303,9 @@ BEGIN_MESSAGE_MAP(Ran2View, CWnd)
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONUP()
 	ON_WM_TIMER()
+
+	ON_COMMAND(ID_RAN2_URL_LINK_COPY, &Ran2View::OnURLLinkCopy)
+	ON_COMMAND(ID_RAN2_URL_LINK_OPEN, &Ran2View::OnURLLinkOpen)
 END_MESSAGE_MAP()
 
 
@@ -2175,8 +2179,17 @@ void Ran2View::ResetDragOffset(void)
  */
 void Ran2View::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	// 親の呼び出し
-	::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+	// pointの示すマウス位置に対応したリンクIDを判断する
+	// リンクをポイントしていればtrueを返し、m_activeLinkIDにリンクIDを設定する
+	if( !MySetLinkIDbyMousePoint( point )) {
+		// 親の呼び出し
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+	} else {
+		// リンク専用メニューを開く
+		CPoint scPoint = point;
+		ClientToScreen( &scPoint );
+		MyPopupURLLinkMenu( scPoint , TPM_LEFTALIGN );
+	}
 
 	CWnd::OnRButtonUp(nFlags, point);
 }
@@ -2313,49 +2326,26 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 		} else {
 			// 左クリック扱いの処理を行う
 
-			// タップ位置の行番号を取得
-			int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
-
-			// Row配列からの取得位置を算出
-			int rowNumber = m_drawOffsetLine + tapLine;
-
-			// タップ位置が範囲内を越える場合は何もしない
-			if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
-				RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
-				for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
-					LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
-
-					CString logStr;
-					logStr.Format(TEXT("リンク情報は[Type:%d][ID:%d][PA:%d][left:%d]～[right:%d]\r\n"),
-						linkInfo->linkType, linkInfo->linkID , linkInfo->anchorIndex,
-						linkInfo->grappleRect.left, linkInfo->grappleRect.right);
-					OutputDebugString(logStr);
-
-					// リンク表示範囲内であればリンク種別により親ウインドウを呼び出して開く
-					if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
-						if( linkInfo->linkType == LinkType_internal ){
-							// 内部（同一ユーザID？）リンク（現状未使用？）
-							break;
-						}else if( linkInfo->linkType == LinkType_external ){
-							// 外部リンク（mixiURL、http:、ttp:、YouTube）
-							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_URL_BASE + 1 + linkInfo->linkID , 0 ), (LPARAM)NULL );
-							//logStr = L"LinkType_external" + logStr;
-							//MessageBox( logStr );
-							break;
-						}else if( linkInfo->linkType == LinkType_picture ){
-							// 画像リンク（日記、コミュコメント、フォトアルバム）
-							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_IMAGE + 1 + linkInfo->imglinkID , 0 ), (LPARAM)NULL );
-							//logStr = L"LinkType_picture" + logStr;
-							//MessageBox( logStr );
-							break;
-						}else if( linkInfo->linkType == LinkType_movie ){
-							// 動画リンク（mixi動画）
-							::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_MOVIE + 1 + linkInfo->movlinkID , 0 ), (LPARAM)NULL );
-							//logStr = L"LinkType_movie" + logStr;
-							//MessageBox( logStr );
-							break;
-						}
-					}
+			// pointの示すマウス位置に対応したリンクIDを判断する
+			// リンクをポイントしていればtrueを返し、m_activeLinkIDにリンクIDを設定する
+			if( MySetLinkIDbyMousePoint( point ) ) {
+				// リンクをポイントしていればリンク種別により親ウインドウを呼び出して開く
+				switch( m_activeLinkID.linkType ){
+				case LinkType_internal:
+					// 内部（同一ユーザID？）リンク（現状未使用？）
+					break;
+				case LinkType_external:
+					// 外部リンク（mixiURL、http:、ttp:、YouTube）
+					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_URL_BASE + 1 + m_activeLinkID.anchor , 0 ), (LPARAM)NULL );
+					break;
+				case LinkType_picture:
+					// 画像リンク（日記、コミュコメント、フォトアルバム）
+					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_IMAGE + 1 + m_activeLinkID.image , 0 ), (LPARAM)NULL );
+					break;
+				case LinkType_movie:
+					// 動画リンク（mixi動画）
+					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_MOVIE + 1 + m_activeLinkID.movie , 0 ), (LPARAM)NULL );
+					break;
 				}
 			}
 			// リンク情報をクリアして再表示する
@@ -2394,48 +2384,11 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 
 	LinkID lastLinkID = m_activeLinkID;
 
-	// タップ位置の行番号を取得
-	int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
+	// pointの示すマウス位置に対応したリンクIDを判断する
+	// リンクをポイントしていればtrueを返し、m_activeLinkIDにリンクIDを設定する
+	bool bLinkArea = MySetLinkIDbyMousePoint( point );
 
-	// Row配列からの取得位置を算出
-	int rowNumber = m_drawOffsetLine + tapLine;
-
-	bool bLinkArea = false;
-
-	//リンク処理はOnLButtonUpで行う
-//	// タップ位置が範囲内を越える場合は何もしない
-	// リンク連番クリア
-	m_activeLinkID.clear();
-	if( parsedRecord->rowInfo->GetSize() > rowNumber && rowNumber >= 0 ){
-		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
-		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
-			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
-			// リンク範囲の該当内部か？
-			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
-				// リンクポイント中フラグを立てる
-				bLinkArea = true;
-				if( m_bScrollDragging != true && m_bPanDragging != true ){
-					// ドラッグ中でなければリンクタイプに合わせてリンク連番を設定する
-					switch( linkInfo->linkType ){
-						case LinkType_external:
-							m_activeLinkID.anchor = linkInfo->linkID;
-							break;
-						case LinkType_picture:
-							m_activeLinkID.image = linkInfo->imglinkID;
-							break;
-						case LinkType_movie:
-							m_activeLinkID.movie = linkInfo->movlinkID;
-							break;
-					}
-				}
-			}
-		}
-	}
-
-	if( lastLinkID.anchor != m_activeLinkID.anchor ||
-		lastLinkID.image  != m_activeLinkID.image ||
-		lastLinkID.movie  != m_activeLinkID.movie)
-	{
+	if ( lastLinkID != m_activeLinkID ) {
 		// リンクポイント状態に変化があれば
 		// リンク反転表示用に一画面再描画→効率悪い！
 		DrawDetail( m_drawOffsetLine , true );
@@ -2450,8 +2403,10 @@ void Ran2View::OnLButtonDown(UINT nFlags, CPoint point)
 	RGesture.dwFlags    = SHRG_RETURNCMD;
 	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
 		if( bLinkArea ) {
-			// TODO あとでリンク専用メニューを開くようにしたい
-			::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+			// リンク専用メニューを開く
+			CPoint scPoint = point;
+			ClientToScreen( &scPoint );
+			MyPopupURLLinkMenu( scPoint , TPM_LEFTALIGN );
 		} else {
 			::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
 		}
@@ -2552,46 +2507,9 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	bool bLinkArea = false;
-
-	// タップ位置の行番号を取得
-	int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
-
-	// Row配列からの取得位置を算出
-	int rowNumber = m_drawOffsetLine + tapLine;
-	// マウス位置が範囲内を越える場合は何もしない
-	// リンク連番クリア
-	m_activeLinkID.clear();
-	if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
-		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
-		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
-			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
-			// リンク表示範囲内か？
-			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
-				// リンクポイント中フラグを立てる
-				bLinkArea = true;
-				if( m_bScrollDragging != true && m_bPanDragging != true ){
-					// ドラッグ中でなければリンクタイプに合わせてリンク連番を設定する
-					switch( linkInfo->linkType ){
-						case LinkType_external:
-							m_activeLinkID.anchor = linkInfo->linkID;
-							break;
-						case LinkType_picture:
-							m_activeLinkID.image = linkInfo->imglinkID;
-							break;
-						case LinkType_movie:
-							m_activeLinkID.movie = linkInfo->movlinkID;
-							break;
-					}
-				}
-				//CString logStr;
-				//logStr.Format(TEXT("座標[%d,%d][m_offsetPixelY:%d][charHeightOffset + charHeight:%d][tapLine:%d][drawOffsetLine:%d]\r\n"),
-				//	point.x , point.y , m_offsetPixelY,
-				//	charHeightOffset + charHeight, tapLine,drawOffsetLine);
-				//OutputDebugString(logStr);
-			}
-		}
-	}
+	// pointの示すマウス位置に対応したリンクIDを判断する
+	// リンクをポイントしていればtrueを返し、m_activeLinkIDにリンクIDを設定する
+	bool bLinkArea = MySetLinkIDbyMousePoint( point );
 
 	if (m_bDragging) {
 		// 左ボタンを押してドラッグ中
@@ -2641,10 +2559,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 				}
 			}
 			if( !m_bScrollDragging ) {
-				if (lastLinkID.anchor != m_activeLinkID.anchor ||
-					lastLinkID.image != m_activeLinkID.image ||
-					lastLinkID.movie != m_activeLinkID.movie)
-				{
+				if ( lastLinkID != m_activeLinkID ) {
 					// リンクポイント状態に変化があれば
 					// リンク反転表示用に一画面再描画→効率悪い！
 					DrawDetail( m_drawOffsetLine , true );
@@ -2668,10 +2583,7 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		// オートスクロール中でなければリンク反転表示用に再描画→効率悪い！
 		if( !m_bAutoScrolling ) {
-			if (lastLinkID.anchor != m_activeLinkID.anchor ||
-				lastLinkID.image != m_activeLinkID.image ||
-				lastLinkID.movie != m_activeLinkID.movie)
-			{
+			if ( lastLinkID != m_activeLinkID ) {
 				// リンクポイント状態に変化があれば
 				// リンク反転表示用に一画面再描画→効率悪い！
 				DrawDetail( m_drawOffsetLine, true );
@@ -2934,4 +2846,161 @@ void Ran2View::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CWnd::OnTimer(nIDEvent);
+}
+/**
+ * pointの示すマウス位置に対応したリンクIDを判断する
+ *
+ * リンクをポイントしていればtrueを返し、m_activeLinkIDにリンクIDを設定する
+ */
+bool Ran2View::MySetLinkIDbyMousePoint( const CPoint point )
+{
+	bool bLinkArea = false;
+	// タップ位置の行番号を取得
+	int tapLine = (point.y - topOffset - m_offsetPixelY + (charHeightOffset + charHeight)) / (charHeightOffset + charHeight) -1;
+
+	// Row配列からの取得位置を算出
+	int rowNumber = m_drawOffsetLine + tapLine;
+	// マウス位置が範囲内を越える場合は何もしない
+	// リンク連番クリア
+	m_activeLinkID.clear();
+	if( parsedRecord->rowInfo->GetSize() > rowNumber  && rowNumber >= 0 ){
+		RowProperty* row = (RowProperty*)parsedRecord->rowInfo->GetAt(rowNumber);
+		for(int i=0 ; i<row->linkProperties->GetSize() ; i++){
+			LinkProperty* linkInfo = (LinkProperty*)row->linkProperties->GetAt(i);
+			// リンク表示範囲内か？
+			if( linkInfo->grappleRect.left <= point.x && linkInfo->grappleRect.right >= point.x ){
+				if( m_bScrollDragging != true && m_bPanDragging != true ){
+					// ドラッグ中でなければリンクタイプに合わせてリンク連番を設定する
+					switch( linkInfo->linkType ){
+						case LinkType_external:
+							m_activeLinkID.linkType = LinkType_external;
+							m_activeLinkID.anchor = linkInfo->linkID;
+							bLinkArea = true;
+							break;
+						case LinkType_picture:
+							m_activeLinkID.linkType = LinkType_picture;
+							m_activeLinkID.image = linkInfo->imglinkID;
+							bLinkArea = true;
+							break;
+						case LinkType_movie:
+							m_activeLinkID.linkType = LinkType_movie;
+							m_activeLinkID.movie = linkInfo->movlinkID;
+							bLinkArea = true;
+							break;
+					}
+				}
+			}
+		}
+	}
+	return bLinkArea;
+}
+
+/**
+ * URLリンクメニュー生成
+ */
+void Ran2View::MyPopupURLLinkMenu(POINT pt_, int flags_)
+{
+	POINT pt    = pt_;
+	int   flags = flags_;
+
+	if (pt.x==0 && pt.y==0) {
+		// 位置指定がなければデフォルト位置を設定する
+		pt = util::GetPopupPos();
+		flags = util::GetPopupFlags();
+	}
+
+	// URLリンク専用メニューをロード
+	CMenu menu;
+	menu.LoadMenu(IDR_RAN2_MENU_URL_LINK);
+	CMenu* pcThisMenu = menu.GetSubMenu(0);
+
+	// リンク種別によりコピーメニューのタイトルを変更する
+	switch( m_activeLinkID.linkType ){
+	case LinkType_internal:
+		// 内部（同一ユーザID？）リンク（現状未使用？）
+		break;
+	case LinkType_external:
+		// 外部リンク（mixiURL、http:、ttp:、YouTube）
+		pcThisMenu->ModifyMenu( ID_RAN2_URL_LINK_COPY,
+			MF_BYCOMMAND,
+			ID_RAN2_URL_LINK_COPY,
+			_T("リンクのURLをコピー"));
+		break;
+	case LinkType_picture:
+		// 画像リンク（日記、コミュコメント、フォトアルバム）
+		pcThisMenu->ModifyMenu( ID_RAN2_URL_LINK_COPY,
+			MF_BYCOMMAND,
+			ID_RAN2_URL_LINK_COPY,
+			_T("画像のURLをコピー"));
+		break;
+	case LinkType_movie:
+		// 動画リンク（mixi動画）
+		pcThisMenu->ModifyMenu( ID_RAN2_URL_LINK_COPY,
+			MF_BYCOMMAND,
+			ID_RAN2_URL_LINK_COPY,
+			_T("動画のURLをコピー"));
+		break;
+	}
+
+#ifndef WINCE
+	// 「開く」は不要なので削除する（いいのか？）
+	pcThisMenu->DeleteMenu( ID_RAN2_URL_LINK_OPEN , MF_BYCOMMAND );
+	pcThisMenu->DeleteMenu( 0 , MF_BYPOSITION );
+
+	//// 「開く」をデフォルトメニューにする（WMにはそんな機能はない）
+	//bool bRtn = pcThisMenu->SetDefaultItem( 0 , MF_BYPOSITION );
+#endif
+
+	//// メニューのポップアップ
+	menu.GetSubMenu(0)->TrackPopupMenu(flags, pt.x, pt.y, this );
+}
+
+/**
+ * URLリンクオープン処理
+ */
+void Ran2View::OnURLLinkOpen()
+{
+	// リンクをポイントしていればリンク種別により親ウインドウを呼び出して開く
+	switch( m_activeLinkID.linkType ){
+	case LinkType_internal:
+		// 内部（同一ユーザID？）リンク（現状未使用？）
+		break;
+	case LinkType_external:
+		// 外部リンク（mixiURL、http:、ttp:、YouTube）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_URL_BASE + 1 + m_activeLinkID.anchor , 0 ), (LPARAM)NULL );
+		break;
+	case LinkType_picture:
+		// 画像リンク（日記、コミュコメント、フォトアルバム）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_IMAGE + 1 + m_activeLinkID.image , 0 ), (LPARAM)NULL );
+		break;
+	case LinkType_movie:
+		// 動画リンク（mixi動画）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_MOVIE + 1 + m_activeLinkID.movie , 0 ), (LPARAM)NULL );
+		break;
+	}
+}
+
+/**
+ * URLリンクコピー処理
+ */
+void Ran2View::OnURLLinkCopy()
+{
+	// リンクをポイントしていればリンク種別によりリンクURLをクリップボードにコピーする
+	switch( m_activeLinkID.linkType ){
+	case LinkType_internal:
+		// 内部（同一ユーザID？）リンク（現状未使用？）
+		break;
+	case LinkType_external:
+		// 外部リンク（mixiURL、http:、ttp:、YouTube）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_COPY_URL_BASE + 1 + m_activeLinkID.anchor , 0 ), (LPARAM)NULL );
+		break;
+	case LinkType_picture:
+		// 画像リンク（日記、コミュコメント、フォトアルバム）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_COPY_IMAGE + 1 + m_activeLinkID.image , 0 ), (LPARAM)NULL );
+		break;
+	case LinkType_movie:
+		// 動画リンク（mixi動画）
+		::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_COPY_MOVIE + 1 + m_activeLinkID.movie , 0 ), (LPARAM)NULL );
+		break;
+	}
 }

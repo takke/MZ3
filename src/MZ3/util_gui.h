@@ -300,7 +300,8 @@ inline int GetPopupFlags()
 	int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
 #else
 	// MZ4 : マウスの位置でポップアップする
-	int flags = TPM_LEFTALIGN | TPM_TOPALIGN;
+	// マウス位置を左上にして表示、右ボタンを有効にする
+	int flags = TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON;
 #endif
 
 	return flags;

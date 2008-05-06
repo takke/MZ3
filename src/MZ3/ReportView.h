@@ -133,6 +133,10 @@ private:
 	afx_msg void OnOpenBrowserUser();
 	afx_msg void OnUpdateWriteComment(CCmdUI *pCmdUI);
 	afx_msg void OnMenuBack();
+
+	afx_msg void OnCopyClipboardUrl(UINT nID);
+	afx_msg void OnCopyClipboardImage(UINT nID);
+	afx_msg void OnCopyClipboardMovie(UINT nID);
 public:
 	void MyPopupReportMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	afx_msg void OnBackMenu();

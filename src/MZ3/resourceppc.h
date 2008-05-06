@@ -50,6 +50,7 @@
 #define IDC_ARROW_LEFT_CURSOR           168
 #define IDC_ARROW_LEFT_CURSOR1          169
 #define IDC_ARROW_RIGHT_CURSOR          169
+#define IDR_MENU2                       169
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -303,18 +304,24 @@
 #define ID_MENU_OPEN_URL                34155
 #define ID_MENU_OPEN_LOCAL_FILE         34157
 #define ID_MENU_RSS_READ                34160
+#define IDR_RAN2_MENU_URL_LINK          34161
+#define ID_RAN2_URL_LINK_OPEN           34162
+#define ID_RAN2_URL_LINK_COPY           34163
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
 #define ID_REPORT_MOVIE                 36300
 #define ID_SKIN_BASE                    36400
+#define ID_REPORT_COPY_URL_BASE         36500
+#define ID_REPORT_COPY_IMAGE            36600
+#define ID_REPORT_COPY_MOVIE            36700
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        169
-#define _APS_NEXT_COMMAND_VALUE         34161
+#define _APS_NEXT_RESOURCE_VALUE        170
+#define _APS_NEXT_COMMAND_VALUE         34164
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

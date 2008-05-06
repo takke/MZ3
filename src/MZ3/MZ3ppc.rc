@@ -414,6 +414,16 @@ BEGIN
     END
 END
 
+IDR_RAN2_MENU_URL_LINK MENU 
+BEGIN
+    POPUP "URLリンク"
+    BEGIN
+        MENUITEM "開く...",                       ID_RAN2_URL_LINK_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "リンクをコピー",                     ID_RAN2_URL_LINK_COPY
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
