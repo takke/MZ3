@@ -5580,12 +5580,21 @@ void CMZ3View::OnMenuRssRead()
 
 	CString item;
 	item = data.GetTitle();
+	item.Append( L"\r\n" );
 
 	// “ú•t‚ª‚ ‚ê‚Î’Ç‰Á
 	if (!data.GetDate().IsEmpty()) {
-		item.Append( L"\r\n" );
 		item.Append( L"----\r\n" );
 		item.AppendFormat( L"%s\r\n", data.GetDate() );
+	}
+
+	// URL’Ç‰Á
+	int n = (int)data.m_linkList.size();
+	if( n > 0 ) {
+		for( int i=0; i<n; i++ ) {
+			// ’Ç‰Á
+			item.AppendFormat( L"URL : %s", data.m_linkList[i].url );
+		}
 	}
 
 	MessageBox( item, data.GetName() );

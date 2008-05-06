@@ -157,7 +157,7 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 		try {
 			const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
 			
-			for (int i=0; i<rdf.getChildrenCount(); i++) {
+			for (unsigned int i=0; i<rdf.getChildrenCount(); i++) {
 				const xml2stl::Node& item = rdf.getNode(i);
 				if (item.getName() != L"item") {
 					continue;
@@ -192,7 +192,7 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 			const xml2stl::Node& rss = root.getNode( L"rss", xml2stl::Property(L"version", L"2.0") );
 			const xml2stl::Node& channel = rss.getNode(L"channel");
 
-			for (int i=0; i<channel.getChildrenCount(); i++) {
+			for (unsigned int i=0; i<channel.getChildrenCount(); i++) {
 				const xml2stl::Node& item = channel.getNode(i);
 				if (item.getName() != L"item") {
 					continue;

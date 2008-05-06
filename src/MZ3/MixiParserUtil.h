@@ -289,7 +289,7 @@ public:
 				int sec    = _wtoi( reg.results[7].str.c_str() );
 
 				CTime t(year, month, day, hour, minute, sec);
-				t += CTimeSpan(0, 9, 0, 0);
+//				t += CTimeSpan(0, 9, 0, 0);
 
 //				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
 				t_result = t;
