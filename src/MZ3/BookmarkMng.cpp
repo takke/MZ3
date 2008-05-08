@@ -171,10 +171,10 @@ BOOL Bookmark::Add( CMixiData* master, CMixiDataList& bookmark )
 	data.SetTitle(master->GetTitle());
 
 	CString buf = master->GetTitle();
-	int index = buf.ReverseFind(_T('(')) ;
-	if( index > 0 ) {
-		data.SetTitle(buf.Left(index));
-	}
+	//int index = buf.ReverseFind(_T('(')) ;
+	//if( index > 0 ) {
+	//	data.SetTitle(buf.Left(index));
+	//}
 
 	// ’Ç‰Á
 	bookmark.push_back( data );
