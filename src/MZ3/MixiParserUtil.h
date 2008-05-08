@@ -1023,17 +1023,17 @@ public:
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a .*?href='([^']+)'[^>]*>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a .*?href *?='([^']+)'[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg2;
-		if( !util::CompileRegex( reg2, L"<a .*?href=\"([^\"]+)\"[^>]*>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg2, L"<a .*?href *?=\"([^\"]+)\"[^>]*>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
 		static MyRegex reg3;
-		if( !util::CompileRegex( reg3, L"<a .*?href=([^>]+)>(.*?)</a>" ) ) {
+		if( !util::CompileRegex( reg3, L"<a .*?href *?=([^>]+)>(.*?)</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
