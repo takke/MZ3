@@ -41,6 +41,13 @@
 #define MZ3LOGGER_TRACE(msg)			SIMPLELOGGER_TRACE(theApp.m_logger,msg)
 #define MZ3LOGGER_IS_DEBUG_ENABLED()	theApp.m_logger.isDebugEnabled()
 
+// コンソール用デバッグログ出力用マクロ
+#ifdef CONSOLE_DEBUG
+# define MZ3_TRACE wprintf
+#else
+# define MZ3_TRACE __noop
+#endif
+
 #define TOOLBAR_HEIGHT 24
 
 /// 現行のWMデバイスで利用されている解像度の列挙。(Phone editionは除く)
