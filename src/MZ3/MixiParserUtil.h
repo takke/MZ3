@@ -198,7 +198,6 @@ public:
 //				t += CTimeSpan(0, 9, 0, 0);
 
 				t_result = t;
-				//mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
 				return true;
 			}
 		}
@@ -218,24 +217,7 @@ public:
 				int year   = _wtoi( reg.results[8].str.c_str() );
 
 				// 月
-				CString strMonth = reg.results[2].str.c_str();
-				int month = 1;
-				if (strMonth == L"Jan")			month = 1;
-				else if (strMonth == L"Feb")	month = 2;
-				else if (strMonth == L"Mar")	month = 3;
-				else if (strMonth == L"Apr")	month = 4;
-				else if (strMonth == L"May")	month = 5;
-				else if (strMonth == L"Jun")	month = 6;
-				else if (strMonth == L"Jul")	month = 7;
-				else if (strMonth == L"Aug")	month = 8;
-				else if (strMonth == L"Sep")	month = 9;
-				else if (strMonth == L"Oct")	month = 10;
-				else if (strMonth == L"Nov")	month = 11;
-				else if (strMonth == L"Dec")	month = 12;
-				else {
-					// ??
-				}
-
+				int month  = ThreeCharMonthToInteger( reg.results[2].str.c_str() );
 				int day    = _wtoi( reg.results[3].str.c_str() );
 				int hour   = _wtoi( reg.results[4].str.c_str() );
 				int minute = _wtoi( reg.results[5].str.c_str() );
@@ -243,8 +225,6 @@ public:
 
 				CTime t(year, month, day, hour, minute, sec);
 				t += CTimeSpan(0, 9, 0, 0);
-
-//				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
 				t_result = t;
 				return true;
 			}
@@ -265,24 +245,7 @@ public:
 				int year   = _wtoi( reg.results[4].str.c_str() );
 
 				// 月
-				CString strMonth = reg.results[3].str.c_str();
-				int month = 1;
-				if (strMonth == L"Jan")			month = 1;
-				else if (strMonth == L"Feb")	month = 2;
-				else if (strMonth == L"Mar")	month = 3;
-				else if (strMonth == L"Apr")	month = 4;
-				else if (strMonth == L"May")	month = 5;
-				else if (strMonth == L"Jun")	month = 6;
-				else if (strMonth == L"Jul")	month = 7;
-				else if (strMonth == L"Aug")	month = 8;
-				else if (strMonth == L"Sep")	month = 9;
-				else if (strMonth == L"Oct")	month = 10;
-				else if (strMonth == L"Nov")	month = 11;
-				else if (strMonth == L"Dec")	month = 12;
-				else {
-					// ??
-				}
-
+				int month  = ThreeCharMonthToInteger( reg.results[3].str.c_str() );
 				int day    = _wtoi( reg.results[2].str.c_str() );
 				int hour   = _wtoi( reg.results[5].str.c_str() );
 				int minute = _wtoi( reg.results[6].str.c_str() );
@@ -290,13 +253,38 @@ public:
 
 				CTime t(year, month, day, hour, minute, sec);
 //				t += CTimeSpan(0, 9, 0, 0);
-
-//				mixi.SetDate(t.GetYear(), t.GetMonth(), t.GetDay(), t.GetHour(), t.GetMinute());
 				t_result = t;
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * 3文字の「月」文字列を数値に変換する。
+	 *
+	 * "Jan" の場合は数値 1 を返す。
+	 * 未解決時は 1 を返す。
+	 */
+	static int ThreeCharMonthToInteger( const CString& strMonth )
+	{
+		int month = 1;
+		if (strMonth == L"Jan")			month = 1;
+		else if (strMonth == L"Feb")	month = 2;
+		else if (strMonth == L"Mar")	month = 3;
+		else if (strMonth == L"Apr")	month = 4;
+		else if (strMonth == L"May")	month = 5;
+		else if (strMonth == L"Jun")	month = 6;
+		else if (strMonth == L"Jul")	month = 7;
+		else if (strMonth == L"Aug")	month = 8;
+		else if (strMonth == L"Sep")	month = 9;
+		else if (strMonth == L"Oct")	month = 10;
+		else if (strMonth == L"Nov")	month = 11;
+		else if (strMonth == L"Dec")	month = 12;
+		else {
+			// ??
+		}
+		return month;
 	}
 
 	/**
@@ -609,7 +597,7 @@ public:
 private:
 
 	/**
-	 * 絵文字画像リンクの変換。
+	 * 絵文字画像リンクの変換
 	 *
 	 * [m:xxx] 文字列に置換する。
 	 */
@@ -714,7 +702,7 @@ album_id=ZZZ&number=ZZZ&owner_id=ZZZ&key=ZZZ
 	}
 
 	/**
-	 * 日記、トピック等の画像変換。
+	 * 日記、トピック等の画像変換
 	 *
 	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
 	 * また、str から該当する画像リンクを削除する。
@@ -788,60 +776,7 @@ alt="" /></a></td>
 	}
 
 	/**
-	 * 画像変換。
-	 *
-	 * str から画像リンクを抽出し、そのリンクを data に追加(AddImage)する。
-	 * また、str から該当する画像リンクを削除する。
- 	 * → ExtractURI()に吸収
-	 */
-	//static void ExtractGeneralImageLink(CString& line, CMixiData& data_)
-	//{
-	//	// 正規表現のコンパイル（一回のみ）
-	//	static MyRegex reg;
-	//	if( !util::CompileRegex( reg, L"<img[^>]*src=\"([^\"]+)\" [^>]*>" ) ) {
-	//		return;
-	//	}
-
-	//	CString target = line;
-	//	line = L"";
-	//	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-	//		if( !reg.exec(target) || reg.results.size() != 2 ) {
-	//			// 未発見。
-	//			// 残りの文字列を代入して終了。
-	//			line += target;
-	//			break;
-	//		}
-
-	//		// 発見。
-	//		std::vector<MyRegex::Result>& results = reg.results;
-
-	//		// マッチ文字列全体の左側を出力
-	//		line.Append( target, results[0].start );
-
-	//		// class="emoji" が含まれていれば、絵文字と判断し、無視する。
-	//		if( util::LineHasStringsNoCase( results[0].str.c_str(), L"class=\"emoji\"" ) ) {
-	//			line.Append( results[0].str.c_str() );
-	//		} else {
-	//			CString text = L"<<画像>>";
-	//			// url を追加
-	//			LPCTSTR url = results[1].str.c_str();
-	//			data_.m_linkList.push_back( CMixiData::Link(url, text) );
-
-	//			// 置換
-	//			line.Append( L"<_a>" + text + L"</_a>" );
-
-	//			// とりあえず改行
-	//			line += _T("<br>");
-	//		}
-
-	//		// ターゲットを更新。
-	//		target.Delete( 0, results[0].end );
-	//	}
-
-	//}
-
-	/**
-	 * 動画変換。
+	 * 動画変換
 	 *
 	 * line から動画リンクを抽出し、そのリンクを data に追加する。
 	 * また、line から該当する動画リンクを削除する。
@@ -951,58 +886,6 @@ alt="" /></a></td>
 
 		}
 	}
-
-	/**
-	 * Youtube 動画変換。
-	 *
-	 * line から動画リンクを抽出し、そのリンクを data に追加する。
-	 * また、line から該当する動画リンクを削除する。
-	 * → ExtractURI()に吸収
-	 */
-	//static void ExtractYoutubeVideoLink(CString& line, CMixiData& data_)
-	//{
-
-	//	// 正規表現のコンパイル（一回のみ）
-	//	static MyRegex reg;
-	//	if( !util::CompileRegex( reg, L"youtube_write.*src=\"(.*?)\".*?;" ) ) {
-	//		MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-	//		return;
-	//	}
-
-	//	CString target = line;
-	//	line = L"";
-	//	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-	//		if( !reg.exec(target) || reg.results.size() != 2 ) {
-	//			// 未発見。
-	//			// 残りの文字列を代入して終了。
-	//			line += target;
-	//			break;
-	//		}
-
-	//		// 発見。
-	//		std::vector<MyRegex::Result>& results = reg.results;
-
-	//		// マッチ文字列全体の左側を出力
-	//		line.Append( target, results[0].start );
-
-	//		CString text = L"<<Youtube動画>>";
-
-	//		// url を追加
-	//		LPCTSTR url = results[1].str.c_str();
-	//		
-	//		//動画を追加
-	//		data_.m_linkList.push_back( CMixiData::Link(url,url) );
-
-	//		// 置換
-	//		line.Append( L"<_a>" + text + L"</_a>" );
-
-	//		// とりあえず改行
-	//		line += _T("<br>");
-
-	//		// ターゲットを更新。
-	//		target.Delete( 0, results[0].end );
-	//	}
-	//}
 
 public:
 	/**
@@ -1306,55 +1189,6 @@ private:
 		ExtractURI( str, data_.m_linkList );
 	}
 
-	/**
-	 * 2ch 形式のURL(ttp://...)を抽出し、正規化して data のリンクリストに追加する。
-	 * → ExtractURI()に吸収
-	 */
-//	static void Extract2chURL( CString& str, CMixiData& data_ )
-//	{
-////		TRACE( L"Extract2chURL:str[%s]\n", (LPCTSTR)str );
-//
-//		// 正規表現のコンパイル（一回のみ）
-//		static MyRegex reg;
-//		if( !util::CompileRegex( reg, L"[^h](ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
-//			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-//			return;
-//		}
-//
-//		CString target = str;
-//		str = L"";
-//		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-//			if( reg.exec(target) == false || reg.results.size() != 2 ) {
-//				// 未発見。
-//				// 残りの文字列を代入して終了。
-//				str += target;
-//				break;
-//			}
-//
-//			// 発見。
-//
-//			// マッチ文字列全体の左側を出力
-//			str += target.Left( reg.results[0].start + 1 );
-//
-//			// 2ch URL
-//			const std::wstring& url_2ch = reg.results[1].str;
-//			TRACE( L"regex-match-2chURL : %s\n", url_2ch.c_str() );
-//
-//			str += L"<_a>";
-//			str += url_2ch.c_str();
-//			str += L"</_a>";
-//
-//			// 2ch URL を正規化
-//			std::wstring url = L"h";
-//			url += url_2ch;
-//
-//			// データに追加
-//			data_.m_linkList.push_back( CMixiData::Link(url.c_str(), url_2ch.c_str()) );
-//
-//			// ターゲットを更新。
-//			target = target.Mid( reg.results[0].end );
-//		}
-//	}
 };
 
 }
