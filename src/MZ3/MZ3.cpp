@@ -715,53 +715,28 @@ void CMZ3App::FilePath::init_logpath()
 	CreateDirectory( imageFolder, NULL/*always null*/ );
 
 	// 日記のログ用フォルダのパス
-	diaryFolder.Format(_T("%s\\diary"), logFolder );
-	CreateDirectory( diaryFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(diaryFolder);
+	deleteTargetFolders.Add(logFolder + L"\\diary");
 
 	// コミュニティ書き込みのログ用フォルダのパス
-	bbsFolder.Format(_T("%s\\bbs"), logFolder );
-	CreateDirectory( bbsFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(bbsFolder);
+	deleteTargetFolders.Add(logFolder + L"\\bbs");
 
 	// アンケートのログ用フォルダのパス
-	enqueteFolder.Format(_T("%s\\enquete"), logFolder );
-	CreateDirectory( enqueteFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(enqueteFolder);
+	deleteTargetFolders.Add(logFolder + L"\\enquete");
 
 	// イベントのログ用フォルダのパス
-	eventFolder.Format(_T("%s\\event"), logFolder );
-	CreateDirectory( eventFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(eventFolder);
+	deleteTargetFolders.Add(logFolder + L"\\event");
 
 	// プロフィールのログ用フォルダのパス
-	profileFolder.Format(_T("%s\\profile"), logFolder );
-	CreateDirectory( profileFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(profileFolder);
+	deleteTargetFolders.Add(logFolder + L"\\profile");
 
 	// メッセージのログ用フォルダのパス
-	messageFolder.Format(_T("%s\\message"), logFolder );
-	CreateDirectory( messageFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(messageFolder);
+	deleteTargetFolders.Add(logFolder + L"\\message");
 
 	// ニュースのログ用フォルダのパス
-	newsFolder.Format(_T("%s\\news"), logFolder );
-	CreateDirectory( newsFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(newsFolder);
+	deleteTargetFolders.Add(logFolder + L"\\news");
 
 	// Twitterのログ用フォルダのパス
-	twitterFolder.Format(_T("%s\\twitter"), logFolder );
-	CreateDirectory( twitterFolder, NULL/*always null*/ );
-	// クリーンアップ対象フォルダに追加
-	deleteTargetFolders.Add(twitterFolder);
-
+	deleteTargetFolders.Add(logFolder + L"\\twitter");
 }
 
 /**

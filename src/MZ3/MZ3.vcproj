@@ -1869,6 +1869,10 @@
 					RelativePath=".\kfm.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\util_mz3.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="net"

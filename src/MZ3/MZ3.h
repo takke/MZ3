@@ -93,14 +93,6 @@ public:
 		CString		logFolder;		///< ログ用共通フォルダのパス
 
 		CString		imageFolder;	///< 画像のダウンロード済みファイル用フォルダのパス
-		CString		diaryFolder;	///< 日記のログ用フォルダのパス
-		CString		bbsFolder;		///< コミュニティ書き込みのログ用フォルダのパス
-		CString		enqueteFolder;	///< アンケートのログ用フォルダのパス
-		CString		eventFolder;	///< イベントのログ用フォルダのパス
-		CString		profileFolder;	///< プロフィールのログ用フォルダのパス
-		CString		messageFolder;	///< メッセージのログ用フォルダのパス
-		CString		newsFolder;		///< ニュースのログ用フォルダのパス
-		CString		twitterFolder;	///< Twitterのログ用フォルダのパス
 
 		CStringArray deleteTargetFolders;	///< 定期クリーンアップ対象フォルダリスト
 

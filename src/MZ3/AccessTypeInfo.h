@@ -72,6 +72,11 @@ public:
 
 		ENCODING			requestEncoding;	///< 取得時のエンコーディングタイプ
 
+		std::wstring		cacheFilePattern;	///< キャッシュファイル名のパターン。
+												///< MakeLogfilePath により、下記のパターンが使用可能。
+												///< "{urlparam:パラメータ名}"
+												///< "{urlafter:TargetURL[:default_path]}"
+
 		//--- グループ系、カテゴリ系のみが持つ項目
 		std::string			serializeKey;		///< Mz3GroupData を ini ファイルにシリアライズする際のキー
 
@@ -88,6 +93,7 @@ public:
 			, shortText(a_shortText)
 			, requestType(a_requestType)
 			, requestEncoding(ENCODING_EUC)
+			, cacheFilePattern(L"")
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
@@ -98,6 +104,7 @@ public:
 			, shortText(L"<unknown>")
 			, requestType(REQUEST_METHOD_INVALID)
 			, requestEncoding(ENCODING_EUC)
+			, cacheFilePattern(L"")
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
@@ -245,6 +252,15 @@ public:
 			return ENCODING_EUC;
 		}
 		return it->second.requestEncoding;
+	}
+
+	/// キャッシュファイル名のパターン
+	const wchar_t* getCacheFilePattern( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.cacheFilePattern.c_str();
 	}
 
 };

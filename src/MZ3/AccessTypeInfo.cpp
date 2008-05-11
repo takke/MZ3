@@ -77,6 +77,9 @@ bool AccessTypeInfo::init()
 		, L"紹介文"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/show_intro.pl
+	// url(2) : http://mixi.jp/show_intro.pl?page=2
+	m_map[type].cacheFilePattern = L"show_intro{urlparam:page}.html";
 	m_map[type].serializeKey = "INTRO";
 	m_map[type].defaultCategoryURL = L"show_intro.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
@@ -89,6 +92,7 @@ bool AccessTypeInfo::init()
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"new_friend_diary.html";
 	m_map[type].serializeKey = "DIARY";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_friend_diary.pl";
@@ -103,6 +107,7 @@ bool AccessTypeInfo::init()
 		, L"新着コメント一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"new_comment.html";
 	m_map[type].serializeKey = "NEW_COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_comment.pl";
@@ -117,6 +122,7 @@ bool AccessTypeInfo::init()
 		, L"コメント一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"list_comment.html";
 	m_map[type].serializeKey = "COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_comment.pl";
@@ -131,6 +137,12 @@ bool AccessTypeInfo::init()
 		, L"ニュース一覧"
 		, REQUEST_METHOD_GET
 		);
+	// カテゴリ、ページ番号毎に分割
+	// url : http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
+	// url : http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1
+	// url : http://news.mixi.jp/list_news_category.pl?page=2&id=pickup&type=bn
+	// url : http://news.mixi.jp/list_news_category.pl?page=2&sort=1&id=1&type=bn
+	m_map[type].cacheFilePattern = L"list_news_category_{urlparam:id}_{urlparam:page}.html";
 	m_map[type].serializeKey = "NEWS";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"";
@@ -145,6 +157,11 @@ bool AccessTypeInfo::init()
 		, L"お気に入りユーザ"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/list_bookmark.pl
+	// url(2) : http://mixi.jp/list_bookmark.pl?page=2&kind=friend
+	// url(3) : http://mixi.jp/list_bookmark.pl?kind=community
+	// url(4) : http://mixi.jp/list_bookmark.pl?page=2&kind=community
+	m_map[type].cacheFilePattern = L"list_bookmark_{urlparam:kind}_{urlparam:page}.html";
 	m_map[type].serializeKey = "FAVORITE";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
@@ -158,6 +175,11 @@ bool AccessTypeInfo::init()
 		, L"お気に入りコミュ"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/list_bookmark.pl
+	// url(2) : http://mixi.jp/list_bookmark.pl?page=2&kind=friend
+	// url(3) : http://mixi.jp/list_bookmark.pl?kind=community
+	// url(4) : http://mixi.jp/list_bookmark.pl?page=2&kind=community
+	m_map[type].cacheFilePattern = L"list_bookmark_{urlparam:kind}_{urlparam:page}.html";
 	m_map[type].serializeKey = "FAVORITE_COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl?kind=community";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
@@ -171,6 +193,9 @@ bool AccessTypeInfo::init()
 		, L"マイミク一覧"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/list_friend.pl
+	// url(2) : http://mixi.jp/list_friend.pl?page=2
+	m_map[type].cacheFilePattern = L"list_friend{urlparam:page}.html";
 	m_map[type].serializeKey = "FRIEND";
 	m_map[type].defaultCategoryURL = L"list_friend.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
@@ -183,6 +208,9 @@ bool AccessTypeInfo::init()
 		, L"コミュニティ一覧"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/list_community.pl?id=xxx
+	// url(2) : http://mixi.jp/list_community.pl?id=xxx&page=2
+	m_map[type].cacheFilePattern = L"list_community{urlparam:page}.html";
 	m_map[type].serializeKey = "COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_community.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
@@ -195,6 +223,9 @@ bool AccessTypeInfo::init()
 		, L"コミュコメント記入履歴"
 		, REQUEST_METHOD_GET
 		);
+	// url(1) : http://mixi.jp/new_bbs_comment.pl?id=xxx
+	// url(2) : http://mixi.jp/new_bbs_comment.pl?id=xxx&page=2
+	m_map[type].cacheFilePattern = L"new_bbs_comment{urlparam:page}.html";
 	m_map[type].serializeKey = "NEW_BBS_COMMENT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs_comment.pl";
@@ -209,6 +240,7 @@ bool AccessTypeInfo::init()
 		, L"コミュ書込一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"new_bbs_{urlparam:page}.html";
 	m_map[type].serializeKey = "BBS";	// 本当は "NEW_BBS" だな
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs.pl";
@@ -223,6 +255,8 @@ bool AccessTypeInfo::init()
 		, L"トピック一覧"
 		, REQUEST_METHOD_GET
 		);
+	// url : list_bbs.pl?id=xxx
+	m_map[type].cacheFilePattern = L"list_bbs_{urlparam:id}.html";
 	m_map[type].serializeKey = "TOPIC";	// 本当は "BBS" だな
 	m_map[type].bCruiseTarget = true;
 	// 動的に生成されるためデフォルトURLは不要
@@ -236,6 +270,7 @@ bool AccessTypeInfo::init()
 		, L"日記一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"list_diary.html";
 	m_map[type].serializeKey = "MYDIARY";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_diary.pl";
@@ -249,6 +284,7 @@ bool AccessTypeInfo::init()
 		, L"足あと"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"tracks.xml";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// mixi API => UTF-8
 	m_map[type].serializeKey = "FOOTSTEP";
 	m_map[type].defaultCategoryURL = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
@@ -262,6 +298,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ(受信箱)"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"list_message_in.html";
 	m_map[type].serializeKey = "MESSAGE_IN";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl";
@@ -276,6 +313,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ(送信箱)"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"list_message_out.html";
 	m_map[type].serializeKey = "MESSAGE_OUT";
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl?box=outbox";
@@ -302,6 +340,7 @@ bool AccessTypeInfo::init()
 		, L"カレンダー"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].cacheFilePattern = L"show_calendar.html";
 	m_map[type].serializeKey = "CALENDAR";
 	m_map[type].defaultCategoryURL = L"show_calendar.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
@@ -309,97 +348,151 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,一般
-	m_map[ACCESS_LOGIN] = AccessTypeInfo::Data(
+	type = ACCESS_LOGIN;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"ログイン"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_MAIN] = AccessTypeInfo::Data(
+	m_map[type].cacheFilePattern = L"login.html";
+
+	// トップページ
+	type = ACCESS_MAIN;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"メイン"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_DIARY] = AccessTypeInfo::Data(
+	m_map[type].cacheFilePattern = L"home.html";
+
+	type = ACCESS_DIARY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"日記内容"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_NEWS] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy
+	// url(2) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy&comment_count=8
+	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:id}.html";
+
+	type = ACCESS_NEWS;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"ニュース"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_BBS] = AccessTypeInfo::Data(
+	// url(1) : http://news.mixi.jp/view_news.pl?id=132704&media_id=4
+	m_map[type].cacheFilePattern = L"news\\{urlparam:media_id}\\{urlparam:id}.html";
+
+	type = ACCESS_BBS;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"コミュ書込"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_ENQUETE] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_bbs.pl?id=9360823&comm_id=1198460
+	// url(2) : http://mixi.jp/view_bbs.pl?page=4&comm_id=1198460&id=9360823
+	m_map[type].cacheFilePattern = L"bbs\\{urlparam:comm_id}\\{urlparam:id}.html";
+
+	type = ACCESS_ENQUETE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"アンケート"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_EVENT] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_enquete.pl?id=13632077&comment_count=1&comm_id=1198460
+	m_map[type].cacheFilePattern = L"enquete\\{urlparam:comm_id}\\{urlparam:id}.html";
+
+	type = ACCESS_EVENT;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"イベント"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_EVENT_MEMBER] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_event.pl?id=xxx&comment_count=20&comm_id=xxx
+	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
+
+	type = ACCESS_EVENT_MEMBER;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY		// v0.9.1 時点ではReportViewの[ページ]からの遷移のみサポート
 		, "mixi"
 		, L"イベント参加者一覧"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_MYDIARY] = AccessTypeInfo::Data(
+
+	type = ACCESS_MYDIARY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"日記"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_MESSAGE] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy
+	// url(2) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy&comment_count=8
+	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:id}.html";
+
+	type = ACCESS_MESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_IMAGE] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/view_message.pl?id=xxx&box=inbox
+	// url(2) : http://mixi.jp/view_message.pl?id=xxx&box=outbox
+	m_map[type].cacheFilePattern = L"message\\{urlparam:box}\\{urlparam:id}.html";
+
+	type = ACCESS_IMAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"画像"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_MOVIE] = AccessTypeInfo::Data(
+
+	type = ACCESS_MOVIE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"動画"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_DOWNLOAD] = AccessTypeInfo::Data(
+
+	type = ACCESS_DOWNLOAD;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"ダウンロード"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_PROFILE] = AccessTypeInfo::Data(
+
+	type = ACCESS_PROFILE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"プロフィール"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_COMMUNITY] = AccessTypeInfo::Data(
+	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
+	m_map[type].cacheFilePattern = L"profile\\{urlparam:id}.html";
+
+	type = ACCESS_COMMUNITY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY		// 本来はコミュニティトップページ。v0.9.1 時点ではCMZ3View内でトピック一覧に切り替えている
 		, "mixi"
 		, L"コミュニティ"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_PLAIN] = AccessTypeInfo::Data(
+
+	type = ACCESS_PLAIN;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
 		, L"汎用URL"
@@ -408,49 +501,64 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系
-	m_map[ACCESS_POST_CONFIRM_COMMENT] = AccessTypeInfo::Data(
+	type = ACCESS_POST_CONFIRM_COMMENT;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"コメント投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_ENTRY_COMMENT] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_ENTRY_COMMENT;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_CONFIRM_REPLYMESSAGE] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_CONFIRM_REPLYMESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"メッセージ返信（確認）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_ENTRY_REPLYMESSAGE] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_ENTRY_REPLYMESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"メッセージ返信（書込）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_CONFIRM_NEWMESSAGE] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_CONFIRM_NEWMESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"新規メッセージ（確認）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_ENTRY_NEWMESSAGE] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_ENTRY_NEWMESSAGE;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"新規メッセージ（書込）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_CONFIRM_NEWDIARY] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_CONFIRM_NEWDIARY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"日記投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
-	m_map[ACCESS_POST_ENTRY_NEWDIARY] = AccessTypeInfo::Data(
+
+	type = ACCESS_POST_ENTRY_NEWDIARY;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"コメント投稿（書込）"
@@ -466,6 +574,13 @@ bool AccessTypeInfo::init()
 		, L"タイムライン"
 		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
 		);
+	// http://twitter.com/statuses/friends_timeline.xml
+	// http://twitter.com/statuses/friends_timeline/takke.xml
+	// http://twitter.com/statuses/replies.xml
+	// http://twitter.com/statuses/user_timeline.xml
+	// http://twitter.com/statuses/user_timeline/takke.xml
+	// => twitter/user_timeline_takke.xml
+	m_map[type].cacheFilePattern = L"twitter\\{urlafter:statuses/:friends_timeline.xml}";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
@@ -480,6 +595,10 @@ bool AccessTypeInfo::init()
 		, L"お気に入り"
 		, REQUEST_METHOD_GET
 		);
+	// http://twitter.com/favorites.xml
+	// http://twitter.com/favorites/takke.xml
+	// => twitter/favorites_takke.xml
+	m_map[type].cacheFilePattern = L"twitter\\favorites{urlafter:favorites/:.xml}";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_FAVORITES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
@@ -494,6 +613,11 @@ bool AccessTypeInfo::init()
 		, L"メッセージ"
 		, REQUEST_METHOD_GET
 		);
+	// http://twitter.com/direct_messages.xml
+	// => twitter/recv.xml
+	// http://twitter.com/direct_messages/sent.xml
+	// => twitter/sent.xml
+	m_map[type].cacheFilePattern = L"twitter\\{urlafter:direct_messages/:recv.xml}";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_DIRECT_MESSAGES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
@@ -573,6 +697,9 @@ bool AccessTypeInfo::init()
 		, L"RSS Feed"
 		, REQUEST_METHOD_GET
 		);
+	// http://hogehoge.mz3.jp/hogefuga/
+	// => hogehoge.mz3.jp_hogefuga_.rss
+	m_map[type].cacheFilePattern = L"rss\\{urlafter://}.rss";
 	m_map[type].requestEncoding = ENCODING_UTF8;
 	m_map[type].serializeKey = "RSS_FEED";
 	m_map[type].defaultCategoryURL = L"";
@@ -591,7 +718,8 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- その他
-	m_map[ACCESS_INVALID] = AccessTypeInfo::Data(
+	type = ACCESS_INVALID;
+	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_INVALID
 		, ""
 		, L"<invalid>"
