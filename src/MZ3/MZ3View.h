@@ -27,66 +27,6 @@ class CMiniImageDialog;
  */
 class CMZ3View : public CFormView
 {
-public: // シリアル化からのみ作成します。
-	CMZ3View();
-	DECLARE_DYNCREATE(CMZ3View)
-
-public:
-	enum{ IDD = IDD_MZ3_FORM };
-
-// 属性
-public:
-	CMZ3Doc* GetDocument() const;
-
-// 操作
-public:
-
-// オーバーライド
-public:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
-	virtual void OnInitialUpdate(); // 構築後に初めて呼び出されます。
-
-// 実装
-public:
-	virtual ~CMZ3View();
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-#endif
-
-protected:
-
-// 生成された、メッセージ割り当て関数
-protected:
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
-	afx_msg LRESULT OnPostEnd(WPARAM, LPARAM);
-	afx_msg LRESULT OnGetEndBinary(WPARAM, LPARAM);
-	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
-	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
-	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
-	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
-	afx_msg LRESULT OnChangeView(WPARAM, LPARAM);
-	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
-
-private:
-	void InsertInitialData();
-
-	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
-
-	void SetBodyList( CMixiDataList& body );
-	void SetBodyImageList( CMixiDataList& body );
-
-	void OnUpdateWriteButton(CCmdUI*);
-	afx_msg void OnWriteButton();
-
 public:
 	//--- UI 要素
 	CGroupTabCtrl		m_groupTab;		///< グループタブ。ItemData は theApp.m_root.groups のインデックス
@@ -220,69 +160,164 @@ private:
 	CListCtrl*		m_hotList;			///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 
 	CImageList		m_iconImageList;	///< アイコン用画像リスト
+	CProgressCtrl	mc_progressBar;
+	CEdit			m_statusEdit;
 
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;
 
-	CProgressCtrl mc_progressBar;
-	DWORD m_dwIntervalTimerStartMsec;			///< 定期取得用タイマーの開始時刻
+	DWORD			m_dwIntervalTimerStartMsec;	///< 定期取得用タイマーの開始時刻
 	CMenu*			m_pCategorySubMenuList;		///< カテゴリ用メニュー
 
-private:
 
+public: // シリアル化からのみ作成します。
+	CMZ3View();
+	DECLARE_DYNCREATE(CMZ3View)
+
+public:
+	enum{ IDD = IDD_MZ3_FORM };
+
+// 属性
+public:
+	CMZ3Doc* GetDocument() const;
+
+// 操作
+public:
+
+// オーバーライド
+public:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
+	virtual void OnInitialUpdate(); // 構築後に初めて呼び出されます。
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+
+// 実装
+public:
+	virtual ~CMZ3View();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#endif
+
+protected:
+
+// 生成された、メッセージ割り当て関数
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnPostEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetEndBinary(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetAbort(WPARAM, LPARAM);
+	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
+	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
+	afx_msg LRESULT OnChangeView(WPARAM, LPARAM);
+	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
+	afx_msg void OnWriteButton();
 	afx_msg void OnEnSetfocusInfoEdit();
 	afx_msg void OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnWriteDiary();
+	afx_msg void OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnOpenBrowser();
+	afx_msg void OnNMSetfocusHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnShowDebugInfo();
+	afx_msg void OnGetAll();
+	afx_msg void OnGetLast10();
+	afx_msg void OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTcnSelchangeGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnOpenBrowserUser();
+	afx_msg void OnOpenIntro();
+	afx_msg void OnOpenSelfintro();
+	afx_msg void OnSetNoRead();
+	afx_msg void OnViewBbsList();
+	afx_msg void OnViewBbsListLog();
+	afx_msg void OnCruise();
+	afx_msg void OnCheckCruise();
+	afx_msg void OnSendNewMessage();
+	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
+	afx_msg void OnLayoutCategoryMakeNarrow();
+	afx_msg void OnLayoutCategoryMakeWide();
+	afx_msg void OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnHideView(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnBnClickedUpdateButton();
+	afx_msg void OnAcceleratorFontMagnify();
+	afx_msg void OnAcceleratorFontShrink();
+	afx_msg void OnAcceleratorContextMenu();
+	afx_msg void OnAcceleratorNextTab();
+	afx_msg void OnAcceleratorPrevTab();
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnSetRead();
+	afx_msg void OnAcceleratorReload();
+	afx_msg void OnMenuTwitterRead();
+	afx_msg void OnMenuTwitterReply();
+	afx_msg void OnMenuTwitterUpdate();
+	afx_msg void OnMenuTwitterHome();
+	afx_msg void OnMenuTwitterFavorites();
+	afx_msg void OnMenuTwitterSite();
+	afx_msg void OnLoadUrl(UINT);
+	afx_msg void OnPaint();
+	afx_msg void OnMenuTwitterFriendTimeline();
+	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
+	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTabmenuDelete();
+	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnAppendCategoryMenu(UINT nID);
+	afx_msg void OnRemoveCategoryItem();
+	afx_msg void OnEditCategoryItem();
+	afx_msg void OnTabmenuEdit();
+	afx_msg void OnTabmenuAdd();
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMenuTwitterNewDm();
+	afx_msg void OnMenuTwitterCreateFavourings();
+	afx_msg void OnMenuTwitterDestroyFavourings();
+	afx_msg void OnMenuTwitterCreateFriendships();
+	afx_msg void OnMenuTwitterDestroyFriendships();
+	afx_msg void OnMenuRssRead();
+	afx_msg void OnViewLog();
 
 	BOOL OnKeydownGroupTab( WORD vKey );
 	BOOL OnKeydownCategoryList( WORD vKey );
 	BOOL OnKeydownBodyList( WORD vKey );
 	BOOL OnKeyupBodyList( WORD vKey );
 	BOOL OnKeyupCategoryList( WORD vKey );
-
 	BOOL OnKeyDown(MSG* pMsg);
 	BOOL OnKeyUp(MSG* pMsg);
 
-	afx_msg void OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnOpenBrowser();
-	afx_msg void OnNMSetfocusHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnShowDebugInfo();
-public:
-	bool DoNewCommentCheck(void);
 private:
-	afx_msg void OnGetAll();
-	afx_msg void OnGetLast10();
+	void InsertInitialData();
+
+	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
+
+	void SetBodyList( CMixiDataList& body );
+	void SetBodyImageList( CMixiDataList& body );
+
+	void OnUpdateWriteButton(CCmdUI*);
 	void OnMySelchangedCategoryList(void);
+
 	bool MyLoadCategoryLogfile(CCategoryItem& category);
-private:
+
 	static unsigned int Initialize_Thread( LPVOID This );
 	static unsigned int ReloadGroupTab_Thread( LPVOID This );
 	static unsigned int LongReturnKey_Thread( LPVOID This );
 
 	bool DoInitialize();
-	afx_msg void OnViewLog();
 	void MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi);
 	void MyShowReportView(CMixiData& mixi);
+
 public:
-	afx_msg void OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
-	bool MyChangeBodyHeader(void);
-	void MyUpdateCategoryListByGroupItem(void);
-	afx_msg void OnTcnSelchangeGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-	void OnSelchangedGroupTab(void);
-
-	BOOL CommandSetFocusCategoryList();
-	BOOL CommandSetFocusGroupTab();
-	BOOL CommandSetFocusBodyList();
-	BOOL CommandSelectGroupTabNextItem();
-	BOOL CommandSelectGroupTabBeforeItem();
-
-	BOOL CommandMoveUpCategoryList();
-	BOOL CommandMoveDownCategoryList();
-	BOOL CommandMoveUpBodyList();
-	BOOL CommandMoveDownBodyList();
-
 	/**
 	 * 現在選択中のボディアイテムを取得する
 	 *
@@ -300,91 +335,53 @@ public:
 		}
 		return pSelectedCategory->GetSelectedBody();
 	}
-	afx_msg void OnOpenBrowserUser();
-	afx_msg void OnOpenIntro();
-	afx_msg void OnOpenSelfintro();
-	afx_msg void OnSetNoRead();
-	afx_msg void OnViewBbsList();
+
+	bool DoNewCommentCheck(void);
+	bool MyChangeBodyHeader(void);
+	void MyUpdateCategoryListByGroupItem(void);
+	void OnSelchangedGroupTab(void);
+
+	BOOL CommandSetFocusCategoryList();
+	BOOL CommandSetFocusGroupTab();
+	BOOL CommandSetFocusBodyList();
+	BOOL CommandSelectGroupTabNextItem();
+	BOOL CommandSelectGroupTabBeforeItem();
+
+	BOOL CommandMoveUpCategoryList();
+	BOOL CommandMoveDownCategoryList();
+	BOOL CommandMoveUpBodyList();
+	BOOL CommandMoveDownBodyList();
+
 	bool PopupBodyMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	void PopupCategoryMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	bool PopupTabMenu(POINT pt_=CPoint(0,0), int flags_=0);
-	afx_msg void OnViewBbsListLog();
 	bool PrepareViewBbsList(void);
-	afx_msg void OnCruise();
 	void MyShowHelp(void);
 	void MyShowHistory(void);
 	void MyShowErrorlog(void);
-	afx_msg void OnCheckCruise();
+
 	void StartCruise( bool unreadOnly );
 	bool CruiseToNextCategory(void);
-	bool MoveToNextCruiseCategory(void);
-	afx_msg void OnSendNewMessage();
-	void ResetColumnWidth();
-	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
-	int GetListWidth(void);
-	bool DoNextBodyItemCruise();
-	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
-	afx_msg void OnLayoutCategoryMakeNarrow();
-	afx_msg void OnLayoutCategoryMakeWide();
-	afx_msg void OnNMRclickHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
+	bool MoveToNextCruiseCategory(void);
+	void ResetColumnWidth();
+	int  GetListWidth(void);
+	bool DoNextBodyItemCruise();
 	bool RetrieveCategoryItem(void);
+
 public:
 	void ResetIntervalTimer(void);
-protected:
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-public:
-	afx_msg void OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1, int pointy=-1);
-	afx_msg LRESULT OnHideView(WPARAM wParam, LPARAM lParam);
-	bool MyLoadMiniImage(const CMixiData& mixi);
-	afx_msg void OnAcceleratorFontMagnify();
-	afx_msg void OnAcceleratorFontShrink();
-	afx_msg void OnAcceleratorContextMenu();
-	afx_msg void OnAcceleratorNextTab();
-	afx_msg void OnAcceleratorPrevTab();
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	afx_msg void OnSetRead();
-	afx_msg void OnAcceleratorReload();
-	afx_msg void OnMenuTwitterRead();
-	afx_msg void OnMenuTwitterReply();
-	afx_msg void OnMenuTwitterUpdate();
-	afx_msg void OnMenuTwitterHome();
-	afx_msg void OnMenuTwitterFavorites();
-	afx_msg void OnMenuTwitterSite();
-	VIEW_STYLE MyGetViewStyleForSelectedCategory(void);
-	afx_msg void OnBnClickedUpdateButton();
-	CEdit m_statusEdit;
-	void MySetLayout(int cx, int cy);
-	afx_msg void OnLoadUrl(UINT);
-	afx_msg void OnPaint();
-	afx_msg void OnMenuTwitterFriendTimeline();
-	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
 	bool AppendCategoryList(const CCategoryItem& categoryItem);
-	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnTabmenuDelete();
-	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
-
-	afx_msg void OnAppendCategoryMenu(UINT nID);
-	afx_msg void OnRemoveCategoryItem();
-	afx_msg void OnEditCategoryItem();
-	afx_msg void OnTabmenuEdit();
-	afx_msg void OnTabmenuAdd();
-	void MyUpdateControlStatus(void);
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
+
+	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1, int pointy=-1);
+	bool MyLoadMiniImage(const CMixiData& mixi);
+	VIEW_STYLE MyGetViewStyleForSelectedCategory(void);
+	void MySetLayout(int cx, int cy);
+	void MyUpdateControlStatus(void);
 	void MyUpdateFocus(void);
-	afx_msg void OnMenuTwitterNewDm();
-	afx_msg void OnMenuTwitterCreateFavourings();
-	afx_msg void OnMenuTwitterDestroyFavourings();
-	afx_msg void OnMenuTwitterCreateFriendships();
-	afx_msg void OnMenuTwitterDestroyFriendships();
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
-	afx_msg void OnMenuRssRead();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

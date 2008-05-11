@@ -1869,14 +1869,6 @@
 					RelativePath=".\kfm.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\ReportScrollBar.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ReportScrollBar.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="net"
@@ -2402,6 +2394,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ReportScrollBar.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\ReportView.cpp"
 					>
 				</File>
@@ -2753,6 +2749,10 @@
 				</File>
 				<File
 					RelativePath=".\ReportListCtrl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ReportScrollBar.h"
 					>
 				</File>
 				<File

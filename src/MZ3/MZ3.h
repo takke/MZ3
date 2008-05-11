@@ -163,7 +163,7 @@ public:
 	option::Login		m_loginMng;				///< ログインデータ
 	option::Bookmark	m_bookmarkMng;			///< ブックマークデータ
 
-	inifile::IniFile	m_logfile;				///< ログ用 INI ファイル
+	inifile::IniFile	m_readlog;				///< 既読管理ログ用 INI ファイル
 
 	//--- mixi データ
 	Mz3GroupData		m_root;					///< mixi 用データのルート要素

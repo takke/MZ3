@@ -92,8 +92,8 @@ public:
 
 	bool			m_killPaneLabel;					///< ペインのラベルを表示しない？
 
-	int				m_lastTopPageTabIndex;		///< 前回終了時のタブのインデックス
-	int				m_lastTopPageCategoryIndex;	///< 前回終了時のカテゴリのインデックス
+	int				m_lastTopPageTabIndex;				///< 前回終了時のタブのインデックス
+	int				m_lastTopPageCategoryIndex;			///< 前回終了時のカテゴリのインデックス
 
 	bool			m_bAutoDownloadEmojiImageFiles;		///< 起動時に絵文字ファイルを自動取得する
 
@@ -102,20 +102,20 @@ public:
 		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
 		REPORT_SCROLL_TYPE_PAGE = 1,	///< ページ単位
 	};
-	REPORT_SCROLL_TYPE	m_reportScrollType;		///< レポート画面のスクロールタイプ
-	int				m_reportScrollLine;			///< レポート画面のスクロール行数
+	REPORT_SCROLL_TYPE	m_reportScrollType;			///< レポート画面のスクロールタイプ
+	int				m_reportScrollLine;				///< レポート画面のスクロール行数
 	
 	bool			m_bUseRan2PanScrollAnimation;	///< らんらんビューのパンスクロールアニメーション
 	bool			m_bUseRan2HorizontalDragMove;	///< 横ドラッグでの項目移動
 	bool			m_bUseRan2DoubleClickMove;		///< ダブルクリックでの項目移動
 
 	//--- メイン画面
-	bool			m_bShowMainViewIcon;		///< トピック等にアイコンを表示する？
-	bool			m_bShowMainViewMiniImage;	///< ユーザやコミュニティの画像を表示する？
-	bool			m_bShowMainViewMiniImageDlg;			///< 別画面で表示する？
-	bool			m_bShowMainViewMiniImageOnMouseOver;	///< マウスオーバーで表示する？
-	int				m_nMainViewMiniImageSize;	///< mini画面サイズ
-	bool			m_bAutoLoadMiniImage;		///< 画像の自動取得
+	bool			m_bShowMainViewIcon;				///< トピック等にアイコンを表示する？
+	bool			m_bShowMainViewMiniImage;			///< ユーザやコミュニティの画像を表示する？
+	bool			m_bShowMainViewMiniImageDlg;		///< 別画面で表示する？
+	bool			m_bShowMainViewMiniImageOnMouseOver;///< マウスオーバーで表示する？
+	int				m_nMainViewMiniImageSize;			///< mini画面サイズ
+	bool			m_bAutoLoadMiniImage;				///< 画像の自動取得
 
 private:
 	int				m_recvBufSize;				///< 受信バッファサイズ
@@ -182,8 +182,8 @@ public:
 		, m_bUseRan2DoubleClickMove( false )
 #else
 		, m_bShowMainViewMiniImage( true )
-		, m_bShowMainViewMiniImageDlg( true )
-		, m_bShowMainViewMiniImageOnMouseOver( true )
+		, m_bShowMainViewMiniImageDlg( false )
+		, m_bShowMainViewMiniImageOnMouseOver( false )
 		, m_bUseRan2DoubleClickMove( true )
 #endif
 		, m_bAutoLoadMiniImage( true )

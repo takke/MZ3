@@ -3113,7 +3113,7 @@ void CMZ3View::OnSetNoRead()
 
 	// ログINIファイルの項目を初期化
 	CString logId = util::GetLogIdString( mixi );
-	theApp.m_logfile.DeleteRecord( util::my_wcstombs((LPCTSTR)logId), "Log" );
+	theApp.m_readlog.DeleteRecord( util::my_wcstombs((LPCTSTR)logId), "Log" );
 
 	// ログファイル削除
 	DeleteFile( util::MakeLogfilePath(mixi) );
@@ -3130,7 +3130,7 @@ void CMZ3View::OnSetRead()
 
 	// ログINIファイルの項目を変更
 	CString logId = util::GetLogIdString( mixi );
-	theApp.m_logfile.SetValue(util::my_wcstombs((LPCTSTR)logId), (const char*)util::int2str_a(mixi.GetCommentCount()), "Log");
+	theApp.m_readlog.SetValue(util::my_wcstombs((LPCTSTR)logId), (const char*)util::int2str_a(mixi.GetCommentCount()), "Log");
 
 	// ビューを更新
 	m_bodyList.Update( m_selGroup->getSelectedCategory()->selectedBody );

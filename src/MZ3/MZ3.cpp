@@ -150,7 +150,7 @@ BOOL CMZ3App::InitInstance()
 
 	// ログ用INIファイルの読み込み
 	MZ3LOGGER_DEBUG( L"ini ファイル読み込み開始" );
-	m_logfile.Load( m_filepath.logfile );
+	m_readlog.Load( m_filepath.logfile );
 	MZ3LOGGER_DEBUG( L"ini ファイル読み込み完了" );
 
 	// スキン関連の初期化
@@ -484,7 +484,7 @@ int CMZ3App::ExitInstance()
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理開始" );
 
 	// ログファイルの保存
-	if( m_logfile.Save( m_filepath.logfile ) == false ) {
+	if( m_readlog.Save( m_filepath.logfile ) == false ) {
 		MessageBox( NULL, L"ログファイル保存失敗", m_filepath.logfile, MB_OK );
 	}
 

@@ -77,9 +77,9 @@ public:
 		// キー取得
 		int lastIndex = -1;
 
-		if (theApp.m_logfile.RecordExists(idKey.c_str(), "Log") ) {
+		if (theApp.m_readlog.RecordExists(idKey.c_str(), "Log") ) {
 			// レコードが在ればそれを使う
-			lastIndex = atoi( theApp.m_logfile.GetValue(idKey.c_str(), "Log").c_str() );
+			lastIndex = atoi( theApp.m_readlog.GetValue(idKey.c_str(), "Log").c_str() );
 		}
 		else {
 			lastIndex = -1;

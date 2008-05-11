@@ -1225,7 +1225,7 @@ void CReportView::EndProc()
  */
 void CReportView::SaveIndex()
 {
-	theApp.m_logfile.SetValue(util::GetLogIdString( m_data ), (LPCTSTR)util::int2str(m_lastIndex), "Log");
+	theApp.m_readlog.SetValue(util::GetLogIdString( m_data ), (LPCTSTR)util::int2str(m_lastIndex), "Log");
 }
 
 /**
