@@ -85,4 +85,5 @@ public:
 	afx_msg void OnCategoryMoveRight();
 	afx_msg void OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMClickTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClose();
 };

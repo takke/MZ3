@@ -109,6 +109,7 @@ BEGIN_MESSAGE_MAP(CMZ3GroupFileEditorDlg, CDialog)
 	ON_COMMAND(ID_CATEGORY_MOVE_RIGHT, &CMZ3GroupFileEditorDlg::OnCategoryMoveRight)
 	ON_NOTIFY(NM_DBLCLK, IDC_CATEGORY_LIST, &CMZ3GroupFileEditorDlg::OnNMDblclkCategoryList)
 	ON_NOTIFY(NM_CLICK, IDC_TAB1, &CMZ3GroupFileEditorDlg::OnNMClickTab1)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -227,7 +228,7 @@ HCURSOR CMZ3GroupFileEditorDlg::OnQueryDragIcon()
 
 void CMZ3GroupFileEditorDlg::OnExitApp()
 {
-	EndDialog(IDOK);
+	SendMessage(WM_CLOSE);
 }
 
 void CMZ3GroupFileEditorDlg::OnAbout()
@@ -896,4 +897,21 @@ void CMZ3GroupFileEditorDlg::OnNMClickTab1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+void CMZ3GroupFileEditorDlg::OnClose()
+{
+	switch (MessageBox( L"ïœçXì‡óeÇï€ë∂ÇµÇ‹Ç∑Ç©ÅH", NULL, MB_YESNOCANCEL)) {
+	case IDYES:
+		OnAcceleratorSave();
+		break;
+
+	case IDNO:
+		break;
+
+	case IDCANCEL:
+		return;
+	}
+
+	CDialog::OnClose();
 }
