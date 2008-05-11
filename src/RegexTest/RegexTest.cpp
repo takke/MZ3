@@ -6,6 +6,22 @@
 #include "../MZ3/MyRegex.h"
 #include "../MZ3/xml2stl.h"
 
+int _tmain(int argc, _TCHAR* argv[]);
+int test_date();
+int test_xml2stl();
+int test_regex();
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	setlocale( LC_ALL, "Japanese" ); 
+
+	test_xml2stl();
+//	test_date();
+//	test_regex();
+
+	return 0;
+}
+
 int test_date()
 {
 	LPCTSTR target_list[] = {
@@ -119,14 +135,8 @@ int test_xml2stl()
 	return 0;
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int test_regex()
 {
-	setlocale( LC_ALL, "Japanese" ); 
-
-	return test_xml2stl();
-
-//	test_date();
-
 	std::wstring target = L"2007-11-07T08:00:40Z";
 	std::wstring pattern = L"";
 	pattern = L"([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z";
@@ -157,7 +167,5 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 
-
 	return 0;
 }
-

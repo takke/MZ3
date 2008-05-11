@@ -166,6 +166,25 @@ BOOL CMZ3GroupFileEditorDlg::OnInitDialog()
 		MyReloadTabs();
 	}
 
+/*	
+	// util::MakeLogfilePathByRule のテストコード
+	{
+		CMixiData data;
+		data.SetURL( L"http://mixi.jp/hogehoge.pl?page=1" );
+
+		CString strLogfilePathRule = L"new_bbs_{urlparam:page}.html";
+		CString strLogfilePath = util::MakeLogfilePathByRule(L"c:\\mz3log", data, strLogfilePathRule);
+
+		CString msg;
+		msg.AppendFormat( L"url    : /%s/\n", data.GetURL() );
+		msg.AppendFormat( L"rule   : /%s/\n", strLogfilePathRule );
+		msg.AppendFormat( L"result : /%s/\n", strLogfilePath );
+
+		MessageBox( msg );
+
+		EndDialog(0);
+	}
+*/
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
 }
 
