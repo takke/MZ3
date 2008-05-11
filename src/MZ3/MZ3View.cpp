@@ -209,7 +209,7 @@ CMZ3View::CMZ3View()
 
 	m_hotList = NULL;
 
-	m_nochange = FALSE;
+	m_bModifyingBodyList = false;
 	m_abort = FALSE;
 }
 
@@ -603,9 +603,9 @@ void CMZ3View::MySetLayout(int cx, int cy)
 			pUpdateButton->ShowWindow(SW_HIDE);
 		}
 #ifdef WINCE
-		hInfo = (int)(hInfoBase * 1.8);
+		hInfo = (int)(hInfoBase * (1+0.8*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #else
-		hInfo = (int)(hInfoBase * 1.5);
+		hInfo = (int)(hInfoBase * (1+0.5*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #endif
 		break;
 	case VIEW_STYLE_TWITTER:
@@ -1294,7 +1294,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
  */
 void CMZ3View::SetBodyList( CMixiDataList& body )
 {
-	m_nochange = TRUE;
+	m_bModifyingBodyList = true;
 
 	// リストのアイテムを削除
 	m_bodyList.m_bStopDraw = true;
@@ -1317,12 +1317,16 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 		// タブ切り替えが行われればキャンセル
 		if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
+			m_bModifyingBodyList = false;
 			return;
 		}
 
 		// １カラム目
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
-		int index = m_bodyList.InsertItem( i, MyGetItemByBodyColType(data,pCategory->m_firstBodyColType), -1 );
+		// 改行はスペースに置換する。
+		CString strInfo = MyGetItemByBodyColType(data, pCategory->m_firstBodyColType);
+		strInfo.Replace(L"\r\n", L" ");
+		int index = m_bodyList.InsertItem( i, strInfo, -1 );
 
 		// ２カラム目
 		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
@@ -1331,7 +1335,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetItemData( index, index );
 	}
 
-	m_nochange = FALSE;
+	m_bModifyingBodyList = false;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
 	m_bodyList.SetRedraw(TRUE);
@@ -1414,7 +1418,8 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 
-	if (m_nochange != FALSE) {
+	if (m_bModifyingBodyList) {
+		// アイテム追加中なのでイベントハンドラ応答なし
 		return;
 	}
 

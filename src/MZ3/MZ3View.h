@@ -33,34 +33,39 @@ public:
 	CCategoryListCtrl	m_categoryList;	///< カテゴリリスト。ItemData は theApp.m_root.groups[].categories のインデックス
 	CBodyListCtrl		m_bodyList;		///< ボディリスト。
 	CEdit				m_infoEdit;		///< 情報表示用エディットボックス
+	CProgressCtrl		mc_progressBar;	///< プログレスバー
+	CEdit				m_statusEdit;	///< 入力領域。
 
-	XcrawlCanceler		m_xcrawl;		///< Xcrawl 制御
+	XcrawlCanceler		m_xcrawl;				///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 
 	bool				m_bReloadingGroupTabByThread;	///< スレッドによるタブ切り替え中か？
 	bool				m_bRetryReloadGroupTabByThread;	///<
 
-	CMiniImageDialog*	m_pMiniImageDlg;	///< 画像画面
+	CMiniImageDialog*	m_pMiniImageDlg;		///< 画像画面
 
 	/// 表示スタイル
 	enum VIEW_STYLE {
-		VIEW_STYLE_DEFAULT = 0,			///< 標準スタイル
-		VIEW_STYLE_IMAGE   = 1,			///< 標準スタイル+ImageIcon
-		VIEW_STYLE_TWITTER = 2,			///< Twitter 用スタイル
+		VIEW_STYLE_DEFAULT = 0,					///< 標準スタイル
+		VIEW_STYLE_IMAGE   = 1,					///< 標準スタイル+ImageIcon
+		VIEW_STYLE_TWITTER = 2,					///< 標準スタイル+ImageIcon+StatusEdit (Twitter)
 	};
-	VIEW_STYLE			m_viewStyle;	///< 表示スタイル
+	VIEW_STYLE			m_viewStyle;			///< 表示スタイル
 
 	/// Twitter 用送信種別
 	enum TWITTER_STYLE_POST_MODE {
-		TWITTER_STYLE_POST_MODE_UPDATE,	///< タイムライン用発言入力中
-		TWITTER_STYLE_POST_MODE_DM,		///< DM入力中
+		TWITTER_STYLE_POST_MODE_UPDATE,			///< タイムライン用発言入力中
+		TWITTER_STYLE_POST_MODE_DM,				///< DM入力中
 	};
 	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
 
-	CRect				m_rectIcon;		///< アイコン表示領域のRECT
+	CRect				m_rectIcon;				///< アイコン表示領域のRECT
 
 private:
-	BOOL				m_access;		///< アクセス中フラグ
+	BOOL				m_access;				///< アクセス中フラグ
+	bool				m_bModifyingBodyList;	///< SetBodyList で Body リスト生成中？
+	BOOL				m_abort;				///< 中断フラグ
+	bool				m_checkNewComment;		///< 新着コメント＆メッセージチェック中？
 
 	/**
 	 * 巡回用データ
@@ -146,22 +151,16 @@ private:
 		bool isFetchListMode() { return state == CRUISE_STATE_LIST; } ///< リスト取得モード？
 		bool isFetchBodyMode() { return state == CRUISE_STATE_BODY; } ///< ボディ取得モード？
 	};
-	CruiseInfo		m_cruise;			///< 巡回情報
-
-	BOOL			m_nochange;
-	BOOL			m_abort;			///< 中断フラグ
-	bool			m_checkNewComment;	///< 新着コメント＆メッセージチェック中？
+	CruiseInfo		m_cruise;				///< 巡回情報
 
 public:
-	CGroupItem*		m_selGroup;			///< 現在選択されているグループタブ項目
+	CGroupItem*		m_selGroup;				///< 現在選択されているグループタブ項目
 
 private:
-	int				m_preCategory;		///< 前回選択していたカテゴリリスト項目のインデックス
-	CListCtrl*		m_hotList;			///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
+	int				m_preCategory;			///< 前回選択していたカテゴリリスト項目のインデックス
+	CListCtrl*		m_hotList;				///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 
-	CImageList		m_iconImageList;	///< アイコン用画像リスト
-	CProgressCtrl	mc_progressBar;
-	CEdit			m_statusEdit;
+	CImageList		m_iconImageList;		///< アイコン用画像リスト
 
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;
