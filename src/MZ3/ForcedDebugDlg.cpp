@@ -55,7 +55,16 @@ BOOL CForcedDebugDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  ‚±‚±‚É‰Šú‰»‚ğ’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢
+#ifndef WINCE
+	// ƒTƒCƒY‰Šú‰»
+	WINDOWPLACEMENT    wp;
+    if (GetWindowPlacement(&wp)) {
+		SetWindowPos(NULL, wp.rcNormalPosition.left, wp.rcNormalPosition.top, 
+			480, 640, SWP_SHOWWINDOW);
+	}
+
+#endif
+
 	CRect rect;
 	GetClientRect( &rect );
 	int w = rect.Width();
