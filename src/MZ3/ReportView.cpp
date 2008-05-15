@@ -759,7 +759,14 @@ BOOL CReportView::CommandMoveUpList()
 
 			// 移動先が非表示なら上方向にスクロール
 			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
-				m_list.Scroll( CSize(0, -m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				if( ( idx < m_list.GetTopIndex() ) &&
+					( idx >= m_list.GetTopIndex() - m_list.GetCountPerPage() ) ) {
+					// 移動先が画面より上、1画面以内にある時は1画面スクロール
+					m_list.Scroll( CSize(0, -m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				} else {
+					// 移動先が画面より下か、上で1画面以上離れている時はEnsureVisible()
+					m_list.EnsureVisible( idx , TRUE );
+				}
 			}
 		}
 	}
@@ -798,7 +805,14 @@ BOOL CReportView::CommandMoveDownList()
 
 			// 移動先が非表示なら下方向にスクロール
 			if( !util::IsVisibleOnListBox( m_list, idx ) ) {
-				m_list.Scroll( CSize(0, m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				if( ( idx >= m_list.GetTopIndex() + m_list.GetCountPerPage() ) &&
+					( idx < m_list.GetTopIndex() + m_list.GetCountPerPage() * 2 ) ) {
+					// 移動先が画面より下、1画面以内にある時は1画面スクロール
+					m_list.Scroll( CSize(0, m_list.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				} else {
+					// 移動先が画面より上か、下で1画面以上離れている時はEnsureVisible()
+					m_list.EnsureVisible( idx , TRUE );
+				}
 			}
 		}
 	}

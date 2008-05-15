@@ -2279,7 +2279,14 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 
 		// 移動先が非表示なら上方向にスクロール
 		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
-			m_categoryList.Scroll( CSize(0, -m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			if( ( m_selGroup->focusedCategory < m_categoryList.GetTopIndex() ) &&
+				( m_selGroup->focusedCategory >= m_categoryList.GetTopIndex() - m_categoryList.GetCountPerPage() ) ) {
+				// 移動先が画面より上、1画面以内にある時は1画面スクロール
+				m_categoryList.Scroll( CSize(0, -m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			} else {
+				// 移動先が画面より下か、上で1画面以上離れている時はEnsureVisible()
+				m_categoryList.EnsureVisible( m_selGroup->focusedCategory , TRUE );
+			}
 
 			// 再描画
 			if (theApp.m_optionMng.IsUseBgImage()) {
@@ -2311,7 +2318,14 @@ BOOL CMZ3View::CommandMoveDownCategoryList()
 
 		// 移動先が非表示なら下方向にスクロール
 		if( !util::IsVisibleOnListBox( m_categoryList, m_selGroup->focusedCategory ) ) {
-			m_categoryList.Scroll( CSize(0, m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			if( ( m_selGroup->focusedCategory >= m_categoryList.GetTopIndex() + m_categoryList.GetCountPerPage() ) &&
+				( m_selGroup->focusedCategory >= m_categoryList.GetTopIndex() + m_categoryList.GetCountPerPage() * 2) ) {
+				// 移動先が画面より下、1画面以内にある時は1画面スクロール
+				m_categoryList.Scroll( CSize(0, m_categoryList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+			} else {
+				// 移動先が画面より上か、下で1画面以上離れている時はEnsureVisible()
+				m_categoryList.EnsureVisible( m_selGroup->focusedCategory , TRUE );
+			}
 
 			// 再描画
 			if (theApp.m_optionMng.IsUseBgImage()) {
@@ -2348,7 +2362,14 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 
 			// 移動先が非表示なら上方向にスクロール
 			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
-				m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				if( ( pCategory->selectedBody < m_bodyList.GetTopIndex() ) &&
+					( pCategory->selectedBody >= m_bodyList.GetTopIndex() - m_bodyList.GetCountPerPage() ) ) {
+					// 移動先が画面より上、1画面以内にある時は1画面スクロール
+					m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				} else {
+					// 移動先が画面より下か、上で1画面以上離れている時はEnsureVisible()
+					m_bodyList.EnsureVisible( pCategory->selectedBody , TRUE );
+				}
 
 				// 再描画
 				if (theApp.m_optionMng.IsUseBgImage()) {
@@ -2379,7 +2400,14 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 
 			// 移動先が非表示なら下方向にスクロール
 			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
-				m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				if( ( pCategory->selectedBody >= m_bodyList.GetTopIndex() + m_bodyList.GetCountPerPage() ) &&
+					( pCategory->selectedBody < m_bodyList.GetTopIndex() + m_bodyList.GetCountPerPage() * 2 ) ) {
+					// 移動先が画面より下、1画面以内にある時は1画面スクロール
+					m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				} else {
+					// 移動先が画面より上か、下で1画面以上離れている時はEnsureVisible()
+					m_bodyList.EnsureVisible( pCategory->selectedBody , TRUE );
+				}
 
 				// 再描画
 				if (theApp.m_optionMng.IsUseBgImage()) {
