@@ -2362,7 +2362,7 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 
 			// 移動先が非表示なら上方向にスクロール
 			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
-				if( ( pCategory->selectedBody < m_bodyList.GetTopIndex() ) &&
+				if( ( pCategory->selectedBody <= m_bodyList.GetTopIndex() ) &&
 					( pCategory->selectedBody >= m_bodyList.GetTopIndex() - m_bodyList.GetCountPerPage() ) ) {
 					// 移動先が画面より上、1画面以内にある時は1画面スクロール
 					m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );

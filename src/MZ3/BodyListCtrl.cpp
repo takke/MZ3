@@ -480,7 +480,7 @@ BOOL CBodyListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	// Å‰‚©ÅŒã‚Ì€–Ú‚Å‚ ‚ê‚Î‘S‘Ì‚ðÄ•`‰æi”wŒi‰æ‘œ‚Ì‚¸‚ê–hŽ~j
 	int iStart = GetTopIndex();
 	int iEnd   = iStart + GetCountPerPage();
-	if( pNMLV->iItem < iStart || pNMLV->iItem == iEnd ) {
+	if( pNMLV->iItem < iStart || pNMLV->iItem >= iEnd ) {
 		if( pNMLV->uNewState & LVIS_FOCUSED ) {
 			Invalidate( FALSE );
 		}

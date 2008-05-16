@@ -62,6 +62,7 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 	int iSrcWidth = bmp.bmWidth ;
 	int iSrcHeight = bmp.bmHeight ;
 
+	int iSrcTop = srcy % iSrcHeight;
 	int iTop = y;
 	do {
 		int iLeft = x;
@@ -69,7 +70,10 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 	// “]‘—
 //	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
 //#ifdef WINCE
-	BitBlt( hdc, iLeft, iTop, iSrcWidth, iSrcHeight, hdc1, srcx, srcy, SRCCOPY );
+	BitBlt( hdc, iLeft, iTop, iSrcWidth, iSrcHeight - iSrcTop , hdc1, srcx, iSrcTop, SRCCOPY );
+	if( srcy > 0 ){
+		BitBlt( hdc, iLeft, iTop + iSrcHeight - iSrcTop , iSrcWidth, iSrcTop , hdc1, srcx, 0, SRCCOPY );
+	}
 /*#else
 	BLENDFUNCTION bf;
 	bf.BlendOp = AC_SRC_OVER;
