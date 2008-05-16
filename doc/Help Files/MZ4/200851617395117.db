@@ -1,0 +1,8 @@
+[Info]
+Name=RSS を利用する
+KeyWord=RSS を利用する
+Context=IDH_HELP76
+[Date]
+<P>&nbsp;</P>
+<P>&nbsp; RSS リーダで情報を受け取るには，RSS フィードを toppage_group.ini に登録する必要があります<BR>&nbsp; <A href="2007101521218532.htm">ini ファイル編集</A>の<A href="20071015212015782.htm">タブ編集</A>の要領でフィードの追加・修正・削除を行ってください </P>
+<P><BR>&nbsp;</P>

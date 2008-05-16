@@ -13,6 +13,10 @@
 <param name="Local" value="2007101519554875.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
+<param name="Name" value="MZ4 を使うには">
+<param name="Local" value="200852175314779.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
 <param name="Name" value="改訂履歴">
 <param name="Local" value="2007101520112677.htm">
 </OBJECT>
@@ -21,8 +25,19 @@
 <param name="Local" value="20071015202046918.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="MZ4 を使うには">
-<param name="Local" value="200852175314779.htm">
+<param name="Name" value="mixi">
+<param name="Name" value="画面上での操作">
+<param name="Local" value="20071015202110441.htm">
+<param name="Name" value="キー操作">
+<param name="Local" value="20071015202619424.htm">
+<param name="Name" value="メインメニュー">
+<param name="Local" value="20071018112438956.htm">
+<param name="Name" value="ini ファイル編集">
+<param name="Local" value="2007101521207472.htm">
+<param name="Name" value="FAQ">
+<param name="Local" value="20071015212732370.htm">
+<param name="Name" value="TIPS">
+<param name="Local" value="20071015214016317.htm">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="画面上での操作">
@@ -334,6 +349,27 @@
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="画面上での操作">
 <param name="Local" value="2007122620810991.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS">
+<param name="Name" value="目次">
+<param name="Local" value="2008516173730556.htm">
+<param name="Name" value="RSS とは？">
+<param name="Local" value="2008516173738744.htm">
+<param name="Name" value="RSS を利用する">
+<param name="Local" value="200851617395117.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="目次">
+<param name="Local" value="2008516173730556.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS とは？">
+<param name="Local" value="2008516173738744.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS を利用する">
+<param name="Local" value="200851617395117.htm">
 </OBJECT>
 </UL>
 </body>
