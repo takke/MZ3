@@ -70,9 +70,11 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 	// “]‘—
 //	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
 //#ifdef WINCE
-	BitBlt( hdc, iLeft, iTop, iSrcWidth, iSrcHeight - iSrcTop , hdc1, srcx, iSrcTop, SRCCOPY );
-	if( srcy > 0 ){
-		BitBlt( hdc, iLeft, iTop + iSrcHeight - iSrcTop , iSrcWidth, iSrcTop , hdc1, srcx, 0, SRCCOPY );
+	int wid = min( w, iSrcWidth );
+	int hei = min( h, iSrcHeight - iSrcTop );
+	BitBlt( hdc, iLeft, iTop, wid, hei , hdc1, srcx, iSrcTop, SRCCOPY );
+	if( hei < h ){
+		BitBlt( hdc, iLeft, iTop + hei , wid, h - hei , hdc1, srcx, 0, SRCCOPY );
 	}
 /*#else
 	BLENDFUNCTION bf;
