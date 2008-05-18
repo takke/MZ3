@@ -6,10 +6,12 @@
  */
 #pragma once
 
+#include "TouchListCtrl.h"
+
 /**
  * ボディーリスト（メイン画面下側領域）
  */
-class CBodyListCtrl : public CListCtrl
+class CBodyListCtrl : public CTouchListCtrl
 {
 	DECLARE_DYNAMIC(CBodyListCtrl)
 
@@ -17,6 +19,8 @@ public:
 	CBodyListCtrl();
 	virtual ~CBodyListCtrl();
 
+	virtual HBITMAP GetBgBitmapHandle();
+	virtual void PopupContextMenu( const CPoint );
 protected:
 	DECLARE_MESSAGE_MAP()
 
@@ -40,9 +44,10 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 #ifndef WINCE
 	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 #endif
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

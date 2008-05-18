@@ -22,7 +22,7 @@ static const int OFFSET_OTHER	= 6*2;
 
 // CBodyListCtrl
 
-IMPLEMENT_DYNAMIC(CBodyListCtrl, CListCtrl)
+IMPLEMENT_DYNAMIC(CBodyListCtrl, CTouchListCtrl)
 
 CBodyListCtrl::CBodyListCtrl()
 	: m_bStopDraw(false)
@@ -34,15 +34,15 @@ CBodyListCtrl::~CBodyListCtrl()
 }
 
 
-BEGIN_MESSAGE_MAP(CBodyListCtrl, CListCtrl)
+BEGIN_MESSAGE_MAP(CBodyListCtrl, CTouchListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CBodyListCtrl::OnLvnItemchanged)
 	ON_WM_VSCROLL()
 	ON_WM_MOUSEWHEEL()
 #ifndef WINCE
 	ON_WM_NCCALCSIZE()
-	ON_WM_MOUSEMOVE()
 #endif
+	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
@@ -51,6 +51,28 @@ END_MESSAGE_MAP()
 // CBodyListCtrl メッセージ ハンドラ
 
 
+
+/**
+ * PreTranslateMessage
+ *  ・トラブルシュート用
+ */
+BOOL CBodyListCtrl::PreTranslateMessage(MSG* pMsg)
+{
+/*	switch (pMsg->message) {
+	case WM_MOUSEMOVE:
+		break;
+
+	case WM_PAINT:
+		// ちらつき防止のため遮断
+		return TRUE;
+
+	default:
+		MZ3_TRACE( L"CBodyListCtrl::PreTranslateMessage(0x%04X, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
+		break;
+	}
+*/
+	return CTouchListCtrl::PreTranslateMessage(pMsg);
+}
 
 void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
@@ -93,10 +115,14 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// アイテムの表示されている幅を取得
 	CRect rcAllLabels;
 	this->GetItemRect(nItem, rcAllLabels, LVIR_BOUNDS);
+	// 表示位置をrcItemに合わせる
+	rcAllLabels.MoveToY( rcItem.top );
 
 	// アイテムのラベルの幅を取得
 	CRect rcLabel;
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcLabel.MoveToY( rcItem.top );
 	if (m_bUseIcon==false) {
 		// アイコンなしの場合は、アイコン分だけオフセットをかける
 		if (rcLabel.left > 16) {
@@ -113,18 +139,25 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// 背景の塗りつぶし
-		if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainBodyCtrl.isEnableImage() ) {
-			// 背景画像なしの場合
-			pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
-		}else{
-			// ビットマップの描画
-			CRect rectClient;
-			this->GetClientRect( &rectClient );
-			int x = lpDrawItemStruct->rcItem.left;
-			int y = lpDrawItemStruct->rcItem.top;
-			int w = rectClient.Width();
-			int h = lpDrawItemStruct->rcItem.bottom - y;
-			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
+		if( GetDrawBk() ) {
+			if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainBodyCtrl.isEnableImage() ) {
+				// 背景画像なしの場合
+				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
+			}else{
+				// ビットマップの描画
+				CRect rectClient;
+				this->GetClientRect( &rectClient );
+				int x = lpDrawItemStruct->rcItem.left;
+				int y = lpDrawItemStruct->rcItem.top;
+				int w = rectClient.Width();
+				int h = lpDrawItemStruct->rcItem.bottom - y;
+#ifdef TOUCHLIST_SCROLLWITHBK
+				int offset = ( h * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
+#else
+				int offset = 0;
+#endif
+				util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y , w, h, x, y + offset );
+			}
 		}
 	}
 
@@ -159,6 +192,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 通常のアイコンとオーバーレイアイコンを描画します。
 		CRect rcIcon;
 		this->GetItemRect(nItem, rcIcon, LVIR_ICON);
+		// 表示位置をrcItemに合わせる
+		rcIcon.MoveToY( rcItem.top );
 		CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
 
 		if (pImageList != NULL) {
@@ -177,7 +212,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// アイテムのラベルを描きます。
-	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
+	CRect rcSubItem;
+	this->GetItemRect(nItem, rcSubItem, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcSubItem.MoveToY( rcItem.top );
 
 	//--- 左側カラム
 	pszText = szBuff;
@@ -331,8 +369,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	lvc.mask = LVCF_FMT | LVCF_WIDTH;
 	// 元の色に戻す
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-		rcItem.left = rcItem.right;
-		rcItem.right = rcItem.left + lvc.cx;
+		rcSubItem.left = rcSubItem.right;
+		rcSubItem.right = rcSubItem.left + lvc.cx;
 
 		int nRetLen = this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff));
 		if (nRetLen == 0) {
@@ -355,7 +393,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			}
 		}
 
-		rcLabel = rcItem;
+		rcLabel = rcSubItem;
 		rcLabel.left  += OFFSET_OTHER;
 		rcLabel.right -= OFFSET_OTHER;
 
@@ -451,6 +489,8 @@ void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2)
 
 BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 {
+	MZ3_TRACE( L" OnEraseBkgnd()\n");
+
 	pDC->SetBkMode( TRANSPARENT );
 
 	// ビットマップの初期化と描画
@@ -465,7 +505,15 @@ BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 			int y = rectClient.top;
 			int w = rectClient.Width();
 			int h = rectClient.Height();
-			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y );
+			int offset = 0;
+#ifdef TOUCHLIST_SCROLLWITHBK
+			if( GetItemCount() > 0) {
+				CRect rcItem;
+				GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
+				offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
+			}
+#endif
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y + offset );
 			return TRUE;
 		}
 	}
@@ -500,14 +548,14 @@ void CBodyListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		// スクロール位置が変化していたら再描画
 		static int s_nLastPos = nPos;
 		if( s_nLastPos != nPos ) {
-			Invalidate( FALSE );
+			//Invalidate( FALSE );			// ちらつき防止のためここでは再描画しない
 			s_nLastPos = nPos;
 
 			theApp.m_pMainView->MoveMiniImageDlg();
 		}
 	}
 
-	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+	CTouchListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
@@ -518,16 +566,16 @@ BOOL CBodyListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		int pos = GetScrollPos(SB_VERT);
 		static int s_lastPos = pos;
 		if (pos != s_lastPos) {
-			Invalidate( FALSE );
+			//Invalidate( FALSE );			// ちらつき防止のためここでは再描画しない
 			s_lastPos = pos;
 
 			theApp.m_pMainView->MoveMiniImageDlg();
 		}
 	}
 
-//	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
-	// 右クリック＋マウスホイール処理のために親呼び出し
-	return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
+	return CTouchListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+	//// 右クリック＋マウスホイール処理のために親呼び出し → CTouchListCtrlに移行
+	//return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
 }
 
 #ifndef WINCE
@@ -540,9 +588,9 @@ void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp
 }
 #endif
 
-#ifndef WINCE
 void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
+#ifndef WINCE
 //	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
 	// オプションがOnならmini画像画面を移動
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage &&
@@ -557,9 +605,9 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 			theApp.m_pMainView->MoveMiniImageDlg( idx, point.x, point.y );
 		}
 	}
-	CListCtrl::OnMouseMove(nFlags, point);
-}
 #endif
+	CTouchListCtrl::OnMouseMove(nFlags, point);
+}
 
 void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -573,6 +621,7 @@ void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
+/* CTouchListCtrl::OnLButtonDown()とCBodyListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;
@@ -587,6 +636,32 @@ void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 #endif
+*/
 
-	CListCtrl::OnLButtonDown(nFlags, point);
+	CTouchListCtrl::OnLButtonDown(nFlags, point);
+}
+
+/**
+ * virtual GetBgBitmapHandle()
+ *  背景Bitmapのハンドルを返す
+ */
+HBITMAP CBodyListCtrl::GetBgBitmapHandle()
+{
+	if( theApp.m_optionMng.IsUseBgImage() ) {
+		theApp.m_bgImageMainBodyCtrl.load();
+		if(theApp.m_bgImageMainBodyCtrl.isEnableImage()) {
+			return theApp.m_bgImageMainBodyCtrl.getHandle();
+		}
+	}
+	return NULL;
+}
+
+/**
+ * virtual PopupContextMenu()
+ *  ポップアップメニューを開く
+ */
+void CBodyListCtrl::PopupContextMenu( const CPoint point )
+{
+	// TODO 本来は WM_COMMAND で通知すべき。
+	theApp.m_pMainView->PopupBodyMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
 }
