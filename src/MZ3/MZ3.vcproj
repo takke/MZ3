@@ -2640,6 +2640,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\AutoScrollManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\BodyListCtrl.h"
 					>
 				</File>

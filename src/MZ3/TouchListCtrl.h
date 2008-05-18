@@ -6,7 +6,7 @@
  */
 #pragma once
 #include "afxcmn.h"
-#include "Ran2View.h"
+#include "AutoScrollManager.h"
 
 /**
  * CTouchListCtrlクラス
@@ -57,7 +57,7 @@ private:
 	bool	m_bDrawBk;				///< DrawItemにおける背景描画フラグ
 	bool	m_bTimerRedraw;			///< 遅延描画中フラグ
 
-	Ran2::AutoScrollManager	m_autoScrollInfo;	///< 慣性スクロール情報
+	AutoScrollManager	m_autoScrollInfo;	///< 慣性スクロール情報
 
 	DWORD		m_dwAutoScrollStartTick;	///< 慣性スクロール開始時刻
 	int			m_yAutoScrollMax;			///< 慣性スクロール中の最大移動量
