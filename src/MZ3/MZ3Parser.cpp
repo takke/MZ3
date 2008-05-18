@@ -176,6 +176,13 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				CString s = item.getProperty(L"rdf:about").c_str();
 				data.m_linkList.push_back(CMixiData::Link(s, data.GetTitle().Left(20)));
 
+				// dc:date
+				try {
+					CString s = item.getNode(L"dc:date").getTextAll().c_str();
+					mixi::ParserUtil::ParseDate(s, data);
+				} catch (xml2stl::NodeNotFoundException&) {
+				}
+
 				data.SetAccessType(ACCESS_RSS_READER_ITEM);
 				out_.push_back(data);
 			}

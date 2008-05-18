@@ -153,7 +153,7 @@ public:
 
 	static bool ParseDate(LPCTSTR line, CTime& t_result)
 	{
-		// RSS 形式 (YYYY-MM-DDT00:00:00Z)
+		// T1. RSS 形式 (YYYY-MM-DDT00:00:00Z)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
@@ -178,7 +178,7 @@ public:
 			}
 		}
 
-		// RSS 形式 (YYYY-MM-DDT00:00:00+09:00)
+		// T2. RSS 形式 (YYYY-MM-DDT00:00:00+09:00)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
@@ -202,7 +202,7 @@ public:
 			}
 		}
 
-		// RSS 形式 (Sun Dec 16 09:00:00 +0000 2007)
+		// T3. RSS 形式 (Sun Dec 16 09:00:00 +0000 2007)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
@@ -230,11 +230,12 @@ public:
 			}
 		}
 
-		// RSS 2.0 形式 (Mon, 16 Dec 2007 09:00:00 +0900)
+		// T4. RSS 2.0 形式 (Mon, 16 Dec 2007 09:00:00 +0900)
+		// T4. RSS 2.0 形式 (Mon, 16 Dec 2007 09:00:00 GMT)
 		{
 			// 正規表現のコンパイル
 			static MyRegex reg;
-			if( !util::CompileRegex( reg, L"([a-zA-Z]{3}), ([0-9]{2}) ([a-zA-Z]{3}) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) \\+([0-9]{4})" ) ) {
+			if( !util::CompileRegex( reg, L"([a-zA-Z]{3}), ([0-9]{2}) ([a-zA-Z]{3}) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) (.*)" ) ) {
 				return false;
 			}
 			// 検索
@@ -250,9 +251,15 @@ public:
 				int hour   = _wtoi( reg.results[5].str.c_str() );
 				int minute = _wtoi( reg.results[6].str.c_str() );
 				int sec    = _wtoi( reg.results[7].str.c_str() );
-
 				CTime t(year, month, day, hour, minute, sec);
-//				t += CTimeSpan(0, 9, 0, 0);
+
+				// 簡易時差変換
+				const std::wstring& time_diff = reg.results[8].str;
+
+				if (time_diff==L"GMT") {
+					t += CTimeSpan(0, 9, 0, 0);
+				}
+
 				t_result = t;
 				return true;
 			}
