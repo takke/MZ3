@@ -19,7 +19,7 @@ static const int OFFSET_OTHER = 6;
 
 // CReportListCtrl
 
-IMPLEMENT_DYNAMIC(CReportListCtrl, CListCtrl)
+IMPLEMENT_DYNAMIC(CReportListCtrl, CTouchListCtrl)
 
 CReportListCtrl::CReportListCtrl()
 {
@@ -30,7 +30,7 @@ CReportListCtrl::~CReportListCtrl()
 }
 
 
-BEGIN_MESSAGE_MAP(CReportListCtrl, CListCtrl)
+BEGIN_MESSAGE_MAP(CReportListCtrl, CTouchListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CReportListCtrl::OnLvnItemchanged)
 	ON_WM_LBUTTONDOWN()
@@ -47,13 +47,20 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CRect rectClient;
 	this->GetClientRect( &rectClient );
 
-	// ビットマップの描画
-	if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageReportListCtrl.isEnableImage() ) {
-		int x = lpDrawItemStruct->rcItem.left;
-		int y = lpDrawItemStruct->rcItem.top;
-		int w = rectClient.Width();
-		int h = lpDrawItemStruct->rcItem.bottom - y;
-		util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y );
+	if( GetDrawBk() ) {
+		// ビットマップの描画
+		if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageReportListCtrl.isEnableImage() ) {
+			int x = lpDrawItemStruct->rcItem.left;
+			int y = lpDrawItemStruct->rcItem.top;
+			int w = rectClient.Width();
+			int h = lpDrawItemStruct->rcItem.bottom - y;
+#ifdef TOUCHLIST_SCROLLWITHBK
+			int offset = ( h * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
+#else
+			int offset = 0;
+#endif
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y + offset );
+		}
 	}
 
 	// 再描画するItemの座標を取得
@@ -92,10 +99,14 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// アイテムの表示されている幅を取得
 	CRect rcAllLabels;
 	this->GetItemRect(nItem, rcAllLabels, LVIR_BOUNDS);
+	// 表示位置をrcItemに合わせる
+	rcAllLabels.MoveToY( rcItem.top );
 
 	// アイテムのラベルの幅を取得
 	CRect rcLabel;
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcLabel.MoveToY( rcItem.top );
 
 	// 左の位置を同じにする
 	rcAllLabels.left = rcLabel.left;
@@ -148,6 +159,9 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 通常のアイコンとオーバーレイアイコンを描画します。
 	CRect rcIcon;
 	this->GetItemRect(nItem, rcIcon, LVIR_ICON);
+	// 表示位置をrcItemに合わせる
+	rcIcon.MoveToY( rcItem.top );
+
 	CImageList* pImageList = this->GetImageList(LVSIL_SMALL);
 
 	if (pImageList != NULL) {
@@ -165,13 +179,16 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// アイテムのラベルを描きます。
-	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
+	CRect rcSubItem;
+	this->GetItemRect(nItem, rcSubItem, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcSubItem.MoveToY( rcItem.top );
 
 	//--- 左側カラム
 
 	pszText = szBuff;
 
-	rcLabel = rcItem;
+	//rcLabel = rcItem;
 	rcLabel.left  += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
@@ -202,8 +219,8 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	LV_COLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH;
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-		rcItem.left = rcItem.right;
-		rcItem.right += lvc.cx;
+		rcSubItem.left = rcSubItem.right;
+		rcSubItem.right += lvc.cx;
 
 		int nRetLen = this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff));
 		if (nRetLen == 0) {
@@ -227,7 +244,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			}
 		}
 
-		rcLabel = rcItem;
+		rcLabel = rcSubItem;
 		rcLabel.left  += OFFSET_OTHER;
 		rcLabel.right -= OFFSET_OTHER;
 
@@ -281,7 +298,15 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 			int y = rectClient.top;
 			int w = rectClient.Width();
 			int h = rectClient.Height();
-			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y );
+			int offset = 0;
+#ifdef TOUCHLIST_SCROLLWITHBK
+			if( GetItemCount() > 0) {
+				CRect rcItem;
+				GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
+				offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
+			}
+#endif
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y + offset );
 			return TRUE;
 		}
 	}
@@ -314,12 +339,12 @@ void CReportListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if (theApp.m_optionMng.IsUseBgImage()) {
 		static int s_nLastPos = nPos;
 		if( s_nLastPos != nPos ) {
-			Invalidate( FALSE );
+			//Invalidate( FALSE );			// ちらつき防止のためここでは再描画しない
 			s_nLastPos = nPos;
 		}
 	}
 
-	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+	CTouchListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 BOOL CReportListCtrl::PreTranslateMessage(MSG* pMsg)
@@ -340,7 +365,7 @@ BOOL CReportListCtrl::PreTranslateMessage(MSG* pMsg)
 	}
 #endif
 
-	return CListCtrl::PreTranslateMessage(pMsg);
+	return CTouchListCtrl::PreTranslateMessage(pMsg);
 }
 
 void CReportListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
@@ -352,6 +377,7 @@ void CReportListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 	}
 
+/* CTouchListCtrl::OnLButtonDown()とCReportListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;
@@ -366,6 +392,32 @@ void CReportListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 #endif
+*/
 
-	CListCtrl::OnLButtonDown(nFlags, point);
+	CTouchListCtrl::OnLButtonDown(nFlags, point);
+}
+
+/**
+ * virtual GetBgBitmapHandle()
+ *  背景Bitmapのハンドルを返す
+ */
+HBITMAP CReportListCtrl::GetBgBitmapHandle()
+{
+	if( theApp.m_optionMng.IsUseBgImage() ) {
+		theApp.m_bgImageReportListCtrl.load();
+		if(theApp.m_bgImageReportListCtrl.isEnableImage()) {
+			return theApp.m_bgImageReportListCtrl.getHandle();
+		}
+	}
+	return NULL;
+}
+
+/**
+ * virtual PopupContextMenu()
+ *  ポップアップメニューを開く
+ */
+void CReportListCtrl::PopupContextMenu( const CPoint point )
+{
+	// TODO 本来は WM_COMMAND で通知すべき。
+	theApp.m_pReportView->MyPopupReportMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
 }

@@ -48,6 +48,7 @@ BEGIN_MESSAGE_MAP(CTouchListCtrl, CListCtrl)
 	ON_NOTIFY_REFLECT(LVN_DELETEITEM, &CTouchListCtrl::OnLvnDeleteitem)
 	ON_NOTIFY_REFLECT(LVN_INSERTITEM, &CTouchListCtrl::OnLvnInsertitem)
 	ON_WM_RBUTTONDOWN()
+	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 /**
@@ -92,6 +93,8 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	// フォーカスを設定する
 	SetFocus();
 
+	// オフセットのずれを調整
+	MyAdjustDrawOffset();
 	// 慣性スクロール停止
 	MyResetAutoScrollTimer();
 
@@ -125,6 +128,7 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	// とりあえずクリック処理として
 	//  ・アイテムの選択
 	//  ・フォーカスの設定
+	//  ・クリック通知メッセージを親に送る
 	// をやってるが、足りなかったら追加しましょ
 	//CListCtrl::OnLButtonDown(nFlags, point);
 }
@@ -144,35 +148,60 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		ReleaseCapture();
 		// フラグクリア
 		m_bDragging = false;
+
 		// 遅延描画タイマーのリセット
 		MyResetRedrawTimer();
 
 		// マウスカーソルを元に戻す
 		::SetCursor( ::LoadCursor(NULL, IDC_ARROW) );
 
+		// クリック通知メッセージを親に送る
+		int nItem = util::MyGetListCtrlSelectedItemIndex( *this );
+		NMLISTVIEW nmlv;
+		nmlv.hdr.hwndFrom = m_hWnd;
+		nmlv.hdr.idFrom = 0 ;
+		nmlv.hdr.code = NM_CLICK ;
+		nmlv.iItem = nItem ;
+		nmlv.iSubItem = 0 ;
+		nmlv.ptAction = point ;
+		nmlv.uChanged = 0;
+		nmlv.uNewState = 0;
+		nmlv.uOldState = LVIS_FOCUSED | LVIS_SELECTED;
+		nmlv.lParam = NULL;
+		GetParent()->SendMessage( WM_NOTIFY , NM_CLICK , (LPARAM)&nmlv );
+
+		// スクロール可能か？
+		if ( GetItemCount() > GetCountPerPage() ) {
 //#ifndef WINCE
-//		// Win32では独自処理で描画する
-//		// WMでは処理が追いつかないので標準処理に任せる
-//		DrawDetail();
-//		UpdateWindow();
+//			// Win32では独自処理で描画する
+//			// WMでは処理が追いつかないので標準処理に任せる
+//			DrawDetail();
+//			UpdateWindow();
 //#else
 //#ifndef TOUCHLIST_SCROLLWITHBK
-//		// WMで、かつ背景同時スクロールでない場合は再描画
-//		Invalidate();
+//			// WMで、かつ背景同時スクロールでない場合は再描画
+//			Invalidate();
 //#endif
 //#endif
 
-		// 慣性スクロール情報取得
-		m_autoScrollInfo.push( GetTickCount(), point );
-		double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
-		MZ3_TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
-		// 慣性スクロール開始
-		m_dwAutoScrollStartTick = GetTickCount();
-		m_yAutoScrollMax = 0;
-		MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
-
+			// 慣性スクロール情報取得
+			m_autoScrollInfo.push( GetTickCount(), point );
+			double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
+			MZ3_TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
+			if( abs(point.y - m_ptDragStart.y) > m_iItemHeight ){
+				// 1行以上ドラッグしていれば慣性スクロール開始
+				m_dwAutoScrollStartTick = GetTickCount();
+				m_yAutoScrollMax = 0;
+				MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
+				return;
+			} else {
+				// 1行未満のドラッグならばすぐに止める
+				MyAdjustDrawOffset();
+				m_autoScrollInfo.clear();
+			}
+		}
 	}
-	CListCtrl::OnLButtonUp(nFlags, point);
+	//CListCtrl::OnLButtonUp(nFlags, point);
 }
 
 /**
@@ -204,7 +233,7 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 	}
 
-	CListCtrl::OnMouseMove(nFlags, point);
+	//CListCtrl::OnMouseMove(nFlags, point);
 }
 
 /**
@@ -451,9 +480,11 @@ void CTouchListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	MZ3_TRACE( L"OnVScroll(%d)\n", nPos );
 
+	// オフセットのズレを調整
+	MyAdjustDrawOffset();
 	// 慣性スクロール停止
 	MyResetAutoScrollTimer();
-
+	
 	// スクロール中の描画を禁止
 #ifndef WINCE
 	LockWindowUpdate();
@@ -487,6 +518,8 @@ void CTouchListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
  */
 BOOL CTouchListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
+	// オフセットのズレを調整
+	MyAdjustDrawOffset();
 	// 慣性スクロール停止
 	MyResetAutoScrollTimer();
 
@@ -512,14 +545,16 @@ BOOL CTouchListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
  * WM_TIMER メッセージハンドラ
  *  ・TIMERID_TOUCHLIST_SCROLLREDRAW
  *    遅延描画処理
+ *  ・TIMERID_TOUCHLIST_AUTOSCROLL
+ *    慣性スクロール処理
  */
 void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 {
 	MZ3_TRACE( L"**OnTimer(0x%04X)\n", nIDEvent );
 	switch( nIDEvent ){
-/*
- * 遅延描画処理
-*/
+/****************************************************
+*			 遅延描画処理
+****************************************************/
 		case TIMERID_TOUCHLIST_SCROLLREDRAW:
 			// 遅延描画処理
 			// 遅延描画タイマーを停止
@@ -542,9 +577,9 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 #endif
 			break;
 
-/*
- * 慣性スクロール処理
-*/
+/****************************************************
+*			 慣性スクロール処理
+****************************************************/
 		case TIMERID_TOUCHLIST_AUTOSCROLL:
 			{
 				// 慣性スクロール
@@ -582,7 +617,7 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 					dt > 5 * 1000)
 				{
 					if( m_offsetPixelY != 0 ){
-						// オフセットのズレを解消
+						// オフセットのズレを調整
 						MyAdjustDrawOffset();
 					} else {
 						// 停止状態で最後の描画
@@ -741,6 +776,8 @@ void CTouchListCtrl::ResetAllTimer()
 {
 	// 遅延描画タイマーを停止
 	MyResetRedrawTimer();
+	// オフセットのズレを調整
+	MyAdjustDrawOffset();
 	// 慣性スクロールタイマーを停止
 	MyResetAutoScrollTimer();
 }
@@ -769,17 +806,26 @@ void CTouchListCtrl::OnLvnInsertitem(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+/*
+ * WM_RBUTTONDOWN メッセージハンドラ
+ *  ・慣性スクロールしていれば停止する
+*/
 void CTouchListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	// オフセットのズレを解消
+	// オフセットのズレを調整
 	MyAdjustDrawOffset();
-
 	// 慣性スクロールの停止
 	MyResetAutoScrollTimer();
 
 	CListCtrl::OnRButtonDown(nFlags, point);
 }
 
+/*
+ * MyAdjustDrawOffset()
+ * m_offsetPixelYが0になるように調整する
+ *  ・移動中なら進行方向に1個進めて止める
+ *  ・移動中でなければ近い方に寄せて止める
+*/
 bool CTouchListCtrl::MyAdjustDrawOffset()
 {
 	bool bMove = false;
@@ -825,4 +871,23 @@ bool CTouchListCtrl::MyAdjustDrawOffset()
 	}
 
 	return bMove;
+}
+
+/*
+ * WM_LBUTTONDBLCLK メッセージハンドラ
+ *  ・最初のクリック位置と二回目がずれた時のために選択項目を二回目に合わせる
+ */
+void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	// 選択変更
+	int nItem = HitTest(point);
+	if (nItem>=0) {
+		int idx = util::MyGetListCtrlSelectedItemIndex( *this );
+		if( GetItemCount() > 0 && idx >= 0 ) {
+			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
+			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+		}
+	}
+
+	CListCtrl::OnLButtonDblClk(nFlags, point);
 }

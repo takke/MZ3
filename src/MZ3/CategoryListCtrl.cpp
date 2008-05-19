@@ -19,7 +19,7 @@ static const int OFFSET_OTHER = 6;
 
 // CCategoryListCtrl
 
-IMPLEMENT_DYNAMIC(CCategoryListCtrl, CListCtrl)
+IMPLEMENT_DYNAMIC(CCategoryListCtrl, CTouchListCtrl)
 
 CCategoryListCtrl::CCategoryListCtrl()
 	: m_bStopDraw(false)
@@ -33,7 +33,7 @@ CCategoryListCtrl::~CCategoryListCtrl()
 }
 
 
-BEGIN_MESSAGE_MAP(CCategoryListCtrl, CListCtrl)
+BEGIN_MESSAGE_MAP(CCategoryListCtrl, CTouchListCtrl)
 	ON_WM_ERASEBKGND()
 	ON_WM_VSCROLL()
 	ON_NOTIFY_REFLECT_EX(LVN_ITEMCHANGED, &CCategoryListCtrl::OnLvnItemchanged)
@@ -91,10 +91,14 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// アイテムの表示されている幅を取得
 	CRect rcAllLabels;
 	this->GetItemRect(nItem, rcAllLabels, LVIR_BOUNDS);
+	// 表示位置をrcItemに合わせる
+	rcAllLabels.MoveToY( rcItem.top );
 
 	// アイテムのラベルの幅を取得
 	CRect rcLabel;
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcLabel.MoveToY( rcItem.top );
 
 	// 左の位置を同じにする
 	rcAllLabels.left = rcLabel.left;
@@ -104,26 +108,36 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// 背景の塗りつぶし
-		if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainCategoryCtrl.isEnableImage() ) {
-			// 背景画像なしの場合
-			pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
-		}else{
-			// ビットマップの描画
-			CRect rectClient;
-			this->GetClientRect( &rectClient );
+		if( GetDrawBk() ) {
+			if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainCategoryCtrl.isEnableImage() ) {
+				// 背景画像なしの場合
+				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
+			}else{
+				// ビットマップの描画
+				CRect rectClient;
+				this->GetClientRect( &rectClient );
 
-			int x = lpDrawItemStruct->rcItem.left;
-			int y = lpDrawItemStruct->rcItem.top;
-			int w = rectClient.Width();
-			int h = lpDrawItemStruct->rcItem.bottom - y;
-			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainCategoryCtrl.getHandle(), x, y, w, h, x, y );
+				int x = lpDrawItemStruct->rcItem.left;
+				int y = lpDrawItemStruct->rcItem.top;
+				int w = rectClient.Width();
+				int h = lpDrawItemStruct->rcItem.bottom - y;
+#ifdef TOUCHLIST_SCROLLWITHBK
+				int offset = ( h * GetTopIndex() ) % theApp.m_bgImageMainCategoryCtrl.getBitmapSize().cy;
+#else
+				int offset = 0;
+#endif
+				util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainCategoryCtrl.getHandle(), x, y, w, h, x, y + offset );
+			}
 		}
 	}
 
 	// アイテムのラベルを描きます。
-	this->GetItemRect(nItem, rcItem, LVIR_LABEL);
+	CRect rcSubItem;
+	this->GetItemRect(nItem, rcSubItem, LVIR_LABEL);
+	// 表示位置をrcItemに合わせる
+	rcSubItem.MoveToY( rcItem.top );
 
-	rcLabel = rcItem;
+	//rcLabel = rcItem;
 	rcLabel.left += OFFSET_FIRST;
 	rcLabel.right -= OFFSET_FIRST;
 
@@ -157,8 +171,8 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 第2カラム以降の描画
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-		rcItem.left = rcItem.right;
-		rcItem.right += lvc.cx;
+		rcSubItem.left = rcSubItem.right;
+		rcSubItem.right += lvc.cx;
 
 		strText = this->GetItemText(nItem, nColumn);
 		if (strText.GetLength() == 0) {
@@ -178,7 +192,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			break;
 		}
 
-		rcLabel = rcItem;
+		rcLabel = rcSubItem;
 		rcLabel.left += OFFSET_OTHER;
 		rcLabel.right -= OFFSET_OTHER;
 
@@ -221,7 +235,15 @@ BOOL CCategoryListCtrl::OnEraseBkgnd(CDC* pDC)
 			int y = rectClient.top;
 			int w = rectClient.Width();
 			int h = rectClient.Height();
-			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainCategoryCtrl.getHandle(), x, y, w, h, x, y );
+			int offset = 0;
+#ifdef TOUCHLIST_SCROLLWITHBK
+			if( GetItemCount() > 0) {
+				CRect rcItem;
+				GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
+				offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageMainCategoryCtrl.getBitmapSize().cy;
+			}
+#endif
+			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainCategoryCtrl.getHandle(), x, y, w, h, x, y + offset );
 			return TRUE;
 		}
 	}
@@ -235,12 +257,12 @@ void CCategoryListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 	if (theApp.m_optionMng.IsUseBgImage()) {
 		static int s_nLastPos = nPos;
 		if( s_nLastPos != nPos ) {
-			Invalidate( FALSE );
+			//Invalidate( FALSE );			// ちらつき防止のためここでは再描画しない
 			s_nLastPos = nPos;
 		}
 	}
 
-	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
+	CTouchListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 BOOL CCategoryListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
@@ -273,6 +295,7 @@ void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, true );
 	}
 
+/* CTouchListCtrl::OnLButtonDown()とCCategoryListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;
@@ -287,15 +310,16 @@ void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 #endif
+*/
 
-	CListCtrl::OnLButtonDown(nFlags, point);
+	CTouchListCtrl::OnLButtonDown(nFlags, point);
 }
 
 #ifndef WINCE
 void CCategoryListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
 //	wprintf( L"CCategoryListCtrl::OnMouseMove\n" );
-	CListCtrl::OnMouseMove(nFlags, point);
+	CTouchListCtrl::OnMouseMove(nFlags, point);
 	// マウスジェスチャ処理のために親呼び出し
 //	return theApp.m_pMainView->OnMouseMove(nFlags, zDelta, pt);
 }
@@ -303,7 +327,32 @@ void CCategoryListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CCategoryListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-//	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
-	// 右クリック＋マウスホイール処理のために親呼び出し
-	return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
+	return CTouchListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+	//// 右クリック＋マウスホイール処理のために親呼び出し → CTouchListCtrlに移行
+	//return theApp.m_pMainView->OnMouseWheel(nFlags, zDelta, pt);
+}
+
+/**
+ * virtual GetBgBitmapHandle()
+ *  背景Bitmapのハンドルを返す
+ */
+HBITMAP CCategoryListCtrl::GetBgBitmapHandle()
+{
+	if( theApp.m_optionMng.IsUseBgImage() ) {
+		theApp.m_bgImageMainCategoryCtrl.load();
+		if(theApp.m_bgImageMainCategoryCtrl.isEnableImage()) {
+			return theApp.m_bgImageMainCategoryCtrl.getHandle();
+		}
+	}
+	return NULL;
+}
+
+/**
+ * virtual PopupContextMenu()
+ *  ポップアップメニューを開く
+ */
+void CCategoryListCtrl::PopupContextMenu( const CPoint point )
+{
+	// TODO 本来は WM_COMMAND で通知すべき。
+	theApp.m_pMainView->PopupCategoryMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
 }

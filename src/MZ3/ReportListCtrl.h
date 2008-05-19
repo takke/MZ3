@@ -6,10 +6,12 @@
  */
 #pragma once
 
+#include "TouchListCtrl.h"
+
 /**
  * レポートリスト（レポート画面上側領域）
  */
-class CReportListCtrl : public CListCtrl
+class CReportListCtrl : public CTouchListCtrl
 {
 	DECLARE_DYNAMIC(CReportListCtrl)
 
@@ -17,6 +19,8 @@ public:
 	CReportListCtrl();
 	virtual ~CReportListCtrl();
 
+	virtual HBITMAP GetBgBitmapHandle();
+	virtual void PopupContextMenu( const CPoint );
 protected:
 	DECLARE_MESSAGE_MAP()
 public:

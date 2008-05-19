@@ -6,10 +6,12 @@
  */
 #pragma once
 
+#include "TouchListCtrl.h"
+
 /**
  * カテゴリリスト（メイン画面2段目領域）
  */
-class CCategoryListCtrl : public CListCtrl
+class CCategoryListCtrl : public CTouchListCtrl
 {
 	DECLARE_DYNAMIC(CCategoryListCtrl)
 
@@ -17,6 +19,8 @@ public:
 	CCategoryListCtrl();
 	virtual ~CCategoryListCtrl();
 
+	virtual HBITMAP GetBgBitmapHandle();
+	virtual void PopupContextMenu( const CPoint );
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
