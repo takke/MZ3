@@ -139,7 +139,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// ”wŒi‚Ì“h‚è‚Â‚Ô‚µ
-		if( GetDrawBk() ) {
+		if( IsDrawBk() ) {
 			if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageMainBodyCtrl.isEnableImage() ) {
 				// ”wŒi‰æ‘œ‚È‚µ‚Ìê‡
 				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
@@ -151,11 +151,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				int y = lpDrawItemStruct->rcItem.top;
 				int w = rectClient.Width();
 				int h = lpDrawItemStruct->rcItem.bottom - y;
-#ifdef TOUCHLIST_SCROLLWITHBK
-				int offset = ( h * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
-#else
 				int offset = 0;
-#endif
+				if( IsScrollWithBk() ){
+					offset = ( h * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
+				}
 				util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y , w, h, x, y + offset );
 			}
 		}
@@ -506,13 +505,13 @@ BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 			int w = rectClient.Width();
 			int h = rectClient.Height();
 			int offset = 0;
-#ifdef TOUCHLIST_SCROLLWITHBK
-			if( GetItemCount() > 0) {
-				CRect rcItem;
-				GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
-				offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
+			if( IsScrollWithBk() ){
+				if( GetItemCount() > 0) {
+					CRect rcItem;
+					GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
+					offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageMainBodyCtrl.getBitmapSize().cy;
+				}
 			}
-#endif
 			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageMainBodyCtrl.getHandle(), x, y, w, h, x, y + offset );
 			return TRUE;
 		}

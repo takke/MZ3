@@ -26,6 +26,8 @@ CTouchListCtrl::CTouchListCtrl(void)
 #endif
 	, m_bTimerRedraw(false)
 	, m_bDrawBk(true)
+	, m_bScrollWithBk(true)
+	, m_bAutoScrolling(false)
 {
 }
 
@@ -220,10 +222,10 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 			// 縦ドラッグ処理
 			ScrollByMoveY( point.y );
 #ifdef WINCE
-#ifndef TOUCHLIST_SCROLLWITHBK
-			// WMで、かつ背景同時スクロールでない場合は遅延再描画
-			MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW );
-#endif
+			if( !IsScrollWithBk() ){
+				// WMで、かつ背景同時スクロールでない場合は遅延再描画
+				MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
+			}
 #endif
 			// 慣性スクロール情報取得
 			m_autoScrollInfo.push( GetTickCount(), point );
@@ -398,11 +400,10 @@ int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 		int y = rectViewClient.top;
 		int w = rectViewClient.Width();
 		int h = rectViewClient.Height() + m_iItemHeight * 2;
-#ifdef TOUCHLIST_SCROLLWITHBK
-		int offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
-#else
 		int offset = 0;
-#endif
+		if( IsScrollWithBk() ){
+			offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
+		}
 		util::DrawBitmap( m_memDC->GetSafeHdc(), hBgBitmap, x, y, w, h, 0, 0 + offset );
 	}
 
@@ -503,10 +504,10 @@ void CTouchListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	DrawDetail();
 	UpdateWindow();
 #else
-#ifndef TOUCHLIST_SCROLLWITHBK
-	// WMで、かつ背景同時スクロールでない場合は遅延再描画
-	MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW );
-#endif
+	if( !IsScrollWithBk() ){
+		// WMで、かつ背景同時スクロールでない場合は遅延再描画
+		MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
+	}
 #endif
 }
 
@@ -626,11 +627,11 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 						// WMでは処理が追いつかないので標準処理に任せる
 						DrawDetail();
 						UpdateWindow();
-#else
-#ifndef TOUCHLIST_SCROLLWITHBK
-						// WMで、かつ背景同時スクロールでない場合は再描画
-						Invalidate();
-#endif
+//#else
+//						if( !IsScrollWithBk() ){
+//							// WMで、かつ背景同時スクロールでない場合は再描画
+//							Invalidate();
+//						}
 #endif
 					}
 
@@ -655,6 +656,12 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 
 				m_yAutoScrollMax = dyAutoScroll;
 				MZ3_TRACE( L"*************AUTOSCROLL:m_yAutoScrollMax=%d\n", m_yAutoScrollMax );
+#ifdef WINCE
+				if( !IsScrollWithBk() ){
+					// WMで、かつ背景同時スクロールでない場合は遅延再描画
+					MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
+				}
+#endif
 				break;
 			}
 		default:
@@ -733,6 +740,10 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 		( GetItemCount() - GetCountPerPage() == iNextTop && m_offsetPixelY < 0) ||
 		( GetItemCount() - GetCountPerPage() < iNextTop ) ){
 		m_offsetPixelY = 0;
+	}
+
+	if( ( iNextTop <= 0 ) ||
+		( GetItemCount() - GetCountPerPage() <= iNextTop ) ){
 		// 先頭or最後尾フラグ
 		bLimitOver = true;
 	}
@@ -863,10 +874,10 @@ bool CTouchListCtrl::MyAdjustDrawOffset()
 		MZ3_TRACE( L"*************AUTOSCROLL:ScrollByMoveY(%d)\n" , dy );
 		ScrollByMoveY( dy );
 #ifdef WINCE
-#ifndef TOUCHLIST_SCROLLWITHBK
-		// WMで、かつ背景同時スクロールでない場合は再描画
-		Invalidate();
-#endif
+		if( !IsScrollWithBk() ){
+			// WMで、かつ背景同時スクロールでない場合は再描画
+			Invalidate();
+		}
 #endif
 	}
 
@@ -887,6 +898,11 @@ void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
 			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 		}
+	}
+
+	// ダブルタップの暴発防止（できてるかどうか不明だが念のため
+	if( m_bAutoScrolling ) {
+		return;
 	}
 
 	CListCtrl::OnLButtonDblClk(nFlags, point);

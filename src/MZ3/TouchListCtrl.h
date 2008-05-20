@@ -18,9 +18,8 @@
 #define TIMERID_TOUCHLIST_AUTOSCROLL	2
 // タイマーインターバル [msec]
 #define TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW	10L
+#define TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L	50L
 #define TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL		20L
-// 背景同時スクロールするか？
-#define TOUCHLIST_SCROLLWITHBK
 
 class CTouchListCtrl :
 	public CListCtrl
@@ -61,10 +60,12 @@ private:
 
 	DWORD		m_dwAutoScrollStartTick;	///< 慣性スクロール開始時刻
 	int			m_yAutoScrollMax;			///< 慣性スクロール中の最大移動量
+	bool		m_bAutoScrolling;			///< 慣性スクロール中
 
+	bool		m_bScrollWithBk;	///< 背景同時スクロールするか
 public:
 	// 背景描画フラグの設定／取得
-	bool	GetDrawBk() { return m_bDrawBk; }
+	bool	IsDrawBk() { return m_bDrawBk; }
 	void	SetDrawBk( const bool bDrawBk ) {
 		m_bDrawBk = bDrawBk; 
 	}
@@ -75,6 +76,10 @@ public:
 
 	void ResetAllTimer();
 
+	bool	IsScrollWithBk() { return m_bScrollWithBk ;}
+	void	SetScrollWithBk( const bool bScrollWithBk ) {
+		m_bScrollWithBk = bScrollWithBk;
+	}
 private:
 	bool	ScrollByMoveY( const int dy);
 	bool	MyAdjustDrawOffset();
@@ -97,10 +102,12 @@ private:
 	inline void	MySetAutoScrollTimer( const int iInterval = TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL ) {
 		KillTimer( TIMERID_TOUCHLIST_AUTOSCROLL );
 		SetTimer( TIMERID_TOUCHLIST_AUTOSCROLL, iInterval , NULL );
+		m_bAutoScrolling = true;
 	}
 	inline void	MyResetAutoScrollTimer(){
 		KillTimer( TIMERID_TOUCHLIST_AUTOSCROLL );
 		m_autoScrollInfo.clear();
+		m_bAutoScrolling = false;
 	}
 
 protected:

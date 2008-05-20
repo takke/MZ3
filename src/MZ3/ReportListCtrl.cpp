@@ -47,18 +47,17 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CRect rectClient;
 	this->GetClientRect( &rectClient );
 
-	if( GetDrawBk() ) {
+	if( IsDrawBk() ) {
 		// ビットマップの描画
 		if( theApp.m_optionMng.IsUseBgImage() && theApp.m_bgImageReportListCtrl.isEnableImage() ) {
 			int x = lpDrawItemStruct->rcItem.left;
 			int y = lpDrawItemStruct->rcItem.top;
 			int w = rectClient.Width();
 			int h = lpDrawItemStruct->rcItem.bottom - y;
-#ifdef TOUCHLIST_SCROLLWITHBK
-			int offset = ( h * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
-#else
 			int offset = 0;
-#endif
+			if( IsScrollWithBk() ){
+				offset = ( h * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
+			}
 			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y + offset );
 		}
 	}
@@ -299,13 +298,13 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 			int w = rectClient.Width();
 			int h = rectClient.Height();
 			int offset = 0;
-#ifdef TOUCHLIST_SCROLLWITHBK
-			if( GetItemCount() > 0) {
-				CRect rcItem;
-				GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
-				offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
+			if( IsScrollWithBk() ){
+				if( GetItemCount() > 0) {
+					CRect rcItem;
+					GetItemRect( 0 , &rcItem , LVIR_BOUNDS );
+					offset = ( rcItem.Height() * GetTopIndex() ) % theApp.m_bgImageReportListCtrl.getBitmapSize().cy;
+				}
 			}
-#endif
 			util::DrawBitmap( pDC->GetSafeHdc(), theApp.m_bgImageReportListCtrl.getHandle(), x, y, w, h, x, y + offset );
 			return TRUE;
 		}
