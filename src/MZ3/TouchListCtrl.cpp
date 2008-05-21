@@ -886,7 +886,7 @@ bool CTouchListCtrl::MyAdjustDrawOffset()
 
 /*
  * WM_LBUTTONDBLCLK メッセージハンドラ
- *  ・最初のクリック位置と二回目がずれた時のために選択項目を二回目に合わせる
+ *  ・最初のクリック位置と二回目がずれたらダブルクリックを効かせない
  */
 void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
@@ -896,7 +896,10 @@ void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 		int idx = util::MyGetListCtrlSelectedItemIndex( *this );
 		if( GetItemCount() > 0 && idx >= 0 ) {
 			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
-			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+		}
+		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+		if( idx != nItem ){
+			return;
 		}
 	}
 
