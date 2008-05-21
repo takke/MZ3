@@ -7,6 +7,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "TwitterParser.h"
+#include "url_encoder.h"
 #include <set>
 #include "xml2stl.h"
 
@@ -144,6 +145,15 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 				// Image : status/user/profile_image_url
 				CString strImage = user.getNode( L"profile_image_url" ).getTextAll().c_str();
 				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strImage );
+				// ファイル名のみをURLエンコード
+				int idx = strImage.ReverseFind( '/' );
+				if (idx >= 0) {
+					CString strFileName = strImage.Mid( idx +1 );
+					strFileName = URLEncoder::encode_utf8( strFileName );
+					strImage = strImage.Left(idx + 1);
+					strImage += strFileName;
+				}
+
 				data.AddImage( strImage );
 
 				// updated : status/created_at
