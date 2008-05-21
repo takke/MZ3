@@ -2250,24 +2250,17 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 #endif
 			if( dx > 0 ) {
 				// ç∂ï˚å¸
-				CBrush brs;
-				brs.CreateSolidBrush( lightGray );
-				CBrush * oldbrs = m_memDC->SelectObject( &brs );
-				m_memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
-				m_memDC->SelectObject( &oldbrs );
-				brs.DeleteObject();
-				brs.CreateSolidBrush( RGB( 32 , 32 , 32 ) );
-				oldbrs = m_memDC->SelectObject( &brs );
-				CPoint pts[3];
-				pts[0].x = screenWidth * 5 / 8;
-				pts[0].y = m_drawStartTopOffset + screenHeight * 3 / 8;
-				pts[1].x = screenWidth * 5 / 8;
-				pts[1].y = m_drawStartTopOffset + screenHeight * 5 / 8;
-				pts[2].x = screenWidth * 3 / 8;
-				pts[2].y = m_drawStartTopOffset + screenHeight / 2;
-				m_memDC->Polygon( pts , 3 );
-				m_memDC->SelectObject( &oldbrs );
-				brs.DeleteObject();
+				HBITMAP hBmp;
+				CBitmap cBmp;
+				int rc = cBmp.LoadBitmap( IDB_SLIDE_LEFT_BITMAP );
+				hBmp = (HBITMAP) cBmp;
+				BITMAP	bmp;
+				GetObject( hBmp , sizeof(bmp), &bmp );
+				CDC cTempDC;
+				cTempDC.CreateCompatibleDC( m_memDC );
+				HBITMAP oldBmp = (HBITMAP)SelectObject( cTempDC.m_hDC , hBmp );
+				m_memDC->BitBlt( screenWidth - bmp.bmWidth , m_drawStartTopOffset + ( screenHeight - bmp.bmHeight ) / 2 , bmp.bmWidth , bmp.bmHeight , &cTempDC , 0 , 0 , SRCCOPY );
+				SelectObject( cTempDC.m_hDC , oldBmp );
 
 				// ã≠êßìIÇ…ï`âÊÇ∑ÇÈ
 				CDC* pDC = GetDC();
@@ -2277,24 +2270,17 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				::SendMessage( GetParent()->GetSafeHwnd(), WM_MZ3_MOVE_DOWN_LIST, (WPARAM)0, (LPARAM)0);
 			} else {
 				// âEï˚å¸
-				CBrush brs;
-				brs.CreateSolidBrush( lightGray );
-				CBrush * oldbrs = m_memDC->SelectObject( &brs );
-				m_memDC->RoundRect( screenWidth  / 8 , m_drawStartTopOffset + screenHeight / 4 , screenWidth * 7 / 8 , m_drawStartTopOffset + screenHeight * 3 / 4 , 10 , 10  );
-				m_memDC->SelectObject( &oldbrs );
-				brs.DeleteObject();
-				brs.CreateSolidBrush( RGB( 32 , 32 , 32 ) );
-				oldbrs = m_memDC->SelectObject( &brs );
-				CPoint pts[3];
-				pts[0].x = screenWidth * 3 / 8;
-				pts[0].y = m_drawStartTopOffset + screenHeight * 3 / 8;
-				pts[1].x = screenWidth * 3 / 8;
-				pts[1].y = m_drawStartTopOffset + screenHeight * 5 / 8;
-				pts[2].x = screenWidth * 5 / 7;
-				pts[2].y = m_drawStartTopOffset + screenHeight / 2;
-				m_memDC->Polygon( pts , 3 );
-				m_memDC->SelectObject( &oldbrs );
-				brs.DeleteObject();
+				HBITMAP hBmp;
+				CBitmap cBmp;
+				int rc = cBmp.LoadBitmap( IDB_SLIDE_RIGHT_BITMAP );
+				hBmp = (HBITMAP) cBmp;
+				BITMAP	bmp;
+				GetObject( hBmp , sizeof(bmp), &bmp );
+				CDC cTempDC;
+				cTempDC.CreateCompatibleDC( m_memDC );
+				HBITMAP oldBmp = (HBITMAP)SelectObject( cTempDC.m_hDC , hBmp );
+				m_memDC->BitBlt( 0 , m_drawStartTopOffset + ( screenHeight - bmp.bmHeight ) / 2 , bmp.bmWidth , bmp.bmHeight , &cTempDC , 0 , 0 , SRCCOPY );
+				SelectObject( cTempDC.m_hDC , oldBmp );
 
 				// ã≠êßìIÇ…ï`âÊÇ∑ÇÈ
 				CDC* pDC = GetDC();

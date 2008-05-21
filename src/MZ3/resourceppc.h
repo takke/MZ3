@@ -51,6 +51,9 @@
 #define IDC_ARROW_LEFT_CURSOR1          169
 #define IDC_ARROW_RIGHT_CURSOR          169
 #define IDR_MENU2                       169
+#define IDB_SLIDE_LEFT_BITMAP           170
+#define IDB_BITMAP2                     172
+#define IDB_SLIDE_RIGHT_BITMAP          172
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -320,7 +323,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        170
+#define _APS_NEXT_RESOURCE_VALUE        173
 #define _APS_NEXT_COMMAND_VALUE         34164
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118

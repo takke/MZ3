@@ -1131,6 +1131,8 @@ END
 IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
 IDR_TOOLBAR_QVGA        BITMAP                  "res\\toolbarQVGA.bmp"
 IDR_TOOLBAR_WIN32       BITMAP                  "res\\toolbar_win32.bmp"
+IDB_SLIDE_LEFT_BITMAP   BITMAP                  "res\\slide_left_bitmap.bmp"
+IDB_SLIDE_RIGHT_BITMAP  BITMAP                  "res\\slide_right_bitmap.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

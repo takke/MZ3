@@ -2879,6 +2879,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\slide_left_bitmap.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\slide_right_bitmap.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\toolbar.bmp"
 				>
 			</File>
