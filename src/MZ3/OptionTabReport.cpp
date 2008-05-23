@@ -64,12 +64,6 @@ BOOL COptionTabReport::OnInitDialog()
 	// スクロール行数
 	SetDlgItemText( IDC_SCROLL_LINE_EDIT, (LPCTSTR)util::int2str(theApp.m_optionMng.m_reportScrollLine) );
 
-	// らんらんビューのパンスクロール
-	CheckDlgButton( IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK, theApp.m_optionMng.m_bUseRan2PanScrollAnimation ? BST_CHECKED : BST_UNCHECKED );
-
-	// 横ドラッグでの項目移動
-	CheckDlgButton( IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2HorizontalDragMove ? BST_CHECKED : BST_UNCHECKED );
-
 	// ダブルクリックでの項目移動
 	CheckDlgButton( IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2DoubleClickMove ? BST_CHECKED : BST_UNCHECKED );
 
@@ -96,12 +90,6 @@ void COptionTabReport::OnOK()
 	// スクロール行数
 	theApp.m_optionMng.m_reportScrollLine
 		= option::Option::normalizeRange( GetDlgItemInt( IDC_SCROLL_LINE_EDIT ), 1, 100 );
-
-	// らんらんビューのパンスクロール
-	theApp.m_optionMng.m_bUseRan2PanScrollAnimation = (IsDlgButtonChecked(IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK) == BST_CHECKED) ? true : false;
-
-	// 横ドラッグでの項目移動
-	theApp.m_optionMng.m_bUseRan2HorizontalDragMove = (IsDlgButtonChecked(IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK) == BST_CHECKED) ? true : false;
 
 	// ダブルクリックでの項目移動
 	theApp.m_optionMng.m_bUseRan2DoubleClickMove = (IsDlgButtonChecked(IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK) == BST_CHECKED) ? true : false;

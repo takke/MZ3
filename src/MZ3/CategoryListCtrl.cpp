@@ -27,8 +27,13 @@ CCategoryListCtrl::CCategoryListCtrl()
 	// 色のデフォルト値を設定
 	m_activeItem	= 0;
 
-	//// 背景同時スクロールしない
+	//// 背景同時スクロールしないオプション(今は未使用とする)
 	//SetScrollWithBk( false );
+
+	// 横スライドによる項目移動とパンスクロールアニメーションをオンにする
+	// （コンストラクタで設定し、以降変更しないこと）
+	SetCanSlide(true);
+	SetCanPanScroll(true);
 }
 
 CCategoryListCtrl::~CCategoryListCtrl()
@@ -289,6 +294,7 @@ BOOL CCategoryListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
+/* CTouchListCtrl::OnLButtonDown()とCCategoryListCtrl::SetSelectItem()に移行
 	// 選択変更
 	int nItem = HitTest(point);
 	if (nItem>=0) {
@@ -296,7 +302,7 @@ void CCategoryListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		m_activeItem = nItem;
 		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, true );
 	}
-
+*/
 /* CTouchListCtrl::OnLButtonDown()とCCategoryListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
@@ -357,4 +363,37 @@ void CCategoryListCtrl::PopupContextMenu( const CPoint point )
 {
 	// TODO 本来は WM_COMMAND で通知すべき。
 	theApp.m_pMainView->PopupCategoryMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+}
+
+/**
+ * virtual SetSelectItem()
+ *  アイテムの選択状態を変更する
+ */
+void CCategoryListCtrl::SetSelectItem( const int nItem )
+{
+	if ( nItem >= 0 && nItem != m_activeItem ) {
+		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, false );
+		m_activeItem = nItem;
+		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, true );
+	}
+}
+
+/**
+ * virtual MoveSlideRight()
+ *  右へスライドして移動
+ */
+void CCategoryListCtrl::MoveSlideRight()
+{
+	GetParent()->SendMessage( WM_COMMAND , ID_ACCELERATOR_PREV_TAB , 0 );
+	return;
+}
+
+/**
+ * virtual MoveSlideLeft()
+ *  左へスライドして移動
+ */
+void CCategoryListCtrl::MoveSlideLeft()
+{
+	GetParent()->SendMessage( WM_COMMAND , ID_ACCELERATOR_NEXT_TAB , 0 );
+	return;
 }

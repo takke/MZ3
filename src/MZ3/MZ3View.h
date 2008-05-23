@@ -286,6 +286,7 @@ public:
 	afx_msg void OnMenuTwitterDestroyFriendships();
 	afx_msg void OnMenuRssRead();
 	afx_msg void OnViewLog();
+	afx_msg void OnCategoryOpen();
 
 	BOOL OnKeydownGroupTab( WORD vKey );
 	BOOL OnKeydownCategoryList( WORD vKey );

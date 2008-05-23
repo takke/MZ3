@@ -369,13 +369,14 @@ BOOL CReportListCtrl::PreTranslateMessage(MSG* pMsg)
 
 void CReportListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
+/* CTouchListCtrl::OnLButtonDown()とCReportListCtrl::SetSelectItem()に移行
 	// 選択変更
 	int nItem = HitTest(point);
 	if (nItem>=0) {
 		util::MySetListCtrlItemFocusedAndSelected( *this, GetSelectedItem(), false );
 		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 	}
-
+*/
 /* CTouchListCtrl::OnLButtonDown()とCReportListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
@@ -419,4 +420,16 @@ void CReportListCtrl::PopupContextMenu( const CPoint point )
 {
 	// TODO 本来は WM_COMMAND で通知すべき。
 	theApp.m_pReportView->MyPopupReportMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+}
+
+/**
+ * virtual SetSelectItem()
+ *  アイテムの選択状態を変更する
+ */
+void CReportListCtrl::SetSelectItem( const int nItem )
+{
+	if ( nItem >= 0 && nItem != GetSelectedItem() ) {
+		util::MySetListCtrlItemFocusedAndSelected( *this, GetSelectedItem(), false );
+		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+	}
 }

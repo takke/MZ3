@@ -20,14 +20,21 @@ IMPLEMENT_DYNAMIC(CTouchListCtrl, CListCtrl)
 CTouchListCtrl::CTouchListCtrl(void)
 	: m_offsetPixelY(0)
 	, m_bDragging(false)
-#ifndef WINCE
 	, m_memBMP(NULL)
 	, m_memDC(NULL)
-#endif
 	, m_bTimerRedraw(false)
 	, m_bDrawBk(true)
 	, m_bScrollWithBk(true)
 	, m_bAutoScrolling(false)
+	, m_bUseHorizontalDragMove(true)
+	, m_bPanDragging(false)
+	, m_bScrollDragging(false)
+	, m_bCanSlide(false)
+	, m_iDragStartItem(-1)
+	, m_bUsePanScrollAnimation(true)
+	, m_offsetPixelX(0)
+	, m_drPanScrollDirection( PAN_SCROLL_DIRECTION_NONE )
+	, m_bCanPanScroll(false)
 {
 }
 
@@ -41,9 +48,7 @@ BEGIN_MESSAGE_MAP(CTouchListCtrl, CListCtrl)
 	ON_WM_MOUSEMOVE()
 	ON_WM_SIZE()
 	ON_WM_DESTROY()
-//#ifndef WINCE
 	ON_WM_VSCROLL()
-//#endif
 	ON_WM_MOUSEWHEEL()
 	ON_WM_TIMER()
 	ON_NOTIFY_REFLECT(LVN_DELETEALLITEMS, &CTouchListCtrl::OnLvnDeleteallitems)
@@ -100,6 +105,11 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	// 慣性スクロール停止
 	MyResetAutoScrollTimer();
 
+	m_iDragStartItem = HitTest( point );
+
+	//if( !m_bCanSlide ){
+	//	SetSelectItem( m_iDragStartItem );
+	//}
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;
@@ -108,6 +118,8 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	RGesture.ptDown     = point;
 	RGesture.dwFlags    = SHRG_RETURNCMD;
 	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		SetSelectItem( m_iDragStartItem );
+		RedrawItems( m_iDragStartItem , m_iDragStartItem );
 		ClientToScreen(&point);
 		PopupContextMenu(point);
 		return;
@@ -142,14 +154,18 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	MZ3_TRACE( L"OnLButtonUp(0x%X,%d,%d)\n", nFlags, point.x, point.y);
+	int dx = point.x - m_ptDragStart.x;
+	int dy = point.y - m_ptDragStart.y;
 
 	if (m_bDragging) {
 		// ドラッグ終了処理
 
 		// キャプチャ終了
 		ReleaseCapture();
-		// フラグクリア
-		m_bDragging = false;
+
+		// dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定する
+		// m_bPanDragging, m_bScrollDragging, m_drPanScrollDirection が設定される
+		MySetDragFlagWhenMovedPixelOverLimit(dx,dy);
 
 		// 遅延描画タイマーのリセット
 		MyResetRedrawTimer();
@@ -157,34 +173,28 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		// マウスカーソルを元に戻す
 		::SetCursor( ::LoadCursor(NULL, IDC_ARROW) );
 
-		// クリック通知メッセージを親に送る
-		int nItem = util::MyGetListCtrlSelectedItemIndex( *this );
-		NMLISTVIEW nmlv;
-		nmlv.hdr.hwndFrom = m_hWnd;
-		nmlv.hdr.idFrom = 0 ;
-		nmlv.hdr.code = NM_CLICK ;
-		nmlv.iItem = nItem ;
-		nmlv.iSubItem = 0 ;
-		nmlv.ptAction = point ;
-		nmlv.uChanged = 0;
-		nmlv.uNewState = 0;
-		nmlv.uOldState = LVIS_FOCUSED | LVIS_SELECTED;
-		nmlv.lParam = NULL;
-		GetParent()->SendMessage( WM_NOTIFY , NM_CLICK , (LPARAM)&nmlv );
+		if( !m_bPanDragging && !m_bScrollDragging ) {
+			// 上下左右のドラッグがなければアイテムを選択する
+			// 選択
+			SetSelectItem( m_iDragStartItem );
+			// クリック通知メッセージを親に送る
+			int nItem = util::MyGetListCtrlSelectedItemIndex( *this );
+			NMLISTVIEW nmlv;
+			nmlv.hdr.hwndFrom = m_hWnd;
+			nmlv.hdr.idFrom = 0 ;
+			nmlv.hdr.code = NM_CLICK ;
+			nmlv.iItem = nItem ;
+			nmlv.iSubItem = 0 ;
+			nmlv.ptAction = point ;
+			nmlv.uChanged = 0;
+			nmlv.uNewState = 0;
+			nmlv.uOldState = LVIS_FOCUSED | LVIS_SELECTED;
+			nmlv.lParam = NULL;
+			GetParent()->SendMessage( WM_NOTIFY , NM_CLICK , (LPARAM)&nmlv );
+		}
 
-		// スクロール可能か？
-		if ( GetItemCount() > GetCountPerPage() ) {
-//#ifndef WINCE
-//			// Win32では独自処理で描画する
-//			// WMでは処理が追いつかないので標準処理に任せる
-//			DrawDetail();
-//			UpdateWindow();
-//#else
-//#ifndef TOUCHLIST_SCROLLWITHBK
-//			// WMで、かつ背景同時スクロールでない場合は再描画
-//			Invalidate();
-//#endif
-//#endif
+		// スクロール中か？
+		if ( m_bScrollDragging ) {
 
 			// 慣性スクロール情報取得
 			m_autoScrollInfo.push( GetTickCount(), point );
@@ -195,13 +205,20 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				m_dwAutoScrollStartTick = GetTickCount();
 				m_yAutoScrollMax = 0;
 				MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
-				return;
 			} else {
 				// 1行未満のドラッグならばすぐに止める
 				MyAdjustDrawOffset();
 				m_autoScrollInfo.clear();
 			}
+		} else if( m_bPanDragging ){ 
+			// 横方向にドラッグ
+			StartPanScroll( m_drPanScrollDirection );
 		}
+		// フラグクリア
+		m_bDragging = false;
+		m_bPanDragging = false;
+		m_bScrollDragging = false;
+		m_drPanScrollDirection = PAN_SCROLL_DIRECTION_NONE;
 	}
 	//CListCtrl::OnLButtonUp(nFlags, point);
 }
@@ -212,10 +229,20 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
  */
 void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
+	int dx = point.x - m_ptDragStart.x;
+	int dy = point.y - m_ptDragStart.y;
+
 	if( m_bDragging ) {
-		// スクロール可能か？
-		if ( GetItemCount() > GetCountPerPage() ) {
-			// スクロール可能
+		// dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定する
+		// m_bPanDragging, m_bScrollDragging, m_drPanScrollDirection が設定される
+		MySetDragFlagWhenMovedPixelOverLimit(dx,dy);
+
+		// 縦スクロール中か？
+		if ( m_bScrollDragging ) {
+			//if( m_bCanSlide ){
+			//	SetSelectItem( m_iDragStartItem );
+			//}
+			// 縦スクロール中
 			// グーのカーソルに変更
 			::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
 
@@ -229,6 +256,19 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 #endif
 			// 慣性スクロール情報取得
 			m_autoScrollInfo.push( GetTickCount(), point );
+		} else if( m_bPanDragging ){
+			// 横スクロール中
+			// マウスポインタ変更
+			switch( m_drPanScrollDirection ){
+				case PAN_SCROLL_DIRECTION_LEFT:
+					// 左方向
+					::SetCursor( AfxGetApp()->LoadCursor(IDC_ARROW_LEFT_CURSOR) );
+					break;
+				case PAN_SCROLL_DIRECTION_RIGHT:
+					// 右方向
+					::SetCursor( AfxGetApp()->LoadCursor(IDC_ARROW_RIGHT_CURSOR) );
+					break;
+			}
 		} else {
 			::SetCursor( ::LoadCursor(NULL, IDC_ARROW) );
 		}
@@ -273,11 +313,17 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 	m_screenWidth = cx;
 	m_screenHeight = cy - rctHeader.Height();
 
-#ifndef WINCE
+#ifdef WINCE
+	if( !m_bCanPanScroll ){
+		return;
+	}
+#endif
+
 	// 裏画面バッファが無ければここで確保する
 	if( m_memBMP == NULL ) {
-		CPaintDC	cdc(this);
-		MyMakeBackBuffers(cdc);
+		CDC* pDC = GetDC();
+		MyMakeBackBuffers(pDC);
+		ReleaseDC(pDC);
 	} else {
 		// 裏画面バッファのサイズが小さい場合は再生成
 		BITMAP bmp;
@@ -285,19 +331,23 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 		if (bmp.bmWidth < m_screenWidth ||
 			bmp.bmHeight < m_screenHeight*2) 
 		{
-			CPaintDC	cdc(this);
-			MyMakeBackBuffers(cdc);
+			CDC* pDC = GetDC();
+			MyMakeBackBuffers(pDC);
+			ReleaseDC(pDC);
 		}
 	}
-#endif
 }
 
-#ifndef WINCE
 /**
  * 裏画面バッファの生成
  */
-bool CTouchListCtrl::MyMakeBackBuffers(CPaintDC& cdc)
+bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 {
+#ifdef WINCE
+	if( !m_bCanPanScroll ){
+		return false;
+	}
+#endif
 	//--- 解放
 	// 裏画面バッファの解放
 	if( m_memDC != NULL ){
@@ -314,7 +364,7 @@ bool CTouchListCtrl::MyMakeBackBuffers(CPaintDC& cdc)
 	//--- バッファ生成
 	// 裏画面バッファの確保
 	// 画面の高さを2倍して余裕をもたせてみた
-	if (m_memBMP->CreateCompatibleBitmap( &cdc , m_screenWidth , m_screenHeight*2 ) != TRUE) {
+	if (m_memBMP->CreateCompatibleBitmap( pdc , m_screenWidth , m_screenHeight*2 ) != TRUE) {
 		MessageBox(TEXT("CreateCompatibelBitmap error!"));
 		return false;
 	}
@@ -322,13 +372,12 @@ bool CTouchListCtrl::MyMakeBackBuffers(CPaintDC& cdc)
 	m_drawStartTopOffset = m_screenHeight/2;
 
 	// DCを生成
-	m_memDC->CreateCompatibleDC(&cdc);
+	m_memDC->CreateCompatibleDC(pdc);
 	m_memDC->SetBkMode(OPAQUE);					// 透過モードに設定する
 	m_oldBMP = m_memDC->SelectObject(m_memBMP);
 
 	return true;
 }
-#endif
 
 /**
  * WM_DESTROY メッセージハンドラ
@@ -337,7 +386,6 @@ bool CTouchListCtrl::MyMakeBackBuffers(CPaintDC& cdc)
 void CTouchListCtrl::OnDestroy()
 {
 	CListCtrl::OnDestroy();
-#ifndef WINCE
 	//--- 解放
 	// 裏画面バッファの解放
 	if( m_memDC != NULL ){
@@ -349,10 +397,8 @@ void CTouchListCtrl::OnDestroy()
 		m_memBMP->DeleteObject();
 		delete m_memBMP;
 	}
-#endif
 }
 
-#ifndef WINCE
 /**
  * DrawToScreen() 描画
  *  裏画面バッファから画面物理デバイスへ転送
@@ -360,7 +406,9 @@ void CTouchListCtrl::OnDestroy()
 void CTouchListCtrl::DrawToScreen(CDC* pDC)
 {
 	MZ3_TRACE( L"DrawToScreen(0x%X)\n", pDC!=NULL ? pDC->m_hDC : 0);
-
+	if( m_memDC == NULL ){
+		return;
+	}
 	// 変更後画面をm_offsetPixelY分ずらして表示する
 	pDC->BitBlt( 
 		0				, m_viewRect.top,
@@ -369,9 +417,78 @@ void CTouchListCtrl::DrawToScreen(CDC* pDC)
 		0				, m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY,
 		SRCCOPY );
 }
-#endif
 
-#ifndef WINCE
+/**
+ * PanDrawToScreen() 描画
+ *  パンスクロール用に裏画面バッファから画面物理デバイスへ転送
+ */
+void CTouchListCtrl::PanDrawToScreen(CDC* pDC)
+{
+	MZ3_TRACE( L"PanDrawToScreen(0x%X)\n", pDC!=NULL ? pDC->m_hDC : 0);
+	if( m_memDC == NULL ){
+		return;
+	}
+	int sx = 0;
+	int dx = 0;
+	int wid = m_screenWidth;
+
+	// パンスクロール処理
+	if( m_offsetPixelX > 0 ){
+		// 右にずれている場合
+		sx = 0;
+		dx = m_offsetPixelX;
+		wid = m_screenWidth - m_offsetPixelX;
+
+		// 変更前画面を左側に表示する
+		pDC->BitBlt( 0 , m_viewRect.top , m_offsetPixelX , m_screenHeight , m_memDC , wid , m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY, SRCCOPY );
+
+		// 移動がわかるように縦線を引く
+		pDC->MoveTo( m_offsetPixelX - 1 , m_viewRect.top );
+		pDC->LineTo( m_offsetPixelX - 1 , m_viewRect.bottom );
+	} else if( m_offsetPixelX < 0 ) {
+		// 左にずれている場合
+		sx = -m_offsetPixelX;
+		dx = 0;
+		wid = m_screenWidth + m_offsetPixelX;
+
+		// 変更前画面を右側に表示する
+		pDC->BitBlt( wid , m_viewRect.top , sx , m_screenHeight , m_memDC , 0 , m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY, SRCCOPY );
+
+		// 移動がわかるように縦線を引く
+		pDC->MoveTo( wid + 1 , m_viewRect.top);
+		pDC->LineTo( wid + 1 , m_viewRect.bottom );
+	}
+
+	// オフセットが一画面分あれば表示不要
+	if( abs( m_offsetPixelX ) > abs( m_screenWidth ) ){
+		return;
+	}
+
+	// 背景をオフセットに合わせて表示する
+	BITMAP bmp;
+	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
+
+	HBITMAP hBgBitmap = GetBgBitmapHandle();
+	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
+		// 背景画像なしの場合
+		pDC->FillSolidRect( dx, m_viewRect.top, wid, m_screenHeight, RGB(255,255,255) );
+	}else{
+		// 背景ビットマップの描画
+		CRect rectViewClient;
+		this->GetClientRect( &rectViewClient );
+		rectViewClient.OffsetRect( 0 , m_drawStartTopOffset-m_offsetPixelY );
+		int x = dx;
+		int y = m_viewRect.top;
+		int w = wid;
+		int h = m_screenHeight;
+		int offset = 0;
+		if( IsScrollWithBk() ){
+			offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
+		}
+		util::DrawBitmap( pDC->GetSafeHdc(), hBgBitmap, x, y , w, h, sx, m_viewRect.top + offset );
+	}
+}
+
 /**
  * DrawDetail()
  *  裏画面バッファにリスト項目を描画する
@@ -379,6 +496,9 @@ void CTouchListCtrl::DrawToScreen(CDC* pDC)
 int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 {
 	MZ3_TRACE( L"DrawDetail(%s)\n", bForceDraw ? L"true" : L"false");
+	if( m_memDC == NULL ){
+		return 0;
+	}
 
 	// 念のため遅延描画タイマーを停止する
 	MyResetRedrawTimer();
@@ -470,7 +590,6 @@ int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 
 	return(1);
 }
-#endif
 
 /**
  * WM_VSCROLL メッセージハンドラ
@@ -548,6 +667,8 @@ BOOL CTouchListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
  *    遅延描画処理
  *  ・TIMERID_TOUCHLIST_AUTOSCROLL
  *    慣性スクロール処理
+ *  ・TIMERID_TOUCHLIST_PANSCROLL:
+ *    パンスクロール処理
  */
 void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 {
@@ -662,6 +783,51 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 					MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
 				}
 #endif
+				break;
+			}
+/****************************************************
+*			 パンスクロール処理
+****************************************************/
+		case TIMERID_TOUCHLIST_PANSCROLL:
+			{
+				int dwDt = GetTickCount() - m_dwPanScrollLastTick;
+				m_dwPanScrollLastTick = GetTickCount();
+
+				if( m_dPxelX == 0 ) {
+					// 移動量ゼロなら無限ループ防止のため中止
+					MyResetPanScrollTimer();
+				} else {
+					// 移動処理
+					m_offsetPixelX += dwDt * m_dPxelX / 10;
+#ifdef DEBUG
+					wprintf( L"m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
+#endif
+					// 終了判定
+					if( m_dPxelX > 0 ){
+						if( m_offsetPixelX > 0 ){
+							m_offsetPixelX = 0;
+						}
+					} else {
+						if( m_offsetPixelX < 0 ){
+							m_offsetPixelX = 0;
+						}
+					}
+					// 強制的に描画する
+					CDC* pDC = GetDC();
+					PanDrawToScreen(pDC);
+					ReleaseDC(pDC);
+					if( m_offsetPixelX == 0 ){
+						// 一画面分移動した
+						// パンスクロール終了
+						MyResetPanScrollTimer();
+						if( m_dPxelX > 0 ){
+							MoveSlideRight();
+						} else {
+							MoveSlideLeft();
+						}
+						m_dPxelX = 0;
+					}
+				}
 				break;
 			}
 		default:
@@ -791,6 +957,8 @@ void CTouchListCtrl::ResetAllTimer()
 	MyAdjustDrawOffset();
 	// 慣性スクロールタイマーを停止
 	MyResetAutoScrollTimer();
+	// パンスクロールタイマーを停止
+	MyResetPanScrollTimer();
 }
 
 // 項目に変化があればタイマー処理を停止する
@@ -909,4 +1077,143 @@ void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	}
 
 	CListCtrl::OnLButtonDblClk(nFlags, point);
+}
+
+/**
+ * dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定し、変数を設定する
+ *
+ * ドラッグ開始時は m_bPanDragging, m_bScrollDragging を設定する
+ */
+void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
+{
+	// 縦ドラッグ開始判断用オフセット値
+#ifndef WINCE
+	// win32の場合半行以内の移動はドラッグとみなさない
+	int dyMinLimit = m_iItemHeight / 2 + 1 ;
+#else
+	// WMの場合一行以内の移動はドラッグとみなさない
+	int dyMinLimit = m_iItemHeight;
+#endif
+
+	if (m_bPanDragging) {
+		// 横ドラッグ中
+		//if( abs( dx ) < screenWidth / 3 ){
+		//	// マウスを元に戻したら横ドラッグをキャンセル　→動きがあやしいので保留
+		//	m_bPanDragging = false ;
+		//}
+	} else if (m_bScrollDragging) {
+		// 縦ドラッグ中
+
+	} else {
+		// ドラッグ方向が確定していない
+		if( m_bCanSlide &&
+			m_bUseHorizontalDragMove &&
+			( abs(dx) > abs(dy) && abs(dx) > m_screenWidth / 3 ) ) {
+				// 横方向の移動量が大きくて移動量が画面の1/3以上の場合]
+				// ドラッグ方向設定
+				if( dx > 0 ){
+					m_drPanScrollDirection = PAN_SCROLL_DIRECTION_RIGHT;
+				} else {
+					m_drPanScrollDirection = PAN_SCROLL_DIRECTION_LEFT;
+				}
+				// 横ドラッグ開始
+				m_bPanDragging = true;
+		} else if( abs(dx) < abs(dy) && abs(dy) > dyMinLimit ) {
+			// 縦方向の移動量が大きくて移動量がドラッグ開始オフセット以上の場合
+			if( GetItemCount()-GetCountPerPage() > 0 ) {
+				// 縦スクロール可能ならば
+				// 縦ドラッグ開始
+				m_bScrollDragging = true;
+			}
+		}
+	}
+}
+
+/**
+ * パンスクロール開始
+ *
+ * スクロール方向（direction）に従いオフセット値と差分を設定してタイマーを起動する
+ */
+void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
+{
+#ifndef WINCE
+#define PANSCROLL_DIVIDE 10
+#else
+#define PANSCROLL_DIVIDE 15
+#endif
+	if ( !m_bUsePanScrollAnimation || !m_bCanPanScroll ) {
+		// オプションでオフになっているのでアニメーションせずに移動する
+		switch (direction) {
+		case PAN_SCROLL_DIRECTION_RIGHT:
+				MoveSlideRight();
+			break;
+		case PAN_SCROLL_DIRECTION_LEFT:
+				MoveSlideLeft();
+			break;
+		}
+		return;
+	}
+
+	if( m_memDC == NULL ){
+		return;
+	}
+	// パンスクロール用に直前の表示状態のコピーを取る（一画面分）
+	CDC* pDC = GetDC();
+	m_memDC->BitBlt( m_viewRect.left , m_viewRect.top + m_drawStartTopOffset , m_screenWidth , m_screenHeight , pDC , m_viewRect.left , m_viewRect.top , SRCCOPY );
+
+	MyResetPanScrollTimer();
+
+	switch (direction) {
+	case PAN_SCROLL_DIRECTION_RIGHT:
+		{
+			// 右方向へスクロール
+			HBITMAP hBmp;
+			CBitmap cBmp;
+			int rc = cBmp.LoadBitmap( IDB_SLIDE_RIGHT_BITMAP );
+			hBmp = (HBITMAP) cBmp;
+			BITMAP	bmp;
+			GetObject( hBmp , sizeof(bmp), &bmp );
+			CDC cTempDC;
+			cTempDC.CreateCompatibleDC( m_memDC );
+			HBITMAP oldBmp = (HBITMAP)SelectObject( cTempDC.m_hDC , hBmp );
+			m_memDC->BitBlt( 0 , m_drawStartTopOffset + ( m_screenHeight - bmp.bmHeight ) / 2 , bmp.bmWidth , bmp.bmHeight , &cTempDC , 0 , 0 , SRCCOPY );
+			SelectObject( cTempDC.m_hDC , oldBmp );
+			
+			// 左へ一画面ずれたところから開始
+			m_offsetPixelX = - m_screenWidth;
+			// 移動差分
+			m_dPxelX = m_screenWidth / PANSCROLL_DIVIDE + 1 ;
+			break;
+		}
+	case PAN_SCROLL_DIRECTION_LEFT:
+		{
+			// 左方向へスクロール
+			HBITMAP hBmp;
+			CBitmap cBmp;
+			int rc = cBmp.LoadBitmap( IDB_SLIDE_LEFT_BITMAP );
+			hBmp = (HBITMAP) cBmp;
+			BITMAP	bmp;
+			GetObject( hBmp , sizeof(bmp), &bmp );
+			CDC cTempDC;
+			cTempDC.CreateCompatibleDC( m_memDC );
+			HBITMAP oldBmp = (HBITMAP)SelectObject( cTempDC.m_hDC , hBmp );
+			m_memDC->BitBlt( m_screenWidth - bmp.bmWidth , m_drawStartTopOffset + ( m_screenHeight - bmp.bmHeight ) / 2 , bmp.bmWidth , bmp.bmHeight , &cTempDC , 0 , 0 , SRCCOPY );
+			SelectObject( cTempDC.m_hDC , oldBmp );
+
+			// 右へ一画面ずれたところから開始
+			m_offsetPixelX = m_screenWidth;
+			// 移動差分
+			m_dPxelX = - m_screenWidth / PANSCROLL_DIVIDE + 1 ;
+			break;
+		}
+	}
+
+	// パンスクロール方向設定
+	m_drPanScrollDirection = direction;
+
+	// パンスクロール開始時刻
+	m_dwPanScrollLastTick = GetTickCount();
+
+	// パンスクロール開始
+	MySetPanScrollTimer( TIMER_INTERVAL_TOUCHLIST_PANSCROLL );
 }

@@ -64,6 +64,12 @@ BOOL COptionTabUI::OnInitDialog()
 	GetDlgItem( IDC_USE_XCRAWL_CANCELER_CHECK )->EnableWindow( FALSE );
 #endif
 
+	// らんらんビューとカテゴリリストのパンスクロール
+	CheckDlgButton( IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK, theApp.m_optionMng.m_bUseRan2PanScrollAnimation ? BST_CHECKED : BST_UNCHECKED );
+
+	// 横ドラッグでの項目移動
+	CheckDlgButton( IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2HorizontalDragMove ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;
 }
 
@@ -81,6 +87,12 @@ void COptionTabUI::OnOK()
 
 	// Xcrawl 誤動作防止機能
 	theApp.m_optionMng.m_bUseXcrawlExtension = IsDlgButtonChecked( IDC_USE_XCRAWL_CANCELER_CHECK ) == BST_CHECKED ? true : false;
+
+	// らんらんビューとカテゴリリストのパンスクロール
+	theApp.m_optionMng.m_bUseRan2PanScrollAnimation = (IsDlgButtonChecked(IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK) == BST_CHECKED) ? true : false;
+
+	// 横ドラッグでの項目移動
+	theApp.m_optionMng.m_bUseRan2HorizontalDragMove = (IsDlgButtonChecked(IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK) == BST_CHECKED) ? true : false;
 
 	CPropertyPage::OnOK();
 }

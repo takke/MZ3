@@ -257,6 +257,8 @@ IDR_CATEGORY_MENU MENU
 BEGIN
     POPUP "カテゴリメニュー"
     BEGIN
+        MENUITEM "最新の一覧を取得",                    IDM_CATEGORY_OPEN
+        MENUITEM SEPARATOR
         MENUITEM "巡回",                          IDM_CRUISE
         MENUITEM "巡回予約",                        IDM_CHECK_CRUISE
         MENUITEM "日記を書く",                       ID_WRITE_DIARY
@@ -646,6 +648,10 @@ BEGIN
     EDITTEXT        IDC_LONG_RETURN_RANGE_MSEC_EDIT,69,23,20,14,ES_AUTOHSCROLL
     LTEXT           "[ミリ秒]",IDC_STATIC,93,26,28,8
     CONTROL         "Xcrawl 拡張機能を有効にする",IDC_USE_XCRAWL_CANCELER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,42,103,10
+    CONTROL         "左右スライドで項目やタブを切り替える",IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,59,125,14
+    CONTROL         "項目やタブ切り替えでアニメーション",IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,81,121,10
 END
 
 IDD_OPTIONTAB_LOG DIALOG  0, 0, 139, 116
@@ -671,12 +677,8 @@ BEGIN
     EDITTEXT        IDC_SCROLL_LINE_EDIT,56,19,21,14,ES_AUTOHSCROLL
     LTEXT           "行",IDC_STATIC,81,22,10,8
     GROUPBOX        "スクロール",IDC_STATIC,7,7,125,46
-    CONTROL         "項目切り替え時にアニメーションする",IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,122,10
-    CONTROL         "左右スライドで項目を切り替える",IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,79,125,14
     CONTROL         "ダブルクリックで項目を切り替える",IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,125,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,58,125,12
 END
 
 IDD_COMMON_SELECT_DIALOG DIALOG  0, 0, 137, 132

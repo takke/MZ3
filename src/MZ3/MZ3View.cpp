@@ -185,6 +185,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_TWITTER_CREATE_FRIENDSHIPS, &CMZ3View::OnMenuTwitterCreateFriendships)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FRIENDSHIPS, &CMZ3View::OnMenuTwitterDestroyFriendships)
 	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
+	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -306,6 +307,8 @@ void CMZ3View::OnInitialUpdate()
 			m_categoryList.InsertColumn(1, _T(""), LVCFMT_LEFT, 100, -1);
 			break;
 		}
+		m_categoryList.m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
+		m_categoryList.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
 	}
 
 	// --------------------------------------------------
@@ -1956,7 +1959,9 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		if( m_access ) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
-		return CommandSelectGroupTabBeforeItem();
+		//return CommandSelectGroupTabBeforeItem();
+		m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
+
 
 		// グループタブに移動
 //		return CommandSetFocusGroupTab();
@@ -1965,10 +1970,12 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		if( m_access ) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
-		return CommandSelectGroupTabNextItem();
+		//return CommandSelectGroupTabNextItem();
+		m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
 
 		// ボディリストに移動
 //		return CommandSetFocusBodyList();
+		return TRUE;
 	case VK_RETURN:
 		if (m_selGroup->selectedCategory == m_selGroup->focusedCategory) {
 			RetrieveCategoryItem();
@@ -2712,12 +2719,14 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 void CMZ3View::OnGetAll()
 {
 	// チェック
-	if( m_hotList != &m_bodyList ) {
-		return;
-	}
+	//if( m_hotList != &m_bodyList ) {
+	//	return;
+	//}
 	switch( GetSelectedBodyItem().GetAccessType() ) {
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
+	case ACCESS_DIARY:
+	case ACCESS_MYDIARY:
 		// ok.
 		break;
 	default:
@@ -2734,12 +2743,14 @@ void CMZ3View::OnGetAll()
 void CMZ3View::OnGetLast10()
 {
 	// チェック
-	if( m_hotList != &m_bodyList ) {
-		return;
-	}
+	//if( m_hotList != &m_bodyList ) {
+	//	return;
+	//}
 	switch( GetSelectedBodyItem().GetAccessType() ) {
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
+	case ACCESS_DIARY:
+	case ACCESS_MYDIARY:
 		// ok.
 		break;
 	default:
@@ -3060,6 +3071,10 @@ void CMZ3View::OnSelchangedGroupTab(void)
 
 	// カテゴリーリストを初期化する
 	MyUpdateCategoryListByGroupItem();
+	// オプションの設定
+	m_categoryList.m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
+	m_categoryList.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
+	// 表示を更新
 	m_categoryList.Update( 0 );
 
 	// 選択変更時の処理を実行する（ログの読み込み）
@@ -3197,6 +3212,8 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			switch( bodyItem.GetAccessType() ) {
 			case ACCESS_ENQUETE:
 			case ACCESS_BBS:
+			case ACCESS_DIARY:
+			case ACCESS_MYDIARY:
 				// BBS, アンケート
 				// 20件or全件の切り替えメニューを出す
 				if( theApp.m_optionMng.GetPageType() == GETPAGE_ALL ) {
@@ -5631,4 +5648,39 @@ void CMZ3View::OnMenuRssRead()
 	}
 
 	MessageBox( item, data.GetName() );
+}
+
+/*
+ * OnCategoryOpen()
+ * WM_COMMAND IDM_CATEBORY_OPEN
+ * カテゴリのコンテキストメニュー「最新の一覧を取得する」
+*/
+void CMZ3View::OnCategoryOpen()
+{
+	if (m_access) {
+		// アクセス中は再アクセス不可
+		return;
+	}
+
+	int iItem = util::MyGetListCtrlSelectedItemIndex( m_categoryList );
+	m_hotList = &m_categoryList;
+
+	if (iItem<0) {
+		return;
+	}
+
+	// カレントデータを取得
+	int idx = (int)m_categoryList.GetItemData(iItem);
+	m_selGroup->selectedCategory = idx;
+	m_selGroup->focusedCategory  = idx;
+	if (m_preCategory != iItem) {
+		m_categoryList.SetActiveItem(iItem);
+		m_categoryList.Update(m_preCategory);
+		m_categoryList.Update(iItem);
+	}
+
+	// アクセス開始
+	if (!RetrieveCategoryItem()) {
+		return;
+	}
 }

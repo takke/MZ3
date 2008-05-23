@@ -610,6 +610,7 @@ void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
+/* CTouchListCtrl::OnLButtonDown()とCBodyListCtrl::SetSelectItem()に移行
 	// 選択変更
 	int nItem = HitTest(point);
 	if (nItem>=0) {
@@ -619,7 +620,7 @@ void CBodyListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 		}
 	}
-
+*/
 /* CTouchListCtrl::OnLButtonDown()とCBodyListCtrl::PopupContextMenu()に移行
 #ifdef WINCE
 	// タップ長押しでソフトキーメニュー表示
@@ -663,4 +664,19 @@ void CBodyListCtrl::PopupContextMenu( const CPoint point )
 {
 	// TODO 本来は WM_COMMAND で通知すべき。
 	theApp.m_pMainView->PopupBodyMenu(point, TPM_LEFTALIGN | TPM_TOPALIGN);
+}
+
+/**
+ * virtual SetSelectItem()
+ *  アイテムの選択状態を変更する
+ */
+void CBodyListCtrl::SetSelectItem( const int nItem )
+{
+	if (nItem>=0) {
+		int idx = util::MyGetListCtrlSelectedItemIndex( *this );
+		if( GetItemCount() > 0 && idx >= 0 && idx != nItem) {
+			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
+			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+		}
+	}
 }
