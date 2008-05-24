@@ -2551,6 +2551,42 @@ void Ran2View::OnMouseMove(UINT nFlags, CPoint point)
 					DrawDetail( m_drawOffsetLine , true );
 				}
 			}
+#ifdef WINCE
+			if( !m_bScrollDragging ) {
+				// ドラッグ移動中ではない
+				// タップ長押しでソフトキーメニュー表示
+				// （指先が微動した時のため）
+				SHRGINFO RGesture;
+				RGesture.cbSize     = sizeof(SHRGINFO);
+				RGesture.hwndClient = m_hWnd;
+				RGesture.ptDown     = point;
+				RGesture.dwFlags    = SHRG_RETURNCMD;
+				if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+					// 長押しした
+
+					// WM_LBUTTONUPと同様にドラッグ終了処理を行う
+
+					// キャプチャ終了
+					ReleaseCapture();
+
+					//ドラッグ処理停止
+					m_bDragging = false;
+					m_bPanDragging = false;
+					m_bScrollDragging = false;
+					m_activeLinkID.clear();
+
+					if( bLinkArea ) {
+						// リンク専用メニューを開く
+						CPoint scPoint = point;
+						ClientToScreen( &scPoint );
+						MyPopupURLLinkMenu( scPoint , TPM_LEFTALIGN );
+					} else {
+						::SendMessage( GetParent()->GetSafeHwnd(), WM_RBUTTONUP, (WPARAM)nFlags, (LPARAM)MAKELPARAM(point.x, point.y) );
+					}
+					return;
+				}
+			}
+#endif
 		}
 
 	} else {

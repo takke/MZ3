@@ -117,6 +117,7 @@ private:
 	bool	MyMakeBackBuffers(CDC* pdc);
 	void	DrawToScreen(CDC* pDC);
 	void	PanDrawToScreen(CDC* pDC);
+	void	DrawItemFocusRect( const int );
 
 	// 遅延描画タイマーのセット／リセット
 	inline void	MySetRedrawTimer( const int iInterval = TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW ) {

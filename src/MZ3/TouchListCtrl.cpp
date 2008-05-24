@@ -111,6 +111,8 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	//	SetSelectItem( m_iDragStartItem );
 	//}
 #ifdef WINCE
+	// フォーカス矩形を表示
+	DrawItemFocusRect( m_iDragStartItem );
 	// タップ長押しでソフトキーメニュー表示
 	SHRGINFO RGesture;
 	RGesture.cbSize     = sizeof(SHRGINFO);
@@ -118,12 +120,19 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	RGesture.ptDown     = point;
 	RGesture.dwFlags    = SHRG_RETURNCMD;
 	if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+		// 長押しした
+		// フォーカス矩形を消す
+		DrawItemFocusRect( m_iDragStartItem );
+		// 項目を選択する
 		SetSelectItem( m_iDragStartItem );
 		RedrawItems( m_iDragStartItem , m_iDragStartItem );
+		// メニューをポップアップ
 		ClientToScreen(&point);
 		PopupContextMenu(point);
 		return;
 	}
+	// フォーカス矩形を消す
+	DrawItemFocusRect( m_iDragStartItem );
 #endif
 
 	// ドラッグ開始
@@ -271,6 +280,47 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 			}
 		} else {
 			::SetCursor( ::LoadCursor(NULL, IDC_ARROW) );
+#ifdef WINCE
+			// フォーカス矩形を表示
+			DrawItemFocusRect( m_iDragStartItem );
+			// タップ長押しでソフトキーメニュー表示
+			// （指先が微動した時のため）
+			SHRGINFO RGesture;
+			RGesture.cbSize     = sizeof(SHRGINFO);
+			RGesture.hwndClient = m_hWnd;
+			RGesture.ptDown     = point;
+			RGesture.dwFlags    = SHRG_RETURNCMD;
+			if (::SHRecognizeGesture(&RGesture) == GN_CONTEXTMENU) {
+				// 長押しした
+				// フォーカス矩形を消す
+				DrawItemFocusRect( m_iDragStartItem );
+
+				// WM_LBUTTONUPと同様にドラッグ終了処理を行う
+
+				// キャプチャ終了
+				ReleaseCapture();
+				// 遅延描画タイマーのリセット
+				MyResetRedrawTimer();
+				// 選択状態の設定
+				SetSelectItem( m_iDragStartItem );
+				RedrawItems( m_iDragStartItem , m_iDragStartItem );
+				// オフセットの調整（念のため）
+				MyAdjustDrawOffset();
+				m_autoScrollInfo.clear();
+				// ドラッグフラグクリア
+				m_bDragging = false;
+				m_bPanDragging = false;
+				m_bScrollDragging = false;
+				m_drPanScrollDirection = PAN_SCROLL_DIRECTION_NONE;
+
+				// メニューポップアップ
+				ClientToScreen(&point);
+				PopupContextMenu(point);
+				return;
+			}
+			// フォーカス矩形を消す
+			DrawItemFocusRect( m_iDragStartItem );
+#endif
 		}
 
 	}
@@ -1216,4 +1266,22 @@ void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
 
 	// パンスクロール開始
 	MySetPanScrollTimer( TIMER_INTERVAL_TOUCHLIST_PANSCROLL );
+}
+
+/**
+ * DrawItemFocusRect()
+ *
+ * 指定されたアイテムにフォーカス矩形を表示する
+ * ・XORで描画するので2回呼べば矩形を消す
+ *   ここは描画か消去か意識できないので呼び出し側で管理すること
+ * ・アイテムがスクロールされたら消される
+ *
+ */
+void CTouchListCtrl::DrawItemFocusRect( const int nItem )
+{
+	CRect rctItem;
+	GetItemRect( nItem , rctItem , LVIR_BOUNDS);
+	CDC* pdc = GetDC();
+	pdc->DrawFocusRect( rctItem );
+	ReleaseDC(pdc);
 }
