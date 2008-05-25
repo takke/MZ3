@@ -674,9 +674,9 @@ void CBodyListCtrl::SetSelectItem( const int nItem )
 {
 	if (nItem>=0) {
 		int idx = util::MyGetListCtrlSelectedItemIndex( *this );
-		if( GetItemCount() > 0 && idx >= 0 && idx != nItem) {
+		if( GetItemCount() > 0 && idx >= 0 ) {
 			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
-			util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 		}
+		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 	}
 }

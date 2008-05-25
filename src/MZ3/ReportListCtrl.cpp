@@ -428,7 +428,7 @@ void CReportListCtrl::PopupContextMenu( const CPoint point )
  */
 void CReportListCtrl::SetSelectItem( const int nItem )
 {
-	if ( nItem >= 0 && nItem != GetSelectedItem() ) {
+	if ( nItem >= 0 ) {
 		util::MySetListCtrlItemFocusedAndSelected( *this, GetSelectedItem(), false );
 		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 	}

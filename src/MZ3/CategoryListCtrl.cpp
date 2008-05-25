@@ -371,7 +371,7 @@ void CCategoryListCtrl::PopupContextMenu( const CPoint point )
  */
 void CCategoryListCtrl::SetSelectItem( const int nItem )
 {
-	if ( nItem >= 0 && nItem != m_activeItem ) {
+	if ( nItem >= 0 ) {
 		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, false );
 		m_activeItem = nItem;
 		util::MySetListCtrlItemFocusedAndSelected( *this, m_activeItem, true );

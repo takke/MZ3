@@ -221,7 +221,14 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 		} else if( m_bPanDragging ){ 
 			// 横方向にドラッグ
-			StartPanScroll( m_drPanScrollDirection );
+			switch( m_drPanScrollDirection ){
+				case PAN_SCROLL_DIRECTION_RIGHT:
+					MoveSlideRight();
+					break;
+				case PAN_SCROLL_DIRECTION_LEFT:
+					MoveSlideLeft();
+					break;
+			}
 		}
 		// フラグクリア
 		m_bDragging = false;
@@ -870,11 +877,6 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 						// 一画面分移動した
 						// パンスクロール終了
 						MyResetPanScrollTimer();
-						if( m_dPxelX > 0 ){
-							MoveSlideRight();
-						} else {
-							MoveSlideLeft();
-						}
 						m_dPxelX = 0;
 					}
 				}
@@ -1187,20 +1189,12 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
 {
 #ifndef WINCE
-#define PANSCROLL_DIVIDE 10
+#define PANSCROLL_DIVIDE 15
 #else
 #define PANSCROLL_DIVIDE 15
 #endif
 	if ( !m_bUsePanScrollAnimation || !m_bCanPanScroll ) {
-		// オプションでオフになっているのでアニメーションせずに移動する
-		switch (direction) {
-		case PAN_SCROLL_DIRECTION_RIGHT:
-				MoveSlideRight();
-			break;
-		case PAN_SCROLL_DIRECTION_LEFT:
-				MoveSlideLeft();
-			break;
-		}
+		// オプションでオフになっているのでアニメーションしない
 		return;
 	}
 

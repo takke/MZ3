@@ -1385,6 +1385,10 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_hotList = &m_bodyList;
 	m_selGroup->getSelectedCategory()->selectedBody = lpnmlv->iItem;
 
+	if( lpnmlv->iItem <0 ){
+		return;
+	}
+
 	CMixiData& data = m_selGroup->getSelectedCategory()->GetSelectedBody();
 
 	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
@@ -1771,6 +1775,11 @@ void CMZ3View::OnTcnSelchangeGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
  */
 BOOL CMZ3View::CommandSelectGroupTabBeforeItem()
 {
+	if( m_access ) return TRUE;	// アクセス中は無視
+
+	// 横スクロールアニメーションを起動する
+	m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
+
 	// 左項目へ選択変更。
 	if( m_groupTab.GetCurSel() == 0 ) {
 		// 左端なので右端へ。
@@ -1791,6 +1800,11 @@ BOOL CMZ3View::CommandSelectGroupTabBeforeItem()
  */
 BOOL CMZ3View::CommandSelectGroupTabNextItem()
 {
+	if( m_access ) return TRUE;	// アクセス中は無視
+
+	// 横スクロールアニメーションを起動する
+	m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
+
 	// 右項目へ選択変更。
 	if( m_groupTab.GetCurSel() == m_groupTab.GetItemCount()-1 ) {
 		// 右端なので左端へ。
@@ -1959,23 +1973,19 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		if( m_access ) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
-		//return CommandSelectGroupTabBeforeItem();
-		m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
+		return CommandSelectGroupTabBeforeItem();
 
 
 		// グループタブに移動
 //		return CommandSetFocusGroupTab();
-		return TRUE;
 	case VK_RIGHT:
 		if( m_access ) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
-		//return CommandSelectGroupTabNextItem();
-		m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
+		return CommandSelectGroupTabNextItem();
 
 		// ボディリストに移動
 //		return CommandSetFocusBodyList();
-		return TRUE;
 	case VK_RETURN:
 		if (m_selGroup->selectedCategory == m_selGroup->focusedCategory) {
 			RetrieveCategoryItem();
