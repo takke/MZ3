@@ -2375,6 +2375,8 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 		if (pCategory!=NULL) {
 			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, false );
 			pCategory->selectedBody --;
+			// 選択項目が無ければ下端へ移動
+			pCategory->selectedBody = ( pCategory->selectedBody < 0 ? m_bodyList.GetItemCount() - 1 : pCategory->selectedBody );
 			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, true );
 
 			// 移動先が非表示なら上方向にスクロール
@@ -4264,7 +4266,7 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 			if (idxBody<0 || idxBody>=(int)pCategory->m_body.size()) {
 				idxBody = pCategory->selectedBody;
 			}
-			if (!pCategory->m_body.empty()) {
+			if (!pCategory->m_body.empty() && idxBody >= 0 && idxBody < pCategory->m_body.size() ) {
 				const CMixiData& data = pCategory->m_body[ idxBody ];
 				MyLoadMiniImage( data );
 
