@@ -2033,7 +2033,10 @@ void CReportView::OnWriteComment()
 	// 引用方法の確認
 	quote::QuoteType quoteType = quote::QUOTETYPE_INVALID;
 	int idx = m_list.GetSelectedItem();
-	CMixiData* data = (CMixiData*)m_list.GetItemData(idx);
+	CMixiData* data = NULL;
+	if( idx >= 0 ){
+		data = (CMixiData*)m_list.GetItemData(idx);
+	}
 
 	{
 		CQuoteDlg dlg;

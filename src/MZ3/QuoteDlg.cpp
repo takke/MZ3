@@ -73,42 +73,44 @@ BOOL CQuoteDlg::OnInitDialog()
 	m_typeList.SetItemData( idx, quote::QUOTETYPE_NONE );
 	idx ++;
 
-	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, quoteMark + L"[番号]" );
-		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM );
+	if( m_pMixi ){
+		if( m_pMixi->GetCommentIndex() > 0 ) {
+			m_typeList.InsertString( idx, quoteMark + L"[番号]" );
+			m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM );
+			idx ++;
+		}
+
+		m_typeList.InsertString( idx, quoteMark + L"[名前]" );
+		m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME );
 		idx ++;
-	}
 
-	m_typeList.InsertString( idx, quoteMark + L"[名前]" );
-	m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME );
-	idx ++;
+		if( m_pMixi->GetCommentIndex() > 0 ) {
+			m_typeList.InsertString( idx, quoteMark + L"[番号] [名前]" );
+			m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME );
+			idx ++;
+		}
 
-	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, quoteMark + L"[番号] [名前]" );
-		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME );
+		m_typeList.InsertString( idx, L"本文のみ" );
+		m_typeList.SetItemData( idx, quote::QUOTETYPE_BODY );
 		idx ++;
-	}
 
-	m_typeList.InsertString( idx, L"本文のみ" );
-	m_typeList.SetItemData( idx, quote::QUOTETYPE_BODY );
-	idx ++;
+		if( m_pMixi->GetCommentIndex() > 0 ) {
+			m_typeList.InsertString( idx, quoteMark + L"[番号] ＋本文" );
+			m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_BODY );
+			idx ++;
+		}
 
-	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, quoteMark + L"[番号] ＋本文" );
-		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_BODY );
-		idx ++;
-	}
-
-	m_typeList.InsertString( idx, quoteMark + L"[名前] ＋本文" );
-	m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME_BODY );
-	default_idx = idx;
-	idx ++;
-
-	if( m_pMixi->GetCommentIndex() > 0 ) {
-		m_typeList.InsertString( idx, quoteMark + L"[番号] [名前] ＋本文" );
-		m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME_BODY );
+		m_typeList.InsertString( idx, quoteMark + L"[名前] ＋本文" );
+		m_typeList.SetItemData( idx, quote::QUOTETYPE_NAME_BODY );
 		default_idx = idx;
 		idx ++;
+
+		if( m_pMixi->GetCommentIndex() > 0 ) {
+			m_typeList.InsertString( idx, quoteMark + L"[番号] [名前] ＋本文" );
+			m_typeList.SetItemData( idx, quote::QUOTETYPE_NUM_NAME_BODY );
+			default_idx = idx;
+			idx ++;
+		}
 	}
 
 	m_typeList.InsertString( idx, L"キャンセル" );
@@ -154,11 +156,11 @@ void CQuoteDlg::OnSize(UINT nType, int cx, int cy)
 
 void CQuoteDlg::OnLbnSelchangeTypeList()
 {
+	m_quoteType = (quote::QuoteType)m_typeList.GetItemData( m_typeList.GetCurSel() );
+
 	if( m_pMixi == NULL ) {
 		return;
 	}
-
-	m_quoteType = (quote::QuoteType)m_typeList.GetItemData( m_typeList.GetCurSel() );
 	CString strQuote = quote::MakeQuoteString( *m_pMixi, m_quoteType );
 
 	// らんらんビュータグを消去
