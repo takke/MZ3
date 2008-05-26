@@ -250,6 +250,11 @@ void CMainFrame::AssertValid() const
  */
 void CMainFrame::OnBackButton()
 {
+	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_BACK_BUTTON )) ){
+		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
+		return;
+	}
+
 	CView* pActiveView = GetActiveView();
 
 	if (pActiveView == theApp.m_pReportView) {
@@ -326,6 +331,11 @@ void CMainFrame::OnBackButton()
  */
 void CMainFrame::OnForwardButton()
 {
+	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_FORWARD_BUTTON )) ){
+		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
+		return;
+	}
+
 	CView* pActiveView = GetActiveView();
 
 	if (pActiveView == theApp.m_pReportView) {
