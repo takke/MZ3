@@ -250,10 +250,12 @@ void CMainFrame::AssertValid() const
  */
 void CMainFrame::OnBackButton()
 {
+#ifndef WINCE
 	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_BACK_BUTTON )) ){
 		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
 		return;
 	}
+#endif
 
 	CView* pActiveView = GetActiveView();
 
@@ -331,10 +333,12 @@ void CMainFrame::OnBackButton()
  */
 void CMainFrame::OnForwardButton()
 {
+#ifndef WINCE
 	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_FORWARD_BUTTON )) ){
 		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
 		return;
 	}
+#endif
 
 	CView* pActiveView = GetActiveView();
 
