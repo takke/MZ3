@@ -16,6 +16,71 @@
 class MZ3Data;
 typedef std::vector<MZ3Data> MZ3DataList;
 
+typedef std::wstring				MZ3String;			///< 文字列型
+typedef std::vector<std::wstring>	MZ3StringArray;		///< 文字列配列型
+
+/// 汎用文字列配列コンテナ
+class MZ3StringArrayMap
+{
+private:
+	std::map<MZ3String, MZ3StringArray> m_theMap;	///< 文字列配列のmap
+
+	/// m_StringArrayMap から文字列配列オブジェクトを取得する
+	MZ3StringArray* GetStringArray(LPCTSTR key)
+	{
+		return &m_theMap[key];
+	}
+
+	/// m_StringArrayMap から文字列配列オブジェクトを取得する。
+	const MZ3StringArray* GetStringArrayConst(LPCTSTR key) const
+	{
+		const std::map<MZ3String, MZ3StringArray>::const_iterator& v = m_theMap.find(key);
+		if (v==m_theMap.end()) {
+			return NULL;
+		}
+		return &v->second;
+	}
+
+public:
+	/// クリアする。
+	void Clear(LPCTSTR key)
+	{
+		MZ3StringArray* pArray = GetStringArray(key);
+		if (pArray!=NULL) {
+			pArray->clear();
+		}
+	}
+
+	/// 文字列を追加する。
+	void AppendString(LPCTSTR key, LPCTSTR text)
+	{
+		MZ3StringArray* pArray = GetStringArray(key);
+		if (pArray!=NULL) {
+			pArray->push_back(text);
+		}
+	}
+
+	/// 文字列を取得する。
+	LPCTSTR GetString(LPCTSTR key, int idx) const
+	{
+		const MZ3StringArray* pArray = GetStringArrayConst(key);
+		if (pArray==NULL) {
+			return L"";
+		}
+		return (*pArray)[idx].c_str();
+	}
+
+	/// 要素数を取得する。key に該当する配列がない場合は、0 を返す。
+	size_t GetSize(LPCTSTR key) const
+	{
+		const MZ3StringArray* pArray = GetStringArrayConst(key);
+		if (pArray==NULL) {
+			return 0;
+		}
+		return pArray->size();
+	}
+};
+
 /**
  * MZ3 のデータ管理クラス
  */
@@ -26,17 +91,14 @@ protected:
 	CString			m_dateText;				///< 日付時刻（文字列）：GetDate() で優先して返却される
 	CTime			m_dateRaw;				///< 日付時刻（メタ情報）
 
+	CONTENT_TYPE	m_contentType;			///< Content-Type
+
 	int				m_authorId;				///< 投稿者のID（オーナーIDに設定される場合もある）
 	int				m_id;					///< 記事ID
 	int				m_commentIndex;			///< コメント番号
 	int				m_commentCount;			///< コメントの数
-	CONTENT_TYPE	m_contentType;			///< Content-Type
 
 	int				m_ownerId;				///< オーナーID（投稿者IDに設定される場合もある）
-
-	std::vector<CString>	m_bodyArray;	///< 本文（コメント等の本文）
-	std::vector<CString>	m_imageArray;	///< 画像のリスト
-	std::vector<CString>	m_MovieArray;	///< 動画のリスト
 
 	MZ3DataList		m_children;				///< 子要素（コメントなど）
 											///< コミュニティページ要素の場合は、
@@ -44,8 +106,9 @@ protected:
 
 	bool			m_myMixi;				///< マイミクフラグ（足あとからのマイミク抽出時のみ対応）
 
-	std::map<std::wstring, std::wstring> m_StringMap;	///< 汎用文字列コンテナ
-	std::map<std::wstring, int>			 m_IntegerMap;	///< 汎用数値コンテナ
+	std::map<MZ3String, MZ3String>		m_StringMap;		///< 汎用文字列コンテナ
+	std::map<MZ3String, int>			m_IntegerMap;		///< 汎用数値コンテナ
+	MZ3StringArrayMap					m_StringArrayMap;	///< 汎用文字列配列コンテナ
 
 public:
 
@@ -84,8 +147,6 @@ public:
 	virtual ~MZ3Data()
 	{
 		ClearChildren();
-		m_imageArray.clear();
-		m_MovieArray.clear();
 	}
 
 public:
@@ -127,25 +188,34 @@ public:
 	void SetOwnerID(int value)			{ m_ownerId = value; }
 	int GetOwnerID() const				{ return m_ownerId; }
 
-	void	AddImage(LPCTSTR str)		{ m_imageArray.push_back(str); }
-	void	AddMovie(LPCTSTR str)		{ m_MovieArray.push_back(str); }
-	int		GetImageCount()	const		{ return (int)m_imageArray.size(); }
-	int		GetMovieCount()	const		{ return (int)m_MovieArray.size(); }
-	LPCTSTR GetImage(int index) const	{ return m_imageArray[index]; }
-	LPCTSTR GetMovie(int index)	const	{ return m_MovieArray[index]; }
-	void	ClearImage()				{ m_imageArray.clear(); }
-	void	ClearMovie()				{ m_MovieArray.clear(); }
-
 	void	SetMyMixi(bool bMyMixi)		{ m_myMixi = bMyMixi; }
 	bool	IsMyMixi()					{ return m_myMixi; }
 
-	void	ClearBody()					{ m_bodyArray.clear(); }
-	void	AddBody(CString str)		{ m_bodyArray.push_back(str); }
-	LPCTSTR GetBody(int idx) const		{ return m_bodyArray[idx]; }
-	size_t	GetBodySize() const			{ return m_bodyArray.size(); }
+public:
+	//--- 汎用文字列配列コンテナのアクセッサ
+
+	// body list
+	void	ClearBody()					{ m_StringArrayMap.Clear(L"body"); }
+	void	AddBody(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"body", str); }
+	LPCTSTR GetBody(int idx) const		{ return m_StringArrayMap.GetString(L"body", idx); }
+	size_t	GetBodySize() const			{ return m_StringArrayMap.GetSize(L"body"); }
+
+	// image list
+	void	ClearImage()				{ m_StringArrayMap.Clear(L"image"); }
+	void	AddImage(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"image", str); }
+	LPCTSTR GetImage(int idx) const		{ return m_StringArrayMap.GetString(L"image", idx); }
+	int		GetImageCount()	const		{ return m_StringArrayMap.GetSize(L"image"); }
+
+	// movie list
+	void	ClearMovie()				{ m_StringArrayMap.Clear(L"movie"); }
+	void	AddMovie(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"movie", str); }
+	LPCTSTR GetMovie(int idx) const		{ return m_StringArrayMap.GetString(L"movie", idx); }
+	int		GetMovieCount()	const		{ return m_StringArrayMap.GetSize(L"movie"); }
+
 
 	//--- 汎用文字列コンテナのアクセッサ
 
+private:
 	/// 汎用文字列コンテナから key 値を取得する。失敗時は L"" を返す。
 	LPCTSTR FindStringMap(LPCTSTR key) const
 	{
@@ -156,6 +226,7 @@ public:
 		return v->second.c_str();
 	}
 
+public:
 	// name : 名前
 	void SetName(CString name);
 	CString GetName() const					{ return FindStringMap(L"name"); }
