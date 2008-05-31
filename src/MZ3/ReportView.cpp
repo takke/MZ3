@@ -472,8 +472,8 @@ void CReportView::SetData(const CMixiData& data)
 		m_list.SetItem(idx, 1, LVIF_TEXT, m_data.GetAuthor(), 0, 0, 0, 0);
 		// Date 列 : 先頭項目には初期版から表示していない。必要であれば、下記をコメントアウトすること。
 //		m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetDate(), 0, 0, 0, 0);
-		if( !m_data.GetopeningRange().IsEmpty() ) {
-			m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetopeningRange() , 0, 0, 0, 0);
+		if( !m_data.GetOpeningRange().IsEmpty() ) {
+			m_list.SetItem(idx, 2, LVIF_TEXT, m_data.GetOpeningRange() , 0, 0, 0, 0);
 		}
 
 		// ItemData に CMixiData* を与える
@@ -532,8 +532,8 @@ void CReportView::ShowCommentData(CMixiData* data)
 	// 書体を変更して1行目を描画
 	bodyStrArray->Add(L"<blue>");
 	bodyStrArray->Add(data->GetAuthor() + L"　" + data->GetDate() );
-	if( !data->GetopeningRange().IsEmpty() ) {
-		bodyStrArray->Add( L"　【" + data->GetopeningRange() + L"】" );
+	if( !data->GetOpeningRange().IsEmpty() ) {
+		bodyStrArray->Add( L"　【" + data->GetOpeningRange() + L"】" );
 	}
 	bodyStrArray->Add(L"</blue>");
 	bodyStrArray->Add(L"<br>");
@@ -2089,11 +2089,7 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 	}
 
-//	if (m_data) {
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, !m_data.IsOtherDiary() );
-//	}else{
-//		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE );
-//	}
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE );
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 
 	return TRUE;
@@ -2325,9 +2321,9 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	}
 
 	// 外部ブログなら、書き込み無効
-	if (m_data.IsOtherDiary() != FALSE) {
-		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
-	}
+//	if (m_data.IsOtherDiary() != FALSE) {
+//		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
+//	}
 
 	// 「進む」無効化
 	int idxPage = 4;		// 「ページ」メニュー（次へが有効の場合は-1となる）

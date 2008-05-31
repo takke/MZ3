@@ -569,7 +569,7 @@ public:
 													  .getNode(L"dt")
 													  .getNode(L"img");
 
-				data_.SetopeningRange( img.getProperty(L"alt").c_str() );
+				data_.SetOpeningRange( img.getProperty(L"alt").c_str() );
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"ŒöŠJ”ÍˆÍ‚Ìæ“¾ƒGƒ‰[ : %s", e.getMessage().c_str()) );

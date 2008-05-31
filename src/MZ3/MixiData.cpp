@@ -13,10 +13,7 @@
 
 // CMixiData
 
-
-
 // CMixiData メンバ関数
-
 
 /**
  * タイトルデータの設定
@@ -24,13 +21,13 @@
  * @param title [in] タイトル
  * @return なし
  */
-void CMixiData::SetTitle(CString title)
+void MZ3Data::SetTitle(CString title)
 {
 	// 変換処理
 	while(title.Replace(_T("&gt;"), _T(">")));
 	while(title.Replace(_T("&lt;"), _T("<")));
 
-	m_title = title;
+	m_StringMap[L"title"] = title;
 }
 
 /**
@@ -39,13 +36,13 @@ void CMixiData::SetTitle(CString title)
  * @param name [in] 名前
  * @return なし
  */
-void CMixiData::SetName(CString name)
+void MZ3Data::SetName(CString name)
 {
 	// 変換処理
 	while(name.Replace(_T("&gt;"), _T(">")));
 	while(name.Replace(_T("&lt;"), _T("<")));
 
-	m_name = name;
+	m_StringMap[L"name"] = name;
 }
 
 /**
@@ -54,20 +51,20 @@ void CMixiData::SetName(CString name)
  * @param author [in] 名前
  * @return なし
  */
-void CMixiData::SetAuthor(CString author)
+void MZ3Data::SetAuthor(CString author)
 {
 	// 変換処理
 	while(author.Replace(_T("&gt;"), _T(">")));
 	while(author.Replace(_T("&lt;"), _T("<")));
 
-	m_author = author;
+	m_StringMap[L"author"] = author;
 }
 
 /**
  * m_dateText があればそれを返す。
  * なければ m_dateRaw を変換して返す。
  */
-CString CMixiData::GetDate() {
+CString MZ3Data::GetDate() {
 	if (!m_dateText.IsEmpty()) {
 		return m_dateText;
 	} else {
@@ -85,14 +82,4 @@ CString CMixiData::GetDate() {
 			return s;
 		}
 	}
-}
-
-void CMixiData::ClearImage()
-{
-	m_imageArray.clear();
-}
-
-void CMixiData::ClearMovie()
-{
-	m_MovieArray.clear();
 }

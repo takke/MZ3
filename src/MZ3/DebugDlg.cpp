@@ -123,9 +123,9 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, data->IsMyMixi() ? L"true" : L"false" );
 	idx++;
 
-	m_List.InsertItem( idx, L"外部ブログ" );
-	m_List.SetItemText( idx, 1, data->IsOtherDiary() ? L"YES" : L"NO" );
-	idx++;
+//	m_List.InsertItem( idx, L"外部ブログ" );
+//	m_List.SetItemText( idx, 1, data->IsOtherDiary() ? L"YES" : L"NO" );
+//	idx++;
 
 	m_List.InsertItem( idx, L"ブラウズURL" );
 	m_List.SetItemText( idx, 1, data->GetBrowseUri() );
