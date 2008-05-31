@@ -1588,7 +1588,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="comsuppwd.lib "
 				OutputFile="$(OutDir)\MZ4.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="false"

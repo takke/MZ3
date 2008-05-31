@@ -19,6 +19,8 @@ typedef std::vector<MZ3Data> MZ3DataList;
 typedef std::wstring				MZ3String;			///< 文字列型
 typedef std::vector<std::wstring>	MZ3StringArray;		///< 文字列配列型
 
+extern int g_nMZ3DataInstances;							///< MZ3Data オブジェクト数
+
 /// 汎用文字列配列コンテナ
 class MZ3StringArrayMap
 {
@@ -93,22 +95,13 @@ protected:
 
 	CONTENT_TYPE	m_contentType;			///< Content-Type
 
-	int				m_authorId;				///< 投稿者のID（オーナーIDに設定される場合もある）
-	int				m_id;					///< 記事ID
-	int				m_commentIndex;			///< コメント番号
-	int				m_commentCount;			///< コメントの数
-
-	int				m_ownerId;				///< オーナーID（投稿者IDに設定される場合もある）
-
 	MZ3DataList		m_children;				///< 子要素（コメントなど）
 											///< コミュニティページ要素の場合は、
 											///< 要素0に list_bbs.pl のデータを持つ。
 
-	bool			m_myMixi;				///< マイミクフラグ（足あとからのマイミク抽出時のみ対応）
-
-	std::map<MZ3String, MZ3String>		m_StringMap;		///< 汎用文字列コンテナ
-	std::map<MZ3String, int>			m_IntegerMap;		///< 汎用数値コンテナ
-	MZ3StringArrayMap					m_StringArrayMap;	///< 汎用文字列配列コンテナ
+	std::map<MZ3String, MZ3String>	m_StringMap;		///< 汎用文字列コンテナ
+	std::map<MZ3String, int>		m_IntegerMap;		///< 汎用数値コンテナ
+	MZ3StringArrayMap				m_StringArrayMap;	///< 汎用文字列配列コンテナ
 
 public:
 
@@ -131,14 +124,9 @@ public:
 	 */
 	MZ3Data()
 		: m_accessType(ACCESS_INVALID) // 初期値
-		, m_authorId(-1)
-		, m_id(-1)
-		, m_commentIndex(-1)
-		, m_commentCount(0)
 		, m_contentType(CONTENT_TYPE_INVALID)
-		, m_ownerId(-1)
-		, m_myMixi(false)
 	{
+		g_nMZ3DataInstances ++;
 	}
 
 	/**
@@ -147,6 +135,7 @@ public:
 	virtual ~MZ3Data()
 	{
 		ClearChildren();
+//		g_nMZ3DataInstances --;
 	}
 
 public:
@@ -167,31 +156,39 @@ public:
 	CString GetDate();
 	const CTime& GetDateRaw() const		{ return m_dateRaw;	}
 
-	void SetAuthorID(int authorId)		{ m_authorId = authorId; }
-	int GetAuthorID() const				{ return m_authorId; }
-
 	void SetAccessType(ACCESS_TYPE type) { m_accessType = type; }
 	ACCESS_TYPE GetAccessType()	const	{ return m_accessType; }
-
-	void SetCommentIndex(int value)		{ m_commentIndex = value; }
-	int GetCommentIndex() const			{ return m_commentIndex; }
-
-	void SetID(int value)				{ m_id = value; }
-	int GetID()	const					{ return m_id; }
 
 	void SetContentType(CONTENT_TYPE value)	{ m_contentType = value; }
 	CONTENT_TYPE GetContentType() const		{ return m_contentType; }
 
-	void SetCommentCount(int value)	    { m_commentCount = value; }
-	int GetCommentCount() const			{ return m_commentCount; }
-
-	void SetOwnerID(int value)			{ m_ownerId = value; }
-	int GetOwnerID() const				{ return m_ownerId; }
-
-	void	SetMyMixi(bool bMyMixi)		{ m_myMixi = bMyMixi; }
-	bool	IsMyMixi()					{ return m_myMixi; }
-
 public:
+	//--- 汎用数値コンテナのアクセッサ
+
+	// author_id : 投稿者のID（オーナーIDに設定される場合もある）
+	void SetAuthorID(int authorId)		{ m_IntegerMap[L"author_id"] = authorId; }
+	int GetAuthorID() const				{ return FindIntegerMap(L"author_id", -1); }
+
+	// id : 記事ID
+	void SetID(int value)				{ m_IntegerMap[L"id"] = value; }
+	int GetID()	const					{ return FindIntegerMap(L"id", -1); }
+
+	// comment_index : コメント番号
+	void SetCommentIndex(int value)		{ m_IntegerMap[L"comment_index"] = value; }
+	int GetCommentIndex() const			{ return FindIntegerMap(L"comment_index", -1); }
+
+	// comment_count : コメントの数
+	void SetCommentCount(int value)	    { m_IntegerMap[L"comment_count"] = value; }
+	int GetCommentCount() const			{ return FindIntegerMap(L"comment_count", 0); }
+
+	// owner_id : オーナーID（投稿者IDに設定される場合もある）
+	void SetOwnerID(int value)			{ m_IntegerMap[L"owner_id"] = value; }
+	int GetOwnerID() const				{ return FindIntegerMap(L"owner_id", -1); }
+
+	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
+	void	SetMyMixi(bool bMyMixi)		{ m_IntegerMap[L"my_mixi"] = bMyMixi ? 1 : 0; }
+	bool	IsMyMixi()					{ return FindIntegerMap(L"my_mixi", 0) ? true : false; }
+
 	//--- 汎用文字列配列コンテナのアクセッサ
 
 	// body list
@@ -214,19 +211,6 @@ public:
 
 
 	//--- 汎用文字列コンテナのアクセッサ
-
-private:
-	/// 汎用文字列コンテナから key 値を取得する。失敗時は L"" を返す。
-	LPCTSTR FindStringMap(LPCTSTR key) const
-	{
-		const std::map<std::wstring, std::wstring>::const_iterator& v = m_StringMap.find(key);
-		if (v==m_StringMap.end()) {
-			return L"";
-		}
-		return v->second.c_str();
-	}
-
-public:
 	// name : 名前
 	void SetName(CString name);
 	CString GetName() const					{ return FindStringMap(L"name"); }
@@ -261,6 +245,30 @@ public:
 	size_t	GetChildrenSize()				{ return m_children.size(); }		///< 子要素数の取得
 	MZ3DataList& GetChildren()				{ return m_children; }				///< 子要素リストの取得
 	void	ClearChildren()					{ m_children.clear(); }				///< 子要素の削除
+
+	//--- debug 情報
+	int		GetInstanceCount()				{ return g_nMZ3DataInstances; }		///< MZ3Data インスタンス数
+
+private:
+	/// 汎用数値コンテナから key 値を取得する。失敗時は default_value を返す。
+	int FindIntegerMap(LPCTSTR key, int default_value) const
+	{
+		const std::map<std::wstring, int>::const_iterator& v = m_IntegerMap.find(key);
+		if (v==m_IntegerMap.end()) {
+			return default_value;
+		}
+		return v->second;
+	}
+
+	/// 汎用文字列コンテナから key 値を取得する。失敗時は L"" を返す。
+	LPCTSTR FindStringMap(LPCTSTR key) const
+	{
+		const std::map<std::wstring, std::wstring>::const_iterator& v = m_StringMap.find(key);
+		if (v==m_StringMap.end()) {
+			return L"";
+		}
+		return v->second.c_str();
+	}
 };
 
 

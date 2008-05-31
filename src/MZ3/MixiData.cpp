@@ -13,6 +13,8 @@
 
 // CMixiData
 
+int g_nMZ3DataInstances=0;
+
 // CMixiData ƒƒ“ƒoŠÖ”
 
 /**
