@@ -4026,10 +4026,11 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}
 
 	// 項目を追加
-	if (pSubMenu->GetMenuItemCount()<=5) {
+	const int CATEGORY_MENU_APPEND_SUB_MENU_IDX = 7;
+	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_APPEND_SUB_MENU_IDX) {
 		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
 	} else {
-		CMenu* pAppendMenu = pSubMenu->GetSubMenu(5);
+		CMenu* pAppendMenu = pSubMenu->GetSubMenu(CATEGORY_MENU_APPEND_SUB_MENU_IDX);
 		if (pAppendMenu) {
 			// ダミーを削除
 			pAppendMenu->RemoveMenu( ID_APPEND_MENU_BEGIN, MF_BYCOMMAND );
