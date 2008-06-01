@@ -83,6 +83,9 @@ public:
 	}
 };
 
+typedef std::map<MZ3String, MZ3String>	MZ3StringMap;
+typedef std::map<MZ3String, int>		MZ3IntegerMap;
+
 /**
  * MZ3 のデータ管理クラス
  */
@@ -99,9 +102,9 @@ protected:
 											///< コミュニティページ要素の場合は、
 											///< 要素0に list_bbs.pl のデータを持つ。
 
-	std::map<MZ3String, MZ3String>	m_StringMap;		///< 汎用文字列コンテナ
-	std::map<MZ3String, int>		m_IntegerMap;		///< 汎用数値コンテナ
-	MZ3StringArrayMap				m_StringArrayMap;	///< 汎用文字列配列コンテナ
+	MZ3StringMap		m_StringMap;		///< 汎用文字列コンテナ
+	MZ3IntegerMap		m_IntegerMap;		///< 汎用数値コンテナ
+	MZ3StringArrayMap	m_StringArrayMap;	///< 汎用文字列配列コンテナ
 
 public:
 
@@ -253,7 +256,7 @@ private:
 	/// 汎用数値コンテナから key 値を取得する。失敗時は default_value を返す。
 	int FindIntegerMap(LPCTSTR key, int default_value) const
 	{
-		const std::map<std::wstring, int>::const_iterator& v = m_IntegerMap.find(key);
+		const MZ3IntegerMap::const_iterator& v = m_IntegerMap.find(key);
 		if (v==m_IntegerMap.end()) {
 			return default_value;
 		}
@@ -263,7 +266,7 @@ private:
 	/// 汎用文字列コンテナから key 値を取得する。失敗時は L"" を返す。
 	LPCTSTR FindStringMap(LPCTSTR key) const
 	{
-		const std::map<std::wstring, std::wstring>::const_iterator& v = m_StringMap.find(key);
+		const MZ3StringMap::const_iterator& v = m_StringMap.find(key);
 		if (v==m_StringMap.end()) {
 			return L"";
 		}
