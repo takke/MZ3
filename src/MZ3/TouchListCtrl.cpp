@@ -35,11 +35,19 @@ CTouchListCtrl::CTouchListCtrl(void)
 	, m_offsetPixelX(0)
 	, m_drPanScrollDirection( PAN_SCROLL_DIRECTION_NONE )
 	, m_bCanPanScroll(false)
+	, m_hPanScrollEvent(NULL)
 {
+	// イベントオブジェクト作成
+	m_hPanScrollEvent = CreateEvent( NULL , TRUE , TRUE , NULL );
 }
 
 CTouchListCtrl::~CTouchListCtrl(void)
 {
+	// イベントオブジェクトクローズ
+	if(	m_hPanScrollEvent ){
+		CloseHandle( m_hPanScrollEvent );
+	}
+
 }
 
 BEGIN_MESSAGE_MAP(CTouchListCtrl, CListCtrl)
@@ -856,9 +864,9 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 				} else {
 					// 移動処理
 					m_offsetPixelX += dwDt * m_dPxelX / 10;
-#ifdef DEBUG
-					wprintf( L"m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
-#endif
+
+					MZ3_TRACE( L"m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
+
 					// 終了判定
 					if( m_dPxelX > 0 ){
 						if( m_offsetPixelX > 0 ){
@@ -1009,8 +1017,8 @@ void CTouchListCtrl::ResetAllTimer()
 	MyAdjustDrawOffset();
 	// 慣性スクロールタイマーを停止
 	MyResetAutoScrollTimer();
-	// パンスクロールタイマーを停止
-	MyResetPanScrollTimer();
+	// パンスクロールタイマーはここでは停止しない
+	//MyResetPanScrollTimer();
 }
 
 // 項目に変化があればタイマー処理を停止する
@@ -1149,10 +1157,10 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 
 	if (m_bPanDragging) {
 		// 横ドラッグ中
-		//if( abs( dx ) < screenWidth / 3 ){
-		//	// マウスを元に戻したら横ドラッグをキャンセル　→動きがあやしいので保留
-		//	m_bPanDragging = false ;
-		//}
+		if( abs( dx ) < m_screenWidth / 3 ){
+			// マウスを元に戻したら横ドラッグをキャンセル
+			m_bPanDragging = false ;
+		}
 	} else if (m_bScrollDragging) {
 		// 縦ドラッグ中
 
@@ -1189,12 +1197,13 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
 {
 #ifndef WINCE
-#define PANSCROLL_DIVIDE 15
+#define PANSCROLL_DIVIDE 18
 #else
 #define PANSCROLL_DIVIDE 15
 #endif
 	if ( !m_bUsePanScrollAnimation || !m_bCanPanScroll ) {
 		// オプションでオフになっているのでアニメーションしない
+		Invalidate();
 		return;
 	}
 
@@ -1259,6 +1268,8 @@ void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
 	m_dwPanScrollLastTick = GetTickCount();
 
 	// パンスクロール開始
+	ResetEvent( m_hPanScrollEvent );
+	MZ3_TRACE( L"ResetEvent(0X%08X)\n" , m_hPanScrollEvent );
 	MySetPanScrollTimer( TIMER_INTERVAL_TOUCHLIST_PANSCROLL );
 }
 
@@ -1278,4 +1289,20 @@ void CTouchListCtrl::DrawItemFocusRect( const int nItem )
 	CDC* pdc = GetDC();
 	pdc->DrawFocusRect( rctItem );
 	ReleaseDC(pdc);
+}
+
+/**
+ * パンスクロール終了待ち
+ *
+ * 横スクロールが終了するのを待つ
+ */
+DWORD CTouchListCtrl::WaitForPanScroll( DWORD dwMilliseconds )
+{
+	if( m_bCanPanScroll && m_bUsePanScrollAnimation ){
+		DWORD dwRtn = WaitForSingleObject( m_hPanScrollEvent , dwMilliseconds );
+		MZ3_TRACE( L"WaitForSingleObject(0X%08X):%d\n" , m_hPanScrollEvent , dwRtn );
+		return dwRtn;
+	} else {
+		return WAIT_ABANDONED;
+	}
 }

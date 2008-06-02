@@ -48,7 +48,8 @@ public:
 		PAN_SCROLL_DIRECTION_RIGHT,		///< 右方向
 		PAN_SCROLL_DIRECTION_LEFT,		///< 左方向
 	};
-	void	StartPanScroll( PAN_SCROLL_DIRECTION );
+	void	StartPanScroll( PAN_SCROLL_DIRECTION direction );
+	DWORD	WaitForPanScroll( DWORD dwMilliseconds );
 private:
 	int		m_offsetPixelY;			///< ピクセル単位スクロールのオフセットピクセル数
 
@@ -89,6 +90,7 @@ private:
 	bool	m_bCanSlide;			///< 左右移動可能か
 	bool	m_bCanPanScroll;		///< パンスクロールアニメ可能か
 	PAN_SCROLL_DIRECTION m_drPanScrollDirection;	///< パンスクロール方向
+	HANDLE	m_hPanScrollEvent;		///<
 public:
 	// 背景描画フラグの設定／取得
 	bool	IsDrawBk() { return m_bDrawBk; }
@@ -149,6 +151,7 @@ private:
 	}
 	inline void	MyResetPanScrollTimer(){
 		KillTimer( TIMERID_TOUCHLIST_PANSCROLL );
+		SetEvent( m_hPanScrollEvent );
 		m_offsetPixelX = 0;
 		m_drPanScrollDirection = PAN_SCROLL_DIRECTION_NONE;
 	}

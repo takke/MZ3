@@ -3086,18 +3086,34 @@ void CMZ3View::OnSelchangedGroupTab(void)
 	// オプションの設定
 	m_categoryList.m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
 	m_categoryList.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
+
 	// 表示を更新
-	m_categoryList.Update( 0 );
+	if( m_categoryList.WaitForPanScroll( 0 ) != WAIT_TIMEOUT ){
+		// 横スクロールが終わっていたら
+		// 背景画像のみが表示されている状態なので最新状態に更新する
+#ifdef WINCE
+		m_categoryList.Invalidate( FALSE );
+#else
+		m_categoryList.Invalidate( TRUE );
+#endif
+		m_categoryList.Update( 0 );
+	}
 
 	// 選択変更時の処理を実行する（ログの読み込み）
 	m_categoryList.m_bStopDraw = true;
 	OnMySelchangedCategoryList();
 	m_categoryList.m_bStopDraw = false;
+
+	// 横スクロールの終了を待つ
+	m_categoryList.WaitForPanScroll( 1000L );
+
+	// 背景画像のみが表示されている状態なので最新状態に更新する
 #ifdef WINCE
 	m_categoryList.Invalidate( FALSE );
 #else
 	m_categoryList.Invalidate( TRUE );
 #endif
+	m_categoryList.Update( 0L );
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );
@@ -4267,7 +4283,7 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 			if (idxBody<0 || idxBody>=(int)pCategory->m_body.size()) {
 				idxBody = pCategory->selectedBody;
 			}
-			if (!pCategory->m_body.empty() && idxBody >= 0 && idxBody < pCategory->m_body.size() ) {
+			if (!pCategory->m_body.empty() && idxBody >= 0 && idxBody < (int)pCategory->m_body.size() ) {
 				const CMixiData& data = pCategory->m_body[ idxBody ];
 				MyLoadMiniImage( data );
 
