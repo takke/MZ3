@@ -683,17 +683,25 @@ private:
 		try {
 			const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 												   .getNode(L"div", L"id=diaryComment")
-												   .getNode(L"div", L"class=diaryMainArea02");
+												   .getNode(L"div", L"class=diaryMainArea02 commentList");
+			// throw なし => div class=diaryMainArea02 commentList があるのでdiv#diaryComment 等がある。
+			parseDiaryComment_sub(data_, div);
 
+		} catch (...) {
+			// throw あり => div class=diaryMainArea02 commentList がないのでdiv class=diaryMainArea02 deleteButtonを探す。
 			try {
-				const xml2stl::Node& form = div.getNode(L"form");
+				const xml2stl::Node& form = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"id=diaryComment")
+													   .getNode(L"div", L"class=diaryMainArea02 deleteButton")
+													   .getNode(L"form");
 				// throw なし => form があるので、form 配下に div#diaryCommentbox 等がある（自分の日記）。
 				parseDiaryComment_sub(data_, form);
-			} catch(...) {
-				// throw あり => form がないので、div 配下に div#diaryComment 等がある。
-				parseDiaryComment_sub(data_, div);
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_INFO( util::FormatString( L"コメントの取得エラー : %s", e.getMessage().c_str()) );
 			}
+		}
 
+		try {
 			// <form name="comment_form" ...> がある div 要素を探索する
 			const xml2stl::Node& divDiaryComment = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 															   .getNode(L"div", L"id=diaryComment");
