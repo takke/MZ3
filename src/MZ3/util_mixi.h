@@ -21,7 +21,7 @@ namespace util
  */
 inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url ) 
 {
-	// とりあえず view 系のみ
+	// view 系
 	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // メイン
 	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // 日記内容
 	if( url.Find( L"view_bbs.pl" ) != -1 ) 		{ return ACCESS_BBS;       } // コミュニティ内容
@@ -34,6 +34,10 @@ inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	if( url.Find( L"show_friend.pl" ) != -1 ) 	{ return ACCESS_PROFILE;   } // 個人ページ
 	if( url.Find( L"view_community.pl" ) != -1 ){ return ACCESS_COMMUNITY; } // コミュニティページ
 
+	// list 系
+	if( url.Find( L"list_bookmark.pl?kind=community" ) != -1 ) { return ACCESS_LIST_FAVORITE_COMMUNITY; }
+	if( url.Find( L"list_bookmark.pl" ) != -1 ) { return ACCESS_LIST_FAVORITE_USER; }
+	
 	// 不明なので INVALID とする
 	return ACCESS_INVALID;
 }

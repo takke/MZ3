@@ -1724,10 +1724,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MZ3Parser.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SimpleLogger.cpp"
 				>
 			</File>
@@ -2442,6 +2438,18 @@
 			<Filter
 				Name="twitter"
 				>
+			</Filter>
+			<Filter
+				Name="parsers"
+				>
+				<File
+					RelativePath=".\MixiParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MZ3Parser.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\TwitterParser.cpp"
 					>
@@ -2494,10 +2502,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MZ3Parser.h"
-				>
-			</File>
-			<File
 				RelativePath=".\QuoteHelper.h"
 				>
 			</File>
@@ -2511,6 +2515,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\twitter_util.h"
 				>
 			</File>
 			<File
@@ -2610,10 +2618,6 @@
 				</File>
 				<File
 					RelativePath=".\MixiData.h"
-					>
-				</File>
-				<File
-					RelativePath=".\MixiParser.h"
 					>
 				</File>
 				<File
@@ -2810,10 +2814,14 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="twitter"
+				Name="parsers"
 				>
 				<File
-					RelativePath=".\twitter_util.h"
+					RelativePath=".\MixiParser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MZ3Parser.h"
 					>
 				</File>
 				<File

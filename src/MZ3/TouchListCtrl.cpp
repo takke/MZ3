@@ -77,20 +77,20 @@ BOOL CTouchListCtrl::PreTranslateMessage(MSG* pMsg)
 		break;
 
 	case WM_PAINT:
-		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_PAINT, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
+//		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_PAINT, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
 		break;
 	case WM_MOUSEWHEEL:
-		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_MOUSEWHEEL, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
+//		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_MOUSEWHEEL, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
 		break;
 	case WM_VSCROLL:
-		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_VSCROLL, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
+//		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(WM_VSCROLL, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
 		break;
 //	case WM_PAINT:
 		// ‚¿‚ç‚Â‚«–hŽ~‚Ì‚½‚ßŽÕ’f
 //		return TRUE;
 
 	default:
-		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(0x%04X, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
+//		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(0x%04X, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
 		break;
 	}
 
