@@ -651,10 +651,12 @@ public:
 			} catch (xml2stl::NodeNotFoundException& e) {
 				// äOïîÉuÉçÉOÇ©Ç‡ÇµÇÍÇ»Ç¢
 				try {
-					const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"class=messageArea")
-														   .getNode(L"div", L"class=alertArea");
+					const xml2stl::Node& messageAlert = bodyMainArea.getNode(L"div", L"class=messageArea")
+														   .getNode(L"div", L"class=contents")
+														   .getNode(L"div")
+														   .getNode(L"p", L"class=messageAlert");
 					
-					CString subHtml = div.getTextAll().c_str();
+					CString subHtml = messageAlert.getTextAll().c_str();
 					ParserUtil::AddBodyWithExtract( data_, subHtml );
 
 				} catch (xml2stl::NodeNotFoundException& e) {
