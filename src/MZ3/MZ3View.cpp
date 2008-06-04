@@ -3088,7 +3088,7 @@ void CMZ3View::OnSelchangedGroupTab(void)
 	m_categoryList.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
 
 	// 表示を更新
-	if( m_categoryList.WaitForPanScroll( 0 ) != WAIT_TIMEOUT ){
+	if( m_categoryList.WaitForPanScroll( 0L ) ){
 		// 横スクロールが終わっていたら
 		// 背景画像のみが表示されている状態なので最新状態に更新する
 #ifdef WINCE
@@ -3113,7 +3113,7 @@ void CMZ3View::OnSelchangedGroupTab(void)
 #else
 	m_categoryList.Invalidate( TRUE );
 #endif
-	m_categoryList.Update( 0L );
+	m_categoryList.Update( 0 );
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );

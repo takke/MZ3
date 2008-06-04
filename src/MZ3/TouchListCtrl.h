@@ -49,7 +49,7 @@ public:
 		PAN_SCROLL_DIRECTION_LEFT,		///< 左方向
 	};
 	void	StartPanScroll( PAN_SCROLL_DIRECTION direction );
-	DWORD	WaitForPanScroll( DWORD dwMilliseconds );
+	BOOL	WaitForPanScroll( DWORD dwMilliseconds );
 private:
 	int		m_offsetPixelY;			///< ピクセル単位スクロールのオフセットピクセル数
 

@@ -488,7 +488,7 @@ void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2)
 
 BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 {
-	MZ3_TRACE( L" OnEraseBkgnd()\n");
+	//MZ3_TRACE( L" OnEraseBkgnd()\n");
 
 	pDC->SetBkMode( TRANSPARENT );
 

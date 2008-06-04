@@ -1295,14 +1295,19 @@ void CTouchListCtrl::DrawItemFocusRect( const int nItem )
  * パンスクロール終了待ち
  *
  * 横スクロールが終了するのを待つ
+ * dwMilliseconds：(I)：タイムアウト時間(ms)
+ * 戻り値：	TRUE：パンスクロールが終了した
+ *			FALSE：タイムアウトかエラー
  */
-DWORD CTouchListCtrl::WaitForPanScroll( DWORD dwMilliseconds )
+BOOL CTouchListCtrl::WaitForPanScroll( DWORD dwMilliseconds )
 {
+	BOOL bRtn = TRUE;
 	if( m_bCanPanScroll && m_bUsePanScrollAnimation ){
 		DWORD dwRtn = WaitForSingleObject( m_hPanScrollEvent , dwMilliseconds );
 		MZ3_TRACE( L"WaitForSingleObject(0X%08X):%d\n" , m_hPanScrollEvent , dwRtn );
-		return dwRtn;
-	} else {
-		return WAIT_ABANDONED;
+		if( dwRtn != WAIT_OBJECT_0 ) {
+			bRtn = FALSE;
+		}
 	}
+	return bRtn;
 }
