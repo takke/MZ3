@@ -3542,7 +3542,7 @@ public:
 			}
 			
 			//開始フラグ
-			if( util::LineHasStringsNoCase( str, L"calendarTable01" ) ) {
+			if( util::LineHasStringsNoCase( str, L"<div class=\"calendarTable\">" ) ) {
 				findFlag2 = TRUE;
 			}
 
@@ -3559,12 +3559,8 @@ public:
 				BOOL findFlag3 = FALSE;
 				CMixiData data;
 					
-				//<img src="http://img.mixi.jp/img/calendaricon2/i_iv2.gif" width="16" height="16" align="middle" /><a href="view_event.pl?id=xxxx&comm_id=xxxx">XXXXXXXXXXXXXXX</a></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">9</font></td><td height="65" bgcolor="#FFFFFF" align="left" valign="top"><font style="color: #996600;">10</font>
-
-				//i_iv1.gif イベント・自分が立てた
-				//i_iv2.gif イベント・他人が立てた
-				if( util::LineHasStringsNoCase( target, L"i_iv1.gif" ) ||
-				    util::LineHasStringsNoCase( target, L"i_iv2.gif" ) ) 
+				//<a href="view_event.pl?id=nnnnn&comm_id=xxxxx">イベントタイトル</a> イベント
+				if( util::LineHasStringsNoCase( target, L"view_event.pl" )) 
 				{
 					util::GetBetweenSubString( target, L"\">", L"</a>", title );
 					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
@@ -3572,8 +3568,8 @@ public:
 					data.SetAccessType( ACCESS_EVENT );
 					findFlag3 = TRUE;
 				}
-				//i_bd.gif　誕生日
-				if( util::LineHasStringsNoCase( target, L"i_bd.gif" ) ) {
+				//<a href="show_friend.pl?id=xxxx">XXさん</a>　誕生日
+				if( util::LineHasStringsNoCase( target, L"show_friend.pl" ) ) {
 				
 					//show_friend.pl以降を取り出す
 					CString after;
@@ -3582,20 +3578,20 @@ public:
 					
 					title = L"【誕生日】" + title;
 					//飛ばし先のプロフィールURLを抽出
-					util::GetBetweenSubString( target, L"<a href=", L">", url );
+					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
 					data.SetURL( url );
 					data.SetAccessType( ACCESS_PROFILE );
 					findFlag3 = TRUE;
 				}
-				//i_sc-.gif　自分スケジュール
-				if( util::LineHasStringsNoCase( target, L"i_sc-.gif" ) ) {
-					util::GetBetweenSubString( target, L"align=\"absmiddle\" />", L"</a>", title );
+				//<a href="javascript:void(0);" onClick="MM_openBrWindow('view_schedule.pl?id=nnnnn','','width=760,height=640,toolbar=no,scrollbars=yes,left=10,top=10')">スケジュール</a>　自分スケジュール
+				if( util::LineHasStringsNoCase( target, L"view_schedule.pl" ) ) {
+					util::GetBetweenSubString( target, L"')\">", L"</a>", title );
 
 					title = L"【スケジュール】" + title;
 					//飛ばし先のスケジュール詳細がまだ未実装のため保留
-					//util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
+					util::GetBetweenSubString( target, L"MM_openBrWindow('", L"'", url );
 
-					data.SetAccessType( ACCESS_PROFILE );
+					data.SetAccessType( ACCESS_PLAIN );
 					findFlag3 = TRUE;
 				}
 
@@ -3609,38 +3605,21 @@ public:
 					out_.push_back( data );
 				}
 				
-				////最後の「<font style=」以降の文字を切り出す
-				CString after = target;
-				while( after.Find(_T("<font style=")) != -1 ) {
-					util::GetAfterSubString( after, L"<font style=", after );
+				//<td xxx>タグに日付があるのでその行の最後の<td>タグから切り出す
+				CString td = target;
+				bool bFindTd = false ;
+				while( util::GetAfterSubString( td, L"<td", td ) != -1 ) {
+					bFindTd = true;
 				}
-
-				//今日の場合　font-weight: bold;">21</font>
-				if( util::LineHasStringsNoCase( after, L"font-weight: bold;\">" ) ) {
-					CString date;
-					util::GetBetweenSubString( after, L"font-weight: bold;\">", L"</font>", date );
+				if( bFindTd ){
+					CString date = L"";
+					// ">"と"<"の間を日付として抽出する
+					if( util::GetBetweenSubString( td, L">", L"<", date ) == -1 ){
+						// "<"が見つからなければ行の最後までを抽出する
+						util::GetBetweenSubString( td, L">", L"\n" ,date );
+					}
 					strDate = YearMonth + date + L"日";
 				}
-				
-				//<font style="color: #996600;"> があれば平日 
-				if( util::LineHasStringsNoCase( after, L"color: #996600;\">" ) ) {
-					CString date;
-					util::GetBetweenSubString( after, L"color: #996600;\">", L"</font>", date );
-					strDate = YearMonth + date + L"日";
-				}
-				//<font style="color: #0000ff;">があれば土曜日
-				if( util::LineHasStringsNoCase( after, L"color: #0000ff;\">" ) ) {
-					CString date;
-					util::GetBetweenSubString( after, L"color: #0000ff;\">", L"</font>", date );
-					strDate = YearMonth + date + L"日";
-				}
-				//<font style="color: #ff0000;">があれば休日
-				if( util::LineHasStringsNoCase( after, L"color: #ff0000;\">" ) ) {
-					CString date;
-					util::GetBetweenSubString( after, L"color: #ff0000;\">", L"</font>", date );
-					strDate = YearMonth + date + L"日";
-				}
-
 			}
 		}
 
@@ -3667,7 +3646,7 @@ private:
 	<a href="show_calendar.pl?year=2007&month=11&pref_id=13">次の月&nbsp;&gt;&gt;</a>&nbsp;
 */
 		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=\"show_calendar.pl([?].+?)\">.*?(前の月|次の月).*?</a>" ) ) {
+		if( !util::CompileRegex( reg, L"<a href=\"show_calendar.pl([?].+?)\">.*?(前の月|当月|次の月).*?</a>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return false;
 		}
