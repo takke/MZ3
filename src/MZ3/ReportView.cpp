@@ -175,7 +175,7 @@ void CReportView::OnInitialUpdate()
 		DWORD dwStyle = m_list.GetStyle();
 		dwStyle &= ~LVS_TYPEMASK;
 		// デフォルトをレポート表示でオーナー固定描画にする
-		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED;
+		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_SINGLESEL;
 
 		// スタイルの更新
 		m_list.ModifyStyle(0, dwStyle);

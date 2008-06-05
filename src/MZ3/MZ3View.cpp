@@ -286,7 +286,7 @@ void CMZ3View::OnInitialUpdate()
 		DWORD dwStyle = m_categoryList.GetStyle();
 		dwStyle &= ~LVS_TYPEMASK;
 		// デフォルトをレポート表示でオーナー固定描画にする
-		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED;
+		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_SINGLESEL;
 
 		// スタイルの更新
 		m_categoryList.ModifyStyle(0, dwStyle);
@@ -328,7 +328,7 @@ void CMZ3View::OnInitialUpdate()
 		DWORD dwStyle = m_bodyList.GetStyle();
 		dwStyle &= ~LVS_TYPEMASK;
 		// デフォルトをレポート表示でオーナー固定描画にする
-		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED;
+		dwStyle |= LVS_REPORT | LVS_OWNERDRAWFIXED | LVS_SINGLESEL;
 
 		// スタイルの更新
 		m_bodyList.ModifyStyle(0, dwStyle);
@@ -5436,7 +5436,7 @@ void CMZ3View::MyUpdateControlStatus(void)
 void CMZ3View::OnRButtonDown(UINT nFlags, CPoint point)
 {
 #ifdef DEBUG
-	wprintf( L"OnRButtonUp\n" );
+	wprintf( L"CMZ3View::OnRButtonDown\n" );
 #endif
 
 	// ジェスチャ開始
@@ -5454,7 +5454,7 @@ void CMZ3View::OnRButtonDown(UINT nFlags, CPoint point)
 void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 {
 #ifdef DEBUG
-	wprintf( L"OnRButtonUp\n" );
+	wprintf( L"CMZ3View::OnRButtonUp\n" );
 #endif
 
 	// マウスキャプチャ終了

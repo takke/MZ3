@@ -10,6 +10,7 @@
  */
 #include "StdAfx.h"
 #include "TouchListCtrl.h"
+#include "MouseGestureManager.h"
 #include "MZ3.h"
 #include "util.h"
 #include "util_gui.h"
@@ -703,21 +704,23 @@ void CTouchListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
  */
 BOOL CTouchListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	// オフセットのズレを調整
-	MyAdjustDrawOffset();
-	// 慣性スクロール停止
-	MyResetAutoScrollTimer();
+	if ( !theApp.m_pMouseGestureManager->IsGestureMode() ) {
+		// オフセットのズレを調整
+		MyAdjustDrawOffset();
+		// 慣性スクロール停止
+		MyResetAutoScrollTimer();
 
-	// 遅延描画を行う
-	// 本来はスクロール位置が確定するメッセージで描画処理を行うべき
-	if( !m_bTimerRedraw ){
-		// 描画を停止
+		// 遅延描画を行う
+		// 本来はスクロール位置が確定するメッセージで描画処理を行うべき
+		if( !m_bTimerRedraw ){
+			// 描画を停止
 #ifndef WINCE
-		LockWindowUpdate();
+			LockWindowUpdate();
 #else
-		SetRedraw( FALSE );
+			SetRedraw( FALSE );
 #endif
-		MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW );
+			MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW );
+		}
 	}
 
 	MZ3_TRACE( L"CTouchListCtrl::OnMouseWheel( %5d ),Top=%5d\n", zDelta, GetTopIndex());
