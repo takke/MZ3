@@ -1651,6 +1651,11 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 		switch (pMsg->message) {
 		case WM_KEYUP:
 		case WM_KEYDOWN:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MOUSEWHEEL:
 			ResetIntervalTimer();
 			break;
 		default:
