@@ -556,10 +556,14 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 	qBoldFont = new CFont();
 
 #ifndef WM2003
+#ifdef WINCE
 	BYTE fontQuality = NONANTIALIASED_QUALITY;
 	if( IsVGA() == true ){
 		fontQuality = CLEARTYPE_QUALITY;
 	}
+#else
+	BYTE fontQuality = DEFAULT_QUALITY;
+#endif
 
 	VERIFY(normalFont->CreateFont(
 	   newHeight,					// nHeight
