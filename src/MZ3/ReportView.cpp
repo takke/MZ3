@@ -545,11 +545,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 //	TRACE( L"■---xdump end---\r\n" );
 
 	// 先頭に改行があったりと、色々フォーマットがおかしいので単一の文字列に連結する
-	CString str = _T("");
-	const int n = data->GetBodySize();
-	for( int i=0; i<n; i++ ){
-		str += data->GetBody(i);
-	}
+	CString str = data->GetBody();
 
 	// 改行分割して追加する
 	for (;;) {
@@ -2882,10 +2878,7 @@ afx_msg void CReportView::OnEditCopy()
 	str += m_currentData->GetDate();
 	str += _T("\r\n");
 
-	const int n = m_currentData->GetBodySize();
-	for( int i=0; i<n; i++ ){
-		str += m_currentData->GetBody(i);
-	}
+	str += m_currentData->GetBody();
 
 	// らんらんビュータグを消去
 	ViewFilter::RemoveRan2ViewTag( str );

@@ -71,7 +71,7 @@ inline CString MakeQuoteString( const CMixiData& mixi, QuoteType quoteType )
 
 	// –{•¶’Ç‰Á
 	for (size_t i=0; i<mixi.GetBodySize(); i++) {
-		CString line = mixi.GetBody(i);
+		CString line = mixi.GetBodyItem(i);
 		if( !line.IsEmpty() ) {
 			// line ‚ð \r\n ‚Å•ª—£B
 			int idx=-1;

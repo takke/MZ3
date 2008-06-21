@@ -55,11 +55,8 @@ inline CString MyGetItemByBodyColType( CMixiData* data, AccessTypeInfo::BODY_IND
 		break;
 	case AccessTypeInfo::BODY_INDICATE_TYPE_BODY:
 		// 本文を1行に変換して割り当て。
-		for( u_int i=0; i<data->GetBodySize(); i++ ) {
-			CString line = data->GetBody(i);
-			while( line.Replace( L"\r\n", L"" ) );
-			item.Append( line );
-		}
+		item = data->GetBody();
+		while( item.Replace( L"\r\n", L"" ) );
 		break;
 	default:
 		return L"";
@@ -3179,12 +3176,7 @@ void CMZ3View::OnOpenIntro()
 void CMZ3View::OnOpenSelfintro()
 {
 	// 本文（自己紹介）を表示
-	CString body = L"";
-	CMixiData& mixi = GetSelectedBodyItem();
-	for( u_int i=0; i<mixi.GetBodySize(); i++ ) {
-		body.Append( mixi.GetBody(i) );
-	}
-	MessageBox( body );
+	MessageBox( GetSelectedBodyItem().GetBody() );
 }
 
 /// 未読にする
@@ -4553,12 +4545,8 @@ void CMZ3View::OnMenuTwitterRead()
 	CMixiData& data = GetSelectedBodyItem();
 
 	// 本文を1行に変換して割り当て。
-	CString item;
-	for( u_int i=0; i<data.GetBodySize(); i++ ) {
-		CString line = data.GetBody(i);
-		while( line.Replace( L"\r\n", L"" ) );
-		item.Append( line );
-	}
+	CString item = data.GetBody();
+	while( item.Replace( L"\r\n", L"" ) );
 
 	item.Append( L"\r\n" );
 	item.Append( L"----\r\n" );
@@ -4571,7 +4559,7 @@ void CMZ3View::OnMenuTwitterRead()
 	if (data.GetChildrenSize()>=1) {
 		// その他の情報を追加
 		for (size_t i=0; i<data.GetChildrenSize(); i++) {
-			CString s = data.GetChild(i).GetBody(0);
+			CString s = data.GetChild(i).GetBodyItem(0);
 			mixi::ParserUtil::StripAllTags( s );
 			item.Append( s );
 		}

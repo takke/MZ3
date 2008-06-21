@@ -22,10 +22,7 @@ bool TwitterParserBase::ExtractLinks(CMixiData &data_)
 		return false;
 	}
 
-	CString target;
-	for (u_int i=0; i<data_.GetBodySize(); i++) {
-		target.Append( data_.GetBody(i) );
-	}
+	CString target = data_.GetBody();
 
 	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT ‚Í–³ŒÀƒ‹[ƒv–hŽ~
 		if( reg.exec(target) == false || reg.results.size() != 2 ) {

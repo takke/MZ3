@@ -200,8 +200,17 @@ public:
 	// body list
 	void	ClearBody()					{ m_StringArrayMap.Clear(L"body"); }
 	void	AddBody(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"body", str); }
-	LPCTSTR GetBody(int idx) const		{ return m_StringArrayMap.GetString(L"body", idx); }
+	LPCTSTR GetBodyItem(int idx) const	{ return m_StringArrayMap.GetString(L"body", idx); }
 	size_t	GetBodySize() const			{ return m_StringArrayMap.GetSize(L"body"); }
+	CString GetBody() const				{
+		CString s;
+		u_int n=this->GetBodySize();
+		for (u_int i=0; i<n; i++) {
+			s.Append( this->GetBodyItem(i) );
+		}
+		return s;
+	}
+
 
 	// image list
 	void	ClearImage()				{ m_StringArrayMap.Clear(L"image"); }
