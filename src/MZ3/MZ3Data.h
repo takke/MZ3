@@ -155,9 +155,9 @@ public:
 	}
 
 	// 日付時刻のアクセッサ
-	void SetDate(const CTime& t)			{ m_dateRaw = t; }
-	void SetDate(CString date)				{ m_dateText = date; }
-	CString GetDate();
+	void		 SetDate(const CTime& t)	{ m_dateRaw = t; }
+	void		 SetDate(CString date)		{ m_dateText = date; }
+	CString		 GetDate();
 	const CTime& GetDateRaw() const			{ return m_dateRaw;	}
 
 	// アクセス種別のアクセッサ
@@ -172,24 +172,24 @@ public:
 	//--- 汎用数値コンテナのアクセッサ
 
 	// author_id : 投稿者のID（オーナーIDに設定される場合もある）
-	void SetAuthorID(int authorId)		{ m_IntegerMap[L"author_id"] = authorId; }
-	int GetAuthorID() const				{ return FindIntegerMap(L"author_id", -1); }
+	void	SetAuthorID(int authorId)	{ m_IntegerMap[L"author_id"] = authorId; }
+	int		GetAuthorID() const			{ return FindIntegerMap(L"author_id", -1); }
 
 	// id : 記事ID
-	void SetID(int value)				{ m_IntegerMap[L"id"] = value; }
-	int GetID()	const					{ return FindIntegerMap(L"id", -1); }
+	void	SetID(int value)			{ m_IntegerMap[L"id"] = value; }
+	int		GetID()	const				{ return FindIntegerMap(L"id", -1); }
 
 	// comment_index : コメント番号
-	void SetCommentIndex(int value)		{ m_IntegerMap[L"comment_index"] = value; }
-	int GetCommentIndex() const			{ return FindIntegerMap(L"comment_index", -1); }
+	void	SetCommentIndex(int value)	{ m_IntegerMap[L"comment_index"] = value; }
+	int		GetCommentIndex() const		{ return FindIntegerMap(L"comment_index", -1); }
 
 	// comment_count : コメントの数
-	void SetCommentCount(int value)	    { m_IntegerMap[L"comment_count"] = value; }
-	int GetCommentCount() const			{ return FindIntegerMap(L"comment_count", 0); }
+	void	SetCommentCount(int value)	{ m_IntegerMap[L"comment_count"] = value; }
+	int		GetCommentCount() const		{ return FindIntegerMap(L"comment_count", 0); }
 
 	// owner_id : オーナーID（投稿者IDに設定される場合もある）
-	void SetOwnerID(int value)			{ m_IntegerMap[L"owner_id"] = value; }
-	int GetOwnerID() const				{ return FindIntegerMap(L"owner_id", -1); }
+	void	SetOwnerID(int value)		{ m_IntegerMap[L"owner_id"] = value; }
+	int		GetOwnerID() const			{ return FindIntegerMap(L"owner_id", -1); }
 
 	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
 	void	SetMyMixi(bool bMyMixi)		{ m_IntegerMap[L"my_mixi"] = bMyMixi ? 1 : 0; }
@@ -202,7 +202,7 @@ public:
 	void	AddBody(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"body", str); }
 	LPCTSTR GetBodyItem(int idx) const	{ return m_StringArrayMap.GetString(L"body", idx); }
 	size_t	GetBodySize() const			{ return m_StringArrayMap.GetSize(L"body"); }
-	CString GetBody() const				{
+	CString GetBody() const {
 		CString s;
 		u_int n=this->GetBodySize();
 		for (u_int i=0; i<n; i++) {
@@ -227,19 +227,19 @@ public:
 
 	//--- 汎用文字列コンテナのアクセッサ
 	// name : 名前
-	void SetName(CString name);
+	void	SetName(CString name);
 	CString GetName() const					{ return FindStringMap(L"name"); }
 
 	// author : 投稿者名
-	void SetAuthor(CString author);
+	void	SetAuthor(CString author);
 	CString GetAuthor() const				{ return FindStringMap(L"author"); }
 
 	// url
-	void SetURL(CString url)				{ m_StringMap[L"url"] = url; }
+	void	SetURL(CString url)				{ m_StringMap[L"url"] = url; }
 	CString GetURL() const					{ return FindStringMap(L"url"); }
 
 	// title : タイトル
-	void SetTitle(CString title);
+	void	SetTitle(CString title);
 	CString GetTitle()						{ return FindStringMap(L"title"); }
 
 	// browse_uri
@@ -247,7 +247,7 @@ public:
 	LPCTSTR GetBrowseUri()					{ return FindStringMap(L"browse_uri"); }
 
 	// post_address : POST用のアドレス
-	void SetPostAddress(LPCTSTR str)		{ m_StringMap[L"post_address"] = str; }
+	void	SetPostAddress(LPCTSTR str)		{ m_StringMap[L"post_address"] = str; }
 	LPCTSTR GetPostAddress()				{ return FindStringMap(L"post_address"); }
 
 	// opening_range : 公開範囲
@@ -255,11 +255,11 @@ public:
 	CString GetOpeningRange()				{ return FindStringMap(L"opening_range"); }
 
 	//--- 子要素操作
-	void	AddChild(const MZ3Data& child)	{ m_children.push_back(child); }	///< 子要素の追加
-	MZ3Data& GetChild( int idx )			{ return m_children[idx]; }			///< 子要素の取得
-	size_t	GetChildrenSize()				{ return m_children.size(); }		///< 子要素数の取得
-	MZ3DataList& GetChildren()				{ return m_children; }				///< 子要素リストの取得
 	void	ClearChildren()					{ m_children.clear(); }				///< 子要素の削除
+	void	AddChild(const MZ3Data& child)	{ m_children.push_back(child); }	///< 子要素の追加
+	size_t	GetChildrenSize()				{ return m_children.size(); }		///< 子要素数の取得
+	MZ3Data&	 GetChild( int idx )		{ return m_children[idx]; }			///< 子要素の取得
+	MZ3DataList& GetChildren()				{ return m_children; }				///< 子要素リストの取得
 
 	//--- debug 情報
 	int		GetInstanceCount()				{ return g_nMZ3DataInstances; }		///< MZ3Data インスタンス数
