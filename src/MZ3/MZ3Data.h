@@ -204,7 +204,7 @@ public:
 	size_t	GetBodySize() const			{ return m_StringArrayMap.GetSize(L"body"); }
 	CString GetBody() const {
 		CString s;
-		u_int n=this->GetBodySize();
+		unsigned int n=this->GetBodySize();
 		for (u_int i=0; i<n; i++) {
 			s.Append( this->GetBodyItem(i) );
 		}
