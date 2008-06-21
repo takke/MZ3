@@ -205,7 +205,7 @@ public:
 	CString GetBody() const {
 		CString s;
 		unsigned int n=this->GetBodySize();
-		for (u_int i=0; i<n; i++) {
+		for (unsigned int i=0; i<n; i++) {
 			s.Append( this->GetBodyItem(i) );
 		}
 		return s;
