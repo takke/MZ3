@@ -16,37 +16,36 @@ class TwitterParserBase : public mixi::MixiListParser
 protected:
 	static bool ExtractLinks( CMixiData& data_ );
 
-	/// id が降順になるように追加する
-	static bool InsertWithOrder( CMixiDataList& out_, const CMixiData& data_ )
-	{
-		int id = data_.GetID();
-
-		size_t j=0;
-		for (; j<out_.size(); j++) {
-			if (id > out_[j].GetID()) {
-				break;
-			}
-		}
-		out_.insert( out_.begin()+j, data_ );
-
-		// for performance tuning
-/*		if (out_.size()==1) {
-			for (int k=0; k<100; k++) {
-				out_.insert( out_.begin()+j, data );
-			}
-		}
-*/
-		return true;
-	}
-
-	/// 最大件数調整（末尾の余分なデータを削除する）
-	static bool EraseExtraItems( CMixiDataList& out_ )
+	/// out_ の先頭に new_list を追加する
+	static bool AppendNewList( CMixiDataList& out_, CMixiDataList& new_list )
 	{
 		const size_t LIST_MAX_SIZE = 1000;
-		if (out_.size()>LIST_MAX_SIZE) {
-			out_.erase( out_.begin()+LIST_MAX_SIZE, out_.end() );
+
+		if (new_list.empty()) {
+			return true;
 		}
 
+		size_t old_list_size = out_.size();
+		size_t new_list_size = new_list.size();
+
+		// 先にメモリ確保
+		out_.resize( out_.size() + new_list.size() );
+		// 旧データの移動
+		for (int i=old_list_size-1; i>=0; i--) {
+			out_[i+new_list_size] = out_[i];
+		}
+		// 新データの追加
+		for (u_int i=0; i<new_list_size; i++) {
+			out_[i] = new_list[i];
+		}
+
+/*		size_t old_list_size = out_.size();
+		new_list.reserve(new_list.size() + old_list_size);
+		for (u_int i=0; i<old_list_size && new_list.size()<=LIST_MAX_SIZE; i++) {
+			new_list.push_back(out_[i]);
+		}
+		out_ = new_list;
+*/
 		return true;
 	}
 };

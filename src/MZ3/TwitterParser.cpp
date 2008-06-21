@@ -63,6 +63,12 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 {
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
 
+	util::StopWatch sw;
+	sw.start();
+
+	// 新規に追加するデータ群
+	CMixiDataList new_list;
+
 	// html_ の文字列化
 	std::vector<TCHAR> text;
 	html_.TranslateToVectorBuffer( text );
@@ -162,8 +168,8 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 				// URL を抽出し、リンクにする
 				TwitterParserBase::ExtractLinks( data );
 
-				// id が降順になるように追加する。
-				TwitterParserBase::InsertWithOrder(out_, data);
+				// 一時リストに追加
+				new_list.push_back(data);
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
@@ -174,10 +180,11 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 		MZ3LOGGER_ERROR( util::FormatString( L"statuses not found... : %s", e.getMessage().c_str()) );
 	}
 
-	// 最大件数調整（末尾の余分なデータを削除する）
-	TwitterParserBase::EraseExtraItems(out_);
 
-	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() finished." );
+	// 生成したデータを出力に反映
+	TwitterParserBase::AppendNewList(out_, new_list);
+
+	MZ3LOGGER_DEBUG( util::FormatString(L"TwitterFriendsTimelineXmlParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
 	return true;
 }
 
@@ -190,6 +197,9 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"TwitterDirectMessagesXmlParser.parse() start." );
+
+	// 新規に追加するデータ群
+	CMixiDataList new_list;
 
 	// html_ の文字列化
 	std::vector<TCHAR> text;
@@ -296,8 +306,8 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 					data.AddChild( recipientData );
 				}
 
-				// id が降順になるように追加する。
-				TwitterParserBase::InsertWithOrder(out_, data);
+				// 一時リストに追加
+				new_list.push_back(data);
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
@@ -308,8 +318,8 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 		MZ3LOGGER_ERROR( util::FormatString( L"direct-messages not found... : %s", e.getMessage().c_str()) );
 	}
 
-	// 最大件数調整（末尾の余分なデータを削除する）
-	TwitterParserBase::EraseExtraItems(out_);
+	// 生成したデータを出力に反映
+	TwitterParserBase::AppendNewList(out_, new_list);
 
 	MZ3LOGGER_DEBUG( L"TwitterDirectMessagesXmlParser.parse() finished." );
 	return true;
