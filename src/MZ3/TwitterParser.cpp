@@ -19,7 +19,6 @@ bool TwitterParserBase::ExtractLinks(CMixiData &data_)
 	// 正規表現のコンパイル（一回のみ）
 	static MyRegex reg;
 	if( !util::CompileRegex( reg, L"(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
-		MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 		return false;
 	}
 

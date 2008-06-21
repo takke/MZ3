@@ -92,13 +92,13 @@ typedef std::map<MZ3String, int>		MZ3IntegerMap;
 class MZ3Data
 {
 protected:
-	ACCESS_TYPE		m_accessType;			///< オブジェクト種別
-	CString			m_dateText;				///< 日付時刻（文字列）：GetDate() で優先して返却される
-	CTime			m_dateRaw;				///< 日付時刻（メタ情報）
+	ACCESS_TYPE			m_accessType;		///< オブジェクト種別
+	CString				m_dateText;			///< 日付時刻（文字列）：GetDate() で優先して返却される
+	CTime				m_dateRaw;			///< 日付時刻（メタ情報）
 
-	CONTENT_TYPE	m_contentType;			///< Content-Type
+	CONTENT_TYPE		m_contentType;		///< Content-Type
 
-	MZ3DataList		m_children;				///< 子要素（コメントなど）
+	MZ3DataList			m_children;			///< 子要素（コメントなど）
 											///< コミュニティページ要素の場合は、
 											///< 要素0に list_bbs.pl のデータを持つ。
 
@@ -154,14 +154,17 @@ public:
 		m_linkPage.clear();
 	}
 
-	void SetDate(const CTime& t)		{ m_dateRaw = t; }
-	void SetDate(CString date)			{ m_dateText = date; }
+	// 日付時刻のアクセッサ
+	void SetDate(const CTime& t)			{ m_dateRaw = t; }
+	void SetDate(CString date)				{ m_dateText = date; }
 	CString GetDate();
-	const CTime& GetDateRaw() const		{ return m_dateRaw;	}
+	const CTime& GetDateRaw() const			{ return m_dateRaw;	}
 
-	void SetAccessType(ACCESS_TYPE type) { m_accessType = type; }
-	ACCESS_TYPE GetAccessType()	const	{ return m_accessType; }
+	// アクセス種別のアクセッサ
+	void SetAccessType(ACCESS_TYPE type)	{ m_accessType = type; }
+	ACCESS_TYPE GetAccessType()	const		{ return m_accessType; }
 
+	// Content-Typeのアクセッサ
 	void SetContentType(CONTENT_TYPE value)	{ m_contentType = value; }
 	CONTENT_TYPE GetContentType() const		{ return m_contentType; }
 
