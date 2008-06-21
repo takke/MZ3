@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="RegexTest"
+	Name="MZ3Test"
 	ProjectGUID="{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}"
-	RootNamespace="RegexTest"
+	RootNamespace="MZ3Test"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -235,7 +235,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\RegexTest.cpp"
+				RelativePath=".\MZ3Test.cpp"
 				>
 			</File>
 			<File

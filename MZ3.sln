@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MZ3", "src\MZ3\MZ3.vcproj",
 EndProject
 Project("{B900F1C2-3D47-4FEC-85B3-04AAF18C3634}") = "MZ3cab", "src\MZ3cab\MZ3cab.vddproj", "{1F943333-1B8B-4111-97DE-72FB9135296C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegexTest", "src\RegexTest\RegexTest.vcproj", "{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MZ3Test", "src\MZ3Test\MZ3Test.vcproj", "{EBEE77FF-E4F1-47F3-9CD5-C0F0D0135B3E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MZ3GroupFileEditor", "src\MZ3GroupFileEditor\MZ3GroupFileEditor.vcproj", "{F1936F3D-29BB-4FE3-BD77-8F98F3D623F1}"
 EndProject
