@@ -403,6 +403,9 @@ LRESULT CDownloadView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 				m_targetItemIndex = i;
 				util::MySetListCtrlItemFocusedAndSelected( m_list, m_targetItemIndex, true );	// 選択
 
+				// 再ダウンロード前のWAIT処理
+				Sleep(100L);
+
 				// ダウンロード開始
 				if (DoDownloadSelectedItem()) {
 					return TRUE;
