@@ -110,6 +110,7 @@ void Option::Sync(bool bSave)
 
 	//--- General
 	SyncIniValue(inifile, bSave, (int&)m_StartupMessageDoneType, "StartupMessageDoneType", "General" );
+	SyncIniValue(inifile, bSave, m_bConfirmOpenURL, "ConfirmOpenURL", "General" );
 	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
 
 	// 起動時に絵文字ファイルを自動取得する

@@ -48,6 +48,10 @@ BOOL COptionTabGeneral::OnInitDialog()
 	// 引用符号
 	SetDlgItemText( IDC_QUOTE_MARK_EDIT, theApp.m_optionMng.GetQuoteMark() );
 
+	// URLを開くときに確認する
+	CheckDlgButton( IDC_CONFIRM_OPEN_URL_CHECK, 
+		theApp.m_optionMng.m_bConfirmOpenURL ? BST_CHECKED : BST_UNCHECKED );
+
 	// mixi モバイル対応
 	CheckDlgButton( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK, 
 		theApp.m_optionMng.m_bConvertUrlForMixiMobile ? BST_CHECKED : BST_UNCHECKED );
@@ -69,6 +73,10 @@ void COptionTabGeneral::OnOK()
 	CString mark;
 	GetDlgItemText( IDC_QUOTE_MARK_EDIT, mark );
 	theApp.m_optionMng.SetQuoteMark( mark );
+
+	// URLを開くときに確認する
+	theApp.m_optionMng.m_bConfirmOpenURL = 
+		IsDlgButtonChecked( IDC_CONFIRM_OPEN_URL_CHECK ) == BST_CHECKED ? true : false;
 
 	// mixi モバイル対応
 	theApp.m_optionMng.m_bConvertUrlForMixiMobile = 

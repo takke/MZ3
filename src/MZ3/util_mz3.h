@@ -153,16 +153,18 @@ inline CString ConvertToMixiAutoLoginUrl( LPCTSTR url )
  */
 inline void OpenBrowserForUrl( LPCTSTR url )
 {
-	// 確認画面
-	CString msg;
-	msg.Format( 
-		L"下記のURLをブラウザで開きます。\n\n"
-		L"%s\n\n"
-		L"よろしいですか？", url );
-	if( MessageBox( theApp.m_pMainWnd->m_hWnd, msg, MZ3_APP_NAME, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
-	{
-		// YES ボタン以外なので終了
-		return;
+	if( theApp.m_optionMng.m_bConfirmOpenURL) {
+		// 確認画面
+		CString msg;
+		msg.Format( 
+			L"下記のURLをブラウザで開きます。\n\n"
+			L"%s\n\n"
+			L"よろしいですか？", url );
+		if( MessageBox( theApp.m_pMainWnd->m_hWnd, msg, MZ3_APP_NAME, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION ) != IDYES )
+		{
+			// YES ボタン以外なので終了
+			return;
+		}
 	}
 
 	// 自動ログイン変換
