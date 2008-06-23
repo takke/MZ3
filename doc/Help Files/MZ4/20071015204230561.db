@@ -20,7 +20,7 @@ Context=IDH_HELP10
 <P></FONT>&nbsp;</P>
 <P><FONT face="ＭＳ ゴシック">　●操作タブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/34_設定画面_操作.jpg"><IMG height=200 src="Capture/34_設定画面_操作.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
-<P><BR>　　【左ソフトキーでメニューを開く】チェックボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　【長押し判定時間】テキストボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　【Xcrawl 拡張機能を有効にする】チェックボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません</P>
+<P><BR>　　【左ソフトキーでメニューを開く】チェックボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　【長押し判定時間】テキストボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　【Xcrawl 拡張機能を有効にする】チェックボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　【左右スライドで項目やタブを切り替える】チェックボックス<BR>　　　マウスによるグラブ＆スクロールで画面を切り替えるか否かを設定します<BR>　　【項目やタブでアニメーション】チェックボックス<BR>　　　画面スライド時にアニメーション表示するか否かを設定します</P>
 <P>&nbsp;</P>
 <P>　●メイン画面タブ</P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/39_設定画面_メイン画面.jpg"><IMG height=200 src="Capture/39_設定画面_メイン画面.jpg"></FONT></A></P>
@@ -28,7 +28,7 @@ Context=IDH_HELP10
 <P>&nbsp;</P><FONT face="ＭＳ ゴシック">
 <P><FONT face="ＭＳ ゴシック">　●レポートタブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/35_設定画面_レポート画面.jpg"><IMG height=200 src="Capture/35_設定画面_レポート画面.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
-<P><BR>&nbsp;&nbsp;&nbsp; 一度のスクロールで移動する行数を指定します<BR>&nbsp;&nbsp;&nbsp; 【スクロール】<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ・行単位<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 指定行分スクロールを行います<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ・ページ<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1ページ毎スクロールします<BR>&nbsp;&nbsp;&nbsp; 【項目切替時にアニメーションする】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 一覧で表示項目を切り替える際，アニメーション表示するか否かを設定します<BR>&nbsp;&nbsp;&nbsp; 【左右スライドで項目を切り替える】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; レポート画面で左右へのグラブ＆スクロールによる画面切替を行うか否かを設定します<BR>&nbsp;&nbsp;&nbsp; 【ダブルクリックで項目を切り替える】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; レポート画面でダブルクリックによる画面切替を行うか否かを設定します</P>
+<P><BR>&nbsp;&nbsp;&nbsp; 一度のスクロールで移動する行数を指定します<BR>&nbsp;&nbsp;&nbsp; 【スクロール】<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ・行単位<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 指定行分スクロールを行います<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ・ページ<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1ページ毎スクロールします<BR>&nbsp;&nbsp;&nbsp; 【ダブルクリックで項目を切り替える】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; レポート画面でダブルクリックによる画面切替を行うか否かを設定します</P>
 <P></FONT>&nbsp;</P>
 <P><FONT face="ＭＳ ゴシック">　●取得タブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/36_設定画面_取得.jpg"><IMG height=200 src="Capture/36_設定画面_取得.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
