@@ -327,7 +327,7 @@ bool RssAutoDiscoveryParser::parseLinkRecursive( CMixiDataList& out_, const xml2
 			if (item.getChildrenCount()>0) {
 				parseLinkRecursive(out_, item);
 			}
-		} catch (xml2stl::NodeNotFoundException& e) {
+		} catch (xml2stl::NodeNotFoundException&) {
 			continue;
 		}
 	}
