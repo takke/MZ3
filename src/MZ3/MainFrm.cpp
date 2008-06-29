@@ -507,7 +507,7 @@ void CMainFrame::OnSettingGeneral()
 
 		// アクティブページの設定
 		if (s_iLastActivePage < 0 || s_iLastActivePage >= cPropSht.GetPageCount()) {
-			s_iLastActivePage = 1;	// 初期化
+			s_iLastActivePage = 0;	// 初期化
 		}
 		cPropSht.SetActivePage(s_iLastActivePage);
 		if (cPropSht.DoModal() == IDOK) {
