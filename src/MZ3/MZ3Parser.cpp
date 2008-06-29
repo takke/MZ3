@@ -288,7 +288,12 @@ bool RssAutoDiscoveryParser::parse( CMixiDataList& out_, const std::vector<TCHAR
 	// html/head/link[rel=alternate,type=application/rss+xml] を取得する
 	// XHTML とは限らないので、全ての link タグを対象とする
 	try {
-		parseLinkRecursive( out_, root.getNode(L"html") );
+		// html/... と HTML/... で試行する
+		try {
+			parseLinkRecursive( out_, root.getNode(L"HTML") );
+		} catch (xml2stl::NodeNotFoundException&) {
+			parseLinkRecursive( out_, root.getNode(L"html") );
+		}
 	} catch (xml2stl::NodeNotFoundException& e) {
 		MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
 		rval = false;
