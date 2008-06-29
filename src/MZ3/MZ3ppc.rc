@@ -274,6 +274,7 @@ BEGIN
         END
         MENUITEM "項目を削除",                       ID_REMOVE_CATEGORY_ITEM
         MENUITEM "項目を変更...",                    ID_EDIT_CATEGORY_ITEM
+        MENUITEM "RSSフィードの追加",                  ID_ADD_RSS_FEED_MENU
     END
 END
 

@@ -135,6 +135,7 @@ enum ACCESS_TYPE {
 	//--- RSS Reader
 	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
 	ACCESS_RSS_READER_ITEM,				///< RSS Reader Item
+	ACCESS_RSS_READER_AUTO_DISCOVERY,	///< RSS Reader; RSS AutoDiscovery 用Item
 
 	//--- その他
 	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ

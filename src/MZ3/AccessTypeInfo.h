@@ -47,6 +47,7 @@ public:
 		ENCODING_SJIS = 0,
 		ENCODING_EUC  = 1,
 		ENCODING_UTF8 = 2,
+		ENCODING_NOCONVERSION = 3,
 	};
 
 	/// ボディのカラム用データ

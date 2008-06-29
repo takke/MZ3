@@ -382,6 +382,7 @@ public:
 	void MyUpdateFocus(void);
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
+	afx_msg void OnAddRssFeedMenu();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

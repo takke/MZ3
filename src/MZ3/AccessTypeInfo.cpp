@@ -716,6 +716,18 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;
 
+	type = ACCESS_RSS_READER_AUTO_DISCOVERY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "RSS"
+		, L"RSS AutoDiscovery"
+		, REQUEST_METHOD_GET
+		);
+	// no-cache
+//	m_map[type].cacheFilePattern = L"rss\\{urlafter://}.rss";
+	m_map[type].requestEncoding = ENCODING_NOCONVERSION;
+	m_map[type].serializeKey = "RSS_AUTO_DISCOVERY";
+
 	//------------------------------------------------------------------
 	//--- ‚»‚Ì‘¼
 	type = ACCESS_INVALID;

@@ -51,7 +51,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_TWITTER_FAVORITES:			return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );	// 暫定
 	case ACCESS_TWITTER_DIRECT_MESSAGES:	return twitter::TwitterDirectMessagesXmlParser::parse( body, html );
-	case ACCESS_RSS_READER_FEED:			return mz3parser::RssParser::parse( body, html );
+	case ACCESS_RSS_READER_FEED:			return mz3parser::RssFeedParser::parse( body, html );
 	default:
 		{
 			CString msg;
@@ -90,17 +90,13 @@ void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	}
 }
 
-bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
+bool RssFeedParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_, CString* pStrTitle )
 {
-	MZ3LOGGER_DEBUG( L"RssParser.parse() start." );
-
-	// html_ の文字列化
-	std::vector<TCHAR> text;
-	html_.TranslateToVectorBuffer( text );
+	MZ3LOGGER_DEBUG( L"RssFeedParser.parse() start." );
 
 	// XML 解析
 	xml2stl::Container root;
-	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text_ )) {
 		MZ3LOGGER_ERROR( L"XML 解析失敗" );
 		return false;
 	}
@@ -135,24 +131,12 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	} catch (xml2stl::NodeNotFoundException&) {
 	}
 
+	bool rval = true;
 	switch (rss_type) {
 	case RSS_TYPE_1_0:
 //		parseRss1(out_, root);
 		// rdf:RDF/channel に対する処理
 
-		// Feed 自体の情報を取得する場合は下記のコードを参考に。
-/*		try {
-			const xml2stl::Node& channel = root.getNode( L"rdf:RDF" ).getNode(L"channel");
-
-			CString s = channel.getNode(L"title").getTextAll().c_str();
-			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( s );
-			out_.SetTitle( s );
-			out_.SetAuthor( s );
-
-		} catch (xml2stl::NodeNotFoundException& e) {
-			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
-		}
-*/
 		// rdf:RDF/item に対する処理
 		try {
 			const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
@@ -170,7 +154,7 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				CString description = item.getNode(L"description").getTextAll().c_str();
 
 				// 整形して格納する
-				RssParser::setDescriptionTitle(data, description, title);
+				RssFeedParser::setDescriptionTitle(data, description, title);
 
 				// link = rdf:about
 				CString s = item.getProperty(L"rdf:about").c_str();
@@ -187,8 +171,16 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				out_.push_back(data);
 			}
 
+			// タイトル取得
+			if (pStrTitle!=NULL) {
+				const xml2stl::Node& channel = rdf.getNode(L"channel");
+				CString title = channel.getNode(L"title").getTextAll().c_str();
+				(*pStrTitle) = title;
+			}
+
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+			rval = false;
 		}
 		break;
 
@@ -212,7 +204,7 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				CString title = item.getNode(L"title").getTextAll().c_str();
 
 				// 整形して格納する
-				RssParser::setDescriptionTitle(data, description, title);
+				RssFeedParser::setDescriptionTitle(data, description, title);
 
 				// link
 				CString link = item.getNode(L"link").getTextAll().c_str();
@@ -236,22 +228,30 @@ bool RssParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 				out_.push_back(data);
 			}
 
+			// タイトル取得
+			if (pStrTitle!=NULL) {
+				CString title = channel.getNode(L"title").getTextAll().c_str();
+				(*pStrTitle) = title;
+			}
+
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+			rval = false;
 		}
 
 		break;
 
 	default:
 		MZ3LOGGER_ERROR(L"未サポートのRSSです");
+		rval = false;
 		break;
 	}
 
-	MZ3LOGGER_DEBUG( L"RssParser.parse() finished." );
-	return true;
+	MZ3LOGGER_DEBUG( L"RssFeedParser.parse() finished." );
+	return rval;
 }
 
-void RssParser::setDescriptionTitle( CMixiData& data, CString description, CString title )
+void RssFeedParser::setDescriptionTitle( CMixiData& data, CString description, CString title )
 {
 	// description の整形
 	mixi::ParserUtil::ReplaceEntityReferenceToCharacter( description );
@@ -270,6 +270,69 @@ void RssParser::setDescriptionTitle( CMixiData& data, CString description, CStri
 	title += description;
 	title = title.Trim();
 	data.SetTitle( title );
+}
+
+bool RssAutoDiscoveryParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_ )
+{
+	MZ3LOGGER_DEBUG( L"RssAutoDiscoveryParser.parse() start." );
+
+	// XML 解析
+	xml2stl::Container root;
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text_ )) {
+		MZ3LOGGER_ERROR( L"XML 解析失敗" );
+		return false;
+	}
+
+	bool rval = true;
+
+	// html/head/link[rel=alternate,type=application/rss+xml] を取得する
+	// XHTML とは限らないので、全ての link タグを対象とする
+	try {
+		parseLinkRecursive( out_, root.getNode(L"html") );
+	} catch (xml2stl::NodeNotFoundException& e) {
+		MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+		rval = false;
+	}
+
+	MZ3LOGGER_DEBUG( L"RssAutoDiscoveryParser.parse() finished." );
+	return rval;
+}
+
+bool RssAutoDiscoveryParser::parseLinkRecursive( CMixiDataList& out_, const xml2stl::Node& node )
+{
+	for (unsigned int i=0; i<node.getChildrenCount(); i++) {
+		const xml2stl::Node& item = node.getNode(i);
+
+		try {
+			if (item.getName() == L"link" &&
+				item.getProperty(L"rel")==L"alternate" &&
+				item.getProperty(L"type")==L"application/rss+xml")
+			{
+				// 追加する
+				CMixiData data;
+
+				CString title = item.getProperty(L"title").c_str();
+				CString href = item.getProperty(L"href").c_str();
+
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
+
+				data.SetTitle(title);
+				data.SetURL(href);
+
+				data.SetAccessType(ACCESS_RSS_READER_FEED);
+				out_.push_back(data);
+				continue;
+			}
+
+			if (item.getChildrenCount()>0) {
+				parseLinkRecursive(out_, item);
+			}
+		} catch (xml2stl::NodeNotFoundException& e) {
+			continue;
+		}
+	}
+
+	return true;
 }
 
 

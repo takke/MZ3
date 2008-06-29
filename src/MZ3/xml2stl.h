@@ -8,6 +8,7 @@
  *   - entity decoding.
  *   - supports XPath subset, like "feed/entry/link/@href"
  */
+#pragma once
 #include <stdio.h>
 #include <string>
 #include <sstream>

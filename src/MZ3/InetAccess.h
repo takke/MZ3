@@ -77,6 +77,7 @@ public:
 		ENCODING_SJIS = 0,
 		ENCODING_EUC  = 1,
 		ENCODING_UTF8 = 2,
+		ENCODING_NOCONVERSION = 3,
 	};
 	ENCODING			m_encodingFrom;			///< 通信取得データのエンコーディング（デフォルトは mixi HTML なので EUC-JP）
 

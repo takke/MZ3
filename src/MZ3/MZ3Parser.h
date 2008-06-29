@@ -9,6 +9,7 @@
 #include "MyRegex.h"
 #include "HtmlArray.h"
 #include "MixiParserUtil.h"
+#include "xml2stl.h"
 
 /// MZ3用HTMLパーサ
 namespace mz3parser {
@@ -593,11 +594,28 @@ namespace mz3parser {
 /**
  * [content] RSS パーサ
  */
-class RssParser : public mixi::MixiContentParser
+class RssFeedParser : public mixi::MixiContentParser
 {
 public:
-	static bool parse( CMixiDataList& mixi, const CHtmlArray& html_ );
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ ) {
+		// html_ の文字列化
+		std::vector<TCHAR> text;
+		html_.TranslateToVectorBuffer( text );
+
+		return RssFeedParser::parse( out_, text );
+	}
+	static bool parse( CMixiDataList& out_, const std::vector<TCHAR>& text_, CString* pStrTitle=NULL );
 	static void setDescriptionTitle( CMixiData& data, CString description, CString title );
+};
+
+/**
+ * [content] RSS AutoDiscovery パーサ
+ */
+class RssAutoDiscoveryParser : public mixi::MixiContentParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const std::vector<TCHAR>& text_ );
+	static bool parseLinkRecursive( CMixiDataList& out_, const xml2stl::Node& node );
 };
 
 }//namespace mz3parser

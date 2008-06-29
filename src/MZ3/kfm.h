@@ -79,6 +79,9 @@ private:
 /// UTF-8‚©‚çMBCS‚Ö‚Ì•ÏŠ·
 int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output );
 
+/// UTF-8‚©‚çUCS2(SJIS)‚Ö‚Ì•ÏŠ·
+int utf8_to_ucs2( const kf_buf_type& input, std::vector<TCHAR>& output );
+
 /// UCS2(SJIS) ‚©‚ç UTF-8 ‚Ö‚Ì•ÏŠ·
 bool ucs2_to_utf8(const CString& strText, CStringA& strResult);
 
