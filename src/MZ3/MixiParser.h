@@ -3530,8 +3530,8 @@ public:
 
 			const CString& str = html_.GetAt(i);
 
-			//</form>‚ªŒ»‚ê‚½‚ç‰ğÍI—¹
-			if (str.Find(_T("</form>")) != -1) {
+			//<div class="calendarNavi bottom">‚ªŒ»‚ê‚½‚ç‰ğÍI—¹
+			if( util::LineHasStringsNoCase( str, L"<div class=\"calendarNavi bottom\">" ) ) {
 				break;
 			}
 			
