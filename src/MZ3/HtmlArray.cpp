@@ -155,7 +155,7 @@ BOOL CHtmlArray::IsPostSucceeded( WRITEVIEW_TYPE type )
 			break;
 
 		default:
-			if (line.Find(_T("反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。")) != -1) {
+			if (line.Find(L"書き込みが完了しました。反映に時間がかかることがあります。") != -1) {
 				return TRUE;
 			}
 			break;
