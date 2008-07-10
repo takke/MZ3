@@ -3562,7 +3562,9 @@ public:
 				//<a href="view_event.pl?id=nnnnn&comm_id=xxxxx">イベントタイトル</a> イベント
 				if( util::LineHasStringsNoCase( target, L"view_event.pl" )) 
 				{
-					util::GetBetweenSubString( target, L"\">", L"</a>", title );
+					CString subtarget;
+					util::GetAfterSubString( target , L"<a href=\"" , subtarget );
+					util::GetBetweenSubString( subtarget, L"\">", L"</a>", title );
 					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
 					
 					data.SetAccessType( ACCESS_EVENT );
