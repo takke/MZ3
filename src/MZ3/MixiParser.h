@@ -2923,7 +2923,10 @@ public:
 				const CString& line0 = html_.GetAt( i-1 );
 				// line0: <td>‚È‚Ü‚¦</td>
 				if( util::GetBetweenSubString( line0, L"<td>", L"</td>", buf ) < 0 ) {
-					continue;
+					const CString& line1 = html_.GetAt( i-2 );
+					if( util::GetBetweenSubString( line1, L"<td>", L" \n", buf ) < 0 ) {
+						continue;
+					}
 				}
 				data.SetName(buf);
 				data.SetAuthor(buf);
