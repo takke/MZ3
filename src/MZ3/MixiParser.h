@@ -3569,8 +3569,11 @@ public:
 					util::GetAfterSubString( target , L"<a href=\"" , subtarget );
 					util::GetBetweenSubString( subtarget, L"\">", L"</a>", title );
 					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
-					
-					data.SetAccessType( ACCESS_EVENT );
+					if( util::LineHasStringsNoCase( target, L"<li class=\"join\">" )) {
+						data.SetAccessType( ACCESS_EVENT_JOIN );
+					} else {
+						data.SetAccessType( ACCESS_EVENT );
+					}
 					findFlag3 = TRUE;
 				}
 				//<a href="show_friend.pl?id=xxxx">XXさん</a>　誕生日
@@ -3585,18 +3588,18 @@ public:
 					//飛ばし先のプロフィールURLを抽出
 					util::GetBetweenSubString( target, L"<a href=\"", L"\">", url );
 					data.SetURL( url );
-					data.SetAccessType( ACCESS_PROFILE );
+					data.SetAccessType( ACCESS_BIRTHDAY );
 					findFlag3 = TRUE;
 				}
 				//<a href="javascript:void(0);" onClick="MM_openBrWindow('view_schedule.pl?id=nnnnn','','width=760,height=640,toolbar=no,scrollbars=yes,left=10,top=10')">スケジュール</a>　自分スケジュール
 				if( util::LineHasStringsNoCase( target, L"view_schedule.pl" ) ) {
 					util::GetBetweenSubString( target, L"')\">", L"</a>", title );
 
-					title = L"【スケジュール】" + title;
+					title = L"【予定】" + title;
 					//飛ばし先のスケジュール詳細がまだ未実装のため保留
 					util::GetBetweenSubString( target, L"MM_openBrWindow('", L"'", url );
 
-					data.SetAccessType( ACCESS_PLAIN );
+					data.SetAccessType( ACCESS_SCHEDULE );
 					findFlag3 = TRUE;
 				}
 

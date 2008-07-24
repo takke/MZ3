@@ -419,6 +419,16 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/view_event.pl?id=xxx&comment_count=20&comm_id=xxx
 	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
 
+	type = ACCESS_EVENT_JOIN;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "mixi"
+		, L"イベント"
+		, REQUEST_METHOD_GET
+		);
+	// url(1) : http://mixi.jp/view_event.pl?id=xxx&comment_count=20&comm_id=xxx
+	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
+
 	type = ACCESS_EVENT_MEMBER;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY		// v0.9.1 時点ではReportViewの[ページ]からの遷移のみサポート
@@ -483,11 +493,29 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
 	m_map[type].cacheFilePattern = L"profile\\{urlparam:id}.html";
 
+	type = ACCESS_BIRTHDAY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "mixi"
+		, L"プロフィール"
+		, REQUEST_METHOD_GET
+		);
+	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
+	m_map[type].cacheFilePattern = L"profile\\{urlparam:id}.html";
+
 	type = ACCESS_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY		// 本来はコミュニティトップページ。v0.9.1 時点ではCMZ3View内でトピック一覧に切り替えている
 		, "mixi"
 		, L"コミュニティ"
+		, REQUEST_METHOD_GET
+		);
+
+	type = ACCESS_SCHEDULE;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "mixi"
+		, L"追加した予定"
 		, REQUEST_METHOD_GET
 		);
 

@@ -88,6 +88,9 @@ inline CString GetLogIdString( const CMixiData& mixi )
 	case ACCESS_EVENT:
 		logId.Format(_T("v%d"), mixi.GetID());
 		break;
+	case ACCESS_EVENT_JOIN:
+		logId.Format(_T("j%d"), mixi.GetID());
+		break;
 	case ACCESS_ENQUETE:
 		logId.Format(_T("e%d"), mixi.GetID());
 		break;

@@ -241,6 +241,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			switch (data->GetAccessType()) {
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
+			case ACCESS_EVENT_JOIN:
 			case ACCESS_ENQUETE:
 				// コミュニティ、イベント、アンケート
 				// 既読数に応じて色づけ。
@@ -293,6 +294,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				break;
 
 			case ACCESS_PROFILE:
+			case ACCESS_BIRTHDAY:
 				// ユーザプロフィール
 				// マイミクなら青にする。
 				if( data->IsMyMixi() ) {

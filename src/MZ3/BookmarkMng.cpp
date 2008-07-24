@@ -73,6 +73,9 @@ void Bookmark::Save( CMixiDataList& bookmark )
 		case ACCESS_EVENT:
 			type = _T("v");
 			break;
+		case ACCESS_EVENT_JOIN:
+			type = _T("j");
+			break;
 		}
 		buf.Format(_T("%s<>%d<>%s<>%s\n"), type, data.GetID(), data.GetName(), data.GetTitle());
 		fputws(buf, fp);
@@ -96,6 +99,8 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 			data.SetAccessType( ACCESS_ENQUETE );
 		}else if (type == _T("v")) {
 			data.SetAccessType( ACCESS_EVENT );
+		}else if (type == _T("j")) {
+			data.SetAccessType( ACCESS_EVENT_JOIN );
 		}
 	}
 	{
@@ -124,6 +129,7 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 			uri.Format( _T("view_enquete.pl?id=%d"), data.GetID() );
 			break;
 		case ACCESS_EVENT:
+		case ACCESS_EVENT_JOIN:
 			uri.Format( _T("view_event.pl?id=%d"), data.GetID() );
 			break;
 		}

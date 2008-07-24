@@ -183,6 +183,7 @@ public:
 		switch( mixi.GetAccessType() ) {
 		case ACCESS_BBS:
 		case ACCESS_EVENT:
+		case ACCESS_EVENT_JOIN:
 			post.AppendPostBody( "submit=confirm&packed=" );
 			post.AppendPostBody( post.GetPacked() );
 			post.AppendPostBody( "&comment=" );

@@ -422,6 +422,7 @@ void CReportView::SetData(const CMixiData& data)
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_PROFILE:
+	case ACCESS_BIRTHDAY:
 		break;
 	default:
 		if( !m_data.GetName().IsEmpty() ) {
@@ -498,7 +499,7 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// プロフィール表示の場合は常に先頭項目を選択
-	if (m_data.GetAccessType() == ACCESS_PROFILE) {
+	if (m_data.GetAccessType() == ACCESS_PROFILE || m_data.GetAccessType() == ACCESS_BIRTHDAY ) {
 		focusItem = 0;
 	}
 
@@ -1246,6 +1247,7 @@ void CReportView::OnAddBookmark()
 
 	if (m_data.GetAccessType() != ACCESS_BBS &&
 		m_data.GetAccessType() != ACCESS_EVENT &&
+		m_data.GetAccessType() != ACCESS_EVENT_JOIN &&
 		m_data.GetAccessType() != ACCESS_ENQUETE) {
 			::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
 			return;
@@ -1366,8 +1368,10 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_EVENT_JOIN:
 	case ACCESS_EVENT_MEMBER:
 	case ACCESS_PROFILE:
+	case ACCESS_BIRTHDAY:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
 

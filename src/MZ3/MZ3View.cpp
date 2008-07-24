@@ -332,10 +332,13 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
+		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 6);
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
+		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
 		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
 
 		// カラム作成
@@ -408,6 +411,9 @@ inline int MyGetBodyListDefaultIconIndex( const CMixiData& mixi )
 	case ACCESS_BBS:		iconIndex = 0;	break;
 	case ACCESS_EVENT:		iconIndex = 1;	break;
 	case ACCESS_ENQUETE:	iconIndex = 2;	break;
+	case ACCESS_EVENT_JOIN:	iconIndex = 3;	break;
+	case ACCESS_BIRTHDAY:	iconIndex = 4;	break;
+	case ACCESS_SCHEDULE:	iconIndex = 5;  break;
 	default:				iconIndex = -1;	break;	// アイコンなし
 	}
 	return iconIndex;
@@ -2636,6 +2642,7 @@ void CMZ3View::OnOpenBrowser()
 
 	switch( GetSelectedBodyItem().GetAccessType() ) {
 	case ACCESS_PROFILE:			// プロフィール
+	case ACCESS_BIRTHDAY:			// 誕生日プロフィール
 		{
 			CString name = GetSelectedBodyItem().GetName();
 			switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
@@ -2985,7 +2992,9 @@ void CMZ3View::OnViewLog()
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_EVENT_JOIN:
 	case ACCESS_PROFILE:
+	case ACCESS_BIRTHDAY:
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
@@ -3325,6 +3334,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
+	case ACCESS_EVENT_JOIN:
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
@@ -3392,6 +3402,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		break;
 
 	case ACCESS_PROFILE:
+	case ACCESS_BIRTHDAY:
 		// プロフィールなら、カテゴリ項目に応じて処理を変更する。（暫定）
 		switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
 		case ACCESS_LIST_INTRO:				// 紹介文
@@ -3957,6 +3968,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 			switch( mixi.GetAccessType() ) {
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
+			case ACCESS_EVENT_JOIN:
 			case ACCESS_ENQUETE:
 				// コミュニティ、イベント、アンケートなので、
 				// 該当トピックのコメントを全て既読なら既読と判定する。

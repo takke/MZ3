@@ -70,9 +70,12 @@ IDR_MZ3TYPE             ICON                    "res\\MZ3Doc.ico"
 IDI_NO_PHOTO_ICON       ICON                    "res\\NoPhotoIcon.ico"
 IDI_PHOTO_ICON          ICON                    "res\\photo.ico"
 IDI_TOPIC_ICON          ICON                    "res\\topic.ico"
-IDI_EVENT_ICON          ICON                    "res\\event.ico"
 IDI_ENQUETE_ICON        ICON                    "res\\enquete.ico"
 IDI_DOWNLOADED_ICON     ICON                    "res\\downloaded.ico"
+IDI_EVENT_JOIN_ICON     ICON                    "res\\event_join.ico"
+IDI_BIRTHDAY_ICON       ICON                    "res\\birthday.ico"
+IDI_EVENT_ICON          ICON                    "res\\event.ico"
+IDI_SCHEDULE_ICON       ICON                    "res\\schedule.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

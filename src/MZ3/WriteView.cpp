@@ -401,6 +401,7 @@ void CWriteView::StartEntryPost()
 			switch (m_data->GetAccessType()) {
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
+			case ACCESS_EVENT_JOIN:
 			case ACCESS_ENQUETE:
 				url.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
 				break;
@@ -1114,6 +1115,7 @@ bool CWriteView::IsEnableAttachImageMode(void)
 		switch (m_data->GetAccessType()) {
 		case ACCESS_BBS:
 		case ACCESS_EVENT:
+		case ACCESS_EVENT_JOIN:
 			return true;
 		}
 		return false;
