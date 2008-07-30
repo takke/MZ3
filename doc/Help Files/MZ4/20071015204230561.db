@@ -12,7 +12,7 @@ Context=IDH_HELP10
 <P></FONT>&nbsp;</P>
 <P><FONT face="ＭＳ ゴシック">　●一般タブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/32_設定画面_一般.jpg"><IMG height=200 src="Capture/32_設定画面_一般.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
-<P><BR>　　【新着メッセージ、コメントチェック】チェックボックス<BR>　　　起動時に新着メッセージ, コメントを取得する場合はチェックをオンにします<BR>　　【引用記号】<BR>　　　書き込み画面で引用をする際に使用する引用符を設定します<BR>　　【mixiモバイルのURLに変換する】チェックボックス<BR>　　　MZ3.i 用設定項目のため，MZ4 では使用しません<BR>　　　※ON にしても PC ブラウザから mixi モバイルにアクセスできないため</P>
+<P><BR>&nbsp;&nbsp;&nbsp; 【新着メッセージ、コメントチェック】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 起動時に新着メッセージ, コメントを取得する場合はチェックをオンにします<BR>&nbsp;&nbsp;&nbsp; 【引用記号】<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 書き込み画面で引用をする際に使用する引用符を設定します<BR>&nbsp;&nbsp;&nbsp; 【URLを開くときに確認する】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; チェックを外すと URL 選択時に確認せずにブラウザで開きます<BR>&nbsp;&nbsp;&nbsp; 【mixiモバイルのURLに変換する】チェックボックス<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MZ3.i 用設定項目のため，MZ4 では使用しません<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ※ON にしても PC ブラウザから mixi モバイルにアクセスできないため</P>
 <P></FONT>&nbsp;</P>
 <P><FONT face="ＭＳ ゴシック">　●表示タブ</FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/33_設定画面_表示.jpg"><IMG height=200 src="Capture/33_設定画面_表示.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
