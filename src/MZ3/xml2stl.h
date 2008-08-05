@@ -298,6 +298,59 @@ public:
 		throw NodeNotFoundException(stream.str());
 	}
 
+	/**
+	 * like getElementById on js.
+	 *
+	 * search node recursively.
+	 *
+	 * example : findNode( L"id=bodyArea" );
+	 * example : findNode( L"class=archiveList" );
+	 */
+	const Node& findNode( const XML2STL_STRING& prop_name_value ) const
+	{
+		XML2STL_STRING::size_type idxEq = prop_name_value.find( '=' );
+		if (idxEq==XML2STL_STRING::npos) {
+			std::wostringstream stream;
+			stream << L"internal error. at findNode, prop_name_value[" << prop_name_value << L"]";
+			_dumpChildren(stream);
+			throw NodeNotFoundException(stream.str());
+		}
+
+		XML2STL_STRING prop_name  = prop_name_value.substr( 0, idxEq );
+		XML2STL_STRING prop_value = prop_name_value.substr( idxEq+1 );
+
+		// Property prop_name=prop_value ‚Å‚ ‚é—v‘f‚ð’Tõ‚·‚é
+		return findNode( Property(prop_name, prop_value) );
+	}
+
+	const Node& findNode( const Property& prop ) const
+	{
+		size_t n = children.size();
+		for (size_t i=0; i<n; i++) {
+			if (children[i].type == XML2STL_TYPE_NODE) {
+				try {
+					if (children[i].getProperty(prop.name) == prop.text) {
+						return children[i];
+					}
+				} catch( NodeNotFoundException& ) {
+					// not found, continue...
+				}
+
+				// not found. search recursively...
+				try {
+					return children[i].findNode(prop);
+				} catch( NodeNotFoundException& ) {
+					// not found, continue...
+				}
+			}
+		}
+
+		std::wostringstream stream;
+		stream << L"node not found... property[" << prop.name + L"=" << prop.text << L"]";
+		_dumpChildren(stream);
+		throw NodeNotFoundException(stream.str());
+	}
+
 //	void setText( const XML2STL_STRING& text )
 //	{
 //		this->name_or_text = text;
