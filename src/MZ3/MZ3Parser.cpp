@@ -48,6 +48,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	case ACCESS_LIST_BBS:					return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_NEW_BBS_COMMENT:		return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:				return mixi::ShowCalendarParser::parse( body, html );
+	case ACCESS_MIXI_RECENT_ECHO:			return mixi::RecentEchoParser::parse( body, html );
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_TWITTER_FAVORITES:			return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );	// Žb’è
 	case ACCESS_TWITTER_DIRECT_MESSAGES:	return twitter::TwitterDirectMessagesXmlParser::parse( body, html );

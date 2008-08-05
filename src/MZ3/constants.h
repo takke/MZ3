@@ -107,6 +107,10 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_NEW_BBS_COMMENT,	///< コミュニティコメント記入履歴
 	ACCESS_LIST_CALENDAR,			///< カレンダー  //icchu追加
 
+	//--- mixi echo 関連
+	ACCESS_MIXI_RECENT_ECHO,			///< みんなのエコー：recent_echo.pl
+
+
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 	ACCESS_POST_CONFIRM_COMMENT,		///< コメント投稿（確認画面）
 	ACCESS_POST_ENTRY_COMMENT,			///< コメント投稿（書き込み画面）

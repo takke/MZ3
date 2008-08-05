@@ -3664,6 +3664,87 @@ private:
 	}
 };
 
+
+/**
+ * [list] みんなのエコー
+ *
+ * http://mixi.jp/recent_echo.pl
+ */
+class RecentEchoParser : public MixiListParser
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
+	{
+		MZ3LOGGER_DEBUG( L"RecentEchoParser.parse() start." );
+
+		// html_ の文字列化
+		std::vector<TCHAR> text;
+		html_.TranslateToVectorBuffer( text );
+
+		// XML 解析
+		xml2stl::Container root;
+		if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+			MZ3LOGGER_ERROR( L"XML 解析失敗" );
+			return false;
+		}
+
+		// entry に対する処理
+		try {
+			const xml2stl::Node& tbody = root.findNode(L"class=archiveList")
+											 .getNode(L"table");
+			size_t nChildren = tbody.getChildrenCount();
+			for (size_t i=0; i<nChildren; i++) {
+				const xml2stl::Node& tr = tbody.getNode(i);
+				if (tr.getName() != L"tr") {
+					continue;
+				}
+				try {
+					// オブジェクト生成
+					CMixiData data;
+					data.SetAccessType( ACCESS_PROFILE );
+
+					// text : tr/td[@comment]
+					CString strBody = tr.getNode(L"td", L"class=comment").getTextAll().c_str();
+					// strBody の <span> タグ以降は日付等のため削除
+					util::GetBeforeSubString(strBody, L"<span>", strBody);
+					strBody.Replace(L"</a>", L"</a>&nbsp;");
+					mixi::ParserUtil::StripAllTags( strBody );
+					mixi::ParserUtil::UnEscapeHtmlElement( strBody );
+					data.AddBody( strBody );
+
+					// 時間：tr/td[@comment]/span
+					CString strDate = tr.getNode(L"td", L"class=comment").getNode(L"span").getTextAll().c_str();
+					// aタグは除去
+					mixi::ParserUtil::StripAllTags( strDate );
+					data.SetDate(strDate);
+
+					// URL : tr/td[@thumb]/a/img/@src
+					CString url = tr.getNode(L"td", L"class=thumb").getNode(L"a").getNode(L"img").getProperty(L"src").c_str();
+					data.AddImage( url );
+
+					// name : tr/td[@nickname]/a
+					const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
+					data.SetName( author.getTextAll().c_str() );
+
+					// 完成したので追加する
+					out_.push_back( data );
+				} catch (xml2stl::NodeNotFoundException& e) {
+					MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
+					break;
+				}
+			}
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( e.getMessage().c_str() );
+			return false;
+		}
+
+		MZ3LOGGER_DEBUG( L"RecentEchoParser.parse() finished." );
+		return true;
+	}
+};
+
+
+
 //■■■MZ3独自■■■
 /**
  * [content] Readme.txt 用パーサ

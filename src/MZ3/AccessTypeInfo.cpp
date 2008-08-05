@@ -717,6 +717,25 @@ bool AccessTypeInfo::init()
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 
 	//------------------------------------------------------------------
+	//--- mixi echo 関連
+	type = ACCESS_MIXI_RECENT_ECHO;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_CATEGORY
+		, "mixi"
+		, L"みんなのエコー"
+		, REQUEST_METHOD_GET
+		);
+	// http://mixi.jp/recent_echo.pl
+	// => recent_echo.html
+	m_map[type].cacheFilePattern = L"recent_echo.html";
+	m_map[type].serializeKey = "MIXI_RECENT_ECHO";
+	m_map[type].defaultCategoryURL = L"recent_echo.pl";
+	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
+	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+
+
+	//------------------------------------------------------------------
 	//--- RSS Reader
 	type = ACCESS_RSS_READER_FEED;
 	m_map[type] = AccessTypeInfo::Data(
