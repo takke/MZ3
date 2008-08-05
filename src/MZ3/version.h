@@ -7,7 +7,7 @@
 #pragma once
 
 /// バージョン文字列
-#define MZ3_VERSION_TEXT_SHORT		L"0.9.2.1"
+#define MZ3_VERSION_TEXT_SHORT		L"0.9.3.0 Beta1"
 #define MZ3_VERSION_TEXT			L"Version " MZ3_VERSION_TEXT_SHORT
 
 /// リビジョン番号
