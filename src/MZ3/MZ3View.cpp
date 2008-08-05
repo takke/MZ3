@@ -4764,20 +4764,25 @@ void CMZ3View::OnMenuTwitterSite()
 	util::OpenBrowserForUrl( data.GetURL() );
 }
 
+/**
+ * カテゴリの選択状態に応じたビュースタイルの判定
+ */
 CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 {
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
 			if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
+				// Twitter系であれば Twitter スタイル
 				return VIEW_STYLE_TWITTER;
 			} else {
 				if (strcmp(theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType()), "RSS")==0) {
-					// 仮
+					// RSS は「イメージ付き」とする
 					return VIEW_STYLE_IMAGE;
 				}
 
 				if (m_bodyList.IsEnableIcon()) {
+					// 画像があれば「イメージ付き」とする
 					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
 					if (pImageList != NULL &&
 						pImageList->m_hImageList == theApp.m_imageCache.GetImageList().m_hImageList)
