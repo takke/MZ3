@@ -734,6 +734,15 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"ñºëO>>");
 	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"ì˙ït>>");
 
+	// add_echo.pl
+	type = ACCESS_MIXI_ADD_ECHO;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_POST
+		, "mixi"
+		, L"èëÇ´çûÇﬁ"
+		, REQUEST_METHOD_GET
+		);
+
 
 	//------------------------------------------------------------------
 	//--- RSS Reader

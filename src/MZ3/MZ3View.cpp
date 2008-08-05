@@ -1144,8 +1144,19 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// Twitter送信モードを「更新」に戻す
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	// Twitter送信モードを変更
+	switch (aType) {
+	case ACCESS_MIXI_RECENT_ECHO:
+	case ACCESS_MIXI_ADD_ECHO:
+		// mixiエコーモード
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		break;
+
+	default:
+		// Twitter「更新」に戻す
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		break;
+	}
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1223,8 +1234,19 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// Twitter送信モードを「更新」に戻す
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	// Twitter送信モードを戻す
+	switch (theApp.m_accessType) {
+	case ACCESS_MIXI_RECENT_ECHO:
+	case ACCESS_MIXI_ADD_ECHO:
+		// mixiエコーモード
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		break;
+
+	default:
+		// Twitter「更新」に戻す
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		break;
+	}
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -4781,6 +4803,11 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 					return VIEW_STYLE_IMAGE;
 				}
 
+				if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
+					// エコーは Twitter スタイル
+					return VIEW_STYLE_TWITTER;
+				}
+
 				if (m_bodyList.IsEnableIcon()) {
 					// 画像があれば「イメージ付き」とする
 					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
@@ -4805,6 +4832,19 @@ void CMZ3View::OnBnClickedUpdateButton()
 		return;
 	}
 
+	// mixi エコー用モード確認
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
+		MZ3LOGGER_ERROR( L"カテゴリが未選択" );
+		return;
+	}
+	switch (pCategory->m_mixi.GetAccessType()) {
+	case ACCESS_MIXI_RECENT_ECHO:
+		// エコー表示中なので強制的にエコーモードに変更する
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		break;
+	}
+
 	// 入力文字列を取得
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
@@ -4814,6 +4854,11 @@ void CMZ3View::OnBnClickedUpdateButton()
 		switch (m_twitterPostMode) {
 		case TWITTER_STYLE_POST_MODE_DM:
 			// 未入力はNG
+			return;
+
+		case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+			// 未入力なので最新取得
+			RetrieveCategoryItem();
 			return;
 
 		case TWITTER_STYLE_POST_MODE_UPDATE:
@@ -4827,6 +4872,21 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// DMモードであれば、送信先確認
 	int	twitterDirectMessageRecipientId;	// DM送信先ユーザID
 	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+		{
+			CString msg;
+			msg.Format( 
+				L"以下のエコーを書き込みます。\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"よろしいですか？", 
+				strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+		}
+		break;
 	case TWITTER_STYLE_POST_MODE_DM:
 		{
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
@@ -4861,12 +4921,36 @@ void CMZ3View::OnBnClickedUpdateButton()
 	post.ClearPostBody();
 
 	// ヘッダーを設定
-	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client: %s", MZ3_APP_NAME ) );
-	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-URL: %s", L"http://mz3.jp/" ) );
-	post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-Version: %s", MZ3_VERSION_TEXT_SHORT ) );
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client: %s", MZ3_APP_NAME ) );
+		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-URL: %s", L"http://mz3.jp/" ) );
+		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-Version: %s", MZ3_VERSION_TEXT_SHORT ) );
+		break;
+	default:
+		break;
+	}
 
 	// POST パラメータを設定
 	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+		{
+			// body=test+from+firefox&x=28&y=20&post_key=74b630af81dfaae59bfb6352728844a7&redirect=recent_echo
+			CString post_key = GetSelectedBodyItem().GetValue(L"post_key");
+			if (post_key.IsEmpty()) {
+				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
+				return;
+			}
+			post.AppendPostBody( "body=" );
+			post.AppendPostBody( URLEncoder::encode_euc(strStatus) );
+			post.AppendPostBody( "&x=28&y=20" );
+			post.AppendPostBody( "&post_key=" );
+			post.AppendPostBody( post_key );
+			post.AppendPostBody( "&redirect=recent_echo" );
+		}
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		post.AppendPostBody( "text=" );
 		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
@@ -4891,6 +4975,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// POST先URL設定
 	CString url;
 	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+		url = L"http://mixi.jp/add_echo.pl";
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		url = L"http://twitter.com/direct_messages/new.xml";
 		break;
@@ -4901,20 +4989,33 @@ void CMZ3View::OnBnClickedUpdateButton()
 		break;
 	}
 
-	// Twitter API => Basic 認証
+	// BASIC 認証設定
 	LPCTSTR szUser = NULL;
 	LPCTSTR szPassword = NULL;
-	szUser     = theApp.m_loginMng.GetTwitterId();
-	szPassword = theApp.m_loginMng.GetTwitterPassword();
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+		break;
 
-	// 未指定の場合はエラー出力
-	if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
-		MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
-		return;
+	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_UPDATE:
+		// Twitter API => Basic 認証
+		szUser     = theApp.m_loginMng.GetTwitterId();
+		szPassword = theApp.m_loginMng.GetTwitterPassword();
+
+		// 未指定の場合はエラー出力
+		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+			return;
+		}
+		break;
 	}
 
 	// アクセス種別を設定
 	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+		theApp.m_accessType = ACCESS_MIXI_ADD_ECHO;
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
 		break;
@@ -5014,7 +5115,17 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				SetDlgItemText( IDC_STATUS_EDIT, L"" );
 			}
 		} else {
-			// アクセス種別不明
+			switch (aType) {
+			case ACCESS_MIXI_ADD_ECHO:
+				util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
+				// 入力値を消去
+				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+				break;
+
+			default:
+				// アクセス種別不明
+				break;
+			}
 		}
 		break;
 
@@ -5023,8 +5134,19 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	// Twitter送信モードを「更新」に戻す
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	// Twitter送信モードを戻す
+	switch (theApp.m_accessType) {
+	case ACCESS_MIXI_RECENT_ECHO:
+	case ACCESS_MIXI_ADD_ECHO:
+		// mixiエコーモード
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		break;
+
+	default:
+		// Twitter「更新」に戻す
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		break;
+	}
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -5522,18 +5644,19 @@ void CMZ3View::MyUpdateControlStatus(void)
 	// Twitterスタイルならボタンの名称をモードにより変更する
 	switch (m_viewStyle) {
 	case VIEW_STYLE_TWITTER:
-		switch (m_twitterPostMode) {
-		case TWITTER_STYLE_POST_MODE_DM:
-			if (pUpdateButton!=NULL) {
+		if (pUpdateButton!=NULL) {
+			switch (m_twitterPostMode) {
+			case TWITTER_STYLE_POST_MODE_DM:
 				pUpdateButton->SetWindowTextW( L"送信" );
-			}
-			break;
-		case TWITTER_STYLE_POST_MODE_UPDATE:
-		default:
-			if (pUpdateButton!=NULL) {
+				break;
+			case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+				pUpdateButton->SetWindowTextW( L"書込" );
+				break;
+			case TWITTER_STYLE_POST_MODE_UPDATE:
+			default:
 				pUpdateButton->SetWindowTextW( L"更新" );
+				break;
 			}
-			break;
 		}
 		break;
 	}
@@ -5677,7 +5800,8 @@ void CMZ3View::MyUpdateFocus(void)
 {
 	switch (m_viewStyle) {
 	case VIEW_STYLE_TWITTER:
-		if (util::IsTwitterAccessType(theApp.m_accessType)) {
+		if (util::IsTwitterAccessType(theApp.m_accessType) ||
+			theApp.m_accessType==ACCESS_MIXI_ADD_ECHO) {
 			// Twitter関連のPOSTが完了したので、フォーカスを入力領域に移動する。
 			// 但し、フォーカスがリストにある場合は移動しない。
 			CWnd* pFocus = GetFocus();

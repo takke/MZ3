@@ -3688,8 +3688,16 @@ public:
 			return false;
 		}
 
-		// entry に対する処理
 		try {
+			// post_key の取得
+			// input[name=post_key]
+			CString post_key = root.findNode(L"name=post_key").getProperty(L"value").c_str();
+			MZ3LOGGER_INFO( util::FormatString(L"post_key : [%s]", post_key) );
+
+			// post_key は全ての要素に設定する
+
+			
+			// tbody に対する処理
 			const xml2stl::Node& tbody = root.findNode(L"class=archiveList")
 											 .getNode(L"table");
 			size_t nChildren = tbody.getChildrenCount();
@@ -3718,13 +3726,26 @@ public:
 					mixi::ParserUtil::StripAllTags( strDate );
 					data.SetDate(strDate);
 
-					// URL : tr/td[@thumb]/a/img/@src
-					CString url = tr.getNode(L"td", L"class=thumb").getNode(L"a").getNode(L"img").getProperty(L"src").c_str();
-					data.AddImage( url );
+					// 画像URL : tr/td[@thumb]/a/img/@src
+					CString imageUrl = tr.getNode(L"td", L"class=thumb").getNode(L"a").getNode(L"img").getProperty(L"src").c_str();
+					data.AddImage( imageUrl );
 
 					// name : tr/td[@nickname]/a
 					const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
 					data.SetName( author.getTextAll().c_str() );
+
+					// プロフィール用URL
+					// とりあえず
+					// http://mixi.jp/list_echo.pl?id=xxxxx
+					// を取得し、
+					// http://mixi.jp/show_friend.pl?id=xxxxx
+					// に変換する。
+					CString url = L"http://mixi.jp/show_friend.pl?id=";
+					url += util::GetParamFromURL(author.getProperty(L"href").c_str(), L"id");
+					data.SetURL( url );
+
+					// post_key は全ての要素に設定する
+					data.SetValue(L"post_key", post_key);
 
 					// 完成したので追加する
 					out_.push_back( data );

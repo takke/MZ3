@@ -52,10 +52,11 @@ public:
 	};
 	VIEW_STYLE			m_viewStyle;			///< 表示スタイル
 
-	/// Twitter 用送信種別
+	/// Twitter 風送信項目の種別
 	enum TWITTER_STYLE_POST_MODE {
 		TWITTER_STYLE_POST_MODE_UPDATE,			///< タイムライン用発言入力中
 		TWITTER_STYLE_POST_MODE_DM,				///< DM入力中
+		TWITTER_STYLE_POST_MODE_MIXI_ECHO,		///< mixiエコー入力中
 	};
 	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
 

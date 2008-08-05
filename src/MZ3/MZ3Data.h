@@ -226,6 +226,16 @@ public:
 
 
 	//--- 汎用文字列コンテナのアクセッサ
+
+	/// 汎用文字列コンテナへのキー指定による文字列設定
+	void	SetValue(LPCTSTR key, LPCTSTR value) {
+		m_StringMap[key] = value;
+	}
+	/// 汎用文字列コンテナからのキー指定による文字列取得
+	CString	GetValue(LPCTSTR key) {
+		return FindStringMap(key);
+	}
+
 	// name : 名前
 	void	SetName(CString name);
 	CString GetName() const					{ return FindStringMap(L"name"); }
