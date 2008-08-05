@@ -3689,17 +3689,24 @@ public:
 		}
 
 		try {
+			const xml2stl::Node& div_echo = root.getNode(L"html")
+				                                .getNode(L"body")
+											    .getNode(L"div", L"id=bodyArea")
+											    .getNode(L"div", L"id=bodyMainArea")
+											    .getNode(L"div", L"id=echo");
+
 			// post_key の取得
 			// input[name=post_key]
-			CString post_key = root.findNode(L"name=post_key").getProperty(L"value").c_str();
+			CString post_key = div_echo.findNode(L"action=add_echo.pl")
+									   .findNode(L"name=post_key").getProperty(L"value").c_str();
 			MZ3LOGGER_INFO( util::FormatString(L"post_key : [%s]", post_key) );
 
 			// post_key は全ての要素に設定する
-
 			
 			// tbody に対する処理
-			const xml2stl::Node& tbody = root.findNode(L"class=archiveList")
-											 .getNode(L"table");
+			const xml2stl::Node& tbody = div_echo.findNode(L"class=echoArchives")
+				                                 .getNode(L"div", L"class=archiveList")
+											     .getNode(L"table");
 			size_t nChildren = tbody.getChildrenCount();
 			for (size_t i=0; i<nChildren; i++) {
 				const xml2stl::Node& tr = tbody.getNode(i);
@@ -3732,7 +3739,9 @@ public:
 
 					// name : tr/td[@nickname]/a
 					const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
-					data.SetName( author.getTextAll().c_str() );
+					CString name = author.getTextAll().c_str();
+					mixi::ParserUtil::UnEscapeHtmlElement( name );
+					data.SetName( name );
 
 					// プロフィール用URL
 					// とりあえず
