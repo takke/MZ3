@@ -10,7 +10,7 @@
 :----- ファイルのコピー -----
 @echo ■ ファイルを収集します
 copy ..\src\MZ3\Release_Win32\MZ4.exe MZ3_win32\
-:copy "..\doc\Help Files\MZ4\MZ4.chm" MZ3_win32\
+copy "..\doc\Help Files\MZ4\MZ4.chm" MZ3_win32\
 copy ..\doc\Readme.txt MZ3_win32\
 copy ..\ChangeLog.txt MZ3_win32\
 copy toppage_group_sample.ini MZ3_win32\
