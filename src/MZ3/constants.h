@@ -76,6 +76,7 @@ enum ACCESS_TYPE {
 	ACCESS_IMAGE,				///< 画像
 	ACCESS_MOVIE,				///< 動画
 	ACCESS_SCHEDULE,			///< 追加した予定  //MOriyama追加
+	ACCESS_MIXI_ECHO_USER,		///< エコーのオブジェクト
 	ACCESS_DOWNLOAD,			///< 汎用ダウンロード
 	ACCESS_PLAIN,				///< 汎用テキストデータ
 

@@ -314,6 +314,9 @@
 #define ID_RAN2_URL_LINK_COPY           34163
 #define IDM_CATEGORY_OPEN               34164
 #define ID_ADD_RSS_FEED_MENU            34166
+#define ID_MENU_MIXI_ECHO_READ          34167
+#define ID_MENU_MIXI_ECHO_UPDATE        34168
+#define ID_MENU_MIXI_ECHO_SHOW_PROFILE  34170
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -328,7 +331,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        174
-#define _APS_NEXT_COMMAND_VALUE         34167
+#define _APS_NEXT_COMMAND_VALUE         34171
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

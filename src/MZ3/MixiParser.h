@@ -3042,7 +3042,7 @@ public:
 		// "{" から始まっていれば ajax_friend_setting.pl とみなす。
 		bool ajax_friend_setting_mode = false;
 		INT_PTR lastLine = html_.GetCount();
-		for (u_int i=0; i<1 && i<lastLine; i++) {
+		for (int i=0; i<1 && i<lastLine; i++) {
 			const CString& line = html_.GetAt(i);
 			if (line.Left(1)==L"{") {
 				ajax_friend_setting_mode = true;
@@ -3063,7 +3063,7 @@ public:
 
 			CString line;
 			if (lastLine>=1) {
-				for (u_int i=0; i<lastLine; i++) {
+				for (int i=0; i<lastLine; i++) {
 					line.Append(html_.GetAt(i));
 				}
 			}
@@ -3129,7 +3129,7 @@ public:
 			MZ3LOGGER_INFO(L"HTML 解析開始");
 
 			// post_key の取得を行う
-			for (u_int i=0; i<lastLine; i++) {
+			for (int i=0; i<lastLine; i++) {
 				const CString& line = html_.GetAt(i);
 
 				if (util::LineHasStringsNoCase(line, L"<input", L"type", L"hidden", L"name", L"post_key")) {
@@ -3703,7 +3703,7 @@ public:
 				try {
 					// オブジェクト生成
 					CMixiData data;
-					data.SetAccessType( ACCESS_PROFILE );
+					data.SetAccessType( ACCESS_MIXI_ECHO_USER );
 
 					// text : tr/td[@comment]
 					CString strBody = tr.getNode(L"td", L"class=comment").getTextAll().c_str();
@@ -3718,6 +3718,7 @@ public:
 					CString strDate = tr.getNode(L"td", L"class=comment").getNode(L"span").getTextAll().c_str();
 					// aタグは除去
 					mixi::ParserUtil::StripAllTags( strDate );
+					while( strDate.Replace( L"\n", L"" ) );
 					data.SetDate(strDate);
 
 					// 画像URL : tr/td[@thumb]/a/img/@src
@@ -3728,6 +3729,7 @@ public:
 					const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
 					CString name = author.getTextAll().c_str();
 					mixi::ParserUtil::UnEscapeHtmlElement( name );
+					while( name.Replace( L"\r\n", L"" ) );
 					data.SetName( name );
 
 					// プロフィール用URL

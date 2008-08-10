@@ -384,6 +384,9 @@ public:
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
 	afx_msg void OnAddRssFeedMenu();
+	afx_msg void OnMenuMixiEchoRead();
+	afx_msg void OnMenuMixiEchoUpdate();
+	afx_msg void OnMenuMixiEchoShowProfile();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
