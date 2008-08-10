@@ -3028,142 +3028,60 @@ public:
 /**
  * [list] list_friend.pl 用パーサ。
  * 【マイミク一覧】
- * http://mixi.jp/list_friend.pl
+ * http://mixi.jp/list_friend.pl または http://mixi.jp/ajax_friend_setting.pl
  */
 class ListFriendParser : public MixiListParser
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	{
+		bool rval = false;
+
 		MZ3LOGGER_DEBUG( L"ListFriendParser.parse() start." );
 
+		// "{" から始まっていれば ajax_friend_setting.pl とみなす。
+		bool ajax_friend_setting_mode = false;
 		INT_PTR lastLine = html_.GetCount();
-
-		// 「次」、「前」のリンク
-		CMixiData backLink;
-		CMixiData nextLink;
-
-		/**
-		 * 方針：
-		 * ふつうに ul, li, div 要素で並んでいるのでふつうにパースするだけ。
-		 */
-		bool bInItems = false;	// 項目開始？
-		int iLine = 100;		// とりあえず読み飛ばす
-		for( ; iLine+1<lastLine; iLine++ ) {
-			const CString& line = html_.GetAt(iLine);
-
-			if( !bInItems ) {
-				// 項目開始？
-				// <div class="iconList03">
-				if( util::LineHasStringsNoCase( line, L"<div", L"class=", L"iconList03" ) ) {
-					bInItems = true;
-				}
-			}
-
-			if( bInItems ) {
-				// <div class="pageNavigation01"> が見つかれば終了
-				if( util::LineHasStringsNoCase( line, L"<div", L"class=", L"pageNavigation01" ) ) {
-					break;
-				}
-
-				// 終了タグが見つからなかったので、解析＋追加
-				//<li><div class="iconState0X" id="xxxx">
-				//<div class="iconListImage"><a href="show_friend.pl?id=xxx" style="background: url(http://member.img.mixi.jp/photo/member/xx/xx/xxs.jpg); text-indent: -9999px;" class="iconTitle" title="なまえさん">なまえさんの写真</a></div><span>なまえさん(11)</span>
-				//<div id="xxx" class="memo_pop"></div><p><a href="show_friend_memo.pl?id=xxx" onClick="openMemo(event,'friend',xxx);return false;"><img src="http://img.mixi.jp/img/basic/icon/memo001.gif" width="12" height="14" /></a></p>
-				//</div></li>
-				if( util::LineHasStringsNoCase( line, L"<li", L"<div", L"class=", L"iconState0" ) ) {
-					// iconState01 : 1日以上
-					// iconState02 : 1日以内
-					// iconState03 : 1時間以内
-					CMixiData mixi;
-					if( util::LineHasStringsNoCase( line, L"iconState03" ) ) {
-						mixi.SetDate( L"1時間以内" );
-					}else if( util::LineHasStringsNoCase( line, L"iconState02" ) ) {
-						mixi.SetDate( L"1日以内" );
-					}else{
-						mixi.SetDate( L"-" );
-					}
-
-					// 次の行をフェッチ
-					const CString& line2 = html_.GetAt( ++iLine );
-
-					// <a 以降のみにする
-					CString target;
-					if( util::GetAfterSubString( line2, L"<a", target ) < 0 ) {
-						// <a がなかったので次の行解析へ。
-						continue;
-					}
-					// target:  href="show_friend.pl?id=xxx" style="background: url(http://member.img.mixi.jp/photo/member/xx/xx/xxs.jpg); text-indent: -9999px;" class="iconTitle" title="なまえさん">なまえさんの写真</a></div><span>なまえさん(11)</span>
-					// URL 抽出
-					CString url;
-					if( util::GetBetweenSubString( target, L"href=\"", L"\"", url ) < 0 ) {
-						continue;
-					}
-					mixi.SetURL( url );
-
-					// URL 構築＆設定
-					url.Insert( 0, L"http://mixi.jp/" );
-					mixi.SetBrowseUri( url );
-
-					// Image 抽出
-					CString image_url;
-					if( util::GetBetweenSubString( target, L"url(", L")", image_url ) < 0 ) {
-						continue;
-					}
-					mixi.AddImage( image_url );
-
-					// 名前抽出
-					// <span>なまえさん(11)</span>
-					CString name;
-					if( util::GetBetweenSubString( target, L"<span>", L"</span>", name ) < 0 ) {
-						continue;
-					}
-					mixi.SetName( name );
-
-					mixi.SetAccessType( ACCESS_PROFILE );
-
-					// 追加する。
-					out_.push_back( mixi );
-				}
+		for (u_int i=0; i<1 && i<lastLine; i++) {
+			const CString& line = html_.GetAt(i);
+			if (line.Left(1)==L"{") {
+				ajax_friend_setting_mode = true;
 			}
 		}
 
-		// 終了タグが見つかったので、その後の行から次、前のリンクを抽出
-		for( ; iLine<lastLine; iLine++ ) {
-			const CString& line = html_.GetAt(iLine);
+		if (ajax_friend_setting_mode) {
+			MZ3LOGGER_INFO(L"JSON 解析開始");
 
-			// 「次を表示」、「前を表示」のリンクを抽出する
-			if( parseNextBackLink( nextLink, backLink, line ) ) {
-				// 抽出できたら終了タグ
-				break;
+			// JSON の解析を行う
+
+			MZ3LOGGER_INFO(L"JSON 解析終了");
+			rval = false;
+		} else {
+			MZ3LOGGER_INFO(L"HTML 解析開始");
+
+			// post_key の取得を行う
+			for (u_int i=0; i<lastLine; i++) {
+				const CString& line = html_.GetAt(i);
+
+				if (util::LineHasStringsNoCase(line, L"<input", L"type", L"hidden", L"name", L"post_key")) {
+					// <input type="hidden" value="536bdcfd534cc1125c3b0b2c0eda942b" name="post_key" />
+					CString post_key;
+					if (util::GetBetweenSubString(line, L"value=\"", L"\"", post_key)>=0) {
+						// dummy アイテムに設定する
+						CMixiData data;
+						data.SetValue(L"post_key", post_key);
+						out_.push_back(data);
+						rval = true;
+					}
+				}
 			}
+
+			MZ3LOGGER_INFO(L"HTML 解析終了");
 		}
 
-		// 前、次のリンクがあれば、追加する。
-		if( !backLink.GetTitle().IsEmpty() ) {
-			out_.insert( out_.begin(), backLink );
-		}
-		if( !nextLink.GetTitle().IsEmpty() ) {
-			out_.push_back( nextLink );
-		}
 
 		MZ3LOGGER_DEBUG( L"ListFriendParser.parse() finished." );
-		return true;
-	}
-
-private:
-	/// 「次を表示」、「前を表示」のリンクを抽出する
-	/// <td align="right" bgcolor="#EED6B5">1件～50件を表示&nbsp;&nbsp;<a href=list_friend.pl?page=2&id=xxx>次を表示</a></td></tr>
-	static bool parseNextBackLink( CMixiData& nextLink, CMixiData& backLink, CString str )
-	{
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=[\"]?list_friend.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
-			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-			return false;
-		}
-
-		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"list_friend.pl", ACCESS_LIST_FRIEND );
+		return rval;
 	}
 };
 

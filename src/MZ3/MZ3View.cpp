@@ -2782,10 +2782,17 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 	// リファラ
 	CString referer;
-	if (data->GetAccessType() == ACCESS_ENQUETE) {
-		// アンケートの場合はリファラーを設定
+	switch (data->GetAccessType()) {
+	case ACCESS_ENQUETE:
+		// アンケート
 		referer = _T("http://mixi.jp/") + data->GetURL();
 		referer.Replace(_T("view_enquete"), _T("reply_enquete"));
+		break;
+
+	case ACCESS_LIST_FRIEND:
+		// マイミク一覧
+		referer = L"http://mixi.jp/list_friend.pl";
+		break;
 	}
 
 	// 【API 用】
@@ -2845,12 +2852,45 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		break;
 	}
 
+	static CPostData post;
+	if (bPost) {
+		post.SetSuccessMessage( WM_MZ3_POST_END );
+		post.AppendAdditionalHeader(L"");
+	}
+
+	// MZ3-API : GET/POST 直前のフック処理(の予定)
+	switch (data->GetAccessType()) {
+	case ACCESS_LIST_FRIEND:
+		// マイミク一覧
+		// マイミク一覧はブラウザでは下記の手順で取得される。
+		//  1. list_friend.pl で post_key を取得し、
+		//  2. そのキーを含めて ajax_friend_setting.pl から JSON 形式を取得する
+		// 従って、MZ3 では下記の手順で取得する。
+		//  1. data に post_key がなければ list_friend.pl から取得する。
+		//  2. 成功すれば ajax_friend_setting.pl から取得する。
+		CString post_key;
+
+		CMixiDataList& body = m_selGroup->getSelectedCategory()->m_body;
+		if (body.size()>0) {
+			post_key = body[0].GetValue(L"post_key");
+		}
+
+		if (post_key.IsEmpty()) {
+			// list_friend.pl から取得する
+			uri = L"http://mixi.jp/list_friend.pl";
+			bPost = false;
+		} else {
+			post.AppendAdditionalHeader(L"X-Requested-With: XMLHttpRequest");
+			post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
+			post.AppendPostBody(L"post_key=");
+			post.AppendPostBody(post_key);
+		}
+		break;
+	}
+
 	// GET/POST 開始
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
 	if (bPost) {
-		static CPostData post;
-		post.SetSuccessMessage( WM_MZ3_POST_END );
-		post.AppendAdditionalHeader(L"");
 		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, szUser, szPassword );
 	} else {
 		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
@@ -5074,6 +5114,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		}
 
 		DoAccessEndProcForBody(aType);
+
 		break;
 
 	case AccessTypeInfo::INFO_TYPE_POST:
@@ -5745,7 +5786,22 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 	// HTML 解析
 	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
-	mz3parser::MyDoParseMixiListHtml( aType, body, html );
+	if (mz3parser::MyDoParseMixiListHtml( aType, body, html )) {
+
+		// MZ3-API : パース後のフック処理(の予定)
+		switch (aType) {
+		case ACCESS_LIST_FRIEND:
+			// マイミク一覧
+			// list_friend.pl であれば、ajax_friend_setting.pl に変更して再リクエスト
+			if (wcsstr(theApp.m_inet.GetURL(), L"list_friend.pl")!=NULL) {
+				// 再リクエスト
+				CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+				AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
+				return false;
+			}
+			break;
+		}
+	}
 
 	// ボディ一覧の設定
 	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );

@@ -88,6 +88,8 @@ public:
 		BodyHeaderColumn	bodyHeaderCol2A;	///< ボディリストのヘッダー2のカラムA
 		BodyHeaderColumn	bodyHeaderCol2B;	///< ボディリストのヘッダー2のカラムB
 
+//		std::wstring		refererUrlPattern;	///< リファラURLのパターン。
+
 		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
 			: infoType(a_infoType)
 			, serviceType(a_serviceType)
@@ -98,6 +100,7 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
+//			, refererUrlPattern(L"")
 		{}
 		Data()
 			: infoType(INFO_TYPE_INVALID)
@@ -109,6 +112,7 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
+//			, refererUrlPattern(L"")
 		{}
 	};
 
@@ -264,4 +268,13 @@ public:
 		return it->second.cacheFilePattern.c_str();
 	}
 
+	/// refererの取得
+/*	const wchar_t* getRefererUrlPattern( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return NULL;
+		}
+		return it->second.refererUrl.c_str();
+	}
+*/
 };

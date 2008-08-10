@@ -166,19 +166,23 @@ bool Mz3GroupData::appendCategoryByIniData(
 		break;
 	}
 
-	// 追加。
-
 	// URL が指定されていればその URL を用いる。
 	CString url = default_category_url;
 	if( category_url!=NULL && strlen(category_url) > 0 ) {
+		// 旧形式iniファイルの移行処理
 		if (category_type == ACCESS_LIST_FOOTSTEP &&
 			strcmp(category_url, "show_log.pl")==0)
 		{
 			// 旧あしあとURLはAPI用URLに置換
-		} else {
+		} else if (category_type == ACCESS_LIST_FRIEND &&
+			strcmp(category_url, "list_friend.pl")==0)
+		{
+			// 旧マイミク一覧URLはAPI用URLに置換
+		} else {	
 			url = util::my_mbstowcs(category_url).c_str();
 		}
 	}
+
 	static CCategoryItem item;
 	item.init( 
 		util::my_mbstowcs(category_name).c_str(), 
