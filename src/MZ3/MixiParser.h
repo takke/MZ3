@@ -3053,9 +3053,78 @@ public:
 			MZ3LOGGER_INFO(L"JSON 解析開始");
 
 			// JSON の解析を行う
+			
+			// ...
+			// {"new_friend_diary":null,"nickname":"xxx",
+			//  "photo":"http://profile.img.mixi.jp/photo/member/54/75/xxx",
+			//  "member_count":"112",
+			//  "relation_id":null,"tag_ids":null,"lastlogin_level":"3","member_id":"xxx"},
+			// {"new_friend_diary":null, ...
+
+			CString line;
+			if (lastLine>=1) {
+				for (u_int i=0; i<lastLine; i++) {
+					line.Append(html_.GetAt(i));
+				}
+			}
+			int iStart = 0;
+			for (;;) {
+				iStart = line.Find(L"{\"new_friend_diary\"", iStart);
+				if (iStart<0) {
+					break;
+				}
+				int iEnd = line.Find(L"}", iStart);
+				CString target = line.Mid(iStart, iEnd-iStart);
+				MZ3LOGGER_DEBUG(util::FormatString(L"[%d,%d] : ", iStart, iEnd) + target);
+				iStart = iEnd;
+
+				CMixiData data;
+
+				// url
+				CString member_id;
+				util::GetBetweenSubString(target, L"\"member_id\":\"", L"\"", member_id);
+				CString url = L"show_friend.pl?id=";
+				url.Append(member_id);
+				data.SetURL(url);
+
+				// URL 構築＆設定
+				url.Insert( 0, L"http://mixi.jp/" );
+				data.SetBrowseUri( url );
+
+				// photo
+				CString image_url;
+				util::GetBetweenSubString(target, L"\"photo\":\"", L"\"", image_url);
+				data.AddImage(image_url);
+
+				// nickname
+				CString nickname;
+				util::GetBetweenSubString(target, L"\"nickname\":\"", L"\"", nickname);
+				data.SetName(nickname);
+
+				// date(lastlogin_level)
+				CString lastlogin_level;
+				util::GetBetweenSubString(target, L"\"lastlogin_level\":\"", L"\"", lastlogin_level);
+				switch (_wtoi(lastlogin_level)) {
+				case 2:
+					data.SetDate(L"1日以内");
+					break;
+				case 3:
+					data.SetDate(L"1時間以内");
+					break;
+				case 1:
+				default:
+					data.SetDate(L"");
+					break;
+				}
+
+				// 追加
+				data.SetAccessType(ACCESS_PROFILE);
+
+				out_.push_back(data);
+			}
 
 			MZ3LOGGER_INFO(L"JSON 解析終了");
-			rval = false;
+			rval = true;
 		} else {
 			MZ3LOGGER_INFO(L"HTML 解析開始");
 
