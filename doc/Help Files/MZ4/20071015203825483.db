@@ -18,9 +18,13 @@ Context=IDH_HELP8
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/03_メイン画面_ニュース.jpg"><IMG height=200 src="Capture/03_メイン画面_ニュース.jpg"></FONT></A></P>
 <P><FONT face="ＭＳ ゴシック"><BR>　 　PC での設定に関わらず, 全ての項目を表示します<BR>　 　表示内容を変更したい場合は「<A href="20071015212015782.htm">タブ編集</A>」の項を参照してください</FONT></P>
 <P><FONT face="ＭＳ ゴシック">【メッセージ】</FONT></P>
-<P><FONT face="ＭＳ ゴシック"><A href="Capture/04_メイン画面_メッセージ.jpg"><IMG height=200 src="Capture/04_メイン画面_メッセージ.jpg"></FONT></A></P>
-<P><FONT face="ＭＳ ゴシック"><BR>　 　【受信箱】【送信箱】にあるデータを表示します<BR>　 　受信メッセージに対する返信は行えますが, 新規メッセージの作成を行う場合は<BR>　 　「その他」タブのマイミク一覧より作成を行ってください</FONT></P>
-<P><FONT face="ＭＳ ゴシック">【その他】</FONT></P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/04_メイン画面_メッセージ.jpg"><IMG height=200 src="Capture/04_メイン画面_メッセージ.jpg"></FONT></A></P><FONT face="ＭＳ ゴシック">
+<P><BR>&nbsp;&nbsp;&nbsp;&nbsp; 【受信箱】【送信箱】にあるデータを表示します<BR>&nbsp;&nbsp;&nbsp;&nbsp; 受信メッセージに対する返信は行えますが, 新規メッセージの作成を行う場合は<BR>&nbsp;&nbsp;&nbsp;&nbsp; 「その他」タブのマイミク一覧より作成を行ってください</P>
+<P>【エコー】</P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/08_メイン画面_エコー.jpg"><IMG height=200 src="Capture/08_メイン画面_エコー.jpg"></FONT></A></P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; みんなのエコーを表示します<BR>&nbsp;&nbsp;&nbsp;&nbsp; 画面最下部にあるテキストボックスに入力し，更新ボタンを押下することで投稿になります<BR>&nbsp;&nbsp;&nbsp;&nbsp; ※ エコーを利用するには，Web ブラウザからエコーを利用する様に設定する必要があります</P>
+<P>【その他】</FONT></P>
+<P><FONT face="ＭＳ ゴシック"></FONT></P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/05_メイン画面_その他.jpg"><IMG height=200 src="Capture/05_メイン画面_その他.jpg"></FONT></A></P>
 <P><FONT face="ＭＳ ゴシック"><BR>　 　上記カテゴリに当てはまらない項目を表示します<BR>　 　・マイミク一覧<BR>　 　　マイミクの一覧を表示します<BR>　 　　また, マイミクを選択している状態でセンターキーを押下することで新規メッセージの作成が行えます<BR>　 　・紹介文<BR>　 　　ユーザに対して紹介文を書いているマイミクの一覧を表示します<BR>　 　　エンターキー押下で現れるメニューから簡易的な紹介文を閲覧できます<BR>　 　・足あと<BR>　 　　足あとの一覧を表示します<BR>　 　・ブックマーク<BR>　 　　MZ3 for Windows でブックマークしたトピックス一覧を表示します<BR>　 　　手動での編集は「<A href="2007101521202861.htm">ブックマーク編集</A>」の項を参照してください</FONT><FONT face="ＭＳ ゴシック"><BR>　 　・お気に入りユーザー<BR>　 　　お気に入り登録してあるユーザの一覧を表示します<BR>　 　・お気に入りコミュ<BR>　 　　お気に入り登録してあるトピックスの一覧を表示します<BR>　 　・カレンダー<BR>　 　　カレンダーに登録されているイベントやマイミクの誕生日などを表示します</FONT></P>
 <P><FONT face="ＭＳ ゴシック">【Twitter】</FONT></P>
