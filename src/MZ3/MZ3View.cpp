@@ -335,14 +335,22 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_iconImageList.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 6);
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
-		m_iconImageList.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
-		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+		m_iconImageListSmall.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 6);
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
+		m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
+
+		m_iconImageListLarge.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 6);
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
 
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
@@ -678,10 +686,19 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		}
 	}
 
-	// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
-	if( theApp.m_optionMng.m_killPaneLabel ) {
+	// 統合カラムモード
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		// カラムヘッダは不要
 		util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
+
+	} else {
+		// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
+		if( theApp.m_optionMng.m_killPaneLabel ) {
+			util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
+		}
 	}
+
+	// 画像再描画
 	MoveMiniImageDlg();
 
 	// プログレスバーは別途配置
@@ -1353,15 +1370,19 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			// 未ロードなのでロード
 			image.load( miniImagePath );
 			if (image.isEnableImage()) {
-				// 16x16 にリサイズする。
-				CMZ3BackgroundImage resizedImage(L"");
-				util::MakeResizedImage( this, resizedImage, image );
+				// 16x16, 32x32 にリサイズする。
+				CMZ3BackgroundImage image16(L"");
+				util::MakeResizedImage( this, image16, image, 16, 16 );
+				CMZ3BackgroundImage image32(L"");
+				util::MakeResizedImage( this, image32, image, 32, 32 );
 
 				// ビットマップの追加
-				CBitmap bm;
-				bm.Attach( resizedImage.getHandle() );
+				CBitmap bm16;
+				bm16.Attach( image16.getHandle() );
+				CBitmap bm32;
+				bm32.Attach( image32.getHandle() );
 
-				theApp.m_imageCache.Add( &bm, (CBitmap*)NULL, miniImagePath );
+				theApp.m_imageCache.Add( &bm16, &bm32, (CBitmap*)NULL, miniImagePath );
 
 				bUseExtendedIcon = true;
 			} else {
@@ -1379,9 +1400,27 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	// アイコン表示・非表示設定
 	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
 	if (bUseDefaultIcon) {
-		m_bodyList.SetImageList(&m_iconImageList, LVSIL_SMALL);
+		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+			// 統合カラムモード
+			if (theApp.m_optionMng.GetFontHeight()>=16) {
+				m_bodyList.SetImageList(&m_iconImageListLarge, LVSIL_SMALL);
+			} else {
+				m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
+			}
+		} else {
+			m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
+		}
 	} else if (bUseExtendedIcon) {
-		m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList(), LVSIL_SMALL);
+		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+			// 統合カラムモード
+			if (theApp.m_optionMng.GetFontHeight()>=16) {
+				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
+			} else {
+				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
+			}
+		} else {
+			m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
+		}
 	}
 
 	// アイコンの設定
@@ -4876,7 +4915,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 					// 画像があれば「イメージ付き」とする
 					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
 					if (pImageList != NULL &&
-						pImageList->m_hImageList == theApp.m_imageCache.GetImageList().m_hImageList)
+						pImageList->m_hImageList == theApp.m_imageCache.GetImageList16().m_hImageList)
 					{
 						return VIEW_STYLE_IMAGE;
 					}

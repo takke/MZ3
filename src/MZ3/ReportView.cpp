@@ -595,7 +595,7 @@ void CReportView::ShowCommentData(CMixiData* data)
 
 	// 描画開始
 	m_edit.ShowWindow(SW_HIDE);
-	m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList());
+	m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList16());
 	TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
 	m_detailView->ResetDragOffset();
 	// OnSize 時にこのルートを2回通るため、即時描画を行うとMZ3の場合に一瞬だけ画面が乱れる。

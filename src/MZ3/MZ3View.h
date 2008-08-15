@@ -161,7 +161,8 @@ private:
 	int				m_preCategory;			///< 前回選択していたカテゴリリスト項目のインデックス
 	CListCtrl*		m_hotList;				///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 
-	CImageList		m_iconImageList;		///< アイコン用画像リスト
+	CImageList		m_iconImageListSmall;		///< アイコン用画像リスト(16x16)
+	CImageList		m_iconImageListLarge;		///< アイコン用画像リスト(32x32)
 
 	/// RETURN キーを押下した時刻
 	DWORD			m_dwLastReturn;

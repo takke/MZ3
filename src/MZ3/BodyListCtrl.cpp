@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CTouchListCtrl)
 #endif
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_MEASUREITEM_REFLECT()
 END_MESSAGE_MAP()
 
 
@@ -118,6 +119,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 表示位置をrcItemに合わせる
 	rcAllLabels.MoveToY( rcItem.top );
 
+	int nIconSize = 16;
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && 
+		theApp.m_optionMng.GetFontHeight()>=16) 
+	{
+		nIconSize = 32;
+	}
+
 	// アイテムのラベルの幅を取得
 	CRect rcLabel;
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
@@ -125,8 +133,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcLabel.MoveToY( rcItem.top );
 	if (m_bUseIcon==false) {
 		// アイコンなしの場合は、アイコン分だけオフセットをかける
-		if (rcLabel.left > 16) {
-			rcLabel.left -= 16;
+		if (rcLabel.left > nIconSize) {
+			rcLabel.left -= nIconSize;
 		}
 	}
 
@@ -202,7 +210,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					ImageList_DrawEx(
 						pImageList->m_hImageList, lvi.iImage,
 						pDC->m_hDC,
-						rcIcon.left, rcIcon.top, 16, 16,
+						rcIcon.left, rcIcon.top, nIconSize, nIconSize,
 						clrMaskBk, clrMaskFg,
 						uiFlags | nOvlImageMask);
 				}
@@ -358,10 +366,22 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
-	pDC->DrawText(pszText,
-		-1,
-		rcLabel,
-		DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		// 統合カラムモード、1行目
+		CRect rcDraw = rcAllLabels;
+
+		rcDraw.left += OFFSET_FIRST;
+		pDC->DrawText(pszText,
+			-1,
+			rcDraw,
+			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+	} else {
+		// 第1カラム
+		pDC->DrawText(pszText,
+			-1,
+			rcLabel,
+			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+	}
 
 	//--- 右側カラム
 
@@ -370,9 +390,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	lvc.mask = LVCF_FMT | LVCF_WIDTH;
 	// 元の色に戻す
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-		rcSubItem.left = rcSubItem.right;
-		rcSubItem.right = rcSubItem.left + lvc.cx;
-
 		int nRetLen = this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff));
 		if (nRetLen == 0) {
 			continue;
@@ -394,14 +411,33 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			}
 		}
 
-		rcLabel = rcSubItem;
-		rcLabel.left  += OFFSET_OTHER;
-		rcLabel.right -= OFFSET_OTHER;
+		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+			// 統合カラムモード、nColumn 行目の描画
+			// TODO とりあえず2行限定とし、半分の高さとする。
+			CRect rcDraw = rcAllLabels;
+			rcDraw.top    += rcDraw.Height()/2;
+			rcDraw.bottom -= 2;
+			rcDraw.left   += OFFSET_FIRST;
+			rcDraw.left   += 16;
 
-		pDC->DrawText(pszText,
-			-1,
-			rcLabel,
-			nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+			pDC->DrawText(pszText,
+				-1,
+				rcDraw,
+				nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_RIGHT | DT_END_ELLIPSIS);
+		} else {
+			// 第 N カラム
+			rcSubItem.left  = rcSubItem.right;
+			rcSubItem.right = rcSubItem.left + lvc.cx;
+
+			CRect rcDraw = rcSubItem;
+			rcDraw.left  += OFFSET_OTHER;
+			rcDraw.right -= OFFSET_OTHER;
+
+			pDC->DrawText(pszText,
+				-1,
+				rcDraw,
+				nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+		}
 	}
 
 	// 色を戻す
@@ -680,5 +716,26 @@ void CBodyListCtrl::SetSelectItem( const int nItem )
 			util::MySetListCtrlItemFocusedAndSelected( *this, idx, false );
 		}
 		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
+	}
+}
+
+void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	LOGFONT lf;
+	GetFont()->GetLogFont( &lf );
+
+	if (lf.lfHeight < 0) {
+		lpMeasureItemStruct->itemHeight = -lf.lfHeight;
+	} else {
+		lpMeasureItemStruct->itemHeight = lf.lfHeight;
+	}
+
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		// 統合カラムモードのため高さをN倍する
+		if (lpMeasureItemStruct->itemHeight < 0) {
+			lpMeasureItemStruct->itemHeight = lpMeasureItemStruct->itemHeight*2 -3;
+		} else {
+			lpMeasureItemStruct->itemHeight = lpMeasureItemStruct->itemHeight*2 +3;
+		}
 	}
 }

@@ -376,6 +376,9 @@ void Option::Sync(bool bSave)
 	// 画像の自動取得
 	SyncIniValue(inifile, bSave, m_bAutoLoadMiniImage, "AutoLoadMiniImage", "MainView");
 
+	// ボディリストのカラムの統合モード
+	SyncIniValue(inifile, bSave, m_bMainViewBodyListIntegratedColumnMode, "MainViewBodyListIntegratedColumnMode", "MainView");
+
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
 	SyncIniValue(inifile, bSave, m_nTwitterStatusLineCount, "TwitterStatusLineCount", "Twitter");

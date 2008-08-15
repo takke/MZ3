@@ -1288,7 +1288,7 @@ void CWriteView::PopupWriteBodyMenu(void)
 	POINT pt    = util::GetPopupPos();
 	int   flags = util::GetPopupFlags();
 
-	CImageList* pGlobalImageList = &theApp.m_imageCache.GetImageList();
+	CImageList* pGlobalImageList = &theApp.m_imageCache.GetImageList16();
 
 	CWMMenu menu( pGlobalImageList );
 	menu.LoadMenu( IDR_WRITE_MENU );
@@ -1347,16 +1347,20 @@ void CWriteView::PopupWriteBodyMenu(void)
 				CMZ3BackgroundImage image(L"");
 				image.load( path );
 				if (image.isEnableImage()) {
-					// 16x16 にリサイズする。
-					CMZ3BackgroundImage resizedImage(L"");
-					util::MakeResizedImage( this, resizedImage, image, 16, 16 );
+					// 16x16, 32x32 にリサイズする。
+					CMZ3BackgroundImage image16(L"");
+					util::MakeResizedImage( this, image16, image, 16, 16 );
+					CMZ3BackgroundImage image32(L"");
+					util::MakeResizedImage( this, image32, image, 32, 32 );
 
 					// ビットマップの追加
-					CBitmap bm;
-					bm.Attach( resizedImage.getHandle() );
+					CBitmap bm16;
+					bm16.Attach( image16.getHandle() );
+					CBitmap bm32;
+					bm32.Attach( image32.getHandle() );
 
 					// グローバルキャッシュに追加し、インデックスを取得する
-					imageIndex = theApp.m_imageCache.Add( &bm, (CBitmap*) NULL, path );
+					imageIndex = theApp.m_imageCache.Add( &bm16, &bm32, (CBitmap*) NULL, path );
 				}
 			}
 			if (imageIndex>=0) {
