@@ -85,13 +85,13 @@ LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（２カラム目）を取得する
 LPCTSTR MyGetBodyHeaderColName2( ACCESS_TYPE accessType, AccessTypeInfo::BODY_INDICATE_TYPE bodyIndicateType )
 {
-	AccessTypeInfo::BODY_INDICATE_TYPE typeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(accessType);
-	AccessTypeInfo::BODY_INDICATE_TYPE typeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(accessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE type2 = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(accessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE type3 = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(accessType);
 
-	if (bodyIndicateType==typeA) {
-		return theApp.m_accessTypeInfo.getBodyHeaderCol2NameA(accessType);
-	} else if (bodyIndicateType==typeB) {
-		return theApp.m_accessTypeInfo.getBodyHeaderCol2NameB(accessType);
+	if (bodyIndicateType==type2) {
+		return theApp.m_accessTypeInfo.getBodyHeaderCol2Name(accessType);
+	} else if (bodyIndicateType==type3) {
+		return theApp.m_accessTypeInfo.getBodyHeaderCol3Name(accessType);
 	} else {
 		// 未定義
 		return L"";
@@ -356,13 +356,15 @@ void CMZ3View::OnInitialUpdate()
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
 		switch( theApp.GetDisplayMode() ) {
 		case SR_VGA:
-			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 120*2, -1);
-			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 105*2, -1);
+			m_bodyList.InsertColumn(0, _T(""), LVCFMT_LEFT, 120*2, -1);
+			m_bodyList.InsertColumn(1, _T(""), LVCFMT_LEFT, 105*2, -1);
+			m_bodyList.InsertColumn(2, _T(""), LVCFMT_LEFT, 0, -1);
 			break;
 		case SR_QVGA:
 		default:
-			m_bodyList.InsertColumn(0, _T("タイトル"), LVCFMT_LEFT, 120, -1);
-			m_bodyList.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 105, -1);
+			m_bodyList.InsertColumn(0, _T(""), LVCFMT_LEFT, 120, -1);
+			m_bodyList.InsertColumn(1, _T(""), LVCFMT_LEFT, 105, -1);
+			m_bodyList.InsertColumn(2, _T(""), LVCFMT_LEFT, 0, -1);
 			break;
 		}
 	}
@@ -1074,7 +1076,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 					ACCESS_RSS_READER_FEED, 
 					m_selGroup->categories.size()+1,
 					theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
-					theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_RSS_READER_FEED) );
+					theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
+					theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 				AppendCategoryList(categoryItem);
 
 				nAppendedFeed = 1;
@@ -1096,7 +1099,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 							ACCESS_RSS_READER_FEED, 
 							m_selGroup->categories.size()+1,
 							theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
-							theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_RSS_READER_FEED) );
+							theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
+							theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 						AppendCategoryList(categoryItem);
 					}
 
@@ -1402,7 +1406,9 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	if (bUseDefaultIcon) {
 		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
 			// 統合カラムモード
-			if (theApp.m_optionMng.GetFontHeight()>=16) {
+			CRect rect;
+			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
+			if (rect.Height()>=32) {
 				m_bodyList.SetImageList(&m_iconImageListLarge, LVSIL_SMALL);
 			} else {
 				m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
@@ -1413,7 +1419,9 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	} else if (bUseExtendedIcon) {
 		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
 			// 統合カラムモード
-			if (theApp.m_optionMng.GetFontHeight()>=16) {
+			CRect rect;
+			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
+			if (rect.Height()>=32) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
 			} else {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
@@ -1471,8 +1479,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 	if (pCategory != NULL) {
 		LPCTSTR szHeaderTitle1 = MyGetBodyHeaderColName1( pCategory->m_mixi.GetAccessType() );
-		LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi.GetAccessType(), pCategory->m_secondBodyColType );
-		m_bodyList.SetHeader( szHeaderTitle1, szHeaderTitle2 );
+		LPCTSTR szHeaderTitle2 = MyGetBodyHeaderColName2( pCategory->m_mixi.GetAccessType(), pCategory->m_bodyColType2 );
+		LPCTSTR szHeaderTitle3 = MyGetBodyHeaderColName2( pCategory->m_mixi.GetAccessType(), pCategory->m_bodyColType3 );
+		m_bodyList.SetHeader( szHeaderTitle1, szHeaderTitle2, szHeaderTitle3 );
 	}
 
 	// アイテムの追加
@@ -1487,15 +1496,18 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 			return;
 		}
 
-		// １カラム目
-		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める
+		// 第1カラム
+		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める。
 		// 改行はスペースに置換する。
-		CString strInfo = MyGetItemByBodyColType(data, pCategory->m_firstBodyColType);
+		CString strInfo = MyGetItemByBodyColType(data, pCategory->m_bodyColType1);
 		strInfo.Replace(L"\r\n", L" ");
 		int index = m_bodyList.InsertItem( i, strInfo, -1 );
 
-		// ２カラム目
-		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data,pCategory->m_secondBodyColType) );
+		// 第2カラム
+		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, pCategory->m_bodyColType2) );
+
+		// 第3カラム
+		m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, pCategory->m_bodyColType3) );
 
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
@@ -1608,7 +1620,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// 第1カラムに表示している内容を表示する。
 	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_firstBodyColType, false) );
+		MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
@@ -2029,7 +2041,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 
 		// 第1カラムに表示している内容を表示する。
 		m_infoEdit.SetWindowText( 
-			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
+			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
@@ -3202,40 +3214,45 @@ bool CMZ3View::MyChangeBodyHeader(void)
 
 	ACCESS_TYPE categoryAccessType = pCategory->m_mixi.GetAccessType();
 
-	AccessTypeInfo::BODY_INDICATE_TYPE colTypeA = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(categoryAccessType);
-	AccessTypeInfo::BODY_INDICATE_TYPE colTypeB = theApp.m_accessTypeInfo.getBodyHeaderCol2TypeB(categoryAccessType);
-	if (colTypeB==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) {
+	AccessTypeInfo::BODY_INDICATE_TYPE colType2 = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(categoryAccessType);
+	AccessTypeInfo::BODY_INDICATE_TYPE colType3 = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(categoryAccessType);
+	if (colType3==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) {
 		// 変更先タイプがないため変更せず終了
 		return false;
 	}
 
 	// トグル動作
-	if (pCategory->m_secondBodyColType==colTypeA) {
-		// A to B
-		pCategory->m_secondBodyColType = colTypeB;
-	} else if (pCategory->m_secondBodyColType==colTypeB) {
-		// B to A
-		pCategory->m_secondBodyColType = colTypeA;
+	if (pCategory->m_bodyColType2==colType2) {
+		// 2 to 3
+		pCategory->m_bodyColType2 = colType3;
+		pCategory->m_bodyColType3 = colType2;
 	} else {
-		// ? to A
-		pCategory->m_secondBodyColType = colTypeA;
+		// 3 to 2
+		// ? to 2
+		pCategory->m_bodyColType2 = colType2;
+		pCategory->m_bodyColType3 = colType3;
 	}
 
-	// ヘッダー文字列の変更（第２カラムのみ）
-	m_bodyList.SetHeader( NULL, MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_secondBodyColType) );
+	// ヘッダー文字列の変更（第2, 3カラムのみ）
+	m_bodyList.SetHeader( NULL, 
+		MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_bodyColType2), 
+		MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_bodyColType3));
 
 	// アイテムの更新
 	INT_PTR count = pCategory->GetBodyList().size();
 	for (int i=0; i<count; i++) {
 		CMixiData& data = pCategory->GetBodyList()[i];
-		// ２カラム目
+		// 第2カラム
 		m_bodyList.SetItem( i, 1, LVIF_TEXT, 
-			MyGetItemByBodyColType(&data, pCategory->m_secondBodyColType), 0, 0, 0, 0 );
+			MyGetItemByBodyColType(&data, pCategory->m_bodyColType2), 0, 0, 0, 0 );
+		// 第3カラム
+		m_bodyList.SetItem( i, 2, LVIF_TEXT, 
+			MyGetItemByBodyColType(&data, pCategory->m_bodyColType3), 0, 0, 0, 0 );
 	}
 
 	// 第1カラムに表示している内容を表示する。
 	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_firstBodyColType, false) );
+		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );
@@ -3656,7 +3673,8 @@ bool CMZ3View::PrepareViewBbsList(void)
 	CCategoryItem categoryItem;
 	categoryItem.init( name, url, ACCESS_LIST_BBS, m_selGroup->categories.size(),
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_LIST_BBS),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_LIST_BBS),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_LIST_BBS),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_LIST_BBS),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 
 	return AppendCategoryList(categoryItem);
@@ -5341,7 +5359,8 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 	AppendCategoryList(categoryItem);
 
@@ -5367,7 +5386,8 @@ void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 		ACCESS_TWITTER_FRIENDS_TIMELINE, 
 		m_selGroup->categories.size()+1,
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2TypeA(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 	AppendCategoryList(categoryItem);
 
@@ -6142,4 +6162,16 @@ void CMZ3View::OnMenuMixiEchoShowProfile()
 	s_data = GetSelectedBodyItem();
 	s_data.SetAccessType(ACCESS_PROFILE);
 	AccessProc( &s_data, util::CreateMixiUrl(s_data.GetURL()));
+}
+
+/**
+ * 表示内容の再設定
+ *
+ * フォントやフォントサイズの変更時に呼び出される。
+ */
+void CMZ3View::ResetViewContent(void)
+{
+	// とりあえずカテゴリ変更時と同じ処理を実施。
+	// これによりアイコンサイズの再設定が行われる
+	OnMySelchangedCategoryList();
 }

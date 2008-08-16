@@ -144,11 +144,12 @@ bool Mz3GroupData::appendCategoryByIniData(
 	// デフォルトURL（category_url が未指定の場合に用いるURL）
 	LPCTSTR default_category_url = accessTypeInfo.getDefaultCategoryURL(category_type);
 
-	AccessTypeInfo::BODY_INDICATE_TYPE firstColType  = accessTypeInfo.getBodyHeaderCol1Type(category_type);
-	AccessTypeInfo::BODY_INDICATE_TYPE secondColType = accessTypeInfo.getBodyHeaderCol2TypeA(category_type);
+	AccessTypeInfo::BODY_INDICATE_TYPE colType1 = accessTypeInfo.getBodyHeaderCol1Type(category_type);
+	AccessTypeInfo::BODY_INDICATE_TYPE colType2 = accessTypeInfo.getBodyHeaderCol2Type(category_type);
+	AccessTypeInfo::BODY_INDICATE_TYPE colType3 = accessTypeInfo.getBodyHeaderCol3Type(category_type);
 
-	if (firstColType==AccessTypeInfo::BODY_INDICATE_TYPE_NONE || 
-		secondColType==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) 
+	if (colType1==AccessTypeInfo::BODY_INDICATE_TYPE_NONE || 
+		colType2==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) 
 	{
 		// サポート外のため追加せず終了
 //		MZ3LOGGER_ERROR(L"サポート外のため追加しません。");
@@ -189,7 +190,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 		url, 
 		category_type, 
 		group.categories.size(), 
-		firstColType, secondColType );
+		colType1, colType2, colType3 );
 	item.m_bCruise = bCruise;
 	group.categories.push_back( item );
 

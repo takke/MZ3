@@ -27,8 +27,9 @@ public:
 
 	CString			m_name;					///< リストに表示する名称
 
-	AccessTypeInfo::BODY_INDICATE_TYPE m_firstBodyColType;	///< １つ目のカラムに表示する項目の識別子
-	AccessTypeInfo::BODY_INDICATE_TYPE m_secondBodyColType;	///< ２つ目のカラムに表示する項目の識別子
+	AccessTypeInfo::BODY_INDICATE_TYPE m_bodyColType1;	///< 第1カラムに表示する項目の識別子
+	AccessTypeInfo::BODY_INDICATE_TYPE m_bodyColType2;	///< 第2カラムに表示する項目の識別子
+	AccessTypeInfo::BODY_INDICATE_TYPE m_bodyColType3;	///< 第3カラムに表示する項目の識別子
 
 	bool			m_bCruise;				///< 巡回対象かどうかを表すフラグ
 
@@ -46,6 +47,9 @@ public:
 		: selectedBody(0)
 		, m_bFromLog(0)
 		, bSaveToGroupFile(true)
+		, m_bodyColType1(AccessTypeInfo::BODY_INDICATE_TYPE_NONE)
+		, m_bodyColType2(AccessTypeInfo::BODY_INDICATE_TYPE_NONE)
+		, m_bodyColType3(AccessTypeInfo::BODY_INDICATE_TYPE_NONE)
 	{
 		memset( &m_accessTime, 0, sizeof(SYSTEMTIME) );
 	}
@@ -58,7 +62,9 @@ public:
 	/// 初期化
 	void init( LPCTSTR name,
 			   LPCTSTR url, ACCESS_TYPE accessType, int index, 
-			   AccessTypeInfo::BODY_INDICATE_TYPE firstColType, AccessTypeInfo::BODY_INDICATE_TYPE secondColType,
+			   AccessTypeInfo::BODY_INDICATE_TYPE colType1, 
+			   AccessTypeInfo::BODY_INDICATE_TYPE colType2,
+			   AccessTypeInfo::BODY_INDICATE_TYPE colType3,
 			   SAVE_TO_GROUPFILE saveToGroupFile=SAVE_TO_GROUPFILE_YES )
 	{
 		m_name = name;
@@ -67,8 +73,9 @@ public:
 		m_mixi.SetAccessType( accessType );
 
 		m_idxItemOnList = index;
-		m_firstBodyColType = firstColType;
-		m_secondBodyColType = secondColType;
+		m_bodyColType1 = colType1;
+		m_bodyColType2 = colType2;
+		m_bodyColType3 = colType3;
 
 		bSaveToGroupFile = saveToGroupFile == SAVE_TO_GROUPFILE_YES ? true : false;
 	}

@@ -85,8 +85,8 @@ public:
 		bool				bCruiseTarget;		///< 巡回対象とするか？
 		std::wstring		defaultCategoryURL;	///< カテゴリのURL
 		BodyHeaderColumn	bodyHeaderCol1;		///< ボディリストのヘッダー1のカラム
-		BodyHeaderColumn	bodyHeaderCol2A;	///< ボディリストのヘッダー2のカラムA
-		BodyHeaderColumn	bodyHeaderCol2B;	///< ボディリストのヘッダー2のカラムB
+		BodyHeaderColumn	bodyHeaderCol2;		///< ボディリストのヘッダー2のカラム
+		BodyHeaderColumn	bodyHeaderCol3;		///< ボディリストのヘッダー3のカラム
 
 //		std::wstring		refererUrlPattern;	///< リファラURLのパターン。
 
@@ -196,22 +196,22 @@ public:
 		return it->second.bodyHeaderCol1.title.c_str();
 	}
 
-	/// ボディリストのヘッダー2のカラム名A
-	const wchar_t* getBodyHeaderCol2NameA( ACCESS_TYPE t ) {
+	/// ボディリストのヘッダー2のカラム名
+	const wchar_t* getBodyHeaderCol2Name( ACCESS_TYPE t ) {
 		MYMAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
-		return it->second.bodyHeaderCol2A.title.c_str();
+		return it->second.bodyHeaderCol2.title.c_str();
 	}
 
-	/// ボディリストのヘッダー2のカラム名B
-	const wchar_t* getBodyHeaderCol2NameB( ACCESS_TYPE t ) {
+	/// ボディリストのヘッダー3のカラム名
+	const wchar_t* getBodyHeaderCol3Name( ACCESS_TYPE t ) {
 		MYMAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
-		return it->second.bodyHeaderCol2B.title.c_str();
+		return it->second.bodyHeaderCol3.title.c_str();
 	}
 
 	/// ボディリストのヘッダー1のカラム種別
@@ -223,22 +223,22 @@ public:
 		return it->second.bodyHeaderCol1.type;
 	}
 
-	/// ボディリストのヘッダー2のカラム種別A
-	BODY_INDICATE_TYPE getBodyHeaderCol2TypeA( ACCESS_TYPE t ) {
+	/// ボディリストのヘッダー2のカラム種別
+	BODY_INDICATE_TYPE getBodyHeaderCol2Type( ACCESS_TYPE t ) {
 		MYMAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
-		return it->second.bodyHeaderCol2A.type;
+		return it->second.bodyHeaderCol2.type;
 	}
 
-	/// ボディリストのヘッダー2のカラム種別B
-	BODY_INDICATE_TYPE getBodyHeaderCol2TypeB( ACCESS_TYPE t ) {
+	/// ボディリストのヘッダー3のカラム種別
+	BODY_INDICATE_TYPE getBodyHeaderCol3Type( ACCESS_TYPE t ) {
 		MYMAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
-		return it->second.bodyHeaderCol2B.type;
+		return it->second.bodyHeaderCol3.type;
 	}
 
 	/// デフォルトURL

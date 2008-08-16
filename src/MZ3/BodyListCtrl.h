@@ -16,6 +16,12 @@ class CBodyListCtrl : public CTouchListCtrl
 	DECLARE_DYNAMIC(CBodyListCtrl)
 
 public:
+	bool	m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
+private:
+	BOOL	m_useColor;
+	bool	m_bUseIcon;			///< アイコン利用フラグ
+
+public:
 	CBodyListCtrl();
 	virtual ~CBodyListCtrl();
 
@@ -27,14 +33,9 @@ protected:
 
 public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
-
-	void SetHeader(LPCTSTR, LPCTSTR);
-	bool	m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
+	void	SetHeader(LPCTSTR col1, LPCTSTR col2, LPCTSTR col3);
 
 private:
-	BOOL	m_useColor;
-	bool	m_bUseIcon;			///< アイコン利用フラグ
-
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
 public:

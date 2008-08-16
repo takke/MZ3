@@ -634,6 +634,9 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 
 		// インフォメーションエディット
 		pView->m_infoEdit.SetFont( &theApp.m_font );
+
+		// ビュー内容の再設定
+		pView->ResetViewContent();
 	}
 
 	//--- レポートビュー

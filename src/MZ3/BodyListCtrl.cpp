@@ -17,8 +17,35 @@
 #include "MixiParserUtil.h"
 #include "MZ3View.h"
 
-static const int OFFSET_FIRST	= 2*2;
-static const int OFFSET_OTHER	= 6*2;
+/// カラムモードのスタイル
+namespace COLUMN_MODE_STYLE {
+static const int BOX_MARGIN_BOTTOM  = 6;	///< ボックス間マージン(下側)
+static const int FIRST_MARGIN_LEFT	= 4;	///< 第1カラム、左側マージン
+static const int FIRST_MARGIN_RIGHT	= 4;	///< 第1カラム、右側マージン
+static const int OTHER_MARGIN_LEFT	= 12;	///< 第2カラム以降、左側マージン
+static const int OTHER_MARGIN_RIGHT	= 12;	///< 第2カラム以降、右側マージン
+}
+
+/// 統合カラムモードのスタイル
+namespace INTEGRATED_MODE_STYLE {
+static const int BOX_MARGIN_BOTTOM      = 6;	///< ボックス間マージン(下側)
+static const int EACH_LINE_MARGIN       = 3;	///< 行間マージン
+static const int FIRST_LINE_MARGIN_LEFT = 4;	///< 1行目、左マージン
+static const int OTHER_LINE_MARGIN_LEFT = 4+16;	///< 2行目以降、左マージン
+};
+
+/* 統合カラムモード
+ *            ------x-----------------------  x : FIRST_LINE_MARGIN_LEFT 
+ *            ------xx----------------------  xx: OTHER_LINE_MARGIN_LEFT
+ * 1st-line: |<icon> AAAAAAAAAAAAAAAAAAAAAAA|
+ * 2nd-line: |<icon>  BBBBBBBBBBBBBBBBBBBBBB| AとB, BとCの行間: EACH_LINE_MARGIN
+ * 3rd-line: |<icon>  CCCCCCCCCCCCCCCCCCCCCC|
+ *           |                              y y:  BOX_MARGIN_BOTTOM
+ * 1st-line: |<icon> DDDDDDDDDDDDDDDDDDDDDDD|
+ * 2nd-line: |<icon>  EEEEEEEEEEEEEEEEEEEEEE|
+ * 3rd-line: |<icon>  FFFFFFFFFFFFFFFFFFFFFF|
+ */
+
 
 // CBodyListCtrl
 
@@ -121,7 +148,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	int nIconSize = 16;
 	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && 
-		theApp.m_optionMng.GetFontHeight()>=16) 
+		rcAllLabels.Height()>=32) 
 	{
 		nIconSize = 32;
 	}
@@ -228,8 +255,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	pszText = szBuff;
 
 //	rcLabel = rcItem;
-	rcLabel.left  += OFFSET_FIRST;
-	rcLabel.right -= OFFSET_FIRST;
+	rcLabel.left  += COLUMN_MODE_STYLE::FIRST_MARGIN_LEFT;
+	rcLabel.right -= COLUMN_MODE_STYLE::FIRST_MARGIN_RIGHT;
 
 	// 文字色の変更
 	COLORREF clrTextSave = (COLORREF)-1;
@@ -370,7 +397,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 統合カラムモード、1行目
 		CRect rcDraw = rcAllLabels;
 
-		rcDraw.left += OFFSET_FIRST;
+		rcDraw.left += INTEGRATED_MODE_STYLE::FIRST_LINE_MARGIN_LEFT;
 		pDC->DrawText(pszText,
 			-1,
 			rcDraw,
@@ -388,50 +415,47 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// カラム用のラベルを描画
 	LV_COLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH;
-	// 元の色に戻す
 	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
 		int nRetLen = this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff));
 		if (nRetLen == 0) {
 			continue;
 		}
-
 		pszText = szBuff;
-		UINT nJustify = DT_LEFT;
-
-		if (pszText == szBuff) {
-			switch(lvc.fmt & LVCFMT_JUSTIFYMASK) {
-			case LVCFMT_RIGHT:
-				nJustify = DT_RIGHT;
-				break;
-			case LVCFMT_CENTER:
-				nJustify = DT_CENTER;
-				break;
-			default:
-				break;
-			}
-		}
 
 		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
-			// 統合カラムモード、nColumn 行目の描画
-			// TODO とりあえず2行限定とし、半分の高さとする。
+			// 統合カラムモード、2行目以降の描画
+			if (nColumn>=2) {
+				continue;
+			}
 			CRect rcDraw = rcAllLabels;
-			rcDraw.top    += rcDraw.Height()/2;
-			rcDraw.bottom -= 2;
-			rcDraw.left   += OFFSET_FIRST;
-			rcDraw.left   += 16;
+			rcDraw.top    += theApp.m_optionMng.GetFontHeight()+INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
+			rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
 
 			pDC->DrawText(pszText,
 				-1,
 				rcDraw,
-				nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_RIGHT | DT_END_ELLIPSIS);
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_RIGHT | DT_END_ELLIPSIS);
 		} else {
 			// 第 N カラム
+			UINT nJustify = DT_LEFT;
+			if (pszText == szBuff) {
+				switch(lvc.fmt & LVCFMT_JUSTIFYMASK) {
+				case LVCFMT_RIGHT:
+					nJustify = DT_RIGHT;
+					break;
+				case LVCFMT_CENTER:
+					nJustify = DT_CENTER;
+					break;
+				default:
+					break;
+				}
+			}
 			rcSubItem.left  = rcSubItem.right;
 			rcSubItem.right = rcSubItem.left + lvc.cx;
 
 			CRect rcDraw = rcSubItem;
-			rcDraw.left  += OFFSET_OTHER;
-			rcDraw.right -= OFFSET_OTHER;
+			rcDraw.left  += COLUMN_MODE_STYLE::OTHER_MARGIN_LEFT;
+			rcDraw.right -= COLUMN_MODE_STYLE::OTHER_MARGIN_RIGHT;
 
 			pDC->DrawText(pszText,
 				-1,
@@ -501,7 +525,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
  *
  * NULL ならそのインデックスの文字は変更しない。
  */
-void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2)
+void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2, LPCTSTR col3)
 {
 	HDITEM hdi;
 	TCHAR lpBuffer[128];
@@ -520,6 +544,12 @@ void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2)
 		this->GetHeaderCtrl()->GetItem(1, &hdi);
 		wcscpy(hdi.pszText, col2);
 		this->GetHeaderCtrl()->SetItem(1, &hdi);
+	}
+
+	if( col3 != NULL ) {
+		this->GetHeaderCtrl()->GetItem(2, &hdi);
+		wcscpy(hdi.pszText, col3);
+		this->GetHeaderCtrl()->SetItem(2, &hdi);
 	}
 }
 
@@ -719,23 +749,27 @@ void CBodyListCtrl::SetSelectItem( const int nItem )
 	}
 }
 
+/**
+ * 各項目のサイズ計算
+ */
 void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
 	LOGFONT lf;
 	GetFont()->GetLogFont( &lf );
 
-	if (lf.lfHeight < 0) {
-		lpMeasureItemStruct->itemHeight = -lf.lfHeight;
-	} else {
-		lpMeasureItemStruct->itemHeight = lf.lfHeight;
-	}
-
 	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
-		// 統合カラムモードのため高さをN倍する
-		if (lpMeasureItemStruct->itemHeight < 0) {
-			lpMeasureItemStruct->itemHeight = lpMeasureItemStruct->itemHeight*2 -3;
+		// 統合カラムモード：高さをN倍する
+		if (lf.lfHeight < 0) {
+			lpMeasureItemStruct->itemHeight = (-lf.lfHeight)*2 -INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
 		} else {
-			lpMeasureItemStruct->itemHeight = lpMeasureItemStruct->itemHeight*2 +3;
+			lpMeasureItemStruct->itemHeight =   lf.lfHeight *2 +INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
+		}
+	} else {
+		// カラムモード
+		if (lf.lfHeight < 0) {
+			lpMeasureItemStruct->itemHeight = -lf.lfHeight -COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
+		} else {
+			lpMeasureItemStruct->itemHeight =  lf.lfHeight +COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
 		}
 	}
 }

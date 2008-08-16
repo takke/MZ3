@@ -388,6 +388,7 @@ public:
 	afx_msg void OnMenuMixiEchoRead();
 	afx_msg void OnMenuMixiEchoUpdate();
 	afx_msg void OnMenuMixiEchoShowProfile();
+	void ResetViewContent(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

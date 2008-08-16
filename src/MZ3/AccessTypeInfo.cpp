@@ -83,7 +83,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "INTRO";
 	m_map[type].defaultCategoryURL = L"show_intro.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"紹介文");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"紹介文");
 
 	type = ACCESS_LIST_DIARY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -97,8 +97,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_friend_diary.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
 
 	type = ACCESS_LIST_NEW_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
@@ -112,8 +112,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_comment.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
 
 	type = ACCESS_LIST_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
@@ -127,8 +127,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_comment.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
 
 	type = ACCESS_LIST_NEWS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -147,8 +147,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"見出し");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"配信時刻>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"配給元>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"配信時刻>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"配給元>>");
 
 	type = ACCESS_LIST_FAVORITE_USER;
 	m_map[type] = AccessTypeInfo::Data(
@@ -165,8 +165,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "FAVORITE";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"最終ログイン>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"自己紹介>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"最終ログイン>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"自己紹介>>");
 
 	type = ACCESS_LIST_FAVORITE_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -183,8 +183,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "FAVORITE_COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl?kind=community";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"説明>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"説明>>");
 
 	type = ACCESS_LIST_FRIEND;
 	m_map[type] = AccessTypeInfo::Data(
@@ -198,7 +198,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "FRIEND";
 	m_map[type].defaultCategoryURL = L"ajax_friend_setting.pl?type=thumbnail&mode=get_friends&page=1&sort=nickname";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"ログイン時刻");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"ログイン時刻");
 	m_map[type].requestEncoding = ENCODING_UTF8;	// mixi API => UTF-8
 
 	type = ACCESS_LIST_COMMUNITY;
@@ -214,7 +214,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "COMMUNITY";
 	m_map[type].defaultCategoryURL = L"list_community.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数");
 
 	type = ACCESS_LIST_NEW_BBS_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
@@ -230,8 +230,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs_comment.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
 
 	type = ACCESS_LIST_NEW_BBS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -245,8 +245,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"new_bbs.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
 
 	type = ACCESS_LIST_BBS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -261,7 +261,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	// 動的に生成されるためデフォルトURLは不要
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
 
 	type = ACCESS_LIST_MYDIARY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -275,7 +275,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_diary.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時");
 
 	type = ACCESS_LIST_FOOTSTEP;
 	m_map[type] = AccessTypeInfo::Data(
@@ -289,7 +289,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "FOOTSTEP";
 	m_map[type].defaultCategoryURL = L"http://mixi.jp/atom/tracks/r=2/member_id={owner_id}";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"時刻");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"時刻");
 
 	type = ACCESS_LIST_MESSAGE_IN;
 	m_map[type] = AccessTypeInfo::Data(
@@ -303,8 +303,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"差出人>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"差出人>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
 
 	type = ACCESS_LIST_MESSAGE_OUT;
 	m_map[type] = AccessTypeInfo::Data(
@@ -318,8 +318,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bCruiseTarget = true;
 	m_map[type].defaultCategoryURL = L"list_message.pl?box=outbox";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"宛先>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"宛先>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
 
 	type = ACCESS_LIST_BOOKMARK;
 	m_map[type] = AccessTypeInfo::Data(
@@ -331,7 +331,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "BOOKMARK";
 	m_map[type].defaultCategoryURL = L"";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ");
 
 	type = ACCESS_LIST_CALENDAR;
 	m_map[type] = AccessTypeInfo::Data(
@@ -344,7 +344,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "CALENDAR";
 	m_map[type].defaultCategoryURL = L"show_calendar.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
 
 	//------------------------------------------------------------------
 	//--- mixi,一般
@@ -613,8 +613,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 
 	type = ACCESS_TWITTER_FAVORITES;
 	m_map[type] = AccessTypeInfo::Data(
@@ -631,8 +631,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "TWITTER_FAVORITES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 
 	type = ACCESS_TWITTER_DIRECT_MESSAGES;
 	m_map[type] = AccessTypeInfo::Data(
@@ -650,8 +650,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "TWITTER_DIRECT_MESSAGES";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"メッセージ");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 
 	type = ACCESS_TWITTER_UPDATE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -731,8 +731,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "MIXI_RECENT_ECHO";
 	m_map[type].defaultCategoryURL = L"recent_echo.pl";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 
 	// add_echo.pl
 	type = ACCESS_MIXI_ADD_ECHO;
@@ -760,8 +760,8 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "RSS_FEED";
 	m_map[type].defaultCategoryURL = L"";
 	m_map[type].bodyHeaderCol1  = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2A = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY,  L"内容>>");
-	m_map[type].bodyHeaderCol2B = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY,  L"内容>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
 
 	type = ACCESS_RSS_READER_ITEM;
 	m_map[type] = AccessTypeInfo::Data(
