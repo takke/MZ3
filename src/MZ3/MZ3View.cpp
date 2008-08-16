@@ -689,7 +689,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	}
 
 	// 統合カラムモード
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// カラムヘッダは不要
 		util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
 
@@ -1409,7 +1409,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	if (bUseDefaultIcon) {
 		// デフォルトアイコン
 		// 32px のデフォルトアイコンができたら下記のコメントを外すこと。
-//		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+//		if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 			// 統合カラムモード
 //			CRect rect;
 //			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
@@ -1425,7 +1425,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			iconMode = CBodyListCtrl::ICON_MODE_16;
 //		}
 	} else if (bUseExtendedIcon) {
-		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 			// 統合カラムモード
 			MEASUREITEMSTRUCT measureItemStruct;
 			m_bodyList.MeasureItem(&measureItemStruct);
@@ -3288,7 +3288,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	m_infoEdit.SetWindowText( 
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
 
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモードでは全体を再描画
 		Invalidate(FALSE);
 	} else {

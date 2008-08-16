@@ -147,7 +147,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcAllLabels.MoveToY( rcItem.top );
 
 	int nIconSize = 16;
-//	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) {
+//	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) {
 	if (m_iconMode==ICON_MODE_32) {
 		nIconSize = 32;
 	}
@@ -392,7 +392,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 各カラム(各行)の描画
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモードの描画
 
 		// 各カラムの取得
@@ -811,7 +811,7 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	LOGFONT lf;
 	GetFont()->GetLogFont( &lf );
 
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
 		if (lf.lfHeight < 0) {
 			lpMeasureItemStruct->itemHeight = (-lf.lfHeight)*2 -INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;

@@ -118,7 +118,7 @@ public:
 	int				m_nMainViewMiniImageSize;			///< mini画面サイズ
 	bool			m_bAutoLoadMiniImage;				///< 画像の自動取得
 
-	bool			m_bMainViewBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
+	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
 
 private:
 	int				m_recvBufSize;					///< 受信バッファサイズ
@@ -191,7 +191,7 @@ public:
 		, m_bUseRan2DoubleClickMove( true )
 #endif
 		, m_bAutoLoadMiniImage( true )
-		, m_bMainViewBodyListIntegratedColumnMode( true )
+		, m_bBodyListIntegratedColumnMode( true )
 		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )

@@ -65,6 +65,9 @@ BOOL COptionTabMainView::OnInitDialog()
 	// トピック等のアイコン表示
 	CheckDlgButton( IDC_SHOW_ICON_CHECK, theApp.m_optionMng.m_bShowMainViewIcon ? BST_CHECKED : BST_UNCHECKED );
 
+	// 下ペインのリストを１行で表示する
+	CheckDlgButton( IDC_NO_INTEGRATED_MODE_CHECK, theApp.m_optionMng.m_bBodyListIntegratedColumnMode ? BST_UNCHECKED : BST_CHECKED);
+
 	// mini画面サイズ
 #ifdef WINCE
 	// 無効
@@ -102,6 +105,9 @@ void COptionTabMainView::OnOK()
 
 	// トピック等のアイコン表示
 	theApp.m_optionMng.m_bShowMainViewIcon = IsDlgButtonChecked( IDC_SHOW_ICON_CHECK ) == BST_CHECKED;
+
+	// 下ペインのリストを１行で表示する
+	theApp.m_optionMng.m_bBodyListIntegratedColumnMode = IsDlgButtonChecked( IDC_NO_INTEGRATED_MODE_CHECK ) != BST_CHECKED;
 
 	// mini画面サイズ
 #ifndef WINCE
