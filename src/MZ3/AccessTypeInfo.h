@@ -87,6 +87,8 @@ public:
 		BodyHeaderColumn	bodyHeaderCol1;		///< ボディリストのヘッダー1のカラム
 		BodyHeaderColumn	bodyHeaderCol2;		///< ボディリストのヘッダー2のカラム
 		BodyHeaderColumn	bodyHeaderCol3;		///< ボディリストのヘッダー3のカラム
+		std::wstring		bodyIntegratedLinePattern1;		///< 統合カラムモード、1行目のパターン(%n でカラム要素を指定する)
+		std::wstring		bodyIntegratedLinePattern2;		///< 統合カラムモード、2行目のパターン(%n でカラム要素を指定する)
 
 //		std::wstring		refererUrlPattern;	///< リファラURLのパターン。
 
@@ -100,6 +102,8 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
+			, bodyIntegratedLinePattern1(L"%1")
+			, bodyIntegratedLinePattern2(L"%2 | %3")
 //			, refererUrlPattern(L"")
 		{}
 		Data()
@@ -112,6 +116,8 @@ public:
 			, serializeKey("")
 			, bCruiseTarget(false)
 			, defaultCategoryURL(L"")
+			, bodyIntegratedLinePattern1(L"%1")
+			, bodyIntegratedLinePattern2(L"%2 | %3")
 //			, refererUrlPattern(L"")
 		{}
 	};
@@ -239,6 +245,24 @@ public:
 			return BODY_INDICATE_TYPE_NONE;
 		}
 		return it->second.bodyHeaderCol3.type;
+	}
+
+	/// 統合カラムモード、1行目のパターン
+	const wchar_t* getBodyIntegratedLinePattern1( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.bodyIntegratedLinePattern1.c_str();
+	}
+
+	/// 統合カラムモード、2行目のパターン
+	const wchar_t* getBodyIntegratedLinePattern2( ACCESS_TYPE t ) {
+		MYMAP::iterator it = m_map.find(t);
+		if (it==m_map.end()) {
+			return L"";
+		}
+		return it->second.bodyIntegratedLinePattern2.c_str();
 	}
 
 	/// デフォルトURL

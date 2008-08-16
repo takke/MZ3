@@ -17,6 +17,9 @@ class CBodyListCtrl : public CTouchListCtrl
 
 public:
 	bool	m_bStopDraw;		///< DrawItem 実行可否フラグ（SetDraw）
+	CString m_strIntegratedLinePattern1;	///< 統合カラムモード、1行目のパターン
+	CString m_strIntegratedLinePattern2;	///< 統合カラムモード、2行目のパターン
+
 private:
 	BOOL	m_useColor;
 	bool	m_bUseIcon;			///< アイコン利用フラグ

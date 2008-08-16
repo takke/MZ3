@@ -122,7 +122,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	TCHAR szBuff[MAX_PATH];
-	LPCTSTR pszText;
 
 	// アイテム データを取得します。
 	LV_ITEM lvi;
@@ -147,8 +146,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcAllLabels.MoveToY( rcItem.top );
 
 	int nIconSize = 16;
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && 
-		rcAllLabels.Height()>=32) 
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) 
 	{
 		nIconSize = 32;
 	}
@@ -252,7 +250,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcSubItem.MoveToY( rcItem.top );
 
 	//--- 左側カラム
-	pszText = szBuff;
+	LPCTSTR pszText = szBuff;
 
 //	rcLabel = rcItem;
 	rcLabel.left  += COLUMN_MODE_STYLE::FIRST_MARGIN_LEFT;
@@ -265,8 +263,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 選択状態なので、システム標準の選択色で塗りつぶす
 		clrTextSave = pDC->SetTextColor(::GetSysColor(COLOR_HIGHLIGHTTEXT));
 		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
-	}
-	else {
+	} else {
 		// 非選択状態なので、状態に応じて色を変更する
 		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < (int)pCategory->m_body.size()) {
@@ -393,62 +390,88 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
+	// 各カラム(各行)の描画
 	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
-		// 統合カラムモード、1行目
-		CRect rcDraw = rcAllLabels;
+		// 統合カラムモードの描画
 
+		// 各カラムの取得
+		CString strColumn1 = pszText;
+		CString strColumn2 = L"";
+		CString strColumn3 = L"";
+		LV_COLUMN lvc;
+		lvc.mask = LVCF_FMT | LVCF_WIDTH;
+		for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
+			if (this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff)) == 0) {
+				continue;
+			}
+			switch (nColumn) {
+			case 1:		strColumn2 = szBuff;	break;
+			case 2:		strColumn3 = szBuff;	break;
+			default:	break;
+			}
+		}
+
+		//--- 1行目の描画
+
+		// パターンの変換
+		CString strLine1 = m_strIntegratedLinePattern1;
+		strLine1.Replace(L"%1", strColumn1);
+		strLine1.Replace(L"%2", strColumn2);
+		strLine1.Replace(L"%3", strColumn3);
+
+		// 描画
+		CRect rcDraw = rcAllLabels;
 		rcDraw.left += INTEGRATED_MODE_STYLE::FIRST_LINE_MARGIN_LEFT;
-		pDC->DrawText(pszText,
+		pDC->DrawText(strLine1,
 			-1,
 			rcDraw,
 			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+
+		//--- 2行目の描画
+
+		// パターンの変換
+		CString strLine2 = m_strIntegratedLinePattern2;
+		strLine2.Replace(L"%1", strColumn1);
+		strLine2.Replace(L"%2", strColumn2);
+		strLine2.Replace(L"%3", strColumn3);
+
+		// 描画
+		rcDraw = rcAllLabels;
+		rcDraw.top    += theApp.m_optionMng.GetFontHeight()+INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
+		rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
+		pDC->DrawText(strLine2,
+			-1,
+			rcDraw,
+			DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
 	} else {
+		// 非統合カラムモードの場合の描画処理
+
 		// 第1カラム
 		pDC->DrawText(pszText,
 			-1,
 			rcLabel,
 			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
-	}
 
-	//--- 右側カラム
-
-	// カラム用のラベルを描画
-	LV_COLUMN lvc;
-	lvc.mask = LVCF_FMT | LVCF_WIDTH;
-	for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-		int nRetLen = this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff));
-		if (nRetLen == 0) {
-			continue;
-		}
-		pszText = szBuff;
-
-		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
-			// 統合カラムモード、2行目以降の描画
-			if (nColumn>=2) {
+		// 第2カラム以降の描画
+		LV_COLUMN lvc;
+		lvc.mask = LVCF_FMT | LVCF_WIDTH;
+		for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
+			if (this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff)) == 0) {
 				continue;
 			}
-			CRect rcDraw = rcAllLabels;
-			rcDraw.top    += theApp.m_optionMng.GetFontHeight()+INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
-			rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
+			LPCTSTR pszText = szBuff;
 
-			pDC->DrawText(pszText,
-				-1,
-				rcDraw,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_RIGHT | DT_END_ELLIPSIS);
-		} else {
 			// 第 N カラム
 			UINT nJustify = DT_LEFT;
-			if (pszText == szBuff) {
-				switch(lvc.fmt & LVCFMT_JUSTIFYMASK) {
-				case LVCFMT_RIGHT:
-					nJustify = DT_RIGHT;
-					break;
-				case LVCFMT_CENTER:
-					nJustify = DT_CENTER;
-					break;
-				default:
-					break;
-				}
+			switch(lvc.fmt & LVCFMT_JUSTIFYMASK) {
+			case LVCFMT_RIGHT:
+				nJustify = DT_RIGHT;
+				break;
+			case LVCFMT_CENTER:
+				nJustify = DT_CENTER;
+				break;
+			default:
+				break;
 			}
 			rcSubItem.left  = rcSubItem.right;
 			rcSubItem.right = rcSubItem.left + lvc.cx;

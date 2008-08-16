@@ -1513,6 +1513,13 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		m_bodyList.SetItemData( index, index );
 	}
 
+	// 統合カラムモード用のフォーマッタを設定する
+	m_bodyList.m_strIntegratedLinePattern1 = 
+		theApp.m_accessTypeInfo.getBodyIntegratedLinePattern1(pCategory->m_mixi.GetAccessType());
+	m_bodyList.m_strIntegratedLinePattern2 = 
+		theApp.m_accessTypeInfo.getBodyIntegratedLinePattern2(pCategory->m_mixi.GetAccessType());
+
+
 	m_bModifyingBodyList = false;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
@@ -3254,8 +3261,13 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	m_infoEdit.SetWindowText( 
 		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
 
-	// アイコン再描画
-	InvalidateRect( m_rectIcon, FALSE );
+	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		// 統合カラムモードでは全体を再描画
+		Invalidate(FALSE);
+	} else {
+		// アイコン再描画
+		InvalidateRect( m_rectIcon, FALSE );
+	}
 
 	return true;
 }
