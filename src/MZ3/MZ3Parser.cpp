@@ -266,12 +266,12 @@ void RssFeedParser::setDescriptionTitle( CMixiData& data, CString description, C
 	description = description.Trim();
 	data.AddBody(description);
 
-	// title = title+description
+	// title = title
 	mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 	if (!title.IsEmpty()) {
 		title += L"\r\n";
 	}
-	title += description;
+//	title += description;
 	title = title.Trim();
 	data.SetTitle( title );
 }

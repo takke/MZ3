@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CTouchListCtrl)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MEASUREITEM_REFLECT()
+	ON_MESSAGE(WM_SETFONT, OnSetFont)
 END_MESSAGE_MAP()
 
 
@@ -146,8 +147,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcAllLabels.MoveToY( rcItem.top );
 
 	int nIconSize = 16;
-	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) 
-	{
+//	if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) {
+	if (m_iconMode==ICON_MODE_32) {
 		nIconSize = 32;
 	}
 
@@ -156,7 +157,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	this->GetItemRect(nItem, rcLabel, LVIR_LABEL);
 	// 表示位置をrcItemに合わせる
 	rcLabel.MoveToY( rcItem.top );
-	if (m_bUseIcon==false) {
+	if (m_iconMode==ICON_MODE_NONE) {
 		// アイコンなしの場合は、アイコン分だけオフセットをかける
 		if (rcLabel.left > nIconSize) {
 			rcLabel.left -= nIconSize;
@@ -207,7 +208,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 状態アイコンを描画します。
-	if (m_bUseIcon) {
+	if (m_iconMode!=ICON_MODE_NONE) {
 		UINT nStateImageMask = lvi.state & LVIS_STATEIMAGEMASK;
 		if ((nStateImageMask>>12) > 0) {
 
@@ -411,13 +412,30 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			}
 		}
 
+//		MZ3_TRACE(L"col1 : %s\n", strColumn1);
+//		MZ3_TRACE(L"col2 : %s\n", strColumn2);
+//		MZ3_TRACE(L"col2 : %s\n", strColumn3);
+
 		//--- 1行目の描画
 
 		// パターンの変換
 		CString strLine1 = m_strIntegratedLinePattern1;
+		bool bEmpty = true;
+		if (m_strIntegratedLinePattern1.Find(L"%1")>=0 && !strColumn1.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine1.Replace(L"%1", strColumn1);
+		if (m_strIntegratedLinePattern1.Find(L"%2")>=0 && !strColumn2.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine1.Replace(L"%2", strColumn2);
+		if (m_strIntegratedLinePattern1.Find(L"%3")>=0 && !strColumn3.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine1.Replace(L"%3", strColumn3);
+		if (bEmpty) {
+			strLine1 = L"";
+		}
 
 		// 描画
 		CRect rcDraw = rcAllLabels;
@@ -431,9 +449,22 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		// パターンの変換
 		CString strLine2 = m_strIntegratedLinePattern2;
+		bEmpty = true;
+		if (m_strIntegratedLinePattern2.Find(L"%1")>=0 && !strColumn1.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine2.Replace(L"%1", strColumn1);
+		if (m_strIntegratedLinePattern2.Find(L"%2")>=0 && !strColumn2.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine2.Replace(L"%2", strColumn2);
+		if (m_strIntegratedLinePattern2.Find(L"%3")>=0 && !strColumn3.IsEmpty()) {
+			bEmpty = false;
+		}
 		strLine2.Replace(L"%3", strColumn3);
+		if (bEmpty) {
+			strLine2 = L"";
+		}
 
 		// 描画
 		rcDraw = rcAllLabels;
@@ -795,4 +826,25 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 			lpMeasureItemStruct->itemHeight =  lf.lfHeight +COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
 		}
 	}
+
+	MZ3_TRACE(L"CBodyListCtrl::MeasureItem(), itemHeight : %d\n", lpMeasureItemStruct->itemHeight);
+}
+
+LRESULT CBodyListCtrl::OnSetFont(WPARAM wParam, LPARAM lParam)
+{
+	MZ3_TRACE(L"CBodyListCtrl::OnSetFont()\n");
+
+	LRESULT res =  Default();
+
+	CRect rc;
+	GetWindowRect( &rc );
+
+	WINDOWPOS wp;
+	wp.hwnd = m_hWnd;
+	wp.cx = rc.Width();
+	wp.cy = rc.Height();
+	wp.flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
+
+	return res;
 }

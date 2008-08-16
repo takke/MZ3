@@ -138,11 +138,15 @@ void Option::Sync(bool bSave)
 	// フォントサイズ
 	if (!bSave) {
 		// 初期値設定
+#ifdef WINCE
 		switch( theApp.GetDisplayMode() ) {
 		case SR_VGA:		m_fontHeight = 24; break;
 		case SR_QVGA:
 		default:			m_fontHeight = 12; break;
 		}
+#else
+		m_fontHeight = 14;
+#endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeight, "FontHeight", "UI");
 

@@ -23,6 +23,10 @@
 #include "url_encoder.h"
 #include "version.h"
 
+// MZ4 の初回起動時のウィンドウサイズ
+#define MZ4_WINDOW_DEFAULT_SIZE_X	400
+#define MZ4_WINDOW_DEFAULT_SIZE_Y	600
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -207,8 +211,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.style &= ~FWS_ADDTOTITLE;
 
 #ifndef WINCE
-	cs.cx = 320;
-	cs.cy = 480;
+	cs.cx = MZ4_WINDOW_DEFAULT_SIZE_X;
+	cs.cy = MZ4_WINDOW_DEFAULT_SIZE_Y;
 
 	// 前回のサイズを復帰する
 	if (theApp.m_optionMng.m_strWindowPos.GetLength() > 16) {
@@ -228,6 +232,16 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	// タイトル変更
 	MySetTitle();
+#else
+	CRect rc;
+	GetWindowRect( &rc );
+
+	WINDOWPOS wp;
+	wp.hwnd = m_hWnd;
+	wp.cx = rc.Width();
+	wp.cy = rc.Height();
+	wp.flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
 #endif
 
 	return TRUE;

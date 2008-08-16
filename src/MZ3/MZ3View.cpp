@@ -1401,35 +1401,50 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		}
 	}
 
+	// 行の高さが乱れた状態で描画されるのを回避するため描画停止
+	m_bodyList.m_bStopDraw = true;
+
 	// アイコン表示・非表示設定
-	m_bodyList.MyEnableIcon( bUseDefaultIcon || bUseExtendedIcon );
+	CBodyListCtrl::ICON_MODE iconMode = CBodyListCtrl::ICON_MODE_NONE;
 	if (bUseDefaultIcon) {
-		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
+		// デフォルトアイコン
+		// 32px のデフォルトアイコンができたら下記のコメントを外すこと。
+//		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
 			// 統合カラムモード
-			CRect rect;
-			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
-			if (rect.Height()>=32) {
-				m_bodyList.SetImageList(&m_iconImageListLarge, LVSIL_SMALL);
-			} else {
-				m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
-			}
-		} else {
+//			CRect rect;
+//			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
+//			if (rect.Height()>=32) {
+//				m_bodyList.SetImageList(&m_iconImageListLarge, LVSIL_SMALL);
+//				iconMode = CBodyListCtrl::ICON_MODE_32;
+//			} else {
+//				m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
+//				iconMode = CBodyListCtrl::ICON_MODE_16;
+//			}
+//		} else {
 			m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
-		}
+			iconMode = CBodyListCtrl::ICON_MODE_16;
+//		}
 	} else if (bUseExtendedIcon) {
 		if (theApp.m_optionMng.m_bMainViewBodyListIntegratedColumnMode) {
 			// 統合カラムモード
-			CRect rect;
-			m_bodyList.GetItemRect(0, rect, LVIR_BOUNDS);
-			if (rect.Height()>=32) {
+			MEASUREITEMSTRUCT measureItemStruct;
+			m_bodyList.MeasureItem(&measureItemStruct);
+			MZ3_TRACE(L"アイテムの高さ : %d\n", measureItemStruct.itemHeight);
+			if (measureItemStruct.itemHeight>=32) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
+				iconMode = CBodyListCtrl::ICON_MODE_32;
 			} else {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
+				iconMode = CBodyListCtrl::ICON_MODE_16;
 			}
 		} else {
 			m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
+			iconMode = CBodyListCtrl::ICON_MODE_16;
 		}
 	}
+
+	// アイコン描画モードの設定
+	m_bodyList.MySetIconMode( iconMode );
 
 	// アイコンの設定
 	int itemCount = m_bodyList.GetItemCount();
@@ -1452,6 +1467,14 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		// アイコンのインデックスを設定
 		util::MySetListCtrlItemImageIndex( m_bodyList, i, 0, iconIndex );
 	}
+
+	m_bodyList.m_bStopDraw = false;
+
+	// アイコンを設定することでボディリストのアイテムの高さがシステム標準に戻っている場合がある。
+	// これを回避するため、再度フォントを設定することで、
+	// OnSetFont() => MeasureItem() が呼び出されるようにし、
+	// ボディリストのアイテムの高さを再設定する。
+	m_bodyList.SetFont( &theApp.m_font );
 
 	// スタイル変更
 	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
@@ -1485,7 +1508,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	}
 
 	// アイテムの追加
-	m_bodyList.MyEnableIcon( false );	// まずアイコンはオフにして生成
+	m_bodyList.MySetIconMode( CBodyListCtrl::ICON_MODE_NONE );	// まずアイコンはオフにして生成
 	INT_PTR count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
@@ -3021,6 +3044,10 @@ void CMZ3View::OnGetLast10()
  */
 void CMZ3View::OnMySelchangedCategoryList(void)
 {
+	if (m_selGroup==NULL) {
+		return;
+	}
+
 	// スタイル変更
 	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
 	if (newStyle!=m_viewStyle) {
@@ -6042,7 +6069,15 @@ void CMZ3View::OnMenuRssRead()
 	CMixiData& data = GetSelectedBodyItem();
 
 	CString item;
+
+	// タイトル
 	item = data.GetTitle();
+	item.Append( L"\r\n" );
+
+	// 本文
+	CString body = data.GetBody();
+	while( body.Replace( L"\r\n", L"" ) );
+	item += body;
 	item.Append( L"\r\n" );
 
 	// 日付があれば追加

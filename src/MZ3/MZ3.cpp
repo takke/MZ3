@@ -447,10 +447,13 @@ BOOL CMZ3App::InitInstance()
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
 
-	if( m_bSmartphone ) {
-		// Smartphone/Standard だと初期描画されないっぽいので、ここで再描画しておく
-		((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
-	}
+//	if( m_bSmartphone ) {
+#ifdef WINCE
+	// 下記の理由からここで再描画
+	// - Smartphone/Standard だと初期描画されないっぽい
+	// - 統合カラムモードのサイズ調整が行われない
+	((CMainFrame*)m_pMainWnd)->ChangeAllViewFont();
+#endif
 
 	// 絵文字定義ファイルのロード
 	{

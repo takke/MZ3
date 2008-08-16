@@ -20,9 +20,14 @@ public:
 	CString m_strIntegratedLinePattern1;	///< 統合カラムモード、1行目のパターン
 	CString m_strIntegratedLinePattern2;	///< 統合カラムモード、2行目のパターン
 
+	enum ICON_MODE {
+		ICON_MODE_NONE = 0,		///< アイコンなし
+		ICON_MODE_16,			///< 16x16 アイコン
+		ICON_MODE_32,			///< 32x32 アイコン
+	};
+
 private:
-	BOOL	m_useColor;
-	bool	m_bUseIcon;			///< アイコン利用フラグ
+	ICON_MODE m_iconMode;		///< アイコンモード
 
 public:
 	CBodyListCtrl();
@@ -42,8 +47,8 @@ private:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult);
 public:
-	void MyEnableIcon( bool bUseIcon ) { m_bUseIcon = bUseIcon; }
-	bool IsEnableIcon() { return m_bUseIcon; }
+	void MySetIconMode( ICON_MODE iconMode ) { m_iconMode = iconMode; }
+	bool IsEnableIcon() { return m_iconMode!=ICON_MODE_NONE; }
 
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
@@ -54,6 +59,7 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+	afx_msg LRESULT OnSetFont(WPARAM wParam, LPARAM lParam);
 };
 
 
