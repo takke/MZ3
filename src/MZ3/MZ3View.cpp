@@ -187,6 +187,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_READ, &CMZ3View::OnMenuMixiEchoRead)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
+	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -6238,4 +6239,15 @@ void CMZ3View::ResetViewContent(void)
 	// とりあえずカテゴリ変更時と同じ処理を実施。
 	// これによりアイコンサイズの再設定が行われる
 	OnMySelchangedCategoryList();
+}
+
+/**
+ * 統合カラムモードの変更(トグル)
+ */
+void CMZ3View::OnAcceleratorToggleIntegratedMode()
+{
+	theApp.m_optionMng.m_bBodyListIntegratedColumnMode = !theApp.m_optionMng.m_bBodyListIntegratedColumnMode;
+
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
 }

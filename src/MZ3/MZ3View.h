@@ -389,6 +389,7 @@ public:
 	afx_msg void OnMenuMixiEchoUpdate();
 	afx_msg void OnMenuMixiEchoShowProfile();
 	void ResetViewContent(void);
+	afx_msg void OnAcceleratorToggleIntegratedMode();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
