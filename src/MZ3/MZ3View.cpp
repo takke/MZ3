@@ -6250,8 +6250,12 @@ void CMZ3View::ResetViewContent(void)
  */
 void CMZ3View::OnAcceleratorToggleIntegratedMode()
 {
+	// 統合カラムモードの変更(トグル)
 	theApp.m_optionMng.m_bBodyListIntegratedColumnMode = !theApp.m_optionMng.m_bBodyListIntegratedColumnMode;
 
-	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-	pMainFrame->ChangeAllViewFont();
+	// レイアウト反映
+	MySetLayout(0, 0);
+
+	// ボディリストの再構築
+	OnMySelchangedCategoryList();
 }
