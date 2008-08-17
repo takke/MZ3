@@ -1526,11 +1526,20 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		strInfo.Replace(L"\r\n", L" ");
 		int index = m_bodyList.InsertItem( i, strInfo, -1 );
 
-		// 第2カラム
-		m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, pCategory->m_bodyColType2) );
-
-		// 第3カラム
-		m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, pCategory->m_bodyColType3) );
+		// 第2、第3カラム
+		if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
+			// 統合カラムモードの場合はカテゴリのカラムタイプ(トグルで変更される)に無関係に
+			// カテゴリ種別に応じた文字列を設定する
+			AccessTypeInfo::BODY_INDICATE_TYPE bodyColType;
+			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(pCategory->m_mixi.GetAccessType());
+			m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, bodyColType) );
+			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(pCategory->m_mixi.GetAccessType());
+			m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, bodyColType) );
+			
+		} else {
+			m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, pCategory->m_bodyColType2) );
+			m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, pCategory->m_bodyColType3) );
+		}
 
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
@@ -3239,6 +3248,11 @@ void CMZ3View::OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 bool CMZ3View::MyChangeBodyHeader(void)
 {
+	// 統合カラムモードでは無効
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
+		return false;
+	}
+
 	// 状態に応じて、「表示項目」の変更を行う
 	// いわゆるトグル動作。
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
