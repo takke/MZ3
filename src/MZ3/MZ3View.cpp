@@ -1565,9 +1565,13 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
 		MoveMiniImageDlg();
-	}
 
-	util::MySetInformationText( m_hWnd, L"完了" );
+		util::MySetInformationText( m_hWnd, L"完了" );
+	} else {
+		// 第1カラムに表示している内容を表示する。
+		m_infoEdit.SetWindowText( 
+			MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+	}
 }
 
 /**
@@ -5979,7 +5983,6 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		}
 	}
 
-	util::MySetInformationText( m_hWnd, L"完了" );
 	return false;
 }
 
