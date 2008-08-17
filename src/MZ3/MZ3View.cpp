@@ -697,7 +697,11 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	} else {
 		// ラベルぬっ殺しモードの場合はスタイルを変更すっぺよ
 		if( theApp.m_optionMng.m_killPaneLabel ) {
+			// カラムヘッダ除去
 			util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, NULL, LVS_NOCOLUMNHEADER);
+		} else {
+			// カラムヘッダ設定
+			util::ModifyStyleDlgItemWindow(this, IDC_BODY_LIST, LVS_NOCOLUMNHEADER, NULL);
 		}
 	}
 
