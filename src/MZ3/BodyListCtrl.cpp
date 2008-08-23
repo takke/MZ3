@@ -532,7 +532,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		clrBkSave = pDC->SetBkColor(clrBkSave);
 	}
 
-	// 日付区切りバーの描画
+	// 日付区切りバー(日付変更線)の描画
 	// 現在の要素 (nItem) の上側に線を引く
 	// 判定処理
 	bool bDrawDayBreakBar = false;
@@ -564,8 +564,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		CPen* pOldPen = pDC->SelectObject(&penDayBreakBar);
 
-		pDC->MoveTo(rcAllLabels.left, rcAllLabels.top);
-		pDC->LineTo(rcAllLabels.right, rcAllLabels.top);
+		pDC->MoveTo(rcAllLabels.left,  rcAllLabels.top-1);
+		pDC->LineTo(rcAllLabels.right, rcAllLabels.top-1);
 
 		pDC->SelectObject(pOldPen);
 //		wprintf( L"draw line (%d,%d) to (%d,%d)\n", 
