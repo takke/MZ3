@@ -3257,25 +3257,39 @@ void CMZ3View::OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 bool CMZ3View::MyChangeBodyHeader(void)
 {
-	// 統合カラムモードでは無効
-	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
-		return false;
-	}
-
-	// 状態に応じて、「表示項目」の変更を行う
-	// いわゆるトグル動作。
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 	if (pCategory == NULL) {
 		return false;
 	}
 
-	ACCESS_TYPE categoryAccessType = pCategory->m_mixi.GetAccessType();
+	/**
+	 * 統合カラムモード → 1行モード(A)
+	 * 1行モード(A) → [Bモードあり] 1行モード(B)
+	 *              → [Bモードなし] 統合カラムモード
+	 * 1行モード(B) → 統合カラムモード
+	 */
 
+	ACCESS_TYPE categoryAccessType = pCategory->m_mixi.GetAccessType();
 	AccessTypeInfo::BODY_INDICATE_TYPE colType2 = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(categoryAccessType);
 	AccessTypeInfo::BODY_INDICATE_TYPE colType3 = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(categoryAccessType);
+
+	// 統合カラムモード → 1行モード(タイプA)
+	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
+		// タイプAに変更
+		pCategory->m_bodyColType2 = colType2;
+		pCategory->m_bodyColType3 = colType3;
+
+		OnAcceleratorToggleIntegratedMode();
+		return true;
+	}
+
+	// 状態に応じて、「表示項目」の変更を行う
+	// いわゆるトグル動作。
 	if (colType3==AccessTypeInfo::BODY_INDICATE_TYPE_NONE) {
-		// 変更先タイプがないため変更せず終了
-		return false;
+		// 変更先タイプがない
+		// → 統合カラムモード
+		OnAcceleratorToggleIntegratedMode();
+		return true;
 	}
 
 	// トグル動作
@@ -3286,8 +3300,13 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	} else {
 		// 3 to 2
 		// ? to 2
-		pCategory->m_bodyColType2 = colType2;
-		pCategory->m_bodyColType3 = colType3;
+//		pCategory->m_bodyColType2 = colType2;
+//		pCategory->m_bodyColType3 = colType3;
+
+		// 3 to 統合カラムモード
+		// ? to 統合カラムモード
+		OnAcceleratorToggleIntegratedMode();
+		return true;
 	}
 
 	// ヘッダー文字列の変更（第2, 3カラムのみ）
