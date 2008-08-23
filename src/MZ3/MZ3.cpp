@@ -778,7 +778,7 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 
 		BYTE fontQuality = DEFAULT_QUALITY;
 #endif
-		int newHeight = -::MulDiv(fontHeight, iDPI, 72);
+		int newHeight = - theApp.pt2px(fontHeight);	// 負数とすることで pixel 値指定とする
 
 		MZ3LOGGER_DEBUG( 
 			util::FormatString(L"CMZ3App::MakeNewFont(), dpi[%d], fontHeight[%d], newHeight[%d]",
@@ -1025,4 +1025,12 @@ bool CMZ3App::DeleteOldCacheFiles(void)
 	MZ3LOGGER_INFO( util::FormatString(L"古いキャッシュファイルを削除しました：%d個", nDeleted) );
 
 	return true;
+}
+
+/**
+ * pt 単位の値を現在の DPI にあわせて px 単位に変換する
+ */
+int CMZ3App::pt2px(int pt)
+{
+	return ::MulDiv(pt, m_dpi, 72);
 }

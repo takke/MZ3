@@ -19,7 +19,7 @@
 
 /// カラムモードのスタイル
 namespace COLUMN_MODE_STYLE {
-static const int BOX_MARGIN_BOTTOM  = 6;	///< ボックス間マージン(下側)
+static const int BOX_MARGIN_BOTTOM_PT = 2;	///< ボックス間マージン(下側)[pt]
 static const int FIRST_MARGIN_LEFT	= 4;	///< 第1カラム、左側マージン
 static const int FIRST_MARGIN_RIGHT	= 4;	///< 第1カラム、右側マージン
 static const int OTHER_MARGIN_LEFT	= 12;	///< 第2カラム以降、左側マージン
@@ -28,8 +28,8 @@ static const int OTHER_MARGIN_RIGHT	= 12;	///< 第2カラム以降、右側マージン
 
 /// 統合カラムモードのスタイル
 namespace INTEGRATED_MODE_STYLE {
-static const int BOX_MARGIN_BOTTOM      = 6;	///< ボックス間マージン(下側)
-static const int EACH_LINE_MARGIN       = 3;	///< 行間マージン
+static const int BOX_MARGIN_BOTTOM_PT   = 2;	///< ボックス間マージン(下側)[pt]
+static const int EACH_LINE_MARGIN_PT    = 1;	///< 行間マージン[pt]
 static const int FIRST_LINE_MARGIN_LEFT = 4;	///< 1行目、左マージン
 static const int OTHER_LINE_MARGIN_LEFT = 4+16;	///< 2行目以降、左マージン
 };
@@ -38,9 +38,9 @@ static const int OTHER_LINE_MARGIN_LEFT = 4+16;	///< 2行目以降、左マージン
  *            ------x-----------------------  x : FIRST_LINE_MARGIN_LEFT 
  *            ------xx----------------------  xx: OTHER_LINE_MARGIN_LEFT
  * 1st-line: |<icon> AAAAAAAAAAAAAAAAAAAAAAA|
- * 2nd-line: |<icon>  BBBBBBBBBBBBBBBBBBBBBB| AとB, BとCの行間: EACH_LINE_MARGIN
+ * 2nd-line: |<icon>  BBBBBBBBBBBBBBBBBBBBBB| AとB, BとCの行間: EACH_LINE_MARGIN_PT
  * 3rd-line: |<icon>  CCCCCCCCCCCCCCCCCCCCCC|
- *           |                              y y:  BOX_MARGIN_BOTTOM
+ *           |                              y y:  BOX_MARGIN_BOTTOM_PT
  * 1st-line: |<icon> DDDDDDDDDDDDDDDDDDDDDDD|
  * 2nd-line: |<icon>  EEEEEEEEEEEEEEEEEEEEEE|
  * 3rd-line: |<icon>  FFFFFFFFFFFFFFFFFFFFFF|
@@ -470,11 +470,11 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		LOGFONT lf;
 		GetFont()->GetLogFont( &lf );
 		// px値に正規化
-		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (::MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
 
 		// 描画
 		rcDraw = rcAllLabels;
-		rcDraw.top    += lfHeightPx +INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
+		rcDraw.top    += lfHeightPx +theApp.pt2px(INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN_PT);
 		rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
 		pDC->DrawText(strLine2,
 			-1,
@@ -820,14 +820,14 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
 
 	// px値に変換
-	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (::MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
 
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
-		lpMeasureItemStruct->itemHeight = lfHeightPx*2 +INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
+		lpMeasureItemStruct->itemHeight = lfHeightPx*2 +theApp.pt2px(INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
 	} else {
 		// カラムモード
-		lpMeasureItemStruct->itemHeight = lfHeightPx   +COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
+		lpMeasureItemStruct->itemHeight = lfHeightPx   +theApp.pt2px(COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
 	}
 
 	MZ3_TRACE(L"CBodyListCtrl::MeasureItem(), itemHeight : %d\n", lpMeasureItemStruct->itemHeight);

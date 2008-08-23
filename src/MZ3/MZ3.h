@@ -203,6 +203,7 @@ public:
 
 	bool IsMixiLogout( ACCESS_TYPE aType );
 	bool DeleteOldCacheFiles(void);
+	int pt2px(int pt);
 };
 
 extern CMZ3App theApp;
