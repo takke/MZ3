@@ -154,9 +154,9 @@ void CDownloadView::OnSize(UINT nType, int cx, int cy)
 
 	CFormView::OnSize(nType, cx, cy);
 
-	int fontHeight = theApp.m_optionMng.GetFontHeight();
+	int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
 	if( fontHeight == 0 ) {
-		fontHeight = 24;
+		fontHeight = 12;
 	}
 
 	int hTitle    = theApp.GetInfoRegionHeight(fontHeight);	// タイトルはフォントサイズ依存

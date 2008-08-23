@@ -109,7 +109,7 @@ void Option::Sync(bool bSave)
 	}
 
 	//--- General
-	SyncIniValue(inifile, bSave, (int&)m_StartupMessageDoneType, "StartupMessageDoneType", "General" );
+	SyncIniValue(inifile, bSave, (int&)m_StartupTransitionDoneType, "StartupMessageDoneType", "General" );
 	SyncIniValue(inifile, bSave, m_bConfirmOpenURL, "ConfirmOpenURL", "General" );
 	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
 
@@ -139,11 +139,12 @@ void Option::Sync(bool bSave)
 	if (!bSave) {
 		// 初期値設定
 #ifdef WINCE
-		switch( theApp.GetDisplayMode() ) {
-		case SR_VGA:		m_fontHeight = 24; break;
-		case SR_QVGA:
-		default:			m_fontHeight = 12; break;
-		}
+//		switch( theApp.GetDisplayMode() ) {
+//		case SR_VGA:		m_fontHeight = 24; break;
+//		case SR_QVGA:
+//		default:			m_fontHeight = 12; break;
+//		}
+		m_fontHeight = 9;
 #else
 		m_fontHeight = 14;
 #endif
@@ -153,11 +154,16 @@ void Option::Sync(bool bSave)
 	// フォントサイズ（大）
 	if (!bSave) {
 		// 初期値設定
-		switch( theApp.GetDisplayMode() ) {
-		case SR_VGA:		m_fontHeightBig = 28; break;
-		case SR_QVGA:
-		default:			m_fontHeightBig = 14; break;
-		}
+#ifdef WINCE
+//		switch( theApp.GetDisplayMode() ) {
+//		case SR_VGA:		m_fontHeightBig = 28; break;
+//		case SR_QVGA:
+//		default:			m_fontHeightBig = 14; break;
+//		}
+		m_fontHeightBig = 11;
+#else
+		m_fontHeightBig = 14;
+#endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeightBig, "FontHeight_Big", "UI");
 
@@ -171,12 +177,16 @@ void Option::Sync(bool bSave)
 	// フォントサイズ（小）
 	if (!bSave) {
 		// 初期値設定
-		// 初期値
-		switch( theApp.GetDisplayMode() ) {
-		case SR_VGA:		m_fontHeightSmall = 18; break;
-		case SR_QVGA:
-		default:			m_fontHeightSmall = 10; break;
-		}
+#ifdef WINCE
+//		switch( theApp.GetDisplayMode() ) {
+//		case SR_VGA:		m_fontHeightSmall = 18; break;
+//		case SR_QVGA:
+//		default:			m_fontHeightSmall = 10; break;
+//		}
+		m_fontHeightSmall = 7;
+#else
+		m_fontHeightSmall = 10;
+#endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeightSmall, "FontHeight_Small", "UI");
 

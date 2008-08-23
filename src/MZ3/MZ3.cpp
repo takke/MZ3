@@ -320,9 +320,9 @@ BOOL CMZ3App::InitInstance()
 		theApp.SaveGroupData();
 	}
 
-	// 移行処理（タブの初期化）
-	switch (m_optionMng.m_StartupMessageDoneType) {
-	case option::Option::STARTUP_MESSAGE_DONE_TYPE_NONE:
+	// 移行処理
+	switch (m_optionMng.m_StartupTransitionDoneType) {
+	case option::Option::STARTUP_TRANSITION_DONE_TYPE_NONE:
 		{
 			// クライアント選択画面を表示
 			CChooseClientTypeDlg dlg;
@@ -332,12 +332,33 @@ BOOL CMZ3App::InitInstance()
 			}
 
 			// 次回以降は表示しない
-			m_optionMng.m_StartupMessageDoneType = option::Option::STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED;
+			m_optionMng.m_StartupTransitionDoneType = option::Option::STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED;
 			theApp.SaveGroupData();
 		}
 		break;
 
-	case option::Option::STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED:
+	case option::Option::STARTUP_TRANSITION_DONE_TYPE_TWITTER_MODE_ADDED:
+		// 実行済み
+		{
+			// フォントサイズの移行処理
+			MZ3LOGGER_DEBUG(util::FormatString(L"フォントサイズの移行処理：m_fontHeight : %d", m_optionMng.m_fontHeight));
+
+			// px 換算値を pt 換算値に変換する
+			int iDPI = theApp.GetDPI();
+			m_optionMng.m_fontHeight       = ::MulDiv(m_optionMng.m_fontHeight       , 72, iDPI);
+			m_optionMng.m_fontHeightBig    = ::MulDiv(m_optionMng.m_fontHeightBig    , 72, iDPI);
+			m_optionMng.m_fontHeightMedium = ::MulDiv(m_optionMng.m_fontHeightMedium , 72, iDPI);
+			m_optionMng.m_fontHeightSmall  = ::MulDiv(m_optionMng.m_fontHeightSmall  , 72, iDPI);
+
+			MZ3LOGGER_DEBUG(util::FormatString(L"移行後：m_fontHeight : %d", m_optionMng.m_fontHeight));
+
+			// 次回以降は処理しない
+			m_optionMng.m_StartupTransitionDoneType = option::Option::STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED;
+			theApp.SaveGroupData();
+		}
+		break;
+
+	case option::Option::STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED:
 	default:
 		// 最新のため移行処理なし
 		break;
@@ -744,18 +765,41 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 	CFont *pFont = pBaseFont;
 	if (pFont)
 	{
-		LOGFONT lf;
-		pFont->GetLogFont( &lf );
+#ifdef WINCE
+		int iDPI = ::GetDeviceCaps(NULL, LOGPIXELSY);
+		BYTE fontQuality = NONANTIALIASED_QUALITY;
+		if (iDPI==192) {
+			// VGA(非RealVGA) ならClearType指定
+			fontQuality = CLEARTYPE_QUALITY;
+		}
+#else
+		// DPI 値の取得
+		int iDPI = theApp.GetDPI();
 
-		if( fontHeight != 0 ) {
-			lf.lfHeight = fontHeight;
-		}
-		if( wcslen(fontFace) > 0 ) {
-			wcscpy_s( lf.lfFaceName, 31, fontFace );
-		}
+		BYTE fontQuality = DEFAULT_QUALITY;
+#endif
+		int newHeight = -::MulDiv(fontHeight, iDPI, 72);
+
+		MZ3LOGGER_DEBUG( 
+			util::FormatString(L"CMZ3App::MakeNewFont(), dpi[%d], fontHeight[%d], newHeight[%d]",
+				iDPI, fontHeight, newHeight) );
 
 		theApp.m_font.Detach();
-		theApp.m_font.CreateFontIndirect( &lf );
+		theApp.m_font.CreateFont( 
+			newHeight,					// nHeight
+			0,							// nWidth
+			0,							// nEscapement
+			0,							// nOrientation
+			FW_MEDIUM,					// nWeight
+			FALSE,						// bItalic
+			FALSE,						// bUnderline
+			0,							// cStrikeOut
+			DEFAULT_CHARSET,			// nCharSet
+			OUT_DEFAULT_PRECIS,			// nOutPrecision
+			CLIP_DEFAULT_PRECIS,		// nClipPrecision
+			fontQuality,				// nQuality
+			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+			fontFace);					// lpszFacename
 	}
 	return true;
 }

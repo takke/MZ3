@@ -466,9 +466,15 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			strLine2 = L"";
 		}
 
+		// フォントの高さ取得
+		LOGFONT lf;
+		GetFont()->GetLogFont( &lf );
+		// px値に正規化
+		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+
 		// 描画
 		rcDraw = rcAllLabels;
-		rcDraw.top    += theApp.m_optionMng.GetFontHeight()+INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
+		rcDraw.top    += lfHeightPx +INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN;
 		rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
 		pDC->DrawText(strLine2,
 			-1,
@@ -811,20 +817,17 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	LOGFONT lf;
 	GetFont()->GetLogFont( &lf );
 
+	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
+
+	// px値に変換
+	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
-		if (lf.lfHeight < 0) {
-			lpMeasureItemStruct->itemHeight = (-lf.lfHeight)*2 -INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
-		} else {
-			lpMeasureItemStruct->itemHeight =   lf.lfHeight *2 +INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
-		}
+		lpMeasureItemStruct->itemHeight = lfHeightPx*2 +INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM;
 	} else {
 		// カラムモード
-		if (lf.lfHeight < 0) {
-			lpMeasureItemStruct->itemHeight = -lf.lfHeight -COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
-		} else {
-			lpMeasureItemStruct->itemHeight =  lf.lfHeight +COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
-		}
+		lpMeasureItemStruct->itemHeight = lfHeightPx   +COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM;
 	}
 
 	MZ3_TRACE(L"CBodyListCtrl::MeasureItem(), itemHeight : %d\n", lpMeasureItemStruct->itemHeight);

@@ -17,13 +17,14 @@ namespace option {
 class Option
 {
 public:
-	/// 起動時のメッセージの表示済みフラグ
-	enum STARTUP_MESSAGE_DONE_TYPE
+	/// 起動時の移行処理の完了フラグ
+	enum STARTUP_TRANSITION_DONE_TYPE
 	{
-		STARTUP_MESSAGE_DONE_TYPE_NONE = 0,				///< 何も表示していない
-		STARTUP_MESSAGE_DONE_TYPE_TWITTER_MODE_ADDED = 1,	///< Twitterモード追加時のメッセージ表示済
+		STARTUP_TRANSITION_DONE_TYPE_NONE = 0,					///< 初期版
+		STARTUP_TRANSITION_DONE_TYPE_TWITTER_MODE_ADDED = 1,	///< Twitterモード追加時のメッセージ表示済
+		STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED = 2,		///< フォントサイズの調整済
 	};
-	STARTUP_MESSAGE_DONE_TYPE	m_StartupMessageDoneType;	///< 起動時のメッセージの表示済みフラグ
+	STARTUP_TRANSITION_DONE_TYPE	m_StartupTransitionDoneType;	///< 起動時のメッセージの表示済みフラグ
 
 private:
 	bool			m_bDebugMode;			///< デバッグモード
@@ -136,10 +137,10 @@ public:
 		, m_bUseGlobalProxy( true )
 		, m_bBootCheckMnC( false )
 		, m_bUseBgImage( TRUE )
-		, m_fontHeight( 24 )				// 初期値は Load() 内で設定される
-		, m_fontHeightBig( 28 )				// 初期値は Load() 内で設定される
-		, m_fontHeightMedium( 24 )			// 初期値は Load() 内で設定される
-		, m_fontHeightSmall( 18 )			// 初期値は Load() 内で設定される
+		, m_fontHeight( 9 )					// 初期値は Load() 内で設定される
+		, m_fontHeightBig( 11 )				// 初期値は Load() 内で設定される
+		, m_fontHeightMedium( 9 )			// 初期値は Load() 内で設定される
+		, m_fontHeightSmall( 7 )			// 初期値は Load() 内で設定される
 #ifdef WINCE
 		, m_recvBufSize( 2048 )
 #else
@@ -194,7 +195,7 @@ public:
 		, m_bBodyListIntegratedColumnMode( true )
 		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
-		, m_StartupMessageDoneType( STARTUP_MESSAGE_DONE_TYPE_NONE )
+		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )
 		, m_nTwitterStatusLineCount(3)
 		, m_bUseRan2PanScrollAnimation( true )
 		, m_bUseRan2HorizontalDragMove( true )
@@ -262,6 +263,11 @@ public:
 	void SetUseBgImage(BOOL flag)		{ m_bUseBgImage = flag; }		///< 背景画像を使うかどうかの設定
 
 	int  GetFontHeight()				{ return m_fontHeight; }		///< フォントサイズの取得
+	
+	/// フォントサイズ(pt換算)をpixel換算値(local DPI換算)で返却する
+	int  GetFontHeightByPixel(int iDPI)	{
+		return ::MulDiv(m_fontHeight, iDPI, 72);
+	}
 	void SetFontHeight( int fontHeight ){ m_fontHeight = fontHeight; }	///< フォントサイズの設定
 
 	LPCTSTR GetFontFace()				{ return m_fontFace; }			///< フォント名の取得

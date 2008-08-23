@@ -153,7 +153,7 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 
 	CFormView::OnSize(nType, cx, cy);
 
-	int hEdit = theApp.GetInfoRegionHeight(theApp.m_optionMng.m_fontHeight);
+	int hEdit = theApp.GetInfoRegionHeight(theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI()));
 
 	// コンボボックスの高さを取得する
 	int hCombo ;

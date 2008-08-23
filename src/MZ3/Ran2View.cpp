@@ -565,6 +565,9 @@ int	Ran2View::ChangeViewFont(int newHeight, LPCTSTR szFontFace)
 	BYTE fontQuality = DEFAULT_QUALITY;
 #endif
 
+	// pt Š·ŽZ’l‚ð px Š·ŽZ’l‚É•ÏŠ·
+	newHeight = -::MulDiv(newHeight, currentDPI, 72);
+
 	VERIFY(normalFont->CreateFont(
 	   newHeight,					// nHeight
 	   0,							// nWidth

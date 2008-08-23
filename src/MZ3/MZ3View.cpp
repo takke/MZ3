@@ -584,9 +584,9 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		MZ3LOGGER_DEBUG( msg );
 	}
 */
-	int fontHeight = theApp.m_optionMng.m_fontHeight;
+	int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
 	if( fontHeight == 0 ) {
-		fontHeight = 24;
+		fontHeight = 12;
 	}
 
 	// ‰æ–Ê‰º•”‚Ìî•ñ—Ìˆæ

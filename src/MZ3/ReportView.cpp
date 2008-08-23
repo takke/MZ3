@@ -229,7 +229,7 @@ void CReportView::OnInitialUpdate()
 	// 超暫定
 	int fontHeight = theApp.m_optionMng.GetFontHeight();
 	if( fontHeight == 0 ) {
-		fontHeight = 24;
+		fontHeight = 9;
 	}
 	m_detailView->ChangeViewFont( fontHeight, theApp.m_optionMng.GetFontFace() );
 	m_detailView->ShowWindow(SW_SHOW);
@@ -255,9 +255,9 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 
 	CFormView::OnSize(nType, cx, cy);
 
-	int fontHeight = theApp.m_optionMng.GetFontHeight();
+	int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
 	if( fontHeight == 0 ) {
-		fontHeight = 24;
+		fontHeight = 12;
 	}
 
 	int hTitle  = theApp.GetInfoRegionHeight(fontHeight);	// タイトル領域はフォントサイズ依存

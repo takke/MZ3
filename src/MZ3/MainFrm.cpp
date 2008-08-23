@@ -199,6 +199,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.EnableDocking( CBRS_ALIGN_ANY );		//  ドッキングモードを設定
 #endif
 
+#ifdef WINCE
+	CRect rc;
+	GetWindowRect( &rc );
+
+	WINDOWPOS wp;
+	wp.hwnd = m_hWnd;
+	wp.cx = rc.Width();
+	wp.cy = rc.Height();
+	wp.flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
+#endif
+
 	return 0;
 }
 
@@ -233,15 +245,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// タイトル変更
 	MySetTitle();
 #else
-	CRect rc;
-	GetWindowRect( &rc );
-
-	WINDOWPOS wp;
-	wp.hwnd = m_hWnd;
-	wp.cx = rc.Width();
-	wp.cy = rc.Height();
-	wp.flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
 #endif
 
 	return TRUE;
