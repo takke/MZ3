@@ -470,7 +470,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		LOGFONT lf;
 		GetFont()->GetLogFont( &lf );
 		// px値に正規化
-		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (::MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
 
 		// 描画
 		rcDraw = rcAllLabels;
@@ -820,7 +820,7 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
 
 	// px値に変換
-	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
+	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : (::MulDiv(lf.lfHeight, theApp.GetDPI(), 72));
 
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する

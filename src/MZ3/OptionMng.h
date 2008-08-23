@@ -300,7 +300,7 @@ public:
 
 	/// フォントサイズの正規化
 	static int normalizeFontSize( int n ) {
-		return normalizeRange( n, 8, 50 );
+		return normalizeRange( n, 5, 50 );
 	}
 
 	/// 長押し判定時間の正規化
