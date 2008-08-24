@@ -259,6 +259,7 @@ public:
 	afx_msg void OnAcceleratorNextTab();
 	afx_msg void OnAcceleratorPrevTab();
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnSetRead();
 	afx_msg void OnAcceleratorReload();
 	afx_msg void OnMenuTwitterRead();

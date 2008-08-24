@@ -1923,9 +1923,9 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 	case WM_MOUSEWHEEL:
 		OnMouseWheel( LOWORD(pMsg->wParam), HIWORD(pMsg->wParam), CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
-//	case WM_MOUSEMOVE:
-//		OnMouseMove( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
-//		break;
+	case WM_MOUSEMOVE:
+		OnMouseMove( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
 	}
 
 	return CFormView::PreTranslateMessage(pMsg);
@@ -5872,9 +5872,7 @@ void CMZ3View::MyUpdateControlStatus(void)
  */
 void CMZ3View::OnRButtonDown(UINT nFlags, CPoint point)
 {
-#ifdef DEBUG
-	wprintf( L"CMZ3View::OnRButtonDown\n" );
-#endif
+//	MZ3_TRACE( L"CMZ3View::OnRButtonDown\n" );
 
 	// ジェスチャ開始
 	theApp.m_pMouseGestureManager->StartGestureMode(point);
@@ -5890,17 +5888,108 @@ void CMZ3View::OnRButtonDown(UINT nFlags, CPoint point)
  */
 void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 {
-#ifdef DEBUG
-	wprintf( L"CMZ3View::OnRButtonUp\n" );
-#endif
+	MZ3_TRACE( L"CMZ3View::OnRButtonUp\n" );
 
 	// マウスキャプチャ終了
 //	ReleaseCapture();
+
+#ifndef WINCE
+	// MZ4 Only
+
+	// 認識済みのジェスチャと比較
+	CString strCmdList = CStringW(theApp.m_pMouseGestureManager->GetCmdList().c_str());
+	MZ3_TRACE(L" gesture : %s\n", (LPCTSTR)strCmdList);
+
+	if (strCmdList==L"R") {
+		// 右：次のタブ
+		OnAcceleratorNextTab();
+	} else if (strCmdList==L"L") {
+		// 左：前のタブ
+		OnAcceleratorPrevTab();
+	} else if (strCmdList==L"D") {
+		// 下：カラム変更(暫定)
+		OnAcceleratorToggleIntegratedMode();
+	} else if (strCmdList==L"U") {
+		// 上：リロード
+		OnAcceleratorReload();
+	} else {
+		// メッセージクリア
+		m_infoEdit.SetWindowText( L"" );
+//		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false)
+	}
+#endif
 
 	// ジェスチャ終了
 	theApp.m_pMouseGestureManager->StopGestureMode();
 
 	CFormView::OnRButtonUp(nFlags, point);
+}
+
+/**
+ * マウス移動
+ */
+void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
+{
+//	MZ3_TRACE( L"CMZ3View::OnMouseMove\n" );
+
+#ifndef WINCE
+	if (theApp.m_pMouseGestureManager->IsGestureMode()) {
+		// MZ4 Only
+
+		// 閾値以上移動していれば処理実行
+		const CPoint ptLastCmd = theApp.m_pMouseGestureManager->m_posLastCmd;
+
+		int dx = point.x - ptLastCmd.x;
+		int dy = point.y - ptLastCmd.y;
+
+//		MZ3_TRACE( L" dx[%3d], dy[%3d]\n", dx, dy );
+
+		// 閾値
+		const int GESTURE_LIMIT_X = 20;
+		const int GESTURE_LIMIT_Y = 20;
+
+		MouseGestureManager::CMD cmd = MouseGestureManager::CMD_NONE;
+		MouseGestureManager::CMD lastCmd = theApp.m_pMouseGestureManager->GetLastCmd();
+
+		if (dx >= GESTURE_LIMIT_X) {
+			// 右移動 : 1つ前と同じでなければ認識
+			if (lastCmd != MouseGestureManager::CMD_RIGHT) {
+				cmd = MouseGestureManager::CMD_RIGHT;
+			}
+		} else if (dx <= -GESTURE_LIMIT_X) {
+			// 左移動 : 1つ前と同じでなければ認識
+			if (lastCmd != MouseGestureManager::CMD_LEFT) {
+				cmd = MouseGestureManager::CMD_LEFT;
+			}
+		}
+		
+		if (dy >= GESTURE_LIMIT_Y) {
+			// 下移動 : 1つ前と同じでなければ認識
+			if (lastCmd != MouseGestureManager::CMD_DOWN) {
+				cmd = MouseGestureManager::CMD_DOWN;
+			}
+		} else if (dy <= -GESTURE_LIMIT_Y) {
+			// 上移動 : 1つ前と同じでなければ認識
+			if (lastCmd != MouseGestureManager::CMD_UP) {
+				cmd = MouseGestureManager::CMD_UP;
+			}
+		}
+
+		// 1つ前と同じでなければ登録
+		if (cmd != MouseGestureManager::CMD_NONE &&	lastCmd!=cmd) {
+
+			theApp.m_pMouseGestureManager->m_cmdList.push_back(cmd);
+			theApp.m_pMouseGestureManager->m_posLastCmd = point;
+
+			CString strCmdList = CStringW(theApp.m_pMouseGestureManager->GetCmdList().c_str());
+			strCmdList.Replace(L"U", L"↑");
+			strCmdList.Replace(L"D", L"↓");
+			strCmdList.Replace(L"L", L"←");
+			strCmdList.Replace(L"R", L"→");
+			util::MySetInformationText( m_hWnd, strCmdList );
+		}
+	}
+#endif
 }
 
 /**
