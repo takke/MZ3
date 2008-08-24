@@ -146,7 +146,7 @@ void Option::Sync(bool bSave)
 //		}
 		m_fontHeight = 9;
 #else
-		m_fontHeight = 14;
+		m_fontHeight = 11;
 #endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeight, "FontHeight", "UI");
@@ -162,7 +162,7 @@ void Option::Sync(bool bSave)
 //		}
 		m_fontHeightBig = 11;
 #else
-		m_fontHeightBig = 14;
+		m_fontHeightBig = 13;
 #endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeightBig, "FontHeight_Big", "UI");
@@ -185,7 +185,7 @@ void Option::Sync(bool bSave)
 //		}
 		m_fontHeightSmall = 7;
 #else
-		m_fontHeightSmall = 10;
+		m_fontHeightSmall = 9;
 #endif
 	}
 	SyncIniValue(inifile, bSave, m_fontHeightSmall, "FontHeight_Small", "UI");
