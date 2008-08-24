@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <list>
 #include "kfm_buffer.h"
 
 namespace xml2stl {
@@ -65,8 +66,11 @@ public:
 	{}
 };
 
-typedef std::vector<Property>	PropertyList;
-typedef std::vector<Node>		NodeList;
+typedef std::list<Property>	PropertyList;
+typedef std::list<Node>		NodeList;
+
+// like iterator
+class NodeRef;
 
 class Container
 {
@@ -84,6 +88,8 @@ public:
 	XML2STL_TYPE getType() const {
 		return type;
 	}
+
+	NodeRef getNodeRef() const;
 
 	/**
 	 * ノード名の取得
@@ -112,8 +118,9 @@ public:
 		// 下位の全ノードを重ねてテキスト化して返す
 		size_t n = children.size();
 		XML2STL_STRING  text;
-		for (size_t i=0; i<n; i++) {
-			const Node& targetNode = children[i];
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
+			const Node& targetNode = *it;
+
 			switch (targetNode.type) {
 			case XML2STL_TYPE_NODE:
 				// プロパティと下位ノードを TEXT 化
@@ -121,9 +128,11 @@ public:
 				text += targetNode.name_or_text;
 				// プロパティを TEXT 化
 				{
-					size_t n_property=targetNode.properties.size();
-					for (size_t j=0; j<n_property; j++) {
-						const Property& prop = targetNode.getProperty(j);
+					for (PropertyList::const_iterator pit=targetNode.properties.begin(); 
+						 pit!=targetNode.properties.end();
+						 pit++)
+					{
+						const Property& prop = (*pit);
 						text += L" ";
 						text += prop.name;
 						text += L"=\"";
@@ -179,7 +188,7 @@ public:
 
 		children.push_back( node );
 
-		return children[ children.size()-1 ];
+		return children.back();
 	}
 
 	Node& addText( const XML2STL_STRING& text=_T("") )
@@ -190,7 +199,7 @@ public:
 
 		children.push_back( node );
 
-		return children[ children.size()-1 ];
+		return children.back();
 	}
 
 	Property& addProperty( const XML2STL_STRING& name, const XML2STL_STRING& text )
@@ -201,20 +210,32 @@ public:
 
 		properties.push_back( prop );
 
-		return properties[ properties.size()-1 ];
+		return properties.back();
 	}
 
 	const Property& getProperty( size_t index ) const
 	{
-		return properties[ index ];
+///		return properties[ index ];
+
+		// very slow implementation
+		size_t i=0;
+		for (PropertyList::const_iterator it=properties.begin(); it!=properties.end(); it++, i++) {
+			if (i==index) {
+				return *it;
+			}
+		}
+
+		std::wostringstream stream;
+		stream << L"property not found... index[" << index << L"]";
+		throw NodeNotFoundException(stream.str());
 	}
 
 	const XML2STL_STRING& getProperty( const XML2STL_STRING& name ) const
 	{
 		size_t n = properties.size();
-		for (size_t i=0; i<n; i++) {
-			if (properties[i].name == name) {
-				return properties[i].text;
+		for (PropertyList::const_iterator it=properties.begin(); it!=properties.end(); it++) {
+			if ((*it).name == name) {
+				return (*it).text;
 			}
 		}
 
@@ -224,6 +245,10 @@ public:
 		// TODO: use another exception.
 	}
 
+	/**
+	 *
+	 * @notice very slow impl. use "getNodeRef" instead.
+	 */
 	const Node& getNode( size_t index ) const
 	{
 		if (index >= children.size()) {
@@ -231,19 +256,31 @@ public:
 			stream << L"node not found... index[" << index << L"]";
 			throw NodeNotFoundException(stream.str());
 		}
-		return children[ index ];
+
+///		return children[ index ];
+
+		// very slow implementation
+		size_t i=0;
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++, i++) {
+			if (i==index) {
+				return *it;
+			}
+		}
+
+		std::wostringstream stream;
+		stream << L"node not found... index[" << index << L"]";
+		throw NodeNotFoundException(stream.str());
 	}
 
 	const Node& getNode( const XML2STL_STRING& name, int index=0 ) const
 	{
 		int nFound = 0;
-		size_t n = children.size();
-		for (size_t i=0; i<n; i++) {
-			if (children[i].type == XML2STL_TYPE_NODE &&
-				children[i].name_or_text == name) 
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
+			if ((*it).type == XML2STL_TYPE_NODE &&
+				(*it).name_or_text == name) 
 			{
 				if (nFound==index) {
-					return children[i];
+					return (*it);
 				} else {
 					nFound ++;
 				}
@@ -277,14 +314,11 @@ public:
 
 	const Node& getNode( const XML2STL_STRING& name, const Property& prop ) const
 	{
-		size_t n = children.size();
-		for (size_t i=0; i<n; i++) {
-			if (children[i].type == XML2STL_TYPE_NODE &&
-				children[i].name_or_text == name) 
-			{
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
+			if ((*it).type == XML2STL_TYPE_NODE && (*it).name_or_text == name) {
 				try {
-					if (children[i].getProperty(prop.name) == prop.text) {
-						return children[i];
+					if ((*it).getProperty(prop.name) == prop.text) {
+						return (*it);
 					}
 				} catch( NodeNotFoundException& ) {
 					// not found, ok.
@@ -326,11 +360,11 @@ public:
 	const Node& findNode( const Property& prop ) const
 	{
 		size_t n = children.size();
-		for (size_t i=0; i<n; i++) {
-			if (children[i].type == XML2STL_TYPE_NODE) {
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
+			if ((*it).type == XML2STL_TYPE_NODE) {
 				try {
-					if (children[i].getProperty(prop.name) == prop.text) {
-						return children[i];
+					if ((*it).getProperty(prop.name) == prop.text) {
+						return (*it);
 					}
 				} catch( NodeNotFoundException& ) {
 					// not found, continue...
@@ -338,13 +372,12 @@ public:
 
 				// not found. search recursively...
 				try {
-					return children[i].findNode(prop);
+					return (*it).findNode(prop);
 				} catch( NodeNotFoundException& ) {
 					// not found, continue...
 				}
 			}
 		}
-
 		std::wostringstream stream;
 		stream << L"node not found... property[" << prop.name + L"=" << prop.text << L"]";
 		_dumpChildren(stream);
@@ -362,24 +395,24 @@ private:
 		stream << L" children[";
 
 		bool bDumpFirst = true;
-		size_t n = children.size();
-		for (size_t i=0; i<n; i++) {
-			if (children[i].type == XML2STL_TYPE_NODE) {
+		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
+			if ((*it).type == XML2STL_TYPE_NODE) {
 				if (!bDumpFirst) {
 					stream << L"\r\n";
 				}
 				stream << L"<";
-				stream << children[i].name_or_text;
-				if (!children[i].properties.empty()) {
+				stream << (*it).name_or_text;
+				if (!(*it).properties.empty()) {
 					stream << L" ";
-					size_t nProperties = children[i].properties.size();
-					for (size_t j=0; j<nProperties; j++) {
-						if (j>0) {
+					size_t nProperties = (*it).properties.size();
+					for (PropertyList::const_iterator pit=(*it).properties.begin(); 
+						 pit!=(*it).properties.end(); pit++) {
+						if (pit!=(*it).properties.begin()) {
 							stream << L" ";
 						}
-						stream << children[i].properties[j].name.c_str();
+						stream << (*pit).name.c_str();
 						stream << L"=\"";
-						stream << children[i].properties[j].text.c_str();
+						stream << (*pit).text.c_str();
 						stream << L"\"";
 					}
 				}
@@ -388,10 +421,37 @@ private:
 				bDumpFirst = false;
 			}
 		}
-
 		stream << L"]";
 	}
 };
+
+/// like iterator
+class NodeRef {
+	NodeList::const_iterator iterator;
+	const NodeList&	     target_node_list;
+
+public:
+	NodeRef(const NodeList& node_list) : target_node_list(node_list) {
+		iterator = node_list.begin();
+	}
+
+	bool isEnd() const {
+		return iterator==target_node_list.end();
+	}
+
+	void next() {
+		iterator++;
+	}
+
+	const Node& getCurrentNode() const {
+		return *iterator;
+	}
+};
+
+inline NodeRef Container::getNodeRef() const {
+
+	return NodeRef(children);
+}
 
 inline void dump_nest( FILE* fp, int nest_level )
 {
@@ -421,9 +481,8 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
 
     // プロパティ
     if (!c.getProperties().empty()) {
-		size_t n = c.getProperties().size();
-        for (size_t i=0; i<n; i++) {
-            const Property& p = c.getProperty(i);
+		for (PropertyList::const_iterator it=c.getProperties().begin(); it!=c.getProperties().end(); it++) {
+            const Property& p = (*it);
             dump_nest( fp, nest_level+1 );
             fwprintf( fp, _T("[%s] => [%s]\n"), p.name.c_str(), p.text.c_str() );
         }
@@ -431,11 +490,13 @@ inline void dump_container( const Container& c, FILE* fp, int nest_level=0 )
 
     // 子要素
     if (c.hasChildren()) {
-		size_t n = c.getChildren().size();
-        for (size_t i=0; i<n; i++) {
-            dump_container( c.getNode(i), fp, nest_level+1 );
-        }
-    }
+		for (NodeList::const_iterator it=c.getChildren().begin();
+			 it!=c.getChildren().end();
+			 it++)
+		{
+			dump_container( *it, fp, nest_level+1 );
+		}
+	}
 }
 
 class SimpleXmlParser

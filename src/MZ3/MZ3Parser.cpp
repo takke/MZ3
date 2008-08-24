@@ -145,8 +145,8 @@ bool RssFeedParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_,
 		try {
 			const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
 			
-			for (unsigned int i=0; i<rdf.getChildrenCount(); i++) {
-				const xml2stl::Node& item = rdf.getNode(i);
+			for (xml2stl::NodeRef nodeRef=rdf.getNodeRef(); !nodeRef.isEnd(); nodeRef.next()) {
+				const xml2stl::Node& item = nodeRef.getCurrentNode();
 				if (item.getName() != L"item") {
 					continue;
 				}
@@ -195,8 +195,8 @@ bool RssFeedParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_,
 			const xml2stl::Node& rss = root.getNode( L"rss", xml2stl::Property(L"version", L"2.0") );
 			const xml2stl::Node& channel = rss.getNode(L"channel");
 
-			for (unsigned int i=0; i<channel.getChildrenCount(); i++) {
-				const xml2stl::Node& item = channel.getNode(i);
+			for (xml2stl::NodeRef nodeRef=channel.getNodeRef(); !nodeRef.isEnd(); nodeRef.next()) {
+				const xml2stl::Node& item = nodeRef.getCurrentNode();
 				if (item.getName() != L"item") {
 					continue;
 				}
