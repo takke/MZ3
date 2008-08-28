@@ -789,6 +789,29 @@ bool AccessTypeInfo::init()
 
 
 	//------------------------------------------------------------------
+	//--- Wassr 系
+	type = ACCESS_WASSR_FRIENDS_TIMELINE;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_CATEGORY
+		, "Wassr"
+		, L"タイムライン"
+		, REQUEST_METHOD_GET
+		);
+	// http://api.wassr.jp/statuses/friends_timeline.xml?id=takke
+	// http://api.wassr.jp/statuses/user_timeline/takke.xml
+	// => wassr/user_timeline_takke.xml
+	m_map[type].cacheFilePattern = L"wassr\\{urlafter:user_timeline/:friends_timeline.xml}";
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
+	m_map[type].serializeKey = "WASSR_FRIENDS_TIMELINE";
+	m_map[type].defaultCategoryURL = L"http://api.wassr.jp/statuses/friends_timeline.xml?id={wassr:id}";
+	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyIntegratedLinePattern1 = L"%2  (%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
+
+
+	//------------------------------------------------------------------
 	//--- RSS Reader
 	type = ACCESS_RSS_READER_FEED;
 	m_map[type] = AccessTypeInfo::Data(

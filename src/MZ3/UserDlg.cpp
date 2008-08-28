@@ -45,6 +45,7 @@ BOOL CUserDlg::OnInitDialog()
 
 	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_MIXI,    L"mixi" );
 	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_TWITTER, L"Twitter" );
+	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_WASSR,	  L"Wassr" );
 
 	mc_comboType.SetCurSel( USER_DLG_COMBO_INDEX_TYPE_MIXI );
 	m_idxSelectedCombo = USER_DLG_COMBO_INDEX_TYPE_MIXI;
@@ -84,6 +85,14 @@ void CUserDlg::MySaveControlData(void)
 		theApp.m_loginMng.SetTwitterPassword( buf );
 		break;
 
+	case USER_DLG_COMBO_INDEX_TYPE_WASSR:
+		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
+		theApp.m_loginMng.SetWassrId( buf );
+
+		GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, buf );
+		theApp.m_loginMng.SetWassrPassword( buf );
+		break;
+
 	case USER_DLG_COMBO_INDEX_TYPE_MIXI:
 	default:
 		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
@@ -106,6 +115,14 @@ void CUserDlg::MyLoadControlData(void)
 		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetTwitterId() );
 		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetTwitterPassword() );
 		break;
+
+	case USER_DLG_COMBO_INDEX_TYPE_WASSR:
+		SetDlgItemText( IDC_ID_STATIC, L"ID" );
+		// TODO
+		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetWassrId() );
+		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetWassrPassword() );
+		break;
+
 	case USER_DLG_COMBO_INDEX_TYPE_MIXI:
 	default:
 		SetDlgItemText( IDC_ID_STATIC, L"メールアドレス" );

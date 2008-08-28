@@ -62,4 +62,10 @@ public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
 
+class WassrFriendsTimelineXmlParser : public twitter::TwitterParserBase
+{
+public:
+	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
+};
+
 }//namespace twitter

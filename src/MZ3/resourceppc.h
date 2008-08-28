@@ -138,6 +138,7 @@
 #define IDC_SERVICE_TYPE_TWITTER_CHECK  1036
 #define IDC_CONFIRM_OPEN_URL_CHECK      1036
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
+#define IDC_SERVICE_TYPE_WASSR_CHECK    1037
 #define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
 #define IDC_TYPE_LIST                   1038

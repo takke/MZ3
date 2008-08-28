@@ -75,6 +75,7 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
 	case ACCESS_TWITTER_USER:
+	case ACCESS_WASSR_USER:
 	case ACCESS_MIXI_ECHO_USER:
 		if (data.GetImageCount()>0) {
 			CString path = MakeImageLogfilePathFromUrl( data.GetImage(0) );
@@ -94,8 +95,7 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
  */
 inline bool IsTwitterAccessType( ACCESS_TYPE type )
 {
-	const char* serviceType = theApp.m_accessTypeInfo.getServiceType(type);
-	if (strcmp(serviceType, "Twitter")==0) {
+	if (theApp.m_accessTypeInfo.getServiceType(type) == "Twitter") {
 		return true;
 	} else {
 		return false;
@@ -107,8 +107,7 @@ inline bool IsTwitterAccessType( ACCESS_TYPE type )
  */
 inline bool IsMixiAccessType( ACCESS_TYPE type )
 {
-	const char* serviceType = theApp.m_accessTypeInfo.getServiceType(type);
-	if (strcmp(serviceType, "mixi")==0) {
+	if (theApp.m_accessTypeInfo.getServiceType(type) == "mixi") {
 		return true;
 	} else {
 		return false;

@@ -23,7 +23,11 @@ private:
 
 	//--- Twitter 用
 	CString m_twitterId;		///< Twitter 用ID
-	CString m_twitterPwd;	///< Twitter 用パスワード
+	CString m_twitterPwd;		///< Twitter 用パスワード
+
+	//--- Wassr 用
+	CString m_wassrId;			///< Wassr 用ID
+	CString m_wassrPwd;			///< Wassr 用パスワード
 
 public:
 	Login();
@@ -45,6 +49,12 @@ public:
 	LPCTSTR GetTwitterId()					{ return m_twitterId;	}
 	void	SetTwitterPassword(LPCTSTR str)	{ m_twitterPwd = str;	}
 	LPCTSTR	GetTwitterPassword()			{ return m_twitterPwd;	}
+
+	//--- Wassr 用
+	void	SetWassrId(LPCTSTR str)			{ m_wassrId = str;	}
+	LPCTSTR GetWassrId()					{ return m_wassrId;	}
+	void	SetWassrPassword(LPCTSTR str)	{ m_wassrPwd = str;	}
+	LPCTSTR	GetWassrPassword()				{ return m_wassrPwd;	}
 
 private:
 	CString Read(FILE*);

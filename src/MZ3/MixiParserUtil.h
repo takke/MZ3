@@ -103,6 +103,7 @@ public:
 	 *                   例："2006年11月19日 17:12"
 	 *                       "<span class="date">2007年07月05日 21:55</span></dt>"
 	 *                       "<td>10月08日</td></tr>"
+	 *                       "1219927284" (エポック時間)
 	 * @param mixi [out] 解析結果を SetDate で保存する。
 	 */
 	static bool ParseDate(LPCTSTR line, CMixiData& mixi)
@@ -261,6 +262,23 @@ public:
 				}
 
 				t_result = t;
+				return true;
+			}
+		}
+
+		// T5. epoch 形式 (1219927284)
+		{
+			// 正規表現のコンパイル
+			static MyRegex reg;
+			if( !util::CompileRegex( reg, L"^([0-9]*)$" ) ) {
+				return false;
+			}
+			// 検索
+			if( reg.exec(line) && reg.results.size() == 2 ) {
+				// 抽出
+
+				t_result = CTime(_wtoi(reg.results[1].str.c_str()));
+
 				return true;
 			}
 		}
@@ -439,6 +457,7 @@ public:
 	{
 		ReplaceDefinedEntityReferenceToCharacter( str );
 		ReplaceNumberEntityReferenceToCharacter( str );
+		ReplaceNumberEntityReferenceToCharacter2( str );
 	}
 
 	/**
@@ -484,6 +503,48 @@ public:
 			{
 				int d = _wtoi( reg.results[1].str.c_str() );
 				str.AppendFormat( L"%c", d );
+			}
+
+			// ターゲットを更新。
+			target = target.Mid( reg.results[0].end );
+		}
+	}
+
+	/**
+	 * &#xxxxx; の実体参照の文字化
+	 * 例）&#x3642; → char(3642)
+	 */
+	static void ReplaceNumberEntityReferenceToCharacter2( CString& str )
+	{
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if( !util::CompileRegex( reg, L"&#x([0-9A-F]{4});" ) ) {
+			return;
+		}
+
+		CString target = str;
+		str = L"";
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
+			std::vector<MyRegex::Result>* pResults = NULL;
+			if( reg.exec(target) == false || reg.results.size() != 2 )
+			{
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				str += target;
+				break;
+			}
+			// 発見。
+			// マッチ文字列の左側を出力
+			str += target.Left( reg.results[0].start );
+
+			// 実体化
+			{
+				// hex => dec
+				int d = 0;
+				if (swscanf(reg.results[1].str.c_str(), L"%X", &d)==1) {
+					str.AppendFormat( L"%c", d );
+				}
+				MZ3LOGGER_DEBUG(util::FormatString(L"%s : %d\n", reg.results[1].str.c_str(), d));
 			}
 
 			// ターゲットを更新。

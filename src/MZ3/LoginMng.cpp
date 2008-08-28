@@ -58,15 +58,18 @@ void Login::Read()
 			return;
 		}
 
+		// mixi
 		m_loginMail   = Read(fp);
 		m_loginPwd    = Read(fp);
 		CString dummy = Read(fp);		// 旧オーナーID（互換性確保のためのパディング）
 
+		// Twitter
 		m_twitterId	  = Read(fp);
 		m_twitterPwd  = Read(fp);
 
-//		TRACE(_T("Mail = %s\n"), m_loginMail);
-//		TRACE(_T("Password = %s\n"), m_loginPwd);
+		// Twitter
+		m_wassrId	  = Read(fp);
+		m_wassrPwd    = Read(fp);
 
 		fclose(fp);
 	}
@@ -84,7 +87,9 @@ void Login::Write()
 	// エンコード処理
 	// ----------------------------------------
 	if (m_loginMail.GetLength() == 0 && m_loginPwd.GetLength() == 0 &&
-		m_twitterId.GetLength() == 0 && m_twitterPwd.GetLength() == 0)
+		m_twitterId.GetLength() == 0 && m_twitterPwd.GetLength() == 0 &&
+		m_wassrId.GetLength() == 0 && m_wassrPwd.GetLength() == 0
+		)
 	{
 		return;
 	}
@@ -94,12 +99,19 @@ void Login::Write()
 		return;
 	}
 
+	// mixi
 	Write( fp, m_loginMail );
 	Write( fp, m_loginPwd  );
 	CString dummyId;
 	Write( fp, dummyId );
+
+	// Twitter
 	Write( fp, m_twitterId );
 	Write( fp, m_twitterPwd );
+
+	// Wassr
+	Write( fp, m_wassrId );
+	Write( fp, m_wassrPwd );
 
 	fclose(fp);
 }

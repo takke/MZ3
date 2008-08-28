@@ -22,6 +22,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	// ÉäÉXÉgÇÃèâä˙âª
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+	case ACCESS_WASSR_FRIENDS_TIMELINE:
 		// èâä˙âªÇµÇ»Ç¢ÅB
 		break;
 	default:
@@ -52,6 +53,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_TWITTER_FAVORITES:			return twitter::TwitterFriendsTimelineXmlParser::parse( body, html );	// ébíË
 	case ACCESS_TWITTER_DIRECT_MESSAGES:	return twitter::TwitterDirectMessagesXmlParser::parse( body, html );
+	case ACCESS_WASSR_FRIENDS_TIMELINE:		return twitter::WassrFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_RSS_READER_FEED:			return mz3parser::RssFeedParser::parse( body, html );
 	default:
 		{

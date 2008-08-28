@@ -22,10 +22,12 @@ public:
 	{
 		bool bUseMixi;		///< mixi
 		bool bUseTwitter;	///< Twitter
+		bool bUseWassr;		///< Wassr
 
-		InitializeType(bool a_bUseMixi=true, bool a_bUseTwitter=true)
+		InitializeType(bool a_bUseMixi=true, bool a_bUseTwitter=true, bool a_bUseWassr=true)
 			: bUseMixi(a_bUseMixi)
 			, bUseTwitter(a_bUseTwitter)
+			, bUseWassr(a_bUseWassr)
 		{
 		}
 	};

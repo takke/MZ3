@@ -1551,11 +1551,12 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	}
 
 	// 統合カラムモード用のフォーマッタを設定する
-	m_bodyList.m_strIntegratedLinePattern1 = 
-		theApp.m_accessTypeInfo.getBodyIntegratedLinePattern1(pCategory->m_mixi.GetAccessType());
-	m_bodyList.m_strIntegratedLinePattern2 = 
-		theApp.m_accessTypeInfo.getBodyIntegratedLinePattern2(pCategory->m_mixi.GetAccessType());
-
+	if (pCategory!=NULL) {
+		m_bodyList.m_strIntegratedLinePattern1 = 
+			theApp.m_accessTypeInfo.getBodyIntegratedLinePattern1(pCategory->m_mixi.GetAccessType());
+		m_bodyList.m_strIntegratedLinePattern2 = 
+			theApp.m_accessTypeInfo.getBodyIntegratedLinePattern2(pCategory->m_mixi.GetAccessType());
+	}
 
 	m_bModifyingBodyList = false;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
@@ -1574,8 +1575,10 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		util::MySetInformationText( m_hWnd, L"完了" );
 	} else {
 		// 第1カラムに表示している内容を表示する。
-		m_infoEdit.SetWindowText( 
-			MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+		if (pCategory!=NULL) {
+			m_infoEdit.SetWindowText( 
+				MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+		}
 	}
 }
 
@@ -2910,6 +2913,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// 【API 用】
 	// URL 内のID置換
 	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
+	uri.Replace( L"{wassr:id}", theApp.m_loginMng.GetWassrId() );
 
 	data->SetBrowseUri(uri);
 
@@ -2933,10 +2937,21 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// 認証情報の設定
 	LPCTSTR szUser = NULL;
 	LPCTSTR szPassword = NULL;
-	if (util::IsTwitterAccessType(data->GetAccessType())) {
+	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Twitter") {
 		// Twitter API => Basic 認証
 		szUser     = theApp.m_loginMng.GetTwitterId();
 		szPassword = theApp.m_loginMng.GetTwitterPassword();
+
+		// 未指定の場合はエラー出力
+		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+			return;
+		}
+	}
+	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Wassr") {
+		// Wassr API => Basic 認証
+		szUser     = theApp.m_loginMng.GetWassrId();
+		szPassword = theApp.m_loginMng.GetWassrPassword();
 
 		// 未指定の場合はエラー出力
 		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
@@ -4996,14 +5011,17 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
-			if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
+			std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
+			if (strServiceType == "Twitter") {
 				// Twitter系であれば Twitter スタイル
 				return VIEW_STYLE_TWITTER;
+			} else if (strServiceType == "Wassr") {
+				// Wassr系であれば Twitter スタイル
+				return VIEW_STYLE_TWITTER;
+			} else if (strServiceType == "RSS") {
+				// RSS は「イメージ付き」とする
+				return VIEW_STYLE_IMAGE;
 			} else {
-				if (strcmp(theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType()), "RSS")==0) {
-					// RSS は「イメージ付き」とする
-					return VIEW_STYLE_IMAGE;
-				}
 
 				if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 					// エコーは Twitter スタイル
@@ -5908,7 +5926,7 @@ void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 		OnAcceleratorPrevTab();
 	} else if (strCmdList==L"D") {
 		// 下：カラム変更(暫定)
-		OnAcceleratorToggleIntegratedMode();
+		MyChangeBodyHeader();
 	} else if (strCmdList==L"U") {
 		// 上：リロード
 		OnAcceleratorReload();
@@ -5981,6 +5999,7 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
 			theApp.m_pMouseGestureManager->m_cmdList.push_back(cmd);
 			theApp.m_pMouseGestureManager->m_posLastCmd = point;
 
+			// ステータスバーに表示
 			CString strCmdList = CStringW(theApp.m_pMouseGestureManager->GetCmdList().c_str());
 			strCmdList.Replace(L"U", L"↑");
 			strCmdList.Replace(L"D", L"↓");

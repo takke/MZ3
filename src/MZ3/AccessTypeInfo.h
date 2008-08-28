@@ -149,7 +149,7 @@ public:
 	}
 
 	/// サービス種別の取得
-	const char* getServiceType( ACCESS_TYPE t ) {
+	std::string getServiceType( ACCESS_TYPE t ) {
 		MYMAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return "";

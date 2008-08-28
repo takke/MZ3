@@ -140,6 +140,10 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_FRIENDSHIPS_CREATE,	///< add
 	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
+	//--- Wassr Timeline Œn
+	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] friends_timeline.xml
+	ACCESS_WASSR_USER,					///< Še”­Œ¾—v‘f
+
 	//--- RSS Reader
 	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
 	ACCESS_RSS_READER_ITEM,				///< RSS Reader Item
