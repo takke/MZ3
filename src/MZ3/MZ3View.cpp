@@ -5138,6 +5138,22 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 	case TWITTER_STYLE_POST_MODE_UPDATE:
+		{
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			CMixiData& data = pCategory->GetSelectedBody();
+			CString msg;
+			msg.Format( 
+				L"ˆÈ‰º‚Ì”­Œ¾‚ğ‘—M‚µ‚Ü‚·B\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"‚æ‚ë‚µ‚¢‚Å‚·‚©H", 
+				strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+		}
+		break;
 	default:
 		break;
 	}
