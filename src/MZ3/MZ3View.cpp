@@ -6383,6 +6383,20 @@ void CMZ3View::OnAcceleratorToggleIntegratedMode()
 	// レイアウト反映
 	MySetLayout(0, 0);
 
+	// ボディリスト選択位置の保存
+	int selectedBody = 0;
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory) {
+		selectedBody = pCategory->selectedBody;
+	}
+
 	// ボディリストの再構築
 	OnMySelchangedCategoryList();
+
+	// ボディリスト選択位置の復帰
+	if (pCategory) {
+		pCategory->selectedBody = selectedBody;
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, true );
+		m_bodyList.EnsureVisible(pCategory->selectedBody, FALSE);
+	}
 }
