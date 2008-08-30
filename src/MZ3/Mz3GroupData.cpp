@@ -118,7 +118,7 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		group.init( L"Wassr", L"", ACCESS_GROUP_OTHERS );
 		{
 			appendCategoryByIniData( accessTypeInfo, group, "タイムライン", ACCESS_WASSR_FRIENDS_TIMELINE );
-//			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
+//			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_WASSR_FRIENDS_TIMELINE, "http://api.wassr.jp/statuses/replies.xml" );
 //			appendCategoryByIniData( accessTypeInfo, group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
 //			appendCategoryByIniData( accessTypeInfo, group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
 //			appendCategoryByIniData( accessTypeInfo, group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
