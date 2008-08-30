@@ -1830,6 +1830,12 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 		}
 	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
 		switch (pMsg->wParam) {
+		case VK_UP:
+			// ボディリストに移動
+			CommandSetFocusBodyList();
+			return TRUE;
+//			break;
+
 		case 'V':
 			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
 				m_statusEdit.Paste();
@@ -2339,6 +2345,11 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 				// 一番下なので無視。
 				if( m_access ) return TRUE;	// アクセス中は禁止
+
+				// Twitter モードならつぶやくモードへ。
+				if (m_viewStyle==VIEW_STYLE_TWITTER) {
+					OnMenuTwitterUpdate();
+				}
 				return TRUE;
 			}else{
 #ifdef WINCE
