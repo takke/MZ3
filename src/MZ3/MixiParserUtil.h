@@ -544,7 +544,7 @@ public:
 				if (swscanf(reg.results[1].str.c_str(), L"%X", &d)==1) {
 					str.AppendFormat( L"%c", d );
 				}
-				MZ3LOGGER_DEBUG(util::FormatString(L"%s : %d\n", reg.results[1].str.c_str(), d));
+//				MZ3LOGGER_DEBUG(util::FormatString(L"%s : %d\n", reg.results[1].str.c_str(), d));
 			}
 
 			// ターゲットを更新。
