@@ -106,6 +106,9 @@ inline CString MakeLogfilePathByRule( CString strBasePath, const CMixiData& data
 	path.Replace( L"/", L"_" );
 	// path ì‡ÇÃ '?' ÇÕ '_' Ç…íuä∑Ç∑ÇÈ
 	path.Replace( L"?", L"_" );
+	// path ì‡ÇÃ '{', '}' ÇÕ '_' Ç…íuä∑Ç∑ÇÈ
+	path.Replace( L"{", L"_" );
+	path.Replace( L"}", L"_" );
 
 //	MZ3_TRACE( L"MakeLogfilePathByRule()\n" );
 //	MZ3_TRACE( L" URL  : /%s/\n", data.GetURL() );
