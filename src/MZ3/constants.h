@@ -141,8 +141,9 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
 	//--- Wassr Timeline 系
-	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] friends_timeline.xml
-	ACCESS_WASSR_USER,					///< 各発言要素
+	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] Wassr, friends_timeline.xml
+	ACCESS_WASSR_UPDATE,				///< [POST] Wassr, ステータス更新
+	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
 
 	//--- RSS Reader
 	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
