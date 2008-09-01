@@ -188,6 +188,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
+	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
+	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -871,8 +873,8 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// Twitter送信モードを初期化
-	MyResetTwitterStylePostMode(aType);
+	// カテゴリに応じてTwitter送信モードを初期化
+	MyResetTwitterStylePostMode();
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1180,8 +1182,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// Twitter送信モードを初期化
-	MyResetTwitterStylePostMode(aType);
+	// カテゴリに応じてTwitter送信モードを初期化
+	MyResetTwitterStylePostMode();
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1218,8 +1220,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// Twitter送信モードを初期化
-	MyResetTwitterStylePostMode(aType);
+	// カテゴリに応じてTwitter送信モードを初期化
+	MyResetTwitterStylePostMode();
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1260,8 +1262,8 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// Twitter送信モードを初期化
-	MyResetTwitterStylePostMode(theApp.m_accessType);
+	// カテゴリに応じてTwitter送信モードを初期化
+	MyResetTwitterStylePostMode();
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1601,38 +1603,44 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 
-	CMixiData& data = m_selGroup->getSelectedCategory()->GetSelectedBody();
+	CMixiData& data = GetSelectedBodyItem();
 
 	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
 
-	if (data.GetAccessType() == ACCESS_LIST_FOOTSTEP) {
-		return;
-	}
-
-	// コミュニティの場合は、トピック一覧を表示する。
-	// （暫定対応）
 	switch (data.GetAccessType()) {
+	case ACCESS_LIST_FOOTSTEP:
+		return;
+
 	case ACCESS_COMMUNITY:
+		// コミュニティの場合は、トピック一覧を表示する。
+		// （暫定対応）
 		OnViewBbsList();
 		return;
 
 	case ACCESS_TWITTER_USER:
-		// ダブルクリックの場合は全文表示
+		// 全文表示
 		OnMenuTwitterRead();
 		return;
 
 	case ACCESS_MIXI_ECHO_USER:
-		// ダブルクリックの場合は全文表示
+		// 全文表示
 		OnMenuMixiEchoRead();
 		return;
 
+	case ACCESS_WASSR_USER:
+		// 全文表示
+		OnMenuWassrRead();
+		break;
+
 	case ACCESS_RSS_READER_ITEM:
-		// ダブルクリックの場合は詳細表示
+		// 詳細表示
 		OnMenuRssRead();
 		return;
-	}
 
-	AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
+	default:
+		// 特殊な要素以外なので、通信処理開始。
+		AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
+	}
 }
 
 /**
@@ -2389,12 +2397,17 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			break;
 
 		case ACCESS_MIXI_ECHO_USER:
-			// ダブルクリックの場合は全文表示
+			// 全文表示
 			OnMenuMixiEchoRead();
 			break;
 
+		case ACCESS_WASSR_USER:
+			// 全文表示
+			OnMenuWassrRead();
+			break;
+
 		case ACCESS_RSS_READER_ITEM:
-			// ダブルクリックの場合は詳細表示
+			// 詳細表示
 			OnMenuRssRead();
 			break;
 
@@ -3094,6 +3107,7 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 
 	// Twitterスタイルであればカテゴリに応じて送信タイプを初期化
 	if (m_viewStyle==VIEW_STYLE_TWITTER) {
+		// カテゴリに応じてTwitter送信モードを初期化
 		MyResetTwitterStylePostMode();
 
 		// コントロール状態の変更
@@ -3687,6 +3701,17 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			CMenu menu;
 			menu.LoadMenu( IDR_BODY_MENU );
 			CMenu* pSubMenu = menu.GetSubMenu(2);	// echo用メニューはidx=2
+
+			// メニューを開く
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		}
+		break;
+
+	case ACCESS_WASSR_USER:
+		{
+			CMenu menu;
+			menu.LoadMenu( IDR_BODY_MENU );
+			CMenu* pSubMenu = menu.GetSubMenu(3);	// Wassr用メニューはidx=3
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -5447,8 +5472,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	// Twitter送信モードを初期化
-	MyResetTwitterStylePostMode(theApp.m_accessType);
+	// カテゴリに応じてTwitter送信モードを初期化
+	MyResetTwitterStylePostMode();
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -6498,7 +6523,7 @@ void CMZ3View::OnAcceleratorToggleIntegratedMode()
 /**
  * Twitterスタイルの送信モードを、カテゴリのアクセス種別に応じて初期化する
  */
-void CMZ3View::MyResetTwitterStylePostMode(ACCESS_TYPE aType)
+void CMZ3View::MyResetTwitterStylePostMode()
 {
 	MZ3_TRACE(L"MyResetTwitterStylePostMode()\n");
 
@@ -6544,4 +6569,41 @@ void CMZ3View::MyResetTwitterStylePostMode(ACCESS_TYPE aType)
 		break;
 	}
 */
+}
+
+/**
+ * Wassr | 読む
+ */
+void CMZ3View::OnMenuWassrRead()
+{
+	CMixiData& data = GetSelectedBodyItem();
+
+	// 本文を1行に変換して割り当て。
+	CString item;
+
+	CString v = data.GetBody();;
+	while( v.Replace( L"\r\n", L"" ) );
+	item.Append(v);
+	item.Append(L"\r\n");
+	item.Append(L"----\r\n");
+	
+	item.AppendFormat( L"name : %s\r\n", data.GetName() );
+	item.AppendFormat( L"%s\r\n", data.GetDate() );
+
+	MessageBox( item, data.GetName() );
+}
+
+/**
+ * Wassr | つぶやく
+ */
+void CMZ3View::OnMenuWassrUpdate()
+{
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }

@@ -392,7 +392,9 @@ public:
 	afx_msg void OnMenuMixiEchoShowProfile();
 	void ResetViewContent(void);
 	afx_msg void OnAcceleratorToggleIntegratedMode();
-	void MyResetTwitterStylePostMode(ACCESS_TYPE aType=ACCESS_INVALID);
+	void MyResetTwitterStylePostMode();
+	afx_msg void OnMenuWassrRead();
+	afx_msg void OnMenuWassrUpdate();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
