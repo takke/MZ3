@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(CDebugDlg, CDialog)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_CLICK, IDC_DEBUG_LIST, &CDebugDlg::OnNMClickDebugList)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_DEBUG_LIST, &CDebugDlg::OnLvnKeydownDebugList)
+	ON_NOTIFY(NM_DBLCLK, IDC_DEBUG_LIST, &CDebugDlg::OnNMDblclkDebugList)
 END_MESSAGE_MAP()
 
 
@@ -217,6 +218,22 @@ void CDebugDlg::OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult)
 			m_List.GetItemText(idx,1) );
 		MessageBox( msg, m_List.GetItemText(idx,0) );
 	}
+
+	*pResult = 0;
+}
+
+void CDebugDlg::OnNMDblclkDebugList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	int idx = util::MyGetListCtrlSelectedItemIndex( m_List );
+	if( idx < 0 ) {
+		return;
+	}
+
+	CString msg;
+	msg.Format( 
+		L"[%s]",
+		m_List.GetItemText(idx,1) );
+	MessageBox( msg, m_List.GetItemText(idx,0) );
 
 	*pResult = 0;
 }

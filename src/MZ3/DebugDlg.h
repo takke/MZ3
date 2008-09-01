@@ -38,4 +38,5 @@ public:
 	afx_msg void OnNMClickDebugList(NMHDR *pNMHDR, LRESULT *pResult);
 public:
 	afx_msg void OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkDebugList(NMHDR *pNMHDR, LRESULT *pResult);
 };
