@@ -493,6 +493,14 @@ bool CMZ3View::DoInitialize()
 		MySetLayout(0,0);
 	}
 
+	// Twitterスタイルであればカテゴリに応じて送信タイプを初期化
+	if (m_viewStyle==VIEW_STYLE_TWITTER) {
+		MyResetTwitterStylePostMode();
+
+		// コントロール状態の変更
+		MyUpdateControlStatus();
+	}
+
 	return true;
 }
 
@@ -802,8 +810,7 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY) {
 		// 日記ボタンをアクティブにする
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-	}
-	else {
+	} else {
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 	}
 	m_infoEdit.SetWindowText(_T(""));
@@ -864,8 +871,8 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// Twitter送信モードを「更新」に戻す
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	// Twitter送信モードを初期化
+	MyResetTwitterStylePostMode(aType);
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1173,19 +1180,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	// 通信完了（フラグを下げる）
 	m_access = FALSE;
 
-	// Twitter送信モードを変更
-	switch (aType) {
-	case ACCESS_MIXI_RECENT_ECHO:
-	case ACCESS_MIXI_ADD_ECHO:
-		// mixiエコーモード
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
-		break;
-
-	default:
-		// Twitter「更新」に戻す
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
-		break;
-	}
+	// Twitter送信モードを初期化
+	MyResetTwitterStylePostMode(aType);
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1203,7 +1199,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 {
 	CMixiData* pMixi = (CMixiData*)lParam;
 
-	if (pMixi->GetAccessType() == ACCESS_LOGIN) {
+	ACCESS_TYPE aType = pMixi->GetAccessType();
+	if (aType == ACCESS_LOGIN) {
 		// ログインの場合は待避させているから元に戻す
 		*pMixi = theApp.m_mixiBeforeRelogin;
 	}
@@ -1221,8 +1218,8 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// Twitter送信モードを「更新」に戻す
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	// Twitter送信モードを初期化
+	MyResetTwitterStylePostMode(aType);
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1263,19 +1260,8 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	m_access = FALSE;
 
-	// Twitter送信モードを戻す
-	switch (theApp.m_accessType) {
-	case ACCESS_MIXI_RECENT_ECHO:
-	case ACCESS_MIXI_ADD_ECHO:
-		// mixiエコーモード
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
-		break;
-
-	default:
-		// Twitter「更新」に戻す
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
-		break;
-	}
+	// Twitter送信モードを初期化
+	MyResetTwitterStylePostMode(theApp.m_accessType);
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -3026,12 +3012,19 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		break;
 	}
 
+	// UserAgent設定
+	// Wassr はブラウザ風UAだとAPIが叩けない事象の回避
+	CString strUserAgent = L"";	// "" で初期値
+	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Wassr") {
+		strUserAgent = MZ3_APP_NAME;
+	}
+
 	// GET/POST 開始
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
 	if (bPost) {
-		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, szUser, szPassword );
+		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, szUser, szPassword, strUserAgent );
 	} else {
-		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword );
+		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword, strUserAgent );
 	}
 }
 
@@ -3097,6 +3090,14 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 	if (newStyle!=m_viewStyle) {
 		m_viewStyle = newStyle;
 		MySetLayout(0,0);
+	}
+
+	// Twitterスタイルであればカテゴリに応じて送信タイプを初期化
+	if (m_viewStyle==VIEW_STYLE_TWITTER) {
+		MyResetTwitterStylePostMode();
+
+		// コントロール状態の変更
+		MyUpdateControlStatus();
 	}
 
 	// 選択状態（赤）の変更
@@ -5088,10 +5089,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			return;
 
 		case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
-			// 未入力なので最新取得
-			RetrieveCategoryItem();
-			return;
-
+		case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 		case TWITTER_STYLE_POST_MODE_UPDATE:
 		default:
 			// 未入力なので最新取得
@@ -5118,6 +5116,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			}
 		}
 		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		{
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
@@ -5137,13 +5136,32 @@ void CMZ3View::OnBnClickedUpdateButton()
 			twitterDirectMessageRecipientId = data.GetOwnerID();
 		}
 		break;
+
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 		{
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
-				L"以下の発言を送信します。\r\n"
+				L"以下の発言をTwitterに送信します。\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"よろしいですか？", 
+				strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+		}
+		break;
+
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		{
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			CMixiData& data = pCategory->GetSelectedBody();
+			CString msg;
+			msg.Format( 
+				L"以下の発言をWassrに送信します。\r\n"
 				L"----\r\n"
 				L"%s\r\n"
 				L"----\r\n"
@@ -5205,6 +5223,18 @@ void CMZ3View::OnBnClickedUpdateButton()
 		post.AppendPostBody( util::int2str(twitterDirectMessageRecipientId) );
 		break;
 
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		post.AppendPostBody( "status=" );
+		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+		post.AppendPostBody( "&source=" );
+		post.AppendPostBody( MZ3_APP_NAME );
+		// TODO reply 時の処理
+//		if (0) {
+//			post.AppendPostBody( "&reply_status_rid=" );
+//			post.AppendPostBody( reply_status_rid );
+//		}
+		break;
+
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 	default:
 		post.AppendPostBody( "status=" );
@@ -5228,6 +5258,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	case TWITTER_STYLE_POST_MODE_DM:
 		url = L"http://twitter.com/direct_messages/new.xml";
+		break;
+
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		url = L"http://api.wassr.jp/statuses/update.json";
 		break;
 
 	case TWITTER_STYLE_POST_MODE_UPDATE:
@@ -5255,6 +5289,18 @@ void CMZ3View::OnBnClickedUpdateButton()
 			return;
 		}
 		break;
+
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		// Wassr API => Basic 認証
+		szUser     = theApp.m_loginMng.GetWassrId();
+		szPassword = theApp.m_loginMng.GetWassrPassword();
+
+		// 未指定の場合はエラー出力
+		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+			return;
+		}
+		break;
 	}
 
 	// アクセス種別を設定
@@ -5265,6 +5311,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	case TWITTER_STYLE_POST_MODE_DM:
 		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		theApp.m_accessType = ACCESS_WASSR_UPDATE;
 		break;
 
 	case TWITTER_STYLE_POST_MODE_UPDATE:
@@ -5328,7 +5378,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		// --------------------------------------------------
 		// 投稿処理
 		// --------------------------------------------------
-		if (util::IsTwitterAccessType(aType)) {
+		MZ3_TRACE(L"POST Status[%d]\n", theApp.m_inet.m_dwHttpStatus);
+		if (theApp.m_accessTypeInfo.getServiceType(aType)=="Twitter") {
 			// Twitter投稿処理
 			// HTTPステータスチェックを行う。
 			LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
@@ -5362,7 +5413,21 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				// 入力値を消去
 				SetDlgItemText( IDC_STATUS_EDIT, L"" );
 			}
+		} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "Wassr") {
+			// HTTPステータスチェックを行う。
+			if (theApp.m_inet.m_dwHttpStatus==200) {
+				// OK
+
+				// 入力値を消去
+				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+			} else {
+				LPCTSTR szStatusErrorMessage = L"?";
+				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+				util::MySetInformationText( m_hWnd, msg );
+				MZ3LOGGER_ERROR( msg );
+			}
 		} else {
+			// Twitter 以外
 			switch (aType) {
 			case ACCESS_MIXI_ADD_ECHO:
 				util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
@@ -5382,19 +5447,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	// Twitter送信モードを戻す
-	switch (theApp.m_accessType) {
-	case ACCESS_MIXI_RECENT_ECHO:
-	case ACCESS_MIXI_ADD_ECHO:
-		// mixiエコーモード
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
-		break;
-
-	default:
-		// Twitter「更新」に戻す
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
-		break;
-	}
+	// Twitter送信モードを初期化
+	MyResetTwitterStylePostMode(theApp.m_accessType);
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -5897,10 +5951,13 @@ void CMZ3View::MyUpdateControlStatus(void)
 		if (pUpdateButton!=NULL) {
 			switch (m_twitterPostMode) {
 			case TWITTER_STYLE_POST_MODE_DM:
-				pUpdateButton->SetWindowTextW( L"送信" );
+				pUpdateButton->SetWindowTextW( L"DM" );
 				break;
 			case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
-				pUpdateButton->SetWindowTextW( L"書込" );
+				pUpdateButton->SetWindowTextW( L"echo" );
+				break;
+			case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+				pUpdateButton->SetWindowTextW( L"Wassr" );
 				break;
 			case TWITTER_STYLE_POST_MODE_UPDATE:
 			default:
@@ -6046,9 +6103,20 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
 bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 {
 	// ステータスコードチェック
+	MZ3_TRACE(L"DoAccessEndProcForBody(), HTTP Status[%d], [%s]\n", 
+		theApp.m_inet.m_dwHttpStatus,
+		(LPCTSTR)CString(theApp.m_accessTypeInfo.getServiceType(aType).c_str()));
 	LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
-	if (util::IsTwitterAccessType(aType)) {
+	if (theApp.m_accessTypeInfo.getServiceType(aType)=="Twitter") {
+		// Twitter
 		szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
+	} else if (theApp.m_accessTypeInfo.getServiceType(aType)=="Wassr") {
+		// Wassr
+		if (theApp.m_inet.m_dwHttpStatus==200) {
+			// OK
+		} else {
+			szStatusErrorMessage = L"不明なエラー";
+		}
 	}
 	if (szStatusErrorMessage!=NULL) {
 		CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
@@ -6154,8 +6222,7 @@ void CMZ3View::MyUpdateFocus(void)
 {
 	switch (m_viewStyle) {
 	case VIEW_STYLE_TWITTER:
-		if (util::IsTwitterAccessType(theApp.m_accessType) ||
-			theApp.m_accessType==ACCESS_MIXI_ADD_ECHO) {
+		{
 			// Twitter関連のPOSTが完了したので、フォーカスを入力領域に移動する。
 			// 但し、フォーカスがリストにある場合は移動しない。
 			CWnd* pFocus = GetFocus();
@@ -6426,4 +6493,55 @@ void CMZ3View::OnAcceleratorToggleIntegratedMode()
 		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, pCategory->selectedBody, true );
 		m_bodyList.EnsureVisible(pCategory->selectedBody, FALSE);
 	}
+}
+
+/**
+ * Twitterスタイルの送信モードを、カテゴリのアクセス種別に応じて初期化する
+ */
+void CMZ3View::MyResetTwitterStylePostMode(ACCESS_TYPE aType)
+{
+	MZ3_TRACE(L"MyResetTwitterStylePostMode()\n");
+
+	// カテゴリの種別を優先して初期化
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory) {
+		std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
+		MZ3_TRACE(L" service_type : %s\n", (LPCTSTR)CString(strServiceType.c_str()));
+
+		if (strServiceType == "Twitter") {
+			// Twitter系
+			m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		} else if (strServiceType == "Wassr") {
+			// Wassr系
+			m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
+		} else if (strServiceType == "RSS") {
+			// RSS => 無視
+		} else {
+			// mixi系 => mixiエコー
+			m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		}
+	} else {
+		// デフォルトは Twitter
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	}
+
+	// 指定されたアクセス種別に応じて初期化
+/*	switch (aType) {
+	case ACCESS_MIXI_RECENT_ECHO:
+	case ACCESS_MIXI_ADD_ECHO:
+		// mixiエコーモード
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+		break;
+
+	case ACCESS_WASSR_UPDATE:
+		// Wassr
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
+		break;
+
+	default:
+		// Twitter「更新」に戻す
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		break;
+	}
+*/
 }
