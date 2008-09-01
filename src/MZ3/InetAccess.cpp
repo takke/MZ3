@@ -234,6 +234,11 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUse
 	MZ3_TRACE(L"CInetAccess::DoGet(), uri[%s], ref[%s], UA[%s], m_strUserAgent[%s]\n", uri, ref, strUserAgent, m_strUserAgent);
 	if (m_strUserAgent!=strUserAgent) {
 		CloseInternetHandles();
+		// Internet ハンドルも閉じる
+		if( m_hInternet != NULL ) {
+			InternetCloseHandle( m_hInternet );
+			m_hInternet = NULL;
+		}
 		m_strUserAgent = strUserAgent;
 	}
 
@@ -310,6 +315,11 @@ BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* p
 	MZ3_TRACE(L"CInetAccess::DoPost(), uri[%s], ref[%s], UA[%s], m_strUserAgent[%s]\n", uri, ref, strUserAgent, m_strUserAgent);
 	if (m_strUserAgent!=strUserAgent) {
 		CloseInternetHandles();
+		// Internet ハンドルも閉じる
+		if( m_hInternet != NULL ) {
+			InternetCloseHandle( m_hInternet );
+			m_hInternet = NULL;
+		}
 		m_strUserAgent = strUserAgent;
 	}
 
