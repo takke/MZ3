@@ -70,6 +70,8 @@ private:
 	CString				m_strErrorMsg;			///< エラー時のメッセージ。
 												///< WM_MZ3_GET_ERROR 時にのみ有効。
 
+	CString				m_strUserAgent;			///< リクエストされたユーザエージェント
+
 	int					m_nRedirect;			///< リダイレクト回数
 
 public:
@@ -102,9 +104,9 @@ public:
 
 	LPCTSTR	GetURL()			{ return m_uri; }
 
-	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL );
+	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL, LPCTSTR strUserAgent=L"" );
 	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
-	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL );
+	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL, LPCTSTR strUserAgent=L"" );
 
 	void Initialize( HWND hwnd, void* object, ENCODING encoding=ENCODING_EUC );
 

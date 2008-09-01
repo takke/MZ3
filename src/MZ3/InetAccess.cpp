@@ -162,7 +162,8 @@ bool CInetAccess::Open()
 
 		// 接続を開く
 		DWORD dwFlag = proxy.IsEmpty() ? INTERNET_OPEN_TYPE_DIRECT : INTERNET_OPEN_TYPE_PROXY;
-		m_hInternet = InternetOpen(theApp.m_optionMng.m_strUserAgent, dwFlag, proxy, NULL, 0);
+		MZ3_TRACE(L"CInetAccess::Open(), InternetOpen(), UA[%s]\n", m_strUserAgent);
+		m_hInternet = InternetOpen(m_strUserAgent, dwFlag, proxy, NULL, 0);
 	} catch (CException &) {
 		m_hInternet = NULL;
 
@@ -211,7 +212,7 @@ void CInetAccess::Initialize( HWND hwnd, void* object, ENCODING encoding/*=ENCOD
  *
  * @return 常に TRUE を返す。
  */
-BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId, LPCTSTR szPassword )
+BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId, LPCTSTR szPassword, LPCTSTR strUserAgent )
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -224,6 +225,17 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUse
 	// 認証情報の取得・設定
 	m_strUserId   = szUserId==NULL ? L"" : szUserId;
 	m_strPassword = szPassword==NULL ? L"" : szPassword;
+
+	// 前回とユーザエージェントが異なれば切断し、再接続する(再接続の際にUserAgentが決まるため)
+	if (wcslen(strUserAgent)==0) {
+		// 初期値解決
+		strUserAgent = theApp.m_optionMng.m_strUserAgent;
+	}
+	MZ3_TRACE(L"CInetAccess::DoGet(), uri[%s], ref[%s], UA[%s], m_strUserAgent[%s]\n", uri, ref, strUserAgent, m_strUserAgent);
+	if (m_strUserAgent!=strUserAgent) {
+		CloseInternetHandles();
+		m_strUserAgent = strUserAgent;
+	}
 
 	// スレッド開始
 	m_pThreadMain = AfxBeginThread(ExecGet_Thread, this);
@@ -275,7 +287,7 @@ unsigned int CInetAccess::ExecGet_Thread(LPVOID This)
 /**
  * データをポストする
  */
-BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId, LPCTSTR szPassword )
+BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId, LPCTSTR szPassword, LPCTSTR strUserAgent )
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -289,6 +301,17 @@ BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* p
 	// 認証情報の取得・設定
 	m_strUserId   = szUserId==NULL ? L"" : szUserId;
 	m_strPassword = szPassword==NULL ? L"" : szPassword;
+
+	// 前回とユーザエージェントが異なれば切断し、再接続する(再接続の際にUserAgentが決まるため)
+	if (wcslen(strUserAgent)==0) {
+		// 初期値解決
+		strUserAgent = theApp.m_optionMng.m_strUserAgent;
+	}
+	MZ3_TRACE(L"CInetAccess::DoPost(), uri[%s], ref[%s], UA[%s], m_strUserAgent[%s]\n", uri, ref, strUserAgent, m_strUserAgent);
+	if (m_strUserAgent!=strUserAgent) {
+		CloseInternetHandles();
+		m_strUserAgent = strUserAgent;
+	}
 
 	// スレッド開始
 	m_pThreadMain = AfxBeginThread(ExecPost_Thread, this);
@@ -1030,6 +1053,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
  */
 void CInetAccess::CloseInternetHandles()
 {
+	MZ3_TRACE(L"CInetAccess::CloseInternetHandles()\n");
+
 	// m_hRequest が NULL でなければ、閉じる
 	if( m_hRequest != NULL ) {
 		MZ3LOGGER_DEBUG( L"InternetCloseHandle( m_hRequest )" );
