@@ -1,0 +1,11 @@
+[Info]
+Name=画面上での操作
+KeyWord=画面上での操作
+Context=IDH_HELP82
+[Date]
+<P><FONT face="ＭＳ ゴシック">* 画面上での操作</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; 投稿の方法は通常の操作と異なり，投稿用の画面はありません<BR>&nbsp; 画面最下部にあるテキストボックスに入力し，更新ボタンを押下することで投稿になります</FONT></P>
+<P><FONT face="ＭＳ ゴシック"><A href="file:///I:/mz3_svn/mz3_svn/doc/Help%20Files/MZ4/Capture/52_Wassr_発言.jpg"><IMG height=200 src="file:///I:/mz3_svn/mz3_svn/doc/Help%20Files/MZ4/Capture/52_Wassr_発言.jpg"></FONT></A></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ※ テキストボックスが空の状態で Wassr ボタンを押下するとタブのダブルクリックと<BR>&nbsp; 同様の処理となり，上部ペインで選択されている項目を取得します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ●タイムライン<BR>&nbsp;&nbsp;&nbsp; 自分と購読対象者の発言を取得します</FONT></P>
+<P><FONT face="ＭＳ ゴシック">&nbsp; ●返信一覧<BR>&nbsp;&nbsp;&nbsp; 自分宛にされた返信を取得します</FONT></P>

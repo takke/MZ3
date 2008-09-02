@@ -371,6 +371,33 @@
 <param name="Name" value="RSS を利用する">
 <param name="Local" value="200851617395117.htm">
 </OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Wassr">
+<param name="Name" value="目次">
+<param name="Local" value="20089210511199.htm">
+<param name="Name" value="Wassr とは？">
+<param name="Local" value="200892105126708.htm">
+<param name="Name" value="Wassr を利用する">
+<param name="Local" value="200892105149395.htm">
+<param name="Name" value="画面上での操作">
+<param name="Local" value="20089210521497.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="目次">
+<param name="Local" value="20089210511199.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Wassr とは？">
+<param name="Local" value="200892105126708.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="Wassr を利用する">
+<param name="Local" value="200892105149395.htm">
+</OBJECT>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="画面上での操作">
+<param name="Local" value="20089210521497.htm">
+</OBJECT>
 </UL>
 </body>
 </html>

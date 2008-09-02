@@ -4,14 +4,14 @@ KeyWord=必須設定項目
 Context=IDH_HELP71
 [Date]
 <P>* MZ4 を使うには</P>
-<P>&nbsp; MZ4 は <A href="http://mixi.jp/">mixi</A>&nbsp;及び <A href="http://twitter.com/">Twitter</A> 用の専用ブラウザであり，RSS リーダ機能も備える統合ブラウザです<BR>&nbsp; そのため，本アプリを使用するには mixi か Twitter のアカウントが必要になります<BR>&nbsp; # RSS リーダとしてのみ使用する場合はその限りではありません<BR><BR>&nbsp; mixi を利用するには既存の利用者からの招待が必要です<BR>&nbsp; Twitter は自己登録制ですので，いつでもアカウントを取得することができます<BR>&nbsp; <A href="https://twitter.com/signup">こちら</A>から取得してください</P>
+<P>&nbsp; MZ4 は <A href="http://mixi.jp/">mixi</A>，<A href="http://twitter.com/">Twitter</A>，及び <A href="http://wassr.jp/">Wassr</A>&nbsp;用の専用ブラウザであり，RSS リーダ機能も備える統合ブラウザです<BR>&nbsp; そのため，本アプリを使用するには mixi，Twitter，Wassr のアカウントが必要になります<BR>&nbsp; # RSS リーダとしてのみ使用する場合はその限りではありません<BR><BR>&nbsp; mixi を利用するには既存の利用者からの招待が必要です<BR>&nbsp; Twitter，Wassr は自己登録制ですので，いつでもアカウントを取得することができます<BR>&nbsp; Twitter は<A href="https://twitter.com/signup">こちら</A>から取得してください<BR>&nbsp;&nbsp;Wassr は<A href="http://wassr.jp/">こちら</A>から取得してください</P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/61_ClientType_Select.jpg"><IMG height=200 src="Capture/61_ClientType_Select.jpg"></FONT></A></P>
 <P>&nbsp; 初回起動時に上記画面が表示されます<BR>&nbsp; mixi，Twitter 共に使用する場合はそのまま OK を，<BR>&nbsp; 使用しないものがある場合は該当サービスのチェックを外して OK を押下してください</P>
 <P>&nbsp; 次にチェックしたサービスのアカウント登録を行います</P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/30_ログイン.jpg"><IMG height=200 src="Capture/30_ログイン.jpg"></FONT></A></P>
 <P>&nbsp; mixi の場合はメールアドレスとパスワードを入力してください</P>
 <P><FONT face="ＭＳ ゴシック"><A href="Capture/31_ログイン_Twitter.jpg"><IMG height=200 src="Capture/31_ログイン_Twitter.jpg"></FONT></A></P>
-<P>&nbsp; Twitter の場合は ID とパスワードを入力してください</P>
+<P>&nbsp; Twitter の場合は ID とパスワードを入力してください<BR>&nbsp; Wassr の場合も同様に ID とパスワードを入力してください</P>
 <P>&nbsp; 次に絵文字ダウンロードの確認画面が表示されます</P>
 <P><IMG src="Capture/42_ダウンローダ_初回絵文字.jpg"></P>
 <P>&nbsp; 「はい」を選んだ場合は以下の画面が表示されます</P>
