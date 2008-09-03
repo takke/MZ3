@@ -492,6 +492,11 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 第2カラム以降の描画
 		LV_COLUMN lvc;
 		lvc.mask = LVCF_FMT | LVCF_WIDTH;
+		int nSubColumnStartX = 0;	// 各カラムの領域開始位置(lvc.cxずつ増やす)
+		if (this->GetColumn(0, &lvc)) {
+			// 第1カラムの幅を加算
+			nSubColumnStartX += lvc.cx;
+		}
 		for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
 			if (this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff)) == 0) {
 				continue;
@@ -510,17 +515,24 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			default:
 				break;
 			}
-			rcSubItem.left  = rcSubItem.right;
+			rcSubItem.left  = nSubColumnStartX;
 			rcSubItem.right = rcSubItem.left + lvc.cx;
 
 			CRect rcDraw = rcSubItem;
-			rcDraw.left  += COLUMN_MODE_STYLE::OTHER_MARGIN_LEFT;
-			rcDraw.right -= COLUMN_MODE_STYLE::OTHER_MARGIN_RIGHT;
+//			MZ3_TRACE(L"★[%d], w[%d]\n", nColumn, rcDraw.Width());
+			if (rcDraw.Width()>=1) {
+				// 描画領域が1以上なので描画する
+				rcDraw.left  += COLUMN_MODE_STYLE::OTHER_MARGIN_LEFT;
+				rcDraw.right -= COLUMN_MODE_STYLE::OTHER_MARGIN_RIGHT;
 
-			pDC->DrawText(pszText,
-				-1,
-				rcDraw,
-				nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+				pDC->DrawText(pszText,
+					-1,
+					rcDraw,
+					nJustify | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+			}
+
+			// 領域開始位置の更新
+			nSubColumnStartX += lvc.cx;
 		}
 	}
 
