@@ -405,7 +405,6 @@ BEGIN
         MENUITEM "フォローやめる",                     ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
         MENUITEM SEPARATOR
         MENUITEM "友達のタイムライン",                   ID_MENU_TWITTER_FRIEND_TIMELINE
-        MENUITEM "友達のタイムライン(with others)",      ID_MENU_TWITTER_FRIEND_TIMELINE_WITH_OTHERS
         MENUITEM SEPARATOR
         MENUITEM "友達のホーム",                      ID_MENU_TWITTER_HOME
         MENUITEM "友達のFavorites",                ID_MENU_TWITTER_FAVORITES
