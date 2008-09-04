@@ -108,6 +108,9 @@ BEGIN
                 MENUITEM "大",                           ID_CHANGE_FONT_BIG
                 MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
                 MENUITEM "小",                           ID_CHANGE_FONT_SMALL
+                MENUITEM SEPARATOR
+                MENUITEM "大きくする",                       ID_MENU_FONT_MAGNIFY
+                MENUITEM "小さくする",                       ID_MENU_FONT_SHRINK
             END
             MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
         END
@@ -372,6 +375,9 @@ BEGIN
             MENUITEM "大",                           ID_CHANGE_FONT_BIG
             MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
             MENUITEM "小",                           ID_CHANGE_FONT_SMALL
+            MENUITEM SEPARATOR
+            MENUITEM "大きくする\tCtrl+W",               ID_MENU_FONT_MAGNIFY
+            MENUITEM "小さくする\tCtrl+S",               ID_MENU_FONT_SHRINK
         END
         MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
     END

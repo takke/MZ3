@@ -104,6 +104,8 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnMenuOpenUrl();
 	afx_msg void OnMenuOpenLocalFile();
+	afx_msg void OnMenuFontMagnify();
+	afx_msg void OnMenuFontShrink();
 };
 
 

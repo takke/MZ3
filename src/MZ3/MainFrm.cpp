@@ -81,6 +81,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_DOWNLOAD_MANAGER_VIEW, &CMainFrame::OnDownloadManagerView)
 	ON_COMMAND(ID_MENU_OPEN_URL, &CMainFrame::OnMenuOpenUrl)
 	ON_COMMAND(ID_MENU_OPEN_LOCAL_FILE, &CMainFrame::OnMenuOpenLocalFile)
+	ON_COMMAND(ID_MENU_FONT_MAGNIFY, &CMainFrame::OnMenuFontMagnify)
+	ON_COMMAND(ID_MENU_FONT_SHRINK, &CMainFrame::OnMenuFontShrink)
 END_MESSAGE_MAP()
 
 
@@ -1189,4 +1191,18 @@ void CMainFrame::OnMenuOpenLocalFile()
 
 	// 委譲
 	theApp.m_pMainView->MyOpenLocalFile();
+}
+
+/// 「文字サイズ｜大きくする」メニュー
+void CMainFrame::OnMenuFontMagnify()
+{
+	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight+1 );
+	ChangeAllViewFont();
+}
+
+/// 「文字サイズ｜小さくする」メニュー
+void CMainFrame::OnMenuFontShrink()
+{
+	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight-1 );
+	ChangeAllViewFont();
 }
