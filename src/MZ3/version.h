@@ -11,7 +11,8 @@
 #define MZ3_VERSION_TEXT			L"Version " MZ3_VERSION_TEXT_SHORT
 
 /// リビジョン番号
-#define MZ3_SVN_REVISION			L"$Rev$"
+/// "get_mz3_trunk_revision.vbs" で mz3.jp から取得し、生成されたファイルを include する。
+#include "mz3_revision.h"
 
 /// MZ3 用ユーティリティ
 namespace util
@@ -24,9 +25,9 @@ namespace util
  */
 inline CString GetSourceRevision()
 {
-	CString rev = MZ3_SVN_REVISION;	// $Rev$
-	rev.Replace( L"$Rev: ", L" [" );
-	rev.Replace( L" $", L"]" );
+	CString rev = MZ3_SVN_REVISION;	// r998
+	rev.Replace( L"r", L" [" );
+	rev += L"]";
 	return rev;
 }
 
