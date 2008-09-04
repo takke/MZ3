@@ -2631,13 +2631,22 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 
 			// 移動先が非表示なら上方向にスクロール
 			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
-				if( ( pCategory->selectedBody <= m_bodyList.GetTopIndex() ) &&
-					( pCategory->selectedBody >= m_bodyList.GetTopIndex() - m_bodyList.GetCountPerPage() ) ) {
-					// 移動先が画面より上、1画面以内にある時は1画面スクロール
-					m_bodyList.Scroll( CSize(0, -m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				int topIdx = m_bodyList.GetTopIndex();
+				int countPerPage = m_bodyList.GetCountPerPage();
+				int selectedBody = pCategory->selectedBody;
+				if (topIdx - countPerPage <= selectedBody && selectedBody < topIdx) {
+					// 移動先が画面より上で、上側の1画面内にある時は1画面スクロール
+					//            +-[TopIndex - CountPerPage]
+					//            +
+					// [selected]-+
+					//            --[TopIndex]
+					MEASUREITEMSTRUCT measureItemStruct;
+					m_bodyList.MeasureItem(&measureItemStruct);
+					int y = -countPerPage * measureItemStruct.itemHeight;
+					m_bodyList.Scroll( CSize(0, y) );
 				} else {
 					// 移動先が画面より下か、上で1画面以上離れている時はEnsureVisible()
-					m_bodyList.EnsureVisible( pCategory->selectedBody , TRUE );
+					m_bodyList.EnsureVisible( selectedBody, TRUE );
 				}
 
 				// 再描画
@@ -2669,13 +2678,22 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 
 			// 移動先が非表示なら下方向にスクロール
 			if( !util::IsVisibleOnListBox( m_bodyList, pCategory->selectedBody ) ) {
-				if( ( pCategory->selectedBody >= m_bodyList.GetTopIndex() + m_bodyList.GetCountPerPage() ) &&
-					( pCategory->selectedBody < m_bodyList.GetTopIndex() + m_bodyList.GetCountPerPage() * 2 ) ) {
-					// 移動先が画面より下、1画面以内にある時は1画面スクロール
-					m_bodyList.Scroll( CSize(0, m_bodyList.GetCountPerPage() * theApp.m_optionMng.GetFontHeight()) );
+				int topIdx = m_bodyList.GetTopIndex();
+				int countPerPage = m_bodyList.GetCountPerPage();
+				int selectedBody = pCategory->selectedBody;
+				if (topIdx + countPerPage <= selectedBody && selectedBody < topIdx + countPerPage * 2) {
+					// 移動先が画面より下で、下側の1画面内にある時は1画面スクロール
+					//            +-[TopIndex + CountPerPage]
+					//            +
+					// [selected]-+
+					//            --[TopIndex + CountPerPage*2]
+					MEASUREITEMSTRUCT measureItemStruct;
+					m_bodyList.MeasureItem(&measureItemStruct);
+					int y = countPerPage * measureItemStruct.itemHeight;
+					m_bodyList.Scroll( CSize(0, y) );
 				} else {
 					// 移動先が画面より上か、下で1画面以上離れている時はEnsureVisible()
-					m_bodyList.EnsureVisible( pCategory->selectedBody , TRUE );
+					m_bodyList.EnsureVisible( selectedBody, TRUE );
 				}
 
 				// 再描画
