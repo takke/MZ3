@@ -4823,10 +4823,8 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
  */
 void CMZ3View::OnAcceleratorFontMagnify()
 {
-	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight+1 );
-
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-	pMainFrame->ChangeAllViewFont();
+	pMainFrame->OnMenuFontShrink();
 }
 
 /**
@@ -4834,10 +4832,8 @@ void CMZ3View::OnAcceleratorFontMagnify()
  */
 void CMZ3View::OnAcceleratorFontShrink()
 {
-	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight-1 );
-
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-	pMainFrame->ChangeAllViewFont();
+	pMainFrame->OnMenuFontShrink();
 }
 
 /**
