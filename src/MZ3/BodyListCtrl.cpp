@@ -108,6 +108,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if( m_bStopDraw )
 		return;
 
+//	MZ3_TRACE(L"CBodyListCtrl::DrawItem(), nItem[%d]\n", lpDrawItemStruct->itemID);
+
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
 	// Ä•`‰æ‚·‚éItem‚ÌÀ•W‚ðŽæ“¾
@@ -147,7 +149,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcAllLabels.MoveToY( rcItem.top );
 
 	int nIconSize = 16;
-//	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode && rcAllLabels.Height()>=32) {
 	if (m_iconMode==ICON_MODE_32) {
 		nIconSize = 32;
 	}
