@@ -195,21 +195,12 @@ inline bool MySetListCtrlItemImageIndex( CListCtrl& listCtrl, int itemIndex, int
 inline bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx )
 {
 	int idxTop  = listCtrl.GetTopIndex();				// 画面の一番上の表示項目のインデックス
-	int idxLast = idxTop + listCtrl.GetCountPerPage();	// 画面の一番下の表示項目のインデックス
-	if( idx >= idxLast ) {
-		// 下方にある
-		return false;
+	int idxLast = idxTop + listCtrl.GetCountPerPage();	// 画面の一番下の表示項目のインデックス+1
+	if (idxTop <= idx && idx < idxLast) {
+		// 描画範囲内
+		return true;
 	}
-	if( idx <= idxTop ) {
-		//// ただし、先頭項目の場合は除く→除かなくした 問題があれば戻す
-		//if( idx==0 ) {
-		//	return true;
-		//}
-
-		// 上方にある
-		return false;
-	}
-	return true;
+	return false;
 }
 
 /**
