@@ -3029,6 +3029,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			post_key = body[0].GetValue(L"post_key");
 		}
 
+//		MZ3_TRACE(L"★post_key[%s]\n", post_key);
 		if (post_key.IsEmpty()) {
 			// list_friend.pl から取得する
 			uri = L"http://mixi.jp/list_friend.pl";
@@ -3038,6 +3039,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
 			post.AppendPostBody(L"post_key=");
 			post.AppendPostBody(post_key);
+			post.AppendPostBody(L"&_=");
 		}
 		break;
 	}
@@ -6196,6 +6198,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		// MZ3-API : パース後のフック処理(の予定)
 		switch (aType) {
 		case ACCESS_LIST_FRIEND:
+			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
 			// マイミク一覧
 			// list_friend.pl であれば、ajax_friend_setting.pl に変更して再リクエスト
 			if (wcsstr(theApp.m_inet.GetURL(), L"list_friend.pl")!=NULL) {
@@ -6203,6 +6206,13 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
 				AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
 				return false;
+			} else {
+				// 取得完了したので post_key を初期化しておく。
+				CMixiDataList& body = m_selGroup->getSelectedCategory()->m_body;
+				if (body.size()>0) {
+//					MZ3_TRACE(L"  ★post_key, reset\n");
+					body[0].SetValue(L"post_key", L"");
+				}
 			}
 			break;
 		}
