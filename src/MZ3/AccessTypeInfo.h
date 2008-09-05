@@ -25,6 +25,25 @@ public:
 		INFO_TYPE_POST,					///< POST系
 		INFO_TYPE_OTHER,				///< その他
 	};
+	LPCTSTR info_type_to_text(INFO_TYPE e) {
+		switch (e) {
+		case INFO_TYPE_INVALID:		return L"未定義";
+		case INFO_TYPE_GROUP:		return L"グループ系";
+		case INFO_TYPE_CATEGORY:	return L"カテゴリ系";
+		case INFO_TYPE_BODY:		return L"ボディ項目系";
+		case INFO_TYPE_POST:		return L"POST系";
+		case INFO_TYPE_OTHER:
+		default:					return L"その他";
+		}
+	}
+	INFO_TYPE text_to_info_type(const CString& s) {
+		if (s==L"未定義")		return INFO_TYPE_INVALID;
+		if (s==L"グループ系")	return INFO_TYPE_GROUP;
+		if (s==L"カテゴリ系")	return INFO_TYPE_CATEGORY;
+		if (s==L"ボディ項目系") return INFO_TYPE_BODY;		
+		if (s==L"POST系")		return INFO_TYPE_POST;
+		return INFO_TYPE_OTHER;
+	}
 
 	/// リクエスト種別
 	enum REQUEST_METHOD {
@@ -32,6 +51,42 @@ public:
 		REQUEST_METHOD_GET = 0,			///< GET メソッド
 		REQUEST_METHOD_POST = 1,		///< POST メソッド
 	};
+	LPCTSTR request_method_to_text(REQUEST_METHOD e) {
+		switch (e) {
+		case REQUEST_METHOD_GET:		return L"GET";
+		case REQUEST_METHOD_POST:		return L"POST";
+		case REQUEST_METHOD_INVALID:
+		default:						return L"未定義";
+		}
+	}
+	REQUEST_METHOD text_to_request_method(const CString& s) {
+		if (s==L"GET")	return REQUEST_METHOD_GET;
+		if (s==L"POST")	return REQUEST_METHOD_POST;
+		return REQUEST_METHOD_INVALID;
+	}
+
+	/// エンコーディング
+	enum ENCODING {
+		ENCODING_SJIS = 0,
+		ENCODING_EUC  = 1,
+		ENCODING_UTF8 = 2,
+		ENCODING_NOCONVERSION = 3,
+	};
+	LPCTSTR encoding_to_text(ENCODING e) {
+		switch (e) {
+		case ENCODING_SJIS:			return L"SJIS";
+		case ENCODING_EUC:			return L"EUC";
+		case ENCODING_UTF8:			return L"UTF8";
+		case ENCODING_NOCONVERSION:
+		default:					return L"NOCONVERSION";
+		}
+	}
+	ENCODING text_to_encoding(const CString& s) {
+		if (s==L"SJIS")	return ENCODING_SJIS;
+		if (s==L"EUC")	return ENCODING_EUC;
+		if (s==L"UTF8")	return ENCODING_UTF8;
+		return ENCODING_NOCONVERSION;
+	}
 
 	/// ボディに CMixiData 内のどの項目を表示するかの識別子
 	enum BODY_INDICATE_TYPE
@@ -42,13 +97,16 @@ public:
 		BODY_INDICATE_TYPE_BODY,		///< 本文を表示する
 		BODY_INDICATE_TYPE_NONE,		///< 何も表示しない
 	};
-
-	enum ENCODING {
-		ENCODING_SJIS = 0,
-		ENCODING_EUC  = 1,
-		ENCODING_UTF8 = 2,
-		ENCODING_NOCONVERSION = 3,
-	};
+	LPCTSTR body_indicate_type_to_text(BODY_INDICATE_TYPE e) {
+		switch (e) {
+		case BODY_INDICATE_TYPE_DATE:	return L"日付";
+		case BODY_INDICATE_TYPE_TITLE:	return L"タイトル";
+		case BODY_INDICATE_TYPE_NAME:	return L"名前";
+		case BODY_INDICATE_TYPE_BODY:	return L"本文";
+		case BODY_INDICATE_TYPE_NONE:
+		default:						return L"";
+		}
+	}
 
 	/// ボディのカラム用データ
 	class BodyHeaderColumn {
@@ -69,7 +127,7 @@ public:
 		INFO_TYPE			infoType;			///< データ自体の種別（何に利用されるアクセス種別か？）
 		std::string			serviceType;		///< 対象とするサービスの種別（"mixi", "Twitter"など）
 		std::wstring		shortText;			///< 説明文字列
-		REQUEST_METHOD		requestType;		///< リクエスト種別
+		REQUEST_METHOD		requestMethod;		///< リクエスト種別
 
 		ENCODING			requestEncoding;	///< 取得時のエンコーディングタイプ
 
@@ -92,11 +150,11 @@ public:
 
 //		std::wstring		refererUrlPattern;	///< リファラURLのパターン。
 
-		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestType)
+		Data(INFO_TYPE a_infoType, const char* a_serviceType, const wchar_t* a_shortText, REQUEST_METHOD a_requestMethod)
 			: infoType(a_infoType)
 			, serviceType(a_serviceType)
 			, shortText(a_shortText)
-			, requestType(a_requestType)
+			, requestMethod(a_requestMethod)
 			, requestEncoding(ENCODING_EUC)
 			, cacheFilePattern(L"")
 			, serializeKey("")
@@ -110,7 +168,7 @@ public:
 			: infoType(INFO_TYPE_INVALID)
 			, serviceType("")
 			, shortText(L"<unknown>")
-			, requestType(REQUEST_METHOD_INVALID)
+			, requestMethod(REQUEST_METHOD_INVALID)
 			, requestEncoding(ENCODING_EUC)
 			, cacheFilePattern(L"")
 			, serializeKey("")
@@ -163,7 +221,7 @@ public:
 		if (it==m_map.end()) {
 			return REQUEST_METHOD_INVALID;
 		}
-		return it->second.requestType;
+		return it->second.requestMethod;
 	}
 
 	/// 説明文字列の取得

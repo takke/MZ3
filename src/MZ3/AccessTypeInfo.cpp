@@ -5,6 +5,7 @@
  * 2 of the License, or (at your option) any later version.
  */
 #include "stdafx.h"
+#include "locale.h"
 #include "AccessTypeInfo.h"
 
 /// 初期化
@@ -874,7 +875,59 @@ bool AccessTypeInfo::init()
 
 	// TODO 必須項目のテスト
 
-	// TODO Debug モードのとき CSV ダンプする
+	// Debug モードのとき CSV ダンプする
+#ifdef _DEBUG
+	CString tsv_dump_filepath;
+	{
+		TCHAR path[256];
+		memset(path, 0x00, sizeof(TCHAR) * 256);
+		GetModuleFileName(NULL, path, 256);
+		tsv_dump_filepath = path;	// "...\\MZ3.exe"
+		tsv_dump_filepath = tsv_dump_filepath.Left(tsv_dump_filepath.ReverseFind('\\'));
+		tsv_dump_filepath += L"\\_access_type_list.csv";
+	}
+
+	FILE* fp_tsv = _wfopen(tsv_dump_filepath, L"wt");
+	if (fp_tsv!=NULL) {
+		setlocale(LC_ALL, "Japanese");
+		fwprintf(fp_tsv, L"ACCESS_TYPE,infoType,serviceType,shortText,requestType,requestEncoding,cacheFilePattern,"
+						 L"serializeKey,bCruiseTarget,defaultCategoryURL,bodyHeaderCol1,,bodyHeaderCol2,,bodyHeaderCol3,,"
+						 L"bodyIntegratedLinePattern1,bodyIntegratedLinePattern2\n");
+		for (MYMAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
+			const ACCESS_TYPE& accessType = it->first;
+			const Data& data = it->second;
+
+			fwprintf(fp_tsv, L"\"%d\",", accessType);
+			fwprintf(fp_tsv, L"\"%s\",", info_type_to_text(data.infoType));
+			fwprintf(fp_tsv, L"\"%s\",", CString(data.serviceType.c_str()));
+			fwprintf(fp_tsv, L"\"%s\",", data.shortText.c_str());
+			fwprintf(fp_tsv, L"\"%s\",", request_method_to_text(data.requestMethod));
+			fwprintf(fp_tsv, L"\"%s\",", encoding_to_text(data.requestEncoding));
+			fwprintf(fp_tsv, L"\"%s\",", data.cacheFilePattern.c_str());
+
+			//--- グループ系、カテゴリ系のみが持つ項目
+			fwprintf(fp_tsv, L"\"%s\",", CString(data.serializeKey.c_str()));
+
+			//--- カテゴリ系のみが持つ項目
+			fwprintf(fp_tsv, L"\"%d\",", data.bCruiseTarget ? 1 : 0);
+			fwprintf(fp_tsv, L"\"%s\",", data.defaultCategoryURL.c_str());
+
+			fwprintf(fp_tsv, L"\"%s\",", data.bodyHeaderCol1.title.c_str());
+			fwprintf(fp_tsv, L"\"%s\",", body_indicate_type_to_text(data.bodyHeaderCol1.type));
+			fwprintf(fp_tsv, L"\"%s\",", data.bodyHeaderCol2.title.c_str());
+			fwprintf(fp_tsv, L"\"%s\",", body_indicate_type_to_text(data.bodyHeaderCol2.type));
+			fwprintf(fp_tsv, L"\"%s\",", data.bodyHeaderCol3.title.c_str());
+			fwprintf(fp_tsv, L"\"%s\",", body_indicate_type_to_text(data.bodyHeaderCol3.type));
+
+			// Excel hack.
+			fwprintf(fp_tsv, L"=\"%s\",", data.bodyIntegratedLinePattern1.c_str());
+			fwprintf(fp_tsv, L"=\"%s\",", data.bodyIntegratedLinePattern2.c_str());
+
+			fwprintf(fp_tsv, L"\n");
+		}
+		fclose(fp_tsv);
+	}
+#endif
 
 	return true;
 }
