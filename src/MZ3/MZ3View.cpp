@@ -5595,6 +5595,7 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
 	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
 }
 
+/* Twitter 仕様変更により利用できないためコメントアウト
 void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 {
 	if( m_access ) {
@@ -5621,6 +5622,7 @@ void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
 	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
 }
+*/
 
 bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 {
