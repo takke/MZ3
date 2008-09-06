@@ -770,7 +770,7 @@ bool AccessTypeInfo::init()
 		);
 	// http://mixi.jp/recent_echo.pl
 	// => recent_echo.html
-	m_map[type].cacheFilePattern = L"mixi_echo\\{urlafter:/:recent_echo}.html";
+	m_map[type].cacheFilePattern = L"mixi_echo\\{urlafter:mixi.jp/:recent_echo}.html";
 	m_map[type].serializeKey = "MIXI_RECENT_ECHO";
 	m_map[type].defaultCategoryURL = L"recent_echo.pl";
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"”­Œ¾");
