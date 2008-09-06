@@ -20,7 +20,7 @@
 #include "util.h"
 #include "DebugDlg.h"
 #include "url_encoder.h"
-#include "version.h"
+#include "mz3_revision.h"
 #include "MZ3Parser.h"
 #include "MouseGestureManager.h"
 #include "MZ3FileCacheManager.h"

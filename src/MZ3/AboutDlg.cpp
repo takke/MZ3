@@ -13,6 +13,7 @@
 #include "util.h"
 #include "ForcedDebugDlg.h"
 #include "version.h"
+#include "mz3_revision.h"
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {
