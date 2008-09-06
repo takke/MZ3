@@ -39,4 +39,5 @@ public:
 public:
 	afx_msg void OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkDebugList(NMHDR *pNMHDR, LRESULT *pResult);
+	void MyShowSelectedItemInfo(void);
 };

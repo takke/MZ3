@@ -132,20 +132,24 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, data->GetBrowseUri() );
 	idx++;
 
-	m_List.InsertItem( idx, L"BodyArray数" );
+	m_List.InsertItem( idx, L"*BodyArray数" );
 	m_List.SetItemText( idx, 1, util::int2str( data->GetBodySize() ) );
+	m_List.SetItemData( idx, (DWORD_PTR)L"body" );
 	idx++;
 
-	m_List.InsertItem( idx, L"ImageArray数" );
+	m_List.InsertItem( idx, L"*ImageArray数" );
 	m_List.SetItemText( idx, 1, util::int2str( data->GetImageCount() ) );
+	m_List.SetItemData( idx, (DWORD_PTR)L"image" );
 	idx++;
 
 	m_List.InsertItem( idx, L"抽出リンク数" );
 	m_List.SetItemText( idx, 1, util::int2str( data->m_linkList.size() ) );
+//	m_List.SetItemData( idx, (DWORD_PTR)L"link_list" );
 	idx++;
 
 	m_List.InsertItem( idx, L"ページ変更リンク数" );
 	m_List.SetItemText( idx, 1, util::int2str( data->m_linkPage.size() ) );
+//	m_List.SetItemData( idx, (DWORD_PTR)L"link_page" );
 	idx++;
 
 	m_List.InsertItem( idx, L"子要素数" );
@@ -207,16 +211,7 @@ void CDebugDlg::OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
 	if (pLVKeyDow->wVKey == VK_RETURN) {
-		int idx = util::MyGetListCtrlSelectedItemIndex( m_List );
-		if( idx < 0 ) {
-			return;
-		}
-
-		CString msg;
-		msg.Format( 
-			L"[%s]",
-			m_List.GetItemText(idx,1) );
-		MessageBox( msg, m_List.GetItemText(idx,0) );
+		MyShowSelectedItemInfo();
 	}
 
 	*pResult = 0;
@@ -224,16 +219,31 @@ void CDebugDlg::OnLvnKeydownDebugList(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CDebugDlg::OnNMDblclkDebugList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	MyShowSelectedItemInfo();
+
+	*pResult = 0;
+}
+
+void CDebugDlg::MyShowSelectedItemInfo(void)
+{
 	int idx = util::MyGetListCtrlSelectedItemIndex( m_List );
 	if( idx < 0 ) {
 		return;
 	}
 
 	CString msg;
-	msg.Format( 
-		L"[%s]",
-		m_List.GetItemText(idx,1) );
-	MessageBox( msg, m_List.GetItemText(idx,0) );
 
-	*pResult = 0;
+	// ItemData に識別子があればそれに従って文字列生成
+	const CString& strType = (LPCTSTR)m_List.GetItemData(idx);
+	if (strType==L"body") {
+		msg.Format(L"[%s]", m_data->GetBody());
+	} else if (strType==L"image") {
+		for (int i=0; i<m_data->GetImageCount(); i++) {
+			msg.AppendFormat(L"[%s]\r\n", m_data->GetImage(i));
+		}
+	} else {
+		msg.Format(L"[%s]", m_List.GetItemText(idx,1) );
+	}
+
+	MessageBox( msg, m_List.GetItemText(idx,0) );
 }
