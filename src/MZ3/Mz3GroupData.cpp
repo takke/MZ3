@@ -83,6 +83,8 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		group.init( L"エコー", L"", ACCESS_GROUP_OTHERS );
 		{
 			appendCategoryByIniData( accessTypeInfo, group, "みんなのエコー", ACCESS_MIXI_RECENT_ECHO );
+			appendCategoryByIniData( accessTypeInfo, group, "自分への返信一覧", ACCESS_MIXI_RECENT_ECHO, "/res_echo.pl" );
+			appendCategoryByIniData( accessTypeInfo, group, "自分の一覧", ACCESS_MIXI_RECENT_ECHO, "/list_echo.pl?id={owner_id}" );
 		}
 		this->groups.push_back( group );
 
