@@ -830,7 +830,7 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	LOGFONT lf;
 	GetFont()->GetLogFont( &lf );
 
-	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
+//	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
 
 	// px’l‚É•ÏŠ·
 	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
@@ -843,7 +843,7 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 		lpMeasureItemStruct->itemHeight = lfHeightPx   +theApp.pt2px(COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
 	}
 
-	MZ3_TRACE(L"CBodyListCtrl::MeasureItem(), itemHeight : %d\n", lpMeasureItemStruct->itemHeight);
+//	MZ3_TRACE(L"CBodyListCtrl::MeasureItem(), itemHeight : %d\n", lpMeasureItemStruct->itemHeight);
 }
 
 LRESULT CBodyListCtrl::OnSetFont(WPARAM wParam, LPARAM lParam)
