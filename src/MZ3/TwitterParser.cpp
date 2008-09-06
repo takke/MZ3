@@ -85,7 +85,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 	// status ‚É‘Î‚·‚éˆ—
 	try {
 		const xml2stl::Node& statuses = root.getNode( L"statuses" );
-		for (xml2stl::NodeRef statusesRef = statuses.getNodeRef();
+		for (xml2stl::NodeRef statusesRef = statuses.getChildrenNodeRef();
 			!statusesRef.isEnd();
 			statusesRef.next())
 		{
@@ -360,7 +360,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 	// status ‚É‘Î‚·‚éˆ—
 	try {
 		const xml2stl::Node& statuses = root.getNode( L"statuses" );
-		for (xml2stl::NodeRef statusesRef = statuses.getNodeRef();
+		for (xml2stl::NodeRef statusesRef = statuses.getChildrenNodeRef();
 			!statusesRef.isEnd();
 			statusesRef.next())
 		{

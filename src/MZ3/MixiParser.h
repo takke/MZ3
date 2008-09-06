@@ -3653,9 +3653,11 @@ private:
 
 
 /**
- * [list] みんなのエコー
+ * [list] みんなのエコー, ほか
  *
- * http://mixi.jp/recent_echo.pl
+ * - http://mixi.jp/recent_echo.pl
+ * - http://mixi.jp/res_echo.pl
+ * - http://mixi.jp/list_echo.pl?id={owner_id}
  */
 class RecentEchoParser : public MixiListParser
 {
@@ -3705,8 +3707,9 @@ public:
 					CMixiData data;
 					data.SetAccessType( ACCESS_MIXI_ECHO_USER );
 
+					const xml2stl::Node& td_comment = tr.getNode(L"td", L"class=comment");
 					// text : tr/td[@comment]
-					CString strBody = tr.getNode(L"td", L"class=comment").getTextAll().c_str();
+					CString strBody = td_comment.getTextAll().c_str();
 					// strBody の <span> タグ以降は日付等のため削除
 					util::GetBeforeSubString(strBody, L"<span>", strBody);
 					strBody.Replace(L"</a>", L"</a>&nbsp;");
@@ -3715,7 +3718,7 @@ public:
 					data.AddBody( strBody );
 
 					// 時間：tr/td[@comment]/span
-					CString strDate = tr.getNode(L"td", L"class=comment").getNode(L"span").getTextAll().c_str();
+					CString strDate = td_comment.getNode(L"span").getTextAll().c_str();
 					// aタグは除去
 					mixi::ParserUtil::StripAllTags( strDate );
 					while( strDate.Replace( L"\n", L"" ) );
@@ -3744,6 +3747,29 @@ public:
 
 					// post_key は全ての要素に設定する
 					data.SetValue(L"post_key", post_key);
+
+					// 返信用データ
+					// .../td[@comment]/div[#echo_member_id_*] : メンバーID => author_id に設定
+					// .../td[@comment]/div[#echo_post_time_*] : 投稿時刻   => 記事ID 値に設定
+					for (xml2stl::NodeRef nodeRef=td_comment.getChildrenNodeRef(); !nodeRef.isEnd(); nodeRef.next()) {
+						const xml2stl::Node& item = nodeRef.getCurrentNode();
+						try {
+							if (item.getProperty(L"id").substr(0, 15)==L"echo_member_id_") {
+								// echo_member_id_*
+								data.SetAuthorID(_wtoi(item.getTextAll().c_str()));
+								MZ3_TRACE(L" echo_member_id : %s\n", item.getTextAll().c_str());
+								continue;
+							}
+							if (item.getProperty(L"id").substr(0, 15)==L"echo_post_time_") {
+								// echo_post_time_*
+								data.SetValue(L"echo_post_time", item.getTextAll().c_str());
+								MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
+								continue;
+							}
+						} catch (xml2stl::NodeNotFoundException&) {
+							// id プロパティがないタグ(spanなど)もあるので続行
+						}
+					}
 
 					// 完成したので追加する
 					out_.push_back( data );

@@ -173,6 +173,7 @@ BEGIN
     BEGIN
         MENUITEM "全文を読む...",                    ID_MENU_MIXI_ECHO_READ
         MENUITEM "つぶやく",                        ID_MENU_MIXI_ECHO_UPDATE
+        MENUITEM "返信",                          ID_MENU_MIXI_ECHO_REPLY
         MENUITEM "プロフィールページ",                   ID_MENU_MIXI_ECHO_SHOW_PROFILE
     END
     POPUP "Wassr用メニュー"

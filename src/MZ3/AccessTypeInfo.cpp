@@ -788,6 +788,15 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
+	// echo î≠åæ
+	type = ACCESS_MIXI_ECHO_USER;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "mixi"
+		, L"mixiÉGÉRÅ[î≠åæ"
+		, REQUEST_METHOD_GET
+		);
+
 
 	//------------------------------------------------------------------
 	//--- Wassr ån

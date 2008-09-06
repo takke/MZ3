@@ -323,6 +323,7 @@
 #define ID_MENU_WASSR_UPDATE            34177
 #define ID_MENU_FONT_MAGNIFY            34180
 #define ID_MENU_FONT_SHRINK             34181
+#define ID_MENU_MIXI_ECHO_REPLY         34183
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -337,7 +338,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        174
-#define _APS_NEXT_COMMAND_VALUE         34182
+#define _APS_NEXT_COMMAND_VALUE         34184
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

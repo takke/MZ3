@@ -57,6 +57,7 @@ public:
 		TWITTER_STYLE_POST_MODE_UPDATE,			///< タイムライン用発言入力中
 		TWITTER_STYLE_POST_MODE_DM,				///< DM入力中
 		TWITTER_STYLE_POST_MODE_MIXI_ECHO,		///< mixiエコー入力中
+		TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY,///< mixiエコー入力中(返信)
 		TWITTER_STYLE_POST_MODE_WASSR_UPDATE,	///< Wassr 用発言入力中
 	};
 	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
@@ -395,6 +396,7 @@ public:
 	void MyResetTwitterStylePostMode();
 	afx_msg void OnMenuWassrRead();
 	afx_msg void OnMenuWassrUpdate();
+	afx_msg void OnMenuMixiEchoReply();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

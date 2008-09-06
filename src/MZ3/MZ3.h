@@ -33,6 +33,13 @@
 	using namespace Gdiplus;
 #endif
 
+// コンソール用デバッグログ出力用マクロ
+#ifdef CONSOLE_DEBUG
+# define MZ3_TRACE wprintf
+#else
+# define MZ3_TRACE __noop
+#endif
+
 // ログ出力用マクロ
 #define MZ3LOGGER_FATAL(msg)			SIMPLELOGGER_FATAL(theApp.m_logger,msg)
 #define MZ3LOGGER_ERROR(msg)			SIMPLELOGGER_ERROR(theApp.m_logger,msg)
@@ -40,13 +47,6 @@
 #define MZ3LOGGER_DEBUG(msg)			SIMPLELOGGER_DEBUG(theApp.m_logger,msg)
 #define MZ3LOGGER_TRACE(msg)			SIMPLELOGGER_TRACE(theApp.m_logger,msg)
 #define MZ3LOGGER_IS_DEBUG_ENABLED()	theApp.m_logger.isDebugEnabled()
-
-// コンソール用デバッグログ出力用マクロ
-#ifdef CONSOLE_DEBUG
-# define MZ3_TRACE wprintf
-#else
-# define MZ3_TRACE __noop
-#endif
 
 #define TOOLBAR_HEIGHT 24
 

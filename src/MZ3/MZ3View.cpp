@@ -189,6 +189,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
 	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
 	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
+	ON_COMMAND(ID_MENU_MIXI_ECHO_REPLY, &CMZ3View::OnMenuMixiEchoReply)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -5110,13 +5111,13 @@ void CMZ3View::OnBnClickedUpdateButton()
 		MZ3LOGGER_ERROR( L"カテゴリが未選択" );
 		return;
 	}
-	switch (pCategory->m_mixi.GetAccessType()) {
+/*	switch (pCategory->m_mixi.GetAccessType()) {
 	case ACCESS_MIXI_RECENT_ECHO:
 		// エコー表示中なので強制的にエコーモードに変更する
 		m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
 		break;
 	}
-
+*/
 	// 入力文字列を取得
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
@@ -5125,6 +5126,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	if (strStatus.IsEmpty()) {
 		switch (m_twitterPostMode) {
 		case TWITTER_STYLE_POST_MODE_DM:
+		case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 			// 未入力はNG
 			return;
 
@@ -5139,7 +5141,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	}
 
 	// DMモードであれば、送信先確認
-	int	twitterDirectMessageRecipientId;	// DM送信先ユーザID
 	switch (m_twitterPostMode) {
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 		{
@@ -5157,9 +5158,25 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
+		{
+			CMixiData& data = pCategory->GetSelectedBody();
+			CString msg;
+			msg.Format( 
+				L"mixi エコーで %s さんに返信します。\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"よろしいですか？", 
+				(LPCTSTR)data.GetName(), strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+		}
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		{
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
@@ -5172,14 +5189,11 @@ void CMZ3View::OnBnClickedUpdateButton()
 			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
 				return;
 			}
-
-			twitterDirectMessageRecipientId = data.GetOwnerID();
 		}
 		break;
 
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 		{
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
@@ -5197,7 +5211,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 		{
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
@@ -5256,11 +5269,38 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
+		{
+			// body=test&x=13&y=13&parent_member_id=xxx&parent_post_time=xxx&redirect=list_echo&post_key=xxx
+			CString post_key = GetSelectedBodyItem().GetValue(L"post_key");
+			if (post_key.IsEmpty()) {
+				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
+				return;
+			}
+
+			CMixiData& data = pCategory->GetSelectedBody();
+			post.AppendPostBody( "body=" );
+			post.AppendPostBody( URLEncoder::encode_euc(strStatus) );
+			post.AppendPostBody( "&x=28&y=20" );
+			post.AppendPostBody( "&parent_member_id=" );
+			post.AppendPostBody( util::int2str(data.GetAuthorID()) );
+			post.AppendPostBody( "&parent_post_time=" );
+			post.AppendPostBody( data.GetValue(L"echo_post_time") );
+			post.AppendPostBody( "&post_key=" );
+			post.AppendPostBody( post_key );
+			post.AppendPostBody( "&redirect=recent_echo" );
+		}
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
-		post.AppendPostBody( "text=" );
-		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
-		post.AppendPostBody( "&user=" );
-		post.AppendPostBody( util::int2str(twitterDirectMessageRecipientId) );
+		{
+			CMixiData& data = pCategory->GetSelectedBody();
+			int	twitterDirectMessageRecipientId = data.GetOwnerID();
+			post.AppendPostBody( "text=" );
+			post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+			post.AppendPostBody( "&user=" );
+			post.AppendPostBody( util::int2str(twitterDirectMessageRecipientId) );
+		}
 		break;
 
 	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
@@ -5296,6 +5336,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 		url = L"http://mixi.jp/add_echo.pl";
 		break;
 
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
+		url = L"http://mixi.jp/add_echo.pl";
+		break;
+
 	case TWITTER_STYLE_POST_MODE_DM:
 		url = L"http://twitter.com/direct_messages/new.xml";
 		break;
@@ -5315,6 +5359,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	LPCTSTR szPassword = NULL;
 	switch (m_twitterPostMode) {
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 		break;
 
 	case TWITTER_STYLE_POST_MODE_DM:
@@ -5346,6 +5391,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// アクセス種別を設定
 	switch (m_twitterPostMode) {
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 		theApp.m_accessType = ACCESS_MIXI_ADD_ECHO;
 		break;
 
@@ -6004,6 +6050,9 @@ void CMZ3View::MyUpdateControlStatus(void)
 			case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 				pUpdateButton->SetWindowTextW( L"echo" );
 				break;
+			case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
+				pUpdateButton->SetWindowTextW( L"返信" );
+				break;
 			case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 				pUpdateButton->SetWindowTextW( L"Wassr" );
 				break;
@@ -6489,10 +6538,29 @@ void CMZ3View::OnMenuMixiEchoRead()
 	MessageBox( item, data.GetName() );
 }
 
+/**
+ * mixiエコー | つぶやく
+ */
 void CMZ3View::OnMenuMixiEchoUpdate()
 {
 	// モード変更
 	m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+}
+
+
+/**
+ * mixiエコー | 返信
+ */
+void CMZ3View::OnMenuMixiEchoReply()
+{
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY;
 
 	// ボタン名称変更
 	MyUpdateControlStatus();

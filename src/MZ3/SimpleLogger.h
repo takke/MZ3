@@ -210,7 +210,7 @@ private:
 	 */
 	bool outputMessage( CATEGORY category, LPCTSTR message, LPCTSTR strSourceFilename, int line ) {
 		bool rval = outputMessage( m_fp, category, message, strSourceFilename, line );
-#ifdef DEBUG
+#if defined(DEBUG) || defined(CONSOLE_DEBUG)
 		rval = outputMessage( stdout, category, message, strSourceFilename, line );
 #endif
 		return rval;

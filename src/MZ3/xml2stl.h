@@ -89,7 +89,7 @@ public:
 		return type;
 	}
 
-	NodeRef getNodeRef() const;
+	NodeRef getChildrenNodeRef() const;
 
 	/**
 	 * ƒm[ƒh–¼‚Ìæ“¾
@@ -247,7 +247,7 @@ public:
 
 	/**
 	 *
-	 * @notice very slow impl. use "getNodeRef" instead.
+	 * @notice very slow impl. use "getChildrenNodeRef" instead.
 	 */
 	const Node& getNode( size_t index ) const
 	{
@@ -448,7 +448,7 @@ public:
 	}
 };
 
-inline NodeRef Container::getNodeRef() const {
+inline NodeRef Container::getChildrenNodeRef() const {
 
 	return NodeRef(children);
 }
