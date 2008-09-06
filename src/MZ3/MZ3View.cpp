@@ -5470,9 +5470,15 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			// Twitter 以外
 			switch (aType) {
 			case ACCESS_MIXI_ADD_ECHO:
-				util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
-				// 入力値を消去
-				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+				// ログアウトチェック
+				if (theApp.IsMixiLogout(aType)) {
+					// ログアウト状態になっている
+					MessageBox(L"未ログインです。エコー一覧をリロードし、mixiにログインして下さい。");
+				} else {
+					util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
+					// 入力値を消去
+					SetDlgItemText( IDC_STATUS_EDIT, L"" );
+				}
 				break;
 
 			default:
