@@ -5145,7 +5145,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		{
 			CString msg;
 			msg.Format( 
-				L"以下のエコーを書き込みます。\r\n"
+				L"mixi エコーで発言します。\r\n"
 				L"----\r\n"
 				L"%s\r\n"
 				L"----\r\n"
@@ -5183,7 +5183,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
-				L"以下の発言をTwitterに送信します。\r\n"
+				L"Twitterで発言します。\r\n"
 				L"----\r\n"
 				L"%s\r\n"
 				L"----\r\n"
@@ -5201,7 +5201,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
 			msg.Format( 
-				L"以下の発言をWassrに送信します。\r\n"
+				L"Wassrで発言します。\r\n"
 				L"----\r\n"
 				L"%s\r\n"
 				L"----\r\n"
