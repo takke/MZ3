@@ -263,6 +263,18 @@ void RssFeedParser::setDescriptionTitle( CMixiData& data, CString description, C
 	mixi::ParserUtil::ReplaceEntityReferenceToCharacter( description );
 	description = description.Trim();
 
+	// description の img タグを解析し、登録する
+/*	static MyRegex s_reg;
+	if (util::CompileRegex(s_reg, L"<img[^>]*src=\"([^\"]+)\"[^>]*>")) {
+		if (s_reg.exec(description) && s_reg.results.size() == 2 ) {
+			// <img>タグ
+			MZ3_TRACE(L"RssFeedParser::setDescriptionTitle(), img-url[%s], description[%s]\n", 
+				s_reg.results[1].str.c_str(), 
+				description);
+			data.AddImage(s_reg.results[1].str.c_str());
+		}
+	}
+*/	
 	// body として description の no-tag 版を設定する
 	mixi::ParserUtil::StripAllTags(description);
 	description = description.Trim();
