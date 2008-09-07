@@ -4827,7 +4827,7 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 void CMZ3View::OnAcceleratorFontMagnify()
 {
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-	pMainFrame->OnMenuFontShrink();
+	pMainFrame->OnMenuFontMagnify();
 }
 
 /**
