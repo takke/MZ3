@@ -1689,7 +1689,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 					CRect rectItem;
 					m_bodyList.GetItemRect(i, &rectItem, LVIR_BOUNDS);
 					m_bodyList.InvalidateRect(rectItem, FALSE);
-					wprintf( L"RedrawItems : %d\n", i );
+//					wprintf( L"RedrawItems : %d\n", i );
 				}
 			}
 		} else {
@@ -3013,7 +3013,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		post.AppendAdditionalHeader(L"");
 	}
 
-	// MZ3-API : GET/POST 直前のフック処理(の予定)
+	// [MZ3-API] GET/POST 直前のフック処理(の予定)
 	switch (data->GetAccessType()) {
 	case ACCESS_LIST_FRIEND:
 		// マイミク一覧
@@ -3200,7 +3200,13 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 
 		// HTML 解析
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 2/3") );
-		mz3parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), body, html );
+		mz3parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), category.m_mixi, body, html );
+
+		// 取得したデータに from_log_flag を設定する
+		// （「Twitterの新着件数カウントに含める」等のため）
+		for (size_t i=0; i<body.size(); i++) {
+			body[i].SetIntValue(L"from_log_flag", 1);
+		}
 
 		// ボディ一覧の設定
 		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 3/3") );
@@ -6246,16 +6252,17 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	html.Load( theApp.m_filepath.temphtml );
 
 	// 保存先 body の取得。
+	CMixiData& parent_data = m_selGroup->getSelectedCategory()->m_mixi;
 	CMixiDataList& body = m_selGroup->getSelectedCategory()->GetBodyList();
 
 	// HTML 解析
 	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
-	if (mz3parser::MyDoParseMixiListHtml( aType, body, html )) {
+	if (mz3parser::MyDoParseMixiListHtml( aType, parent_data, body, html )) {
 
-		// MZ3-API : パース後のフック処理(の予定)
+		// [MZ3-API] : パース後のフック処理(の予定)
 		switch (aType) {
 		case ACCESS_LIST_FRIEND:
-			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
+//			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
 			// マイミク一覧
 			// list_friend.pl であれば、ajax_friend_setting.pl に変更して再リクエスト
 			if (wcsstr(theApp.m_inet.GetURL(), L"list_friend.pl")!=NULL) {
@@ -6269,6 +6276,51 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				if (body.size()>0) {
 //					MZ3_TRACE(L"  ★post_key, reset\n");
 					body[0].SetTextValue(L"post_key", L"");
+				}
+			}
+			break;
+
+		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");
+			// Twitter タイムライン、ページ変更(複数ページ取得)処理
+			{
+#ifdef WINCE
+				const int MAX_PAGE = 2;	// WM では 2 ページ固定とする(暫定)
+#else
+				const int MAX_PAGE = 3;
+#endif
+
+				CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+				int page = pCategoryItem->m_mixi.GetIntValue(L"request_page", 1);
+				MZ3_TRACE(L"　★page=%d\n", page);
+
+				// 新着件数を取得
+				int new_count = parent_data.GetIntValue(L"new_count", 0);
+				// ログファイルから取得していたデータは新着とみなす(ログより前のデータを取得するため)
+				if (page==1) {
+					for (int i=0; i<body.size(); i++) {
+						if (body[i].GetIntValue(L"from_log_flag", 0)) {
+							new_count ++;
+							// 次回はカウントしないためフラグを下げとく
+							body[i].SetIntValue(L"from_log_flag", 0);
+						}
+					}
+				}
+
+				MZ3_TRACE(L"　★新着件数=%d\n", new_count);
+
+				// 最大ページ数未満で、かつ、新着件数が閾値よりも多い場合
+				if (page<MAX_PAGE && new_count >= 20/2) {
+					// 次ページリクエスト
+					page ++;
+					pCategoryItem->m_mixi.SetIntValue(L"request_page", page);
+					CString url = util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL());
+					url.AppendFormat(L"%spage=%d", (url.Find('?')<0 ? L"?" : L"&"), page);
+					AccessProc(&pCategoryItem->m_mixi, url);
+					return false;
+				} else {
+					// リクエストページ変数を初期化して終了
+					pCategoryItem->m_mixi.SetIntValue(L"request_page", 1);
 				}
 			}
 			break;

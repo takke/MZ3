@@ -55,7 +55,7 @@ bool TwitterParserBase::ExtractLinks(CMixiData &data_)
  * 【タイムライン】
  * http://twitter.com/statuses/friends_timeline.xml
  */
-bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
+bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
 
@@ -181,7 +181,10 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArr
 
 
 	// 生成したデータを出力に反映
-	TwitterParserBase::AppendNewList(out_, new_list);
+	TwitterParserBase::MergeNewList(out_, new_list);
+
+	// 新着件数を parent(カテゴリの m_mixi) に設定する
+	parent.SetIntValue(L"new_count", new_list.size());
 
 	MZ3LOGGER_DEBUG( util::FormatString(L"TwitterFriendsTimelineXmlParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
 	return true;
@@ -318,7 +321,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 	}
 
 	// 生成したデータを出力に反映
-	TwitterParserBase::AppendNewList(out_, new_list);
+	TwitterParserBase::MergeNewList(out_, new_list);
 
 	MZ3LOGGER_DEBUG( L"TwitterDirectMessagesXmlParser.parse() finished." );
 	return true;
@@ -469,7 +472,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 	}
 
 	// 生成したデータを出力に反映
-	TwitterParserBase::AppendNewList(out_, new_list);
+	TwitterParserBase::MergeNewList(out_, new_list);
 
 	MZ3LOGGER_DEBUG( util::FormatString(L"WassrFriendsTimelineXmlParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
 	return true;

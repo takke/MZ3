@@ -15,7 +15,7 @@
 namespace mz3parser {
 
 /// ÉäÉXÉgånHTMLÇÃâêÕ
-bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiDataList& body, CHtmlArray& html );
+bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList& body, CHtmlArray& html );
 void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html );
 
 }//namespace mz3parser
