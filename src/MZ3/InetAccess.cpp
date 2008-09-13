@@ -33,6 +33,9 @@
 #define SZ_REG_CONNECTION_ROOT TEXT("System\\State\\Connections")
 #define SZ_REG_CONNECTION_DBVOL TEXT("Count") 
 
+#define MYSETTRAFFICINFO_CANCELABLE_ON	true
+#define MYSETTRAFFICINFO_CANCELABLE_OFF	false
+
 // CInetAccess
 
 /**
@@ -41,8 +44,9 @@
  * @param dwLoaded      読み込み済みデータ量
  * @param dwContentLen  総データ量。負のときは参考値とみなす。0 のときは総データ量不明とみなす。
  * @param dwElapsedMsec 経過時間[msec]
+ * @param bCancelable   「前回の表示から一定時間経った場合に表示する」機能のon/off
  */
-inline void MySetTrafficInfo( HWND hWnd, LONG dwLoaded, LONG dwContentLen, DWORD dwElapsedMsec )
+inline void MySetTrafficInfo( HWND hWnd, LONG dwLoaded, LONG dwContentLen, DWORD dwElapsedMsec, bool bCancelable=true )
 {
 	// メッセージ生成
 	CString msg;
@@ -100,16 +104,27 @@ inline void MySetTrafficInfo( HWND hWnd, LONG dwLoaded, LONG dwContentLen, DWORD
 		DWORD restSec  = (DWORD)ceil( rest * (double)dwElapsedMsec / 1000 / dwLoaded );
 
 		// 最大で 3600 sec までとする
-		if( restSec > 3600 ) restSec = 3600;
 		if( restSec < 0    ) restSec = 0;
-		msg.AppendFormat( L" [%dsec]", restSec );
+		if( restSec <= 3600 ) {
+			msg.AppendFormat( L" [%dsec]", restSec );
+		}
 	}
 
-	// メッセージ設定
-	util::MySetInformationText( hWnd, msg );
+	// 前回の表示時刻
+	static DWORD s_dwLastSetInfoTime = 0;
+#define CANCEL_LIMIT_MSEC 500
 
-	// プログレスバー設定も行う
-	::SendMessage( hWnd, WM_MZ3_ACCESS_LOADED, (WPARAM)dwLoaded, (LPARAM)dwLength );
+	// 前回の表示時刻から一定時間以上経っていれば表示する
+	DWORD dwNow = GetTickCount();
+	if (!bCancelable || dwNow > s_dwLastSetInfoTime + CANCEL_LIMIT_MSEC) {
+		// メッセージ設定
+		util::MySetInformationText( hWnd, msg );
+
+		// プログレスバー設定も行う
+		::SendMessage( hWnd, WM_MZ3_ACCESS_LOADED, (WPARAM)dwLoaded, (LPARAM)dwLength );
+
+		s_dwLastSetInfoTime = dwNow;
+	}
 }
 
 /**
@@ -935,7 +950,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			}
 		}
 		// 受信完了
-		MySetTrafficInfo( m_hwnd, recv_buffer.size(), recv_buffer.size(), sw.getElapsedMilliSecUntilNow() );
+		MySetTrafficInfo( m_hwnd, recv_buffer.size(), recv_buffer.size(), sw.getElapsedMilliSecUntilNow(), 
+			MYSETTRAFFICINFO_CANCELABLE_OFF);
 	}
 	catch (CException &) {
 		// m_hRequest, m_hConnection を閉じる。
