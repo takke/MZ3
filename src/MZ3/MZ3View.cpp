@@ -3027,7 +3027,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 		CMixiDataList& body = m_selGroup->getSelectedCategory()->m_body;
 		if (body.size()>0) {
-			post_key = body[0].GetValue(L"post_key");
+			post_key = body[0].GetTextValue(L"post_key");
 		}
 
 //		MZ3_TRACE(L"★post_key[%s]\n", post_key);
@@ -5255,7 +5255,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 		{
 			// body=test+from+firefox&x=28&y=20&post_key=74b630af81dfaae59bfb6352728844a7&redirect=recent_echo
-			CString post_key = GetSelectedBodyItem().GetValue(L"post_key");
+			CString post_key = GetSelectedBodyItem().GetTextValue(L"post_key");
 			if (post_key.IsEmpty()) {
 				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
 				return;
@@ -5272,7 +5272,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 		{
 			// body=test&x=13&y=13&parent_member_id=xxx&parent_post_time=xxx&redirect=list_echo&post_key=xxx
-			CString post_key = GetSelectedBodyItem().GetValue(L"post_key");
+			CString post_key = GetSelectedBodyItem().GetTextValue(L"post_key");
 			if (post_key.IsEmpty()) {
 				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
 				return;
@@ -5285,7 +5285,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			post.AppendPostBody( "&parent_member_id=" );
 			post.AppendPostBody( util::int2str(data.GetAuthorID()) );
 			post.AppendPostBody( "&parent_post_time=" );
-			post.AppendPostBody( data.GetValue(L"echo_post_time") );
+			post.AppendPostBody( data.GetTextValue(L"echo_post_time") );
 			post.AppendPostBody( "&post_key=" );
 			post.AppendPostBody( post_key );
 			post.AppendPostBody( "&redirect=recent_echo" );
@@ -6268,7 +6268,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				CMixiDataList& body = m_selGroup->getSelectedCategory()->m_body;
 				if (body.size()>0) {
 //					MZ3_TRACE(L"  ★post_key, reset\n");
-					body[0].SetValue(L"post_key", L"");
+					body[0].SetTextValue(L"post_key", L"");
 				}
 			}
 			break;

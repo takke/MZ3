@@ -3138,7 +3138,7 @@ public:
 					if (util::GetBetweenSubString(line, L"value=\"", L"\"", post_key)>=0) {
 						// dummy アイテムに設定する
 						CMixiData data;
-						data.SetValue(L"post_key", post_key);
+						data.SetTextValue(L"post_key", post_key);
 						out_.push_back(data);
 						rval = true;
 					}
@@ -3746,7 +3746,7 @@ public:
 					data.SetURL( url );
 
 					// post_key は全ての要素に設定する
-					data.SetValue(L"post_key", post_key);
+					data.SetTextValue(L"post_key", post_key);
 
 					// 返信用データ
 					// .../td[@comment]/div[#echo_member_id_*] : メンバーID => author_id に設定
@@ -3762,7 +3762,7 @@ public:
 							}
 							if (item.getProperty(L"id").substr(0, 15)==L"echo_post_time_") {
 								// echo_post_time_*
-								data.SetValue(L"echo_post_time", item.getTextAll().c_str());
+								data.SetTextValue(L"echo_post_time", item.getTextAll().c_str());
 //								MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
 								continue;
 							}

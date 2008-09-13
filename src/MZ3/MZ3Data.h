@@ -171,6 +171,16 @@ public:
 public:
 	//--- 汎用数値コンテナのアクセッサ
 
+	/// 汎用数値コンテナへのキー指定による数値設定
+	void	SetIntValue(LPCTSTR key, int value) {
+		m_IntegerMap[key] = value;
+	}
+	/// 汎用数値コンテナからのキー指定による数値取得
+	/// 取得失敗時は default_value を返す
+	int	GetIntValue(LPCTSTR key, int default_value=-1) {
+		return FindIntegerMap(key, default_value);
+	}
+
 	// author_id : 投稿者のID（オーナーIDに設定される場合もある）
 	void	SetAuthorID(int authorId)	{ m_IntegerMap[L"author_id"] = authorId; }
 	int		GetAuthorID() const			{ return FindIntegerMap(L"author_id", -1); }
@@ -194,6 +204,7 @@ public:
 	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
 	void	SetMyMixi(bool bMyMixi)		{ m_IntegerMap[L"my_mixi"] = bMyMixi ? 1 : 0; }
 	bool	IsMyMixi()					{ return FindIntegerMap(L"my_mixi", 0) ? true : false; }
+
 
 	//--- 汎用文字列配列コンテナのアクセッサ
 
@@ -228,11 +239,11 @@ public:
 	//--- 汎用文字列コンテナのアクセッサ
 
 	/// 汎用文字列コンテナへのキー指定による文字列設定
-	void	SetValue(LPCTSTR key, LPCTSTR value) {
+	void	SetTextValue(LPCTSTR key, LPCTSTR value) {
 		m_StringMap[key] = value;
 	}
 	/// 汎用文字列コンテナからのキー指定による文字列取得
-	CString	GetValue(LPCTSTR key) {
+	CString	GetTextValue(LPCTSTR key) {
 		return FindStringMap(key);
 	}
 
