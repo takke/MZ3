@@ -3757,13 +3757,13 @@ public:
 							if (item.getProperty(L"id").substr(0, 15)==L"echo_member_id_") {
 								// echo_member_id_*
 								data.SetAuthorID(_wtoi(item.getTextAll().c_str()));
-								MZ3_TRACE(L" echo_member_id : %s\n", item.getTextAll().c_str());
+//								MZ3_TRACE(L" echo_member_id : %s\n", item.getTextAll().c_str());
 								continue;
 							}
 							if (item.getProperty(L"id").substr(0, 15)==L"echo_post_time_") {
 								// echo_post_time_*
 								data.SetValue(L"echo_post_time", item.getTextAll().c_str());
-								MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
+//								MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
 								continue;
 							}
 						} catch (xml2stl::NodeNotFoundException&) {
