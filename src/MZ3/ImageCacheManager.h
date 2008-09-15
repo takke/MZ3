@@ -15,6 +15,7 @@ class ImageCacheManager
 	int				m_height;			///< 高さ
 	CImageList		m_imageList16;		///< 画像リスト(16x16)
 	CImageList		m_imageList32;		///< 画像リスト(32x32)
+	CImageList		m_imageList48;		///< 画像リスト(48x48)
 	CStringArray	m_imageListMap;		///< m_imageList の各インデックスに
 										///< どのファイルが格納されているかを示す疑似マップ
 
@@ -23,6 +24,7 @@ public:
 	{
 		m_imageList16.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
 		m_imageList32.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 4);
+		m_imageList48.Create(48, 48, ILC_COLOR24 | ILC_MASK, 0, 4);
 		m_imageListMap.RemoveAll();
 
 		return true;
@@ -40,6 +42,13 @@ public:
 	 */
 	CImageList& GetImageList32() {
 		return m_imageList32;
+	}
+
+	/**
+	 * 画像リスト(48x48)の取得
+	 */
+	CImageList& GetImageList48() {
+		return m_imageList48;
 	}
 
 	/**
@@ -62,11 +71,12 @@ public:
 	 *
 	 * 追加できなかった場合は -1 を返す。
 	 */
-	int Add( CBitmap* pbmImage16, CBitmap* pbmImage32, CBitmap* pbmMask, LPCTSTR path )
+	int Add( CBitmap* pbmImage16, CBitmap* pbmImage32, CBitmap* pbmImage48, CBitmap* pbmMask, LPCTSTR path )
 	{
 		// TODO 追加失敗時の処理
 		m_imageList16.Add( pbmImage16, pbmMask );
 		m_imageList32.Add( pbmImage32, pbmMask );
+		m_imageList48.Add( pbmImage48, pbmMask );
 		m_imageListMap.Add( path );
 
 		// 追加したインデックスを返す

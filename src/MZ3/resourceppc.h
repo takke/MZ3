@@ -20,7 +20,6 @@
 #define IDR_IMAGE_MENU                  140
 #define IDR_WRITE_MENU                  141
 #define IDR_DIARY_MENU                  142
-#define IDB_BITMAP1                     144
 #define IDR_TOOLBAR_QVGA                145
 #define IDD_DEBUG_DIALOG                145
 #define IDD_QUOTE_DIALOG                146
@@ -30,7 +29,6 @@
 #define IDR_CATEGORY_MENU               149
 #define IDR_ATTACH_IMAGE_MENU           150
 #define IDD_COMMON_SELECT_DIALOG        151
-#define IDR_MENU1                       152
 #define IDR_SKIN_MENU                   152
 #define IDD_USER_DIALOG                 154
 #define IDI_TOPIC_ICON                  157
@@ -38,8 +36,6 @@
 #define IDD_CHOOSE_ACCESS_TYPE_DIALOG   158
 #define IDI_ENQUETE_ICON                159
 #define IDD_OPEN_URL_DIALOG             159
-#define IDD_DIALOG1                     160
-#define IDD_MINI_IMAGE_DIALOG           160
 #define IDI_DOWNLOADED_ICON             160
 #define IDI_EVENT_JOIN_ICON             161
 #define IDC_GRABBABLE_CURSOR            162
@@ -50,7 +46,6 @@
 #define IDD_COMMON_EDIT_DIALOG          167
 #define IDR_RSS_MENU                    167
 #define IDC_ARROW_LEFT_CURSOR           168
-#define IDC_ARROW_LEFT_CURSOR1          169
 #define IDC_ARROW_RIGHT_CURSOR          169
 #define IDB_SLIDE_LEFT_BITMAP           170
 #define IDB_SLIDE_RIGHT_BITMAP          172
@@ -97,7 +92,6 @@
 #define IDC_PROXY_PORT_EDIT             1016
 #define IDC_PAGE_USELOG_CHECK           1020
 #define IDC_PAGE_GETALL_RADIO           1021
-#define IDC_RADIO2                      1022
 #define IDC_PAGE_GETLATEST_RADIO        1022
 #define IDC_PROXY_USER_EDIT             1023
 #define IDC_PROXY_PASSWPRD_EDIT         1024
@@ -120,10 +114,8 @@
 #define IDC_WRITE_SEND_BUTTON           1030
 #define IDC_LONG_RETURN_RANGE_MSEC_EDIT 1030
 #define IDC_WRITE_CANCEL_BUTTON         1031
-#define IDC_EDIT3                       1032
 #define IDC_WRITE_INFO_EDIT             1032
 #define IDC_BOOT_MNC_CHECK              1033
-#define IDC_CHECK1                      1035
 #define IDC_USE_BGIMAGE_CHECK           1035
 #define IDC_USE_LOG_CHECK               1035
 #define IDC_SAVE_LOG_CHECK              1035
@@ -139,18 +131,14 @@
 #define IDC_CONFIRM_OPEN_URL_CHECK      1036
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
 #define IDC_SERVICE_TYPE_WASSR_CHECK    1037
-#define IDC_LIST1                       1038
 #define IDC_DEBUG_LIST                  1038
 #define IDC_TYPE_LIST                   1038
-#define IDC_USE_XCRAWL_CANCELER_CHECK2  1038
 #define IDC_USE_RUN_CONFIRM_DLG_CHECK   1038
 #define IDC_ACCESS_TYPE_LIST            1038
 #define IDC_GROUP_TAB                   1039
-#define IDC_SHOW_MINI_IMAGE_DLG_CHECK   1039
 #define IDC_CHANGE_LOG_FOLDER_BUTTON    1040
 #define IDC_SHOW_ICON_CHECK             1040
 #define IDC_PROGRESS_BAR                1041
-#define IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK 1041
 #define IDC_RECV_BUF_COMBO              1042
 #define IDC_SHOW_MINI_IMAGE_CHECK       1042
 #define IDC_AUTO_LOAD_MINI_IMAGE_CHECK  1043
@@ -167,8 +155,6 @@
 #define IDC_SELECT2_BUTTON              1053
 #define IDC_MESSAGE_STATIC              1054
 #define IDC_ENCODING_COMBO              1057
-#define IDC_MINI_IMAGE_SIZE_COMBO       1059
-#define IDC_SIZE_STATIC                 1060
 #define IDC_ITEM_LIST                   1061
 #define IDC_START_BUTTON                1062
 #define IDC_START_STOP_BUTTON           1062
@@ -184,7 +170,6 @@
 #define IDC_WRITE_VIEWLIMIT_COMBO       1072
 #define IDC_STATUS_LINE_COUNT_COMBO     1073
 #define IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK 1074
-#define IDC_CHECK3                      1075
 #define IDC_USE_RAN2_DOUBLECLICK_MOVE_CHECK 1075
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
@@ -285,7 +270,6 @@
 #define ID_OPEN_PROFILE                 34000
 #define ID_OPEN_PROFILE_LOG             34003
 #define ID_SEND_MESSAGE                 34004
-#define ID_RAN2MENU_34008               34008
 #define ID_MENU_TWITTER_READ            34013
 #define ID_MENU_TWITTER_REPLY           34014
 #define ID_MENU_TWITTER_UPDATE          34016

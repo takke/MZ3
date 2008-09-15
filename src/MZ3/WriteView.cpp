@@ -1348,19 +1348,19 @@ void CWriteView::PopupWriteBodyMenu(void)
 				image.load( path );
 				if (image.isEnableImage()) {
 					// 16x16, 32x32 にリサイズする。
-					CMZ3BackgroundImage image16(L"");
+					CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
 					util::MakeResizedImage( this, image16, image, 16, 16 );
-					CMZ3BackgroundImage image32(L"");
 					util::MakeResizedImage( this, image32, image, 32, 32 );
+					util::MakeResizedImage( this, image48, image, 48, 48 );
 
 					// ビットマップの追加
-					CBitmap bm16;
+					CBitmap bm16, bm32, bm48;
 					bm16.Attach( image16.getHandle() );
-					CBitmap bm32;
 					bm32.Attach( image32.getHandle() );
+					bm48.Attach( image48.getHandle() );
 
 					// グローバルキャッシュに追加し、インデックスを取得する
-					imageIndex = theApp.m_imageCache.Add( &bm16, &bm32, (CBitmap*) NULL, path );
+					imageIndex = theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*) NULL, path );
 				}
 			}
 			if (imageIndex>=0) {

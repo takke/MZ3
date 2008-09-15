@@ -20,7 +20,6 @@
 #include "XcrawlCanceler.h"
 
 class CMZ3Doc;
-class CMiniImageDialog;
 
 /**
  * MZ3 のメインビュー
@@ -41,8 +40,6 @@ public:
 
 	bool				m_bReloadingGroupTabByThread;	///< スレッドによるタブ切り替え中か？
 	bool				m_bRetryReloadGroupTabByThread;	///<
-
-	CMiniImageDialog*	m_pMiniImageDlg;		///< 画像画面
 
 	/// 表示スタイル
 	enum VIEW_STYLE {

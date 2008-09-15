@@ -2329,10 +2329,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\MiniImageDialog.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\MZ3View.cpp"
 					>
 				</File>
@@ -2704,10 +2700,6 @@
 				</File>
 				<File
 					RelativePath=".\MainFrm.h"
-					>
-				</File>
-				<File
-					RelativePath=".\MiniImageDialog.h"
 					>
 				</File>
 				<File

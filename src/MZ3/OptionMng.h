@@ -114,9 +114,6 @@ public:
 	//--- メイン画面
 	bool			m_bShowMainViewIcon;				///< トピック等にアイコンを表示する？
 	bool			m_bShowMainViewMiniImage;			///< ユーザやコミュニティの画像を表示する？
-	bool			m_bShowMainViewMiniImageDlg;		///< 別画面で表示する？
-	bool			m_bShowMainViewMiniImageOnMouseOver;///< マウスオーバーで表示する？
-	int				m_nMainViewMiniImageSize;			///< mini画面サイズ
 	bool			m_bAutoLoadMiniImage;				///< 画像の自動取得
 
 	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
@@ -182,18 +179,13 @@ public:
 		, m_bShowMainViewIcon( true )
 #ifdef WINCE
 		, m_bShowMainViewMiniImage( true )
-		, m_bShowMainViewMiniImageDlg( false )
-		, m_bShowMainViewMiniImageOnMouseOver( false )
 		, m_bUseRan2DoubleClickMove( false )
 #else
 		, m_bShowMainViewMiniImage( true )
-		, m_bShowMainViewMiniImageDlg( false )
-		, m_bShowMainViewMiniImageOnMouseOver( false )
 		, m_bUseRan2DoubleClickMove( true )
 #endif
 		, m_bAutoLoadMiniImage( true )
 		, m_bBodyListIntegratedColumnMode( true )
-		, m_nMainViewMiniImageSize( 50 )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )
 		, m_nTwitterStatusLineCount(3)

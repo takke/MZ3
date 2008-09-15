@@ -374,19 +374,6 @@ void Option::Sync(bool bSave)
 	// ユーザやコミュニティの画像を表示する？
 	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImage, "ShowMainViewMiniImage", "MainView");
 	
-	// 別画面で表示する？
-	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImageDlg, "ShowMainViewMiniImageDlg", "MainView");
-
-	// マウスオーバーで表示する？
-	SyncIniValue(inifile, bSave, m_bShowMainViewMiniImageOnMouseOver, "ShowMainViewMiniImageOnMouseOver", "MainView");
-
-	// mini画面サイズ
-	SyncIniValue(inifile, bSave, m_nMainViewMiniImageSize, "MainViewMiniImageSize", "MainView");
-	if (!bSave) {
-		// normalize
-		m_nMainViewMiniImageSize = normalizeRange( m_nMainViewMiniImageSize, 25, 200 );
-	}
-
 	// 画像の自動取得
 	SyncIniValue(inifile, bSave, m_bAutoLoadMiniImage, "AutoLoadMiniImage", "MainView");
 

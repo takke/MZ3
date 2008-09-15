@@ -18,7 +18,6 @@
 #include "MainFrm.h"
 #include "WriteView.h"
 #include "CommonEditDlg.h"
-#include "MiniImageDialog.h"
 #include "MouseGestureManager.h"
 #include "OpenUrlDlg.h"
 #include "ChooseAccessTypeDlg.h"
@@ -210,7 +209,6 @@ CMZ3View::CMZ3View()
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
-	m_pMiniImageDlg = NULL;
 
 	m_hotList = NULL;
 
@@ -389,25 +387,6 @@ void CMZ3View::OnInitialUpdate()
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
 	m_categoryList.SetFocus();
-
-	// 子画面
-#ifndef WINCE
-	m_pMiniImageDlg = new CMiniImageDialog( this );
-	m_pMiniImageDlg->ShowWindow( SW_HIDE );
-
-	// 半透明処理
-	::SetWindowLong( m_pMiniImageDlg->m_hWnd, GWL_EXSTYLE, GetWindowLong(m_pMiniImageDlg->m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-	
-	typedef BOOL (WINAPI *PROCSETLAYEREDWINDOW)(HWND, COLORREF, BYTE, DWORD);
-	PROCSETLAYEREDWINDOW pProcSetLayeredWindowAttributes;
-	pProcSetLayeredWindowAttributes = 
-		(PROCSETLAYEREDWINDOW)GetProcAddress(GetModuleHandleA("USER32.DLL"), "SetLayeredWindowAttributes");
-
-	int n = 100-10;
-	if (pProcSetLayeredWindowAttributes!=NULL) {
-		pProcSetLayeredWindowAttributes(m_pMiniImageDlg->m_hWnd, 0, 255*n/100, LWA_ALPHA);
-	}
-#endif
 
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
@@ -849,11 +828,6 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 			// コピー
 			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_inet.GetURL() );
 			CopyFile( theApp.m_filepath.temphtml, path, FALSE/*bFailIfExists, 上書き*/ );
-
-			// 描画
-			if (m_pMiniImageDlg!=NULL) {
-				m_pMiniImageDlg->DrawImageFile( path );
-			}
 
 			// アイコン差し替え
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
@@ -1323,6 +1297,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 {
 	util::MySetInformationText( m_hWnd, L"アイコン作成中..." );
 
+	util::StopWatch sw_generate_icon, sw_set_icon;
+
 	bool bUseDefaultIcon = false;
 	bool bUseExtendedIcon = false;
 
@@ -1342,6 +1318,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	}
 
 	// ユーザやコミュニティの画像をアイコン化して表示する
+	sw_generate_icon.start();
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
 		for (int i=0; i<count; i++) {
@@ -1367,19 +1344,19 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			// 未ロードなのでロード
 			image.load( miniImagePath );
 			if (image.isEnableImage()) {
-				// 16x16, 32x32 にリサイズする。
-				CMZ3BackgroundImage image16(L"");
+				// 16x16, 32x32, 48x48 にリサイズする。
+				CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
 				util::MakeResizedImage( this, image16, image, 16, 16 );
-				CMZ3BackgroundImage image32(L"");
 				util::MakeResizedImage( this, image32, image, 32, 32 );
+				util::MakeResizedImage( this, image48, image, 48, 48 );
 
 				// ビットマップの追加
-				CBitmap bm16;
+				CBitmap bm16, bm32, bm48;
 				bm16.Attach( image16.getHandle() );
-				CBitmap bm32;
 				bm32.Attach( image32.getHandle() );
+				bm48.Attach( image48.getHandle() );
 
-				theApp.m_imageCache.Add( &bm16, &bm32, (CBitmap*)NULL, miniImagePath );
+				theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, miniImagePath );
 
 				bUseExtendedIcon = true;
 			} else {
@@ -1393,6 +1370,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			}
 		}
 	}
+	sw_generate_icon.stop();
 
 	// 行の高さが乱れた状態で描画されるのを回避するため描画停止
 	m_bodyList.m_bStopDraw = true;
@@ -1423,7 +1401,10 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			MEASUREITEMSTRUCT measureItemStruct;
 			m_bodyList.MeasureItem(&measureItemStruct);
 			MZ3_TRACE(L"アイテムの高さ : %d\n", measureItemStruct.itemHeight);
-			if (measureItemStruct.itemHeight>=32) {
+			if (measureItemStruct.itemHeight>=48) {
+				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList48(), LVSIL_SMALL);
+				iconMode = CBodyListCtrl::ICON_MODE_48;
+			} else if (measureItemStruct.itemHeight>=32) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
 				iconMode = CBodyListCtrl::ICON_MODE_32;
 			} else {
@@ -1440,6 +1421,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	m_bodyList.MySetIconMode( iconMode );
 
 	// アイコンの設定
+	sw_set_icon.start();
 	int itemCount = m_bodyList.GetItemCount();
 	for (int i=0; i<itemCount; i++) {
 		const CMixiData& mixi = body[i];
@@ -1460,6 +1442,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		// アイコンのインデックスを設定
 		util::MySetListCtrlItemImageIndex( m_bodyList, i, 0, iconIndex );
 	}
+	sw_set_icon.stop();
 
 	m_bodyList.m_bStopDraw = false;
 
@@ -1477,6 +1460,10 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	}
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
+	MZ3LOGGER_DEBUG(
+		util::FormatString(L"アイコン生成完了, generate[%dms], set[%dms]", 
+			sw_generate_icon.getElapsedMilliSecUntilStoped(),
+			sw_set_icon.getElapsedMilliSecUntilStoped()));
 }
 
 /**
@@ -4707,76 +4694,10 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 			}
 		}
 	}
-
-	if (m_pMiniImageDlg != NULL) {
-		if (!theApp.m_optionMng.m_bShowMainViewMiniImageDlg) {
-			// オプションがOffなので、常に非表示
-			m_pMiniImageDlg->ShowWindow( SW_HIDE );
-		} else {
-			m_pMiniImageDlg->ShowWindow( bDrawMiniImage ? SW_SHOWNOACTIVATE : SW_HIDE );
-
-			if (bDrawMiniImage) {
-				CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-				int idx = idxBody;
-			
-				CRect rectBodyList; 
-				m_bodyList.GetWindowRect( &rectBodyList );
-
-				CRect rect;
-				m_bodyList.GetItemRect( idx, &rect, LVIR_BOUNDS );
-
-				rect.OffsetRect( rectBodyList.left, rectBodyList.top );
-
-				// オプションで指定
-				const int w = theApp.m_optionMng.m_nMainViewMiniImageSize;
-				const int h = theApp.m_optionMng.m_nMainViewMiniImageSize;
-
-				// とりあえず行の直下に描画。
-				int delta = 5;
-				int x = 0;
-				if (pointx>=0) {
-					x = rectBodyList.left +pointx +delta;
-					if (x+w > rectBodyList.right) {
-						// ボディリストからはみ出すので左側に描画。
-						x = x -w -delta -delta;
-					}
-				} else {
-					x = rect.left+32;
-				}
-
-				int y = 0;
-				if (pointy>=0) {
-					y = rectBodyList.top +pointy +delta;
-					if (y+h > rectBodyList.bottom) {
-						// ボディリストからはみ出すので上側に描画。
-						y = rectBodyList.top +pointy -h -delta;
-					}
-				} else {
-					y = rect.bottom;
-					if (y+h > rectBodyList.bottom) {
-						// ボディリストからはみ出すので上側に描画。
-						y = rect.top -h;
-					}
-				}
-
-				// それでもはみだす場合（スクロール時など）は非表示
-				if (y+h > rectBodyList.bottom || y<rectBodyList.top) {
-					m_pMiniImageDlg->ShowWindow( SW_HIDE );
-				} else {
-					m_pMiniImageDlg->MoveWindow( x, y, w, h );
-				}
-			}
-		}
-	}
 }
 
 LRESULT CMZ3View::OnHideView(WPARAM wParam, LPARAM lParam)
 {
-	// 画像ウィンドウの消去
-	if (m_pMiniImageDlg != NULL) {
-		m_pMiniImageDlg->ShowWindow( SW_HIDE );
-	}
-
 	return TRUE;
 }
 
@@ -4793,7 +4714,7 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 	CString miniImagePath = util::MakeImageLogfilePath( mixi );
 	if (!miniImagePath.IsEmpty()) {
 		if (!util::ExistFile(miniImagePath)) {
-			if(! m_access ) {
+			if (!m_access) {
 				// アクセス中は禁止
 				// 取得
 				static CMixiData s_data;
@@ -4815,11 +4736,6 @@ bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
 
 				theApp.m_inet.Initialize( m_hWnd, &s_data );
 				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
-			}
-		} else {
-			// すでに存在するので描画
-			if (m_pMiniImageDlg!=NULL) {
-				m_pMiniImageDlg->DrawImageFile( miniImagePath );
 			}
 		}
 	}

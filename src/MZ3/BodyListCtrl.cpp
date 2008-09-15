@@ -149,8 +149,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcAllLabels.MoveToY( rcItem.top );
 
 	int nIconSize = 16;
-	if (m_iconMode==ICON_MODE_32) {
-		nIconSize = 32;
+	switch (m_iconMode) {
+	case ICON_MODE_48:	nIconSize = 48;	break;
+	case ICON_MODE_32:	nIconSize = 32;	break;
+	default:			nIconSize = 16;	break;
 	}
 
 	// アイテムのラベルの幅を取得
@@ -730,22 +732,6 @@ void CBodyListCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp
 
 void CBodyListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
-#ifndef WINCE
-//	TRACE( L"OnMouseMove %d,%d\n", point.x, point.y );
-	// オプションがOnならmini画像画面を移動
-	if (theApp.m_optionMng.m_bShowMainViewMiniImage &&
-		theApp.m_optionMng.m_bShowMainViewMiniImageDlg &&
-		theApp.m_optionMng.m_bShowMainViewMiniImageOnMouseOver ) 
-	{
-		int idx = HitTest(point);
-		if (idx>=0) {
-			TRACE( L" idx=%d\n", idx );
-
-			// 画像位置変更
-			theApp.m_pMainView->MoveMiniImageDlg( idx, point.x, point.y );
-		}
-	}
-#endif
 	CTouchListCtrl::OnMouseMove(nFlags, point);
 }
 

@@ -768,12 +768,6 @@ BEGIN
     COMBOBOX        IDC_ENCODING_COMBO,7,29,48,58,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_MINI_IMAGE_DIALOG DIALOG  0, 0, 53, 52
-STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_SYSMENU
-FONT 9, "ＭＳ Ｐゴシック"
-BEGIN
-END
-
 IDD_OPTIONTAB_MAIN_VIEW DIALOG  0, 0, 139, 148
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 CAPTION "メイン画面"
@@ -782,11 +776,6 @@ BEGIN
     CONTROL         "トピック等にアイコンを表示する",IDC_SHOW_ICON_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,106,10
     CONTROL         "ユーザやコミュニティの画像を表示する",IDC_SHOW_MINI_IMAGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,39,129,10
     CONTROL         "選択変更時に自動取得する",IDC_AUTO_LOAD_MINI_IMAGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,54,97,10
-    CONTROL         "別画面で拡大表示する",IDC_SHOW_MINI_IMAGE_DLG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,72,83,10
-    CONTROL         "カーソル位置に表示する",IDC_SHOW_MINI_IMAGE_DLG_ON_MOUSEOVER_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,91,87,10
-    LTEXT           "サイズ：",IDC_SIZE_STATIC,16,110,24,8
-    COMBOBOX        IDC_MINI_IMAGE_SIZE_COMBO,48,107,48,56,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "下ペインのリストを１行で表示する",IDC_NO_INTEGRATED_MODE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,113,10
 END
 
@@ -847,8 +836,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,8,2,0
- PRODUCTVERSION 0,8,2,0
+ FILEVERSION 0,9,3,1
+ PRODUCTVERSION 0,9,3,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -864,12 +853,12 @@ BEGIN
         BLOCK "041103a4"
         BEGIN
             VALUE "FileDescription", "mixi Browser ""ZERO"""
-            VALUE "FileVersion", "0.8.2.0"
+            VALUE "FileVersion", "0.9.3.1"
             VALUE "InternalName", "MZ3.exe"
             VALUE "LegalCopyright", "mako, icchu, takke  All rights reserved."
             VALUE "OriginalFilename", "MZ3.exe"
             VALUE "ProductName", "MZ3"
-            VALUE "ProductVersion", "0.8.2.0"
+            VALUE "ProductVersion", "0.9.3.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -1060,14 +1049,6 @@ BEGIN
         VERTGUIDE, 60
         TOPMARGIN, 7
         BOTTOMMARGIN, 60
-    END
-
-    IDD_MINI_IMAGE_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 46
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 45
     END
 
     IDD_OPTIONTAB_MAIN_VIEW, DIALOG
