@@ -529,7 +529,7 @@ public:
 													  .getNode(L"ul");
 
 				for (size_t i=0; i<ul.getChildrenCount(); i++) {
-					const xml2stl::Node& li = ul.getNode(i);
+					const xml2stl::Node& li = ul.getNodeByIndex(i);
 					if (li.getName()==L"li") {
 						const xml2stl::Node& a = li.getNode(L"a");
 						CString title = a.getTextAll().c_str();
@@ -581,17 +581,17 @@ public:
 				// この規則で著者を解析。
 				CString author;
 				for (size_t i=0; i<bodyMainArea.getChildrenCount(); i++) {
-					const xml2stl::Node& node = bodyMainArea.getNode(i);
+					const xml2stl::Node& node = bodyMainArea.getNodeByIndex(i);
 					try {
 						const xml2stl::XML2STL_STRING& class_value = node.getProperty(L"class");
 
 						if (wcsstr(class_value.c_str(), L"diaryTitleFriend") != NULL) {
-							CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+							CString line = bodyMainArea.getNodeByIndex(i).getTextAll().c_str();
 							util::GetBetweenSubString( line, L">", L"さんの日記<", author );
 							break;
 						}
 						if (wcsstr(class_value.c_str(), L"diaryTitle") != NULL) {
-							CString line = bodyMainArea.getNode(i).getTextAll().c_str();
+							CString line = bodyMainArea.getNodeByIndex(i).getTextAll().c_str();
 							util::GetBetweenSubString( line, L">", L"の日記<", author );
 							break;
 						}
@@ -708,7 +708,7 @@ private:
 			const xml2stl::Node& divDiaryComment = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 															   .getNode(L"div", L"id=diaryComment");
 			for (size_t i=0; i<divDiaryComment.getChildrenCount(); i++) {
-				const xml2stl::Node& div2 = divDiaryComment.getNode(i);
+				const xml2stl::Node& div2 = divDiaryComment.getNodeByIndex(i);
 
 				try {
 					// div2 から form を探す
@@ -748,7 +748,7 @@ private:
 
 		size_t n = div.getChildrenCount();
 		for (size_t i=0; i<n; i++) {
-			const xml2stl::Node& divDiaryCommentBox = div.getNode(i);
+			const xml2stl::Node& divDiaryCommentBox = div.getNodeByIndex(i);
 			try {
 				if (divDiaryCommentBox.getProperty(L"class") == L"diaryCommentbox" ||
 					divDiaryCommentBox.getProperty(L"class") == L"diaryCommentboxLast")
@@ -2282,13 +2282,13 @@ public:
 				int user_num = 1;
 
 				for (size_t i=0; i<div.getChildrenCount(); i++) {
-					const xml2stl::Node& ul = div.getNode(i);
+					const xml2stl::Node& ul = div.getNodeByIndex(i);
 					if (ul.getName() != L"ul") {
 						continue;
 					}
 
 					for (size_t j=0; j<ul.getChildrenCount(); j++) {
-						const xml2stl::Node& li = ul.getNode(j);
+						const xml2stl::Node& li = ul.getNodeByIndex(j);
 						if (li.getName() != L"li") {
 							continue;
 						}
@@ -2450,7 +2450,7 @@ public:
 			// 各liを追加していく
 			int nChildren = ul.getChildrenCount();
 			for (int i=0; i<nChildren; i++) {
-				const xml2stl::Node& li = ul.getNode(i);
+				const xml2stl::Node& li = ul.getNodeByIndex(i);
 				if (li.getName()!=L"li")
 					continue;
 
@@ -2497,7 +2497,7 @@ public:
 			diaryItem.AddBody(_T("\r\n"));
 
 			for (int i=0; i<n; i++) {
-				const xml2stl::Node& node = dl.getNode(i);
+				const xml2stl::Node& node = dl.getNodeByIndex(i);
 				if (node.getName() == L"dt") {
 					CString date = node.getNode(L"span").getTextAll().c_str();
 					
@@ -2552,7 +2552,7 @@ public:
 			// dl が続く。
 			int n = div.getChildrenCount();
 			for (int i=0; i<n; i++) {
-				const xml2stl::Node& dl = div.getNode(i);
+				const xml2stl::Node& dl = div.getNodeByIndex(i);
 				if (dl.getName() != L"dl") {
 					continue;
 				}
@@ -2572,7 +2572,7 @@ public:
 				const xml2stl::Node& dd = dl.getNode(L"dd");
 				size_t n_dd_children = dd.getChildrenCount();
 				for (size_t j=0; j<n_dd_children; j++) {
-					const xml2stl::Node& dd_sub = dd.getNode(j);
+					const xml2stl::Node& dd_sub = dd.getNodeByIndex(j);
 					if (dd_sub.isNode() && dd_sub.getName() == L"p") {
 						CString className = dd_sub.getProperty(L"class").c_str();
 						if (className==L"relation") {
@@ -3431,7 +3431,7 @@ public:
 			const xml2stl::Node& feed = root.getNode( L"feed" );
 			size_t nChildren = feed.getChildrenCount();
 			for (size_t i=0; i<nChildren; i++) {
-				const xml2stl::Node& node = feed.getNode(i);
+				const xml2stl::Node& node = feed.getNodeByIndex(i);
 				if (node.getName() != L"entry") {
 					continue;
 				}
@@ -3698,7 +3698,7 @@ public:
 											     .getNode(L"table");
 			size_t nChildren = tbody.getChildrenCount();
 			for (size_t i=0; i<nChildren; i++) {
-				const xml2stl::Node& tr = tbody.getNode(i);
+				const xml2stl::Node& tr = tbody.getNodeByIndex(i);
 				if (tr.getName() != L"tr") {
 					continue;
 				}

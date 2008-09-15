@@ -324,7 +324,7 @@ bool RssAutoDiscoveryParser::parse( CMixiDataList& out_, const std::vector<TCHAR
 bool RssAutoDiscoveryParser::parseLinkRecursive( CMixiDataList& out_, const xml2stl::Node& node )
 {
 	for (unsigned int i=0; i<node.getChildrenCount(); i++) {
-		const xml2stl::Node& item = node.getNode(i);
+		const xml2stl::Node& item = node.getNodeByIndex(i);
 
 		try {
 			if (item.getName() == L"link" &&

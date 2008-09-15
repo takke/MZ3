@@ -1549,12 +1549,12 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	m_bModifyingBodyList = false;
 	util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
 
+	// アイコン用ImageListの設定
+	SetBodyImageList( body );
+
 	m_bodyList.SetRedraw(TRUE);
 	m_bodyList.m_bStopDraw = false;
 	m_bodyList.Invalidate( FALSE );
-
-	// アイコン用ImageListの設定
-	SetBodyImageList( body );
 
 	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
@@ -6298,7 +6298,8 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				int new_count = parent_data.GetIntValue(L"new_count", 0);
 				// ログファイルから取得していたデータは新着とみなす(ログより前のデータを取得するため)
 				if (page==1) {
-					for (int i=0; i<body.size(); i++) {
+					size_t body_size = body.size();
+					for (size_t i=0; i<body_size; i++) {
 						if (body[i].GetIntValue(L"from_log_flag", 0)) {
 							new_count ++;
 							// 次回はカウントしないためフラグを下げとく

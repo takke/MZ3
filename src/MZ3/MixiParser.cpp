@@ -40,7 +40,7 @@ bool ListBookmarkParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 		// ˆê——
 		const xml2stl::Node& ul = div_bookmarkList.getNode( L"ul" );
 		for (size_t i=0; i<ul.getChildrenCount(); i++) {
-			const xml2stl::Node& li = ul.getNode(i);
+			const xml2stl::Node& li = ul.getNodeByIndex(i);
 			if (li.getName()!=L"li") {
 				continue;
 			}
@@ -91,7 +91,7 @@ bool ListBookmarkParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 			const xml2stl::Node& div_pageNavigation01 = div_bookmarkList.getNode( L"div", L"class=pageNavigation01 top" );
 			const xml2stl::Node& ul = div_pageNavigation01.getNode(L"div", L"class=pageList02").getNode(L"ul");
 			for (size_t i=0; i<ul.getChildrenCount(); i++) {
-				const xml2stl::Node& li = ul.getNode(i);
+				const xml2stl::Node& li = ul.getNodeByIndex(i);
 				if (li.getName()!=L"li") {
 					continue;
 				}

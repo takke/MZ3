@@ -33,6 +33,9 @@ protected:
 	 */
 	static bool MergeNewList( CMixiDataList& out_, CMixiDataList& new_ )
 	{
+		util::StopWatch sw_detect_insert_pos;
+		util::StopWatch sw_move;
+
 		const size_t LIST_MAX_SIZE = 1000;
 
 		if (new_.empty()) {
@@ -48,6 +51,7 @@ protected:
 		// out_, new_ 共に id の降順にソート済
 
 		//--- 挿入位置の判定
+		sw_detect_insert_pos.start();
 		// new_[0].id が out_ の中で最初に大きくなる位置を探索する
 		int insert_pos = old_list_size;	// 初期値：new_[0].id が out_ の中で最小の場合の挿入位置
 		int max_id_on_new = new_[0].GetID();
@@ -57,9 +61,11 @@ protected:
 				break;
 			}
 		}
-		MZ3_TRACE(L"★挿入位置=%d\n", insert_pos);
+		sw_detect_insert_pos.stop();
+//		MZ3_TRACE(L"★挿入位置=%d\n", insert_pos);
 
 		//--- 旧データのうち、新データより古いものを後方に(新着分)移動する
+		sw_move.start();
 		// 先にメモリ確保
 		out_.resize( out_.size() + new_.size() );
 
@@ -73,6 +79,16 @@ protected:
 		for (u_int i=0; i<new_list_size; i++) {
 			out_[insert_pos+i] = new_[i];
 		}
+		sw_move.stop();
+
+		MZ3LOGGER_DEBUG(
+			util::FormatString(
+				L"MergeNewList(), old[%d], new[%d], detect[%dms], move[%dms]", 
+				old_list_size,
+				new_list_size,
+				sw_detect_insert_pos.getElapsedMilliSecUntilStoped(),
+				sw_move.getElapsedMilliSecUntilStoped()));
+
 
 		return true;
 	}

@@ -20,11 +20,12 @@ class kf_buf_reader
 private:
 	const std::vector<T>& buf_;	///< vector のバッファ
 	size_t len_readed;			///< 読み込み済みサイズ
+	size_t buf_size;			///< サイズ
 
 public:
 	/// Constructor
 	kf_buf_reader( const std::vector<T>& buf )
-		: buf_(buf), len_readed(0)
+		: buf_(buf), len_readed(0), buf_size(buf.size())
 	{
 	}
 	
@@ -33,19 +34,19 @@ public:
 	 *
 	 * 末尾の場合は EOF を返す
 	 */
-	int get_char()
-	{
-		if( len_readed < buf_.size() ) {
-			int c = buf_[len_readed];
-			len_readed ++;
-			return c;
+	inline int get_char() {
+		if (len_readed < buf_size) {
+			return buf_[len_readed++];
+//			int c = buf_[len_readed];
+//			len_readed ++;
+//			return c;
 		}else{
 			return EOF;
 		}
 	}
 
-	bool is_eof() const {
-		return len_readed >= buf_.size();
+	inline bool is_eof() const {
+		return len_readed >= buf_size;
 	}
 };
 

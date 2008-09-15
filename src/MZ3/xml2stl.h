@@ -19,6 +19,7 @@
 namespace xml2stl {
 
 typedef std::wstring XML2STL_STRING;
+const static size_t INITIAL_RESERVED_SIZE_OF_XML2STL_STRING = 1024;
 
 enum XML2STL_STATE
 {
@@ -83,7 +84,8 @@ private:
 
 public:
 	Container() : type(XML2STL_TYPE_ROOTNODE) 
-	{}
+	{
+	}
 
 	XML2STL_TYPE getType() const {
 		return type;
@@ -117,7 +119,9 @@ public:
 	const XML2STL_STRING getTextAll() const {
 		// 下位の全ノードを重ねてテキスト化して返す
 		size_t n = children.size();
-		XML2STL_STRING  text;
+		XML2STL_STRING text;
+		text.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+
 		for (NodeList::const_iterator it=children.begin(); it!=children.end(); it++) {
 			const Node& targetNode = *it;
 
@@ -249,7 +253,7 @@ public:
 	 *
 	 * @notice very slow impl. use "getChildrenNodeRef" instead.
 	 */
-	const Node& getNode( size_t index ) const
+	const Node& getNodeByIndex( size_t index ) const
 	{
 		if (index >= children.size()) {
 			std::wostringstream stream;
@@ -538,7 +542,7 @@ public:
 	}
 
 private:
-	bool parse_properties( Node& node, kfm::kf_buf_reader<TCHAR>& reader )
+	inline bool parse_properties( Node& node, kfm::kf_buf_reader<TCHAR>& reader )
 	{
 		while( !reader.is_eof() ) {
 			wint_t c = reader.get_char();
@@ -572,8 +576,10 @@ private:
 			default:
 				// name="value" が続くはず。
 				{
-					xml2stl::XML2STL_STRING name;
-					xml2stl::XML2STL_STRING value;
+					xml2stl::XML2STL_STRING name, value;
+					name.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+					value.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+
 					// name 取得
 					name.push_back(c);
 					while( !reader.is_eof() ) {
@@ -620,8 +626,10 @@ private:
 
 	bool parse_until_target( Container& node, kfm::kf_buf_reader<TCHAR>& reader, const xml2stl::XML2STL_STRING& target )
 	{
-		xml2stl::XML2STL_STRING node_text;
-		xml2stl::XML2STL_STRING temp;
+		xml2stl::XML2STL_STRING node_text, temp;
+		node_text.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+		temp.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+
 		while(! reader.is_eof() ) {
 			wint_t c = reader.get_char();
 
@@ -674,8 +682,9 @@ private:
 			}
 		}
 
-		xml2stl::XML2STL_STRING node_name;
-		xml2stl::XML2STL_STRING node_text;
+		xml2stl::XML2STL_STRING node_name, node_text;
+		node_name.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
+		node_text.reserve(INITIAL_RESERVED_SIZE_OF_XML2STL_STRING);
 
 		while(! reader.is_eof() ) {
 			wint_t c = reader.get_char();

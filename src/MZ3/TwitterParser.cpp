@@ -59,22 +59,26 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 {
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
 
-	util::StopWatch sw;
+	util::StopWatch sw, sw_serialize, sw_parse, sw_generate;
 	sw.start();
 
 	// 新規に追加するデータ群
 	CMixiDataList new_list;
 
 	// html_ の文字列化
+	sw_serialize.start();
 	std::vector<TCHAR> text;
 	html_.TranslateToVectorBuffer( text );
+	sw_serialize.stop();
 
 	// XML 解析
+	sw_parse.start();
 	xml2stl::Container root;
 	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
 		MZ3LOGGER_ERROR( L"XML 解析失敗" );
 		return false;
 	}
+	sw_parse.stop();
 
 	// 重複防止用の id 一覧を生成。
 	std::set<int> id_set;
@@ -83,6 +87,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 	}
 
 	// status に対する処理
+	sw_generate.start();
 	try {
 		const xml2stl::Node& statuses = root.getNode( L"statuses" );
 		for (xml2stl::NodeRef statusesRef = statuses.getChildrenNodeRef();
@@ -178,7 +183,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 	} catch (xml2stl::NodeNotFoundException& e) {
 		MZ3LOGGER_ERROR( util::FormatString( L"statuses not found... : %s", e.getMessage().c_str()) );
 	}
-
+	sw_generate.stop();
 
 	// 生成したデータを出力に反映
 	TwitterParserBase::MergeNewList(out_, new_list);
@@ -186,7 +191,15 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 	// 新着件数を parent(カテゴリの m_mixi) に設定する
 	parent.SetIntValue(L"new_count", new_list.size());
 
-	MZ3LOGGER_DEBUG( util::FormatString(L"TwitterFriendsTimelineXmlParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
+	MZ3LOGGER_DEBUG( 
+		util::FormatString(
+			L"TwitterFriendsTimelineXmlParser.parse() finished. elapsed:[%dms]"
+			L", serialize[%dms], parse[%dms], generate[%dms]", 
+			sw.getElapsedMilliSecUntilNow(),
+			sw_serialize.getElapsedMilliSecUntilStoped(), 
+			sw_parse.getElapsedMilliSecUntilStoped(), 
+			sw_generate.getElapsedMilliSecUntilStoped()
+			) );
 	return true;
 }
 
@@ -225,7 +238,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 		const xml2stl::Node& direct_messages = root.getNode( L"direct-messages" );
 		size_t nChildren = direct_messages.getChildrenCount();
 		for (size_t i=0; i<nChildren; i++) {
-			const xml2stl::Node& node = direct_messages.getNode(i);
+			const xml2stl::Node& node = direct_messages.getNodeByIndex(i);
 			if (node.getName() != L"direct_message") {
 				continue;
 			}
