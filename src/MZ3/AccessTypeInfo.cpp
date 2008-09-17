@@ -415,6 +415,17 @@ bool AccessTypeInfo::init()
 	// url(2) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy&comment_count=8
 	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:id}.html";
 
+	type = ACCESS_NEIGHBORDIARY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "mixi"
+		, L"“ú‹L“à—e"
+		, REQUEST_METHOD_GET
+		);
+	// url(1) : http://mixi.jp/neighbor_diary.pl?id=xxx&owner_id=yyy&direction=prev&new_id=zzz
+	// url(2) : http://mixi.jp/neighbor_diary.pl?id=xxx&owner_id=yyy&direction=next&new_id=zzz
+	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:new_id}.html";
+
 	type = ACCESS_NEWS;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY

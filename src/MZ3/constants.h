@@ -62,6 +62,7 @@ enum ACCESS_TYPE {
 	ACCESS_LOGIN = 0,			///< ログイン
 	ACCESS_MAIN,				///< メイン(home.pl)
 	ACCESS_DIARY,				///< 日記内容(view_diary.pl)
+	ACCESS_NEIGHBORDIARY,		///< 日記内容(neighbor_diary.pl)	//MOriyama追加 次の日記、前の日記
 	ACCESS_BBS,					///< コミュニティ内容(view_bbs.pl)
 	ACCESS_ENQUETE,				///< アンケート(view_enquete.pl)
 	ACCESS_EVENT,				///< イベント(view_event.pl)

@@ -24,6 +24,7 @@ inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	// view 系
 	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // メイン
 	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // 日記内容
+	if( url.Find( L"neighbor_diary.pl" ) != -1 ){ return ACCESS_NEIGHBORDIARY;} // 日記内容(次の日記、前の日記)
 	if( url.Find( L"view_bbs.pl" ) != -1 ) 		{ return ACCESS_BBS;       } // コミュニティ内容
 	if( url.Find( L"view_enquete.pl" ) != -1 ) 	{ return ACCESS_ENQUETE;   } // アンケート
 	if( url.Find( L"view_event.pl" ) != -1 ) 	{ return ACCESS_EVENT;     } // イベント
@@ -80,6 +81,7 @@ inline CString GetLogIdString( const CMixiData& mixi )
 	switch (mixi.GetAccessType()) {
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
+	case ACCESS_NEIGHBORDIARY:
 		logId.Format(_T("d%d"), mixi::MixiUrlParser::GetID( mixi.GetURL() ) );
 		break;
 	case ACCESS_BBS:

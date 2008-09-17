@@ -627,6 +627,38 @@ public:
 				MZ3LOGGER_INFO( util::FormatString( L"写真の取得エラー : %s", e.getMessage().c_str()) );
 			}
 
+			// 前の日記へのリンク
+			try {
+				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"class=diaryPaging01 clearfix")
+													   .getNode(L"div", L"class=diaryPagingLeft");
+
+				CString PrevLink = div.getTextAll().c_str();
+				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( PrevLink );
+				mixi::ParserUtil::ExtractURI( PrevLink , data_.m_linkList );
+
+				data_.SetPrevDiary( PrevLink );
+			} catch (xml2stl::NodeNotFoundException& e) {
+				// リンクがなかったと判断する
+				MZ3LOGGER_INFO( util::FormatString( L"前の日記へのリンク取得エラー : %s", e.getMessage().c_str()) );
+			}
+
+			// 次の日記へのリンク
+			try {
+				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"class=diaryPaging01 clearfix")
+													   .getNode(L"div", L"class=diaryPagingRight");
+
+				CString NextLink = div.getTextAll().c_str();
+				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( NextLink );
+				mixi::ParserUtil::ExtractURI( NextLink , data_.m_linkList );
+
+				data_.SetNextDiary( NextLink );
+			} catch (xml2stl::NodeNotFoundException& e) {
+				// リンクがなかったと判断する
+				MZ3LOGGER_INFO( util::FormatString( L"次の日記へのリンク取得エラー : %s", e.getMessage().c_str()) );
+			}
+
 			// 本文取得
 			try {
 				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")

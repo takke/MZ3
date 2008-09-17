@@ -3060,6 +3060,7 @@ void CMZ3View::OnGetAll()
 	case ACCESS_ENQUETE:
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
+	case ACCESS_NEIGHBORDIARY:
 		// ok.
 		break;
 	default:
@@ -3084,6 +3085,7 @@ void CMZ3View::OnGetLast10()
 	case ACCESS_ENQUETE:
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
+	case ACCESS_NEIGHBORDIARY:
 		// ok.
 		break;
 	default:
@@ -3221,6 +3223,7 @@ void CMZ3View::OnViewLog()
 	// レポート画面で開けるタイプのみサポートする
 	switch (mixi.GetAccessType()) {	
 	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
@@ -3597,6 +3600,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	CMixiData& bodyItem = GetSelectedBodyItem();
 	switch( bodyItem.GetAccessType() ) {
 	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
@@ -3614,6 +3618,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			case ACCESS_BBS:
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
+			case ACCESS_NEIGHBORDIARY:
 				// BBS, アンケート
 				// 20件or全件の切り替えメニューを出す
 				if( theApp.m_optionMng.GetPageType() == GETPAGE_ALL ) {

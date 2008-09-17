@@ -71,6 +71,7 @@ void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 {
 	switch (aType) {
 	case ACCESS_DIARY:			mixi::ViewDiaryParser::parse( mixi, html );			break;
+	case ACCESS_NEIGHBORDIARY:	mixi::ViewDiaryParser::parse( mixi, html );			break;
 	case ACCESS_BBS:			mixi::ViewBbsParser::parse( mixi, html );			break;
 	case ACCESS_ENQUETE:		mixi::ViewEnqueteParser::parse( mixi, html );		break;
 	case ACCESS_EVENT_JOIN:

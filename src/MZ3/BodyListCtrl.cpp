@@ -298,6 +298,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
+			case ACCESS_NEIGHBORDIARY:
 				// 日記
 				// 外部ブログは薄く表示
 				if( data->GetURL().Find( L"?url=http" ) != -1 ) {

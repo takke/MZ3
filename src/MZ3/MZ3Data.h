@@ -275,6 +275,14 @@ public:
 	void	SetOpeningRange(LPCTSTR range)	{ m_StringMap[L"opening_range"] = range; }
 	CString GetOpeningRange()				{ return FindStringMap(L"opening_range"); }
 
+	// next_diary : 次の日記
+	void	SetNextDiary(LPCTSTR url)		{ m_StringMap[L"next_diary"] = url; }
+	CString GetNextDiary()				{ return FindStringMap(L"next_diary"); }
+
+	// prev_diary : 次の日記
+	void	SetPrevDiary(LPCTSTR url)		{ m_StringMap[L"prev_diary"] = url; }
+	CString GetPrevDiary()				{ return FindStringMap(L"prev_diary"); }
+
 	//--- 子要素操作
 	void	ClearChildren()					{ m_children.clear(); }				///< 子要素の削除
 	void	AddChild(const MZ3Data& child)	{ m_children.push_back(child); }	///< 子要素の追加

@@ -144,6 +144,7 @@ public:
 			switch (mixi.GetAccessType()) {
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
+			case ACCESS_NEIGHBORDIARY:
 				body.Format(L"owner_id=%d&comment_body=%s", mixi.GetOwnerID(), msg);
 				break;
 			case ACCESS_ENQUETE:
@@ -201,6 +202,7 @@ public:
 
 		case ACCESS_DIARY:
 		case ACCESS_MYDIARY:
+		case ACCESS_NEIGHBORDIARY:
 			post.AppendPostBody( "submit=confirm&comment_body=" );
 			post.AppendPostBody( post.GetComment() );
 

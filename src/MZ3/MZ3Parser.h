@@ -168,6 +168,7 @@ public:
 				switch(data_.GetAccessType()) {
 				case ACCESS_DIARY:
 				case ACCESS_MYDIARY:
+				case ACCESS_NEIGHBORDIARY:
 					break;
 				default:
 					// ˆÈ~‚Ì‰ğÍ‚Í•s—vB

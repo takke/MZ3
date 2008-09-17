@@ -48,6 +48,7 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 	ACCESS_TYPE accessTypeList[] = { 
 		ACCESS_PLAIN,
 		ACCESS_DIARY, 
+		ACCESS_NEIGHBORDIARY,
 		ACCESS_BBS, 
 		ACCESS_ENQUETE, 
 		ACCESS_EVENT, 

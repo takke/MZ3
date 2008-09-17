@@ -499,7 +499,7 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// プロフィール表示の場合は常に先頭項目を選択
-	if (m_data.GetAccessType() == ACCESS_PROFILE || m_data.GetAccessType() == ACCESS_BIRTHDAY ) {
+	if (m_data.GetAccessType() == ACCESS_PROFILE || m_data.GetAccessType() == ACCESS_BIRTHDAY || m_data.GetAccessType() == ACCESS_NEIGHBORDIARY ) {
 		focusItem = 0;
 	}
 
@@ -538,6 +538,20 @@ void CReportView::ShowCommentData(CMixiData* data)
 	}
 	bodyStrArray->Add(L"</blue>");
 	bodyStrArray->Add(L"<br>");
+
+	// 2行目を描画
+	if( !data->GetPrevDiary().IsEmpty() || !data->GetNextDiary().IsEmpty() ){
+		if( !data->GetPrevDiary().IsEmpty() ){
+			CString PrevLink = data->GetPrevDiary();
+			ViewFilter::ReplaceHTMLTagToRan2Tags( PrevLink, *bodyStrArray, theApp.m_emoji, this );
+		}
+		bodyStrArray->Add(L"　");
+		if( !data->GetNextDiary().IsEmpty() ){
+			CString NextLink = data->GetNextDiary();
+			ViewFilter::ReplaceHTMLTagToRan2Tags( NextLink, *bodyStrArray, theApp.m_emoji, this );
+		}
+		bodyStrArray->Add(L"<br>");
+	}
 
 //	TRACE( L"■---xdump start---\r\n" );
 //	for (int i=0; i<data->GetBodySize(); i++) {
@@ -1365,6 +1379,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 	switch (estimatedAccessType) {
 	case ACCESS_MYDIARY:
 	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
 	case ACCESS_EVENT:
@@ -2952,7 +2967,27 @@ void CReportView::OnCopyClipboardUrl(UINT nID)
 		return;
 	}
 
-	util::SetClipboardDataTextW( m_currentData->m_linkList[idx].url );
+	CMixiData::Link link = m_currentData->m_linkList[idx];
+	CString url = link.url;
+
+	ACCESS_TYPE estimatedAccessType = util::EstimateAccessTypeByUrl( link.url );
+	switch (estimatedAccessType) {
+	case ACCESS_MYDIARY:
+	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
+	case ACCESS_BBS:
+	case ACCESS_ENQUETE:
+	case ACCESS_EVENT:
+	case ACCESS_EVENT_JOIN:
+	case ACCESS_EVENT_MEMBER:
+	case ACCESS_PROFILE:
+	case ACCESS_BIRTHDAY:
+	case ACCESS_MESSAGE:
+	case ACCESS_NEWS:
+		url = util::CreateMixiUrl(link.url);
+	}
+
+	util::SetClipboardDataTextW( url );
 }
 
 /**

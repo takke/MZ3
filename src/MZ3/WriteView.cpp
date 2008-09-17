@@ -408,6 +408,7 @@ void CWriteView::StartEntryPost()
 
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
+			case ACCESS_NEIGHBORDIARY:
 				url.Format( L"http://mixi.jp/%s&owner_id=%d", m_data->GetPostAddress(), m_data->GetOwnerID());
 				//ƒŠƒtƒ@ƒ‰Ý’è‚µ‚½‚ç“Še‚ÅŽ~‚Ü‚é‚æ‚¤‚É‚È‚Á‚½‚Ì‚Å•Û—¯
 				//refUrl.Format( L"http://mixi.jp/%s", m_data->GetPostAddress());
