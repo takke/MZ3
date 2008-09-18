@@ -22,6 +22,8 @@ public:
 	virtual HBITMAP GetBgBitmapHandle();
 	virtual void PopupContextMenu( const CPoint );
 	virtual void SetSelectItem( const int );
+	virtual void MoveSlideRight();
+	virtual void MoveSlideLeft();
 protected:
 	DECLARE_MESSAGE_MAP()
 public:

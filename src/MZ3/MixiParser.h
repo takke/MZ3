@@ -634,10 +634,11 @@ public:
 													   .getNode(L"div", L"class=diaryPagingLeft");
 
 				CString PrevLink = div.getTextAll().c_str();
+				data_.SetPrevDiary( PrevLink );
+
 				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( PrevLink );
 				mixi::ParserUtil::ExtractURI( PrevLink , data_.m_linkList );
 
-				data_.SetPrevDiary( PrevLink );
 			} catch (xml2stl::NodeNotFoundException& e) {
 				// リンクがなかったと判断する
 				MZ3LOGGER_INFO( util::FormatString( L"前の日記へのリンク取得エラー : %s", e.getMessage().c_str()) );
@@ -650,10 +651,11 @@ public:
 													   .getNode(L"div", L"class=diaryPagingRight");
 
 				CString NextLink = div.getTextAll().c_str();
+				data_.SetNextDiary( NextLink );
+
 				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( NextLink );
 				mixi::ParserUtil::ExtractURI( NextLink , data_.m_linkList );
 
-				data_.SetNextDiary( NextLink );
 			} catch (xml2stl::NodeNotFoundException& e) {
 				// リンクがなかったと判断する
 				MZ3LOGGER_INFO( util::FormatString( L"次の日記へのリンク取得エラー : %s", e.getMessage().c_str()) );

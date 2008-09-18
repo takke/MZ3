@@ -641,8 +641,8 @@ public:
 		const CString& line = html_.GetAt( iLine_ );
 		if( util::LineHasStringsNoCase( line, L"<script") ) {
 			while( iLine_<lastLine ) {
-				// 次の行をフェッチ
-				const CString& nextLine = html_.GetAt( ++iLine_ );
+				// 行をフェッチ
+				const CString& nextLine = html_.GetAt( iLine_ );
 				// 拡張子.flvが見つかったら投入
 				if( util::LineHasStringsNoCase( nextLine, L".flv" ) ) {
 					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
@@ -651,10 +651,16 @@ public:
 				if( LINE_HAS_YOUTUBE_LINK(nextLine) ) {
 					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
 				}
+				// ニコニコ動画対応
+				if( LINE_HAS_NICOVIDEO_LINK(nextLine) ) {
+					ParserUtil::AddBodyWithExtract( mixi_, nextLine );
+				}
 				// </script> があれば終了
 				if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
 					break;
 				}
+				// 次の行へ進める
+				++iLine_;
 			}
 			return true;
 		} else {
@@ -1018,7 +1024,7 @@ public:
 		}
 		// ニコニコ動画リンク抽出用
 		static MyRegex reg9;
-		if( !util::CompileRegex( reg9, L"<script *type=\"text/javascript\" *src=\"http://ext\\.nicovideo\\.jp/thumb_watch/([a-z0-9]*)\\?.*?\".*?>" ) ) {
+		if( !util::CompileRegex( reg9, L"<script *type=\"text/javascript\" *src=\"http://ext\\.nicovideo\\.jp/thumb_watch/([a-z0-9]*)\\?.*?\".*?></script>" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}

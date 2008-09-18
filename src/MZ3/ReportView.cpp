@@ -123,6 +123,10 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_IMAGE+1, ID_REPORT_COPY_IMAGE+50, OnCopyClipboardImage)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_MOVIE+1, ID_REPORT_COPY_MOVIE+50, OnCopyClipboardMovie)
+	ON_COMMAND(ID_MENU_NEXT_DIARY, &CReportView::OnMenuNextDiary)
+	ON_COMMAND(ID_MENU_PREV_DIARY, &CReportView::OnMenuPrevDiary)
+	ON_UPDATE_COMMAND_UI(ID_MENU_NEXT_DIARY, &CReportView::OnUpdateMenuNextDiary)
+	ON_UPDATE_COMMAND_UI(ID_MENU_PREV_DIARY, &CReportView::OnUpdateMenuPrevDiary)
 END_MESSAGE_MAP()
 
 
@@ -542,13 +546,19 @@ void CReportView::ShowCommentData(CMixiData* data)
 	// 2行目を描画
 	if( !data->GetPrevDiary().IsEmpty() || !data->GetNextDiary().IsEmpty() ){
 		if( !data->GetPrevDiary().IsEmpty() ){
-			CString PrevLink = data->GetPrevDiary();
-			ViewFilter::ReplaceHTMLTagToRan2Tags( PrevLink, *bodyStrArray, theApp.m_emoji, this );
+			//CString PrevLink = data->GetPrevDiary();
+			//ViewFilter::ReplaceHTMLTagToRan2Tags( PrevLink, *bodyStrArray, theApp.m_emoji, this );
+			bodyStrArray->Add(L"<a>");
+			bodyStrArray->Add(L"<<前の日記へ");
+			bodyStrArray->Add(L"</a>");
 		}
 		bodyStrArray->Add(L"　");
 		if( !data->GetNextDiary().IsEmpty() ){
-			CString NextLink = data->GetNextDiary();
-			ViewFilter::ReplaceHTMLTagToRan2Tags( NextLink, *bodyStrArray, theApp.m_emoji, this );
+			//CString NextLink = data->GetNextDiary();
+			//ViewFilter::ReplaceHTMLTagToRan2Tags( NextLink, *bodyStrArray, theApp.m_emoji, this );
+			bodyStrArray->Add(L"<a>");
+			bodyStrArray->Add(L"次の日記へ>>");
+			bodyStrArray->Add(L"</a>");
 		}
 		bodyStrArray->Add(L"<br>");
 	}
@@ -2341,10 +2351,43 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 //	}
 
 	// 「進む」無効化
-	int idxPage = 4;		// 「ページ」メニュー（次へが有効の場合は-1となる）
+	int idxPage = 7;		// 「ページ」メニュー（次へが有効の場合は-1となる）
+	int idxDiarySeparator = 5;
 	if( theApp.m_pWriteView->m_sendEnd ) {
 		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
 		idxPage = idxPage-1;
+		idxDiarySeparator--;
+	}
+
+	// 前の日記、次の日記の処理
+	switch( m_data.GetAccessType() ) {
+	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
+	case ACCESS_MYDIARY:
+		if( m_data.GetPrevDiary().IsEmpty() ){
+			pcThisMenu->RemoveMenu(ID_MENU_PREV_DIARY, MF_BYCOMMAND);
+			idxPage--;
+			idxDiarySeparator--;
+		}
+		if( m_data.GetNextDiary().IsEmpty() ){
+			pcThisMenu->RemoveMenu(ID_MENU_NEXT_DIARY, MF_BYCOMMAND);
+			idxPage--;
+			idxDiarySeparator--;
+		}
+		if( m_data.GetPrevDiary().IsEmpty() &&  m_data.GetNextDiary().IsEmpty() ){
+			pcThisMenu->RemoveMenu(idxDiarySeparator, MF_BYPOSITION);
+			idxPage--;
+		}
+		break;
+	default:
+		pcThisMenu->RemoveMenu(ID_MENU_PREV_DIARY, MF_BYCOMMAND);
+		idxPage--;
+		idxDiarySeparator--;
+		pcThisMenu->RemoveMenu(ID_MENU_NEXT_DIARY, MF_BYCOMMAND);
+		idxPage--;
+		idxDiarySeparator--;
+		pcThisMenu->RemoveMenu(idxDiarySeparator, MF_BYPOSITION);
+		idxPage--;
 	}
 
 	// 「ページ」および「URLをコピー」の追加
@@ -3022,4 +3065,79 @@ void CReportView::OnCopyClipboardMovie(UINT nID)
 	}
 
 	util::SetClipboardDataTextW( m_currentData->GetMovie(idx) );
+}
+
+/**
+ * 「次の日記へ>>」メニュー処理
+ */
+void CReportView::OnMenuNextDiary()
+{
+	//MZ3_TRACE(L"CReportView::OnMenuNextDiary()\n");
+
+	CString link = m_data.GetNextDiary();
+	if( !link.IsEmpty() ){
+		std::vector<CMixiData::Link> list_;
+		mixi::ParserUtil::ExtractURI( link , list_ );
+
+		if( list_.size() > 0 ){
+			// 横スクロールアニメーションを起動する
+			m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
+			// mixi 内リンクのはずなのでロードする。
+			if ( MyLoadMixiViewPage( list_[0] )) {
+				return;
+			} else {
+				// mixi内リンクでなければエラーが表示されているので隠す
+				m_infoEdit.ShowWindow(SW_HIDE);
+			}
+		}
+
+	}
+}
+
+/**
+ * 「<<前の日記へ」メニュー処理
+ */
+void CReportView::OnMenuPrevDiary()
+{
+	//MZ3_TRACE(L"CReportView::OnMenuPrevDiary()\n");
+
+	CString link = m_data.GetPrevDiary();
+	if( !link.IsEmpty() ){
+		std::vector<CMixiData::Link> list_;
+		mixi::ParserUtil::ExtractURI( link , list_ );
+
+		if( list_.size() > 0 ){
+			// 横スクロールアニメーションを起動する
+			m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
+			// mixi 内リンクのはずなのでロードする。
+			if ( MyLoadMixiViewPage( list_[0] )) {
+				return;
+			} else {
+				// mixi内リンクでなければエラーが表示されているので隠す
+				m_infoEdit.ShowWindow(SW_HIDE);
+			}
+		}
+	}
+}
+
+/**
+ * 「次の日記へ>>」メニュー活性化処理
+ */
+void CReportView::OnUpdateMenuNextDiary(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable( false );
+	if( !m_data.GetNextDiary().IsEmpty() ){
+		pCmdUI->Enable( true );
+	}
+}
+
+/**
+ * 「<<前の日記へ」メニュー活性化処理
+ */
+void CReportView::OnUpdateMenuPrevDiary(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable( false );
+	if( !m_data.GetPrevDiary().IsEmpty() ){
+		pCmdUI->Enable( true );
+	}
 }

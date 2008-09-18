@@ -23,6 +23,10 @@ IMPLEMENT_DYNAMIC(CReportListCtrl, CTouchListCtrl)
 
 CReportListCtrl::CReportListCtrl()
 {
+	// 横スライドによる項目移動とパンスクロールアニメーションをオンにする
+	// （コンストラクタで設定し、以降変更しないこと）
+	SetCanSlide(true);
+	SetCanPanScroll(true);
 }
 
 CReportListCtrl::~CReportListCtrl()
@@ -432,4 +436,24 @@ void CReportListCtrl::SetSelectItem( const int nItem )
 		util::MySetListCtrlItemFocusedAndSelected( *this, GetSelectedItem(), false );
 		util::MySetListCtrlItemFocusedAndSelected( *this, nItem, true );
 	}
+}
+
+/**
+ * virtual MoveSlideRight()
+ *  右へスライドして移動
+ */
+void CReportListCtrl::MoveSlideRight()
+{
+	GetParent()->SendMessage( WM_COMMAND , ID_MENU_PREV_DIARY , 0 );
+	return;
+}
+
+/**
+ * virtual MoveSlideLeft()
+ *  左へスライドして移動
+ */
+void CReportListCtrl::MoveSlideLeft()
+{
+	GetParent()->SendMessage( WM_COMMAND , ID_MENU_NEXT_DIARY , 0 );
+	return;
 }

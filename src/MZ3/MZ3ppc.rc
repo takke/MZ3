@@ -190,6 +190,9 @@ BEGIN
         MENUITEM "戻る",                          ID_BACK_MENU
         MENUITEM "進む",                          ID_NEXT_MENU
         MENUITEM SEPARATOR
+        MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
+        MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
+        MENUITEM SEPARATOR
         MENUITEM "コメントを書く...",                  ID_WRITE_COMMENT
         POPUP "ページ"
         BEGIN
