@@ -368,24 +368,54 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			case ACCESS_TWITTER_USER:
 				// Twitter 項目
 				{
+					// デフォルト値設定
+					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+
 					// 自分宛の発言を強調表示する
 					const CString& bodyText = data->GetBody();
-					CString atId = L"@";
-					atId += theApp.m_loginMng.GetTwitterId();
-					if (bodyText.Find(atId)!=-1) {
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
-					} else {
+					if (bodyText.Find(util::FormatString(L"@%s", theApp.m_loginMng.GetTwitterId()))!=-1) {
+						// 強調２
+						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
+						break;
+					}
+
+					int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
+					CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+					if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
+						const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
+
 						// 選択項目と同じオーナーIDの項目を強調表示する。
-						int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
-						CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-						if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
-							const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
-							if (selectedData.GetOwnerID()==data->GetOwnerID()) {
-								// 同じオーナーID：強調表示
-								clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-							} else {
-								// 異なるオーナーID
-								clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+						if (selectedData.GetOwnerID()==data->GetOwnerID()) {
+							// 同じオーナーID：強調表示
+							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+							break;
+						}
+
+						// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
+						CString target = selectedData.GetBody();
+						if (target.Find(L"@")!=-1) {
+							// 正規表現のコンパイル（一回のみ）
+							static MyRegex reg;
+							if( !util::CompileRegex( reg, L"@([0-9a-zA-Z_]+)" ) ) {
+								return;
+							}
+
+							for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
+								std::vector<MyRegex::Result>* pResults = NULL;
+								if( reg.exec(target) == false || reg.results.size() != 2 ) {
+									// 未発見
+									break;
+								}
+
+								// 一致すれば強調表示
+//								MZ3_TRACE(L"★抽出ユーザ：[%s]\n", reg.results[1].str.c_str());
+								if (data->GetName()==reg.results[1].str.c_str()) {
+									clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
+									break;
+								}
+
+								// ターゲットを更新。
+								target = target.Mid( reg.results[0].end );
 							}
 						}
 					}

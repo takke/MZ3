@@ -30,6 +30,7 @@ public:
 	COLORREF clrMainBodyListFootprintMyMixiText;///< メイン画面、ボディコントロールのあしあとのマイミクの文字色
 	COLORREF clrMainBodyListExternalBlogText;	///< メイン画面、ボディコントロールの外部ブログの文字色
 	COLORREF clrMainBodyListDayBreakLine;		///< メイン画面、ボディコントロールの日付区切り線
+	COLORREF clrMainBodyListEmphasis2;			///< メイン画面、ボディコントロールの強調２
 
 	CMZ3SkinInfo()
 	{
