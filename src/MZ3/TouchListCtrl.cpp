@@ -379,12 +379,6 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 	m_screenWidth = cx;
 	m_screenHeight = cy - rctHeader.Height();
 
-#ifdef WINCE
-	if( !m_bCanPanScroll ){
-		return;
-	}
-#endif
-
 	// 裏画面バッファが無ければここで確保する
 	if( m_memBMP == NULL ) {
 		CDC* pDC = GetDC();
@@ -409,11 +403,6 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
  */
 bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 {
-#ifdef WINCE
-	if( !m_bCanPanScroll ){
-		return false;
-	}
-#endif
 	//--- 解放
 	// 裏画面バッファの解放
 	if( m_memDC != NULL ){

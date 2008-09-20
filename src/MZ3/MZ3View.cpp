@@ -1659,6 +1659,11 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// Twitter であれば同一オーナーIDの項目を再表示
 	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
+		// バックバッファ経由で再描画
+		m_bodyList.DrawDetail();
+		m_bodyList.UpdateWindow();
+
+		/*
 		static int s_lastSelectedBody = 0;
 
 		// 現在選択中の項目のオーナーID、前回選択中だった項目のオーナーIDと同一のオーナーIDを持つ項目のみ、再描画する。
@@ -1685,6 +1690,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		s_lastSelectedBody = pCategory->selectedBody;
+		*/
 	}
 
 	// アイコン再描画

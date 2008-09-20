@@ -173,7 +173,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// ‘I‘ð‚³‚ê‚Ä‚¢‚éê‡‚ÍA
 	// ‘I‘ð‚³‚ê‚Ä‚¢‚é•¶Žš‚Ì‚Ýˆês‚ð“h‚è‚Â‚Ô‚·
-	if (bSelected == TRUE) {
+	if (bSelected) {
 		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// ”wŒi‚Ì“h‚è‚Â‚Ô‚µ

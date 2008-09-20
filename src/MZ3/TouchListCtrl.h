@@ -39,7 +39,7 @@ public:
 	virtual void MoveSlideLeft() { Invalidate(); }
 
 	bool	m_bUseHorizontalDragMove;	///< 横ドラッグでの項目移動
-	bool	m_bUsePanScrollAnimation;	///<横スクロールアニメーションするか
+	bool	m_bUsePanScrollAnimation;	///< 横スクロールアニメーションするか
 
 	/// パンスクロールの方向定義
 	enum PAN_SCROLL_DIRECTION
