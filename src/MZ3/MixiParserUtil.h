@@ -657,6 +657,15 @@ public:
 				}
 				// </script> があれば終了
 				if( util::LineHasStringsNoCase( nextLine, L"</script>" ) ) {
+					// </script>の後ろに何かあればBodyに追加しておく
+					CString scripttag = L"</script>";
+					int idx = nextLine.Find(scripttag);
+					if( idx>=0 ){
+						idx += scripttag.GetLength();
+						if( nextLine.GetLength() > idx ){
+							ParserUtil::AddBodyWithExtract( mixi_, nextLine.Mid( idx ) );
+						}
+					}
 					break;
 				}
 				// 次の行へ進める
@@ -1024,7 +1033,7 @@ public:
 		}
 		// ニコニコ動画リンク抽出用
 		static MyRegex reg9;
-		if( !util::CompileRegex( reg9, L"<script *type=\"text/javascript\" *src=\"http://ext\\.nicovideo\\.jp/thumb_watch/([a-z0-9]*)\\?.*?\".*?></script>" ) ) {
+		if( !util::CompileRegex( reg9, L"<script *type=\"text/javascript\" *src=\"http://ext\\.nicovideo\\.jp/thumb_watch/([a-z0-9]*)\\?.*?\".*?>(</script>)?" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -1140,7 +1149,7 @@ public:
 			}
 			// ニコニコ動画リンク
 			if( LINE_HAS_NICOVIDEO_LINK(regtarget) ) {
-				if( reg9.exec(regtarget) && reg9.results.size() == 2 ) {
+				if( reg9.exec(regtarget) && reg9.results.size() >= 2 ) {
 					//if( offset < 0 || ( reg9.results[0].start < offset ) ){
 						// ニコニコ動画リンク
 						offset = reg9.results[0].start ;

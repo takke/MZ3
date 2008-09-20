@@ -636,8 +636,8 @@ public:
 				CString PrevLink = div.getTextAll().c_str();
 				data_.SetPrevDiary( PrevLink );
 
-				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( PrevLink );
-				mixi::ParserUtil::ExtractURI( PrevLink , data_.m_linkList );
+				//mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( PrevLink );
+				//mixi::ParserUtil::ExtractURI( PrevLink , data_.m_linkList );
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				// ƒŠƒ“ƒN‚ª‚È‚©‚Á‚½‚Æ”»’f‚·‚é
@@ -653,8 +653,8 @@ public:
 				CString NextLink = div.getTextAll().c_str();
 				data_.SetNextDiary( NextLink );
 
-				mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( NextLink );
-				mixi::ParserUtil::ExtractURI( NextLink , data_.m_linkList );
+				//mixi::ParserUtil::ReplaceDefinedEntityReferenceToCharacter( NextLink );
+				//mixi::ParserUtil::ExtractURI( NextLink , data_.m_linkList );
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				// ƒŠƒ“ƒN‚ª‚È‚©‚Á‚½‚Æ”»’f‚·‚é

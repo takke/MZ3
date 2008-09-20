@@ -91,6 +91,9 @@ BEGIN
             MENUITEM "前の画面へ",                       ID_MENU_BACK
             MENUITEM "次の画面へ",                       ID_MENU_NEXT
             MENUITEM SEPARATOR
+            MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
+            MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
+            MENUITEM SEPARATOR
             MENUITEM "ダウンロードマネージャ",                 ID_DOWNLOAD_MANAGER_VIEW
         END
         POPUP "設定"
@@ -361,6 +364,9 @@ BEGIN
     BEGIN
         MENUITEM "前の画面へ",                       ID_MENU_BACK
         MENUITEM "次の画面へ",                       ID_MENU_NEXT
+        MENUITEM SEPARATOR
+        MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
+        MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
         MENUITEM SEPARATOR
         MENUITEM "ダウンロードマネージャ",                 ID_DOWNLOAD_MANAGER_VIEW
     END

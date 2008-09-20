@@ -36,6 +36,9 @@ private:
 	/// m_StringArrayMap から文字列配列オブジェクトを取得する。
 	const MZ3StringArray* GetStringArrayConst(LPCTSTR key) const
 	{
+		if( m_theMap.size() == 0 ){
+			return NULL;
+		}
 		const std::map<MZ3String, MZ3StringArray>::const_iterator& v = m_theMap.find(key);
 		if (v==m_theMap.end()) {
 			return NULL;
@@ -297,6 +300,9 @@ private:
 	/// 汎用数値コンテナから key 値を取得する。失敗時は default_value を返す。
 	int FindIntegerMap(LPCTSTR key, int default_value) const
 	{
+		if( m_IntegerMap.size() == 0 ){
+			return default_value;
+		}
 		const MZ3IntegerMap::const_iterator& v = m_IntegerMap.find(key);
 		if (v==m_IntegerMap.end()) {
 			return default_value;
@@ -307,6 +313,9 @@ private:
 	/// 汎用文字列コンテナから key 値を取得する。失敗時は L"" を返す。
 	LPCTSTR FindStringMap(LPCTSTR key) const
 	{
+		if( m_StringMap.size() == 0 ){
+			return L"";
+		}
 		const MZ3StringMap::const_iterator& v = m_StringMap.find(key);
 		if (v==m_StringMap.end()) {
 			return L"";

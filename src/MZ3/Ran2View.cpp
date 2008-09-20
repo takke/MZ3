@@ -1177,6 +1177,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,
 			newText->linkID = -1;
 			newText->imglinkID = -1;
 			newText->movlinkID = -1;
+			newText->linktype = LinkType_noLink;
 			// リンクがある場合はフラグを立ててタップ反応領域を登録
 			if( bridgeInfo->isLink == true ){
 				newText->isUnderLine = true;
@@ -1213,6 +1214,7 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,
 						newText->movlinkID = bigBridgeInfo->movlinkID;
 						break;
 				}
+				newText->linktype = bridgeInfo->linkType ;
 			}
 			rowRecord->textProperties->Add(newText);
 		}else{
@@ -1309,6 +1311,34 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,
 		bridgeInfo->jumpID = 0;
 		bridgeInfo->pageAnchor = 0;
 		bigBridgeInfo->movlinkID++;		// 動画リンク連番をインクリメント
+	// 前の日記リンクの設定
+	}else if( currentTag == Tag_prevdiary ){
+		// リンクの領域登録はtextの領域作成時にまとめて行う
+		bridgeInfo->isLink = true;
+
+		bridgeInfo->linkType = LinkType_prevdiary;			// リンクタイプ＝前の日記リンク
+
+		bridgeInfo->pageAnchor = 0;
+	// 前の日記リンクタグの終了
+	}else if( currentTag == Tag_end_prevdiary ){
+		bridgeInfo->isLink = false;
+		bridgeInfo->linkType = LinkType_noLink;
+		bridgeInfo->jumpID = 0;
+		bridgeInfo->pageAnchor = 0;
+	// 次の日記リンクの設定
+	}else if( currentTag == Tag_nextdiary ){
+		// リンクの領域登録はtextの領域作成時にまとめて行う
+		bridgeInfo->isLink = true;
+
+		bridgeInfo->linkType = LinkType_nextdiary;			// リンクタイプ＝次の日記リンク
+
+		bridgeInfo->pageAnchor = 0;
+	// 次の日記リンクタグの終了
+	}else if( currentTag == Tag_end_nextdiary ){
+		bridgeInfo->isLink = false;
+		bridgeInfo->linkType = LinkType_noLink;
+		bridgeInfo->jumpID = 0;
+		bridgeInfo->pageAnchor = 0;
 	}else{
 		// それ以外のエラーの場合
 		//CString logStr;
@@ -1638,6 +1668,12 @@ void Ran2View::DrawTextProperty(int line,CPtrArray* textProperties)
 			bReverse = true;
 		}
 
+		if( ( m_activeLinkID.linkType == LinkType_prevdiary && text->linktype == LinkType_prevdiary ) ||
+			( m_activeLinkID.linkType == LinkType_nextdiary && text->linktype == LinkType_nextdiary ) ){
+			// 前の日記、次の日記をポイントしてれば反転フラグを設定
+			bReverse = true;
+		}
+
 		// リンクの反転表示
 		//   テキスト色：GetSysColor(COLOR_HIGHLIGHTTEXT)
 		//   背景色：GetSysColor(COLOR_HIGHLIGHT)
@@ -1876,6 +1912,18 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		}else if( lineStr.Compare(TEXT("</mov>")) == 0 ) {
 			// 動画リンク終了
 			hashRecord->type = Tag_end_mov;
+		}else if( lineStr.Compare(TEXT("<prevdiary>")) == 0 ) {
+			// 前の日記リンク開始
+			hashRecord->type = Tag_prevdiary;
+		}else if( lineStr.Compare(TEXT("</prevdiary>")) == 0 ) {
+			// 前の日記リンク終了
+			hashRecord->type = Tag_end_prevdiary;
+		}else if( lineStr.Compare(TEXT("<nextdiary>")) == 0 ) {
+			// 次の日記リンク開始
+			hashRecord->type = Tag_nextdiary;
+		}else if( lineStr.Compare(TEXT("</nextdiary>")) == 0 ) {
+			// 次の日記リンク終了
+			hashRecord->type = Tag_end_nextdiary;
 		}else{
 			hashRecord->type = Tag_text;
 		}
@@ -2338,6 +2386,14 @@ void Ran2View::OnLButtonUp(UINT nFlags, CPoint point)
 				case LinkType_movie:
 					// 動画リンク（mixi動画）
 					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)MAKEWPARAM(  ID_REPORT_MOVIE + 1 + m_activeLinkID.movie , 0 ), (LPARAM)NULL );
+					break;
+				case LinkType_prevdiary:
+					// 前の日記リンク
+					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)ID_MENU_PREV_DIARY, (LPARAM)NULL );
+					break;
+				case LinkType_nextdiary:
+					// 次の日記リンク
+					::SendMessage( GetParent()->GetSafeHwnd(), WM_COMMAND, (WPARAM)ID_MENU_NEXT_DIARY, (LPARAM)NULL );
 					break;
 				}
 			}
@@ -2914,6 +2970,14 @@ bool Ran2View::MySetLinkIDbyMousePoint( const CPoint point )
 						case LinkType_movie:
 							m_activeLinkID.linkType = LinkType_movie;
 							m_activeLinkID.movie = linkInfo->movlinkID;
+							bLinkArea = true;
+							break;
+						case LinkType_prevdiary:
+							m_activeLinkID.linkType = LinkType_prevdiary;
+							bLinkArea = true;
+							break;
+						case LinkType_nextdiary:
+							m_activeLinkID.linkType = LinkType_nextdiary;
 							bLinkArea = true;
 							break;
 					}

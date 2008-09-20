@@ -36,7 +36,7 @@ const enum TAG_TYPE {
 	Tag_h1, Tag_h2, Tag_h3,	
 	Tag_p, Tag_blue, Tag_underline, 
 	Tag_sub, Tag_sup, Tag_text, 
-	Tag_entity, Tag_gaiji, Tag_img, Tag_mov, 
+	Tag_entity, Tag_gaiji, Tag_img, Tag_mov, Tag_prevdiary, Tag_nextdiary,
 	Tag_br, Tag_anchor,	Tag_link, 
 	Tag_level0, Tag_level1,	Tag_level2,	
 	Tag_kakomi_blue, Tag_kakomi_gray, Tag_kakomi_gray2, 
@@ -45,7 +45,7 @@ const enum TAG_TYPE {
 // 終了タグ
 	Tag_end_p, Tag_end_blue, Tag_end_underline,
 	Tag_end_sub, Tag_end_sup, Tag_end_bold, Tag_end_blockquote,
-	Tag_end_link, Tag_end_img, Tag_end_mov,
+	Tag_end_link, Tag_end_img, Tag_end_mov, Tag_end_prevdiary, Tag_end_nextdiary,
 	Tag_end_h1, Tag_end_h2, Tag_end_h3, 
 	Tag_end_kakomi_blue, Tag_end_kakomi_gray, Tag_end_kakomi_gray2, 
 	Tag_end_kakomi_white, Tag_end_kakomi_white2, 
@@ -97,6 +97,8 @@ enum LinkType {
 	LinkType_external,		///< ページ外部リンク
 	LinkType_picture,		///< 画像拡大リンク
 	LinkType_movie,			///< mixiムービーリンク
+	LinkType_prevdiary,		///< 前の日記リンク
+	LinkType_nextdiary,		///< 次の日記リンク
 };
 
 
@@ -116,6 +118,7 @@ public:
 	int				linkID;					///< リンクID
 	int				imglinkID;				///< リンクID
 	int				movlinkID;				///< リンクID
+	LinkType		linktype;				///< リンクタイプ
 	TextProperty();
 	~TextProperty();
 };

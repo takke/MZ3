@@ -195,6 +195,10 @@ void CReportView::OnInitialUpdate()
 		m_list.InsertColumn(0, _T(""), LVCFMT_LEFT, 20, -1);
 		m_list.InsertColumn(1, _T("名前"), LVCFMT_LEFT, 20, -1);
 		m_list.InsertColumn(2, _T("日時"), LVCFMT_LEFT, 20, -1);
+
+		// オプションの設定
+		m_list.m_bUsePanScrollAnimation = theApp.m_optionMng.m_bUseRan2PanScrollAnimation;
+		m_list.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
 	}
 
 	//--- エディットの変更
@@ -548,17 +552,17 @@ void CReportView::ShowCommentData(CMixiData* data)
 		if( !data->GetPrevDiary().IsEmpty() ){
 			//CString PrevLink = data->GetPrevDiary();
 			//ViewFilter::ReplaceHTMLTagToRan2Tags( PrevLink, *bodyStrArray, theApp.m_emoji, this );
-			bodyStrArray->Add(L"<a>");
+			bodyStrArray->Add(L"<prevdiary>");
 			bodyStrArray->Add(L"<<前の日記へ");
-			bodyStrArray->Add(L"</a>");
+			bodyStrArray->Add(L"</prevdiary>");
 		}
 		bodyStrArray->Add(L"　");
 		if( !data->GetNextDiary().IsEmpty() ){
 			//CString NextLink = data->GetNextDiary();
 			//ViewFilter::ReplaceHTMLTagToRan2Tags( NextLink, *bodyStrArray, theApp.m_emoji, this );
-			bodyStrArray->Add(L"<a>");
+			bodyStrArray->Add(L"<nextdiary>");
 			bodyStrArray->Add(L"次の日記へ>>");
-			bodyStrArray->Add(L"</a>");
+			bodyStrArray->Add(L"</nextdiary>");
 		}
 		bodyStrArray->Add(L"<br>");
 	}
@@ -1488,7 +1492,7 @@ void CReportView::OnLoadUrl(UINT nID)
 	}
 
 	UINT idx = nID - (ID_REPORT_URL_BASE+1);
-	if( idx > m_currentData->m_linkList.size() ) {
+	if( m_currentData->m_linkList.size() == 0 || idx > m_currentData->m_linkList.size() ) {
 		return;
 	}
 
@@ -3080,10 +3084,10 @@ void CReportView::OnMenuNextDiary()
 		mixi::ParserUtil::ExtractURI( link , list_ );
 
 		if( list_.size() > 0 ){
-			// 横スクロールアニメーションを起動する
-			m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
 			// mixi 内リンクのはずなのでロードする。
 			if ( MyLoadMixiViewPage( list_[0] )) {
+				// 横スクロールアニメーションを起動する
+				m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
 				return;
 			} else {
 				// mixi内リンクでなければエラーが表示されているので隠す
@@ -3107,10 +3111,10 @@ void CReportView::OnMenuPrevDiary()
 		mixi::ParserUtil::ExtractURI( link , list_ );
 
 		if( list_.size() > 0 ){
-			// 横スクロールアニメーションを起動する
-			m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
 			// mixi 内リンクのはずなのでロードする。
 			if ( MyLoadMixiViewPage( list_[0] )) {
+				// 横スクロールアニメーションを起動する
+				m_list.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
 				return;
 			} else {
 				// mixi内リンクでなければエラーが表示されているので隠す

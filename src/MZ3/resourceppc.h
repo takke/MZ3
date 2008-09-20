@@ -311,6 +311,8 @@
 #define ID_34184                        34184
 #define ID_MENU_PREV_DIARY              34185
 #define ID_MENU_NEXT_DIARY              34186
+#define ID_MENU_PREVDIARY               34187
+#define ID_34188                        34188
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -325,7 +327,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        174
-#define _APS_NEXT_COMMAND_VALUE         34187
+#define _APS_NEXT_COMMAND_VALUE         34189
 #define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
