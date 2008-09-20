@@ -863,7 +863,12 @@ LRESULT CBodyListCtrl::OnSetFont(WPARAM wParam, LPARAM lParam)
 
 void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	if (!m_bPanDragging && !m_bScrollDragging) {
+	bool bDragging = m_bPanDragging || m_bScrollDragging;
+
+	// 先に親を呼び出し、選択変更する
+	CTouchListCtrl::OnLButtonUp(nFlags, point);
+
+	if (!bDragging) {
 		// Twitterでアイコン領域なら引用を追加
 		int idx = HitTest(point);
 		if (m_iconMode != ICON_MODE_NONE && point.x < m_iconMode) {
@@ -873,18 +878,10 @@ void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			if (pCategory!=NULL && 0 <= idx && idx < (int)pCategory->m_body.size()) {
 				CMixiData* data = &pCategory->m_body[ idx ];
 				if (data->GetAccessType()==ACCESS_TWITTER_USER) {
-
-					CString strStatus;
-					theApp.m_pMainView->GetDlgItemText( IDC_STATUS_EDIT, strStatus );
-					// すでに含まれていれば追加しない
-					if (strStatus.Find( util::FormatString(L"@%s", (LPCTSTR)data->GetName() ))==-1) {
-						strStatus.AppendFormat( L"@%s ", (LPCTSTR)data->GetName() );
-						theApp.m_pMainView->SetDlgItemText( IDC_STATUS_EDIT, strStatus );
-					}
+					// 親ビューに通知
+					theApp.m_pMainView->OnMenuTwitterReply();
 				}
 			}
 		}
 	}
-
-	CTouchListCtrl::OnLButtonUp(nFlags, point);
 }

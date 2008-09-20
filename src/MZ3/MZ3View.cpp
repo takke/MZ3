@@ -4913,7 +4913,12 @@ void CMZ3View::OnMenuTwitterReply()
 	CString strStatus;
 	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
 
+	// ‚·‚Å‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚ê‚Î’Ç‰Á‚µ‚È‚¢
 	CMixiData& data = GetSelectedBodyItem();
+	if (strStatus.Find( util::FormatString(L"@%s", (LPCTSTR)data.GetName() ))!=-1) {
+		return;
+	}
+
 	strStatus.AppendFormat( L"@%s ", (LPCTSTR)data.GetName() );
 
 	SetDlgItemText( IDC_STATUS_EDIT, strStatus );
