@@ -20,11 +20,12 @@ public:
 	CString m_strIntegratedLinePattern1;	///< 統合カラムモード、1行目のパターン
 	CString m_strIntegratedLinePattern2;	///< 統合カラムモード、2行目のパターン
 
+	/// アイコンモード。値はピクセル数
 	enum ICON_MODE {
 		ICON_MODE_NONE = 0,		///< アイコンなし
-		ICON_MODE_16,			///< 16x16 アイコン
-		ICON_MODE_32,			///< 32x32 アイコン
-		ICON_MODE_48,			///< 48x48 アイコン
+		ICON_MODE_16 = 16,		///< 16x16 アイコン
+		ICON_MODE_32 = 32,		///< 32x32 アイコン
+		ICON_MODE_48 = 48,		///< 48x48 アイコン
 	};
 
 private:
@@ -61,6 +62,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	afx_msg LRESULT OnSetFont(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };
 
 

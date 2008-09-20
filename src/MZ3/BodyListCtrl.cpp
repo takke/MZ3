@@ -73,6 +73,7 @@ BEGIN_MESSAGE_MAP(CBodyListCtrl, CTouchListCtrl)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MEASUREITEM_REFLECT()
 	ON_MESSAGE(WM_SETFONT, OnSetFont)
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -367,17 +368,25 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			case ACCESS_TWITTER_USER:
 				// Twitter 項目
 				{
-					// 選択項目と同じオーナーIDの項目を強調表示する。
-					int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
-					CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-					if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
-						const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
-						if (selectedData.GetOwnerID()==data->GetOwnerID()) {
-							// 同じオーナーID：強調表示
-							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-						} else {
-							// 異なるオーナーID
-							clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					// 自分宛の発言を強調表示する
+					const CString& bodyText = data->GetBody();
+					CString atId = L"@";
+					atId += theApp.m_loginMng.GetTwitterId();
+					if (bodyText.Find(atId)!=-1) {
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+					} else {
+						// 選択項目と同じオーナーIDの項目を強調表示する。
+						int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
+						CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+						if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
+							const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
+							if (selectedData.GetOwnerID()==data->GetOwnerID()) {
+								// 同じオーナーID：強調表示
+								clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+							} else {
+								// 異なるオーナーID
+								clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+							}
 						}
 					}
 				}
@@ -850,4 +859,32 @@ LRESULT CBodyListCtrl::OnSetFont(WPARAM wParam, LPARAM lParam)
 	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
 
 	return res;
+}
+
+void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (!m_bPanDragging && !m_bScrollDragging) {
+		// Twitterでアイコン領域なら引用を追加
+		int idx = HitTest(point);
+		if (m_iconMode != ICON_MODE_NONE && point.x < m_iconMode) {
+			MZ3_TRACE(L"lbu [%d]\n", idx);
+
+			CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+			if (pCategory!=NULL && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+				CMixiData* data = &pCategory->m_body[ idx ];
+				if (data->GetAccessType()==ACCESS_TWITTER_USER) {
+
+					CString strStatus;
+					theApp.m_pMainView->GetDlgItemText( IDC_STATUS_EDIT, strStatus );
+					// すでに含まれていれば追加しない
+					if (strStatus.Find( util::FormatString(L"@%s", (LPCTSTR)data->GetName() ))==-1) {
+						strStatus.AppendFormat( L"@%s ", (LPCTSTR)data->GetName() );
+						theApp.m_pMainView->SetDlgItemText( IDC_STATUS_EDIT, strStatus );
+					}
+				}
+			}
+		}
+	}
+
+	CTouchListCtrl::OnLButtonUp(nFlags, point);
 }

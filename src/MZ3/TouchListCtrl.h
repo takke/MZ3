@@ -50,7 +50,7 @@ public:
 	};
 	void	StartPanScroll( PAN_SCROLL_DIRECTION direction );
 	BOOL	WaitForPanScroll( DWORD dwMilliseconds );
-private:
+protected:
 	int		m_offsetPixelY;			///< ピクセル単位スクロールのオフセットピクセル数
 
 	int		m_iItemHeight;			///< Item一行の高さ
