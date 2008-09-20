@@ -45,6 +45,7 @@ BOOL CChooseClientTypeDlg::OnInitDialog()
 	// 初期選択
 	CheckDlgButton( IDC_SERVICE_TYPE_MIXI_CHECK, BST_CHECKED );
 	CheckDlgButton( IDC_SERVICE_TYPE_TWITTER_CHECK, BST_CHECKED );
+	CheckDlgButton( IDC_SERVICE_TYPE_WASSR_CHECK, BST_UNCHECKED );
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
@@ -55,10 +56,12 @@ void CChooseClientTypeDlg::OnOK()
 	// 選択状態の取得
 	m_initType.bUseMixi    = (IsDlgButtonChecked( IDC_SERVICE_TYPE_MIXI_CHECK ) == BST_CHECKED);
 	m_initType.bUseTwitter = (IsDlgButtonChecked( IDC_SERVICE_TYPE_TWITTER_CHECK ) == BST_CHECKED);
+	m_initType.bUseWassr   = (IsDlgButtonChecked( IDC_SERVICE_TYPE_WASSR_CHECK ) == BST_CHECKED);
 
 	// 両方チェックされていなければエラー
 	if (m_initType.bUseMixi==false &&
-		m_initType.bUseTwitter==false)
+		m_initType.bUseTwitter==false &&
+		m_initType.bUseWassr==false)
 	{
 		MessageBox(L"選択してください");
 		return;
