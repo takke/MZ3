@@ -1322,39 +1322,33 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
 		for (int i=0; i<count; i++) {
-
 			// タブ切り替えが行われればキャンセル
 			if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
 				return;
 			}
 
 			const CMixiData& mixi = body[i];
-			// icon
-			CMZ3BackgroundImage image(L"");
 			CString miniImagePath = util::MakeImageLogfilePath( mixi );
 
-			// ロード済みか判定
-			bool bLoaded = theApp.m_imageCache.GetImageIndex(miniImagePath) >= 0 ? true : false;
-			if (bLoaded) {
+			if (theApp.m_imageCache.GetImageIndex(miniImagePath) >= 0) {
 				// ロード済みなのでロード不要
 				bUseExtendedIcon = true;
-				continue;
-			}
-
-			// 未ロードなのでロード
-			image.load( miniImagePath );
-			if (image.isEnableImage()) {
-				// リサイズして画像キャッシュに追加する。
-				theApp.AddImageToImageCache(this, image, miniImagePath);
-
-				bUseExtendedIcon = true;
 			} else {
-				// ロードエラー
-				// ダウンロードマネージャに登録する
-				if (mixi.GetImageCount()>0 && !miniImagePath.IsEmpty()) {
-					CString url = mixi.GetImage(0);
-					DownloadItem item( url, L"絵文字", miniImagePath, true );
-					theApp.m_pDownloadView->AppendDownloadItem( item );
+				// 未ロードなのでロード
+				CMZ3BackgroundImage image(L"");
+				image.load( miniImagePath );
+				if (image.isEnableImage()) {
+					// リサイズして画像キャッシュに追加する。
+					theApp.AddImageToImageCache(this, image, miniImagePath);
+
+					bUseExtendedIcon = true;
+				} else {
+					// ロードエラー => ダウンロードマネージャに登録する
+					if (mixi.GetImageCount()>0 && !miniImagePath.IsEmpty()) {
+						CString url = mixi.GetImage(0);
+						DownloadItem item( url, L"絵文字", miniImagePath, true );
+						theApp.m_pDownloadView->AppendDownloadItem( item );
+					}
 				}
 			}
 		}
@@ -1654,10 +1648,10 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		// バックバッファ経由で再描画
 		m_bodyList.DrawDetail();
 		m_bodyList.UpdateWindow();
+	} else {
+		// アイコン再描画
+		InvalidateRect( m_rectIcon, FALSE );
 	}
-
-	// アイコン再描画
-	InvalidateRect( m_rectIcon, FALSE );
 
 	*pResult = 0;
 }
