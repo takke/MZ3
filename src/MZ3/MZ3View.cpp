@@ -1541,7 +1541,10 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 	m_bodyList.SetRedraw(TRUE);
 	m_bodyList.m_bStopDraw = false;
-	m_bodyList.Invalidate( FALSE );
+
+	// バックバッファ経由で再描画
+	m_bodyList.DrawDetail();
+	m_bodyList.UpdateWindow();
 
 	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
@@ -1657,40 +1660,11 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	// 画像位置変更
 	MoveMiniImageDlg();
 
-	// Twitter であれば同一オーナーIDの項目を再表示
+	// Twitter であれば再表示(同一IDや引用者の色変更を伴うため)
 	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
 		// バックバッファ経由で再描画
 		m_bodyList.DrawDetail();
 		m_bodyList.UpdateWindow();
-
-		/*
-		static int s_lastSelectedBody = 0;
-
-		// 現在選択中の項目のオーナーID、前回選択中だった項目のオーナーIDと同一のオーナーIDを持つ項目のみ、再描画する。
-		if (0 <= pCategory->selectedBody && pCategory->selectedBody < (int)pCategory->m_body.size() &&
-			0 <= s_lastSelectedBody && s_lastSelectedBody < (int)pCategory->m_body.size()) 
-		{
-			int selectedOwnerID = pCategory->m_body[ pCategory->selectedBody ].GetOwnerID();
-			int lastOwnerID     = pCategory->m_body[ s_lastSelectedBody ].GetOwnerID();
-
-			for (size_t i=0; i<pCategory->m_body.size(); i++) {
-				int ownerID = pCategory->m_body[ i ].GetOwnerID();
-				if (ownerID == selectedOwnerID ||
-					ownerID == lastOwnerID)
-				{
-					CRect rectItem;
-					m_bodyList.GetItemRect(i, &rectItem, LVIR_BOUNDS);
-					m_bodyList.InvalidateRect(rectItem, FALSE);
-//					wprintf( L"RedrawItems : %d\n", i );
-				}
-			}
-		} else {
-			// 全件再描画する。
-			m_bodyList.Invalidate(FALSE);
-		}
-
-		s_lastSelectedBody = pCategory->selectedBody;
-		*/
 	}
 
 	// アイコン再描画
@@ -2645,7 +2619,10 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 
 				// 再描画
 				if (theApp.m_optionMng.IsUseBgImage()) {
-					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+					// 再描画
+					int topIdx = m_bodyList.GetTopIndex();
+					m_bodyList.RedrawItems(topIdx, topIdx + m_bodyList.GetCountPerPage());
+//					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 					m_bodyList.UpdateWindow();
 					MoveMiniImageDlg();
 				}
@@ -2692,7 +2669,10 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 
 				// 再描画
 				if (theApp.m_optionMng.IsUseBgImage()) {
-					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
+					// 再描画
+					int topIdx = m_bodyList.GetTopIndex();
+					m_bodyList.RedrawItems(topIdx, topIdx + m_bodyList.GetCountPerPage());
+//					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 					m_bodyList.UpdateWindow();
 					MoveMiniImageDlg();
 				}
@@ -5658,7 +5638,9 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	// ボディリストは消去しておく。
 	m_bodyList.DeleteAllItems();
 	m_bodyList.SetRedraw(TRUE);
-	m_bodyList.Invalidate( FALSE );
+	// バックバッファ経由で再描画
+	m_bodyList.DrawDetail();
+	m_bodyList.UpdateWindow();
 
 	return true;
 }

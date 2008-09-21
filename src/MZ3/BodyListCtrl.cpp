@@ -856,7 +856,8 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	LOGFONT lf;
 	GetFont()->GetLogFont( &lf );
 
-//	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d", lf.lfHeight));
+//	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d, itemID : %d", 
+//		(int)lf.lfHeight, (int)lpMeasureItemStruct->itemID));
 
 	// px’l‚É•ÏŠ·
 	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);

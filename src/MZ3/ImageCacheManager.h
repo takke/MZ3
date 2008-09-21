@@ -6,6 +6,8 @@
  */
 #pragma once
 
+#include <set>
+
 /**
  * 画像キャッシュ
  */
@@ -19,6 +21,10 @@ class ImageCacheManager
 	CStringArray	m_imageListMap;		///< m_imageList の各インデックスに
 										///< どのファイルが格納されているかを示す疑似マップ
 
+	typedef std::map<std::wstring, int> wstring_to_index_map;
+	wstring_to_index_map m_loadedFileToIndexMap;	///< ロード済みファイルから
+													///< m_imageList のインデックスを引くマップ
+
 public:
 	bool Create()
 	{
@@ -26,6 +32,7 @@ public:
 		m_imageList32.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 4);
 		m_imageList48.Create(48, 48, ILC_COLOR24 | ILC_MASK, 0, 4);
 		m_imageListMap.RemoveAll();
+		m_loadedFileToIndexMap.clear();
 
 		return true;
 	}
@@ -57,14 +64,21 @@ public:
 	 * 未ロードであれば -1 を返す。
 	 */
 	int GetImageIndex( LPCTSTR path ) {
-		const int n = m_imageListMap.GetCount();
+
+		wstring_to_index_map::iterator it = m_loadedFileToIndexMap.find(path);
+		if (it==m_loadedFileToIndexMap.end()) {
+			return -1;
+		}
+		return it->second;
+
+/*		const int n = m_imageListMap.GetCount();
 		for (int i=0; i<n; i++) {
 			if (m_imageListMap[i] == path) {
 				return i;
 			}
 		}
 		return -1;
-	}
+*/	}
 
 	/**
 	 * 画像を追加し、追加したインデックスを返す。
@@ -79,15 +93,19 @@ public:
 		m_imageList48.Add( pbmImage48, pbmMask );
 		m_imageListMap.Add( path );
 
+		int idx = m_imageList16.GetImageCount() -1;
+
+		m_loadedFileToIndexMap.insert( std::pair<std::wstring, int>(path, idx) );
+
 		// 追加したインデックスを返す
-		return m_imageList16.GetImageCount() -1;
+		return idx;
 	}
 
 	/**
 	 * インデックスがどのパスを示すか返す。
 	 * 範囲外の場合は-1を返す。
 	 */
-	CString GetImagePath(int index){
+	CString GetImagePath(int index) {
 		CString iconFullPath = TEXT("");
 		if( index < 0 || m_imageListMap.GetSize() < index ){
 			return(iconFullPath);
