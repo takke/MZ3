@@ -1344,19 +1344,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			// 未ロードなのでロード
 			image.load( miniImagePath );
 			if (image.isEnableImage()) {
-				// 16x16, 32x32, 48x48 にリサイズする。
-				CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
-				util::MakeResizedImage( this, image16, image, 16, 16 );
-				util::MakeResizedImage( this, image32, image, 32, 32 );
-				util::MakeResizedImage( this, image48, image, 48, 48 );
-
-				// ビットマップの追加
-				CBitmap bm16, bm32, bm48;
-				bm16.Attach( image16.getHandle() );
-				bm32.Attach( image32.getHandle() );
-				bm48.Attach( image48.getHandle() );
-
-				theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, miniImagePath );
+				// リサイズして画像キャッシュに追加する。
+				theApp.AddImageToImageCache(this, image, miniImagePath);
 
 				bUseExtendedIcon = true;
 			} else {

@@ -98,18 +98,8 @@ public:
 							break;
 						}
 
-						// 16x16, 32x32, 48x48 にリサイズする。
-						CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
-						util::MakeResizedImage( pWnd, image16, image, 16, 16 );
-						util::MakeResizedImage( pWnd, image32, image, 32, 32 );
-						util::MakeResizedImage( pWnd, image48, image, 48, 48 );
-
-						// ビットマップの追加
-						CBitmap bm16, bm32, bm48;
-						bm16.Attach( image16.getHandle() );
-						bm32.Attach( image32.getHandle() );
-						bm48.Attach( image48.getHandle() );
-						imageIndex = theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, path );
+						// リサイズして画像キャッシュに追加する。
+						imageIndex = theApp.AddImageToImageCache(pWnd, image, path);
 					}
 					bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );
 					break;
@@ -315,18 +305,8 @@ public:
 								break;
 							}
 
-							// 16x16, 32x32, 48x48 にリサイズする。
-							CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
-							util::MakeResizedImage( pWnd, image16, image, 16, 16 );
-							util::MakeResizedImage( pWnd, image32, image, 32, 32 );
-							util::MakeResizedImage( pWnd, image48, image, 48, 48 );
-
-							// ビットマップの追加
-							CBitmap bm16, bm32, bm48;
-							bm16.Attach( image16.getHandle() );
-							bm32.Attach( image32.getHandle() );
-							bm48.Attach( image48.getHandle() );
-							imageIndex = theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, path );
+							// リサイズして画像キャッシュに追加する。
+							imageIndex = theApp.AddImageToImageCache(pWnd, image, path);
 						}
 						bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );
 						break;

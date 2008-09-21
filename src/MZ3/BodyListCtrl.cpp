@@ -376,46 +376,40 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					if (bodyText.Find(util::FormatString(L"@%s", theApp.m_loginMng.GetTwitterId()))!=-1) {
 						// 強調２
 						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
-						break;
-					}
+					} else {
+						int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
+						if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
+							const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
 
-					int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
-					CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-					if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
-						const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
+							// 選択項目と同じオーナーIDの項目を強調表示する。
+							if (selectedData.GetOwnerID()==data->GetOwnerID()) {
+								// 同じオーナーID：強調表示
+								clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+							} else {
+								// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
+								CString target = selectedData.GetBody();
+								if (target.Find(L"@")!=-1) {
+									// 正規表現のコンパイル（一回のみ）
+									static MyRegex reg;
+									util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
 
-						// 選択項目と同じオーナーIDの項目を強調表示する。
-						if (selectedData.GetOwnerID()==data->GetOwnerID()) {
-							// 同じオーナーID：強調表示
-							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-							break;
-						}
+									for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
+										std::vector<MyRegex::Result>* pResults = NULL;
+										if (reg.exec(target) == false || reg.results.size() != 2) {
+											// 未発見
+											break;
+										}
 
-						// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
-						CString target = selectedData.GetBody();
-						if (target.Find(L"@")!=-1) {
-							// 正規表現のコンパイル（一回のみ）
-							static MyRegex reg;
-							if( !util::CompileRegex( reg, L"@([0-9a-zA-Z_]+)" ) ) {
-								return;
-							}
+										// 一致すれば強調表示
+										if (data->GetName()==reg.results[1].str.c_str()) {
+											clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
+											break;
+										}
 
-							for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-								std::vector<MyRegex::Result>* pResults = NULL;
-								if( reg.exec(target) == false || reg.results.size() != 2 ) {
-									// 未発見
-									break;
+										// ターゲットを更新。
+										target.Delete(0, reg.results[0].end);
+									}
 								}
-
-								// 一致すれば強調表示
-//								MZ3_TRACE(L"★抽出ユーザ：[%s]\n", reg.results[1].str.c_str());
-								if (data->GetName()==reg.results[1].str.c_str()) {
-									clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
-									break;
-								}
-
-								// ターゲットを更新。
-								target = target.Mid( reg.results[0].end );
 							}
 						}
 					}

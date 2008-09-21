@@ -204,6 +204,7 @@ public:
 	bool IsMixiLogout( ACCESS_TYPE aType );
 	bool DeleteOldCacheFiles(void);
 	int pt2px(int pt);
+	int AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& srcImage, const CString& strImagePath);
 };
 
 extern CMZ3App theApp;

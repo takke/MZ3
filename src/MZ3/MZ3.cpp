@@ -18,6 +18,7 @@
 #include "DownloadView.h"
 #include "AboutDlg.h"
 #include "util.h"
+#include "util_gui.h"
 #include "DebugDlg.h"
 #include "url_encoder.h"
 #include "mz3_revision.h"
@@ -26,8 +27,13 @@
 #include "MZ3FileCacheManager.h"
 #include "ChooseClientTypeDlg.h"
 
-//#include "MixiParser.h"
-//#include <comutil.h>
+/* lua support exp.
+extern "C" {
+#include "lua/src/lua.h"
+#include "lua/src/lualib.h"
+#include "lua/src/lauxlib.h"
+}
+*/
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,6 +46,19 @@ BEGIN_MESSAGE_MAP(CMZ3App, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CMZ3App::OnAppAbout)
 END_MESSAGE_MAP()
 
+/* lua support exp.
+// the Lua object
+lua_State* g_luaState = NULL;
+
+int lua_mz3_trace(lua_State *lua)
+{
+	CString s( lua_tostring(lua, -1) );
+
+	MZ3_TRACE(s);
+
+	return 0;
+}
+*/
 
 #define SZ_REG_ROOT		TEXT("System\\GWE\\Display")
 #define SZ_REG_DBVOL	TEXT("LogicalPixelsY")
@@ -138,6 +157,15 @@ BOOL CMZ3App::InitInstance()
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 起動開始 " + util::GetSourceRevision() );
 	MZ3_TRACE(L" sizeof MZ3Data : %d bytes\n", sizeof(MZ3Data));
 
+/* lua support exp.
+	// Lua の初期化
+	g_luaState = lua_open();
+
+	lua_register(g_luaState, "mz3_trace", lua_mz3_trace);
+	luaL_dostring(g_luaState, "mz3_trace('xxx\\n');");
+
+	lua_close(g_luaState);
+*/
 	// オプション読み込み
 	m_optionMng.Load();
 
@@ -1033,4 +1061,24 @@ bool CMZ3App::DeleteOldCacheFiles(void)
 int CMZ3App::pt2px(int pt)
 {
 	return ::MulDiv(pt, m_dpi, 72);
+}
+
+/**
+ * image をリサイズし、画像キャッシュに追加する。
+ */
+int CMZ3App::AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& image, const CString& strImagePath)
+{
+	// 16x16, 32x32, 48x48 にリサイズする。
+	CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
+	util::MakeResizedImage( pWnd, image16, image, 16, 16 );
+	util::MakeResizedImage( pWnd, image32, image, 32, 32 );
+	util::MakeResizedImage( pWnd, image48, image, 48, 48 );
+
+	// ビットマップの追加
+	CBitmap bm16, bm32, bm48;
+	bm16.Attach( image16.getHandle() );
+	bm32.Attach( image32.getHandle() );
+	bm48.Attach( image48.getHandle() );
+
+	return theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, strImagePath );
 }

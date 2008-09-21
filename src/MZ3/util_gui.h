@@ -59,32 +59,22 @@ inline bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, in
 	HDC hdc1 = CreateCompatibleDC(NULL);
 	HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdc1,hBitmap);
 
-	int iSrcWidth = bmp.bmWidth ;
-	int iSrcHeight = bmp.bmHeight ;
+	int iSrcWidth  = bmp.bmWidth;
+	int iSrcHeight = bmp.bmHeight;
 
 	int iSrcTop = srcy % iSrcHeight;
 	int iTop = y;
 	do {
 		int iLeft = x;
 		do {
-	// “]‘—
-//	TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
-//#ifdef WINCE
-	int wid = min( w, iSrcWidth );
-	int hei = min( h, iSrcHeight - iSrcTop );
-	BitBlt( hdc, iLeft, iTop, wid, hei , hdc1, srcx, iSrcTop, SRCCOPY );
-	if( hei < h ){
-		BitBlt( hdc, iLeft, iTop + hei , wid, h - hei , hdc1, srcx, 0, SRCCOPY );
-	}
-/*#else
-	BLENDFUNCTION bf;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.BlendFlags = 0;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.SourceConstantAlpha = 0;
-	::AlphaBlend( hdc, iLeft, iTop, iSrcWidth, iSrcHeight, hdc1, srcx, srcy, w, h, bf );
-#endif
-*/
+			// “]‘—
+//			TRACE( L"DrawBitmap [%d,%d,%d,%d,%d,%d]\n", x, y, w, h, tox, toy );
+			int wid = min( w, iSrcWidth );
+			int hei = min( h, iSrcHeight - iSrcTop );
+			BitBlt( hdc, iLeft, iTop, wid, hei , hdc1, srcx, iSrcTop, SRCCOPY );
+			if( hei < h ){
+				BitBlt( hdc, iLeft, iTop + hei , wid, h - hei , hdc1, srcx, 0, SRCCOPY );
+			}
 			iLeft += iSrcWidth;
 		} while( iLeft < x + w );
 		iTop += iSrcHeight;
