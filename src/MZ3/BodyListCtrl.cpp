@@ -585,24 +585,22 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 現在の要素 (nItem) の上側に線を引く
 	// 判定処理
 	bool bDrawDayBreakBar = false;
-	if (nItem>=1) { // 2番目以降の要素であること。
-		if (theApp.m_pMainView != NULL &&
-			theApp.m_pMainView->m_selGroup != NULL &&
-			theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL) 
-		{
-			CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-			CMixiDataList& list = pCategory->GetBodyList();
-			if (list.size()>(size_t)nItem) {
-				// 日付取得
-				CTime t0 = list[nItem-1].GetDateRaw();
-				CTime t1 = list[nItem  ].GetDateRaw();
-				if (t0.GetYear()  != t1.GetYear() ||
-					t0.GetMonth() != t1.GetMonth() ||
-					t0.GetDay()   != t1.GetDay())
-				{
-					// 日付が異なる
-					bDrawDayBreakBar = true;
-				}
+	if (theApp.m_pMainView != NULL &&
+		theApp.m_pMainView->m_selGroup != NULL &&
+		theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL) 
+	{
+		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+		CMixiDataList& list = pCategory->GetBodyList();
+		if (list.size()>(size_t)nItem && (size_t)nItem<list.size()-1) {	// 最終要素でないこと
+			// 日付取得
+			CTime t0 = list[nItem  ].GetDateRaw();
+			CTime t1 = list[nItem+1].GetDateRaw();
+			if (t0.GetYear()  != t1.GetYear() ||
+				t0.GetMonth() != t1.GetMonth() ||
+				t0.GetDay()   != t1.GetDay())
+			{
+				// 日付が異なる
+				bDrawDayBreakBar = true;
 			}
 		}
 	}
@@ -613,8 +611,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		CPen* pOldPen = pDC->SelectObject(&penDayBreakBar);
 
-		pDC->MoveTo(rcAllLabels.left,  rcAllLabels.top-1);
-		pDC->LineTo(rcAllLabels.right, rcAllLabels.top-1);
+		pDC->MoveTo(rcAllLabels.left,  rcAllLabels.bottom-1);
+		pDC->LineTo(rcAllLabels.right, rcAllLabels.bottom-1);
 
 		pDC->SelectObject(pOldPen);
 //		wprintf( L"draw line (%d,%d) to (%d,%d)\n", 

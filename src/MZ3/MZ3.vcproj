@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.01"
+				AdditionalOptions=" /subsystem:windowsce,5.01&#x0D;&#x0A;comsuppwd.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				EntryPointSymbol="WinMainCRTStartup"
@@ -827,7 +827,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.01&#x0D;&#x0A;comsuppwd.lib "
+				AdditionalOptions=" /subsystem:windowsce,5.01&#x0D;&#x0A;comsuppw.lib "
 				LinkIncremental="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

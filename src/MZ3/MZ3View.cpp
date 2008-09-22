@@ -1645,13 +1645,75 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// Twitter であれば再表示(同一IDや引用者の色変更を伴うため)
 	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
-		// バックバッファ経由で再描画
-		m_bodyList.DrawDetail();
-		m_bodyList.UpdateWindow();
-	} else {
-		// アイコン再描画
-		InvalidateRect( m_rectIcon, FALSE );
-	}
+		static int s_lastSelected = 0;
+		int selected = pCategory->selectedBody;
+
+		if (!m_bodyList.m_bStopDraw) {
+			std::set<int> redrawItems;
+
+			// selected, s_lastSelected は再描画
+			if (selected < m_bodyList.GetItemCount()) {
+				redrawItems.insert( selected );
+			}
+			if (s_lastSelected < m_bodyList.GetItemCount()) {
+				redrawItems.insert( s_lastSelected );
+			}
+
+			const CMixiData& sel_data      = pCategory->m_body[selected];
+			const CMixiData& last_sel_data = pCategory->m_body[s_lastSelected];
+
+			// selected, s_lastSelected と同一IDの項目は再描画
+			int idxStart = m_bodyList.GetTopIndex();
+			int idxEnd   = idxStart + m_bodyList.GetCountPerPage();
+			for (int idx=idxStart; idx<=idxEnd; idx++) {
+				if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+					int id = pCategory->m_body[idx].GetOwnerID();
+					if (id == sel_data.GetOwnerID()) {
+						redrawItems.insert(idx);
+					} else if (selected!=s_lastSelected && id == last_sel_data.GetOwnerID()) {
+						redrawItems.insert(idx);
+					}
+				}
+			}
+
+			// selected, s_lastSelected の言及ユーザは再描画
+			static MyRegex reg;
+			util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
+			for (int i=0; i<2; i++) {
+				CString target = (i==0) ? sel_data.GetBody() : last_sel_data.GetBody();
+				if (target.Find(L"@")!=-1) {
+					for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
+						std::vector<MyRegex::Result>* pResults = NULL;
+						if (reg.exec(target) == false || reg.results.size() != 2) {
+							break;
+						}
+
+						// 一致すれば強調表示
+						for (int idx=idxStart; idx<=idxEnd; idx++) {
+							if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+								if (pCategory->m_body[idx].GetName()==reg.results[1].str.c_str()) {
+									redrawItems.insert(idx);
+								}
+							}
+						}
+
+						// ターゲットを更新。
+						target.Delete(0, reg.results[0].end);
+					}
+				}
+			}
+
+			for (std::set<int>::iterator it=redrawItems.begin(); it!=redrawItems.end(); it++) {
+				int idx = (*it);
+				m_bodyList.DrawToScreen(idx);
+			}
+		}
+
+		s_lastSelected = selected;
+	} 
+
+	// アイコン再描画
+	InvalidateRect( m_rectIcon, FALSE );
 
 	*pResult = 0;
 }

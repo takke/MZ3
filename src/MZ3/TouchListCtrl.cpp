@@ -456,6 +456,7 @@ void CTouchListCtrl::OnDestroy()
 
 /**
  * DrawToScreen() 描画
+ *
  *  裏画面バッファから画面物理デバイスへ転送
  */
 void CTouchListCtrl::DrawToScreen(CDC* pDC)
@@ -471,6 +472,89 @@ void CTouchListCtrl::DrawToScreen(CDC* pDC)
 		m_memDC,
 		0				, m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY,
 		SRCCOPY );
+}
+
+/**
+ * DrawToScreen() 描画
+ *
+ *  裏画面バッファから画面物理デバイスへ転送
+ */
+void CTouchListCtrl::DrawToScreen(CDC* pDC, const CRect& rectDest)
+{
+//	MZ3_TRACE( L"DrawToScreen(0x%X, %d, %d, %d, %d)\n", pDC!=NULL ? pDC->m_hDC : 0, 
+//		rectDest.left, rectDest.top, rectDest.right, rectDest.bottom);
+	if( m_memDC == NULL ){
+		return;
+	}
+	// 変更後画面をm_offsetPixelY分ずらして表示する
+	int x = rectDest.left;
+	int y = rectDest.top;
+	int w = min(rectDest.Width(), m_screenWidth-x);
+	int h = min(rectDest.Height(), m_screenHeight-y);
+	pDC->BitBlt( 
+		x, y+m_viewRect.top,
+		w, h, 
+		m_memDC,
+		x, y+m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY,
+		SRCCOPY );
+}
+
+/**
+ * DrawToScreen() 描画
+ *
+ *  裏画面バッファから画面物理デバイスへ転送
+ */
+void CTouchListCtrl::DrawToScreen(int nItem)
+{
+//	MZ3_TRACE( L"DrawToScreen(%d)\n", nItem);
+	if( m_memDC == NULL ){
+		return;
+	}
+
+	CRect rectItem;
+	GetItemRect(nItem , &rectItem , LVIR_BOUNDS);
+
+	// 背景を塗りつぶす
+	BITMAP bmp;
+	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
+
+	HBITMAP hBgBitmap = GetBgBitmapHandle();
+	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
+		// 背景画像なしの場合
+		m_memDC->FillSolidRect( rectItem.left, rectItem.top, rectItem.right, rectItem.bottom, RGB(255,255,255) );
+	}else{
+		// 背景ビットマップの描画
+		CRect r = rectItem;
+		r.OffsetRect( 0 , m_drawStartTopOffset-m_offsetPixelY );
+		int x = r.left;
+		int y = r.top;
+		int w = r.Width();
+		int h = r.Height() + m_iItemHeight * 2;
+		int offset = 0;
+		if( IsScrollWithBk() ){
+			offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
+		}
+		util::DrawBitmap( m_memDC->GetSafeHdc(), hBgBitmap, x, y, w, h, x, rectItem.top + offset );
+	}
+
+	// 透過モードに設定
+	m_memDC->SetBkMode(TRANSPARENT);
+
+	// フォントを現在のフォントに置き換え
+	CFont* oldFont = (CFont*)m_memDC->SelectObject( GetFont() );
+
+	// バックバッファに描画
+	DrawItemToBackSurface(nItem);
+
+	// フォントを元に戻す
+	m_memDC->SelectObject( oldFont );
+
+	// 強制的に描画する
+	CDC* pDC = GetDC();
+	DrawToScreen(pDC, rectItem);
+	ReleaseDC(pDC);
+
+	ValidateRect( &rectItem );
 }
 
 /**
@@ -604,30 +688,8 @@ int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 			break;
 		}
 
-		// DRAWITEMSTRUCTをでっちあげて派生クラスのDrawItem()をだます
-		DRAWITEMSTRUCT dis;
-		CRect rctItem;
-		GetItemRect( nItem , &rctItem , LVIR_BOUNDS );
-		// 描画領域はバッファ先頭からオフセットした位置にある
-		rctItem.OffsetRect( 0 , m_drawStartTopOffset );
-
-		dis.CtlType		= ODT_LISTVIEW;
-		dis.CtlID		= 0;
-		dis.itemAction	= ODA_DRAWENTIRE;
-		dis.hwndItem	= m_hWnd;
-		dis.hDC			= m_memDC->GetSafeHdc();
-		dis.rcItem		= rctItem;
-		dis.itemID		= nItem;
-		dis.itemData	= GetItemData( nItem );
-
-		// 背景は描画済みなので描画しない
-		// （DrawItem()で背景描画されると、ズレが生じるので）
-		SetDrawBk( false );
-
-		// 本物のアイテム描画を使用することで実際の画面と描画内容を一致させる
-		DrawItem( &dis );
-
-		SetDrawBk( true );
+		// バックバッファにアイテムを描画する
+		DrawItemToBackSurface(nItem);
 	}
 
 	// フォントを元に戻す
@@ -1302,4 +1364,36 @@ BOOL CTouchListCtrl::WaitForPanScroll( DWORD dwMilliseconds )
 		}
 	}
 	return bRtn;
+}
+
+void CTouchListCtrl::DrawItemToBackSurface(int nItem)
+{
+	// 背景は描画済みなので描画しない
+	// （DrawItem()で背景描画されると、ズレが生じるので）
+	SetDrawBk( false );
+
+	// DRAWITEMSTRUCTをでっちあげて派生クラスのDrawItem()をだます
+	DRAWITEMSTRUCT dis;
+	CRect rctItem;
+	GetItemRect( nItem , &rctItem , LVIR_BOUNDS );
+
+//	MZ3_TRACE(L" DrawItemToBackSurface, %d, %d, %d, %d, %d\n",
+//		rctItem.left, rctItem.top, rctItem.right, rctItem.bottom, m_drawStartTopOffset);
+
+	// 描画領域はバッファ先頭からオフセットした位置にある
+	rctItem.OffsetRect( 0 , m_drawStartTopOffset );
+
+	dis.CtlType		= ODT_LISTVIEW;
+	dis.CtlID		= 0;
+	dis.itemAction	= ODA_DRAWENTIRE;
+	dis.hwndItem	= m_hWnd;
+	dis.hDC			= m_memDC->GetSafeHdc();
+	dis.rcItem		= rctItem;
+	dis.itemID		= nItem;
+	dis.itemData	= GetItemData( nItem );
+
+	// 本物のアイテム描画を使用することで実際の画面と描画内容を一致させる
+	DrawItem( &dis );
+
+	SetDrawBk( true );
 }

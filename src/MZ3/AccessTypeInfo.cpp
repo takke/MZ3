@@ -896,7 +896,7 @@ bool AccessTypeInfo::init()
 	// TODO 必須項目のテスト
 
 	// Debug モードのとき CSV ダンプする
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(WINCE)
 	CString tsv_dump_filepath;
 	{
 		TCHAR path[256];
@@ -909,7 +909,6 @@ bool AccessTypeInfo::init()
 
 	FILE* fp_tsv = _wfopen(tsv_dump_filepath, L"wt");
 	if (fp_tsv!=NULL) {
-		setlocale(LC_ALL, "Japanese");
 		fwprintf(fp_tsv, L"ACCESS_TYPE,infoType,serviceType,shortText,requestType,requestEncoding,cacheFilePattern,"
 						 L"serializeKey,bCruiseTarget,defaultCategoryURL,bodyHeaderCol1,,bodyHeaderCol2,,bodyHeaderCol3,,"
 						 L"bodyIntegratedLinePattern1,bodyIntegratedLinePattern2\n");

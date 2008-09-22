@@ -113,11 +113,13 @@ public:
 	void	SetCanPanScroll( const bool bCanPanScroll ) {
 		m_bCanPanScroll = bCanPanScroll;
 	}
+	void	DrawToScreen(int nItem);
 private:
 	bool	ScrollByMoveY( const int dy);
 	bool	MyAdjustDrawOffset();
 	bool	MyMakeBackBuffers(CDC* pdc);
 	void	DrawToScreen(CDC* pDC);
+	void	DrawToScreen(CDC* pDC, const CRect& rectDest);
 	void	PanDrawToScreen(CDC* pDC);
 	void	DrawItemFocusRect( const int );
 
@@ -176,4 +178,5 @@ public:
 	afx_msg void OnLvnInsertitem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	void DrawItemToBackSurface(int nItem);
 };
