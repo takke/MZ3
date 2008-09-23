@@ -235,7 +235,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 
 	// direct-messages ‚É‘Î‚·‚éˆ—
 	try {
-		const xml2stl::Node& direct_messages = root.getNode( L"direct-messages" );
+		const xml2stl::Node& direct_messages = root.getNode( L"directmessages" );
 		size_t nChildren = direct_messages.getChildrenCount();
 		for (size_t i=0; i<nChildren; i++) {
 			const xml2stl::Node& node = direct_messages.getNodeByIndex(i);
