@@ -88,7 +88,7 @@ void CAboutDlg::SetTotalBytes(void)
 	if( (item=GetDlgItem( IDC_TOTAL_BYTES_STATIC )) != NULL ) {
 		CString msg;
 		msg.Format( L"Total Received : %s bytes", 
-			util::int2comma_str( theApp.m_optionMng.GetTotalRecvBytes() ) );
+			(LPCTSTR)util::int2comma_str( theApp.m_optionMng.GetTotalRecvBytes() ) );
 		item->SetWindowTextW( msg );
 	}
 }
