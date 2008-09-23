@@ -486,56 +486,74 @@ void CTouchListCtrl::DrawToScreen(CDC* pDC, const CRect& rectDest)
 	if( m_memDC == NULL ){
 		return;
 	}
+	// 先頭アイテムの矩形取得
+	// →1行表示モード時の「カラム」部分(y=18など)を除くため。2行表示モードの場合は y=0。
+	CRect rectItem0;
+	GetItemRect(GetTopIndex(), &rectItem0, LVIR_BOUNDS);
+	int hHeaderColumn = rectItem0.top;
+
 	// 変更後画面をm_offsetPixelY分ずらして表示する
 	int x = rectDest.left;
-	int y = rectDest.top;
-	int w = min(rectDest.Width(), m_screenWidth-x);
-	int h = min(rectDest.Height(), m_screenHeight-y);
-	pDC->BitBlt( 
-		x, y+m_viewRect.top,
-		w, h, 
-		m_memDC,
-		x, y+m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY,
-		SRCCOPY );
+	int y = rectDest.top +m_viewRect.top -hHeaderColumn;
+	int w = rectDest.Width();
+	int h = rectDest.Height();
+	// y が描画範囲外なら描画しない。
+	if (y>=rectItem0.top) {
+		pDC->BitBlt( 
+			x, y,
+			w, h, 
+			m_memDC,
+			x, y +m_drawStartTopOffset -m_offsetPixelY,
+			SRCCOPY );
+	}
 }
 
 /**
- * DrawToScreen() 描画
+ * DrawItemWithBackSurface() 描画
  *
  *  裏画面バッファから画面物理デバイスへ転送
  */
-void CTouchListCtrl::DrawToScreen(int nItem)
+void CTouchListCtrl::DrawItemWithBackSurface(int nItem)
 {
 //	MZ3_TRACE( L"DrawToScreen(%d)\n", nItem);
 	if( m_memDC == NULL ){
 		return;
 	}
 
+	// アイテムの矩形取得
 	CRect rectItem;
-	GetItemRect(nItem , &rectItem , LVIR_BOUNDS);
+	GetItemRect(nItem, &rectItem, LVIR_BOUNDS);
 
 	// 背景を塗りつぶす
 	BITMAP bmp;
 	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
 
 	HBITMAP hBgBitmap = GetBgBitmapHandle();
+	CRect r = rectItem;
+	r.OffsetRect( 0, m_drawStartTopOffset-m_offsetPixelY );
+	int x = r.left;
+	int y = r.top;
+	int w = r.Width();
+	int h = r.Height();
+//	int h = r.Height() + m_iItemHeight*2;
+	MZ3_TRACE( L"DrawToScreen(%d), [%d, %d, %d, %d], [%d,%d,%d,%d], %d, %d\n", 
+		nItem, 
+		rectItem.left, rectItem.top, rectItem.Width(), rectItem.Height(),
+		x, y, w, h, m_drawStartTopOffset, m_offsetPixelY);
 	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
 		// 背景画像なしの場合
-		m_memDC->FillSolidRect( rectItem.left, rectItem.top, rectItem.right, rectItem.bottom, RGB(255,255,255) );
+		m_memDC->FillSolidRect(x, y, x+w, y+h, RGB(255,255,255));
 	}else{
 		// 背景ビットマップの描画
-		CRect r = rectItem;
-		r.OffsetRect( 0 , m_drawStartTopOffset-m_offsetPixelY );
-		int x = r.left;
-		int y = r.top;
-		int w = r.Width();
-		int h = r.Height() + m_iItemHeight * 2;
 		int offset = 0;
 		if( IsScrollWithBk() ){
 			offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
 		}
 		util::DrawBitmap( m_memDC->GetSafeHdc(), hBgBitmap, x, y, w, h, x, rectItem.top + offset );
 	}
+
+	// デバッグ用矩形
+//	m_memDC->Rectangle(x, y, x+w, y+h);
 
 	// 透過モードに設定
 	m_memDC->SetBkMode(TRANSPARENT);
@@ -552,6 +570,7 @@ void CTouchListCtrl::DrawToScreen(int nItem)
 	// 強制的に描画する
 	CDC* pDC = GetDC();
 	DrawToScreen(pDC, rectItem);
+//	DrawToScreen(pDC);
 	ReleaseDC(pDC);
 
 	ValidateRect( &rectItem );

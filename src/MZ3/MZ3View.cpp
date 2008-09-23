@@ -1705,7 +1705,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 			for (std::set<int>::iterator it=redrawItems.begin(); it!=redrawItems.end(); it++) {
 				int idx = (*it);
-				m_bodyList.DrawToScreen(idx);
+				m_bodyList.DrawItemWithBackSurface(idx);
 			}
 		}
 
@@ -1807,6 +1807,13 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 		if( OnKeyupBodyList( pMsg->wParam ) ) {
 			return TRUE;
 		}
+	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
+		switch (pMsg->wParam) {
+		case VK_UP:
+			// ボディリストに移動
+			CommandSetFocusBodyList();
+			return TRUE;
+		}
 	}
 
 	return FALSE;
@@ -1837,10 +1844,7 @@ BOOL CMZ3View::OnKeyDown(MSG* pMsg)
 	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
 		switch (pMsg->wParam) {
 		case VK_UP:
-			// ボディリストに移動
-			CommandSetFocusBodyList();
 			return TRUE;
-//			break;
 
 		case 'V':
 			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
@@ -2338,12 +2342,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				
 				return CommandSetFocusCategoryList();
 			}else{
-#ifdef WINCE
-				// デフォルト動作
-				return FALSE;
-#else
 				return CommandMoveUpBodyList();
-#endif
 			}
 			break;
 
@@ -2358,12 +2357,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				}
 				return TRUE;
 			}else{
-#ifdef WINCE
-				// デフォルト動作
-				return FALSE;
-#else
 				return CommandMoveDownBodyList();
-#endif
 			}
 			break;
 		}
@@ -2667,7 +2661,6 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 					// 再描画
 					int topIdx = m_bodyList.GetTopIndex();
 					m_bodyList.RedrawItems(topIdx, topIdx + m_bodyList.GetCountPerPage());
-//					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 					m_bodyList.UpdateWindow();
 					MoveMiniImageDlg();
 				}
@@ -2682,6 +2675,7 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 	if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下なので無視。
 		if( m_access ) return TRUE;	// アクセス中は禁止
+
 		return TRUE;
 	}else{
 		// 一番下ではない。
@@ -2717,7 +2711,6 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 					// 再描画
 					int topIdx = m_bodyList.GetTopIndex();
 					m_bodyList.RedrawItems(topIdx, topIdx + m_bodyList.GetCountPerPage());
-//					m_bodyList.RedrawItems(0, m_bodyList.GetItemCount());
 					m_bodyList.UpdateWindow();
 					MoveMiniImageDlg();
 				}

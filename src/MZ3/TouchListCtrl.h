@@ -113,7 +113,7 @@ public:
 	void	SetCanPanScroll( const bool bCanPanScroll ) {
 		m_bCanPanScroll = bCanPanScroll;
 	}
-	void	DrawToScreen(int nItem);
+	void	DrawItemWithBackSurface(int nItem);
 private:
 	bool	ScrollByMoveY( const int dy);
 	bool	MyAdjustDrawOffset();
