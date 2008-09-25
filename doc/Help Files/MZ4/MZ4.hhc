@@ -323,27 +323,6 @@
 </object>
 </UL>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="RSS">
-<param name="ImageNumber" value="1">
-</object>
-<UL>
-<LI><OBJECT type="text/sitemap">
-<param name="Name" value="目次">
-<param name="ImageNumber" value="12">
-<param name="Local" value="2008516173730556.htm">
-</object>
-<LI><OBJECT type="text/sitemap">
-<param name="Name" value="RSS とは？">
-<param name="ImageNumber" value="9">
-<param name="Local" value="2008516173738744.htm">
-</object>
-<LI><OBJECT type="text/sitemap">
-<param name="Name" value="RSS を利用する">
-<param name="ImageNumber" value="9">
-<param name="Local" value="200851617395117.htm">
-</object>
-</UL>
-<LI><OBJECT type="text/sitemap">
 <param name="Name" value="Wassr">
 <param name="ImageNumber" value="1">
 </object>
@@ -367,6 +346,27 @@
 <param name="Name" value="画面上での操作">
 <param name="ImageNumber" value="9">
 <param name="Local" value="20089210521497.htm">
+</object>
+</UL>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS">
+<param name="ImageNumber" value="1">
+</object>
+<UL>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="目次">
+<param name="ImageNumber" value="12">
+<param name="Local" value="2008516173730556.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS とは？">
+<param name="ImageNumber" value="9">
+<param name="Local" value="2008516173738744.htm">
+</object>
+<LI><OBJECT type="text/sitemap">
+<param name="Name" value="RSS を利用する">
+<param name="ImageNumber" value="9">
+<param name="Local" value="200851617395117.htm">
 </object>
 </UL>
 </UL>

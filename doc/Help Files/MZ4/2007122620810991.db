@@ -23,7 +23,6 @@ Context=IDH_HELP69
 <P>&nbsp; 【フォローする】<BR>&nbsp;&nbsp; 選択したユーザを follow します</P>
 <P>&nbsp; 【フォローやめる】<BR>&nbsp;&nbsp; 選択したユーザを follow から外します</P>
 <P><BR>&nbsp; 【友達のタイムライン】<BR>&nbsp;&nbsp; 選択したユーザの発言履歴を表示します</P>
-<P>&nbsp; 【友達のタイムライン(with others)】<BR>&nbsp;&nbsp; 選択したユーザ，及びその Follow 対象のユーザの発言履歴を表示します<BR>&nbsp;&nbsp; ※ API が廃止になった可能性があり，自分のタイムラインを取得します</P>
 <P><BR>&nbsp; 【友達のホーム】<BR>&nbsp;&nbsp; 選択したユーザのホームを開きます</P>
 <P>&nbsp; 【友達のFavorites】<BR>&nbsp;&nbsp; 選択したユーザの Favorites を表示します</P>
 <P>&nbsp; 【友達のサイト】<BR>&nbsp;&nbsp;&nbsp; 選択したユーザが Twitter で登録しているサイトを表示します<BR></FONT></P>
