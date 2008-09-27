@@ -206,6 +206,7 @@ CMZ3View::CMZ3View()
 	, m_bReloadingGroupTabByThread(false)
 	, m_bRetryReloadGroupTabByThread(false)
 	, m_pCategorySubMenuList(NULL)
+	, m_bImeCompositioning(false)
 {
 	m_preCategory = 0;
 	m_selGroup = NULL;
@@ -1810,9 +1811,14 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	}else if (pMsg->hwnd == m_statusEdit.m_hWnd) {
 		switch (pMsg->wParam) {
 		case VK_UP:
-			// ボディリストに移動
-			CommandSetFocusBodyList();
-			return TRUE;
+			if (m_bImeCompositioning) {
+				// 漢字入力中はデフォルト動作
+				return FALSE;
+			} else {
+				// ボディリストに移動
+				CommandSetFocusBodyList();
+				return TRUE;
+			}
 		}
 	}
 
@@ -1933,6 +1939,15 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 			}
 		}
 		break;
+
+	case WM_IME_STARTCOMPOSITION:	// IME 変換開始
+		m_bImeCompositioning = true;
+		break;
+
+	case WM_IME_ENDCOMPOSITION:		// IME 変換終了
+		m_bImeCompositioning = false;
+		break;
+
 	case WM_RBUTTONDOWN:
 		OnRButtonDown( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
@@ -2303,6 +2318,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 	// VK_UP, VK_DOWN
 	if( theApp.m_optionMng.m_bUseXcrawlExtension ) {
+		// Xcrawl 拡張モード
 		switch( vKey ) {
 		case VK_UP:
 			// VK_KEYDOWN では無視。
@@ -2327,6 +2343,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			return TRUE;
 		}
 	} else {
+		// Xcrawl 拡張モード以外
 		switch( vKey ) {
 		case VK_UP:
 			if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
@@ -2342,7 +2359,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				
 				return CommandSetFocusCategoryList();
 			}else{
-				return CommandMoveUpBodyList();
+				if (m_bImeCompositioning) {
+					// 漢字入力中はデフォルト動作
+					return FALSE;
+				} else {
+					return CommandMoveUpBodyList();
+				}
 			}
 			break;
 
@@ -2353,11 +2375,32 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 				// Twitter モードならつぶやくモードへ。
 				if (m_viewStyle==VIEW_STYLE_TWITTER) {
-					OnMenuTwitterUpdate();
+					// モード判定
+					CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+					if (pCategory!=NULL) {
+						std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
+						if (strServiceType == "Twitter") {
+							OnMenuTwitterUpdate();
+							return TRUE;
+						} else if (strServiceType == "Wassr") {
+							OnMenuWassrUpdate();
+							return TRUE;
+						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
+							OnMenuMixiEchoUpdate();
+							return TRUE;
+						}
+					}
 				}
-				return TRUE;
+				// デフォルト動作
+				return FALSE;
+
 			}else{
-				return CommandMoveDownBodyList();
+				if (m_bImeCompositioning) {
+					// 漢字入力中はデフォルト動作
+					return FALSE;
+				} else {
+					return CommandMoveDownBodyList();
+				}
 			}
 			break;
 		}

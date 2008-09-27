@@ -168,6 +168,7 @@ private:
 
 	DWORD			m_dwIntervalTimerStartMsec;	///< 定期取得用タイマーの開始時刻
 	CMenu*			m_pCategorySubMenuList;		///< カテゴリ用メニュー
+	bool			m_bImeCompositioning;		///< IME変換中フラグ
 
 
 public: // シリアル化からのみ作成します。
