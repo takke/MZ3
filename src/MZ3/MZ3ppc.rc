@@ -178,6 +178,9 @@ BEGIN
         MENUITEM "つぶやく",                        ID_MENU_MIXI_ECHO_UPDATE
         MENUITEM "返信",                          ID_MENU_MIXI_ECHO_REPLY
         MENUITEM "プロフィールページ",                   ID_MENU_MIXI_ECHO_SHOW_PROFILE
+        MENUITEM SEPARATOR
+        MENUITEM "△さんのエコー",                     ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST
+        MENUITEM "○さんのエコー",                     ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST
     END
     POPUP "Wassr用メニュー"
     BEGIN

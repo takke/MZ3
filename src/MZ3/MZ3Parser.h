@@ -30,13 +30,15 @@ namespace mixi {
 class MZ3ParserBase 
 {
 public:
+	static bool ExtractLinks( CMixiData& data_ );
+
 	/**
 	 * ログアウトしたかをチェックする
 	 */
 	static bool IsLogout( LPCTSTR szHtmlFilename )
 	{
 		// 最大で N 行目までチェックする
-		const int CHECK_LINE_NUM_MAX = 300;
+		const int CHECK_LINE_NUM_MAX = 1000;
 
 		FILE* fp = _wfopen(szHtmlFilename, _T("r"));
 		if( fp == NULL ) {

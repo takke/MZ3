@@ -14,41 +14,6 @@
 /// Twitter 用パーサ
 namespace twitter {
 
-bool TwitterParserBase::ExtractLinks(CMixiData &data_)
-{
-	// 正規表現のコンパイル（一回のみ）
-	static MyRegex reg;
-	if( !util::CompileRegex( reg, L"(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
-		return false;
-	}
-
-	CString target = data_.GetBody();
-
-	for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-		if( reg.exec(target) == false || reg.results.size() != 2 ) {
-			// 未発見。終了。
-			break;
-		}
-
-		// 発見。
-
-		// URL
-		std::wstring& url = reg.results[1].str;
-
-		if (!url.empty() && url[0] != 'h') {
-			url.insert( url.begin(), 'h' );
-		}
-
-		// データに追加
-		data_.m_linkList.push_back( CMixiData::Link(url.c_str(), url.c_str()) );
-
-		// ターゲットを更新。
-		target = target.Mid( reg.results[0].end );
-	}
-
-	return true;
-}
-
 /**
  * [list] タイムライン用パーサ
  *
@@ -170,7 +135,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 				mixi::ParserUtil::ParseDate( status.getNode( L"created_at" ).getTextAll().c_str(), data );
 
 				// URL を抽出し、リンクにする
-				TwitterParserBase::ExtractLinks( data );
+				MZ3ParserBase::ExtractLinks( data );
 
 				// 一時リストに追加
 				new_list.push_back(data);
@@ -268,7 +233,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 				mixi::ParserUtil::ParseDate( direct_message.getNode( L"created_at" ).getTextAll().c_str(), data );
 
 				// URL を抽出し、リンクにする
-				TwitterParserBase::ExtractLinks( data );
+				MZ3ParserBase::ExtractLinks( data );
 
 				// 送信者情報：CMixiData のメタデータとして保存する
 				{
@@ -470,7 +435,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 				mixi::ParserUtil::ParseDate( status.getNode( L"epoch" ).getTextAll().c_str(), data );
 
 				// URL を抽出し、リンクにする
-				TwitterParserBase::ExtractLinks( data );
+				MZ3ParserBase::ExtractLinks( data );
 
 				// 一時リストに追加
 				new_list.push_back(data);

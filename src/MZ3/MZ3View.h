@@ -395,6 +395,8 @@ public:
 	afx_msg void OnMenuWassrRead();
 	afx_msg void OnMenuWassrUpdate();
 	afx_msg void OnMenuMixiEchoReply();
+	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
+	afx_msg void OnMenuMixiEchoAddUserEchoList();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -14,8 +14,6 @@ namespace twitter {
 class TwitterParserBase : public mixi::MixiListParser
 {
 protected:
-	static bool ExtractLinks( CMixiData& data_ );
-
 	/**
 	 * out_ ‚Æ new_ ‚ğƒ}[ƒW‚·‚é
 	 *

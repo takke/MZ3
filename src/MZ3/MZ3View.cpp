@@ -189,6 +189,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
 	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_REPLY, &CMZ3View::OnMenuMixiEchoReply)
+	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
+	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -3787,6 +3789,34 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			menu.LoadMenu( IDR_BODY_MENU );
 			CMenu* pSubMenu = menu.GetSubMenu(2);	// echo用メニューはidx=2
 
+			// リンク
+			int n = (int)bodyItem.m_linkList.size();
+			if( n > 0 ) {
+				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+				for( int i=0; i<n; i++ ) {
+					// 追加
+					CString s;
+					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				}
+			}
+
+			// ユーザ、引用ユーザのエコー一覧
+			CString s;
+			s.Format(L"%s さんのエコー", bodyItem.GetName());
+			pSubMenu->ModifyMenu(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, MF_BYCOMMAND, 
+								 ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, s);
+
+			// 引用ユーザのエコー一覧
+			CString ref_user_name = bodyItem.GetTextValue(L"ref_user_name");
+			if (!ref_user_name.IsEmpty()) {
+				s.Format(L"%s さんのエコー", ref_user_name);
+				pSubMenu->ModifyMenu(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, MF_BYCOMMAND, 
+									 ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, s);
+			} else {
+				pSubMenu->RemoveMenu(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, MF_BYCOMMAND);
+			}
+
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
@@ -3798,6 +3828,18 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			menu.LoadMenu( IDR_BODY_MENU );
 			CMenu* pSubMenu = menu.GetSubMenu(3);	// Wassr用メニューはidx=3
 
+			// リンク
+			int n = (int)bodyItem.m_linkList.size();
+			if( n > 0 ) {
+				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+				for( int i=0; i<n; i++ ) {
+					// 追加
+					CString s;
+					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				}
+			}
+			
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
@@ -5632,6 +5674,70 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
 		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+	AppendCategoryList(categoryItem);
+
+	// 取得開始
+	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
+}
+
+/**
+ * mixiエコー｜引用ユーザのエコー一覧
+ */
+void CMZ3View::OnMenuMixiEchoAddRefUserEchoList()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	// タイムライン項目の追加
+	CMixiData& bodyItem = GetSelectedBodyItem();
+	CCategoryItem categoryItem;
+	CString name = bodyItem.GetTextValue(L"ref_user_name");
+	int author_id = _wtoi(bodyItem.GetTextValue(L"ref_user_id"));
+	categoryItem.init( 
+		// 名前
+		util::FormatString( L"%sさんのエコー", name ),
+		util::FormatString( L"http://mixi.jp/list_echo.pl?id=%d", author_id ), 
+		ACCESS_MIXI_RECENT_ECHO, 
+		m_selGroup->categories.size()+1,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_MIXI_RECENT_ECHO),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_MIXI_RECENT_ECHO),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_MIXI_RECENT_ECHO),
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+	AppendCategoryList(categoryItem);
+
+	// 取得開始
+	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
+}
+
+/**
+ * mixiエコー｜ユーザのエコー一覧
+ */
+void CMZ3View::OnMenuMixiEchoAddUserEchoList()
+{
+	if( m_access ) {
+		// アクセス中は禁止
+		return;
+	}
+
+	// タイムライン項目の追加
+	CMixiData& bodyItem = GetSelectedBodyItem();
+	CCategoryItem categoryItem;
+	CString name = bodyItem.GetName();
+	int author_id = bodyItem.GetAuthorID();
+	categoryItem.init( 
+		// 名前
+		util::FormatString( L"%sさんのエコー", name ),
+		util::FormatString( L"http://mixi.jp/list_echo.pl?id=%d", author_id ), 
+		ACCESS_MIXI_RECENT_ECHO, 
+		m_selGroup->categories.size()+1,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_MIXI_RECENT_ECHO),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_MIXI_RECENT_ECHO),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_MIXI_RECENT_ECHO),
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 	AppendCategoryList(categoryItem);
 

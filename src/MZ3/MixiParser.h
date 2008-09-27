@@ -3712,105 +3712,29 @@ public:
 		}
 
 		try {
-			const xml2stl::Node& div_echo = root.getNode(L"html")
-				                                .getNode(L"body")
-											    .getNode(L"div", L"id=bodyArea")
-											    .getNode(L"div", L"id=bodyMainArea")
-											    .getNode(L"div", L"id=echo");
+			const xml2stl::Node& div_bodyMainArea = root.getNode(L"html")
+													.getNode(L"body")
+													.getNode(L"div", L"id=bodyArea")
+													.getNode(L"div", L"id=bodyMainArea");
+			const xml2stl::Node& div_echo = div_bodyMainArea.getNode(L"div", L"id=echo");
 
 			// post_key の取得
 			// input[name=post_key]
-			CString post_key = div_echo.findNode(L"action=add_echo.pl")
-									   .findNode(L"name=post_key").getProperty(L"value").c_str();
-			MZ3LOGGER_INFO( util::FormatString(L"post_key : [%s]", post_key) );
+			CString post_key;
+			try {
+				post_key = div_echo.findNode(L"action=add_echo.pl")
+										   .findNode(L"name=post_key").getProperty(L"value").c_str();
+				MZ3LOGGER_INFO( util::FormatString(L"post_key : [%s]", post_key) );
+			} catch (xml2stl::NodeNotFoundException&) {
+			}
 
-			// post_key は全ての要素に設定する
-			
 			// tbody に対する処理
-			const xml2stl::Node& tbody = div_echo.findNode(L"class=echoArchives")
-				                                 .getNode(L"div", L"class=archiveList")
-											     .getNode(L"table");
-			size_t nChildren = tbody.getChildrenCount();
-			for (size_t i=0; i<nChildren; i++) {
-				const xml2stl::Node& tr = tbody.getNodeByIndex(i);
-				if (tr.getName() != L"tr") {
-					continue;
-				}
-				try {
-					// オブジェクト生成
-					CMixiData data;
-					data.SetAccessType( ACCESS_MIXI_ECHO_USER );
-
-					const xml2stl::Node& td_comment = tr.getNode(L"td", L"class=comment");
-					// text : tr/td[@comment]
-					CString strBody = td_comment.getTextAll().c_str();
-					// strBody の <span> タグ以降は日付等のため削除
-					util::GetBeforeSubString(strBody, L"<span>", strBody);
-					strBody.Replace(L"</a>", L"</a>&nbsp;");
-					mixi::ParserUtil::StripAllTags( strBody );
-					mixi::ParserUtil::UnEscapeHtmlElement( strBody );
-					data.AddBody( strBody );
-
-					// 時間：tr/td[@comment]/span
-					CString strDate = td_comment.getNode(L"span").getTextAll().c_str();
-					// aタグは除去
-					mixi::ParserUtil::StripAllTags( strDate );
-					while( strDate.Replace( L"\n", L"" ) );
-					data.SetDate(strDate);
-
-					// 画像URL : tr/td[@thumb]/a/img/@src
-					CString imageUrl = tr.getNode(L"td", L"class=thumb").getNode(L"a").getNode(L"img").getProperty(L"src").c_str();
-					data.AddImage( imageUrl );
-
-					// name : tr/td[@nickname]/a
-					const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
-					CString name = author.getTextAll().c_str();
-					mixi::ParserUtil::UnEscapeHtmlElement( name );
-					while( name.Replace( L"\r\n", L"" ) );
-					data.SetName( name );
-
-					// プロフィール用URL
-					// とりあえず
-					// http://mixi.jp/list_echo.pl?id=xxxxx
-					// を取得し、
-					// http://mixi.jp/show_friend.pl?id=xxxxx
-					// に変換する。
-					CString url = L"http://mixi.jp/show_friend.pl?id=";
-					url += util::GetParamFromURL(author.getProperty(L"href").c_str(), L"id");
-					data.SetURL( url );
-
-					// post_key は全ての要素に設定する
-					data.SetTextValue(L"post_key", post_key);
-
-					// 返信用データ
-					// .../td[@comment]/div[#echo_member_id_*] : メンバーID => author_id に設定
-					// .../td[@comment]/div[#echo_post_time_*] : 投稿時刻   => 記事ID 値に設定
-					for (xml2stl::NodeRef nodeRef=td_comment.getChildrenNodeRef(); !nodeRef.isEnd(); nodeRef.next()) {
-						const xml2stl::Node& item = nodeRef.getCurrentNode();
-						try {
-							if (item.getProperty(L"id").substr(0, 15)==L"echo_member_id_") {
-								// echo_member_id_*
-								data.SetAuthorID(_wtoi(item.getTextAll().c_str()));
-//								MZ3_TRACE(L" echo_member_id : %s\n", item.getTextAll().c_str());
-								continue;
-							}
-							if (item.getProperty(L"id").substr(0, 15)==L"echo_post_time_") {
-								// echo_post_time_*
-								data.SetTextValue(L"echo_post_time", item.getTextAll().c_str());
-//								MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
-								continue;
-							}
-						} catch (xml2stl::NodeNotFoundException&) {
-							// id プロパティがないタグ(spanなど)もあるので続行
-						}
-					}
-
-					// 完成したので追加する
-					out_.push_back( data );
-				} catch (xml2stl::NodeNotFoundException& e) {
-					MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
-					break;
-				}
+			try {
+				const xml2stl::Node& tbody = div_bodyMainArea.findNode(L"class=echoArchives")
+													 .getNode(L"div", L"class=archiveList")
+													 .getNode(L"table");
+				parseUserEcho(out_, tbody, post_key);
+			} catch (xml2stl::NodeNotFoundException&) {
 			}
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( e.getMessage().c_str() );
@@ -3819,6 +3743,120 @@ public:
 
 		MZ3LOGGER_DEBUG( L"RecentEchoParser.parse() finished." );
 		return true;
+	}
+
+	static void parseUserEcho(CMixiDataList& out_, const xml2stl::Node& tbody, const CString& post_key)
+	{
+		// post_key は全ての要素に設定する
+		size_t nChildren = tbody.getChildrenCount();
+		for (size_t i=0; i<nChildren; i++) {
+			const xml2stl::Node& tr = tbody.getNodeByIndex(i);
+			if (tr.getName() != L"tr") {
+				continue;
+			}
+			try {
+				// オブジェクト生成
+				CMixiData data;
+				data.SetAccessType( ACCESS_MIXI_ECHO_USER );
+
+				const xml2stl::Node& td_comment = tr.getNode(L"td", L"class=comment");
+				// text : tr/td[@comment]
+				CString strBody = td_comment.getTextAll().c_str();
+				// strBody の <span> タグ以降は日付等のため削除
+				util::GetBeforeSubString(strBody, L"<span>", strBody);
+				strBody.Replace(L"</a>", L"</a>&nbsp;");
+				mixi::ParserUtil::StripAllTags( strBody );
+				mixi::ParserUtil::UnEscapeHtmlElement( strBody );
+				data.AddBody( strBody );
+
+				// 返信先ユーザ
+				// a タグを抽出
+				try {
+					const xml2stl::Node& a_node = td_comment.getNode(L"a");
+					if (a_node.getName() == L"a") {
+						CString ref_user_name = a_node.getTextAll().c_str();
+						mixi::ParserUtil::UnEscapeHtmlElement( ref_user_name );
+						if (ref_user_name.Left(2)==L">>") {
+							// ">>" で始まっているので返信とみなす
+							CString ref_user_id = util::GetParamFromURL(a_node.getProperty(L"href").c_str(), L"id");
+							if (!ref_user_id.IsEmpty()) {
+								data.SetTextValue(L"ref_user_id", ref_user_id);
+								MZ3_TRACE(L" ref_user_id : %s\n", ref_user_id);
+
+								// ユーザ名の先頭の ">>" を削除する
+								ref_user_name.Delete(0, 2);
+								data.SetTextValue(L"ref_user_name", ref_user_name);
+								MZ3_TRACE(L" ref_user_name : %s\n", ref_user_name);
+							}
+						}
+					}
+				} catch (xml2stl::NodeNotFoundException&) {
+				}
+
+				// 時間：tr/td[@comment]/span
+				CString strDate = td_comment.getNode(L"span").getTextAll().c_str();
+				// aタグは除去
+				mixi::ParserUtil::StripAllTags( strDate );
+				while( strDate.Replace( L"\n", L"" ) );
+				data.SetDate(strDate);
+
+				// 画像URL : tr/td[@thumb]/a/img/@src
+				CString imageUrl = tr.getNode(L"td", L"class=thumb").getNode(L"a").getNode(L"img").getProperty(L"src").c_str();
+				data.AddImage( imageUrl );
+
+				// name : tr/td[@nickname]/a
+				const xml2stl::Node& author = tr.getNode(L"td", L"class=nickname").getNode(L"a");
+				CString name = author.getTextAll().c_str();
+				mixi::ParserUtil::UnEscapeHtmlElement( name );
+				while( name.Replace( L"\r\n", L"" ) );
+				data.SetName( name );
+
+				// プロフィール用URL
+				// とりあえず
+				// http://mixi.jp/list_echo.pl?id=xxxxx
+				// を取得し、
+				// http://mixi.jp/show_friend.pl?id=xxxxx
+				// に変換する。
+				CString url = L"http://mixi.jp/show_friend.pl?id=";
+				url += util::GetParamFromURL(author.getProperty(L"href").c_str(), L"id");
+				data.SetURL( url );
+
+				// post_key は全ての要素に設定する
+				data.SetTextValue(L"post_key", post_key);
+
+				// 返信用データ
+				// .../td[@comment]/div[#echo_member_id_*] : メンバーID => author_id に設定
+				// .../td[@comment]/div[#echo_post_time_*] : 投稿時刻   => 記事ID 値に設定
+				for (xml2stl::NodeRef nodeRef=td_comment.getChildrenNodeRef(); !nodeRef.isEnd(); nodeRef.next()) {
+					const xml2stl::Node& item = nodeRef.getCurrentNode();
+					try {
+						if (item.getProperty(L"id").substr(0, 15)==L"echo_member_id_") {
+							// echo_member_id_*
+							data.SetAuthorID(_wtoi(item.getTextAll().c_str()));
+//							MZ3_TRACE(L" echo_member_id : %s\n", item.getTextAll().c_str());
+							continue;
+						}
+						if (item.getProperty(L"id").substr(0, 15)==L"echo_post_time_") {
+							// echo_post_time_*
+							data.SetTextValue(L"echo_post_time", item.getTextAll().c_str());
+//							MZ3_TRACE(L" echo_post_time : %s\n", item.getTextAll().c_str());
+							continue;
+						}
+					} catch (xml2stl::NodeNotFoundException&) {
+						// id プロパティがないタグ(spanなど)もあるので続行
+					}
+				}
+
+				// URL を抽出し、リンクにする
+				MZ3ParserBase::ExtractLinks( data );
+
+				// 完成したので追加する
+				out_.push_back( data );
+			} catch (xml2stl::NodeNotFoundException& e) {
+				MZ3LOGGER_ERROR( util::FormatString( L"some node or property not found... : %s", e.getMessage().c_str()) );
+				break;
+			}
+		}
 	}
 };
 
