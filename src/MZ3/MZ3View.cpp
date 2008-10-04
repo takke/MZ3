@@ -5361,7 +5361,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		post.AppendPostBody( "status=" );
 		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
 		if (theApp.m_optionMng.m_bAddSourceTextOnTwitterPost) {
-			post.AppendPostBody( L" *" MZ3_APP_NAME L"*" );
+			post.AppendPostBody( URLEncoder::encode_utf8(theApp.m_optionMng.m_strTwitterPostFotterText) );
 		}
 		post.AppendPostBody( "&source=" );
 		post.AppendPostBody( MZ3_APP_NAME );
@@ -6385,12 +6385,6 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 			MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");
 			// Twitter タイムライン、ページ変更(複数ページ取得)処理
 			{
-#ifdef WINCE
-				const int MAX_PAGE = 2;	// WM では 2 ページ固定とする(暫定)
-#else
-				const int MAX_PAGE = 3;
-#endif
-
 				CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
 				int page = pCategoryItem->m_mixi.GetIntValue(L"request_page", 1);
 				MZ3_TRACE(L"　★page=%d\n", page);
@@ -6412,7 +6406,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				MZ3_TRACE(L"　★新着件数=%d\n", new_count);
 
 				// 最大ページ数未満で、かつ、新着件数が閾値よりも多い場合
-				if (page<MAX_PAGE && new_count >= 20/2) {
+				if (page<theApp.m_optionMng.m_nTwitterGetPageCount && new_count >= 20/2) {
 					// 次ページリクエスト
 					page ++;
 					pCategoryItem->m_mixi.SetIntValue(L"request_page", page);

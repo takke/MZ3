@@ -382,10 +382,16 @@ void Option::Sync(bool bSave)
 
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
+	SyncIniValue(inifile, bSave, m_strTwitterPostFotterText, "PostFotterText", "Twitter" );
 	SyncIniValue(inifile, bSave, m_nTwitterStatusLineCount, "TwitterStatusLineCount", "Twitter");
 	if (!bSave) {
 		// normalize
 		m_nTwitterStatusLineCount = normalizeTwitterStatusLineCount(m_nTwitterStatusLineCount);
+	}
+	SyncIniValue(inifile, bSave, m_nTwitterGetPageCount, "GetPageCount", "Twitter");
+	if (!bSave) {
+		// normalize
+		m_nTwitterGetPageCount = normalizeTwitterGetPageCount(m_nTwitterGetPageCount);
 	}
 
 	// èIóπèàóù

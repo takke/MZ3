@@ -124,7 +124,9 @@ private:
 public:
 	//--- Twitter
 	bool			m_bAddSourceTextOnTwitterPost;	///< 文末に *MZ3* マークをつける
+	CString			m_strTwitterPostFotterText;		///< 文末に付けるマーク
 	int				m_nTwitterStatusLineCount;		///< Twitterモード時のステータス行数
+	int				m_nTwitterGetPageCount;			///< Twitterモード時の取得ページ数
 
 public:
 	Option()
@@ -192,6 +194,12 @@ public:
 		, m_bUseRan2PanScrollAnimation( true )
 		, m_bUseRan2HorizontalDragMove( true )
 		, m_bAutoDownloadEmojiImageFiles( true )
+#ifdef WINCE
+		, m_nTwitterGetPageCount(1)
+#else
+		, m_nTwitterGetPageCount(3)
+#endif
+		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
 	{
 	}
 
@@ -308,6 +316,11 @@ public:
 	/// Twitterモード時のステータス行数
 	static int normalizeTwitterStatusLineCount( int n ) {
 		return normalizeRange( n, 2, 3 );
+	}
+
+	/// Twitterモード時の最大取得ページ数
+	static int normalizeTwitterGetPageCount( int n ) {
+		return normalizeRange( n, 1, 5 );
 	}
 };
 
