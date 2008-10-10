@@ -191,6 +191,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_REPLY, &CMZ3View::OnMenuMixiEchoReply)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
+	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -3893,6 +3894,9 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		{
 			CMenu menu;
 			menu.LoadMenu( IDR_RSS_MENU );
+			CMenu editmenu;
+			editmenu.CreatePopupMenu();
+
 			CMenu* pSubMenu = menu.GetSubMenu(0);	// メニューはidx=0
 
 			// リンク
@@ -3904,8 +3908,13 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 					CString s;
 					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
 					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+					// URLをコピーメニューの生成
+					editmenu.AppendMenu( MF_STRING , ID_REPORT_COPY_URL_BASE+(i+1), s);
 				}
 			}
+			// リンクの下に「URLをコピー」メニューを追加する
+			pSubMenu->AppendMenu( MF_SEPARATOR , ID_REPORT_URL_BASE, _T("-"));
+			pSubMenu->AppendMenu( MF_POPUP , (UINT_PTR)editmenu.GetSafeHmenu() , L"URLをコピー" ); 
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -6854,3 +6863,23 @@ void CMZ3View::OnMenuWassrUpdate()
 	// フォーカス移動。
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
+
+/**
+ * URLをクリップボードにコピー
+ */
+void CMZ3View::OnCopyClipboardUrl(UINT nID)
+{
+	const CMixiData& data = GetSelectedBodyItem();
+
+	UINT idx = nID - (ID_REPORT_COPY_URL_BASE+1);
+	if( idx > data.m_linkList.size() ) {
+		return;
+	}
+
+	LPCTSTR url  = data.m_linkList[idx].url;
+
+	// クリップボードにコピー
+	util::SetClipboardDataTextW( url );
+
+}
+
