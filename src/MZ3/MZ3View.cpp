@@ -1490,7 +1490,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 
 	// アイテムの追加
 	m_bodyList.MySetIconMode( CBodyListCtrl::ICON_MODE_NONE );	// まずアイコンはオフにして生成
-	INT_PTR count = body.size();
+	util::StopWatch sw;
+	sw.start();
+	int count = body.size();
 	for (int i=0; i<count; i++) {
 		CMixiData* data = &body[i];
 
@@ -1525,6 +1527,9 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
 	}
+	MZ3LOGGER_DEBUG(
+		util::FormatString(L"ボディリスト設定完了, elapsed[%dms], count[%d]", 
+		sw.getElapsedMilliSecUntilNow(), m_bodyList.GetItemCount()));
 
 	// 統合カラムモード用のフォーマッタを設定する
 	if (pCategory!=NULL) {
@@ -1547,10 +1552,8 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	m_bodyList.DrawDetail();
 	m_bodyList.UpdateWindow();
 
-	// アイテムが0件の場合は、mini画像画面を非表示にする
 	if (m_bodyList.GetItemCount()==0) {
-		MoveMiniImageDlg();
-
+		// アイテムが0件
 		util::MySetInformationText( m_hWnd, L"完了" );
 	} else {
 		// 第1カラムに表示している内容を表示する。
@@ -4800,7 +4803,7 @@ void CMZ3View::OnNMClickGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 /**
- * mini画像ウィンドウの移動（および消去）
+ * ボディリスト選択項目の画像がなければ取得する
  */
 void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int pointy/*=-1*/)
 {
@@ -4808,26 +4811,19 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 		return;
 	}
 
-	// mini画像画面制御
-	bool bDrawMiniImage = false;
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
-			// mini画像が未ロードであれば取得する
+			// 対象(idxBodyパラメータ)が未指定であれば「選択項目」を対象とする。
+			int target = idxBody;
 			if (idxBody<0 || idxBody>=(int)pCategory->m_body.size()) {
-				idxBody = pCategory->selectedBody;
+				target = pCategory->selectedBody;
 			}
-			if (!pCategory->m_body.empty() && idxBody >= 0 && idxBody < (int)pCategory->m_body.size() ) {
-				const CMixiData& data = pCategory->m_body[ idxBody ];
+
+			// mini画像が未ロードであれば取得する
+			if (!pCategory->m_body.empty() && 0 <= target && target < (int)pCategory->m_body.size() ) {
+				const CMixiData& data = pCategory->m_body[ target ];
 				MyLoadMiniImage( data );
-
-				// プロフィール or コミュニティで、
-				// かつ画像があれば表示
-
-				CString path = util::MakeImageLogfilePath( data );
-				if (!path.IsEmpty() ) {
-					bDrawMiniImage = true;
-				}
 			}
 		}
 	}
@@ -6430,6 +6426,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 				// 最大ページ数未満で、かつ、新着件数が閾値よりも多い場合
 				if (page<theApp.m_optionMng.m_nTwitterGetPageCount && new_count >= 20/2) {
+//				if (page<50 && new_count >= 20/2) {
 					// 次ページリクエスト
 					page ++;
 					pCategoryItem->m_mixi.SetIntValue(L"request_page", page);

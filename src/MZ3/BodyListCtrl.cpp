@@ -402,7 +402,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 										// ˆê’v‚·‚ê‚Î‹­’²•\Ž¦
 										if (data->GetName()==reg.results[1].str.c_str()) {
-											clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
+											clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
 											break;
 										}
 

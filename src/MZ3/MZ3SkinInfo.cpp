@@ -108,6 +108,10 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		// メイン画面、ボディコントロールの強調２
 		clrMainBodyListEmphasis2			= loadColorFromInifile( inifile, clrMainBodyListEmphasis2, 
 																	"MainBodyListEmphasis2", SECTION_NAME );
+
+		// メイン画面、ボディコントロールの強調２
+		clrMainBodyListEmphasis3			= loadColorFromInifile( inifile, clrMainBodyListEmphasis3, 
+																	"MainBodyListEmphasis3", SECTION_NAME );
 	}
 
 	return true;
@@ -133,7 +137,8 @@ bool CMZ3SkinInfo::setDefaultInfo()
 	clrMainBodyListFootprintMyMixiText	= RGB(0x00, 0x00, 0xFF);	// メイン画面、ボディコントロールのあしあとのマイミクの文字色
 	clrMainBodyListExternalBlogText		= RGB(0x80, 0x80, 0x80);	// メイン画面、ボディコントロールの外部ブログの文字色
 	clrMainBodyListDayBreakLine			= RGB(0xC0, 0xC0, 0xFF);	// メイン画面、ボディコントロールの日付区切り線
-	clrMainBodyListEmphasis2			= RGB(0x00, 0xA0, 0x00);	// メイン画面、ボディコントロールの強調２
+	clrMainBodyListEmphasis2			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの強調２(デフォルト：赤)
+	clrMainBodyListEmphasis3			= RGB(0x00, 0xA0, 0x00);	// メイン画面、ボディコントロールの強調３(デフォルト：緑)
 
 	return true;
 }
