@@ -1621,7 +1621,7 @@ void CReportView::OnLoadUrl(UINT nID)
 LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
 	TRACE(_T("InetAccess End\n"));
-	util::MySetInformationText( m_hWnd, _T("HTML‰ğÍ’†") );
+	util::MySetInformationText( m_hWnd, _T("‰ğÍ’†") );
 
 	if (m_abort != FALSE) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);

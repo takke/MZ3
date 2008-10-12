@@ -869,7 +869,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
 	TRACE(_T("InetAccess End\n"));
 
-	util::MySetInformationText( m_hWnd, _T("HTML解析中") );
+	util::MySetInformationText( m_hWnd, _T("解析中") );
 
 //	util::StopWatch sw;
 
@@ -3253,12 +3253,12 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 		msgHead.Format( L"%s : ", theApp.m_accessTypeInfo.getShortText(category.m_mixi.GetAccessType()));
 
 		// HTML の取得
-		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 1/3") );
+		util::MySetInformationText( m_hWnd, msgHead + _T("解析中 : 1/3") );
 		CHtmlArray html;
 		html.Load( logfile );
 
 		// HTML 解析
-		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 2/3") );
+		util::MySetInformationText( m_hWnd, msgHead + _T("解析中 : 2/3") );
 		mz3parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), category.m_mixi, body, html );
 
 		// 取得したデータに from_log_flag を設定する
@@ -3268,7 +3268,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 		}
 
 		// ボディ一覧の設定
-		util::MySetInformationText( m_hWnd, msgHead + _T("HTML解析中 : 3/3") );
+		util::MySetInformationText( m_hWnd, msgHead + _T("解析中 : 3/3") );
 
 		// 取得時刻文字列の設定
 		SYSTEMTIME st;
@@ -6339,7 +6339,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		return false;
 	}
 
-	util::MySetInformationText( m_hWnd, _T("HTML解析中 : 1/3") );
+	util::MySetInformationText( m_hWnd, _T("解析中 : 1/3") );
 
 	// 巡回モード（リストモード）の場合は、巡回モードを終了する。
 	if( m_cruise.enable() && !m_cruise.isFetchListMode() ) {
@@ -6366,7 +6366,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	CMixiDataList& body = m_selGroup->getSelectedCategory()->GetBodyList();
 
 	// HTML 解析
-	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 2/3") );
+	util::MySetInformationText( m_hWnd,  _T("解析中 : 2/3") );
 	if (mz3parser::MyDoParseMixiListHtml( aType, parent_data, body, html )) {
 
 		// [MZ3-API] : パース後のフック処理(の予定)
@@ -6421,7 +6421,12 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 					pCategoryItem->m_mixi.SetIntValue(L"request_page", page);
 					CString url = util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL());
 					url.AppendFormat(L"%spage=%d", (url.Find('?')<0 ? L"?" : L"&"), page);
-					AccessProc(&pCategoryItem->m_mixi, url);
+
+					static MZ3Data s_data;
+					s_data = pCategoryItem->m_mixi;
+					s_data.SetURL(url);
+					s_data.SetBrowseUri(url);
+					AccessProc(&s_data, url);
 					return false;
 				} else {
 					// リクエストページ変数を初期化して終了
@@ -6433,7 +6438,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	}
 
 	// ボディ一覧の設定
-	util::MySetInformationText( m_hWnd,  _T("HTML解析中 : 3/3") );
+	util::MySetInformationText( m_hWnd,  _T("解析中 : 3/3") );
 
 	// 取得時刻文字列の作成
 	SYSTEMTIME localTime;

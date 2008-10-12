@@ -771,7 +771,7 @@ LRESULT CWriteView::OnFit(WPARAM wParam, LPARAM lParam)
 
 LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
-	util::MySetInformationText( m_hWnd, L"HTML‰ğÍ’†" );
+	util::MySetInformationText( m_hWnd, L"‰ğÍ’†" );
 
 	CHtmlArray html;
 	html.Load( theApp.m_filepath.temphtml );

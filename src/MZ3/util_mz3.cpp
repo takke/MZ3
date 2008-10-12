@@ -67,6 +67,8 @@ inline CString LogfileRuleToText( const CMixiData& data, const CString& strRule 
  */
 inline CString MakeLogfilePathByRule( CString strBasePath, const CMixiData& data, LPCTSTR strLogfilePathRule )
 {
+//	MZ3_TRACE(L"ÅöMakeLogfilePathByRule(), base_path[%s], rule[%s], url[%s]\n", strBasePath, strLogfilePathRule, data.GetURL());
+
 	CString rule = strLogfilePathRule;
 	CString path = strBasePath;
 	path += L"\\";
