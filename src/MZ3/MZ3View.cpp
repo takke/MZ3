@@ -395,6 +395,9 @@ void CMZ3View::OnInitialUpdate()
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
 
+	// キャッシュ削除スレッド開始
+	AfxBeginThread( CacheCleanup_Thread, this );
+
 	// インターバルタイマー生成
 	UINT result = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
 //	DWORD e = ::GetLastError();
@@ -433,14 +436,25 @@ unsigned int CMZ3View::Initialize_Thread( LPVOID This )
 }
 
 /**
+ * キャッシュ削除用スレッド
+ */
+unsigned int CMZ3View::CacheCleanup_Thread( LPVOID This )
+{
+	CMZ3View* pView = (CMZ3View*)This;
+
+	::Sleep( 300L );
+
+	// 古いキャッシュファイルの削除
+	theApp.DeleteOldCacheFiles();
+
+	return 0;
+}
+
+/**
  * 遅延初期化メソッド（初期化用スレッドから起動される）
  */
 bool CMZ3View::DoInitialize()
 {
-	// 古いキャッシュファイルの削除
-	util::MySetInformationText( m_hWnd, L"古いログファイルを削除しています..." );
-	theApp.DeleteOldCacheFiles();
-
 	// 初期データ設定
 	util::MySetInformationText( m_hWnd, L"画面を作成しています..." );
 	InsertInitialData();

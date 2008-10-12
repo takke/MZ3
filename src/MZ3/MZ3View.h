@@ -314,6 +314,7 @@ private:
 	bool MyLoadCategoryLogfile(CCategoryItem& category);
 
 	static unsigned int Initialize_Thread( LPVOID This );
+	static unsigned int CacheCleanup_Thread( LPVOID This );
 	static unsigned int ReloadGroupTab_Thread( LPVOID This );
 	static unsigned int LongReturnKey_Thread( LPVOID This );
 

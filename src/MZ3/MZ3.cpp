@@ -1046,6 +1046,7 @@ bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
  */
 bool CMZ3App::DeleteOldCacheFiles(void)
 {
+	MZ3LOGGER_INFO( L"古いキャッシュファイルの削除開始" );
 	int nDeleted = 0;	// 削除済みファイル数
 	int nTargetFileLastWriteDaysBack = 30*2;	// 2ヶ月以上前のファイルを削除対象とする
 	MZ3FileCacheManager cacheManager;
