@@ -79,6 +79,11 @@ protected:
 		}
 		sw_move.stop();
 
+		//--- はみ出したデータを削除する
+		if (out_.size() > LIST_MAX_SIZE) {
+			out_.erase(out_.begin()+LIST_MAX_SIZE, out_.end());
+		}
+
 		MZ3LOGGER_DEBUG(
 			util::FormatString(
 				L"MergeNewList(), old[%d], new[%d], detect[%dms], move[%dms]", 
@@ -86,7 +91,6 @@ protected:
 				new_list_size,
 				sw_detect_insert_pos.getElapsedMilliSecUntilStoped(),
 				sw_move.getElapsedMilliSecUntilStoped()));
-
 
 		return true;
 	}
