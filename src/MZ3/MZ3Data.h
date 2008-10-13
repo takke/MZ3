@@ -160,7 +160,7 @@ public:
 	// 日付時刻のアクセッサ
 	void		 SetDate(const CTime& t)	{ m_dateRaw = t; }
 	void		 SetDate(CString date)		{ m_dateText = date; }
-	CString		 GetDate();
+	CString		 GetDate() const;
 	const CTime& GetDateRaw() const			{ return m_dateRaw;	}
 
 	// アクセス種別のアクセッサ
@@ -206,7 +206,7 @@ public:
 
 	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
 	void	SetMyMixi(bool bMyMixi)		{ m_IntegerMap[L"my_mixi"] = bMyMixi ? 1 : 0; }
-	bool	IsMyMixi()					{ return FindIntegerMap(L"my_mixi", 0) ? true : false; }
+	bool	IsMyMixi() const			{ return FindIntegerMap(L"my_mixi", 0) ? true : false; }
 
 
 	//--- 汎用文字列配列コンテナのアクセッサ
@@ -264,7 +264,7 @@ public:
 
 	// title : タイトル
 	void	SetTitle(CString title);
-	CString GetTitle()						{ return FindStringMap(L"title"); }
+	CString GetTitle() const				{ return FindStringMap(L"title"); }
 
 	// browse_uri
 	void	SetBrowseUri(LPCTSTR str)		{ m_StringMap[L"browse_uri"] = str; }

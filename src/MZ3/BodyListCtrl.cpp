@@ -125,17 +125,64 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		bFocus = TRUE;
 	}
 
-	TCHAR szBuff[MAX_PATH];
-
 	// アイテム データを取得します。
 	LV_ITEM lvi;
-	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
+	lvi.mask = LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
 	lvi.iItem = nItem;
 	lvi.iSubItem = 0;
-	lvi.pszText = szBuff;
-	lvi.cchTextMax = sizeof(szBuff);
 	lvi.stateMask = LVIS_SELECTED | LVIS_STATEIMAGEMASK;
 	this->GetItem(&lvi);
+
+
+	// 出力対象の要素を取得する
+	CCategoryItem* pCategory = NULL;
+	if (theApp.m_pMainView != NULL &&
+		theApp.m_pMainView->m_selGroup != NULL &&
+		theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL)
+	{
+		pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	}
+
+	// 出力対象の要素
+	const CMixiData* pData = NULL;
+	if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < (int)pCategory->m_body.size()) {
+		pData = &pCategory->m_body[ lvi.lParam ];
+	}
+
+	// 選択要素
+	int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
+	const CMixiData* pSelectedData = NULL;
+	if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
+		pSelectedData = &pCategory->m_body[ selectedIdx ];
+	}
+
+	// 出力文字列の取得(pData から変換)
+	CString strTarget1;
+	CString strTarget2;
+	CString strTarget3;
+	if (pCategory!=NULL) {
+		// 第1カラム
+		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める。
+		// 改行はスペースに置換する。
+		strTarget1 = util::MyGetItemByBodyColType(pData, pCategory->m_bodyColType1, false);
+		strTarget1.Replace(L"\r\n", L" ");
+
+		// 第2、第3カラム
+		if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
+			// 統合カラムモードの場合はカテゴリのカラムタイプ(トグルで変更される)に無関係に
+			// カテゴリ種別に応じた文字列を設定する
+			AccessTypeInfo::BODY_INDICATE_TYPE bodyColType;
+			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(pCategory->m_mixi.GetAccessType());
+			strTarget2 = util::MyGetItemByBodyColType(pData, bodyColType, false);
+			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(pCategory->m_mixi.GetAccessType());
+			strTarget3 = util::MyGetItemByBodyColType(pData, bodyColType, false);
+			
+		} else {
+			strTarget2 = util::MyGetItemByBodyColType(pData, pCategory->m_bodyColType2);
+			strTarget3 = util::MyGetItemByBodyColType(pData, pCategory->m_bodyColType3);
+		}
+	}
+
 
 	// アイテムが選択状態か否かのフラグを設定
 	BOOL bSelected =
@@ -255,8 +302,6 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	rcSubItem.MoveToY( rcItem.top );
 
 	//--- 左側カラム
-	LPCTSTR pszText = szBuff;
-
 //	rcLabel = rcItem;
 	rcLabel.left  += COLUMN_MODE_STYLE::FIRST_MARGIN_LEFT;
 	rcLabel.right -= COLUMN_MODE_STYLE::FIRST_MARGIN_RIGHT;
@@ -270,12 +315,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
 	} else {
 		// 非選択状態なので、状態に応じて色を変更する
-		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
-		if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < (int)pCategory->m_body.size()) {
-			CMixiData* data = &pCategory->m_body[ lvi.lParam ];
+		if (pData!=NULL) {
 
 			COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
-			switch (data->GetAccessType()) {
+			switch (pData->GetAccessType()) {
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
 			case ACCESS_EVENT_JOIN:
@@ -283,11 +326,11 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// コミュニティ、イベント、アンケート
 				// 既読数に応じて色づけ。
 				{
-					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*data);
+					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*pData);
 					if (lastIndex == -1) {
 						// 全くの未読
 						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-					} else if (lastIndex >= data->GetCommentCount()) {
+					} else if (lastIndex >= pData->GetCommentCount()) {
 						// 既読
 						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 					} else {
@@ -302,13 +345,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			case ACCESS_NEIGHBORDIARY:
 				// 日記
 				// 外部ブログは薄く表示
-				if( data->GetURL().Find( L"?url=http" ) != -1 ) {
+				if( pData->GetURL().Find( L"?url=http" ) != -1 ) {
 					// "?url=http" を含むので外部ブログとみなす
 					clrTextFg = theApp.m_skininfo.clrMainBodyListExternalBlogText;
 				} else {
 					// mixi 日記
 					// 未読なら青、既読なら黒
-					if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
+					if( util::ExistFile(util::MakeLogfilePath( *pData )) ) {
 						// ログあり:既読
 						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 					}else{
@@ -322,7 +365,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			case ACCESS_MESSAGE:
 				// ニュース
 				// ログがあれば（既読なら）黒、未読なら青
-				if( util::ExistFile(util::MakeLogfilePath( *data )) ) {
+				if( util::ExistFile(util::MakeLogfilePath( *pData )) ) {
 					// ログあり:既読
 					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 				}else{
@@ -335,7 +378,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			case ACCESS_BIRTHDAY:
 				// ユーザプロフィール
 				// マイミクなら青にする。
-				if( data->IsMyMixi() ) {
+				if( pData->IsMyMixi() ) {
 					clrTextFg = theApp.m_skininfo.clrMainBodyListFootprintMyMixiText;
 				}else{
 					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
@@ -348,7 +391,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					// 暫定処置として、トピック一覧のログ存在チェックで色変更を行う。
 
 					// トピック一覧用 mixi オブジェクトを生成する
-					CMixiData mixi = *data;
+					CMixiData mixi = *pData;
 					mixi.SetAccessType( ACCESS_LIST_BBS );
 					CString url;
 					url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
@@ -372,43 +415,38 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
 
 					// 自分宛の発言を強調表示する
-					const CString& bodyText = data->GetBody();
+					const CString& bodyText = pData->GetBody();
 					if (bodyText.Find(util::FormatString(L"@%s", theApp.m_loginMng.GetTwitterId()))!=-1) {
 						// 強調２
 						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
-					} else {
-						int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
-						if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
-							const CMixiData& selectedData = pCategory->m_body[ selectedIdx ];
+					} else if (pSelectedData!=NULL) {
+						// 選択項目と同じオーナーIDの項目を強調表示する。
+						if (pSelectedData->GetOwnerID()==pData->GetOwnerID()) {
+							// 同じオーナーID：強調表示
+							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						} else {
+							// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
+							CString target = pSelectedData->GetBody();
+							if (target.Find(L"@")!=-1) {
+								// 正規表現のコンパイル（一回のみ）
+								static MyRegex reg;
+								util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
 
-							// 選択項目と同じオーナーIDの項目を強調表示する。
-							if (selectedData.GetOwnerID()==data->GetOwnerID()) {
-								// 同じオーナーID：強調表示
-								clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-							} else {
-								// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
-								CString target = selectedData.GetBody();
-								if (target.Find(L"@")!=-1) {
-									// 正規表現のコンパイル（一回のみ）
-									static MyRegex reg;
-									util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
-
-									for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
-										std::vector<MyRegex::Result>* pResults = NULL;
-										if (reg.exec(target) == false || reg.results.size() != 2) {
-											// 未発見
-											break;
-										}
-
-										// 一致すれば強調表示
-										if (data->GetName()==reg.results[1].str.c_str()) {
-											clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
-											break;
-										}
-
-										// ターゲットを更新。
-										target.Delete(0, reg.results[0].end);
+								for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
+									std::vector<MyRegex::Result>* pResults = NULL;
+									if (reg.exec(target) == false || reg.results.size() != 2) {
+										// 未発見
+										break;
 									}
+
+									// 一致すれば強調表示
+									if (pData->GetName()==reg.results[1].str.c_str()) {
+										clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
+										break;
+									}
+
+									// ターゲットを更新。
+									target.Delete(0, reg.results[0].end);
 								}
 							}
 						}
@@ -432,44 +470,23 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモードの描画
 
-		// 各カラムの取得
-		CString strColumn1 = pszText;
-		CString strColumn2 = L"";
-		CString strColumn3 = L"";
-		LV_COLUMN lvc;
-		lvc.mask = LVCF_FMT | LVCF_WIDTH;
-		for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-			if (this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff)) == 0) {
-				continue;
-			}
-			switch (nColumn) {
-			case 1:		strColumn2 = szBuff;	break;
-			case 2:		strColumn3 = szBuff;	break;
-			default:	break;
-			}
-		}
-
-//		MZ3_TRACE(L"col1 : %s\n", strColumn1);
-//		MZ3_TRACE(L"col2 : %s\n", strColumn2);
-//		MZ3_TRACE(L"col2 : %s\n", strColumn3);
-
 		//--- 1行目の描画
 
 		// パターンの変換
 		CString strLine1 = m_strIntegratedLinePattern1;
 		bool bEmpty = true;
-		if (m_strIntegratedLinePattern1.Find(L"%1")>=0 && !strColumn1.IsEmpty()) {
+		if (m_strIntegratedLinePattern1.Find(L"%1")>=0 && !strTarget1.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine1.Replace(L"%1", strColumn1);
-		if (m_strIntegratedLinePattern1.Find(L"%2")>=0 && !strColumn2.IsEmpty()) {
+		strLine1.Replace(L"%1", strTarget1);
+		if (m_strIntegratedLinePattern1.Find(L"%2")>=0 && !strTarget2.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine1.Replace(L"%2", strColumn2);
-		if (m_strIntegratedLinePattern1.Find(L"%3")>=0 && !strColumn3.IsEmpty()) {
+		strLine1.Replace(L"%2", strTarget2);
+		if (m_strIntegratedLinePattern1.Find(L"%3")>=0 && !strTarget3.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine1.Replace(L"%3", strColumn3);
+		strLine1.Replace(L"%3", strTarget3);
 		if (bEmpty) {
 			strLine1 = L"";
 		}
@@ -487,18 +504,18 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// パターンの変換
 		CString strLine2 = m_strIntegratedLinePattern2;
 		bEmpty = true;
-		if (m_strIntegratedLinePattern2.Find(L"%1")>=0 && !strColumn1.IsEmpty()) {
+		if (m_strIntegratedLinePattern2.Find(L"%1")>=0 && !strTarget1.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine2.Replace(L"%1", strColumn1);
-		if (m_strIntegratedLinePattern2.Find(L"%2")>=0 && !strColumn2.IsEmpty()) {
+		strLine2.Replace(L"%1", strTarget1);
+		if (m_strIntegratedLinePattern2.Find(L"%2")>=0 && !strTarget2.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine2.Replace(L"%2", strColumn2);
-		if (m_strIntegratedLinePattern2.Find(L"%3")>=0 && !strColumn3.IsEmpty()) {
+		strLine2.Replace(L"%2", strTarget2);
+		if (m_strIntegratedLinePattern2.Find(L"%3")>=0 && !strTarget3.IsEmpty()) {
 			bEmpty = false;
 		}
-		strLine2.Replace(L"%3", strColumn3);
+		strLine2.Replace(L"%3", strTarget3);
 		if (bEmpty) {
 			strLine2 = L"";
 		}
@@ -521,7 +538,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 非統合カラムモードの場合の描画処理
 
 		// 第1カラム
-		pDC->DrawText(pszText,
+		pDC->DrawText(strTarget1,
 			-1,
 			rcLabel,
 			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
@@ -535,10 +552,15 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			nSubColumnStartX += lvc.cx;
 		}
 		for (int nColumn = 1; this->GetColumn(nColumn, &lvc); nColumn++) {
-			if (this->GetItemText(nItem, nColumn, szBuff, sizeof(szBuff)) == 0) {
-				continue;
+			LPCTSTR pszText = L"";
+			switch (nColumn) {
+			case 1:	
+				pszText = strTarget2;
+				break;
+			case 2:	
+				pszText = strTarget3;
+				break;
 			}
-			LPCTSTR pszText = szBuff;
 
 			// 第 N カラム
 			UINT nJustify = DT_LEFT;
@@ -585,11 +607,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 現在の要素 (nItem) の上側に線を引く
 	// 判定処理
 	bool bDrawDayBreakBar = false;
-	if (theApp.m_pMainView != NULL &&
-		theApp.m_pMainView->m_selGroup != NULL &&
-		theApp.m_pMainView->m_selGroup->getSelectedCategory() != NULL) 
-	{
-		CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	if (pCategory!=NULL) {
 		CMixiDataList& list = pCategory->GetBodyList();
 		if (list.size()>(size_t)nItem && (size_t)nItem<list.size()-1) {	// 最終要素でないこと
 			// 日付取得

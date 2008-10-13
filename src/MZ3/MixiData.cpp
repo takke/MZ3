@@ -66,7 +66,7 @@ void MZ3Data::SetAuthor(CString author)
  * m_dateText ‚ª‚ ‚ê‚Î‚»‚ê‚ğ•Ô‚·B
  * ‚È‚¯‚ê‚Î m_dateRaw ‚ğ•ÏŠ·‚µ‚Ä•Ô‚·B
  */
-CString MZ3Data::GetDate() {
+CString MZ3Data::GetDate() const {
 	if (!m_dateText.IsEmpty()) {
 		return m_dateText;
 	} else {

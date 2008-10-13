@@ -38,43 +38,6 @@
 
 #define TIMERID_INTERVAL_CHECK	101
 
-inline CString MyGetItemByBodyColType( CMixiData* data, AccessTypeInfo::BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
-{
-	CString item;
-
-	switch( bodyColType ) {
-	case AccessTypeInfo::BODY_INDICATE_TYPE_DATE:
-		item = data->GetDate();
-		break;
-	case AccessTypeInfo::BODY_INDICATE_TYPE_NAME:
-		item = data->GetName();
-		break;
-	case AccessTypeInfo::BODY_INDICATE_TYPE_TITLE:
-		item = data->GetTitle();
-		break;
-	case AccessTypeInfo::BODY_INDICATE_TYPE_BODY:
-		// 本文を1行に変換して割り当て。
-		item = data->GetBody();
-		while( item.Replace( L"\r\n", L"" ) );
-		break;
-	default:
-		return L"";
-	}
-
-	// 上限設定
-	if (bLimitForList) {
-#ifdef WINCE
-		// WindowsMobile の場合は、30文字くらいで切らないと落ちるので制限する。
-		return item.Left( 30 );
-#else
-		// Windows の場合は、とりあえず100文字で切っておく。
-		return item.Left( 100 );
-#endif
-	} else {
-		return item;
-	}
-}
-
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
 LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
 {
@@ -1502,27 +1465,8 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 			return;
 		}
 
-		// 第1カラム
-		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める。
-		// 改行はスペースに置換する。
-		CString strInfo = MyGetItemByBodyColType(data, pCategory->m_bodyColType1);
-		strInfo.Replace(L"\r\n", L" ");
-		int index = m_bodyList.InsertItem( i, strInfo, -1 );
-
-		// 第2、第3カラム
-		if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
-			// 統合カラムモードの場合はカテゴリのカラムタイプ(トグルで変更される)に無関係に
-			// カテゴリ種別に応じた文字列を設定する
-			AccessTypeInfo::BODY_INDICATE_TYPE bodyColType;
-			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol2Type(pCategory->m_mixi.GetAccessType());
-			m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, bodyColType) );
-			bodyColType = theApp.m_accessTypeInfo.getBodyHeaderCol3Type(pCategory->m_mixi.GetAccessType());
-			m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, bodyColType) );
-			
-		} else {
-			m_bodyList.SetItemText( index, 1, MyGetItemByBodyColType(data, pCategory->m_bodyColType2) );
-			m_bodyList.SetItemText( index, 2, MyGetItemByBodyColType(data, pCategory->m_bodyColType3) );
-		}
+		// 文字列は表示時に取得する
+		int index = m_bodyList.InsertItem( i, L"", -1 );
 
 		// ボディの項目の ItemData に index を割り当てる。
 		m_bodyList.SetItemData( index, index );
@@ -1559,7 +1503,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// 第1カラムに表示している内容を表示する。
 		if (pCategory!=NULL) {
 			m_infoEdit.SetWindowText( 
-				MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+				util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
 		}
 	}
 }
@@ -1659,7 +1603,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	// 第1カラムに表示している内容を表示する。
 	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+		util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
@@ -2143,7 +2087,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 
 		// 第1カラムに表示している内容を表示する。
 		m_infoEdit.SetWindowText( 
-			MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
+			util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
@@ -3458,28 +3402,12 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_bodyColType2), 
 		MyGetBodyHeaderColName2(categoryAccessType, pCategory->m_bodyColType3));
 
-	// アイテムの更新
-	INT_PTR count = pCategory->GetBodyList().size();
-	for (int i=0; i<count; i++) {
-		CMixiData& data = pCategory->GetBodyList()[i];
-		// 第2カラム
-		m_bodyList.SetItem( i, 1, LVIF_TEXT, 
-			MyGetItemByBodyColType(&data, pCategory->m_bodyColType2), 0, 0, 0, 0 );
-		// 第3カラム
-		m_bodyList.SetItem( i, 2, LVIF_TEXT, 
-			MyGetItemByBodyColType(&data, pCategory->m_bodyColType3), 0, 0, 0, 0 );
-	}
-
-	// 第1カラムに表示している内容を表示する。
-	m_infoEdit.SetWindowText( 
-		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
-
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
-		// 統合カラムモードでは全体を再描画
+		// 統合カラムモードでは背景以外再描画
 		Invalidate(FALSE);
 	} else {
-		// アイコン再描画
-		InvalidateRect( m_rectIcon, FALSE );
+		// 再描画
+		Invalidate(TRUE);
 	}
 
 	return true;
@@ -6240,7 +6168,7 @@ void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 	} else {
 		// メッセージクリア
 		m_infoEdit.SetWindowText( L"" );
-//		MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false)
+//		util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false)
 	}
 #endif
 

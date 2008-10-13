@@ -47,6 +47,46 @@ inline void MySetInformationText( HWND hWnd, LPCTSTR szMessage )
 	::SendMessage( hWnd, WM_MZ3_ACCESS_INFORMATION, NULL, (LPARAM)&text );
 }
 
+/**
+ * data から表示カラム種別に応じた文字列を取得する
+ */
+inline CString MyGetItemByBodyColType( const CMixiData* data, AccessTypeInfo::BODY_INDICATE_TYPE bodyColType, bool bLimitForList=true )
+{
+	CString item;
+
+	switch( bodyColType ) {
+	case AccessTypeInfo::BODY_INDICATE_TYPE_DATE:
+		item = data->GetDate();
+		break;
+	case AccessTypeInfo::BODY_INDICATE_TYPE_NAME:
+		item = data->GetName();
+		break;
+	case AccessTypeInfo::BODY_INDICATE_TYPE_TITLE:
+		item = data->GetTitle();
+		break;
+	case AccessTypeInfo::BODY_INDICATE_TYPE_BODY:
+		// 本文を1行に変換して割り当て。
+		item = data->GetBody();
+		while( item.Replace( L"\r\n", L"" ) );
+		break;
+	default:
+		return L"";
+	}
+
+	// 上限設定
+	if (bLimitForList) {
+#ifdef WINCE
+		// WindowsMobile の場合は、30文字くらいで切らないと落ちるので制限する。
+		return item.Left( 30 );
+#else
+		// Windows の場合は、とりあえず100文字で切っておく。
+		return item.Left( 100 );
+#endif
+	} else {
+		return item;
+	}
+}
+
 inline CString ExtractFilenameFromUrl( const CString& url, const CString& strDefault )
 {
 	int idx = url.ReverseFind( '/' );
