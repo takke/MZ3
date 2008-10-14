@@ -2903,7 +2903,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	theApp.m_accessType = data->GetAccessType();
 
 	// URL 整形
-	CString uri;
+	CString uri = a_url;
 	switch (data->GetAccessType()) {
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
@@ -2936,10 +2936,26 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			break;
 		}
 		break;
-	default:
-		uri = a_url;
+
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		// Twitterタイムライン：
+		// pageパラメータがなければ(つまりpage=1であれば)since_idパラメータ追加。
+		if (util::GetParamFromURL(uri, L"page").IsEmpty()) {
+			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+			if (pCategory!=NULL && pCategory->m_body.size()>0) {
+				int last_id = pCategory->m_body[0].GetID();
+				uri.AppendFormat(L"%ssince_id=%d", (uri.Find('?')<0 ? L"?" : L"&"), last_id);
+			}
+		}
 		break;
 	}
+
+	// 【API 用】
+	// URL 内のID置換
+	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
+	uri.Replace( L"{wassr:id}", theApp.m_loginMng.GetWassrId() );
+
+	data->SetBrowseUri(uri);
 
 	// リファラ
 	CString referer;
@@ -2955,13 +2971,6 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		referer = L"http://mixi.jp/list_friend.pl";
 		break;
 	}
-
-	// 【API 用】
-	// URL 内のID置換
-	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
-	uri.Replace( L"{wassr:id}", theApp.m_loginMng.GetWassrId() );
-
-	data->SetBrowseUri(uri);
 
 	// encoding 指定
 	switch (theApp.m_accessTypeInfo.getRequestEncoding(data->GetAccessType())) {
