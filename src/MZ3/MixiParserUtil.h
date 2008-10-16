@@ -677,6 +677,52 @@ public:
 		}
 	}
 
+	/**
+	 * 絵文字画像リンクの変換
+	 *
+	 * ((文字)) 文字列に置換する。
+	 */
+	static void ReplaceEmojiImageToText( CString& line )
+	{
+		// <img src="http://img.mixi.jp/img/emoji/xx.gif" alt="文字" width="16" height="16" class="emoji" border="0">
+		// のようなリンクを
+		// "((文字))" に変換する
+
+		// 正規表現のコンパイル（一回のみ）
+		static MyRegex reg;
+		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
+			return;
+		}
+
+		// ((文字)) に変換する
+		reg.replaceAll( line, L"(({2}))" );
+
+	}
+
+	/**
+	 * 件数文字列の分割
+	 *
+	 * 文字列の最後が(数字)ならばその前までの文字列と(数字)文字列に分割する。
+	 */
+	static void SepalateCountString( const CString strTarget , CString& strLeft , CString& strRight )
+	{
+		// 文字列の最後が"(数字)"で終わっていれば分離する
+		strLeft = strTarget;
+		strRight = L"";
+		if ( strTarget.Right(1) == ")" && strTarget.Find(L"(") >= 0) {
+			// 正規表現のコンパイル（一回のみ）
+			static MyRegex reg;
+			util::CompileRegex(reg, L"(\\([0-9]+\\))$");
+
+			std::vector<MyRegex::Result>* pResults = NULL;
+			if (reg.exec(strTarget) == true && reg.results.size() == 2) {
+				strLeft = strTarget.Left( reg.results[1].start );
+				strRight = reg.results[1].str.c_str();
+			}
+		}
+
+	}
+
 private:
 
 	/**

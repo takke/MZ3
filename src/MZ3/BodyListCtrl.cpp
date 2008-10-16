@@ -160,7 +160,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CString strTarget1;
 	CString strTarget2;
 	CString strTarget3;
-	if (pCategory!=NULL) {
+	if (pCategory!=NULL && pData!=NULL) {
 		// 第1カラム
 		// どの項目を与えるかは、カテゴリ項目データ内の種別で決める。
 		// 改行はスペースに置換する。
@@ -467,6 +467,12 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	// 各カラム(各行)の描画
+
+	// 絵文字を文字列に変換する
+	if( LINE_HAS_EMOJI_LINK(strTarget1) ) {
+		mixi::ParserUtil::ReplaceEmojiImageToText( strTarget1 );
+	}
+
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモードの描画
 
@@ -490,14 +496,44 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if (bEmpty) {
 			strLine1 = L"";
 		}
+		// パターンに\tが含まれていれば左右に分割する
+		CString strLine1Left = strLine1;
+		CString strLine1Right = L"";
+		int iSepPos = strLine1.Find(L"\t");
+		if( iSepPos >=0 ){
+			strLine1Left = strLine1.Left( iSepPos );
+			strLine1Right = strLine1.Mid( iSepPos + 1);
+			strLine1.Replace( L"\t" , L" " );
+		}
+		//MZ3_TRACE( L"一行目：%s>■%s■%s■\n" , strLine1 , strLine1Left ,strLine1Right  );
 
 		// 描画
 		CRect rcDraw = rcAllLabels;
 		rcDraw.left += INTEGRATED_MODE_STYLE::FIRST_LINE_MARGIN_LEFT;
-		pDC->DrawText(strLine1,
-			-1,
-			rcDraw,
-			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+		// 左右分割描画
+		CSize csDrawRight = pDC->GetOutputTextExtent( strLine1Right );
+		CSize csDrawAllText = pDC->GetOutputTextExtent( strLine1 );
+		if( csDrawAllText.cx > rcDraw.Width() && csDrawRight.cx < rcDraw.Width() ) {
+			// 二つに分割した文字列を両端に分けて描画する
+			// 左側文字列は右側文字列分を除いた領域に描画する
+			CRect rcDrawLeft( rcDraw );
+			rcDrawLeft.right -= csDrawRight.cx ; 
+			pDC->DrawText(strLine1Left,
+				-1,
+				rcDrawLeft,
+				DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+			// 右側文字列は右寄せで描画する
+			pDC->DrawText(strLine1Right,
+				-1,
+				rcDraw,
+				DT_RIGHT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+		} else {
+			// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま描画する
+			pDC->DrawText(strLine1,
+				-1,
+				rcDraw,
+				DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+		}
 
 		//--- 2行目の描画
 
@@ -520,6 +556,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			strLine2 = L"";
 		}
 
+		// 文字列の最後が"(数字)"で終わっていれば分離する
+		CString strLine2Left = strLine2;
+		CString strLine2Right = L"";
+		mixi::ParserUtil::SepalateCountString( strLine2 , strLine2Left , strLine2Right );
+
+		//MZ3_TRACE( L"二行目：%s>■%s■%s■%d\n" , strLine2 , strLine2Left ,strLine2Right , iSepPos );
+
 		// フォントの高さ取得
 		LOGFONT lf;
 		GetFont()->GetLogFont( &lf );
@@ -530,18 +573,65 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		rcDraw = rcAllLabels;
 		rcDraw.top    += lfHeightPx +theApp.pt2px(INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN_PT);
 		rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
-		pDC->DrawText(strLine2,
-			-1,
-			rcDraw,
-			DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
+		// 左右分割描画
+		csDrawRight = pDC->GetOutputTextExtent( strLine2Right );
+		csDrawAllText = pDC->GetOutputTextExtent( strLine2 );
+		if( csDrawAllText.cx > rcDraw.Width() && csDrawRight.cx < rcDraw.Width() ) {
+			// 二つに分割した文字列を両端に分けて描画する
+			// 左側文字列は右側文字列分を除いた領域に描画する
+			CRect rcDrawLeft( rcDraw );
+			rcDrawLeft.right -= csDrawRight.cx ; 
+			pDC->DrawText(strLine2Left,
+				-1,
+				rcDrawLeft,
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
+			// 右側文字列は右寄せで描画する
+			pDC->DrawText(strLine2Right,
+				-1,
+				rcDraw,
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_RIGHT | DT_END_ELLIPSIS);
+
+		} else {
+			// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま左詰めで描画する
+			pDC->DrawText(strLine2,
+				-1,
+				rcDraw,
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
+		}
+
 	} else {
 		// 非統合カラムモードの場合の描画処理
 
 		// 第1カラム
-		pDC->DrawText(strTarget1,
-			-1,
-			rcLabel,
-			DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+		// 文字列の最後が"(数字)"で終わっていれば分離する
+		CString strTarget1Left = strTarget1;
+		CString strTarget1Right = L"";
+		mixi::ParserUtil::SepalateCountString( strTarget1 , strTarget1Left , strTarget1Right );
+
+		// 左右分割描画
+		CSize csLabelRight = pDC->GetOutputTextExtent( strTarget1Right );
+		CSize csLabelAllText = pDC->GetOutputTextExtent( strTarget1 );
+		if( csLabelAllText.cx > rcLabel.Width() && csLabelRight.cx < rcLabel.Width() ) {
+			// 二つに分割した文字列を両端に分けて描画する
+			// 左側文字列は右側文字列分を除いた領域に描画する
+			CRect rcLabelLeft( rcLabel );
+			rcLabelLeft.right -= csLabelRight.cx ; 
+			pDC->DrawText(strTarget1Left,
+				-1,
+				rcLabelLeft,
+				DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+			// 右側文字列は右寄せで描画する
+			pDC->DrawText(strTarget1Right,
+				-1,
+				rcLabel,
+				DT_RIGHT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+		} else {
+			// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま左詰めで描画する
+			pDC->DrawText(strTarget1,
+				-1,
+				rcLabel,
+				DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER | DT_END_ELLIPSIS);
+		}
 
 		// 第2カラム以降の描画
 		LV_COLUMN lvc;

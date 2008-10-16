@@ -1502,8 +1502,12 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	} else {
 		// 第1カラムに表示している内容を表示する。
 		if (pCategory!=NULL) {
-			m_infoEdit.SetWindowText( 
-				util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+			CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
+			// 絵文字を文字列に変換する
+			if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+				mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+			}
+			m_infoEdit.SetWindowText( strInfo );
 		}
 	}
 }
@@ -1602,8 +1606,13 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	pCategory->selectedBody = pNMLV->iItem;
 
 	// 第1カラムに表示している内容を表示する。
-	m_infoEdit.SetWindowText( 
-		util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false) );
+	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
+	// 絵文字を文字列に変換する
+	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+	}
+
+	m_infoEdit.SetWindowText( strInfo );
 
 	// 画像位置変更
 	MoveMiniImageDlg();
@@ -2086,8 +2095,12 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 		m_hotList = &m_bodyList;
 
 		// 第1カラムに表示している内容を表示する。
-		m_infoEdit.SetWindowText( 
-			util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false) );
+		CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false);
+		// 絵文字を文字列に変換する
+		if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+			mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+		}
+		m_infoEdit.SetWindowText( strInfo );
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;

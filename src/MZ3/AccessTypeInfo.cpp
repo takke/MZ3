@@ -118,7 +118,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_NEW_COMMENT;
@@ -135,7 +135,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_COMMENT;
@@ -152,7 +152,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_NEWS;
@@ -194,7 +194,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"最終ログイン>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"自己紹介>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1 (%2)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%1\t(%2)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%3";
 
 	type = ACCESS_LIST_FAVORITE_COMMUNITY;
@@ -214,7 +214,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"説明>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1 (%2)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%1\t(%2)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%3";
 
 	type = ACCESS_LIST_FRIEND;
@@ -267,7 +267,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_NEW_BBS;
@@ -284,7 +284,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_BBS;
@@ -334,7 +334,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"差出人>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_MESSAGE_OUT;
@@ -351,7 +351,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"宛先>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 (%3)";
+	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
 	type = ACCESS_LIST_BOOKMARK;
@@ -663,7 +663,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2  (%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
 
 	type = ACCESS_TWITTER_FAVORITES;
@@ -683,7 +683,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2  (%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
 
 	type = ACCESS_TWITTER_DIRECT_MESSAGES;
@@ -704,7 +704,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"メッセージ");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2  (%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "メッセージ"
 
 	type = ACCESS_TWITTER_UPDATE;
@@ -787,7 +787,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2  %3";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t%3";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";		// "発言"
 
 	// add_echo.pl
@@ -828,7 +828,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2  (%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
 
 	type = ACCESS_WASSR_UPDATE;
@@ -859,7 +859,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY,  L"内容>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1  (%3)";	// "タイトル  (日付)"
+	m_map[type].bodyIntegratedLinePattern1 = L"%1 \t(%3)";	// "タイトル  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";			// "内容"
 
 	type = ACCESS_RSS_READER_ITEM;
