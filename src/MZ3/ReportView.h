@@ -172,6 +172,8 @@ public:
 	afx_msg void OnMenuPrevDiary();
 	afx_msg void OnUpdateMenuNextDiary(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateMenuPrevDiary(CCmdUI *pCmdUI);
+	afx_msg void OnLoadFullDiary();
+	afx_msg void OnUpdateLoadFullDiary(CCmdUI *pCmdUI);
 };
 
 

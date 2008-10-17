@@ -661,6 +661,40 @@ public:
 				MZ3LOGGER_INFO( util::FormatString( L"次の日記へのリンク取得エラー : %s", e.getMessage().c_str()) );
 			}
 
+			// 全てを表示へのリンク
+			try {
+				const xml2stl::Node& li = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+													   .getNode(L"div", L"id=diaryComment")
+													   .getNode(L"div", L"class=diaryMainArea02 deleteButton")
+													   .getNode(L"form")
+													   .getNode(L"div", L"class=pageNavigation01 preComment01")
+													   .getNode(L"div", L"class=pageList03")
+													   .getNode(L"ul")
+													   .getNode(L"li");
+
+				CString FullLink = li.getTextAll().c_str();
+				data_.SetFullDiary( FullLink );
+
+			} catch (xml2stl::NodeNotFoundException& e) {
+				// 人の日記の場合
+				try {
+					const xml2stl::Node& li = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
+														   .getNode(L"div", L"id=diaryComment")
+														   .getNode(L"div", L"class=pageNavigation01 preComment01")
+														   .getNode(L"div", L"class=pageList03")
+														   .getNode(L"ul")
+														   .getNode(L"li");
+
+					CString FullLink = li.getTextAll().c_str();
+					data_.SetFullDiary( FullLink );
+
+				} catch (xml2stl::NodeNotFoundException& e) {
+					// リンクがなかったと判断する
+					MZ3LOGGER_INFO( util::FormatString( L"「全てを表示」リンク取得エラー : %s", e.getMessage().c_str()) );
+				}
+				MZ3LOGGER_INFO( util::FormatString( L"自分の日記の「全てを表示」リンク取得エラー : %s", e.getMessage().c_str()) );
+			}
+
 			// 本文取得
 			try {
 				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")

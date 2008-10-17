@@ -203,6 +203,8 @@ BEGIN
         POPUP "ページ"
         BEGIN
             MENUITEM "再読込",                         IDM_RELOAD_PAGE
+            MENUITEM "全てを表示",                       IDM_LOAD_FULL_DIARY
+            MENUITEM SEPARATOR
         END
         POPUP "ブックマーク"
         BEGIN

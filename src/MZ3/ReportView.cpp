@@ -127,6 +127,8 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_MENU_PREV_DIARY, &CReportView::OnMenuPrevDiary)
 	ON_UPDATE_COMMAND_UI(ID_MENU_NEXT_DIARY, &CReportView::OnUpdateMenuNextDiary)
 	ON_UPDATE_COMMAND_UI(ID_MENU_PREV_DIARY, &CReportView::OnUpdateMenuPrevDiary)
+	ON_COMMAND(IDM_LOAD_FULL_DIARY, &CReportView::OnLoadFullDiary)
+	ON_UPDATE_COMMAND_UI(IDM_LOAD_FULL_DIARY, &CReportView::OnUpdateLoadFullDiary)
 END_MESSAGE_MAP()
 
 
@@ -2382,6 +2384,19 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 			pcThisMenu->RemoveMenu(idxDiarySeparator, MF_BYPOSITION);
 			idxPage--;
 		}
+		// 「全てを表示」メニューの処理
+		{
+			CString fulldiarylink = m_data.GetFullDiary();
+			if( fulldiarylink.IsEmpty() ){
+				pcThisMenu->RemoveMenu(IDM_LOAD_FULL_DIARY, MF_BYCOMMAND);
+			} else {
+				// リンク文字列をメニューに設定する
+				std::vector<CMixiData::Link> list_;
+				mixi::ParserUtil::ExtractURI( fulldiarylink , list_ );
+
+				pcThisMenu->ModifyMenu( IDM_LOAD_FULL_DIARY ,  MF_BYCOMMAND | MF_STRING , IDM_LOAD_FULL_DIARY , list_[0].text );
+			}
+		}
 		break;
 	default:
 		pcThisMenu->RemoveMenu(ID_MENU_PREV_DIARY, MF_BYCOMMAND);
@@ -2392,6 +2407,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		idxDiarySeparator--;
 		pcThisMenu->RemoveMenu(idxDiarySeparator, MF_BYPOSITION);
 		idxPage--;
+		pcThisMenu->RemoveMenu(IDM_LOAD_FULL_DIARY, MF_BYCOMMAND);
 	}
 
 	// 「ページ」および「URLをコピー」の追加
@@ -3142,6 +3158,41 @@ void CReportView::OnUpdateMenuPrevDiary(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable( false );
 	if( !m_data.GetPrevDiary().IsEmpty() ){
+		pCmdUI->Enable( true );
+	}
+}
+
+/**
+ * 「全てを表示」メニュー処理
+ */
+void CReportView::OnLoadFullDiary()
+{
+	//MZ3_TRACE(L"CReportView::OnLoadFullDiary()\n");
+
+	CString link = m_data.GetFullDiary();
+	if( !link.IsEmpty() ){
+		std::vector<CMixiData::Link> list_;
+		mixi::ParserUtil::ExtractURI( link , list_ );
+
+		if( list_.size() > 0 ){
+			// mixi 内リンクのはずなのでロードする。
+			if ( MyLoadMixiViewPage( list_[0] )) {
+				return;
+			} else {
+				// mixi内リンクでなければエラーが表示されているので隠す
+				m_infoEdit.ShowWindow(SW_HIDE);
+			}
+		}
+	}
+}
+
+/**
+ * 「全てを表示」メニュー活性化処理
+ */
+void CReportView::OnUpdateLoadFullDiary(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable( false );
+	if( !m_data.GetFullDiary().IsEmpty() ){
 		pCmdUI->Enable( true );
 	}
 }

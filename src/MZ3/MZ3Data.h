@@ -282,9 +282,13 @@ public:
 	void	SetNextDiary(LPCTSTR url)		{ m_StringMap[L"next_diary"] = url; }
 	CString GetNextDiary()				{ return FindStringMap(L"next_diary"); }
 
-	// prev_diary : 次の日記
+	// prev_diary : 前の日記
 	void	SetPrevDiary(LPCTSTR url)		{ m_StringMap[L"prev_diary"] = url; }
 	CString GetPrevDiary()				{ return FindStringMap(L"prev_diary"); }
+
+	// full_diary : 全てを表示
+	void	SetFullDiary(LPCTSTR url)		{ m_StringMap[L"full_diary"] = url; }
+	CString GetFullDiary()				{ return FindStringMap(L"full_diary"); }
 
 	//--- 子要素操作
 	void	ClearChildren()					{ m_children.clear(); }				///< 子要素の削除
