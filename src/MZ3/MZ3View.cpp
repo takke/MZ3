@@ -1457,8 +1457,6 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	sw.start();
 	int count = body.size();
 	for (int i=0; i<count; i++) {
-		CMixiData* data = &body[i];
-
 		// タブ切り替えが行われればキャンセル
 		if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
 			m_bModifyingBodyList = false;
@@ -1466,10 +1464,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		}
 
 		// 文字列は表示時に取得する
-		int index = m_bodyList.InsertItem( i, L"", -1 );
-
-		// ボディの項目の ItemData に index を割り当てる。
-		m_bodyList.SetItemData( index, index );
+		m_bodyList.InsertItem( i, L"", -1 );
 	}
 	MZ3LOGGER_DEBUG(
 		util::FormatString(L"ボディリスト設定完了, elapsed[%dms], count[%d]", 
@@ -2953,13 +2948,13 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
 		// Twitterタイムライン：
 		// pageパラメータがなければ(つまりpage=1であれば)since_idパラメータ追加。
-		if (util::GetParamFromURL(uri, L"page").IsEmpty()) {
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-			if (pCategory!=NULL && pCategory->m_body.size()>0) {
-				int last_id = pCategory->m_body[0].GetID();
-				uri.AppendFormat(L"%ssince_id=%d", (uri.Find('?')<0 ? L"?" : L"&"), last_id);
-			}
-		}
+//		if (util::GetParamFromURL(uri, L"page").IsEmpty()) {
+//			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+//			if (pCategory!=NULL && pCategory->m_body.size()>0) {
+//				int last_id = pCategory->m_body[0].GetID();
+//				uri.AppendFormat(L"%ssince_id=%d", (uri.Find('?')<0 ? L"?" : L"&"), last_id);
+//			}
+//		}
 		break;
 	}
 
@@ -3429,7 +3424,9 @@ bool CMZ3View::MyChangeBodyHeader(void)
 		Invalidate(FALSE);
 	} else {
 		// 再描画
-		Invalidate(TRUE);
+		// バックバッファ経由で再描画
+		m_bodyList.DrawDetail();
+		m_bodyList.UpdateWindow();
 	}
 
 	return true;

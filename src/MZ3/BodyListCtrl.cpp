@@ -127,7 +127,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// アイテム データを取得します。
 	LV_ITEM lvi;
-	lvi.mask = LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
+	lvi.mask = LVIF_IMAGE | LVIF_STATE;
 	lvi.iItem = nItem;
 	lvi.iSubItem = 0;
 	lvi.stateMask = LVIS_SELECTED | LVIS_STATEIMAGEMASK;
@@ -145,8 +145,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 出力対象の要素
 	const CMixiData* pData = NULL;
-	if (pCategory!=NULL && 0 <= lvi.lParam && lvi.lParam < (int)pCategory->m_body.size()) {
-		pData = &pCategory->m_body[ lvi.lParam ];
+	if (pCategory!=NULL && 0 <= nItem && nItem < (int)pCategory->m_body.size()) {
+		pData = &pCategory->m_body[ nItem ];
 	}
 
 	// 選択要素
