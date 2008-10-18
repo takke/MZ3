@@ -48,6 +48,58 @@ public:
 	inline bool is_eof() const {
 		return len_readed >= buf_size;
 	}
+
+	/**
+	 * target が現れるまで読み飛ばし、その直前までの文字列を until_text に設定(追加)する
+	 */
+	inline bool search_until_target( const wchar_t* target, std::wstring* until_text )
+	{
+		if (is_eof()) {
+			return false;
+		}
+		const wchar_t* p_start = (const wchar_t*)&buf_[len_readed];
+
+		const wchar_t* found_at = wcsstr(p_start, target);
+		if (found_at==NULL) {
+			len_readed = buf_size;
+			return false;
+		}
+
+		int until_len = found_at - p_start;
+		if (until_text!=NULL) {
+			until_text->append(p_start, until_len);
+		}
+
+		len_readed += until_len + wcslen(target);
+
+		return true;
+	}
+
+	/**
+	 * target が現れるまで読み飛ばし、その直前までの文字列を until_text に設定(追加)する
+	 */
+	inline bool search_until_target( const wchar_t target, std::wstring* until_text )
+	{
+		if (is_eof()) {
+			return false;
+		}
+		const wchar_t* p_start = (const wchar_t*)&buf_[len_readed];
+
+		const wchar_t* found_at = wcschr(p_start, target);
+		if (found_at==NULL) {
+			len_readed = buf_size;
+			return false;
+		}
+
+		int until_len = found_at - p_start;
+		if (until_text!=NULL) {
+			until_text->append(p_start, until_len);
+		}
+
+		len_readed += until_len + 1;	// 1=length of target
+
+		return true;
+	}
 };
 
 /**

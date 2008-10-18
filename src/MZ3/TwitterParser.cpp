@@ -39,7 +39,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 	// XML ‰ğÍ
 	sw_parse.start();
 	xml2stl::Container root;
-	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text, false )) {
 		MZ3LOGGER_ERROR( L"XML ‰ğÍ¸”s" );
 		return false;
 	}
@@ -159,7 +159,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 	MZ3LOGGER_DEBUG( 
 		util::FormatString(
 			L"TwitterFriendsTimelineXmlParser.parse() finished. elapsed:[%dms]"
-			L", serialize[%dms], parse[%dms], generate[%dms]", 
+			L", serialize[%dms], dom_generate[%dms], bean_generate[%dms]", 
 			sw.getElapsedMilliSecUntilNow(),
 			sw_serialize.getElapsedMilliSecUntilStoped(), 
 			sw_parse.getElapsedMilliSecUntilStoped(), 
@@ -187,7 +187,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 
 	// XML ‰ğÍ
 	xml2stl::Container root;
-	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text, false )) {
 		MZ3LOGGER_ERROR( L"XML ‰ğÍ¸”s" );
 		return false;
 	}
@@ -327,7 +327,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 
 	// XML ‰ğÍ
 	xml2stl::Container root;
-	if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text, false )) {
 		MZ3LOGGER_ERROR( L"XML ‰ğÍ¸”s" );
 		return false;
 	}

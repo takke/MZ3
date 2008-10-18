@@ -103,7 +103,7 @@ bool RssFeedParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_,
 
 	// XML ‰ğÍ
 	xml2stl::Container root;
-	if (!xml2stl::SimpleXmlParser::loadFromText( root, text_ )) {
+	if (!xml2stl::SimpleXmlParser::loadFromText( root, text_, false )) {
 		MZ3LOGGER_ERROR( L"XML ‰ğÍ¸”s" );
 		return false;
 	}
