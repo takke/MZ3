@@ -648,7 +648,8 @@ bool AccessTypeInfo::init()
 		INFO_TYPE_CATEGORY
 		, "Twitter"
 		, L"タイムライン"
-		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
+//		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
+		, REQUEST_METHOD_GET
 		);
 	// http://twitter.com/statuses/friends_timeline.xml
 	// http://twitter.com/statuses/friends_timeline/takke.xml
