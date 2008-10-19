@@ -1,1 +1,1 @@
-#define MZ3_SVN_REVISION L"r1063"
+#define MZ3_SVN_REVISION L"r1069"
