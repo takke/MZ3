@@ -6,4 +6,6 @@ Context=IDH_HELP76
 <P>&nbsp; RSS リーダで情報を受け取るには，RSS フィードを toppage_group.ini に登録する必要があります<BR>&nbsp; 登録方法は画面上で登録する方法と，ini ファイルを直接編集する方法とがあります</P>
 <P>&nbsp; 画面から登録する場合はフィードを追加したいカテゴリタブでコンテキストメニューを開き，<BR>&nbsp; メニューにある「RSSフィードの追加」に該当 URL を入力してください</P>
 <P>&nbsp; ini ファイルを直接編集する場合は&nbsp;<A href="2007101521218532.htm">ini ファイル編集</A>の<A href="20071015212015782.htm">タブ編集</A>の要領で<BR>&nbsp; フィードの追加・修正・削除を行ってください </P>
-<P>&nbsp;</P>
+<P><FONT face="ＭＳ ゴシック"><A href="Capture/07_メイン画面_RSS.jpg"><IMG height=200 src="Capture/07_メイン画面_RSS.jpg"></FONT></A></P>
+<P>&nbsp;&nbsp; 下部ペインの各発言にフォーカスを当てた状態でコンテキストメニューを表示させることができます</P>
+<P>&nbsp; 【全文を読む】<BR>&nbsp;&nbsp;&nbsp; フィードのタイトル，内容を表示します<BR>&nbsp; 【link:】<BR>&nbsp;&nbsp;&nbsp; 該当ページを開きます<BR>&nbsp; 【URL をコピー】<BR>&nbsp;&nbsp;&nbsp; 内容に含まれる URL をコピーします</P>
