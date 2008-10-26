@@ -94,3 +94,5 @@
 // GDI+
 #include <atlimage.h>
 #endif
+
+#include "../../src_lib/md5-cc/md5.h"

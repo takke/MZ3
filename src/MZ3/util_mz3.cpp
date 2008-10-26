@@ -9,6 +9,7 @@
 #include "MyRegex.h"
 #include "util_base.h"
 #include "util_mixi.h"
+#include "util_mz3.h"
 
 /// MZ3 用ユーティリティ
 namespace util
@@ -150,6 +151,32 @@ CString MakeLogfilePath( const CMixiData& data )
 	} else {
 		// ルール解析した結果を返す。
 		return MakeLogfilePathByRule( theApp.m_filepath.logFolder, data, strCacheFilePattern );
+	}
+}
+
+CString MakeImageLogfilePathFromUrl( const CString& url )
+{
+	CString filename = ExtractFilenameFromUrl( url, L"" );
+	if (!filename.IsEmpty()) {
+		return theApp.m_filepath.imageFolder + L"\\" + filename;
+	}
+	return L"";
+}
+
+CString MakeImageLogfilePathFromUrlMD5( const CString& url )
+{
+	// http://takke.jp/hoge/fuga.png => (md5) => xxxx...xxx
+	if (url.IsEmpty()) {
+		return L"";
+	} else {
+		unsigned char ansi_string[1024];
+		memset( &ansi_string[0], 0x00, sizeof(char) * 1024 );
+		unsigned int len_in_mbs = wcstombs( (char*)&ansi_string[0], url, 1023 );
+
+		MD5 md5(ansi_string, len_in_mbs);
+		MZ3_TRACE(L"MakeImageLogfilePathFromUrlMD5(), url[%s], filename[%s]\n", 
+			(LPCTSTR)url, (LPCTSTR)CString(CStringA(md5.hex_digest())));
+		return theApp.m_filepath.imageFolder + L"\\" + CString(CStringA(md5.hex_digest()));
 	}
 }
 

@@ -21,6 +21,13 @@ namespace util
 
 CString MakeLogfilePath( const CMixiData& data );
 
+/// URL から画像ファイルのパスを生成する
+CString MakeImageLogfilePathFromUrl( const CString& url );
+
+
+/// URL から画像ファイルのパスをMD5で生成する
+CString MakeImageLogfilePathFromUrlMD5( const CString& url );
+
 /**
  * 画面下部の情報領域にメッセージを設定する
  */
@@ -96,19 +103,12 @@ inline CString ExtractFilenameFromUrl( const CString& url, const CString& strDef
 	return strDefault;
 }
 
-inline CString MakeImageLogfilePathFromUrl( const CString& url )
-{
-	CString filename = ExtractFilenameFromUrl( url, L"" );
-	if (!filename.IsEmpty()) {
-		return theApp.m_filepath.imageFolder + L"\\" + filename;
-	}
-	return L"";
-}
-
 /**
  * CMixiData に対応する画像ファイルのパスを生成する
+ *
+ * パスは "local_image_filepath" としてキャッシュする。
  */
-inline CString MakeImageLogfilePath( const CMixiData& data )
+inline CString MakeImageLogfilePath( CMixiData& data )
 {
 	// アクセス種別に応じてパスを生成する
 	switch( data.GetAccessType() ) {
@@ -118,7 +118,17 @@ inline CString MakeImageLogfilePath( const CMixiData& data )
 	case ACCESS_WASSR_USER:
 	case ACCESS_MIXI_ECHO_USER:
 		if (data.GetImageCount()>0) {
-			CString path = MakeImageLogfilePathFromUrl( data.GetImage(0) );
+			const CString& image_url = data.GetImage(0);
+			if (image_url.IsEmpty()) {
+				return L"";
+			}
+			CString path = data.GetTextValue(L"local_image_filepath");
+			if (path.IsEmpty()) {
+				path = MakeImageLogfilePathFromUrlMD5( image_url );
+				if (!path.IsEmpty()) {
+					data.SetTextValue(L"local_image_filepath", path);
+				}
+			}
 			if (!path.IsEmpty()) {
 				return path;
 			}

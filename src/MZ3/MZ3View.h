@@ -380,7 +380,7 @@ public:
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
 
 	void MoveMiniImageDlg(int idxBody=-1, int pointx=-1, int pointy=-1);
-	bool MyLoadMiniImage(const CMixiData& mixi);
+	bool MyLoadMiniImage(CMixiData& mixi);
 	VIEW_STYLE MyGetViewStyleForSelectedCategory(void);
 	void MySetLayout(int cx, int cy);
 	void MyUpdateControlStatus(void);

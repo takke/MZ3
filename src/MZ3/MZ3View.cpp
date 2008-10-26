@@ -807,7 +807,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	case ACCESS_IMAGE:
 		{
 			// コピー
-			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_inet.GetURL() );
+			CString path = util::MakeImageLogfilePathFromUrlMD5( theApp.m_inet.GetURL() );
 			CopyFile( theApp.m_filepath.temphtml, path, FALSE/*bFailIfExists, 上書き*/ );
 
 			// アイコン差し替え
@@ -1308,9 +1308,9 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 				return;
 			}
 
-			const CMixiData& mixi = body[i];
-			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+			CString miniImagePath = util::MakeImageLogfilePath( body[i] );
 
+			const CMixiData& mixi = body[i];
 			if (theApp.m_imageCache.GetImageIndex(miniImagePath) >= 0) {
 				// ロード済みなのでロード不要
 				bUseExtendedIcon = true;
@@ -1397,7 +1397,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 		}
 		if (bUseExtendedIcon) {
 			// ファイルパスからインデックスを解決する
-			CString miniImagePath = util::MakeImageLogfilePath( mixi );
+			CString miniImagePath = util::MakeImageLogfilePath( body[i] );
 
 			// インデックス探索
 			iconIndex = theApp.m_imageCache.GetImageIndex( miniImagePath );
@@ -4769,7 +4769,7 @@ void CMZ3View::MoveMiniImageDlg(int idxBody/*=-1*/, int pointx/*=-1*/, int point
 
 			// mini画像が未ロードであれば取得する
 			if (!pCategory->m_body.empty() && 0 <= target && target < (int)pCategory->m_body.size() ) {
-				const CMixiData& data = pCategory->m_body[ target ];
+				CMixiData& data = pCategory->m_body[ target ];
 				MyLoadMiniImage( data );
 			}
 		}
@@ -4781,7 +4781,7 @@ LRESULT CMZ3View::OnHideView(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-bool CMZ3View::MyLoadMiniImage(const CMixiData& mixi)
+bool CMZ3View::MyLoadMiniImage(CMixiData& mixi)
 {
 	if (!theApp.m_optionMng.m_bShowMainViewMiniImage) {
 		return false;
@@ -5605,7 +5605,7 @@ void CMZ3View::OnPaint()
 
 			bool bDrawFinished = false;
 
-			const CMixiData& data = GetSelectedBodyItem();
+			CMixiData& data = GetSelectedBodyItem();
 			CString path = util::MakeImageLogfilePath( data );
 			if (!path.IsEmpty() ) {
 				// 情報領域の左側に描画する。
