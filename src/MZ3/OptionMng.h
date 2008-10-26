@@ -127,6 +127,7 @@ public:
 	CString			m_strTwitterPostFotterText;		///< 文末に付けるマーク
 	int				m_nTwitterStatusLineCount;		///< Twitterモード時のステータス行数
 	int				m_nTwitterGetPageCount;			///< Twitterモード時の取得ページ数
+	bool			m_bTwitterReloadTLAfterPost;	///< 投稿後にタイムラインを取得する
 
 public:
 	Option()
@@ -200,6 +201,7 @@ public:
 		, m_nTwitterGetPageCount(3)
 #endif
 		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
+		, m_bTwitterReloadTLAfterPost(false)
 	{
 	}
 

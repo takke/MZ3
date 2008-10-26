@@ -82,6 +82,10 @@ BOOL COptionTabTwitter::OnInitDialog()
 		}
 	}
 
+	// 投稿後にタイムラインを取得する
+	CheckDlgButton( IDC_TWITTER_RELOAD_TL_AFTER_POST_CHECK, 
+					theApp.m_optionMng.m_bTwitterReloadTLAfterPost ? BST_CHECKED : BST_UNCHECKED );
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 例外 : OCX プロパティ ページは必ず FALSE を返します。
 }
@@ -113,6 +117,9 @@ void COptionTabTwitter::OnOK()
 			theApp.m_optionMng.m_nTwitterGetPageCount = option::Option::normalizeTwitterGetPageCount(n);
 		}
 	}
+
+	// 投稿後にタイムラインを取得する
+	theApp.m_optionMng.m_bTwitterReloadTLAfterPost = IsDlgButtonChecked( IDC_TWITTER_RELOAD_TL_AFTER_POST_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }

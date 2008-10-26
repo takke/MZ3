@@ -5555,6 +5555,19 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// フォーカスの変更
 	MyUpdateFocus();
 
+	// [MZ3-API] 通信終了(UI初期化完了)後のフック処理
+	switch (theApp.m_accessTypeInfo.getInfoType(aType)) {
+	case AccessTypeInfo::INFO_TYPE_POST:
+		switch (aType) {
+		case ACCESS_TWITTER_UPDATE:
+			// 投稿後にタイムラインを取得する
+			if (theApp.m_optionMng.m_bTwitterReloadTLAfterPost) {
+				RetrieveCategoryItem();
+			}
+			break;
+		}
+	}
+
 	return TRUE;
 }
 
