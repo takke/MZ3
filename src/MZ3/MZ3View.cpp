@@ -1299,6 +1299,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	}
 
 	// ユーザやコミュニティの画像をアイコン化して表示する
+	DWORD dwLoadAndResizeMS = 0;
 	sw_generate_icon.start();
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
@@ -1315,6 +1316,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 				// ロード済みなのでロード不要
 				bUseExtendedIcon = true;
 			} else {
+				util::StopWatch sw_load_and_resize;
+				sw_load_and_resize.start();
 				// 未ロードなのでロード
 				CMZ3BackgroundImage image(L"");
 				image.load( miniImagePath );
@@ -1331,6 +1334,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 						theApp.m_pDownloadView->AppendDownloadItem( item );
 					}
 				}
+				dwLoadAndResizeMS += sw_load_and_resize.getElapsedMilliSecUntilNow();
 			}
 		}
 	}
@@ -1425,8 +1429,9 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
 	MZ3LOGGER_DEBUG(
-		util::FormatString(L"アイコン生成完了, generate[%dms], set[%dms]", 
+		util::FormatString(L"アイコン生成完了, generate[%dms](load/resize[%dms]), set[%dms]", 
 			sw_generate_icon.getElapsedMilliSecUntilStoped(),
+			dwLoadAndResizeMS,
 			sw_set_icon.getElapsedMilliSecUntilStoped()));
 }
 

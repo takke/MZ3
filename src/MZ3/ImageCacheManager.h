@@ -28,9 +28,11 @@ class ImageCacheManager
 public:
 	bool Create()
 	{
-		m_imageList16.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 4);
-		m_imageList32.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 4);
-		m_imageList48.Create(48, 48, ILC_COLOR24 | ILC_MASK, 0, 4);
+		const unsigned int nGrow = 8;
+
+		m_imageList16.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, nGrow);
+		m_imageList32.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, nGrow);
+		m_imageList48.Create(48, 48, ILC_COLOR24 | ILC_MASK, 0, nGrow);
 		m_imageListMap.RemoveAll();
 		m_loadedFileToIndexMap.clear();
 
