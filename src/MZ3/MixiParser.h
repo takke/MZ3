@@ -443,6 +443,10 @@ public:
 						continue;
 					}
 
+					// &#xxxx; の実体参照の文字化
+					// 例）&#3642; → char(3642)
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( author );
+
 					data.SetName( author );
 					data.SetAuthor( author );
 					TRACE(_T("%s\n"), data.GetName());
@@ -598,6 +602,10 @@ public:
 					} catch (...) {
 					}
 				}
+
+				// &#xxxx; の実体参照の文字化
+				// 例）&#3642; → char(3642)
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( author );
 
 				// 著者設定
 				data_.SetAuthor( author );
