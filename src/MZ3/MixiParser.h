@@ -2974,7 +2974,7 @@ public:
 				// buf: HREF="view_message.pl?id=xxx&box=inbox">件名</a></td>
 
 				CString link;
-				if( util::GetBetweenSubString( buf, L"HREF=\"", L"\"", link ) < 0 ) {
+				if( util::GetBetweenSubString( buf, L"href=\"", L"\"", link ) < 0 ) {
 					continue;
 				}
 				data.SetURL(link);
@@ -2989,10 +2989,17 @@ public:
 				// 名前
 				// 前の行から取得する
 				const CString& line0 = html_.GetAt( i-1 );
-				// line0: <td>なまえ</td>
-				if( util::GetBetweenSubString( line0, L"<td>", L"</td>", buf ) < 0 ) {
-					const CString& line1 = html_.GetAt( i-2 );
-					if( util::GetBetweenSubString( line1, L"<td>", L" \n", buf ) < 0 ) {
+				// line01: <td class="sender">
+				// line02: なまえ
+				//
+				// line0: </td>
+				if( util::LineHasStringsNoCase( line0, L"</td>" ) ) {
+					const CString& line01 = html_.GetAt( i-4 );
+					if( util::LineHasStringsNoCase( line01, L"<td", L"class=" , L"sender" ,L">" ) ) {
+						const CString& line02 = html_.GetAt( i-3 );
+						buf = line02;
+						buf.Replace( L"\n" , L"" );
+					} else {
 						continue;
 					}
 				}
@@ -3000,9 +3007,9 @@ public:
 				data.SetAuthor(buf);
 
 				// 次の行から、日付を取得
-				const CString& line2 = html_.GetAt( i+1 );
-				// line2: <td>04月08日</td></tr>
-				if( util::GetBetweenSubString( line2, L"<td>", L"</td>", buf ) < 0 ) {
+				const CString& line2 = html_.GetAt( i+2 );
+				// line2: <td calss="date">04月08日<a ... > ... </td></tr>
+				if( util::GetBetweenSubString( line2, L"<td class=\"date\">", L"<a", buf ) < 0 ) {
 					continue;
 				}
 				data.SetDate( buf );
@@ -3045,16 +3052,21 @@ public:
 			CString str = html_.GetAt(i);
 
 			// 日付抽出
-			// <font COLOR=#996600>日　付</font>&nbsp;:&nbsp;2007年10月08日 21時52分&nbsp;&nbsp;
-			if( util::LineHasStringsNoCase( str, L"<font", L" COLOR=#996600", L">", L"日　付" ) ) {
-				CString buf = str;
+			// <dt>日付</dt>
+			// <dd>2008年11月12日 11時13分</dd>
+			if( util::LineHasStringsNoCase( str, L"<dt>日付</dt>" ) ) {
+				const CString line0 = html_.GetAt( i+1 );
+				CString buf = line0;
 				buf.Replace(_T("時"), _T(":"));
 				ParserUtil::ParseDate(buf, data_);
+				if( util::GetBetweenSubString( line0 , L"<dd>", L"</dd>", buf ) ) {
+					data_.SetDate( buf );
+				}
 				continue;
 			}
 
 			// 差出人ID抽出
-			if( util::LineHasStringsNoCase( str, L"<font", L" COLOR=#996600", L">", L"差出人", L"show_friend.pl?id=" ) ) {
+			if( util::LineHasStringsNoCase( str, L"<a" L"href=" , L"show_friend.pl?id=", L"\">", L"</a>" ) ) {
 				CString buf;
 				util::GetBetweenSubString( str, L"show_friend.pl?id=", L"\"", buf );
 				data_.SetOwnerID(_wtoi(buf));
@@ -3062,13 +3074,13 @@ public:
 			}
 
 			// 本文抽出
-			if( util::LineHasStringsNoCase( str, L"<td", L"CLASS=", L"h120" ) ) {
+			if( util::LineHasStringsNoCase( str, L"<div", L"class=", L"messageDetailBody" ) ) {
 
 				data_.AddBody(_T("\r\n"));
 				ParserUtil::AddBodyWithExtract( data_, str );
 
-				// 同じ行に </td></tr> が存在すれば終了。
-				if( util::LineHasStringsNoCase( str, L"</td></tr>" ) ) {
+				// </div> が存在すれば終了。
+				if( util::LineHasStringsNoCase( str, L"</div>" ) ) {
 					break;
 				}
 
@@ -3076,7 +3088,7 @@ public:
 					str = html_.GetAt(j);
 					ParserUtil::AddBodyWithExtract( data_, str );
 
-					if( util::LineHasStringsNoCase( str, L"</td></tr>" ) ) {
+					if( util::LineHasStringsNoCase( str, L"</div>" ) ) {
 						// 終了フラグ発見
 						break;
 					}
