@@ -1816,7 +1816,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// レポートビューに遷移
 			theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
-			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, (theApp.m_pWriteView->m_sendEnd == FALSE) ? TRUE : FALSE );
+			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
 			theApp.ChangeView( theApp.m_pReportView );
 
 			// ログファイルに保存
@@ -2134,10 +2134,10 @@ LRESULT CReportView::OnChangeView(WPARAM wParam, LPARAM lParam)
 	theApp.ChangeView(theApp.m_pReportView);
 
 	// Write ビューが有効ならONに。
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->m_sendEnd==FALSE ? TRUE : FALSE );
+	theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
 
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE );
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
+	theApp.EnableCommandBarButton(ID_WRITE_BUTTON, TRUE);
+	theApp.EnableCommandBarButton(ID_OPEN_BROWSER, TRUE);
 
 	return TRUE;
 }
@@ -2359,7 +2359,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	// 「進む」無効化
 	int idxPage = 7;		// 「ページ」メニュー（次へが有効の場合は-1となる）
 	int idxDiarySeparator = 5;
-	if( theApp.m_pWriteView->m_sendEnd ) {
+	if( theApp.m_pWriteView->IsWriteCompleted() ) {
 		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
 		idxPage = idxPage-1;
 		idxDiarySeparator--;

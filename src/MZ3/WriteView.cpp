@@ -33,10 +33,11 @@ IMPLEMENT_DYNCREATE(CWriteView, CFormView)
 // -----------------------------------------------------------------------------
 CWriteView::CWriteView()
 	: CFormView(CWriteView::IDD)
-	, m_abort(FALSE)
+	, m_access(false)
+	, m_abort(false)
+	, m_bWriteCompleted(true)
 {
 	m_postData = new CPostData();
-	m_sendEnd = TRUE;
 }
 
 // -----------------------------------------------------------------------------
@@ -187,9 +188,10 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_WRITE_SEND_BUTTON,      0,       cy-hEdit, yBtn,             hEdit);
 	util::MoveDlgItemWindow( this, IDC_WRITE_CANCEL_BUTTON, yBtn,       cy-hEdit, yBtn,             hEdit);
 }
-// -----------------------------------------------------------------------------
-// 書き込みボタン押下時の処理
-// -----------------------------------------------------------------------------
+
+/**
+ * 書き込みボタン押下時の処理
+ */
 void CWriteView::OnBnClickedWriteSendButton()
 {
 	CString msg;
@@ -203,11 +205,13 @@ void CWriteView::OnBnClickedWriteSendButton()
 		::MessageBox(m_hWnd, L"送信文字数が多すぎます", MZ3_APP_NAME, MB_ICONERROR);
 		return;
 	}
-	else if (title.GetLength() == 0) {
+	
+	if (title.GetLength() == 0) {
 		::MessageBox(m_hWnd, L"タイトルを入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
 	}
-	else if (msg.GetLength() == 0) {
+	
+	if (msg.GetLength() == 0) {
 		::MessageBox(m_hWnd, L"本文を入力してください", MZ3_APP_NAME, MB_ICONERROR);
 		return;
 	}
@@ -257,25 +261,22 @@ void CWriteView::OnBnClickedWriteSendButton()
 		}
 	}
 
-	m_access = TRUE;
-	m_sendButton.EnableWindow(FALSE);
-	m_cancelButton.EnableWindow(FALSE);
-	m_infoEdit.ShowWindow(SW_SHOW);
+	m_access = true;
+	m_abort  = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 		MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
 
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
-		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+
 		theApp.m_accessType = ACCESS_LOGIN;
 		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
 		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), L"", CInetAccess::FILE_HTML );
 		return;
 	}
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 
 	StartConfirmPost( msg );
 
@@ -283,38 +284,43 @@ void CWriteView::OnBnClickedWriteSendButton()
 	SetFocus();
 }
 
-// -----------------------------------------------------------------------------
-// 中止ボタン押下時の処理
-// -----------------------------------------------------------------------------
+/**
+ * 中止ボタン押下時の処理
+ */
 void CWriteView::OnBnClickedWriteCancelButton()
 {
-	int ret;
 	CString msg;
-	((CEdit*)GetDlgItem(IDC_WRITE_BODY_EDIT))->GetWindowText(msg);
+	GetDlgItem(IDC_WRITE_BODY_EDIT)->GetWindowText(msg);
 
 	if (msg.GetLength() > 0) {
-		ret = ::MessageBox(m_hWnd, L"未投稿のデータがあります\n破棄されますがいいですか？",
-			MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
-		if (ret == IDCANCEL) {
-			// 処理を中止
+		if (MessageBox(L"未投稿のデータがあります\n破棄されますがよろしいですか？", 
+			MZ3_APP_NAME,
+			MB_ICONQUESTION | MB_OKCANCEL)==IDCANCEL)
+		{
+			// 中止処理のキャンセル(編集に戻る)
 			return;
 		}
 	}
 
 	// 内容をクリア
-	((CEdit*)GetDlgItem(IDC_WRITE_TITLE_EDIT))->SetWindowText(L"");
-	((CEdit*)GetDlgItem(IDC_WRITE_BODY_EDIT))->SetWindowText(L"");
+	GetDlgItem(IDC_WRITE_TITLE_EDIT)->SetWindowText(L"");
+	GetDlgItem(IDC_WRITE_BODY_EDIT)->SetWindowText(L"");
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	// 前の画面に戻る
-	if (IsWriteFromMainView() == FALSE) {
+	if (IsWriteFromMainView()) {
+		// メインビューに戻るため、戻るボタン無効化
+		theApp.EnableCommandBarButton(ID_BACK_BUTTON, FALSE);
+		::SendMessage(theApp.m_pMainView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
+	} else {
+		// レポートビューに戻るため、戻るボタン有効化
+		theApp.EnableCommandBarButton(ID_BACK_BUTTON, TRUE);
 		::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
 	}
-	else {
-		::SendMessage(theApp.m_pMainView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
-	}
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE);
 
-	m_sendEnd = TRUE;
+	m_bWriteCompleted = true;
 }
 
 /**
@@ -322,7 +328,7 @@ void CWriteView::OnBnClickedWriteCancelButton()
  */
 LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 {
-	if (m_abort != FALSE) {
+	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
 		return TRUE;
 	}
@@ -377,13 +383,12 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
  */
 void CWriteView::StartEntryPost() 
 {
-
 	// 中断確認
-	if (m_abort != FALSE) {
+	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
 		return;
 	}
-	m_abort = FALSE;
+	m_abort = false;
 
 	CString url;	// URL
 	CString refUrl;	// リファラー用URL
@@ -519,7 +524,11 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	CHtmlArray html;
 	html.Load( theApp.m_filepath.temphtml );
 
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+	m_access = false;
+	m_abort  = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	// 投稿完了チェック
 	if (html.IsPostSucceeded(m_writeViewType) != FALSE) {
@@ -527,7 +536,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		// only for Release_MZ3 configuration
 		DumpToTemporaryDraftFile();
 #endif
-		if (m_abort == FALSE) {
+		if (m_abort == false) {
 			switch (m_writeViewType ) {
 			case WRITEVIEW_TYPE_REPLYMESSAGE:
 			case WRITEVIEW_TYPE_NEWMESSAGE:
@@ -537,31 +546,29 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				::MessageBox(m_hWnd, L"投稿しました", MZ3_APP_NAME, MB_OK);
 				break;
 			}
-		}
-		else {
+		} else {
 			// 中断が押されていた場合は上に返す
 			return TRUE;
 		}
 
-		((CEdit*)GetDlgItem(IDC_WRITE_TITLE_EDIT))->SetWindowText(L"");
-		((CEdit*)GetDlgItem(IDC_WRITE_BODY_EDIT))->SetWindowText(L"");
+		GetDlgItem(IDC_WRITE_TITLE_EDIT)->SetWindowText(L"");
+		GetDlgItem(IDC_WRITE_BODY_EDIT)->SetWindowText(L"");
 
-		// 進むボタンを使用不可にする
-		theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE);
-
-		if( IsWriteFromMainView() ) {
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-		} else {
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-		}
-		m_sendEnd = TRUE;
+		m_bWriteCompleted = true;
 
 		// 前の画面に戻る
-		if( IsWriteFromMainView() ) {
+		if (IsWriteFromMainView()) {
+			// メインビューに戻るため、戻るボタン無効化
+			theApp.EnableCommandBarButton(ID_BACK_BUTTON, FALSE);
 			::SendMessage(theApp.m_pMainView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
-		}else{
+		} else {
+			// レポートビューに戻るため、戻るボタン有効化
+			theApp.EnableCommandBarButton(ID_BACK_BUTTON, TRUE);
 			::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL);
+		}
 
+		if (!IsWriteFromMainView()) {
+			// レポートビューに戻った後のリロード処理
 			switch (m_writeViewType ) {
 			case WRITEVIEW_TYPE_REPLYMESSAGE:
 			case WRITEVIEW_TYPE_NEWMESSAGE:
@@ -572,8 +579,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
-	}
-	else {
+	} else {
 		LPCTSTR msg = L"投稿に失敗しました(1)";
 		util::MySetInformationText( m_hWnd, msg );
 
@@ -587,15 +593,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 		// 失敗したのでダンプする
 		DumpToTemporaryDraftFile();
-
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
-		m_sendButton.EnableWindow(TRUE);
-		m_cancelButton.EnableWindow(FALSE);
 	}
-
-	m_infoEdit.ShowWindow( SW_HIDE );
-
-	m_access = FALSE;
 
 	return TRUE;
 }
@@ -627,21 +625,15 @@ bool CWriteView::DumpToTemporaryDraftFile()
 	return true;
 }
 
-// -----------------------------------------------------------------------------
-// 中断
-// -----------------------------------------------------------------------------
+/**
+ * 中断
+ */
 LRESULT CWriteView::OnPostAbort(WPARAM wParam, LPARAM lParam)
 {
-	// 中止ボタンを使用不可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
+	m_access = false;
 
-	m_sendButton.EnableWindow(TRUE);
-	m_cancelButton.EnableWindow(TRUE);
-
-	m_infoEdit.ShowWindow(SW_HIDE);
-
-	m_access = FALSE;
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -655,30 +647,25 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 		// 通信中ならば、Abort を呼び出す
 		theApp.m_inet.Abort();
 	}
-	m_abort = TRUE;
+	m_abort = true;
 
 	LPCTSTR msg = L"";
 	if (m_postData->GetSuccessMessage() == WM_MZ3_POST_CONFIRM) {
 		msg = L"中断しましたが、投稿された可能性があります";
-	}
-	else {
+	} else {
 		msg = L"中断しました";
 	}
 	util::MySetInformationText( m_hWnd, msg );
 	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
-	// 中止ボタンを使用不可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-
-	m_sendButton.EnableWindow(TRUE);
-	m_cancelButton.EnableWindow(TRUE);
-
-	m_infoEdit.ShowWindow(SW_HIDE);
-
 	// 中断後に書き込みボタンが押されると何故か強制終了してしまうため、
 	// 本文領域にフォーカスを戻す。
 	m_bodyEdit.SetFocus();
+
+	m_access = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -736,7 +723,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 #ifndef WINCE
 		case VK_ESCAPE:
 #endif
-			if (m_access != FALSE) {
+			if (m_access) {
 				// アクセス中は中断処理
 				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 				return TRUE;
@@ -776,7 +763,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	CHtmlArray html;
 	html.Load( theApp.m_filepath.temphtml );
 
-	if (m_abort != FALSE) {
+	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
 		return TRUE;
 	}
@@ -938,8 +925,10 @@ void CWriteView::OnImageButton()
  */
 void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 {
+	m_access = false;
+	m_abort  = false;
+
 	m_data = pMixi;
-	m_access = FALSE;
 	int iComboIndex;
 
 	// 内容をクリア
@@ -951,7 +940,7 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 	m_writeViewType = writeViewType;
 
 	// 書きかけであることを設定
-	m_sendEnd = FALSE;
+	m_bWriteCompleted = false;
 
 	switch( writeViewType ) {
 	case WRITEVIEW_TYPE_REPLYMESSAGE:
@@ -963,8 +952,8 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 			SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
 		}
 
-		// 公開範囲コンボボックス
-		m_viewlimitCombo.EnableWindow( false );
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
 
 		// フォーカス：本文から開始
 		m_bodyEdit.SetFocus();
@@ -974,8 +963,8 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 		// タイトル変更：有効
 		m_titleEdit.SetReadOnly(FALSE);
 
-		// 公開範囲コンボボックス
-		m_viewlimitCombo.EnableWindow( false );
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
 
 		// フォーカス：タイトルから開始
 		m_titleEdit.SetFocus();
@@ -990,8 +979,8 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 			SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
 		}
 
-		// 公開範囲コンボボックス
-		m_viewlimitCombo.EnableWindow( false );
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
 
 		// フォーカス：本文から開始
 		m_bodyEdit.SetFocus();
@@ -1013,7 +1002,7 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 		iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
 		m_viewlimitCombo.SetItemData( iComboIndex , 4 );
 		m_viewlimitCombo.SetCurSel( 0 );
-		m_viewlimitCombo.EnableWindow( true );
+		m_viewlimitCombo.EnableWindow(TRUE);
 
 		// フォーカス：タイトルから開始
 		m_titleEdit.SetFocus();
@@ -1024,23 +1013,13 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 		return;
 	}
 
-	// ボタン制御
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON,    TRUE  );
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER,   FALSE );
-
-	// イメージボタンは画像投稿可能な状態にのみ有効
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, IsEnableAttachImageMode() ? TRUE : FALSE );
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	// 画像添付関連の初期化
 	m_photo1_filepath = L"";
 	m_photo2_filepath = L"";
 	m_photo3_filepath = L"";
-
-	// ボタンの初期化
-	m_sendButton.EnableWindow(TRUE);
-	m_cancelButton.EnableWindow(TRUE);
-	m_infoEdit.ShowWindow(SW_HIDE);
 
 	// Ｖｉｅｗ入れ替え
 	theApp.ChangeView(theApp.m_pWriteView);
@@ -1250,15 +1229,16 @@ void CWriteView::StartConfirmPost( CString wmsg )
 
 	TRACE( L"Post URL = [%s]\n", url );
 
-	m_abort = FALSE;
+	m_access = true;
+	m_abort  = false;
 
-	m_infoEdit.ShowWindow( SW_SHOW );
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE );
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	// リファラ設定
 	LPCTSTR refUrl = L"";
-  //リファラ設定したら投稿で止まるようになったので保留
+	
+	//リファラ設定したら投稿で止まるようになったので保留
 	//LPCTSTR refUrl = m_data->GetURL();
 
 	// 通信開始
@@ -1372,4 +1352,37 @@ void CWriteView::PopupWriteBodyMenu(void)
 
 	// メニュー表示
 	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+}
+
+/**
+ * 状態に応じたコントロール状態の変更
+ */
+void CWriteView::MyUpdateControlStatus(void)
+{
+	// 本ビューでは、進むボタン、ブラウザで開くボタン、書き込みボタンは常に無効
+	theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, FALSE);
+	theApp.EnableCommandBarButton(ID_OPEN_BROWSER,   FALSE);
+	theApp.EnableCommandBarButton(ID_WRITE_BUTTON,   FALSE);
+
+	// イメージボタンは画像投稿可能な状態にのみ有効
+	if (m_access) {
+		theApp.EnableCommandBarButton(ID_IMAGE_BUTTON, FALSE);
+	} else {
+		theApp.EnableCommandBarButton(ID_IMAGE_BUTTON, IsEnableAttachImageMode() ? TRUE : FALSE);
+	}
+
+	// 中止ボタン：アクセス中は有効
+	theApp.EnableCommandBarButton(ID_STOP_BUTTON, m_access ? TRUE : FALSE);
+
+	// 戻るボタン：アクセス中は無効
+	theApp.EnableCommandBarButton(ID_BACK_BUTTON, m_access ? FALSE : TRUE);
+
+	// 送信ボタン：アクセス中は無効
+	m_sendButton.EnableWindow(m_access ? FALSE : TRUE);
+
+	// キャンセルボタン：アクセス中は無効
+	m_cancelButton.EnableWindow(m_access ? FALSE : TRUE);
+
+	// 情報領域：アクセス中は表示
+	m_infoEdit.ShowWindow(m_access ? SW_SHOW : SW_HIDE);
 }

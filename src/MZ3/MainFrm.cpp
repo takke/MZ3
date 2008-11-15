@@ -300,7 +300,7 @@ void CMainFrame::OnBackButton()
 			// Write ビュー（日記, 新規メッセージ） → メインビュー
 
 			// 書きかけのデータがあるかどうかの判定
-			if (theApp.m_pWriteView->IsSendEnd() == FALSE) {
+			if (!theApp.m_pWriteView->IsWriteCompleted()) {
 				// 未送信データ有り
 				int ret = ::MessageBox(m_hWnd, _T("未投稿のデータがあります\n破棄されますがよろしいですか？"),
 					MZ3_APP_NAME, MB_ICONQUESTION | MB_OKCANCEL);
@@ -308,7 +308,7 @@ void CMainFrame::OnBackButton()
 					// 処理を中止
 					return;
 				}
-				theApp.m_pWriteView->SetSendEnd(TRUE);
+				theApp.m_pWriteView->SetWriteCompleted(true);
 			}
 
 			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
@@ -364,9 +364,9 @@ void CMainFrame::OnForwardButton()
 	if (pActiveView == theApp.m_pReportView) {
 		// レポートビュー → 書き込みビュー
 		// 但し、未送信の場合のみ。
-		if( theApp.m_pWriteView->m_sendEnd == FALSE ) {
-			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+		if (!theApp.m_pWriteView->IsWriteCompleted()) {
+			theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, FALSE);
+			theApp.EnableCommandBarButton(ID_BACK_BUTTON, TRUE);
 
 			theApp.ChangeView( theApp.m_pWriteView );
 		}
@@ -382,9 +382,9 @@ void CMainFrame::OnForwardButton()
 		// メインビュー → レポートビュー
 
 		// 書き込みビューに行けるなら、NEXT ボタンを有効に。
-		// 送信完了フラグ(m_sendEnd)がONなら、「書き込みビューに行ける」と判断する
-		theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, (theApp.m_pWriteView->m_sendEnd == FALSE) ? TRUE : FALSE );
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+		// 送信完了フラグ(IsWriteCompleted())がOFFなら、「書き込みビューに行ける」と判断する
+		theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
+		theApp.EnableCommandBarButton(ID_BACK_BUTTON,    TRUE);
 
 		theApp.ChangeView(theApp.m_pReportView);
 	}

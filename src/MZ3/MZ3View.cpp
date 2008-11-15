@@ -3349,7 +3349,7 @@ void CMZ3View::MyShowReportView(CMixiData& mixi)
 	theApp.m_pReportView->SetData( mixi );
 
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, (theApp.m_pWriteView->m_sendEnd == FALSE) ? TRUE : FALSE );
+	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE );
 	theApp.ChangeView( theApp.m_pReportView );
 }
 

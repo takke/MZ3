@@ -47,8 +47,10 @@ public:
 	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
 	afx_msg LRESULT OnFit(WPARAM, LPARAM);
 
-	BOOL IsSendEnd() { return m_sendEnd; }
-	void SetSendEnd(BOOL flag) { m_sendEnd = flag; }
+	bool IsWriteCompleted() { return m_bWriteCompleted; }
+	void SetWriteCompleted(bool bWriteCompleted) { m_bWriteCompleted = bWriteCompleted; }
+
+	void MyUpdateControlStatus();
 
 	/// メインビュー（MZ3View）から起動した書き込み画面かどうかを返す
 	bool IsWriteFromMainView() {
@@ -149,8 +151,8 @@ private:
 	CString m_photo2_filepath;	///< 写真２のパス
 	CString m_photo3_filepath;	///< 写真３のパス
 
-public:
-	BOOL m_sendEnd;
+private:
+	bool m_bWriteCompleted;		///< 書き込み完了フラグ(他ビューから本ビューに復帰できるかどうかの判定に利用される)
 
 public:
 	// UI 要素
@@ -162,8 +164,8 @@ public:
 	CComboBox m_viewlimitCombo;	///< 公開範囲コンボボックス
 
 private:
-	BOOL m_abort;
-	BOOL m_access;
+	bool m_abort;		///< 中断フラグ
+	bool m_access;		///< 通信中フラグ
 
 	WRITEVIEW_TYPE m_writeViewType;	///< 処理種別（日記 or コメント or メッセージ）
 public:
