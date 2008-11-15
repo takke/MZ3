@@ -190,6 +190,111 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 }
 
 /**
+ * 書き込み画面を開始する。
+ */
+void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
+{
+	m_access = false;
+	m_abort  = false;
+
+	m_data = pMixi;
+	int iComboIndex;
+
+	// 内容をクリア
+	SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"" );
+	SetDlgItemText( IDC_WRITE_BODY_EDIT, L"" );
+	m_viewlimitCombo.ResetContent();
+
+	// 種別を保存
+	m_writeViewType = writeViewType;
+
+	// 書きかけであることを設定
+	m_bWriteCompleted = false;
+
+	switch( writeViewType ) {
+	case WRITEVIEW_TYPE_REPLYMESSAGE:
+		// タイトル変更：有効
+		m_titleEdit.SetReadOnly(FALSE);
+
+		if (m_data != NULL) {
+			// タイトルの初期値を設定
+			SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
+		}
+
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
+
+		// フォーカス：本文から開始
+		m_bodyEdit.SetFocus();
+		break;
+
+	case WRITEVIEW_TYPE_NEWMESSAGE:
+		// タイトル変更：有効
+		m_titleEdit.SetReadOnly(FALSE);
+
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
+
+		// フォーカス：タイトルから開始
+		m_titleEdit.SetFocus();
+		break;
+
+	case WRITEVIEW_TYPE_COMMENT:
+		// タイトル変更：無効
+		m_titleEdit.SetReadOnly(TRUE);
+
+		if (m_data != NULL) {
+			// タイトルを設定
+			SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
+		}
+
+		// 公開範囲コンボボックス：無効
+		m_viewlimitCombo.EnableWindow(FALSE);
+
+		// フォーカス：本文から開始
+		m_bodyEdit.SetFocus();
+		break;
+
+	case WRITEVIEW_TYPE_NEWDIARY:
+		// タイトル変更：有効
+		m_titleEdit.SetReadOnly(FALSE);
+
+		// 公開範囲コンボボックス
+		iComboIndex = m_viewlimitCombo.AddString( L"標準の公開設定" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 0 );
+		iComboIndex = m_viewlimitCombo.AddString( L"非公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 1 );
+		iComboIndex = m_viewlimitCombo.AddString( L"友人まで公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 2 );
+		iComboIndex = m_viewlimitCombo.AddString( L"友人の友人まで公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 3 );
+		iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
+		m_viewlimitCombo.SetItemData( iComboIndex , 4 );
+		m_viewlimitCombo.SetCurSel( 0 );
+		m_viewlimitCombo.EnableWindow(TRUE);
+
+		// フォーカス：タイトルから開始
+		m_titleEdit.SetFocus();
+		break;
+
+	default:
+		MessageBox( L"アプリケーション内部エラー：未対応の書き込み画面種別です" );
+		return;
+	}
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
+
+	// 画像添付関連の初期化
+	m_photo1_filepath = L"";
+	m_photo2_filepath = L"";
+	m_photo3_filepath = L"";
+
+	// View 入れ替え
+	theApp.ChangeView(theApp.m_pWriteView);
+}
+
+/**
  * 書き込みボタン押下時の処理
  */
 void CWriteView::OnBnClickedWriteSendButton()
@@ -278,6 +383,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 		return;
 	}
 
+	// POST 開始
 	StartConfirmPost( msg );
 
 	// キー押下イベントを奪うためにフォーカスを取得する
@@ -670,9 +776,9 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-// -----------------------------------------------------------------------------
-// アクセス情報通知
-// -----------------------------------------------------------------------------
+/**
+ * アクセス情報通知
+ */
 LRESULT CWriteView::OnAccessInformation(WPARAM wParam, LPARAM lParam)
 {
 	m_infoEdit.SetWindowText(*(CString*)lParam);
@@ -736,9 +842,9 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 	return CFormView::PreTranslateMessage(pMsg);
 }
 
-// -----------------------------------------------------------------------------
-// 前の画面に切り替える
-// -----------------------------------------------------------------------------
+/**
+ * 前の画面に切り替える
+ */
 void CWriteView::OnWriteBackMenu()
 {
 	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
@@ -756,6 +862,9 @@ LRESULT CWriteView::OnFit(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
+/**
+ * GET メソッド完了時の処理
+ */
 LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
 	util::MySetInformationText( m_hWnd, L"解析中" );
@@ -768,7 +877,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 
-	switch( ((CMixiData*)lParam)->GetAccessType() ) {
+	switch (((CMixiData*)lParam)->GetAccessType()) {
 	case ACCESS_LOGIN:
 		// ログインしたかどうかの確認
 		if( mixi::HomeParser::IsLoginSucceeded(html) ) {
@@ -831,7 +940,6 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 void CWriteView::OnSetFocus(CWnd* pOldWnd)
 {
 	CFormView::OnSetFocus(pOldWnd);
-
 }
 
 /**
@@ -918,111 +1026,6 @@ void CWriteView::OnImageButton()
 	}
 
 	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
-}
-
-/**
- * 書き込み画面を開始する。
- */
-void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
-{
-	m_access = false;
-	m_abort  = false;
-
-	m_data = pMixi;
-	int iComboIndex;
-
-	// 内容をクリア
-	SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"" );
-	SetDlgItemText( IDC_WRITE_BODY_EDIT, L"" );
-	m_viewlimitCombo.ResetContent();
-
-	// 種別を保存
-	m_writeViewType = writeViewType;
-
-	// 書きかけであることを設定
-	m_bWriteCompleted = false;
-
-	switch( writeViewType ) {
-	case WRITEVIEW_TYPE_REPLYMESSAGE:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
-
-		if (m_data != NULL) {
-			// タイトルの初期値を設定
-			SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
-		}
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：本文から開始
-		m_bodyEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_NEWMESSAGE:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：タイトルから開始
-		m_titleEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_COMMENT:
-		// タイトル変更：無効
-		m_titleEdit.SetReadOnly(TRUE);
-
-		if (m_data != NULL) {
-			// タイトルを設定
-			SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
-		}
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：本文から開始
-		m_bodyEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_NEWDIARY:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
-
-		// 公開範囲コンボボックス
-		iComboIndex = m_viewlimitCombo.AddString( L"標準の公開設定" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 0 );
-		iComboIndex = m_viewlimitCombo.AddString( L"非公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 1 );
-		iComboIndex = m_viewlimitCombo.AddString( L"友人まで公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 2 );
-		iComboIndex = m_viewlimitCombo.AddString( L"友人の友人まで公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 3 );
-		iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 4 );
-		m_viewlimitCombo.SetCurSel( 0 );
-		m_viewlimitCombo.EnableWindow(TRUE);
-
-		// フォーカス：タイトルから開始
-		m_titleEdit.SetFocus();
-		break;
-
-	default:
-		MessageBox( L"アプリケーション内部エラー：未対応の書き込み画面種別です" );
-		return;
-	}
-
-	// コントロール状態の変更
-	MyUpdateControlStatus();
-
-	// 画像添付関連の初期化
-	m_photo1_filepath = L"";
-	m_photo2_filepath = L"";
-	m_photo3_filepath = L"";
-
-	// Ｖｉｅｗ入れ替え
-	theApp.ChangeView(theApp.m_pWriteView);
 }
 
 /// 写真１｜添付
@@ -1263,7 +1266,9 @@ void CWriteView::OnInsertEmoji(UINT nID)
 	m_bodyEdit.ReplaceSel( theApp.m_emoji[ emojiIndex ].code, /*bCanUndo=*/TRUE );
 }
 
-
+/**
+ * ポップアップメニュー
+ */
 void CWriteView::PopupWriteBodyMenu(void)
 {
 	POINT pt    = util::GetPopupPos();
