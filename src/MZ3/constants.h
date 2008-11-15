@@ -115,13 +115,13 @@ enum ACCESS_TYPE {
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 	ACCESS_POST_CONFIRM_COMMENT,		///< コメント投稿（確認画面）
-	ACCESS_POST_ENTRY_COMMENT,			///< コメント投稿（書き込み画面）
+	ACCESS_POST_REGIST_COMMENT,			///< コメント投稿（書き込み画面）
 	ACCESS_POST_CONFIRM_REPLYMESSAGE,	///< メッセージ返信（確認画面）
-	ACCESS_POST_ENTRY_REPLYMESSAGE,		///< メッセージ返信（書き込み画面）
+	ACCESS_POST_REGIST_REPLYMESSAGE,	///< メッセージ返信（書き込み画面）
 	ACCESS_POST_CONFIRM_NEWMESSAGE,		///< 新規メッセージ（確認画面）
-	ACCESS_POST_ENTRY_NEWMESSAGE,		///< 新規メッセージ（書き込み画面）
+	ACCESS_POST_REGIST_NEWMESSAGE,		///< 新規メッセージ（書き込み画面）
 	ACCESS_POST_CONFIRM_NEWDIARY,		///< 日記投稿（確認画面）
-	ACCESS_POST_ENTRY_NEWDIARY,			///< コメント投稿（書き込み画面）
+	ACCESS_POST_REGIST_NEWDIARY,		///< コメント投稿（書き込み画面）
 
 	//--- Twitter Timeline 系
 	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml

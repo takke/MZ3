@@ -585,7 +585,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_ENTRY_COMMENT;
+	type = ACCESS_POST_REGIST_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -601,7 +601,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_ENTRY_REPLYMESSAGE;
+	type = ACCESS_POST_REGIST_REPLYMESSAGE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -617,7 +617,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_ENTRY_NEWMESSAGE;
+	type = ACCESS_POST_REGIST_NEWMESSAGE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -633,7 +633,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_ENTRY_NEWDIARY;
+	type = ACCESS_POST_REGIST_NEWDIARY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"

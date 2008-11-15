@@ -167,7 +167,7 @@ public:
  * 
  * add_bbs_comment.pl
  */
-class EntryCommentGenerator : public PostDataGeneratorBase {
+class RegistCommentGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -306,7 +306,7 @@ public:
  * 
  * add_diary.pl
  */
-class EntryDiaryGenerator : public PostDataGeneratorBase {
+class RegistDiaryGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -398,7 +398,7 @@ public:
  * 
  * reply_message.pl
  */
-class EntryReplyMessageGenerator : public PostDataGeneratorBase {
+class RegistReplyMessageGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -409,9 +409,7 @@ public:
 	 */
 	static bool generate( CPostData& post, LPCTSTR title )
 	{
-		CString msgId;
-		msgId = post.GetConfirmUri();
-		msgId = msgId.Mid(msgId.Find(L"message_id=") + wcslen(L"message_id="));
+		CString msgId = util::GetParamFromURL(post.GetConfirmUri(), L"message_id");
 
 		// POST ìdï∂ÇÃê∂ê¨
 		post.ClearPostBody();
@@ -495,7 +493,7 @@ public:
  * 
  * send_message.pl
  */
-class EntryNewMessageGenerator : public PostDataGeneratorBase {
+class RegistNewMessageGenerator : public PostDataGeneratorBase {
 public:
 
 	/**

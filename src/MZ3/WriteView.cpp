@@ -190,7 +190,9 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
 }
 
 /**
- * 書き込み画面を開始する。
+ * 書き込み画面の開始
+ *
+ * 他ビューからのエントリポイント
  */
 void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 {
@@ -296,6 +298,14 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 /**
  * 書き込みボタン押下時の処理
+ *
+ * 正常系処理シーケンス：
+ *
+ * <ol>
+ *  <li>StartConfirmPost => DoPost/WM_MZ3_POST_CONFIRM => 通信開始
+ *  <li>OnPostConfirm => StartRegistPost => DoPost/WM_MZ3_POST_END => 通信開始
+ *  <li>OnPostEnd
+ * </ol>
  */
 void CWriteView::OnBnClickedWriteSendButton()
 {
@@ -479,7 +489,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 	}
 
 	// 書き込み開始
-	StartEntryPost();
+	StartRegistPost();
 
 	return TRUE;
 }
@@ -487,7 +497,7 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 /**
  * 確認画面｜書き込みボタン押下時の電文送信
  */
-void CWriteView::StartEntryPost() 
+void CWriteView::StartRegistPost() 
 {
 	// 中断確認
 	if (m_abort) {
@@ -503,7 +513,7 @@ void CWriteView::StartEntryPost()
 	case WRITEVIEW_TYPE_COMMENT:
 		{
 			// 電文の生成
-			if( !mixi::EntryCommentGenerator::generate( *m_postData, *m_data ) ) {
+			if( !mixi::RegistCommentGenerator::generate( *m_postData, *m_data ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -545,7 +555,7 @@ void CWriteView::StartEntryPost()
 			}
 
 			// 電文の生成
-			if( !mixi::EntryDiaryGenerator::generate( *m_postData, title , viewlimit ) ) {
+			if( !mixi::RegistDiaryGenerator::generate( *m_postData, title , viewlimit ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -562,7 +572,7 @@ void CWriteView::StartEntryPost()
 			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
 
 			// 電文の生成
-			if( !mixi::EntryReplyMessageGenerator::generate( *m_postData, title ) ) {
+			if( !mixi::RegistReplyMessageGenerator::generate( *m_postData, title ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -580,7 +590,7 @@ void CWriteView::StartEntryPost()
 			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
 
 			// 電文の生成
-			if( !mixi::EntryNewMessageGenerator::generate( *m_postData, title ) ) {
+			if( !mixi::RegistNewMessageGenerator::generate( *m_postData, title ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
