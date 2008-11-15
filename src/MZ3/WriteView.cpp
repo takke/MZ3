@@ -617,10 +617,10 @@ void CWriteView::StartRegistPost()
 
 	// アクセス種別の設定
 	switch (m_writeViewType) {
-	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_ENTRY_COMMENT;		break;
-	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_ENTRY_NEWDIARY;		break;
-	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_ENTRY_REPLYMESSAGE;	break;
-	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_ENTRY_NEWMESSAGE;		break;
+	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_REGIST_COMMENT;		break;
+	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_REGIST_NEWDIARY;		break;
+	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_REGIST_REPLYMESSAGE;	break;
+	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_REGIST_NEWMESSAGE;	break;
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
