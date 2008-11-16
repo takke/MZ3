@@ -825,8 +825,8 @@ void CMainFrame::OnHelpMenu()
 	// Readme.txt を解析して表示
 	theApp.m_pMainView->MyShowHelp();
 #else
-	// Win32 の場合はヘルプ表示
-	util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
+	// Win32 の場合はオンラインマニュアル表示
+	util::OpenByShellExecute( L"http://mz3.jp/manual_mz4/" );
 #endif
 }
 
