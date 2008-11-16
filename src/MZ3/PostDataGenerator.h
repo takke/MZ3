@@ -100,7 +100,7 @@ protected:
  * 
  * add_bbs_comment.pl
  */
-class PostCommentGenerator : public PostDataGeneratorBase {
+class CommentConfirmGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -167,7 +167,7 @@ public:
  * 
  * add_bbs_comment.pl
  */
-class RegistCommentGenerator : public PostDataGeneratorBase {
+class CommentRegistGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -228,7 +228,7 @@ public:
  * 
  * add_diary.pl
  */
-class PostDiaryGenerator : public PostDataGeneratorBase {
+class DiaryConfirmGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -306,7 +306,7 @@ public:
  * 
  * add_diary.pl
  */
-class RegistDiaryGenerator : public PostDataGeneratorBase {
+class DiaryRegistGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -347,7 +347,7 @@ public:
  * 
  * reply_message.pl
  */
-class PostReplyMessageGenerator : public PostDataGeneratorBase {
+class ReplyMessageConfirmGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -366,20 +366,26 @@ public:
 		post.ClearPostBody();
 		post.AppendPostBody( "mode=confirm_or_save&" );
 		post.AppendPostBody( "from_show_friend=&" );
-		post.AppendPostBody( "subject=" );
+		
 		// タイトルを EUC-JP URL Encoded String に変換して埋め込む
+		post.AppendPostBody( "subject=" );
 		post.AppendPostBody( URLEncoder::encode_euc( title ) );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "body=" );
 		post.AppendPostBody( msg );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "post_key=" );
 		post.AppendPostBody( post.GetPostKey() );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "original_message_id=&" );
+		
 		post.AppendPostBody( "reply_message_id=" );
 		post.AppendPostBody( reply_message_id );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "id=" );
 		post.AppendPostBody( util::int2str(friend_id) );
 
@@ -396,7 +402,7 @@ public:
  * 
  * reply_message.pl
  */
-class RegistReplyMessageGenerator : public PostDataGeneratorBase {
+class ReplyMessageRegistGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -407,8 +413,6 @@ public:
 	 */
 	static bool generate( CPostData& post, LPCTSTR title, int friend_id, LPCTSTR reply_message_id )
 	{
-		CString msgId = util::GetParamFromURL(post.GetConfirmUri(), L"message_id");
-
 		// POST 電文の生成
 		post.ClearPostBody();
 
@@ -428,9 +432,11 @@ public:
 		post.AppendPostBody( "&" );
 
 		post.AppendPostBody( "original_message_id=&" );
+		
 		post.AppendPostBody( "reply_message_id=" );
 		post.AppendPostBody( reply_message_id );
 		post.AppendPostBody( "&" );
+
 		post.AppendPostBody( "id=" );
 		post.AppendPostBody( util::int2str(friend_id) );
 
@@ -448,7 +454,7 @@ public:
  * 
  * send_message.pl
  */
-class PostNewMessageGenerator : public PostDataGeneratorBase {
+class NewMessageConfirmGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -469,15 +475,19 @@ public:
 		post.ClearPostBody();
 		post.AppendPostBody( "mode=confirm_or_save&" );
 		post.AppendPostBody( "from_show_friend=&" );
+		
 		post.AppendPostBody( "subject=" );
 		post.AppendPostBody( URLEncoder::encode_euc(title) );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "body=" );
 		post.AppendPostBody( msg );
 		post.AppendPostBody( "&" );
+		
 		post.AppendPostBody( "post_key=" );
 		post.AppendPostBody( post.GetPostKey() );
 		post.AppendPostBody( "&" );
+
 		post.AppendPostBody( "original_message_id=&" );
 		post.AppendPostBody( "reply_message_id=&" );
 		post.AppendPostBody( "id=" );
@@ -511,7 +521,7 @@ public:
  * 
  * send_message.pl
  */
-class RegistNewMessageGenerator : public PostDataGeneratorBase {
+class NewMessageRegistGenerator : public PostDataGeneratorBase {
 public:
 
 	/**
@@ -520,27 +530,37 @@ public:
 	 * @param post				CPostData オブジェクト
 	 * @param title				タイトル文字列(wchar_t)
 	 */
-	static bool generate( CPostData& post, LPCTSTR title )
+	static bool generate( CPostData& post, LPCTSTR title, int friend_id )
 	{
 		post.ClearPostBody();
 
-		post.AppendPostBody( "submit=confirm&" );
-		post.AppendPostBody( "&subject=" );
+		post.AppendPostBody( "from_show_friend=&" );
+		post.AppendPostBody( "mode=commit_or_edit&" );
 
 		// タイトルを EUC-JP URL Encoded String に変換して埋め込む
+		post.AppendPostBody( "subject=" );
 		post.AppendPostBody( URLEncoder::encode_euc( title ) );
+		post.AppendPostBody( "&" );
 
 		// 本文を埋め込む
-		post.AppendPostBody( "&body=" );
+		post.AppendPostBody( "body=" );
 		post.AppendPostBody( post.GetComment() );
+		post.AppendPostBody( "&" );
 
-		post.AppendPostBody( "&post_key=" );
+		post.AppendPostBody( "post_key=" );
 		post.AppendPostBody( post.GetPostKey() );
-		post.AppendPostBody( "&yes=%A1%A1%C1%F7%A1%A1%BF%AE%A1%A1" );
+		post.AppendPostBody( "&" );
+
+		post.AppendPostBody( "id=" );
+		post.AppendPostBody( util::int2str(friend_id) );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "original_message_id=&" );
+		post.AppendPostBody( "reply_message_id=&" );
+
+		post.AppendPostBody( "yes=%C1%F7%BF%AE%A4%B9%A4%EB" );
 
 		// Content-Type: application/x-www-form-urlencoded
 		post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
-
 		return true;
 	}
 };

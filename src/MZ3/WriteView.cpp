@@ -470,6 +470,9 @@ void CWriteView::StartEntryPost()
 			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
 			if( id <= 0 ) {
 				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -486,6 +489,9 @@ void CWriteView::StartEntryPost()
 			CString s;
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
+
+			m_access = false;
+			MyUpdateControlStatus();
 			return;
 		}
 		break;
@@ -500,8 +506,6 @@ void CWriteView::StartEntryPost()
 	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_NEWMESSAGE_ENTRY;		break;
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
-
-	TRACE( L"Post URL = [%s]\n", url );
 
 	m_access = true;
 	m_abort  = false;
@@ -539,10 +543,13 @@ void CWriteView::StartConfirmPost()
 		// コメントの投稿確認
 		{
 			// 電文生成
-			if( !mixi::PostCommentGenerator::generate( *m_postData, *m_data, euc_msg, 
-													   m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) ) 
+			if( !mixi::CommentConfirmGenerator::generate( *m_postData, *m_data, euc_msg, 
+													      m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) ) 
 			{
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -555,10 +562,13 @@ void CWriteView::StartConfirmPost()
 		// 日記の投稿確認
 		{
 			// 電文生成
-			if( !mixi::PostDiaryGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
-													 m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
+			if( !mixi::DiaryConfirmGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
+													    m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
 			{
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -577,8 +587,11 @@ void CWriteView::StartConfirmPost()
 			// 電文生成
 			int friend_id = m_data->GetOwnerID();
 			CString reply_message_id = util::GetParamFromURL(m_data->GetURL(), L"id");
-			if( !mixi::PostReplyMessageGenerator::generate( *m_postData, title, euc_msg, friend_id, reply_message_id ) ) {
+			if( !mixi::ReplyMessageConfirmGenerator::generate( *m_postData, title, euc_msg, friend_id, reply_message_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -604,23 +617,23 @@ void CWriteView::StartConfirmPost()
 
 			// 電文生成
 			int friend_id = m_data->GetOwnerID();
-			if( !mixi::PostNewMessageGenerator::generate( *m_postData, title, euc_msg, friend_id ) ) {
-				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+			if( friend_id <= 0 ) {
+				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
+			if( !mixi::NewMessageConfirmGenerator::generate( *m_postData, title, euc_msg, friend_id ) ) {
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
-			// リクエストURL生成
-
-			// m_data から id を取得する
-			// http://mixi.jp/show_friend.pl?id=xxx
-			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
-			if( id <= 0 ) {
-				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
 			// URL 生成
-			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d", id );
+			url = L"http://mixi.jp/send_message.pl";
 			m_postData->SetConfirmUri(url);
 		}
 
@@ -632,6 +645,8 @@ void CWriteView::StartConfirmPost()
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
 
+			m_access = false;
+			MyUpdateControlStatus();
 			return;
 		}
 		break;
@@ -649,8 +664,6 @@ void CWriteView::StartConfirmPost()
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
-	TRACE( L"Post URL = [%s]\n", url );
-
 	m_access = true;
 	m_abort  = false;
 
@@ -662,12 +675,6 @@ void CWriteView::StartConfirmPost()
 	
 	//リファラ設定したら投稿で止まるようになったので保留
 	//LPCTSTR refUrl = m_data->GetURL();
-	switch (m_writeViewType) {
-	case WRITEVIEW_TYPE_NEWMESSAGE:
-		refUrl = util::FormatString(L"http://mixi.jp/send_message.pl?id=%d&ref=list_friend&sort=lastlogin&tag_id=all",
-						mixi::MixiUrlParser::GetID( m_data->GetURL() ));
-		break;
-	}
 
 	// 通信開始
 	theApp.m_inet.Initialize( m_hWnd, NULL );
@@ -742,7 +749,7 @@ void CWriteView::OnBnClickedWriteCancelButton()
 }
 
 /**
- * 入力画面の取得（＝入力画面の表示）完了。確認画面ボタン押下のシミュレート。
+ * 入力画面の取得完了。確認画面ボタン押下のシミュレート。
  */
 LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
 {
@@ -800,7 +807,7 @@ LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
 }
 
 /**
- * 書き込み画面の投稿（＝確認画面の表示）完了。書き込みのシミュレート。
+ * 確認画面の表示完了。書き込みのシミュレート。
  */
 LRESULT CWriteView::OnPostConfirmEnd(WPARAM wParam, LPARAM lParam)
 {
@@ -876,8 +883,12 @@ void CWriteView::StartRegistPost()
 	case WRITEVIEW_TYPE_COMMENT:
 		{
 			// 電文の生成
-			if( !mixi::RegistCommentGenerator::generate( *m_postData, *m_data ) ) {
+			if( !mixi::CommentRegistGenerator::generate( *m_postData, *m_data ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				// コントロール状態の復帰
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -918,8 +929,12 @@ void CWriteView::StartRegistPost()
 			}
 
 			// 電文の生成
-			if( !mixi::RegistDiaryGenerator::generate( *m_postData, title, viewlimit ) ) {
+			if( !mixi::DiaryRegistGenerator::generate( *m_postData, title, viewlimit ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				// コントロール状態の復帰
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -937,8 +952,12 @@ void CWriteView::StartRegistPost()
 			// 電文の生成
 			int friend_id = m_data->GetOwnerID();
 			CString reply_message_id = util::GetParamFromURL(m_data->GetURL(), L"id");
-			if( !mixi::RegistReplyMessageGenerator::generate( *m_postData, title, friend_id, reply_message_id ) ) {
+			if( !mixi::ReplyMessageRegistGenerator::generate( *m_postData, title, friend_id, reply_message_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				// コントロール状態の復帰
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -955,8 +974,13 @@ void CWriteView::StartRegistPost()
 			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
 
 			// 電文の生成
-			if( !mixi::RegistNewMessageGenerator::generate( *m_postData, title ) ) {
+			int friend_id = m_data->GetOwnerID();
+			if( !mixi::NewMessageRegistGenerator::generate( *m_postData, title, friend_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+
+				// コントロール状態の復帰
+				m_access = false;
+				MyUpdateControlStatus();
 				return;
 			}
 
@@ -972,6 +996,9 @@ void CWriteView::StartRegistPost()
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
 
+			// コントロール状態の復帰
+			m_access = false;
+			MyUpdateControlStatus();
 			return;
 		}
 		break;
