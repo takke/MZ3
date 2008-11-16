@@ -15,8 +15,8 @@ class URLEncoder
 {
 private:
 	static unsigned long UrlEncode( unsigned char *csource,
-							 unsigned char *cbuffer,
-							 unsigned long lbuffersize )
+									unsigned char *cbuffer,
+									unsigned long lbuffersize )
 	{
 		unsigned long   llength;		// csource のサイズを格納
 		unsigned long   lcount = 0;		// csource の読み込み位置カウンタ
@@ -39,10 +39,11 @@ private:
 				strncpy((char*)(cbuffer + lresultcount), "+", 2);	// "+" を cbuffer にコピー
 				lcount++;											// 読み込みカウンタをインクリメント
 				lresultcount++;										// 書き込みカウンタをインクリメント
-			} else if (((cbyte >= 0x40) && (cbyte <= 0x5A)) ||		// @A-Z
+			} else if (((cbyte >= 0x41) && (cbyte <= 0x5A)) ||		// A-Z
 				((cbyte >= 0x61) && (cbyte <= 0x7A)) ||				// a-z 
 				((cbyte >= 0x30) && (cbyte <= 0x39)) ||				// 0-9 
-				(cbyte == 0x2A) ||									// "*" 
+//				(cbyte == 0x40) ||									// "@" 
+//				(cbyte == 0x2A) ||									// "*" 
 				(cbyte == 0x2D) ||									// "-" 
 				(cbyte == 0x2E) ||									// "." 
 				(cbyte == 0x5F) )									// "_"
@@ -78,11 +79,12 @@ private:
 	 */
 	static void encode_euc( LPCTSTR msg, TCHAR* url_encoded_text, int len )
 	{
-	#define MY_BUFFER_MAX	10000
+		size_t wlen = wcslen(msg);
+
 		// msg (UNICODE) を sjis に変換
 		kfm::kf_buf_type buf_sjis;
-		buf_sjis.resize( MY_BUFFER_MAX+1 );
-		wcstombs( (char*)&buf_sjis[0], msg, MY_BUFFER_MAX );
+		buf_sjis.resize( wlen*2+1 );
+		wcstombs( (char*)&buf_sjis[0], msg, wlen*2 );
 
 		// sjis を euc に変換
 		kfm::kf_buf_type buf_euc;
@@ -92,14 +94,15 @@ private:
 
 		// URLエンコード
 		// euc 文字列 を URL エンコード
-		char buf_euc_url[ MY_BUFFER_MAX+1 ];
+		size_t buf_euc_len = buf_euc.size();
+		std::vector<char> buf_euc_url( buf_euc_len*3+1 );
 		{
-			memset(buf_euc_url, 0x00, sizeof(char) * (MY_BUFFER_MAX+1));
-			UrlEncode((unsigned char*)&buf_euc[0], (unsigned char*)buf_euc_url, MY_BUFFER_MAX);
+			memset(&buf_euc_url[0], 0x00, sizeof(char) * (buf_euc_len*3+1));
+			UrlEncode((unsigned char*)&buf_euc[0], (unsigned char*)&buf_euc_url[0], buf_euc_len*3+1);
 		}
 
 		// URLエンコード済み文字列をワイド文字列へ変換
-		mbstowcs(url_encoded_text, buf_euc_url, len);
+		mbstowcs(url_encoded_text, &buf_euc_url[0], len);
 	}
 
 public:
@@ -108,11 +111,15 @@ public:
 	 */
 	static CString encode_euc( LPCTSTR msg )
 	{
-		TCHAR url_encoded_text[MY_BUFFER_MAX+1];
+		size_t len = wcslen(msg);
 
-		encode_euc( msg, url_encoded_text, MY_BUFFER_MAX );
+		std::vector<TCHAR> url_encoded_text;
+		url_encoded_text.resize( len*6+1 );
+		memset(&url_encoded_text[0], 0x00, sizeof(TCHAR) * len*6+1);
 
-		return url_encoded_text;
+		encode_euc(msg, &url_encoded_text[0], len*6);
+
+		return &url_encoded_text[0];
 	}
 
 	/**
@@ -120,12 +127,15 @@ public:
 	 */
 	static CStringA encode_utf8( LPCSTR msg )
 	{
-		char url_encoded_text[ MY_BUFFER_MAX+1 ];
-		memset(url_encoded_text, 0x00, sizeof(char) * (MY_BUFFER_MAX+1));
+		size_t len = strlen(msg);
 
-		UrlEncode((unsigned char*)&msg[0], (unsigned char*)url_encoded_text, MY_BUFFER_MAX);
+		std::vector<char> url_encoded_text;
+		url_encoded_text.resize( len*3+1 );
+		memset(&url_encoded_text[0], 0x00, sizeof(char) * len*3+1);
 
-		return url_encoded_text;
+		UrlEncode((unsigned char*)&msg[0], (unsigned char*)&url_encoded_text[0], len*3+1);
+
+		return &url_encoded_text[0];
 	}
 
 	static CStringA encode_utf8( LPCTSTR msg )

@@ -556,6 +556,72 @@ BOOL CMZ3App::InitInstance()
 		}
 	}
 
+	//--- テスト用コード
+#ifdef DEBUG
+	// 
+	// encode_euc TEST
+	//
+	if (false) {
+		CString src_text = L"";
+		CString valid_text = L"";
+		CString url_encoded_text = L"";
+
+		// アルファベットTEST
+		url_encoded_text = URLEncoder::encode_euc(L"a");
+		ASSERT(url_encoded_text==L"a");
+
+		// 2バイト文字TEST
+		url_encoded_text = URLEncoder::encode_euc(L"あ");
+		ASSERT(url_encoded_text==L"%A4%A2");
+
+		// 記号TEST
+		url_encoded_text = URLEncoder::encode_euc(L"!\"#$%&'()-=^~\\|@[]{}+*};:],./<>?_");
+		ASSERT(url_encoded_text==L"%21%22%23%24%25%26%27%28%29-%3D%5E%7E%5C%7C%40%5B%5D%7B%7D%2B%2A%7D%3B%3A%5D%2C.%2F%3C%3E%3F_");
+
+		// 200000文字TEST
+		src_text = L"";
+		valid_text = L"";
+		for (int i=0; i<20000; i++) {
+			src_text += L"あいうえおかきくけこ";
+			valid_text += L"%A4%A2%A4%A4%A4%A6%A4%A8%A4%AA%A4%AB%A4%AD%A4%AF%A4%B1%A4%B3";
+		}
+		url_encoded_text = URLEncoder::encode_euc(src_text);
+		ASSERT(url_encoded_text==valid_text);
+	}
+
+	// 
+	// encode_utf8 TEST
+	//
+	if (0) {
+		CString src_text = L"";
+		CStringA valid_text = "";
+		CStringA url_encoded_text = "";
+
+		// アルファベットTEST
+		url_encoded_text = URLEncoder::encode_utf8(L"a");
+		ASSERT(url_encoded_text=="a");
+
+		// 2バイト文字TEST
+		url_encoded_text = URLEncoder::encode_utf8(L"あ");
+		ASSERT(url_encoded_text=="%E3%81%82");
+
+		// 記号TEST
+		url_encoded_text = URLEncoder::encode_utf8(L"!\"#$%&'()-=^~\\|@[]{}+*};:],./<>?_");
+		ASSERT(url_encoded_text=="%21%22%23%24%25%26%27%28%29-%3D%5E%7E%5C%7C%40%5B%5D%7B%7D%2B%2A%7D%3B%3A%5D%2C.%2F%3C%3E%3F_");
+
+		// 200000文字TEST
+		src_text = L"";
+		valid_text = L"";
+		for (int i=0; i<20000; i++) {
+			src_text += L"あいうえおかきくけこ";
+			valid_text += "%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A%E3%81%8B%E3%81%8D%E3%81%8F%E3%81%91%E3%81%93";
+		}
+		url_encoded_text = URLEncoder::encode_utf8(src_text);
+		ASSERT(url_encoded_text==valid_text);
+	}
+
+#endif
+
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 初期化完了" );
 
 	return TRUE;
