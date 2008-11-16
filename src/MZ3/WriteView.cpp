@@ -477,7 +477,7 @@ void CWriteView::StartEntryPost()
 			}
 
 			// URL 生成
-			// http://mixi.jp/send_message.pl?id=590362&mode=from_show_friend
+			// http://mixi.jp/send_message.pl?id=xxx&mode=from_show_friend
 			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d&mode=from_show_friend", id );
 			m_postData->SetConfirmUri(url);
 		}
@@ -618,11 +618,14 @@ void CWriteView::StartConfirmPost()
 			// 電文生成
 			int friend_id = m_data->GetOwnerID();
 			if( friend_id <= 0 ) {
-				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+				friend_id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
+				if( friend_id <= 0 ) {
+					MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
 
-				m_access = false;
-				MyUpdateControlStatus();
-				return;
+					m_access = false;
+					MyUpdateControlStatus();
+					return;
+				}
 			}
 			if( !mixi::NewMessageConfirmGenerator::generate( *m_postData, title, euc_msg, friend_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
@@ -975,6 +978,9 @@ void CWriteView::StartRegistPost()
 
 			// 電文の生成
 			int friend_id = m_data->GetOwnerID();
+			if( friend_id <= 0 ) {
+				friend_id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
+			}
 			if( !mixi::NewMessageRegistGenerator::generate( *m_postData, title, friend_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
