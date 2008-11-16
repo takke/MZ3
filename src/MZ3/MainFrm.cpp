@@ -826,7 +826,7 @@ void CMainFrame::OnHelpMenu()
 	theApp.m_pMainView->MyShowHelp();
 #else
 	// Win32 の場合はオンラインマニュアル表示
-	util::OpenByShellExecute( L"http://mz3.jp/manual_mz4/" );
+	util::OpenByShellExecute( MZ4_MANUAL_URL);
 #endif
 }
 

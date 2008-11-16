@@ -938,7 +938,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 		}
 #else
 		// ƒwƒ‹ƒv•\Ž¦
-		util::OpenByShellExecute( MZ3_CHM_HELPFILENAME );
+		util::OpenByShellExecute( MZ4_MANUAL_URL );
 #endif
 		break;
 

@@ -12,7 +12,7 @@
 
 // CHM ヘルプファイルパス
 #ifndef WINCE
-#define MZ3_CHM_HELPFILENAME		L"MZ4.chm"
+# define MZ4_MANUAL_URL				L"http://mz3.jp/manual_mz4/"
 #endif
 
 // Window メッセージ
