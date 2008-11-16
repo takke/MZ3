@@ -577,7 +577,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系
-	type = ACCESS_POST_CONFIRM_COMMENT;
+	type = ACCESS_POST_COMMENT_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -585,7 +585,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_REGIST_COMMENT;
+	type = ACCESS_POST_COMMENT_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -593,7 +593,15 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_CONFIRM_REPLYMESSAGE;
+	type = ACCESS_POST_REPLYMESSAGE_ENTRY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_POST
+		, "mixi"
+		, L"メッセージ返信（入力）"
+		, REQUEST_METHOD_GET
+		);
+
+	type = ACCESS_POST_REPLYMESSAGE_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -601,7 +609,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_REGIST_REPLYMESSAGE;
+	type = ACCESS_POST_REPLYMESSAGE_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -609,7 +617,15 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_CONFIRM_NEWMESSAGE;
+	type = ACCESS_POST_NEWMESSAGE_ENTRY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_POST
+		, "mixi"
+		, L"新規メッセージ（入力）"
+		, REQUEST_METHOD_GET
+		);
+
+	type = ACCESS_POST_NEWMESSAGE_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -617,7 +633,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_REGIST_NEWMESSAGE;
+	type = ACCESS_POST_NEWMESSAGE_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -625,7 +641,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_CONFIRM_NEWDIARY;
+	type = ACCESS_POST_NEWDIARY_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
@@ -633,7 +649,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
-	type = ACCESS_POST_REGIST_NEWDIARY;
+	type = ACCESS_POST_NEWDIARY_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"

@@ -40,7 +40,9 @@ public:
 	afx_msg void OnBnClickedWriteSendButton();
 	afx_msg void OnBnClickedWriteCancelButton();
 	afx_msg LRESULT OnGetEnd(WPARAM, LPARAM);
-	afx_msg LRESULT OnPostConfirm(WPARAM, LPARAM);
+	afx_msg LRESULT OnGetError(WPARAM, LPARAM);
+	afx_msg LRESULT OnPostEntryEnd(WPARAM, LPARAM);
+	afx_msg LRESULT OnPostConfirmEnd(WPARAM, LPARAM);
 	afx_msg LRESULT OnPostEnd(WPARAM, LPARAM);
 	afx_msg LRESULT OnPostAbort(WPARAM, LPARAM);
 	afx_msg LRESULT OnAbort(WPARAM, LPARAM);
@@ -182,7 +184,8 @@ public:
 	afx_msg void OnAttachPhoto();
 	bool IsEnableAttachImageMode(void);
 
-	void StartConfirmPost( CString msg );
+	void StartEntryPost();
+	void StartConfirmPost();
 	void StartRegistPost();
 	afx_msg void OnPreviewAttachedPhoto1();
 	afx_msg void OnPreviewAttachedPhoto2();

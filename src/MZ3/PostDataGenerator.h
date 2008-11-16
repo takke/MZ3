@@ -357,33 +357,31 @@ public:
 	 * @param msg				ユーザが入力したメッセージ
 	 */
 	static bool generate( CPostData& post,
-						  LPCTSTR msg )
+						  LPCTSTR title, LPCTSTR msg, int friend_id, LPCTSTR reply_message_id )
 	{
 		// 次画面で hidden タグとして埋め込むメッセージを保存しておく
 		post.SetComment(msg);
 
 		// POST 電文の生成
 		post.ClearPostBody();
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
-		post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"submit\"" );
-		post.AppendPostBodyWithCRLF( "" );
-		post.AppendPostBodyWithCRLF( "main" );
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
-		post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"post_key\"" );
-		post.AppendPostBodyWithCRLF( "" );
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
-		post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"subject\"" );
-		post.AppendPostBodyWithCRLF( "" );
-		post.AppendPostBodyWithCRLF( "title" );
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
-		post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"body\"" );
-		post.AppendPostBodyWithCRLF( "" );
-		post.AppendPostBodyWithCRLF( "msg" );
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
-		post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"post_key\"" );
-		post.AppendPostBodyWithCRLF( "" );
-		post.AppendPostBodyWithCRLF( "4a960f4bbeb6f5cb7b28c8f82a55d0a5" );
-		post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e--" );
+		post.AppendPostBody( "mode=confirm_or_save&" );
+		post.AppendPostBody( "from_show_friend=&" );
+		post.AppendPostBody( "subject=" );
+		// タイトルを EUC-JP URL Encoded String に変換して埋め込む
+		post.AppendPostBody( URLEncoder::encode_euc( title ) );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "body=" );
+		post.AppendPostBody( msg );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "post_key=" );
+		post.AppendPostBody( post.GetPostKey() );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "original_message_id=&" );
+		post.AppendPostBody( "reply_message_id=" );
+		post.AppendPostBody( reply_message_id );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "id=" );
+		post.AppendPostBody( util::int2str(friend_id) );
 
 		// Content-Type を設定する
 		// Content-Type: application/x-www-form-urlencoded
@@ -407,26 +405,35 @@ public:
 	 * @param post				CPostData オブジェクト
 	 * @param title				タイトル文字列(wchar_t)
 	 */
-	static bool generate( CPostData& post, LPCTSTR title )
+	static bool generate( CPostData& post, LPCTSTR title, int friend_id, LPCTSTR reply_message_id )
 	{
 		CString msgId = util::GetParamFromURL(post.GetConfirmUri(), L"message_id");
 
 		// POST 電文の生成
 		post.ClearPostBody();
 
-		post.AppendPostBody( "submit=confirm&message_id=" );
-		post.AppendPostBody( msgId );
-
-		// 本文を埋め込む
-		post.AppendPostBody( "&body=" );
-		post.AppendPostBody( post.GetComment() );
-		post.AppendPostBody( "&subject=" );
+		post.AppendPostBody( "from_show_friend=&mode=commit_or_edit&" );
 
 		// タイトルを EUC-JP URL Encoded String に変換して埋め込む
+		post.AppendPostBody( "subject=" );
 		post.AppendPostBody( URLEncoder::encode_euc( title ) );
+		post.AppendPostBody( "&" );
 
-		post.AppendPostBody( "&post_key=" );
+		post.AppendPostBody( "body=" );
+		post.AppendPostBody( post.GetComment() );
+		post.AppendPostBody( "&" );
+
+		post.AppendPostBody( "post_key=" );
 		post.AppendPostBody( post.GetPostKey() );
+		post.AppendPostBody( "&" );
+
+		post.AppendPostBody( "original_message_id=&" );
+		post.AppendPostBody( "reply_message_id=" );
+		post.AppendPostBody( reply_message_id );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "id=" );
+		post.AppendPostBody( util::int2str(friend_id) );
+
 		post.AppendPostBody( "&yes=%A1%A1%C1%F7%A1%A1%BF%AE%A1%A1" );
 
 		// Content-Type: application/x-www-form-urlencoded
@@ -451,20 +458,30 @@ public:
 	 * @param msg				ユーザが入力したメッセージ
 	 */
 	static bool generate( CPostData& post,
-						  LPCTSTR msg )
+						  LPCTSTR title, 
+						  LPCTSTR msg, 
+						  int friend_id )
 	{
 		// 次画面で hidden タグとして埋め込むメッセージを保存しておく
 		post.SetComment(msg);
 
 		// POST 電文の生成
 		post.ClearPostBody();
-		post.AppendPostBody( "submit=main&" );
-		post.AppendPostBody( "subject=title&" );
+		post.AppendPostBody( "mode=confirm_or_save&" );
+		post.AppendPostBody( "from_show_friend=&" );
+		post.AppendPostBody( "subject=" );
+		post.AppendPostBody( URLEncoder::encode_euc(title) );
+		post.AppendPostBody( "&" );
 		post.AppendPostBody( "body=" );
 		post.AppendPostBody( msg );
-		post.AppendPostBody( "&post_key=" );
-//		post.AppendPostBody( "74b630af81dfaae59bfb6352728844a7" );
-		post.AppendPostBody( generateNewPostKey() );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "post_key=" );
+		post.AppendPostBody( post.GetPostKey() );
+		post.AppendPostBody( "&" );
+		post.AppendPostBody( "original_message_id=&" );
+		post.AppendPostBody( "reply_message_id=&" );
+		post.AppendPostBody( "id=" );
+		post.AppendPostBody( util::int2str(friend_id) );
 
 		// Content-Type を設定する
 		// Content-Type: application/x-www-form-urlencoded
@@ -473,7 +490,7 @@ public:
 		return true;
 	}
 
-	static CStringA generateNewPostKey() {
+/*	static CStringA generateNewPostKey() {
 		CStringA postKey;
 
 		const char chars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -486,6 +503,7 @@ public:
 
 		return postKey;
 	}
+*/
 };
 
 /**

@@ -2308,6 +2308,7 @@ void CReportView::OnSendMessage()
 	s_mixi.SetAccessType(ACCESS_PROFILE);
 	s_mixi.SetURL(url);
 	s_mixi.SetBrowseUri(url);
+	s_mixi.SetOwnerID(data->GetOwnerID());
 
 	// ‘‚«ž‚Ý‰æ–Ê¶¬
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &s_mixi );

@@ -65,7 +65,9 @@ BEGIN_MESSAGE_MAP(CWriteView, CFormView)
 	ON_BN_CLICKED(IDC_WRITE_SEND_BUTTON, &CWriteView::OnBnClickedWriteSendButton)
 	ON_BN_CLICKED(IDC_WRITE_CANCEL_BUTTON, &CWriteView::OnBnClickedWriteCancelButton)
     ON_MESSAGE(WM_MZ3_GET_END, OnGetEnd)
-    ON_MESSAGE(WM_MZ3_POST_CONFIRM, OnPostConfirm)
+	ON_MESSAGE(WM_MZ3_GET_ERROR, OnGetError)
+	ON_MESSAGE(WM_MZ3_POST_ENTRY_END, OnPostEntryEnd)
+	ON_MESSAGE(WM_MZ3_POST_CONFIRM_END, OnPostConfirmEnd)
     ON_MESSAGE(WM_MZ3_POST_END, OnPostEnd)
     ON_MESSAGE(WM_MZ3_POST_ABORT, OnPostAbort)
     ON_MESSAGE(WM_MZ3_ABORT, OnAbort)
@@ -301,11 +303,23 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
  *
  * 正常系処理シーケンス：
  *
- * <ol>
- *  <li>StartConfirmPost => DoPost/WM_MZ3_POST_CONFIRM => 通信開始
- *  <li>OnPostConfirm => StartRegistPost => DoPost/WM_MZ3_POST_END => 通信開始
- *  <li>OnPostEnd
- * </ol>
+ * <pre>
+ *  StartEntryPost
+ *    => StartConfirmPost()  [メッセージ以外]
+ *      => DoPost/WM_MZ3_POST_CONFIRM_END
+ *        => 通信開始
+ *    => DoPost/WM_MZ3_POST_ENTRY_END [メッセージのみ]
+ *      => 通信開始
+ *  OnPostEntryEnd (メッセージのみ)
+ *    => StartConfirmPost()
+ *      => DoPost/WM_MZ3_POST_CONFIRM_END
+ *        => 通信開始
+ *  OnPostConfirmEnd
+ *    => StartRegistPost()
+ *      => DoPost/WM_MZ3_POST_END
+ *        => 通信開始
+ *  OnPostEnd
+ * </pre>
  */
 void CWriteView::OnBnClickedWriteSendButton()
 {
@@ -394,10 +408,298 @@ void CWriteView::OnBnClickedWriteSendButton()
 	}
 
 	// POST 開始
-	StartConfirmPost( msg );
+	StartEntryPost();
 
 	// キー押下イベントを奪うためにフォーカスを取得する
 	SetFocus();
+}
+
+/**
+ * 入力画面の取得(メッセージ以外の場合は確認画面への遷移)
+ */
+void CWriteView::StartEntryPost()
+{
+	CString url;
+
+	switch (m_writeViewType) {
+	case WRITEVIEW_TYPE_COMMENT:		// コメントの投稿確認
+	case WRITEVIEW_TYPE_NEWDIARY:		// 日記の投稿確認
+
+		// 確認画面への遷移
+		StartConfirmPost();
+		return;
+
+	case WRITEVIEW_TYPE_REPLYMESSAGE:
+		// メッセージの返信確認
+		{
+			// POST 電文の生成
+			m_postData->ClearPostBody();
+
+			// Content-Type を設定する
+			// Content-Type: application/x-www-form-urlencoded
+			m_postData->SetContentType( CONTENT_TYPE_FORM_URLENCODED );
+
+			// リクエストURL生成
+			// http://mixi.jp/view_message.pl?id=xxx&box=inbox
+			// ↓
+			// http://mixi.jp/reply_message.pl?reply_message_id=xxx&id=yyy
+			int friend_id = m_data->GetOwnerID();
+			CString reply_message_id = util::GetParamFromURL(m_data->GetURL(), L"id");
+			url.Format(L"http://mixi.jp/reply_message.pl?reply_message_id=%s&id=%d",
+				reply_message_id, friend_id);
+
+			m_postData->SetConfirmUri(url);
+		}
+		break;
+
+	case WRITEVIEW_TYPE_NEWMESSAGE:
+		// 新規メッセージの送信確認
+		{
+			// POST 電文の生成
+			m_postData->ClearPostBody();
+
+			// Content-Type を設定する
+			// Content-Type: application/x-www-form-urlencoded
+			m_postData->SetContentType( CONTENT_TYPE_FORM_URLENCODED );
+
+
+			// リクエストURL生成
+
+			// m_data から id を取得する
+			// http://mixi.jp/show_friend.pl?id=xxx
+			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
+			if( id <= 0 ) {
+				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+				return;
+			}
+
+			// URL 生成
+			// http://mixi.jp/send_message.pl?id=590362&mode=from_show_friend
+			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d&mode=from_show_friend", id );
+			m_postData->SetConfirmUri(url);
+		}
+
+		break;
+
+	default:
+		{
+			CString s;
+			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
+			MessageBox( s );
+			return;
+		}
+		break;
+	}
+
+	// 成功時のメッセージを設定する
+	m_postData->SetSuccessMessage( WM_MZ3_POST_ENTRY_END );
+
+	// アクセス種別の設定
+	switch (m_writeViewType) {
+	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_REPLYMESSAGE_ENTRY;	break;
+	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_NEWMESSAGE_ENTRY;		break;
+	default:							theApp.m_accessType = ACCESS_MAIN;						break;
+	}
+
+	TRACE( L"Post URL = [%s]\n", url );
+
+	m_access = true;
+	m_abort  = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
+
+	LPCTSTR refUrl = L"";
+
+	// 通信開始
+	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.DoPost(
+		url, 
+		refUrl, 
+		CInetAccess::FILE_HTML, 
+		m_postData);
+}
+
+/**
+ * 確認画面への遷移
+ */
+void CWriteView::StartConfirmPost()
+{
+	CString wmsg;
+	GetDlgItemText( IDC_WRITE_BODY_EDIT, wmsg );
+
+	// ユーザが入力したメッセージを EUC-JP URL Encoded String に変換する
+	CString euc_msg = URLEncoder::encode_euc(wmsg);
+	TRACE(L"euc-jp url encoded string = [%s]\n", euc_msg);
+
+	CString url;
+
+	switch (m_writeViewType) {
+	case WRITEVIEW_TYPE_COMMENT:
+		// コメントの投稿確認
+		{
+			// 電文生成
+			if( !mixi::PostCommentGenerator::generate( *m_postData, *m_data, euc_msg, 
+													   m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) ) 
+			{
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+				return;
+			}
+
+			// リクエストURL生成
+			url.Format( L"http://mixi.jp/%s", m_data->GetPostAddress() );
+		}
+		break;
+
+	case WRITEVIEW_TYPE_NEWDIARY:
+		// 日記の投稿確認
+		{
+			// 電文生成
+			if( !mixi::PostDiaryGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
+													 m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
+			{
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+				return;
+			}
+
+			// リクエストURL生成
+			url = L"http://mixi.jp/add_diary.pl";
+		}
+		break;
+
+	case WRITEVIEW_TYPE_REPLYMESSAGE:
+		// メッセージの返信確認
+		{
+			// タイトルを取得する
+			CString title;
+			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
+
+			// 電文生成
+			int friend_id = m_data->GetOwnerID();
+			CString reply_message_id = util::GetParamFromURL(m_data->GetURL(), L"id");
+			if( !mixi::PostReplyMessageGenerator::generate( *m_postData, title, euc_msg, friend_id, reply_message_id ) ) {
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+				return;
+			}
+
+			// リクエストURL生成
+			// http://mixi.jp/view_message.pl?id=xxx&box=inbox
+			// ↓
+			// http://mixi.jp/reply_message.pl?id=yyy&message_id=xxx
+			//url.Format(L"http://mixi.jp/reply_message.pl?reply_message_id=%s&id=%d",
+			//	(LPCTSTR)util::GetParamFromURL(m_data->GetURL(), L"id"),
+			//	m_data->GetOwnerID());
+			url = L"http://mixi.jp/reply_message.pl";
+
+			m_postData->SetConfirmUri(url);
+		}
+		break;
+
+	case WRITEVIEW_TYPE_NEWMESSAGE:
+		// 新規メッセージの送信確認
+		{
+			// タイトルを取得する
+			CString title;
+			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
+
+			// 電文生成
+			int friend_id = m_data->GetOwnerID();
+			if( !mixi::PostNewMessageGenerator::generate( *m_postData, title, euc_msg, friend_id ) ) {
+				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
+				return;
+			}
+
+			// リクエストURL生成
+
+			// m_data から id を取得する
+			// http://mixi.jp/show_friend.pl?id=xxx
+			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
+			if( id <= 0 ) {
+				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
+				return;
+			}
+
+			// URL 生成
+			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d", id );
+			m_postData->SetConfirmUri(url);
+		}
+
+		break;
+
+	default:
+		{
+			CString s;
+			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
+			MessageBox( s );
+
+			return;
+		}
+		break;
+	}
+
+	// 成功時のメッセージを設定する
+	m_postData->SetSuccessMessage( WM_MZ3_POST_CONFIRM_END );
+
+	// アクセス種別の設定
+	switch (m_writeViewType) {
+	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_COMMENT_CONFIRM;		break;
+	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_NEWDIARY_CONFIRM;		break;
+	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_REPLYMESSAGE_CONFIRM;	break;
+	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_NEWMESSAGE_CONFIRM;	break;
+	default:							theApp.m_accessType = ACCESS_MAIN;						break;
+	}
+
+	TRACE( L"Post URL = [%s]\n", url );
+
+	m_access = true;
+	m_abort  = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
+
+	// リファラ設定
+	CString refUrl = L"";
+	
+	//リファラ設定したら投稿で止まるようになったので保留
+	//LPCTSTR refUrl = m_data->GetURL();
+	switch (m_writeViewType) {
+	case WRITEVIEW_TYPE_NEWMESSAGE:
+		refUrl = util::FormatString(L"http://mixi.jp/send_message.pl?id=%d&ref=list_friend&sort=lastlogin&tag_id=all",
+						mixi::MixiUrlParser::GetID( m_data->GetURL() ));
+		break;
+	}
+
+	// 通信開始
+	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.DoPost(
+		url, 
+		refUrl, 
+		CInetAccess::FILE_HTML, 
+		m_postData );
+}
+
+/**
+* アクセスエラー通知受信
+*/
+LRESULT CWriteView::OnGetError(WPARAM wParam, LPARAM lParam)
+{
+	// 通信エラーが発生した場合の処理
+	LPCTSTR smsg = L"エラーが発生しました";
+	util::MySetInformationText( m_hWnd, smsg );
+
+	CString msg;
+	msg.Format( 
+		L"%s\n\n"
+		L"原因：%s", smsg, theApp.m_inet.GetErrorMessage() );
+	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
+	MZ3LOGGER_ERROR( msg );
+
+	m_access = false;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
+
+	return TRUE;
 }
 
 /**
@@ -440,9 +742,67 @@ void CWriteView::OnBnClickedWriteCancelButton()
 }
 
 /**
+ * 入力画面の取得（＝入力画面の表示）完了。確認画面ボタン押下のシミュレート。
+ */
+LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
+{
+	if (m_abort) {
+		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
+		return TRUE;
+	}
+
+	// ログアウトチェック
+	if (theApp.IsMixiLogout(theApp.m_accessType)) {
+		// ログアウト状態になっている
+		// ログイン処理実施
+		MZ3LOGGER_INFO(_T("ログインします。"));
+		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
+
+		theApp.m_accessType = ACCESS_LOGIN;
+		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
+
+		return TRUE;
+	}
+
+	// 確認画面判定
+	CHtmlArray html;
+	html.Load( theApp.m_filepath.temphtml );
+
+	// 解析用に入力画面を保存しておく
+	CString strEntryTempFile = theApp.m_filepath.temphtml + L".entry.html";
+	CopyFile( theApp.m_filepath.temphtml, strEntryTempFile, FALSE );
+
+	// 確認画面の解析
+	if (html.GetPostConfirmData(m_postData) == false) {
+		CString msg = 
+			L"エラーが発生しました\r\n"
+			L"確認画面にエラー内容が表示されていますが、"
+			L"本バージョンの" MZ3_APP_NAME L"ではエラー内容を表示できません・・・\r\n"
+			L"お手数ですが、下記ファイルを直接解析してくださいm(_ _)m\r\n"
+			+ strEntryTempFile;
+		MessageBox( msg );
+		MZ3LOGGER_ERROR( msg );
+
+		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
+		theApp.m_loginMng.SetOwnerID( L"" );
+
+		m_access = false;
+		MyUpdateControlStatus();
+
+		return 0;
+	}
+
+	// 確認画面取得開始
+	StartConfirmPost();
+
+	return TRUE;
+}
+
+/**
  * 書き込み画面の投稿（＝確認画面の表示）完了。書き込みのシミュレート。
  */
-LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
+LRESULT CWriteView::OnPostConfirmEnd(WPARAM wParam, LPARAM lParam)
 {
 	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, NULL);
@@ -484,6 +844,9 @@ LRESULT CWriteView::OnPostConfirm(WPARAM wParam, LPARAM lParam)
 
 		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
 		theApp.m_loginMng.SetOwnerID( L"" );
+
+		m_access = false;
+		MyUpdateControlStatus();
 
 		return 0;
 	}
@@ -555,7 +918,7 @@ void CWriteView::StartRegistPost()
 			}
 
 			// 電文の生成
-			if( !mixi::RegistDiaryGenerator::generate( *m_postData, title , viewlimit ) ) {
+			if( !mixi::RegistDiaryGenerator::generate( *m_postData, title, viewlimit ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -572,7 +935,9 @@ void CWriteView::StartRegistPost()
 			GetDlgItemText( IDC_WRITE_TITLE_EDIT, title );
 
 			// 電文の生成
-			if( !mixi::RegistReplyMessageGenerator::generate( *m_postData, title ) ) {
+			int friend_id = m_data->GetOwnerID();
+			CString reply_message_id = util::GetParamFromURL(m_data->GetURL(), L"id");
+			if( !mixi::RegistReplyMessageGenerator::generate( *m_postData, title, friend_id, reply_message_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 				return;
 			}
@@ -617,10 +982,10 @@ void CWriteView::StartRegistPost()
 
 	// アクセス種別の設定
 	switch (m_writeViewType) {
-	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_REGIST_COMMENT;		break;
-	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_REGIST_NEWDIARY;		break;
-	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_REGIST_REPLYMESSAGE;	break;
-	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_REGIST_NEWMESSAGE;	break;
+	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_COMMENT_REGIST;		break;
+	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_NEWDIARY_REGIST;		break;
+	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_REPLYMESSAGE_REGIST;	break;
+	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_NEWMESSAGE_REGIST;	break;
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
@@ -766,7 +1131,7 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 	m_abort = true;
 
 	LPCTSTR msg = L"";
-	if (m_postData->GetSuccessMessage() == WM_MZ3_POST_CONFIRM) {
+	if (m_postData->GetSuccessMessage() == WM_MZ3_POST_CONFIRM_END) {
 		msg = L"中断しましたが、投稿された可能性があります";
 	} else {
 		msg = L"中断しました";
@@ -938,11 +1303,8 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	CString msg;
-	GetDlgItemText( IDC_WRITE_BODY_EDIT, msg );
-
 	// POST 処理を続行
-	StartConfirmPost( msg );
+	StartEntryPost();
 
 	return TRUE;
 }
@@ -1119,148 +1481,6 @@ bool CWriteView::IsEnableAttachImageMode(void)
 	default:
 		return false;
 	}
-}
-
-/**
- * 確認画面への遷移開始
- */
-void CWriteView::StartConfirmPost( CString wmsg )
-{
-	// ユーザが入力したメッセージを EUC-JP URL Encoded String に変換する
-	CString euc_msg = URLEncoder::encode_euc(wmsg);
-	TRACE(L"euc-jp url encoded string = [%s]\n", euc_msg);
-
-	CString url;
-
-	switch (m_writeViewType) {
-	case WRITEVIEW_TYPE_COMMENT:
-		// コメントの投稿確認
-		{
-			// 電文生成
-			if( !mixi::PostCommentGenerator::generate( *m_postData, *m_data, euc_msg, 
-													   m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) ) 
-			{
-				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
-				return;
-			}
-
-			// リクエストURL生成
-			url.Format( L"http://mixi.jp/%s", m_data->GetPostAddress() );
-		}
-		break;
-
-	case WRITEVIEW_TYPE_NEWDIARY:
-		// 日記の投稿確認
-		{
-			// 電文生成
-			if( !mixi::PostDiaryGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
-													 m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
-			{
-				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
-				return;
-			}
-
-			// リクエストURL生成
-			url = L"http://mixi.jp/add_diary.pl";
-		}
-		break;
-
-	case WRITEVIEW_TYPE_REPLYMESSAGE:
-		// メッセージの返信確認
-		{
-			// 電文生成
-			if( !mixi::PostReplyMessageGenerator::generate( *m_postData, euc_msg ) ) {
-				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
-				return;
-			}
-
-			// リクエストURL生成
-			// http://mixi.jp/view_message.pl?id=xxx&box=inbox
-			// ↓
-			// http://mixi.jp/reply_message.pl?id=yyy&message_id=xxx
-
-			url.Format( L"http://mixi.jp/%s", m_data->GetURL() );
-			url.Replace( L"&box=inbox", L"" );
-			url.Replace( L"id=", L"message_id=" );
-
-			CString subUri;
-			subUri.Format(L"reply_message.pl?id=%d&", m_data->GetOwnerID());
-			url.Replace(L"view_message.pl?", subUri);
-
-			m_postData->SetConfirmUri(url);
-		}
-		break;
-
-	case WRITEVIEW_TYPE_NEWMESSAGE:
-		// 新規メッセージの送信確認
-		{
-			// 電文生成
-			if( !mixi::PostNewMessageGenerator::generate( *m_postData, euc_msg ) ) {
-				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
-				return;
-			}
-
-			// リクエストURL生成
-
-			// m_data から id を取得する
-			// http://mixi.jp/show_friend.pl?id=xxx
-			int id = mixi::MixiUrlParser::GetID( m_data->GetURL() );
-			if( id <= 0 ) {
-				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
-				return;
-			}
-
-			// URL 生成
-			url = util::FormatString( L"http://mixi.jp/send_message.pl?id=%d", id );
-			m_postData->SetConfirmUri(url);
-		}
-
-		break;
-
-	default:
-		{
-			CString s;
-			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
-			MessageBox( s );
-
-			return;
-		}
-		break;
-	}
-
-	// 成功時のメッセージを設定する
-	m_postData->SetSuccessMessage( WM_MZ3_POST_CONFIRM );
-
-	// アクセス種別の設定
-	switch (m_writeViewType) {
-	case WRITEVIEW_TYPE_COMMENT:		theApp.m_accessType = ACCESS_POST_CONFIRM_COMMENT;		break;
-	case WRITEVIEW_TYPE_NEWDIARY:		theApp.m_accessType = ACCESS_POST_CONFIRM_NEWDIARY;		break;
-	case WRITEVIEW_TYPE_REPLYMESSAGE:	theApp.m_accessType = ACCESS_POST_CONFIRM_REPLYMESSAGE;	break;
-	case WRITEVIEW_TYPE_NEWMESSAGE:		theApp.m_accessType = ACCESS_POST_CONFIRM_NEWMESSAGE;	break;
-	default:							theApp.m_accessType = ACCESS_MAIN;						break;
-	}
-
-	TRACE( L"Post URL = [%s]\n", url );
-
-	m_access = true;
-	m_abort  = false;
-
-	// コントロール状態の変更
-	MyUpdateControlStatus();
-
-	// リファラ設定
-	LPCTSTR refUrl = L"";
-	
-	//リファラ設定したら投稿で止まるようになったので保留
-	//LPCTSTR refUrl = m_data->GetURL();
-
-	// 通信開始
-	theApp.m_inet.Initialize( m_hWnd, NULL );
-	theApp.m_inet.DoPost(
-		url, 
-		refUrl, 
-		CInetAccess::FILE_HTML, 
-		m_postData );
 }
 
 /// 絵文字挿入

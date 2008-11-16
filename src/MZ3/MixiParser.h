@@ -3074,7 +3074,7 @@ public:
 			}
 
 			// 差出人ID抽出
-			if( util::LineHasStringsNoCase( str, L"<a" L"href=" , L"show_friend.pl?id=", L"\">", L"</a>" ) ) {
+			if( util::LineHasStringsNoCase( str, L"<a", L"href=" , L"show_friend.pl?id=", L"\">", L"</a>" ) ) {
 				CString buf;
 				util::GetBetweenSubString( str, L"show_friend.pl?id=", L"\"", buf );
 				data_.SetOwnerID(_wtoi(buf));
@@ -3174,6 +3174,7 @@ public:
 				CString url = L"show_friend.pl?id=";
 				url.Append(member_id);
 				data.SetURL(url);
+				data.SetOwnerID(_wtoi(member_id));
 
 				// URL 構築＆設定
 				url.Insert( 0, L"http://mixi.jp/" );

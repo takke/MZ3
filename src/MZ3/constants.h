@@ -31,8 +31,10 @@
 #define WM_MZ3_CHANGE_VIEW			WM_APP + 10
 /// 再読込（投稿後など）
 #define WM_MZ3_RELOAD				WM_APP + 11
+/// データ送信完了（入力画面取得用送信処理）
+#define WM_MZ3_POST_ENTRY_END		WM_APP + 12
 /// データ送信完了（確認用送信処理）
-#define WM_MZ3_POST_CONFIRM			WM_APP + 12
+#define WM_MZ3_POST_CONFIRM_END		WM_APP + 13
 /// データ送信完了（正常終了）
 #define	WM_MZ3_POST_END				WM_APP + 14
 /// データ送信完了（中断）
@@ -114,14 +116,16 @@ enum ACCESS_TYPE {
 	ACCESS_MIXI_ADD_ECHO,				///< エコー書き込む：add_echo.pl
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
-	ACCESS_POST_CONFIRM_COMMENT,		///< コメント投稿（確認画面）
-	ACCESS_POST_REGIST_COMMENT,			///< コメント投稿（書き込み画面）
-	ACCESS_POST_CONFIRM_REPLYMESSAGE,	///< メッセージ返信（確認画面）
-	ACCESS_POST_REGIST_REPLYMESSAGE,	///< メッセージ返信（書き込み画面）
-	ACCESS_POST_CONFIRM_NEWMESSAGE,		///< 新規メッセージ（確認画面）
-	ACCESS_POST_REGIST_NEWMESSAGE,		///< 新規メッセージ（書き込み画面）
-	ACCESS_POST_CONFIRM_NEWDIARY,		///< 日記投稿（確認画面）
-	ACCESS_POST_REGIST_NEWDIARY,		///< コメント投稿（書き込み画面）
+	ACCESS_POST_COMMENT_CONFIRM,		///< コメント投稿（確認画面）
+	ACCESS_POST_COMMENT_REGIST,			///< コメント投稿（書き込み画面）
+	ACCESS_POST_REPLYMESSAGE_ENTRY,		///< メッセージ返信（入力画面）
+	ACCESS_POST_REPLYMESSAGE_CONFIRM,	///< メッセージ返信（確認画面）
+	ACCESS_POST_REPLYMESSAGE_REGIST,	///< メッセージ返信（書き込み画面）
+	ACCESS_POST_NEWMESSAGE_ENTRY,		///< 新規メッセージ（入力画面）
+	ACCESS_POST_NEWMESSAGE_CONFIRM,		///< 新規メッセージ（確認画面）
+	ACCESS_POST_NEWMESSAGE_REGIST,		///< 新規メッセージ（書き込み画面）
+	ACCESS_POST_NEWDIARY_CONFIRM,		///< 日記投稿（確認画面）
+	ACCESS_POST_NEWDIARY_REGIST,		///< 日記投稿（書き込み画面）
 
 	//--- Twitter Timeline 系
 	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
