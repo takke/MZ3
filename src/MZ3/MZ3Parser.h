@@ -320,6 +320,7 @@ public:
 				CString name;
 				if (util::GetBetweenSubString( line, L"<a", L"</a>", name ) >= 0) {
 					if (util::GetBetweenSubString( name, L"[", L"]", name ) >= 0) {
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 						mixi.SetName( name );
 						return true;
 					}

@@ -59,6 +59,7 @@ public:
 				// "<h2>" と "の日記</h2>" で囲まれた部分を抽出する
 				CString name;
 				util::GetBetweenSubString( str, L"<h2>", L"の日記</h2>", name );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 
 				// 名前
 				data.SetName( name );
@@ -78,6 +79,7 @@ public:
 
 				CString title;
 				util::GetBetweenSubString( buf, L"\">", L"</a><span><a", title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data.SetTitle( title );
 
 				// 日付
@@ -204,6 +206,7 @@ public:
 											util::GetBetweenSubString( target, L"\">", L"</a>", title );
 											//改行を削除
 											title.Replace(_T("\n"), _T(""));
+											mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 											//タイトルをセット
 											data.SetTitle(title);
 											//ループを抜けるフラグをセット
@@ -212,6 +215,7 @@ public:
 										//名前を抽出
 										CString author;
 										util::GetBetweenSubString( target, L"&nbsp;(", L")", author );
+										mixi::ParserUtil::ReplaceEntityReferenceToCharacter( author );
 										data.SetName( author );
 										data.SetAuthor( author );
 										break;
@@ -305,6 +309,7 @@ public:
 				util::GetAfterSubString( line2, L"<a", after );
 				CString title;
 				util::GetBetweenSubString( after, L">", L"<", title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data.SetTitle(title);
 
 				// ＵＲＩ
@@ -325,6 +330,7 @@ public:
 					// 失敗したので ")" までを抽出
 					util::GetBetweenSubString( line2, L"</a> (", L")", name);
 				}
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 
 				data.SetName(name);
 				data.SetAuthor(name);
@@ -424,6 +430,7 @@ public:
 
 					CString title;
 					util::GetBetweenSubString( line2, L"\">", L"</a>", title );
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 					data.SetTitle(title);
 					MZ3LOGGER_DEBUG( L"title : " + data.GetTitle() );
 
@@ -507,6 +514,7 @@ public:
 													 .getNode(L"title");
 
 				CString title = titleNode.getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 
 				// 自分の日記なら　　「<title>[mixi] タイトル</title>」
 				// 自分以外の日記なら「<title>[mixi] 名前 | タイトル</title>」
@@ -924,6 +932,7 @@ public:
 				}
 				CString title;
 				util::GetBetweenSubString( after, L">", L"<", title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				
 				//アンケート、イベントの場合はタイトルの前にマークを付ける
 				if(util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEvent" )){
@@ -958,6 +967,7 @@ public:
 				// 整形：最初と最後の括弧を取り除く
 				communityName.Trim();
 				util::GetBetweenSubString( communityName, L"(", L")", communityName );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( communityName );
 				data.SetName(communityName);
 				out_.push_back( data );
 			}
@@ -1162,6 +1172,7 @@ private:
 					userCount = name.Mid(idxStart+1, idxEnd-idxStart-1) + L"人";
 					name = name.Left(idxStart);
 				}
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 				mixi.SetName( name );
 				mixi.SetDate( userCount );	// 仮に日付として登録する
 				mixi.SetAccessType( ACCESS_COMMUNITY );
@@ -1273,6 +1284,7 @@ public:
 				// タイトル抽出
 				CString title;
 				util::GetBetweenSubString( line, L"class=\"title\">", L"</a>", title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				mixi.SetTitle(title);
 
 				// URL 抽出
@@ -1410,6 +1422,7 @@ public:
 				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
 				// タグの除去
 				ParserUtil::StripAllTags( title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				mixi.SetTitle( title );
 				continue;
 			}
@@ -1664,6 +1677,7 @@ public:
 				util::GetBetweenSubString( line, L"titleSpan\">", L"</span>", title );
 				// タグの除去
 				ParserUtil::StripAllTags( title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data_.SetTitle(title);
 				continue;
 			}
@@ -2022,6 +2036,7 @@ public:
 			{
 				CString title;
 				util::GetBetweenSubString( line, L"class=\"title\">", L"</span>", title );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data_.SetTitle(title);
 				continue;
 			}
@@ -2343,8 +2358,10 @@ public:
 				const xml2stl::Node& div = bodyMainArea.getNode(L"div", L"class=pageTitle communityTitle002")
 													   .getNode(L"h2");
 
-				data_.SetTitle(div.getTextAll().c_str());
-				data_.SetName(div.getTextAll().c_str());
+				CString name = div.getTextAll().c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
+				data_.SetTitle( name );
+				data_.SetName( name );
 
 			} catch (xml2stl::NodeNotFoundException& e) {
 				MZ3LOGGER_ERROR( util::FormatString( L"タイトルエラー : %s", e.getMessage().c_str()) );
@@ -2374,6 +2391,7 @@ public:
 
 						// name
 						CString name = li_div.getNode(L"span").getTextAll().c_str();
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 
 						// href
 						CString url = a_node.getProperty(L"href").c_str();
@@ -2455,6 +2473,7 @@ public:
 										  .getNode( L"div" )
 										  .getNode( L"h3" );
 			CString name = h3.getTextAll().c_str();
+			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 			mixi.SetName( name );
 			mixi.SetTitle( name );
 			mixi.SetAuthor( name );
@@ -2815,7 +2834,9 @@ public:
 				TRACE(_T("%s\n"), data.GetDate());
 
 				// 見出し
-				data.SetTitle( title.c_str() );
+				CString wktitle = title.c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( wktitle );
+				data.SetTitle( wktitle );
 				TRACE(_T("%s\n"), data.GetTitle());
 
 				// URL 生成
@@ -2825,8 +2846,10 @@ public:
 				TRACE(_T("%s\n"), data.GetURL());
 
 				// 名前
-				data.SetName( author.c_str() );
-				data.SetAuthor( author.c_str() );
+				CString name = author.c_str();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
+				data.SetName( name );
+				data.SetAuthor( name );
 				TRACE(_T("%s\n"), data.GetName());
 
 				out_.push_back(data);
@@ -2889,6 +2912,7 @@ public:
 				CString title;
 				util::GetBetweenSubString( line, L"<title>[mixi]", L"</title>", title );
 				title.Trim();
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data_.SetTitle(title);
 				break;
 			}
@@ -2992,6 +3016,7 @@ public:
 				if( util::GetBetweenSubString( buf, L">", L"<", title ) < 0 ) {
 					continue;
 				}
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				data.SetTitle(title);
 
 				// 名前
@@ -3011,6 +3036,7 @@ public:
 						continue;
 					}
 				}
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( buf );
 				data.SetName(buf);
 				data.SetAuthor(buf);
 
@@ -3188,6 +3214,7 @@ public:
 				// nickname
 				CString nickname;
 				util::GetBetweenSubString(target, L"\"nickname\":\"", L"\"", nickname);
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( nickname );
 				data.SetName(nickname);
 
 				// date(lastlogin_level)
@@ -3357,6 +3384,7 @@ private:
 		if( util::GetBetweenSubString( target, L">", L"<", name ) < 0 ) {
 			return false;
 		}
+		mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 		mixi.SetName( name );
 
 		mixi.SetAccessType( ACCESS_PROFILE );
@@ -3463,6 +3491,7 @@ public:
 				target = str.Mid( pos );
 				CString name;
 				pos = util::GetBetweenSubString( target, L">", L"</a>", name );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 
 				// "show_friend_memo.pl" と "http://img.mixi.jp/img/memo_s.gif" があればマイミクとみなす
 				bool bMyMixi = false;
@@ -3537,7 +3566,9 @@ public:
 
 					// name : entry/author/name
 					const xml2stl::Node& author = entry.getNode( L"author" );
-					data.SetName( author.getNode( L"name" ).getTextAll().c_str() );
+					CString name = author.getNode( L"name" ).getTextAll().c_str();
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
+					data.SetName( name );
 
 					// 関係 : entry/author/tracks:relation
 					const std::wstring& relation = author.getNode( L"tracks:relation" ).getTextAll();
@@ -3679,6 +3710,7 @@ public:
 					findFlag3 = TRUE;
 				}
 
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
 				if (findFlag3 != FALSE) {
 					// オブジェクト生成
 
@@ -3864,6 +3896,7 @@ public:
 				CString name = author.getTextAll().c_str();
 				mixi::ParserUtil::UnEscapeHtmlElement( name );
 				while( name.Replace( L"\r\n", L"" ) );
+				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
 				data.SetName( name );
 
 				// プロフィール用URL

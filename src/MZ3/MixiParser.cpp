@@ -63,7 +63,9 @@ bool ListBookmarkParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 			mixi.SetBrowseUri( url );
 
 			// name
-			mixi.SetName( a.getTextAll().c_str() );
+			CString name = a.getTextAll().c_str();
+			mixi::ParserUtil::ReplaceEntityReferenceToCharacter( name );
+			mixi.SetName( name );
 
 			// 最終ログイン抽出
 			CString span = div_listContents.getNode(L"div", L"class=heading").getNode(L"span").getTextAll().c_str();
