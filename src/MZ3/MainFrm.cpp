@@ -56,7 +56,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_HISTORY_MENU, &CMainFrame::OnHistoryMenu)
 	ON_COMMAND(IDM_START_CRUISE, &CMainFrame::OnStartCruise)
 	ON_COMMAND(IDM_START_CRUISE_UNREAD_ONLY, &CMainFrame::OnStartCruiseUnreadOnly)
-	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
+//	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 	ON_COMMAND(ID_ERRORLOG_MENU, &CMainFrame::OnErrorlogMenu)
 	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
@@ -1023,11 +1023,13 @@ void CMainFrame::OnStartCruiseUnreadOnly()
 /**
  * その他｜mixiモバイルを開く
  */
+/*
 void CMainFrame::OnOpenMixiMobileByBrowser()
 {
 	CString url = theApp.MakeLoginUrlForMixiMobile( L"home.pl" );
 	util::OpenUrlByBrowser( url );
 }
+*/
 
 /**
  * 右ソフトキー押下イベント：ポップアップ

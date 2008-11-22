@@ -399,11 +399,12 @@ void CWriteView::OnBnClickedWriteSendButton()
 	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 		MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
 
+		// ログイン実行
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
-
 		theApp.m_accessType = ACCESS_LOGIN;
-		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), L"", CInetAccess::FILE_HTML );
+		theApp.StartMixiLoginAccess(m_hWnd, &theApp.m_mixi4recv);
+//		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+//		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), L"", CInetAccess::FILE_HTML );
 		return;
 	}
 
@@ -766,12 +767,13 @@ LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
 		// ログアウト状態になっている
 		// ログイン処理実施
 		MZ3LOGGER_INFO(_T("ログインします。"));
+		
+		// ログイン実行
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
-
 		theApp.m_accessType = ACCESS_LOGIN;
-		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
-
+		theApp.StartMixiLoginAccess(m_hWnd, &theApp.m_mixi4recv);
+//		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+//		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
 		return TRUE;
 	}
 
@@ -824,12 +826,13 @@ LRESULT CWriteView::OnPostConfirmEnd(WPARAM wParam, LPARAM lParam)
 		// ログアウト状態になっている
 		// ログイン処理実施
 		MZ3LOGGER_INFO(_T("ログインします。"));
+
+		// ログイン実行
 		theApp.m_mixi4recv.SetAccessType(ACCESS_LOGIN);
-
 		theApp.m_accessType = ACCESS_LOGIN;
-		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
-
+		theApp.StartMixiLoginAccess(m_hWnd, &theApp.m_mixi4recv);
+//		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+//		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
 		return TRUE;
 	}
 

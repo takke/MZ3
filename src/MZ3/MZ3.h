@@ -183,8 +183,9 @@ public:
 	void ChangeView(CView*);
 	CString GetAppDirPath();
 
-	CString MakeLoginUrl( LPCTSTR nextUrl=L"/home.pl" );
-	CString MakeLoginUrlForMixiMobile( LPCTSTR nextUrl );
+//	CString MakeLoginUrl( LPCTSTR nextUrl=L"/home.pl" );
+//	CString MakeLoginUrlForMixiMobile( LPCTSTR nextUrl );
+	void StartMixiLoginAccess(HWND hwnd, CMixiData* data);
 
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:

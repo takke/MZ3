@@ -796,6 +796,7 @@ CString CMZ3App::GetAppDirPath()
 /**
  * ユーザ設定（E-Mailアドレス、パスワード）を用いて、ログインページの実行後のURLを生成する
  */
+/*
 CString CMZ3App::MakeLoginUrl( LPCTSTR nextUrl )
 {
 	// アドレス、パスワード、next_url を EUC エンコードする
@@ -813,10 +814,11 @@ CString CMZ3App::MakeLoginUrl( LPCTSTR nextUrl )
 //	MessageBox( NULL, uri, MZ3_APP_NAME, MB_OK );
 	return uri;
 }
-
+*/
 /**
  * ユーザ設定（E-Mailアドレス、パスワード）を用いて、自動ログインURLを生成する
  */
+/*
 CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 {
 	// アドレス、パスワード、next_url を EUC エンコードする
@@ -832,6 +834,48 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 		pass);
 
 	return url;
+}
+*/
+
+/**
+ * mixi のログイン用通信を開始する
+ */
+void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
+{
+	//--- ここからログイン対応
+	static CPostData post_data;
+
+	CString url = L"http://mixi.jp/login.pl";
+	LPCTSTR nextUrl = L"/home.pl";
+
+	post_data.ClearPostBody();
+	post_data.AppendPostBody(L"email=");
+	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetEmail() ));
+	post_data.AppendPostBody(L"&");
+	post_data.AppendPostBody(L"password=");
+	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetPassword() ));
+	post_data.AppendPostBody(L"&");
+	post_data.AppendPostBody(L"next_url=");
+	post_data.AppendPostBody(URLEncoder::encode_euc( nextUrl ));
+
+	// Content-Type: application/x-www-form-urlencoded
+	post_data.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
+
+	// 成功時のメッセージを設定する
+	post_data.SetSuccessMessage( WM_MZ3_GET_END );
+
+	data->SetURL( url );
+	data->SetAccessType( ACCESS_LOGIN );
+	theApp.m_accessType = ACCESS_LOGIN;
+
+	// 通信開始
+	CString refUrl = L"";
+	theApp.m_inet.Initialize( hwnd, data );
+	theApp.m_inet.DoPost(
+		url, 
+		refUrl, 
+		CInetAccess::FILE_HTML, 
+		&post_data);
 }
 
 /// コマンドバーのボタンの有効・無効制御

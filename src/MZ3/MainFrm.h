@@ -84,7 +84,7 @@ public:
 	afx_msg void OnHistoryMenu();
 	afx_msg void OnStartCruise();
 	afx_msg void OnStartCruiseUnreadOnly();
-	afx_msg void OnOpenMixiMobileByBrowser();
+//	afx_msg void OnOpenMixiMobileByBrowser();
 	afx_msg void OnErrorlogMenu();
 
 	afx_msg void OnChangeSkin();

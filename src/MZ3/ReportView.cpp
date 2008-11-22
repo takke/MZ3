@@ -1642,8 +1642,9 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 		// ÉçÉOÉCÉìé¿çs
 		theApp.m_accessType = ACCESS_LOGIN;
-		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
+//		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
+//		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
+		theApp.StartMixiLoginAccess(m_hWnd, &theApp.m_mixi4recv);
 
 		return TRUE;
 	}

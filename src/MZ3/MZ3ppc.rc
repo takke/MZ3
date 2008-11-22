@@ -134,7 +134,6 @@ BEGIN
             MENUITEM "新着チェック",                      IDM_CHECK_NEW
             MENUITEM "全てを巡回",                       IDM_START_CRUISE
             MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
-            MENUITEM "mixiモバイルを開く",                 IDM_OPEN_MIXI_MOBILE_BY_BROWSER
         END
         POPUP "ヘルプ"
         BEGIN

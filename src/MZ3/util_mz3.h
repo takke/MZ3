@@ -168,6 +168,7 @@ inline bool IsMixiAccessType( ACCESS_TYPE type )
  * 指定されたURLが mixi の URL であれば、
  * mixi モバイルの自動ログイン用URLに変換する
  */
+/*
 inline CString ConvertToMixiMobileAutoLoginUrl( LPCTSTR url )
 {
 	CString path;
@@ -180,11 +181,13 @@ inline CString ConvertToMixiMobileAutoLoginUrl( LPCTSTR url )
 	// mixi 用URLではないため、変換せずに返す。
 	return url;
 }
+*/
 
 /**
  * 指定されたURLが mixi の URL であれば、
  * mixi の自動ログイン用URLに変換する
  */
+/*
 inline CString ConvertToMixiAutoLoginUrl( LPCTSTR url )
 {
 	CString path;
@@ -197,6 +200,7 @@ inline CString ConvertToMixiAutoLoginUrl( LPCTSTR url )
 	// mixi 用URLではないため、変換せずに返す。
 	return url;
 }
+*/
 
 /**
  * 指定されたURLをブラウザで開く（確認画面付き）

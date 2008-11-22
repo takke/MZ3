@@ -360,6 +360,10 @@ public:
 				// <html><head><meta http-equiv="refresh" content="0;url=/check.pl?n=%2Fhome.pl"></head></html>
 				return true;
 			}
+			// <title>[mixi]</title>
+			if (util::LineHasStringsNoCase(line, L"<title>[mixi]</title>")) {
+				return true;
+			}
 		}
 
 		return false;

@@ -856,8 +856,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	if (lParam == NULL) {
-		// データがＮＵＬＬの場合
-		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
+		// データがNULLの場合
+		LPCTSTR msg = L"内部エラーが発生しました(LPARAM=NULL)";
 		MZ3LOGGER_ERROR( msg );
 		util::MySetInformationText( m_hWnd, msg );
 		return TRUE;
@@ -878,11 +878,21 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// mixi データを保存（待避）
 			theApp.m_mixiBeforeRelogin = *data;
-			data->SetURL( theApp.MakeLoginUrl() );
+
+//			data->SetURL( theApp.MakeLoginUrl() );
 
 			// ログイン実行
-			data->SetAccessType( ACCESS_LOGIN );
-			AccessProc( data, data->GetURL() );
+//			data->SetAccessType( ACCESS_LOGIN );
+//			AccessProc( data, data->GetURL() );
+
+			// ログイン実行
+			m_access = TRUE;
+			m_abort = FALSE;
+
+			// コントロール状態の変更
+			MyUpdateControlStatus();
+
+			theApp.StartMixiLoginAccess(m_hWnd, data);
 
 			return TRUE;
 		}
