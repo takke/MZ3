@@ -858,8 +858,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,3,1
- PRODUCTVERSION 0,9,3,1
+ FILEVERSION 0,9,3,7
+ PRODUCTVERSION 0,9,3,7
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -875,12 +875,12 @@ BEGIN
         BLOCK "041103a4"
         BEGIN
             VALUE "FileDescription", "mixi Browser ""ZERO"""
-            VALUE "FileVersion", "0.9.3.1"
+            VALUE "FileVersion", "0.9.3.7"
             VALUE "InternalName", "MZ3.exe"
             VALUE "LegalCopyright", "mako, icchu, takke  All rights reserved."
             VALUE "OriginalFilename", "MZ3.exe"
             VALUE "ProductName", "MZ3"
-            VALUE "ProductVersion", "0.9.3.1"
+            VALUE "ProductVersion", "0.9.3.7"
         END
     END
     BLOCK "VarFileInfo"
