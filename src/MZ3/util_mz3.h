@@ -225,6 +225,7 @@ inline void OpenBrowserForUrl( LPCTSTR url )
 	CString requestUrl = url;
 
 	// WindowsMobile 版のみ自動ログインURL変換を行う
+/*
 #ifdef WINCE
 	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
 		// mixi モバイル用自動ログインURL変換
@@ -234,7 +235,7 @@ inline void OpenBrowserForUrl( LPCTSTR url )
 		requestUrl = ConvertToMixiAutoLoginUrl( url );
 	}
 #endif
-
+*/
 	// ブラウザで開く
 	util::OpenUrlByBrowser( requestUrl );
 }
@@ -260,6 +261,7 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 	CString requestUrl = url;
 
 	// WindowsMobile 版のみ自動ログインURL変換を行う
+/*
 #ifdef WINCE
 	if( theApp.m_optionMng.m_bConvertUrlForMixiMobile ) {
 		// mixi モバイル用自動ログインURL変換
@@ -269,7 +271,7 @@ inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
 		requestUrl = ConvertToMixiAutoLoginUrl( url );
 	}
 #endif
-
+*/
 	// ブラウザで開く
 	util::OpenUrlByBrowser( requestUrl );
 }

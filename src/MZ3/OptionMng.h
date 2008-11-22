@@ -58,7 +58,7 @@ public:
 #endif
 
 	bool			m_bConfirmOpenURL;			///< URLを開くときに確認する
-	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
+//	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）
@@ -166,11 +166,13 @@ public:
 		, m_reportScrollType( REPORT_SCROLL_TYPE_LINE )
 		, m_reportScrollLine( 7 )
 		, m_bConfirmOpenURL( true )
+/*
 #ifdef WINCE
 		, m_bConvertUrlForMixiMobile( true )
 #else
 		, m_bConvertUrlForMixiMobile( false )
 #endif
+*/
 		, m_bDebugMode( false )
 		, m_longReturnRangeMSec( 300 )
 		, m_strUserAgent( L"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" )

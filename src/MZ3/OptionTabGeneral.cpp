@@ -53,13 +53,13 @@ BOOL COptionTabGeneral::OnInitDialog()
 		theApp.m_optionMng.m_bConfirmOpenURL ? BST_CHECKED : BST_UNCHECKED );
 
 	// mixi モバイル対応
-	CheckDlgButton( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK, 
+/*	CheckDlgButton( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK, 
 		theApp.m_optionMng.m_bConvertUrlForMixiMobile ? BST_CHECKED : BST_UNCHECKED );
 #ifndef WINCE
 	// Win32 では無効
 	GetDlgItem( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK )->EnableWindow( FALSE );
 #endif
-
+*/
 	return TRUE;
 }
 
@@ -79,9 +79,9 @@ void COptionTabGeneral::OnOK()
 		IsDlgButtonChecked( IDC_CONFIRM_OPEN_URL_CHECK ) == BST_CHECKED ? true : false;
 
 	// mixi モバイル対応
-	theApp.m_optionMng.m_bConvertUrlForMixiMobile = 
+/*	theApp.m_optionMng.m_bConvertUrlForMixiMobile = 
 		IsDlgButtonChecked( IDC_CONVERT_URL_FOR_MIXI_MOBILE_CHECK ) == BST_CHECKED ? true : false;
-
+*/
 	CPropertyPage::OnOK();
 }
 
