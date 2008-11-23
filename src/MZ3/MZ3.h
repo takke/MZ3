@@ -206,6 +206,7 @@ public:
 	bool DeleteOldCacheFiles(void);
 	int pt2px(int pt);
 	int AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& srcImage, const CString& strImagePath);
+	CString MakeMZ3RegularVersion(CString strVersion);
 };
 
 extern CMZ3App theApp;

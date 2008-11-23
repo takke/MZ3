@@ -620,6 +620,19 @@ BOOL CMZ3App::InitInstance()
 		ASSERT(url_encoded_text==valid_text);
 	}
 
+	//
+	// MakeMZ3RegularVersion test
+	//
+	if (true) {
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7 Alpha1") ==L"0.090300701");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7 Alpha10")==L"0.090300710");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7 Beta1")  ==L"0.090310701");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7 Beta10") ==L"0.090310710");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7")        ==L"0.090320700");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"0.10.2.3")       ==L"0.100220300");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2.3")        ==L"1.000220300");
+	}
+
 #endif
 
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 初期化完了" );
@@ -1192,4 +1205,58 @@ int CMZ3App::AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& image, const 
 	bm48.Attach( image48.getHandle() );
 
 	return theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, strImagePath );
+}
+
+
+/**
+ * バージョン番号(0.9.3.7)を正規化する
+ *
+ * Giraffe 等の比較用バージョン番号と同一のもの。
+ *
+ * 下記の規則で変換する。
+ * <pre>
+ *                   vvvvvv------ major version (0.9.3)
+ *                   ||||||v------ release level (0=Alpha/Beta, 1=Release)
+ *                   |||||||vv---- minor version (x.x.x.7)
+ *                   |||||||||vv-- Alpha/Beta version (x.x.x.x Beta1)
+ * 0.9.3.7        => 0.090320700
+ * 0.9.3.10       => 0.090321000
+ * 0.9.4.0 Beta1  => 0.090400001
+ * 0.9.4.0 Alpha1 => 0.090400001
+ * </pre>
+ *
+ * @return 正規化バージョン番号
+ */
+CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
+{
+	CString strVersionR = strVersion;
+
+	static MyRegex reg;
+	util::CompileRegex(reg, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)( (Alpha|Beta)([0-9]+))?$");
+	if (reg.exec(strVersion) && reg.results.size()>4) {
+		// AA.BB.CC.DD AlphaEE
+		LPCTSTR AA = reg.results[1].str.c_str();
+		LPCTSTR BB = reg.results[2].str.c_str();
+		LPCTSTR CC = reg.results[3].str.c_str();
+		LPCTSTR DD = reg.results[4].str.c_str();
+
+		CString AlphaBeta = NULL;
+		LPCTSTR EE=L"";
+		if (reg.results.size()==8) {
+			AlphaBeta = reg.results[6].str.c_str();
+			EE        = reg.results[7].str.c_str();
+		}
+		if (AlphaBeta==L"Alpha") {
+			// Alpha Version
+			strVersionR.Format(L"%s.%02s%02s0%02s%02s", AA, BB, CC, DD, EE);
+		} else if (AlphaBeta==L"Beta") {
+			// Beta Version
+			strVersionR.Format(L"%s.%02s%02s1%02s%02s", AA, BB, CC, DD, EE);
+		} else {
+			// Release Version
+			strVersionR.Format(L"%s.%02s%02s2%02s00", AA, BB, CC, DD);
+		}
+	}
+
+	return strVersionR;
 }

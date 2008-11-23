@@ -6963,11 +6963,19 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 			strUrl,
 			strTitle));
 
-	if (strLatestVersion > MZ3_VERSION_TEXT_SHORT) {
+	// バージョン番号の正規化
+	// 0.9.3.7       => 0.9310700
+	CString strCurrentVersionR = theApp.MakeMZ3RegularVersion(MZ3_VERSION_TEXT_SHORT);
+	CString strLatestVersionR  = theApp.MakeMZ3RegularVersion(strLatestVersion);
+
+	MZ3LOGGER_DEBUG(util::FormatString(L"正規化バージョン番号：current[%s]", strCurrentVersionR));
+	MZ3LOGGER_DEBUG(util::FormatString(L"正規化バージョン番号：latest [%s]", strLatestVersionR));
+
+	if (strLatestVersionR > strCurrentVersionR) {
 		// 新バージョンあり
 		CString msg;
 		msg.Format(L"新しいバージョン(%s)が利用できます。\n今すぐダウンロードしてもよろしいですか？", strTitle);
-		if (MessageBox(msg, NULL, MB_YESNO)==IDYES) {
+		if (MessageBox(msg, NULL, MB_YESNO | MB_ICONQUESTION)==IDYES) {
 			// MZ4はダウンロード
 			static CMixiData s_data;
 			s_data = CMixiData();
@@ -6987,7 +6995,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 		}
 	} else {
 		// 最新バージョン
-		MessageBox(L"新しいバージョンはありませんでした。");
+		MessageBox(L"新しいバージョンはありませんでした。", NULL, MB_ICONINFORMATION);
 	}
 
 	return true;
