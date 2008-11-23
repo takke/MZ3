@@ -910,6 +910,18 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 
+	// バージョンチェック
+	type = ACCESS_SOFTWARE_UPDATE_CHECK;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "general"
+		, L"バージョンチェック"
+		, REQUEST_METHOD_GET
+		);
+	// http://mz3.jp/latest_version.xml
+	m_map[type].cacheFilePattern = L"mz3.jp\\latest_version.xml";
+	m_map[type].defaultCategoryURL = L"http://mz3.jp/latest_version.xml";
+
 	// TODO 必須項目のテスト
 
 	// Debug モードのとき CSV ダンプする

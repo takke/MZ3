@@ -793,7 +793,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	}
 
 	if (lParam == NULL) {
-		// データがＮＵＬＬの場合
+		// データがNULLの場合
 		LPCTSTR msg = L"内部エラーが発生しました(戻り値＝NULL)";
 		MZ3LOGGER_ERROR( msg );
 		util::MySetInformationText( m_hWnd, msg );
@@ -821,6 +821,37 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 
 			// アイコン再描画
 			InvalidateRect( m_rectIcon, FALSE );
+		}
+		break;
+
+	case ACCESS_DOWNLOAD:
+		{
+			// パス生成
+			CString strFilepath;
+			{
+				CString url = theApp.m_inet.GetURL();
+
+				strFilepath.Format(_T("%s\\%s"), 
+					theApp.m_filepath.downloadFolder, 
+					util::ExtractFilenameFromUrl( url, L"_mz3_noname.dat" ) );
+
+				// コピー
+				CopyFile( theApp.m_filepath.temphtml, strFilepath, FALSE/*bFailIfExists, 上書き*/ );
+			}
+
+			// ダウンロードの場合は、実行を確認する。
+			if (theApp.m_optionMng.m_bUseRunConfirmDlg) {
+				CString msg;
+				msg.Format( 
+					L"ダウンロードが完了しました！\n\n"
+					L"ファイル %s を開きますか？", strFilepath );
+
+				if (MessageBox( msg, 0, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 ) == IDYES) {
+					util::OpenByShellExecute(strFilepath);
+				}
+			} else {
+				util::OpenByShellExecute(strFilepath);
+			}
 		}
 		break;
 	}
@@ -878,12 +909,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// mixi データを保存（待避）
 			theApp.m_mixiBeforeRelogin = *data;
-
-//			data->SetURL( theApp.MakeLoginUrl() );
-
-			// ログイン実行
-//			data->SetAccessType( ACCESS_LOGIN );
-//			AccessProc( data, data->GetURL() );
 
 			// ログイン実行
 			m_access = TRUE;
@@ -1006,99 +1031,15 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	case ACCESS_RSS_READER_AUTO_DISCOVERY:
 		// RSS AutoDiscovery を試みる
-		{
-			// まずは RSSフィードであるか確認する。
+		DoAccessEndProcForRssAutoDiscovery();
+		break;
 
-			// HTML の取得
-			std::vector<unsigned char> text;
-			FILE* fp = _wfopen(theApp.m_filepath.temphtml, _T("rb"));
-			if( fp != NULL ) {
-				CHAR buf[4096];
-
-				while (fgets(buf, 4096, fp) != NULL) {
-					size_t old_size = text.size();
-					int new_size = strlen(buf);
-					if (new_size>0) {
-						text.resize( old_size+new_size );
-						strncpy( (char*)&text[old_size], buf, new_size );
-					}
-				}
-				fclose(fp);
-			}
-
-			// 文字コード変換
-			// とりあえず UTF-8 固定とする
-			/*
-			std::vector<unsigned char> out_text;
-			out_text.reserve( text.size() );
-			kfm::kfm k( text, out_text );
-			k.tosjis();
-			*/
-			std::vector<TCHAR> out_text;
-			kfm::utf8_to_ucs2( text, out_text );
-
-
-			CMixiDataList dummy_list;
-			CString title;
-
-			int nAppendedFeed = 0;
-			if (mz3parser::RssFeedParser::parse( dummy_list, out_text, &title )) {
-				MZ3LOGGER_INFO( util::FormatString(L"RSS だったので追加するよ。url[%s], title[%s]", 
-					theApp.m_inet.GetURL(), title) );
-
-				// 項目の追加
-				CCategoryItem categoryItem;
-				categoryItem.init( 
-					// 名前
-					title,
-					theApp.m_inet.GetURL(), 
-					ACCESS_RSS_READER_FEED, 
-					m_selGroup->categories.size()+1,
-					theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
-					theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
-					theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
-				AppendCategoryList(categoryItem);
-
-				nAppendedFeed = 1;
-			} else {
-				MZ3LOGGER_INFO( L"RSS じゃないので、RSS AutoDiscovery してみるよ" );
-
-				CMixiDataList items;
-				if (mz3parser::RssAutoDiscoveryParser::parse( items, out_text ) &&
-					items.size()>0)
-				{
-					// items の登録確認
-					for (u_int i=0; i<items.size(); i++) {
-						// 項目の追加
-						CCategoryItem categoryItem;
-						categoryItem.init( 
-							// 名前
-							items[i].GetTitle(),
-							items[i].GetURL(), 
-							ACCESS_RSS_READER_FEED, 
-							m_selGroup->categories.size()+1,
-							theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
-							theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
-							theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
-						AppendCategoryList(categoryItem);
-					}
-
-					nAppendedFeed = items.size();
-				}
-			}
-			
-			switch (nAppendedFeed) {
-			case 0:
-				MessageBox( L"RSS が見つかりませんでした" );
-				break;
-			case 1:
-				MessageBox( L"RSS を追加しました" );
-				break;
-			default:
-				MessageBox( util::FormatString(L"%d 個の RSS を追加しました", nAppendedFeed) );
-				break;
-			}
+	case ACCESS_SOFTWARE_UPDATE_CHECK:
+		// バージョンチェック
+		if (!DoAccessEndProcForSoftwareUpdateCheck()) {
+			MessageBox(L"バージョンチェックに失敗しました。しばらくしてから再度お試し下さい。");
 		}
+		util::MySetInformationText( m_hWnd, L"完了" );
 		break;
 
 	default:
@@ -3100,6 +3041,13 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	CString strUserAgent = L"";	// "" で初期値
 	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Wassr") {
 		strUserAgent = MZ3_APP_NAME;
+	}
+
+	// アップデート時のUA設定
+	switch (data->GetAccessType()) {
+	case ACCESS_SOFTWARE_UPDATE_CHECK:
+		strUserAgent.Format(L"%s(%s)", MZ3_APP_NAME, MZ3_VERSION_TEXT_SHORT);
+		break;
 	}
 
 	// GET/POST 開始
@@ -6874,3 +6822,173 @@ void CMZ3View::OnCopyClipboardUrl(UINT nID)
 
 }
 
+/**
+ * RSS AutoDiscovery URL 取得後の処理
+ */
+bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
+{
+	// まずは RSSフィードであるか確認する。
+
+	// HTML の取得
+	std::vector<unsigned char> text;
+	util::LoadDownloadedFile(text, theApp.m_filepath.temphtml);
+
+	// 文字コード変換
+	// とりあえず UTF-8 固定とする
+	/*
+	std::vector<unsigned char> out_text;
+	out_text.reserve( text.size() );
+	kfm::kfm k( text, out_text );
+	k.tosjis();
+	*/
+	std::vector<TCHAR> out_text;
+	kfm::utf8_to_ucs2( text, out_text );
+
+
+	CMixiDataList dummy_list;
+	CString title;
+
+	int nAppendedFeed = 0;
+	if (mz3parser::RssFeedParser::parse( dummy_list, out_text, &title )) {
+		MZ3LOGGER_INFO( util::FormatString(L"RSS だったので追加するよ。url[%s], title[%s]", 
+			theApp.m_inet.GetURL(), title) );
+
+		// 項目の追加
+		CCategoryItem categoryItem;
+		categoryItem.init( 
+			// 名前
+			title,
+			theApp.m_inet.GetURL(), 
+			ACCESS_RSS_READER_FEED, 
+			m_selGroup->categories.size()+1,
+			theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
+			theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
+			theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
+		AppendCategoryList(categoryItem);
+
+		nAppendedFeed = 1;
+	} else {
+		MZ3LOGGER_INFO( L"RSS じゃないので、RSS AutoDiscovery してみるよ" );
+
+		CMixiDataList items;
+		if (mz3parser::RssAutoDiscoveryParser::parse( items, out_text ) &&
+			items.size()>0)
+		{
+			// items の登録確認
+			for (u_int i=0; i<items.size(); i++) {
+				// 項目の追加
+				CCategoryItem categoryItem;
+				categoryItem.init( 
+					// 名前
+					items[i].GetTitle(),
+					items[i].GetURL(), 
+					ACCESS_RSS_READER_FEED, 
+					m_selGroup->categories.size()+1,
+					theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_RSS_READER_FEED),
+					theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_RSS_READER_FEED),
+					theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
+				AppendCategoryList(categoryItem);
+			}
+
+			nAppendedFeed = items.size();
+		}
+	}
+	
+	switch (nAppendedFeed) {
+	case 0:
+		MessageBox( L"RSS が見つかりませんでした" );
+		break;
+	case 1:
+		MessageBox( L"RSS を追加しました" );
+		break;
+	default:
+		MessageBox( util::FormatString(L"%d 個の RSS を追加しました", nAppendedFeed) );
+		break;
+	}
+
+	return true;
+}
+
+/**
+ * バージョンチェック開始
+ */
+bool CMZ3View::DoCheckSoftwareUpdate(void)
+{
+	if (m_access) {
+		// アクセス中は再アクセス不可
+		return false;
+	}
+
+	static CMixiData s_data;
+	s_data = CMixiData();
+	s_data.SetAccessType(ACCESS_SOFTWARE_UPDATE_CHECK);
+	AccessProc( &s_data, theApp.m_accessTypeInfo.getDefaultCategoryURL(ACCESS_SOFTWARE_UPDATE_CHECK));
+
+	return true;
+}
+
+/**
+ * バージョンチェック URL 取得後の処理
+ */
+bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
+{
+	// XML 解析
+	xml2stl::Container root;
+	if (!xml2stl::SimpleXmlParser::loadFromFile(root, theApp.m_filepath.temphtml)) {
+		MZ3LOGGER_ERROR( L"XML 解析失敗" );
+		return false;
+	}
+
+	// バージョン、URL、タイトルの取得
+	CString strLatestVersion, strUrl, strTitle;
+	try {
+#ifdef WINCE
+		const xml2stl::Node& target = root.getNode(L"latest_version").getNode(L"mz3");
+#else
+		const xml2stl::Node& target = root.getNode(L"latest_version").getNode(L"mz4");
+#endif
+		strLatestVersion = target.getProperty(L"version").c_str();
+		strUrl           = target.getProperty(L"url").c_str();
+		strTitle         = target.getProperty(L"title").c_str();
+	} catch (xml2stl::NodeNotFoundException& e) {
+		MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+		return false;
+	}
+
+	// バージョンチェック
+	MZ3LOGGER_DEBUG(
+		util::FormatString(L"バージョンチェック結果：current[%s], latest_version[%s], url[%s], title[%s]",
+			MZ3_VERSION_TEXT_SHORT,
+			strLatestVersion,
+			strUrl,
+			strTitle));
+
+	if (strLatestVersion > MZ3_VERSION_TEXT_SHORT) {
+		// 新バージョンあり
+		CString msg;
+		msg.Format(L"新しいバージョン(%s)が利用できます。\n今すぐダウンロードしてもよろしいですか？", strTitle);
+		if (MessageBox(msg, NULL, MB_YESNO)==IDYES) {
+			// MZ4はダウンロード
+			static CMixiData s_data;
+			s_data = CMixiData();
+			s_data.SetAccessType(ACCESS_DOWNLOAD);
+
+			// アクセス開始
+			m_access = TRUE;
+			m_abort = FALSE;
+
+			// コントロール状態の変更
+			MyUpdateControlStatus();
+
+			// ダウンロードファイルパス
+			theApp.m_inet.Initialize( m_hWnd, &s_data );
+			theApp.m_accessType = s_data.GetAccessType();
+			theApp.m_inet.DoGet(strUrl, _T(""), CInetAccess::FILE_BINARY);
+		}
+	} else {
+		// 最新バージョン
+		MessageBox(L"新しいバージョンはありませんでした。");
+	}
+
+	return true;
+}

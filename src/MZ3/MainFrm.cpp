@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
 	ON_COMMAND(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnEnableIntervalCheck)
+	ON_COMMAND(ID_MENU_CHECK_UPDATE, &CMainFrame::OnCheckUpdate)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
     ON_UPDATE_COMMAND_UI(ID_BACK_BUTTON, OnUpdateBackButton)
     ON_UPDATE_COMMAND_UI(ID_FORWARD_BUTTON, OnUpdateForwardButton)
@@ -75,6 +76,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_MENU_NEXT, &CMainFrame::OnUpdateMenuNext)
 	ON_UPDATE_COMMAND_UI(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnUpdateEnableIntervalCheck)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
+	ON_UPDATE_COMMAND_UI(ID_MENU_CHECK_UPDATE, &CMainFrame::OnUpdateCheckUpdate)
 	ON_WM_ACTIVATE()
 	ON_WM_DESTROY()
 	ON_WM_MOVE()
@@ -790,6 +792,28 @@ void CMainFrame::OnUpdateEnableIntervalCheck(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable();
 	pCmdUI->SetCheck( theApp.m_optionMng.m_bEnableIntervalCheck ? TRUE : FALSE );
+}
+
+/// バージョンチェック
+void CMainFrame::OnCheckUpdate()
+{
+	// メイン画面であれば利用可能
+	CView* pActiveView = GetActiveView();
+	if (pActiveView == theApp.m_pMainView) {
+		theApp.m_pMainView->DoCheckSoftwareUpdate();
+	}
+}
+
+/// バージョンチェックメニューの制御
+void CMainFrame::OnUpdateCheckUpdate(CCmdUI *pCmdUI)
+{
+	// メイン画面であれば利用可能
+	CView* pActiveView = GetActiveView();
+	if (pActiveView == theApp.m_pMainView) {
+		pCmdUI->Enable();
+	} else {
+		pCmdUI->Enable(FALSE);
+	}
 }
 
 /// 画面｜前の画面メニューのイベント

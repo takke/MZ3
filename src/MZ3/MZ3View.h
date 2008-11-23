@@ -342,6 +342,7 @@ public:
 	}
 
 	bool DoNewCommentCheck(void);
+	bool DoCheckSoftwareUpdate(void);
 	bool MyChangeBodyHeader(void);
 	void MyUpdateCategoryListByGroupItem(void);
 	void OnSelchangedGroupTab(void);
@@ -399,6 +400,9 @@ public:
 	afx_msg void OnMenuMixiEchoReply();
 	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
 	afx_msg void OnMenuMixiEchoAddUserEchoList();
+	bool DoAccessEndProcForRssAutoDiscovery(void);
+private:
+	bool DoAccessEndProcForSoftwareUpdateCheck(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

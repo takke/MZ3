@@ -445,4 +445,28 @@ inline bool SetClipboardDataTextW( const wchar_t* szText_ )
 	return true;
 }
 
+/**
+ * ダウンロード済みファイルをバッファに読み込む
+ */
+inline bool LoadDownloadedFile(std::vector<unsigned char>& buffer, LPCTSTR filename)
+{
+	FILE* fp = _wfopen(filename, _T("rb"));
+	if (fp==NULL) {
+		return false;
+	}
+
+	CHAR buf[4096];
+	while (fgets(buf, 4096, fp) != NULL) {
+		size_t old_size = buffer.size();
+		int new_size = strlen(buf);
+		if (new_size>0) {
+			buffer.resize( old_size+new_size );
+			strncpy( (char*)&buffer[old_size], buf, new_size );
+		}
+	}
+	fclose(fp);
+
+	return true;
+}
+
 }

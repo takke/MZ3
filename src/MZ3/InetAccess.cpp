@@ -720,7 +720,19 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			MZ3LOGGER_DEBUG( msg );
 			msg.Format( L"ref : %s", m_ref );
 			MZ3LOGGER_DEBUG( msg );
+
 			msg.Format( L"post-body : %s", buf.empty() ? L"" : CStringW(&buf[0], buf.size()) );
+
+			// パスワードを消す
+			static MyRegex reg;
+			if( !reg.isCompiled() ) {
+				if(! reg.compile( L"password=[^&]+" ) ) {
+					MZ3LOGGER_DEBUG( FAILED_TO_COMPILE_REGEX_MSG );
+				}
+			}
+			if( reg.isCompiled() ) {
+				reg.replaceAll( msg, L"password=xxxxxxxx" );
+			}
 			MZ3LOGGER_DEBUG( msg );
 		}
 

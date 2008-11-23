@@ -95,6 +95,8 @@ public:
 	afx_msg void OnDestroy();
 	afx_msg void OnEnableIntervalCheck();
 	afx_msg void OnUpdateEnableIntervalCheck(CCmdUI *pCmdUI);
+	afx_msg void OnCheckUpdate();
+	afx_msg void OnUpdateCheckUpdate(CCmdUI *pCmdUI);
 protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 public:

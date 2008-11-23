@@ -61,7 +61,11 @@
  */
 enum ACCESS_TYPE {
 	ACCESS_INVALID = -1,		///< 不正なアクセス種別（初期値=アクセス種別未設定）
-	ACCESS_LOGIN = 0,			///< ログイン
+
+	//----------------------------------------------
+	// mixi 系
+	//----------------------------------------------
+	ACCESS_LOGIN=0,				///< ログイン
 	ACCESS_MAIN,				///< メイン(home.pl)
 	ACCESS_DIARY,				///< 日記内容(view_diary.pl)
 	ACCESS_NEIGHBORDIARY,		///< 日記内容(neighbor_diary.pl)	//MOriyama追加 次の日記、前の日記
@@ -127,6 +131,9 @@ enum ACCESS_TYPE {
 	ACCESS_POST_NEWDIARY_CONFIRM,		///< 日記投稿（確認画面）
 	ACCESS_POST_NEWDIARY_REGIST,		///< 日記投稿（書き込み画面）
 
+	//----------------------------------------------
+	// Twitter
+	//----------------------------------------------
 	//--- Twitter Timeline 系
 	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
 	ACCESS_TWITTER_UPDATE,				///< [POST] ステータス更新
@@ -145,11 +152,17 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_FRIENDSHIPS_CREATE,	///< add
 	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
+	//----------------------------------------------
+	// Wassr
+	//----------------------------------------------
 	//--- Wassr Timeline 系
 	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] Wassr, friends_timeline.xml
 	ACCESS_WASSR_UPDATE,				///< [POST] Wassr, ステータス更新
 	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
 
+	//----------------------------------------------
+	// RSS
+	//----------------------------------------------
 	//--- RSS Reader
 	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
 	ACCESS_RSS_READER_ITEM,				///< RSS Reader Item
@@ -158,6 +171,7 @@ enum ACCESS_TYPE {
 	//--- その他
 	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ
 	ACCESS_ERRORLOG,					///< mz3log.txt 専用の特殊タイプ
+	ACCESS_SOFTWARE_UPDATE_CHECK,		///< バージョンチェック
 };
 
 /**
