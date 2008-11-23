@@ -156,4 +156,14 @@ void CAboutDlg::MyReplaceText(void)
 		s.Replace( L"{YEAR}", year );
 		item->SetWindowTextW( s );
 	}
+
+#ifndef WINCE
+	// MZ4 ‚Í FDQ ‚ð—˜—p‚µ‚Ä‚¢‚È‚¢
+	if ((item=GetDlgItem(IDC_STATIC_FDQ_TEXT)) != NULL) {
+		item->ShowWindow(SW_HIDE);
+	}
+	if ((item=GetDlgItem(IDC_STATIC_FDQ_COPYRIGHT)) != NULL) {
+		item->ShowWindow(SW_HIDE);
+	}	
+#endif
 }

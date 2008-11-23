@@ -139,7 +139,10 @@ BEGIN
         BEGIN
             MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
             MENUITEM "改版履歴",                        ID_HISTORY_MENU
+            MENUITEM SEPARATOR
+            MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
             MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+            MENUITEM SEPARATOR
             POPUP "デバッグツール"
             BEGIN
                 MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
@@ -403,7 +406,10 @@ BEGIN
     BEGIN
         MENUITEM "MZ4 ヘルプ",                     ID_HELP_MENU
         MENUITEM "改版履歴",                        ID_HISTORY_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
         MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+        MENUITEM SEPARATOR
         POPUP "デバッグツール"
         BEGIN
             MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
@@ -531,8 +537,8 @@ BEGIN
     LTEXT           "includes :",IDC_STATIC_9,27,86,28,8
     LTEXT           "JRegex lib.",IDC_STATIC_10,30,97,34,8
     LTEXT           "Copyright (C) 2003 (全略)",IDC_STATIC_6,30,108,77,8
-    LTEXT           "FDQ Library",IDC_STATIC_12,30,120,36,8
-    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_13,30,131,69,8
+    LTEXT           "FDQ Library",IDC_STATIC_FDQ_TEXT,30,120,36,8
+    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_FDQ_COPYRIGHT,30,131,69,8
     LTEXT           "total received bytes here.",IDC_TOTAL_BYTES_STATIC,27,147,112,8
 END
 
@@ -556,8 +562,8 @@ BEGIN
     LTEXT           "JRegex lib.",IDC_STATIC_10,63,75,34,8
     LTEXT           "Takke, Icchu and many contributors...",IDC_STATIC_7,33,29,108,8
     LTEXT           "based on :",IDC_STATIC_11,30,52,31,8
-    LTEXT           "FDQ Library",IDC_STATIC_12,63,86,36,8
-    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_13,103,86,69,8
+    LTEXT           "FDQ Library",IDC_STATIC_FDQ_TEXT,63,86,36,8
+    LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_FDQ_COPYRIGHT,103,86,69,8
 END
 
 IDD_MZ3_FORM DIALOG  0, 0, 87, 109
