@@ -53,7 +53,6 @@ void CReportView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_REPORT_LIST, m_list);
-	DDX_Control(pDX, IDC_REPORT_EDIT, m_edit);
 	DDX_Control(pDX, IDC_TITLE_EDIT, m_titleEdit);
 	DDX_Control(pDX, IDC_PROGRESS_BAR, mc_progressBar);
 	DDX_Control(pDX, IDC_INFO_EDIT, m_infoEdit);
@@ -88,7 +87,6 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(ID_WRITE_MESSAGE, &CReportView::OnWriteComment)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
 	ON_COMMAND(ID_EDIT_COPY, &CReportView::OnEditCopy)
-	ON_COMMAND(ID_SELECT_ALL, &CReportView::OnSelectAll)
     ON_MESSAGE(WM_MZ3_FIT, OnFit)
     ON_COMMAND(ID_OPEN_BROWSER, OnOpenBrowser)
 
@@ -101,7 +99,6 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_NOTIFY(HDN_ENDTRACK, 0, &CReportView::OnHdnEndtrackReportList)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_NARROW, &CReportView::OnLayoutReportlistMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
-	ON_EN_VSCROLL(IDC_REPORT_EDIT, &CReportView::OnEnVscrollReportEdit)
 	ON_NOTIFY(NM_RCLICK, IDC_REPORT_LIST, &CReportView::OnNMRclickReportList)
 	ON_COMMAND(ID_OPEN_PROFILE, &CReportView::OnOpenProfile)
 	ON_COMMAND(ID_OPEN_PROFILE_LOG, &CReportView::OnOpenProfileLog)
@@ -200,12 +197,6 @@ void CReportView::OnInitialUpdate()
 		m_list.m_bUseHorizontalDragMove = theApp.m_optionMng.m_bUseRan2HorizontalDragMove;
 	}
 
-	//--- エディットの変更
-	{
-		// フォント変更
-		m_edit.SetFont( &theApp.m_font );
-	}
-
 	//--- 通知領域の変更
 	{
 		// フォント変更
@@ -217,7 +208,6 @@ void CReportView::OnInitialUpdate()
 	// スクロール量の初期値設定
 	m_scrollLine = theApp.m_optionMng.m_reportScrollLine;
 
-#ifdef USE_RAN2
 	const int DETAIL_VIEWID = 1000;	// 暫定なのでてきとー
 	if( m_detailView != NULL ){
 		delete m_detailView;
@@ -241,7 +231,6 @@ void CReportView::OnInitialUpdate()
 	m_detailView->ChangeViewFont( fontHeight, theApp.m_optionMng.GetFontFace() );
 	m_detailView->ShowWindow(SW_SHOW);
 	MZ3LOGGER_INFO(L"らんらんビュー初期化完了(2/2)");
-#endif	// endif USE_RAN2
 }
 
 /**
@@ -277,26 +266,19 @@ void CReportView::OnSize(UINT nType, int cx, int cy)
 	// 情報領域は必要に応じて表示されるため、上記の比率とは関係なくサイズを設定する
 	int hInfo   = theApp.GetInfoRegionHeight(fontHeight);	// 情報領域もフォントサイズ依存
 
-#ifdef USE_RAN2
 	// スクロールバーの幅
 	int barWidth = ::GetSystemMetrics(SM_CXVSCROLL);
-#endif
 
 	// 各コントロールの移動
 	util::MoveDlgItemWindow( this, IDC_TITLE_EDIT,  0, 0,            cx, hTitle  );
 	util::MoveDlgItemWindow( this, IDC_REPORT_LIST, 0, hTitle,       cx, hList   );
 
-#ifdef USE_RAN2
 	// RAN2 の移動
 	if (m_detailView && ::IsWindow(m_detailView->GetSafeHwnd())) {
 		int wRan2 = cx - barWidth;
 		m_detailView->MoveWindow( 0, hTitle+hList, wRan2, hReport );
 		ShowCommentData( m_currentData );
 	}
-#else
-	// エディットコントロールの移動
-	util::MoveDlgItemWindow( this, IDC_REPORT_EDIT, 0, hTitle+hList, cx, hReport );
-#endif
 
 	util::MoveDlgItemWindow( this, IDC_INFO_EDIT,   0, cy - hInfo,   cx, hInfo   );
 
@@ -534,7 +516,6 @@ void CReportView::ShowCommentData(CMixiData* data)
 		return;
 	}
 
-#ifdef USE_RAN2
 	CStringArray* bodyStrArray = new CStringArray();
 
 	// 書体を変更して1行目を描画
@@ -621,7 +602,6 @@ void CReportView::ShowCommentData(CMixiData* data)
 	ViewFilter::InsertBRTagToBeforeblockquoteTag( bodyStrArray );
 
 	// 描画開始
-	m_edit.ShowWindow(SW_HIDE);
 	m_scrollBarHeight = m_detailView->LoadDetail(bodyStrArray, &theApp.m_imageCache.GetImageList16());
 	TRACE(TEXT("LoadDetailで%d行をパースしました\r\n"), m_scrollBarHeight);
 	m_detailView->ResetDragOffset();
@@ -652,30 +632,6 @@ void CReportView::ShowCommentData(CMixiData* data)
 	if( allLineCount-viewLineCount > 0 ) {
 		m_vScrollbar.ShowWindow(SW_SHOW);
 	}
-#else
-	CString str = _T("");
-
-	str += data->GetAuthor();
-	str += _T("　");
-	str += data->GetDate();
-	str += _T("\r\n");
-
-	const int n = data->GetBodySize();
-	for( int i=0; i<n; i++ ){
-		str += data->GetBody(i);
-	}
-
-	str += _T("\r\n");			// 最後に１行入れて見やすくする
-
-	// 絵文字用フィルタ
-	ViewFilter::ReplaceEmojiCodeToText( str, theApp.m_emoji );
-	m_edit.SetWindowText(str);
-
-	// Win32 の場合は再描画
-#ifndef WINCE
-	m_edit.Invalidate();
-#endif	// endif WINCE
-#endif	// endif USE_RAN2
 }
 
 void CReportView::OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -850,7 +806,6 @@ BOOL CReportView::CommandMoveDownList()
 
 BOOL CReportView::CommandScrollUpEdit()
 {
-#ifdef USE_RAN2
 	int pos = m_vScrollbar.GetScrollPos();
 	if( pos <= 0 ) {
 		return FALSE;
@@ -864,22 +819,12 @@ BOOL CReportView::CommandScrollUpEdit()
 	m_vScrollbar.SetScrollPos(pos);
 	m_detailView->ResetDragOffset();
 	m_detailView->DrawDetail(pos);
-#else
-	SCROLLINFO si;
-	m_edit.GetScrollInfo( SB_VERT, &si );
-	if (si.nPos > si.nMin) {
-		m_edit.LineScroll( -m_scrollLine );
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-#endif
+
 	return TRUE;
 }
 
 BOOL CReportView::CommandScrollDownEdit()
 {
-#ifdef USE_RAN2
 	int pos = m_vScrollbar.GetScrollPos();
 	if( pos >= m_scrollBarHeight ){
 		return FALSE;
@@ -893,16 +838,6 @@ BOOL CReportView::CommandScrollDownEdit()
 	m_vScrollbar.SetScrollPos(pos);
 	m_detailView->ResetDragOffset();
 	m_detailView->DrawDetail(pos);
-#else
-	SCROLLINFO si;
-	m_edit.GetScrollInfo( SB_VERT, &si );
-	if (si.nPos+si.nPage <= (UINT)si.nMax) {
-		m_edit.LineScroll( m_scrollLine );
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-#endif
 	return TRUE;
 }
 
@@ -2757,14 +2692,6 @@ void CReportView::OnLayoutReportlistMakeWide()
 	pMainFrame->ChangeAllViewFont();
 }
 
-void CReportView::OnEnVscrollReportEdit()
-{
-	// Win32 の場合は再描画
-#ifndef WINCE
-	m_edit.Invalidate();
-#endif
-}
-
 /**
  * リストの右クリックイベント
  */
@@ -2841,28 +2768,22 @@ void CReportView::OnDestroy()
 {
 	CFormView::OnDestroy();
 
-#ifdef USE_RAN2
 	m_detailView->DestroyWindow();
-#endif
 }
 
 void CReportView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-#ifdef USE_RAN2
 	// スクロール確定。
 	// スクロールバーの位置を変更。
 	m_vScrollbar.SetScrollPos( m_detailView->MyGetScrollPos() );
-#endif
 
 	CFormView::OnLButtonUp(nFlags, point);
 }
 
 void CReportView::OnMouseMove(UINT nFlags, CPoint point)
 {
-#ifdef USE_RAN2
 	// スクロールバーの位置を変更。
 	m_vScrollbar.SetScrollPos( m_detailView->MyGetScrollPos() );
-#endif
 
 	CFormView::OnMouseMove(nFlags, point);
 }
@@ -2886,7 +2807,6 @@ void CReportView::OnAcceleratorNextComment()
 
 void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-#ifdef USE_RAN2
 	if (m_detailView == NULL) {
 		return;
 	}
@@ -2905,21 +2825,17 @@ void CReportView::OnLButtonDblClk(UINT nFlags, CPoint point)
 		// 次の項目に移動
 		CommandMoveDownList();
 	}
-#endif
 }
 
 void CReportView::OnRButtonUp(UINT nFlags, CPoint point)
 {
-#ifdef USE_RAN2
 	MyPopupReportMenu();
-#endif
 
 //	CFormView::OnRButtonUp(nFlags, point);
 }
 
 afx_msg void CReportView::OnEditCopy()
 {
-#ifdef USE_RAN2
 	if (m_currentData==NULL) {
 		return;
 	}
@@ -2937,9 +2853,6 @@ afx_msg void CReportView::OnEditCopy()
 	ViewFilter::RemoveRan2ViewTag( str );
 
 	util::SetClipboardDataTextW( str );
-#else
-	m_edit.Copy();
-#endif
 }
 
 BOOL CReportView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)

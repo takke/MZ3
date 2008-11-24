@@ -307,9 +307,7 @@ BOOL CMZ3App::InitInstance()
 	*/
 
 	// 詳細画面のクラス登録
-#ifdef USE_RAN2
 	Ran2View::RegisterWndClass(AfxGetInstanceHandle());
-#endif
 
 	// 画像キャッシュの初期化
 	m_imageCache.Create();
@@ -730,9 +728,7 @@ int CMZ3App::ExitInstance()
 //	MessageBox( NULL, msg, 0, MB_OK );
 
 	// 詳細画面のクラス登録解除
-#ifdef USE_RAN2
 	Ran2View::UnregisterWndClass(AfxGetInstanceHandle());
-#endif
 
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理開始" );
 

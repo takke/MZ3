@@ -59,7 +59,6 @@ private:
 public:
 	//--- UI
 	CReportListCtrl		m_list;
-	CEdit				m_edit;
 	CEdit				m_titleEdit;
 	CEdit				m_infoEdit;
 
@@ -116,9 +115,6 @@ private:
 	afx_msg LRESULT OnAccessInformation(WPARAM, LPARAM);
 	afx_msg LRESULT OnFit(WPARAM, LPARAM);
 	afx_msg void OnEditCopy();
-	afx_msg void OnSelectAll() {
-		m_edit.SetSel(0, -1);
-	}
 	afx_msg LRESULT OnAccessLoaded(WPARAM, LPARAM);
 
 	afx_msg LRESULT OnMoveDownList(WPARAM, LPARAM);

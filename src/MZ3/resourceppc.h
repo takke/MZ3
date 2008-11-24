@@ -84,7 +84,6 @@
 #define IDC_BODY_LIST                   1002
 #define IDC_PROGRESS                    1003
 #define IDC_REPORT_LIST                 1004
-#define IDC_REPORT_EDIT                 1005
 #define IDC_LOGIN_MAIL_EDIT             1007
 #define IDC_LOGIN_PASSWORD_EDIT         1008
 #define IDC_PROXY_USE_CHECK             1014
