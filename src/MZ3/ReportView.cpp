@@ -25,9 +25,6 @@
 
 #define MASK_COLOR RGB(255,0,255);
 
-// Ver.0.9 形式の操作系を利用する
-bool g_bUseVer09KeyInterface = true;
-
 // CReportView
 
 IMPLEMENT_DYNCREATE(CReportView, CFormView)
@@ -999,10 +996,8 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 					}
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
-					if (g_bUseVer09KeyInterface) {
-						if (CommandScrollUpEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollUpEdit()) {
+						return TRUE;
 					}
 
 					if( CommandMoveUpList() ) {
@@ -1022,10 +1017,8 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 					}
 
 					// スクロール位置判定（スクロール余地があればスクロールする）
-					if (g_bUseVer09KeyInterface) {
-						if (CommandScrollDownEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollDownEdit()) {
+						return TRUE;
 					}
 
 					if( CommandMoveDownList() ) {
@@ -1066,10 +1059,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
-					if (g_bUseVer09KeyInterface) {
-						if (CommandScrollUpEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollUpEdit()) {
+						return TRUE;
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
 					return CommandMoveUpList();
@@ -1085,10 +1076,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 				// ただし、２回目以降のキー押下であれば、長押しとみなし、移動する
 				if( !m_xcrawl.isXcrawlEnabled() && m_nKeydownRepeatCount >= 2 ) {
 					// スクロール位置判定（スクロール余地があればスクロールする）
-					if (g_bUseVer09KeyInterface) {
-						if (CommandScrollDownEdit()) {
-							return TRUE;
-						}
+					if (CommandScrollDownEdit()) {
+						return TRUE;
 					}
 //					MZ3LOGGER_ERROR( L"repeat" );
 					return CommandMoveDownList();
@@ -1104,10 +1093,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 			switch(pMsg->wParam) {
 			case VK_UP:
 				// スクロール位置判定（スクロール余地があればスクロールする）
-				if (g_bUseVer09KeyInterface) {
-					if (CommandScrollUpEdit()) {
-						return TRUE;
-					}
+				if (CommandScrollUpEdit()) {
+					return TRUE;
 				}
 
 				// 項目変更
@@ -1134,10 +1121,8 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 
 			case VK_DOWN:
 				// スクロール位置判定（スクロール余地があればスクロールする）
-				if (g_bUseVer09KeyInterface) {
-					if (CommandScrollDownEdit()) {
-						return TRUE;
-					}
+				if (CommandScrollDownEdit()) {
+					return TRUE;
 				}
 
 				// 項目変更
@@ -1170,22 +1155,13 @@ BOOL CReportView::OnKeyDown(MSG* pMsg)
 		// リストでのキー押下イベント
 		switch(pMsg->wParam) {
 		case VK_RIGHT:
-			if (g_bUseVer09KeyInterface) {
-				// 次のコメントに移動
-				return CommandMoveDownList();
-			} else {
-				// 下スクロール
-				return CommandScrollDownEdit();
-			}
+			// 次のコメントに移動
+			return CommandMoveDownList();
 
 		case VK_LEFT:
-			if (g_bUseVer09KeyInterface) {
-				// 前のコメントに移動
-				return CommandMoveUpList();
-			} else {
-				// 上スクロール
-				return CommandScrollUpEdit();
-			}
+			// 前のコメントに移動
+			return CommandMoveUpList();
+
 		case VK_SPACE:
 			if (GetAsyncKeyState( VK_CONTROL ) & 0x8000) {
 				// Ctrl+Space
@@ -2894,10 +2870,8 @@ void CReportView::OnMouseMove(UINT nFlags, CPoint point)
 void CReportView::OnAcceleratorScrollOrNextComment()
 {
 	// スクロール位置判定（スクロール余地があればスクロールする）
-	if (g_bUseVer09KeyInterface) {
-		if (CommandScrollDownEdit()) {
-			return;
-		}
+	if (CommandScrollDownEdit()) {
+		return;
 	}
 
 	// 次の項目に移動
