@@ -174,9 +174,16 @@ CString MakeImageLogfilePathFromUrlMD5( const CString& url )
 		unsigned int len_in_mbs = wcstombs( (char*)&ansi_string[0], url, 1023 );
 
 		MD5 md5(ansi_string, len_in_mbs);
-		MZ3_TRACE(L"MakeImageLogfilePathFromUrlMD5(), url[%s], filename[%s]\n", 
-			(LPCTSTR)url, (LPCTSTR)CString(CStringA(md5.hex_digest())));
-		return theApp.m_filepath.imageFolder + L"\\" + CString(CStringA(md5.hex_digest()));
+		char* pMD5hexdigest = md5.hex_digest();
+		if ( pMD5hexdigest ) {
+			MZ3_TRACE(L"MakeImageLogfilePathFromUrlMD5(), url[%s], filename[%s]\n", 
+				(LPCTSTR)url, (LPCTSTR)CString(CStringA(pMD5hexdigest)));
+			CString LogfilePath = theApp.m_filepath.imageFolder + L"\\" + CString(CStringA(pMD5hexdigest));
+			delete pMD5hexdigest;
+			return LogfilePath;
+		} else {
+			return L"";
+		}
 	}
 }
 
