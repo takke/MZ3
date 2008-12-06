@@ -30,7 +30,7 @@
 #include "util_gui.h"
 #include "url_encoder.h"
 #include "twitter_util.h"
-#include "MZ3Parser.h"
+#include "MixiParser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -3200,7 +3200,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 
 		// HTML 解析
 		util::MySetInformationText( m_hWnd, msgHead + _T("解析中 : 2/3") );
-		mz3parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), category.m_mixi, body, html );
+		parser::MyDoParseMixiListHtml( category.m_mixi.GetAccessType(), category.m_mixi, body, html );
 
 		// 取得したデータに from_log_flag を設定する
 		// （「Twitterの新着件数カウントに含める」等のため）
@@ -3293,7 +3293,7 @@ void CMZ3View::MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi)
 	html.Load( szHtmlfile );
 
 	// HTML 解析
-	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 }
 
@@ -3960,7 +3960,7 @@ void CMZ3View::MyShowHelp(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
 	mixi.SetTitle(MZ3_APP_NAME L" ヘルプ");
-	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***
@@ -3984,7 +3984,7 @@ void CMZ3View::MyShowHistory(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_HELP );
 	mixi.SetTitle(MZ3_APP_NAME L" 改版履歴");
-	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***
@@ -4012,7 +4012,7 @@ void CMZ3View::MyShowErrorlog(void)
 	mixi = dummy;
 	mixi.SetAccessType( ACCESS_ERRORLOG );
 	mixi.SetTitle(MZ3_APP_NAME L" エラーログ");
-	mz3parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
+	parser::MyDoParseMixiHtml( mixi.GetAccessType(), mixi, html );
 	util::MySetInformationText( m_hWnd, L"完了" );
 
 	// *** 解析結果を表示する ***
@@ -6300,7 +6300,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 	// HTML 解析
 	util::MySetInformationText( m_hWnd,  _T("解析中 : 2/3") );
-	if (mz3parser::MyDoParseMixiListHtml( aType, parent_data, body, html )) {
+	if (parser::MyDoParseMixiListHtml( aType, parent_data, body, html )) {
 
 		// [MZ3-API] : パース後のフック処理(の予定)
 		switch (aType) {
@@ -6849,7 +6849,7 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 	CString title;
 
 	int nAppendedFeed = 0;
-	if (mz3parser::RssFeedParser::parse( dummy_list, out_text, &title )) {
+	if (parser::RssFeedParser::parse( dummy_list, out_text, &title )) {
 		MZ3LOGGER_INFO( util::FormatString(L"RSS だったので追加するよ。url[%s], title[%s]", 
 			theApp.m_inet.GetURL(), title) );
 
@@ -6871,7 +6871,7 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 		MZ3LOGGER_INFO( L"RSS じゃないので、RSS AutoDiscovery してみるよ" );
 
 		CMixiDataList items;
-		if (mz3parser::RssAutoDiscoveryParser::parse( items, out_text ) &&
+		if (parser::RssAutoDiscoveryParser::parse( items, out_text ) &&
 			items.size()>0)
 		{
 			// items の登録確認

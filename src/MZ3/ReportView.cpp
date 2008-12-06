@@ -18,7 +18,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "QuoteDlg.h"
-#include "MZ3Parser.h"
+#include "MixiParser.h"
 #include "ViewFilter.h"
 #include "CommonSelectDlg.h"
 #include "Ran2View.h"
@@ -1573,8 +1573,8 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			//ÉCÉÅÅ[ÉWÇÃURLÇéÊìæ
 			CString url;
 			switch( theApp.m_accessType ) {
-			case ACCESS_IMAGE:		url = mixi::ShowPictureParser::GetImageURL( html ); break;
-			case ACCESS_MOVIE:		url = theApp.m_inet.GetURL();						break;
+			case ACCESS_IMAGE:		url = mixi::ShowPictureParser::GetImageURL( html );	break;
+			case ACCESS_MOVIE:		url = theApp.m_inet.GetURL();							break;
 			default:
 				break;
 			}
@@ -1722,7 +1722,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			html.Load( theApp.m_filepath.temphtml );
 
 			// HTML âêÕ
-			mz3parser::MyDoParseMixiHtml( m_data.GetAccessType(), m_data, html );
+			parser::MyDoParseMixiHtml( m_data.GetAccessType(), m_data, html );
 			util::MySetInformationText( m_hWnd, _T("wait...") );
 
 			theApp.m_pReportView->SetData( m_data );
@@ -2175,7 +2175,7 @@ void CReportView::OnOpenProfileLog()
 	html.Load( strLogfilePath );
 
 	// HTML âêÕ
-	mz3parser::MyDoParseMixiHtml( s_mixi.GetAccessType(), s_mixi, html );
+	parser::MyDoParseMixiHtml( s_mixi.GetAccessType(), s_mixi, html );
 	util::MySetInformationText( m_hWnd, L"äÆóπ" );
 
 	// URL ê›íË

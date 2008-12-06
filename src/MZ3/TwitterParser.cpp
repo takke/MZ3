@@ -12,7 +12,7 @@
 #include "xml2stl.h"
 
 /// Twitter 用パーサ
-namespace twitter {
+namespace parser {
 
 /**
  * [list] タイムライン用パーサ
@@ -456,4 +456,4 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 	return true;
 }
 
-}//namespace twitter
+}//namespace parser

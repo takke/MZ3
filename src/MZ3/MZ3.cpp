@@ -22,7 +22,7 @@
 #include "DebugDlg.h"
 #include "url_encoder.h"
 #include "mz3_revision.h"
-#include "MZ3Parser.h"
+#include "MixiParser.h"
 #include "MouseGestureManager.h"
 #include "MZ3FileCacheManager.h"
 #include "ChooseClientTypeDlg.h"
@@ -1150,7 +1150,7 @@ bool CMZ3App::SaveGroupData(void)
 bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 {
 	if (util::IsMixiAccessType(aType)) {
-		if (mixi::MZ3ParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
+		if (mixi::MixiParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
 			return true;
 		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetOwnerID())==0) {
 			// オーナーID未取得の場合もログアウトとみなす。

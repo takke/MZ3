@@ -14,7 +14,7 @@
 
 
 /// MZ3用HTMLパーサ
-namespace mz3parser {
+namespace parser {
 
 /// リスト系HTMLの解析
 bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
@@ -50,11 +50,11 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_NEW_BBS_COMMENT:		return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:				return mixi::ShowCalendarParser::parse( body, html );
 	case ACCESS_MIXI_RECENT_ECHO:			return mixi::RecentEchoParser::parse( body, html );
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return twitter::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
-	case ACCESS_TWITTER_FAVORITES:			return twitter::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// 暫定
-	case ACCESS_TWITTER_DIRECT_MESSAGES:	return twitter::TwitterDirectMessagesXmlParser::parse( body, html );
-	case ACCESS_WASSR_FRIENDS_TIMELINE:		return twitter::WassrFriendsTimelineXmlParser::parse( body, html );
-	case ACCESS_RSS_READER_FEED:			return mz3parser::RssFeedParser::parse( body, html );
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
+	case ACCESS_TWITTER_FAVORITES:			return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// 暫定
+	case ACCESS_TWITTER_DIRECT_MESSAGES:	return parser::TwitterDirectMessagesXmlParser::parse( body, html );
+	case ACCESS_WASSR_FRIENDS_TIMELINE:		return parser::WassrFriendsTimelineXmlParser::parse( body, html );
+	case ACCESS_RSS_READER_FEED:			return parser::RssFeedParser::parse( body, html );
 	default:
 		{
 			CString msg;
@@ -82,10 +82,10 @@ void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_MYDIARY:		mixi::ViewDiaryParser::parse( mixi, html );			break;
 	case ACCESS_MESSAGE:		mixi::ViewMessageParser::parse( mixi, html );		break;
 	case ACCESS_NEWS:			mixi::ViewNewsParser::parse( mixi, html );			break;
-	case ACCESS_HELP:			mixi::HelpParser::parse( mixi, html );				break;
-	case ACCESS_ERRORLOG:		mixi::ErrorlogParser::parse( mixi, html );			break;
+	case ACCESS_HELP:			parser::HelpParser::parse( mixi, html );				break;
+	case ACCESS_ERRORLOG:		parser::ErrorlogParser::parse( mixi, html );			break;
 	case ACCESS_SCHEDULE:
-	case ACCESS_PLAIN:			mixi::PlainTextParser::parse( mixi, html );			break;
+	case ACCESS_PLAIN:			parser::PlainTextParser::parse( mixi, html );			break;
 	default:
 		{
 			CString msg;
@@ -359,10 +359,6 @@ bool RssAutoDiscoveryParser::parseLinkRecursive( CMixiDataList& out_, const xml2
 	return true;
 }
 
-}//namespace mz3parser
-
-namespace mixi {
-
 bool MZ3ParserBase::ExtractLinks(CMixiData &data_)
 {
 	// 正規表現のコンパイル（一回のみ）
@@ -398,5 +394,121 @@ bool MZ3ParserBase::ExtractLinks(CMixiData &data_)
 	return true;
 }
 
+bool HelpParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
+{
+	MZ3LOGGER_DEBUG( L"HelpParser.parse() start." );
 
-}//namespace mixi
+	mixi.ClearAllList();
+
+	INT_PTR count = html_.GetCount();
+
+	int iLine = 0;
+
+	int status = 0;		// 0 : start, 1 : 最初の項目, 2 : 2番目以降の項目解析中
+	CMixiData child;
+
+	for( ; iLine<count; iLine++ ) {
+		const CString& line = html_.GetAt(iLine);
+
+		CString head2 = line.Left(2);
+
+		// - "--" で始まる行は無視する。
+		if( head2 == "--" ) {
+			continue;
+		}
+
+		// - "* " で始まる行があれば、ステータスに応じて処理を行う。
+		if( head2 == L"* " ) {
+			// 3 文字目以降を Author として登録する。
+			// これにより、章目次としてレポート画面に表示される。
+			CString chapter = line.Mid(2);
+			chapter.Replace( L"\n", L"" );
+			chapter.Replace( L"\t", L"    " );
+			switch( status ) {
+			case 0:
+				// 最初の項目が見つかったので、トップ要素として追加する。
+				mixi.SetAuthor( chapter );
+				status = 1;
+				break;
+			case 1:
+				// 2番目以降の項目が見つかったので、最初の子要素として追加する。
+				child.SetAuthor( chapter );
+				status = 2;
+				break;
+
+			case 2:
+				// 3番目以降の項目が見つかったので、追加し、子要素を初期化する。
+				child.SetCommentIndex( mixi.GetChildrenSize()+1 );
+				mixi.AddChild( child );
+
+				child.ClearBody();
+				child.SetAuthor( chapter );
+				break;
+			}
+			continue;
+		}
+
+		// - "** " で始まる行があれば、節項目として解析、追加する。
+		if( line.Left(3) == L"** " ) {
+			// 4 文字目以降を Author として登録する。
+			// これにより、節目次としてレポート画面に表示される。
+			CString section = line.Mid(3);
+			section.Replace( L"\n", L"" );
+			section.Replace( L"\t", L"    " );
+
+			// 節名称の先頭に識別子を追加する。
+			section.Insert( 0, L" " );
+
+			switch( status ) {
+			case 0:
+				// 最初の項目としての節項目はありえないので無視する。
+				break;
+			case 1:
+				// 1番目の解析中に見つかったので、最初の子要素として追加する。
+				child.SetAuthor( section );
+				status = 2;
+				break;
+
+			case 2:
+				// 2番目以降の解析中に見つかったので、追加し、子要素を初期化する。
+				child.SetCommentIndex( mixi.GetChildrenSize()+1 );
+				mixi.AddChild( child );
+
+				child.ClearBody();
+				child.SetAuthor( section );
+				break;
+			}
+			continue;
+		}
+
+		switch( status ) {
+		case 1:
+		case 2:
+			{
+				// 要素継続
+				CString str = line;
+				str.Replace( L"\n", L"" );
+				str.Replace( L"\t", L"    " );
+
+				// 要素追加
+				if( status == 1 ) {
+					mixi.AddBody( L"\r\n" + str );
+				}else{
+					child.AddBody( L"\r\n" + str );
+				}
+			}
+			break;
+		}
+	}
+	if( status == 2 ) {
+		if( child.GetBodySize()>0 ) {
+			child.SetCommentIndex( mixi.GetChildrenSize()+1 );
+			mixi.AddChild( child );
+		}
+	}
+
+	MZ3LOGGER_DEBUG( L"HelpParser.parse() finished." );
+	return true;
+}
+
+}//namespace parser

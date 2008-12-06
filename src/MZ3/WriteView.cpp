@@ -20,7 +20,7 @@
 #include "util_gui.h"
 #include "url_encoder.h"
 #include "PostDataGenerator.h"
-#include "MZ3Parser.h"
+#include "MixiParser.h"
 
 #define GENERATE_POSTMSG_FAILED_MESSAGE L"送信データの作成に失敗しました"
 

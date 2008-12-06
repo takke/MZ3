@@ -9,9 +9,9 @@
 #include "MZ3Parser.h"
 
 /// Twitter 用パーサ
-namespace twitter {
+namespace parser {
 
-class TwitterParserBase : public mixi::MixiListParser
+class TwitterParserBase : public parser::MZ3ParserBase
 {
 protected:
 	/**
@@ -123,22 +123,22 @@ protected:
 */
 };
 
-class TwitterFriendsTimelineXmlParser : public twitter::TwitterParserBase
+class TwitterFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiData& parent, CMixiDataList& out_, const CHtmlArray& html_ );
 };
 
-class TwitterDirectMessagesXmlParser : public twitter::TwitterParserBase
+class TwitterDirectMessagesXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
 
-class WassrFriendsTimelineXmlParser : public twitter::TwitterParserBase
+class WassrFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
 
-}//namespace twitter
+}//namespace parser

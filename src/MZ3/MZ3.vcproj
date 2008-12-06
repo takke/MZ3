@@ -2554,10 +2554,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="twitter"
-				>
-			</Filter>
-			<Filter
 				Name="parsers"
 				>
 				<File
