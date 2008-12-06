@@ -19,38 +19,7 @@ public:
 	/**
 	 * ログアウトしたかをチェックする
 	 */
-	static bool IsLogout( LPCTSTR szHtmlFilename )
-	{
-		// 最大で N 行目までチェックする
-		const int CHECK_LINE_NUM_MAX = 1000;
-
-		FILE* fp = _wfopen(szHtmlFilename, _T("r"));
-		if( fp == NULL ) {
-			// 取得失敗
-			return false;
-		}
-
-		TCHAR buf[4096];
-		for( int i=0; i<CHECK_LINE_NUM_MAX && fgetws(buf, 4096, fp) != NULL; i++ ) {
-			// <form action="/login.pl" method="post">
-			// があればログアウト状態と判定する。
-			if (util::LineHasStringsNoCase( buf, L"<form", L"action=", L"login.pl" )) {
-				// ログアウト状態
-				fclose( fp );
-				return true;
-			}
-
-			// API 対応（仮実装）
-			if (i==0 && util::LineHasStringsNoCase( buf, L"WSSEによる認証が必要です" )) {
-				fclose( fp );
-				return true;
-			}
-		}
-		fclose(fp);
-
-		// ここにはデータがなかったのでログアウトとは判断しない
-		return false;
-	}
+	static bool IsLogout( LPCTSTR szHtmlFilename );
 };
 
 /// list 系ページに対するパーサの基本クラス
@@ -112,45 +81,8 @@ protected:
 
 };
 
-/**
- * 画像ダウンロードCGI 用パーサ
- *
- * show_diary_picture.pl
- * show_bbs_comment_picture.pl
- */
-class ShowPictureParser : public MixiParserBase
-{
-public:
-
-	/**
-	 * 画像URL取得
-	 */
-	static CString GetImageURL( const CHtmlArray& html )
-	{
-		INT_PTR count = html.GetCount();
-
-		/* 
-		 * 解析対象文字列：
-		 * <img SRC="http://ic76.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" BORDER=0>
-		 */
-		CString uri;
-		for (int i=0; i<count; i++) {
-			// 画像へのリンクを抽出
-			const CString& line = html.GetAt(i);
-			if( util::LineHasStringsNoCase( line, L"<img src=\"", L"\"" ) ) {
-				// " から " までを取得する。
-				if( util::GetBetweenSubString( line, L"\"", L"\"", uri ) > 0 ) {
-					MZ3LOGGER_DEBUG( L"画像へのリンク抽出OK, url[" + uri + L"]" );
-					break;
-				}
-			}
-		}
-		return uri;
-	}
-};
-
 /// contents 系ページに対するパーサの基本クラス
-class MixiContentParser : public MixiParserBase
+class MixiContentParser : public MixiParserBase, public parser::MZ3ContentParser
 {
 public:
 	/**
@@ -354,6 +286,43 @@ public:
 };
 
 //■■■共通■■■
+
+/**
+ * 画像ダウンロードCGI 用パーサ
+ *
+ * show_diary_picture.pl
+ * show_bbs_comment_picture.pl
+ */
+class ShowPictureParser : public MixiParserBase
+{
+public:
+
+	/**
+	 * 画像URL取得
+	 */
+	static CString GetImageURL( const CHtmlArray& html )
+	{
+		INT_PTR count = html.GetCount();
+
+		/* 
+		 * 解析対象文字列：
+		 * <img SRC="http://ic76.mixi.jp/p/xxx/xxx/diary/xx/x/xxx.jpg" BORDER=0>
+		 */
+		CString uri;
+		for (int i=0; i<count; i++) {
+			// 画像へのリンクを抽出
+			const CString& line = html.GetAt(i);
+			if( util::LineHasStringsNoCase( line, L"<img src=\"", L"\"" ) ) {
+				// " から " までを取得する。
+				if( util::GetBetweenSubString( line, L"\"", L"\"", uri ) > 0 ) {
+					MZ3LOGGER_DEBUG( L"画像へのリンク抽出OK, url[" + uri + L"]" );
+					break;
+				}
+			}
+		}
+		return uri;
+	}
+};
 
 /**
  * [content] home.pl ログイン後のメイン画面用パーサ
