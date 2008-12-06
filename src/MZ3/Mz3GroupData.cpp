@@ -121,9 +121,15 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		{
 			appendCategoryByIniData( accessTypeInfo, group, "タイムライン", ACCESS_WASSR_FRIENDS_TIMELINE );
 			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_WASSR_FRIENDS_TIMELINE, "http://api.wassr.jp/statuses/replies.xml" );
-//			appendCategoryByIniData( accessTypeInfo, group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
-//			appendCategoryByIniData( accessTypeInfo, group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
-//			appendCategoryByIniData( accessTypeInfo, group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
+		}
+		this->groups.push_back( group );
+	}
+
+	if (initType.bUseGoohome) {
+		// gooホームグループ
+		group.init( L"gooホーム", L"", ACCESS_GROUP_OTHERS );
+		{
+			appendCategoryByIniData( accessTypeInfo, group, "友達・注目の人", ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS );
 		}
 		this->groups.push_back( group );
 	}
@@ -391,7 +397,7 @@ bool Mz3GroupDataWriter::save( AccessTypeInfo& accessTypeInfo, const Mz3GroupDat
 
 		// セクション名生成
 		CStringA strSectionName;
-		strSectionName.Format( "Group%d", i+1 );
+		strSectionName.Format( "Group%02d", i+1 );
 
 		// Name 出力
 		inifile.SetValue( L"Name", group.name, strSectionName );

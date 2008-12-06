@@ -116,6 +116,7 @@ inline CString MakeImageLogfilePath( CMixiData& data )
 	case ACCESS_COMMUNITY:
 	case ACCESS_TWITTER_USER:
 	case ACCESS_WASSR_USER:
+	case ACCESS_GOOHOME_USER:
 	case ACCESS_MIXI_ECHO_USER:
 		if (data.GetImageCount()>0) {
 			const CString& image_url = data.GetImage(0);

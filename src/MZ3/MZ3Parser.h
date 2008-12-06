@@ -65,7 +65,6 @@ public:
 	static bool parseLinkRecursive( CMixiDataList& out_, const xml2stl::Node& node );
 };
 
-
 //Å°Å°Å°MZ3ì∆é©Å°Å°Å°
 
 /**

@@ -161,6 +161,14 @@ enum ACCESS_TYPE {
 	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
 
 	//----------------------------------------------
+	// gooホーム
+	//----------------------------------------------
+	//--- gooホーム ひとこと関連
+	ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS,	///< [GET] quotes/friends/json
+	ACCESS_GOOHOME_USER,					///< gooHome, 各発言要素
+	ACCESS_GOOHOME_QUOTE_UPDATE,			///< [POST] ひとこと発言
+
+	//----------------------------------------------
 	// RSS
 	//----------------------------------------------
 	//--- RSS Reader

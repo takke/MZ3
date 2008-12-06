@@ -67,9 +67,13 @@ void Login::Read()
 		m_twitterId	  = Read(fp);
 		m_twitterPwd  = Read(fp);
 
-		// Twitter
+		// Wassr
 		m_wassrId	  = Read(fp);
 		m_wassrPwd    = Read(fp);
+
+		// gooホーム
+		m_gooId					  = Read(fp);
+		m_goohomeQuoteMailAddress = Read(fp);
 
 		fclose(fp);
 	}
@@ -112,6 +116,10 @@ void Login::Write()
 	// Wassr
 	Write( fp, m_wassrId );
 	Write( fp, m_wassrPwd );
+
+	// gooホーム
+	Write( fp, m_gooId );
+	Write( fp, m_goohomeQuoteMailAddress );
 
 	fclose(fp);
 }

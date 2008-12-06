@@ -1714,6 +1714,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MixiParserUtil.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MZ3.cpp"
 				>
 			</File>
@@ -2692,6 +2696,10 @@
 				</File>
 				<File
 					RelativePath=".\util_base.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util_goo.h"
 					>
 				</File>
 				<File

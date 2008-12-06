@@ -859,6 +859,37 @@ bool AccessTypeInfo::init()
 
 
 	//------------------------------------------------------------------
+	//--- gooホーム 系
+	type = ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_CATEGORY
+		, "gooHome"
+		, L"友達・注目の人"
+		, REQUEST_METHOD_GET
+		);
+	// http://home.goo.ne.jp/api/quote/quotes/friends/json
+	// => goohome/quote/quotes_friends.json
+	m_map[type].cacheFilePattern = L"goohome\\quote\\quotes_friends.json";
+	m_map[type].requestEncoding = ENCODING_UTF8;	// goohome API => UTF-8
+	m_map[type].serializeKey = "GOOHOME_QUOTE_QUOTES_FRIENDS";
+	m_map[type].defaultCategoryURL = L"http://home.goo.ne.jp/api/quote/quotes/friends/json";
+	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
+	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
+	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
+	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
+
+	type = ACCESS_GOOHOME_QUOTE_UPDATE;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_POST
+		, "gooHome"
+		, L"ひとこと更新"
+		, REQUEST_METHOD_POST
+		);
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
+
+
+	//------------------------------------------------------------------
 	//--- RSS Reader
 	type = ACCESS_RSS_READER_FEED;
 	m_map[type] = AccessTypeInfo::Data(

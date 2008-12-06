@@ -28,6 +28,7 @@
 #include "CategoryItem.h"
 #include "util.h"
 #include "util_gui.h"
+#include "util_goo.h"
 #include "url_encoder.h"
 #include "twitter_util.h"
 #include "MixiParser.h"
@@ -2954,27 +2955,38 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	}
 
 	// 認証情報の設定
-	LPCTSTR szUser = NULL;
-	LPCTSTR szPassword = NULL;
+	CString strUser = NULL;
+	CString strPassword = NULL;
 	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Twitter") {
 		// Twitter API => Basic 認証
-		szUser     = theApp.m_loginMng.GetTwitterId();
-		szPassword = theApp.m_loginMng.GetTwitterPassword();
+		strUser     = theApp.m_loginMng.GetTwitterId();
+		strPassword = theApp.m_loginMng.GetTwitterPassword();
 
 		// 未指定の場合はエラー出力
-		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
 			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
 			return;
 		}
 	}
 	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Wassr") {
 		// Wassr API => Basic 認証
-		szUser     = theApp.m_loginMng.GetWassrId();
-		szPassword = theApp.m_loginMng.GetWassrPassword();
+		strUser     = theApp.m_loginMng.GetWassrId();
+		strPassword = theApp.m_loginMng.GetWassrPassword();
 
 		// 未指定の場合はエラー出力
-		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
 			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
+			return;
+		}
+	}
+	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="gooHome") {
+		// gooHome API => Basic 認証
+		strUser     = theApp.m_loginMng.GetGooId();
+		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
+
+		// 未指定の場合はエラー出力
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
+			MessageBox( L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください" );
 			return;
 		}
 	}
@@ -3053,9 +3065,9 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// GET/POST 開始
 	theApp.m_inet.Initialize( m_hWnd, data, encoding );
 	if (bPost) {
-		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, szUser, szPassword, strUserAgent );
+		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, strUser, strPassword, strUserAgent );
 	} else {
-		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, szUser, szPassword, strUserAgent );
+		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, strUser, strPassword, strUserAgent );
 	}
 }
 
@@ -5041,6 +5053,9 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 			} else if (strServiceType == "Wassr") {
 				// Wassr系であれば Twitter スタイル
 				return VIEW_STYLE_TWITTER;
+			} else if (strServiceType == "gooHome") {
+				// gooHome系であれば Twitter スタイル
+				return VIEW_STYLE_TWITTER;
 			} else if (strServiceType == "RSS") {
 				// RSS は「イメージ付き」とする
 				return VIEW_STYLE_IMAGE;
@@ -5102,6 +5117,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 		case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 		case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
 		case TWITTER_STYLE_POST_MODE_UPDATE:
 		default:
 			// 未入力なので最新取得
@@ -5195,6 +5211,23 @@ void CMZ3View::OnBnClickedUpdateButton()
 			}
 		}
 		break;
+
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		{
+			CString msg;
+			msg.Format( 
+				L"gooホームひとことで発言します。\r\n"
+				L"----\r\n"
+				L"%s\r\n"
+				L"----\r\n"
+				L"よろしいですか？", 
+				strStatus );
+			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
+				return;
+			}
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -5285,6 +5318,19 @@ void CMZ3View::OnBnClickedUpdateButton()
 //		}
 		break;
 
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		{
+			// text=***&privacy=***
+			// privacy 1:非公開
+			//         2:公開
+			//         4:友達まで公開
+			//         8:友達の友達まで公開
+			post.AppendPostBody( "text=" );
+			post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
+			post.AppendPostBody( "&privacy=2" );
+		}
+		break;
+
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 	default:
 		post.AppendPostBody( "status=" );
@@ -5318,6 +5364,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 		url = L"http://api.wassr.jp/statuses/update.json";
 		break;
 
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		url = L"http://home.goo.ne.jp/api/quote/quotes/post/json";
+		break;
+
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 	default:
 		url = L"http://twitter.com/statuses/update.xml";
@@ -5325,8 +5375,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 	}
 
 	// BASIC 認証設定
-	LPCTSTR szUser = NULL;
-	LPCTSTR szPassword = NULL;
+	CString strUser = NULL;
+	CString strPassword = NULL;
 	switch (m_twitterPostMode) {
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
@@ -5335,11 +5385,11 @@ void CMZ3View::OnBnClickedUpdateButton()
 	case TWITTER_STYLE_POST_MODE_DM:
 	case TWITTER_STYLE_POST_MODE_UPDATE:
 		// Twitter API => Basic 認証
-		szUser     = theApp.m_loginMng.GetTwitterId();
-		szPassword = theApp.m_loginMng.GetTwitterPassword();
+		strUser     = theApp.m_loginMng.GetTwitterId();
+		strPassword = theApp.m_loginMng.GetTwitterPassword();
 
 		// 未指定の場合はエラー出力
-		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
 			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
 			return;
 		}
@@ -5347,15 +5397,26 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 		// Wassr API => Basic 認証
-		szUser     = theApp.m_loginMng.GetWassrId();
-		szPassword = theApp.m_loginMng.GetWassrPassword();
+		strUser     = theApp.m_loginMng.GetWassrId();
+		strPassword = theApp.m_loginMng.GetWassrPassword();
 
 		// 未指定の場合はエラー出力
-		if (wcslen(szUser)==0 || wcslen(szPassword)==0) {
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
 			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
 			return;
 		}
 		break;
+
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		// gooHome API => Basic 認証
+		strUser     = theApp.m_loginMng.GetGooId();
+		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
+
+		// 未指定の場合はエラー出力
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
+			MessageBox( L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください" );
+			return;
+		}
 	}
 
 	// アクセス種別を設定
@@ -5371,6 +5432,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 		theApp.m_accessType = ACCESS_WASSR_UPDATE;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		theApp.m_accessType = ACCESS_GOOHOME_QUOTE_UPDATE;
 		break;
 
 	case TWITTER_STYLE_POST_MODE_UPDATE:
@@ -5391,7 +5456,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		url, 
 		L"", 
 		CInetAccess::FILE_HTML, 
-		&post, szUser, szPassword );
+		&post, strUser, strPassword );
 
 //	CPostData::post_array& buf = post.GetPostBody();
 //	MessageBox( CStringW(&buf[0], buf.size()) );
@@ -5470,6 +5535,19 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				SetDlgItemText( IDC_STATUS_EDIT, L"" );
 			}
 		} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "Wassr") {
+			// HTTPステータスチェックを行う。
+			if (theApp.m_inet.m_dwHttpStatus==200) {
+				// OK
+
+				// 入力値を消去
+				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+			} else {
+				LPCTSTR szStatusErrorMessage = L"?";
+				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+				util::MySetInformationText( m_hWnd, msg );
+				MZ3LOGGER_ERROR( msg );
+			}
+		} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "gooHome") {
 			// HTTPステータスチェックを行う。
 			if (theApp.m_inet.m_dwHttpStatus==200) {
 				// OK
@@ -6105,6 +6183,9 @@ void CMZ3View::MyUpdateControlStatus(void)
 			case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 				pUpdateButton->SetWindowTextW( L"Wassr" );
 				break;
+			case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+				pUpdateButton->SetWindowTextW( L"ひとこと" );
+				break;
 			case TWITTER_STYLE_POST_MODE_UPDATE:
 			default:
 				pUpdateButton->SetWindowTextW( L"更新" );
@@ -6734,6 +6815,9 @@ void CMZ3View::MyResetTwitterStylePostMode()
 		} else if (strServiceType == "Wassr") {
 			// Wassr系
 			m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
+		} else if (strServiceType == "gooHome") {
+			// Wassr系
+			m_twitterPostMode = TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE;
 		} else if (strServiceType == "RSS") {
 			// RSS => 無視
 		} else {

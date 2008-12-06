@@ -28,9 +28,10 @@ protected:
 public:
 	/// コンボボックスのインデックスと種別の対応
 	enum USER_DLG_COMBO_INDEX_TYPE {
-		USER_DLG_COMBO_INDEX_TYPE_MIXI = 0,
+		USER_DLG_COMBO_INDEX_TYPE_MIXI    = 0,
 		USER_DLG_COMBO_INDEX_TYPE_TWITTER = 1,
-		USER_DLG_COMBO_INDEX_TYPE_WASSR = 2,
+		USER_DLG_COMBO_INDEX_TYPE_WASSR   = 2,
+		USER_DLG_COMBO_INDEX_TYPE_GOOHOME = 3,
 	};
 
 	CComboBox					mc_comboType;
@@ -39,6 +40,6 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnCbnSelchangeTypeCombo();
-	void MySaveControlData(void);
+	bool MySaveControlData(void);
 	void MyLoadControlData(void);
 };

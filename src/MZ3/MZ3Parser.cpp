@@ -31,30 +31,31 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	}
 
 	switch (aType) {
-	case ACCESS_LIST_DIARY:					return mixi::ListNewFriendDiaryParser::parse( body, html );
-	case ACCESS_LIST_NEW_COMMENT:			return mixi::NewCommentParser::parse( body, html );
-	case ACCESS_LIST_COMMENT:				return mixi::ListCommentParser::parse( body, html );
-	case ACCESS_LIST_NEW_BBS:				return mixi::NewBbsParser::parse( body, html );
-	case ACCESS_LIST_MYDIARY:				return mixi::ListDiaryParser::parse( body, html );
-//	case ACCESS_LIST_FOOTSTEP:				return mixi::ShowLogParser::parse( body, html );
-	case ACCESS_LIST_FOOTSTEP:				return mixi::TrackParser::parse( body, html );
-	case ACCESS_LIST_MESSAGE_IN:			return mixi::ListMessageParser::parse( body, html );
-	case ACCESS_LIST_MESSAGE_OUT:			return mixi::ListMessageParser::parse( body, html );
-	case ACCESS_LIST_NEWS:					return mixi::ListNewsCategoryParser::parse( body, html );
-	case ACCESS_LIST_FAVORITE_USER:			return mixi::ListBookmarkParser::parse( body, html );
-	case ACCESS_LIST_FAVORITE_COMMUNITY:	return mixi::ListBookmarkParser::parse( body, html );
-	case ACCESS_LIST_FRIEND:				return mixi::ListFriendParser::parse( body, html );
-	case ACCESS_LIST_COMMUNITY:				return mixi::ListCommunityParser::parse( body, html );
-	case ACCESS_LIST_INTRO:					return mixi::ShowIntroParser::parse( body, html );
-	case ACCESS_LIST_BBS:					return mixi::ListBbsParser::parse( body, html );
-	case ACCESS_LIST_NEW_BBS_COMMENT:		return mixi::ListNewBbsCommentParser::parse( body, html );
-	case ACCESS_LIST_CALENDAR:				return mixi::ShowCalendarParser::parse( body, html );
-	case ACCESS_MIXI_RECENT_ECHO:			return mixi::RecentEchoParser::parse( body, html );
-	case ACCESS_TWITTER_FRIENDS_TIMELINE:	return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
-	case ACCESS_TWITTER_FAVORITES:			return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// Žb’è
-	case ACCESS_TWITTER_DIRECT_MESSAGES:	return parser::TwitterDirectMessagesXmlParser::parse( body, html );
-	case ACCESS_WASSR_FRIENDS_TIMELINE:		return parser::WassrFriendsTimelineXmlParser::parse( body, html );
-	case ACCESS_RSS_READER_FEED:			return parser::RssFeedParser::parse( body, html );
+	case ACCESS_LIST_DIARY:						return mixi::ListNewFriendDiaryParser::parse( body, html );
+	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
+	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS:					return mixi::NewBbsParser::parse( body, html );
+	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
+//	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
+	case ACCESS_LIST_FOOTSTEP:					return mixi::TrackParser::parse( body, html );
+	case ACCESS_LIST_MESSAGE_IN:				return mixi::ListMessageParser::parse( body, html );
+	case ACCESS_LIST_MESSAGE_OUT:				return mixi::ListMessageParser::parse( body, html );
+	case ACCESS_LIST_NEWS:						return mixi::ListNewsCategoryParser::parse( body, html );
+	case ACCESS_LIST_FAVORITE_USER:				return mixi::ListBookmarkParser::parse( body, html );
+	case ACCESS_LIST_FAVORITE_COMMUNITY:		return mixi::ListBookmarkParser::parse( body, html );
+	case ACCESS_LIST_FRIEND:					return mixi::ListFriendParser::parse( body, html );
+	case ACCESS_LIST_COMMUNITY:					return mixi::ListCommunityParser::parse( body, html );
+	case ACCESS_LIST_INTRO:						return mixi::ShowIntroParser::parse( body, html );
+	case ACCESS_LIST_BBS:						return mixi::ListBbsParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS_COMMENT:			return mixi::ListNewBbsCommentParser::parse( body, html );
+	case ACCESS_LIST_CALENDAR:					return mixi::ShowCalendarParser::parse( body, html );
+	case ACCESS_MIXI_RECENT_ECHO:				return mixi::RecentEchoParser::parse( body, html );
+	case ACCESS_TWITTER_FRIENDS_TIMELINE:		return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
+	case ACCESS_TWITTER_FAVORITES:				return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// Žb’è
+	case ACCESS_TWITTER_DIRECT_MESSAGES:		return parser::TwitterDirectMessagesXmlParser::parse( body, html );
+	case ACCESS_WASSR_FRIENDS_TIMELINE:			return parser::WassrFriendsTimelineXmlParser::parse( body, html );
+	case ACCESS_RSS_READER_FEED:				return parser::RssFeedParser::parse( body, html );
+	case ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS:	return parser::GoohomeQuoteQuotesFriendsParser::parse( body, html );
 	default:
 		{
 			CString msg;

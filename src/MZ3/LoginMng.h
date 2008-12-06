@@ -29,6 +29,10 @@ private:
 	CString m_wassrId;			///< Wassr 用ID
 	CString m_wassrPwd;			///< Wassr 用パスワード
 
+	//--- gooホーム 用
+	CString m_gooId;					///< gooID
+	CString m_goohomeQuoteMailAddress;	///< gooホームひとこと投稿アドレス
+
 public:
 	Login();
 	virtual ~Login();
@@ -55,6 +59,12 @@ public:
 	LPCTSTR GetWassrId()					{ return m_wassrId;	}
 	void	SetWassrPassword(LPCTSTR str)	{ m_wassrPwd = str;	}
 	LPCTSTR	GetWassrPassword()				{ return m_wassrPwd;	}
+
+	//--- gooホーム 用
+	void	SetGooId(LPCTSTR str)					{ m_gooId = str;	}
+	LPCTSTR GetGooId()								{ return m_gooId;	}
+	void	SetGoohomeQuoteMailAddress(LPCTSTR str)	{ m_goohomeQuoteMailAddress = str;	}
+	LPCTSTR	GetGoohomeQuoteMailAddress()			{ return m_goohomeQuoteMailAddress;	}
 
 private:
 	CString Read(FILE*);
