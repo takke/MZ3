@@ -156,6 +156,9 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
+	ON_COMMAND(ID_MENU_GOOHOME_READ, &CMZ3View::OnMenuGoohomeRead)
+	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
+	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1526,6 +1529,11 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnMenuWassrRead();
 		break;
 
+	case ACCESS_GOOHOME_USER:
+		// 全文表示
+		OnMenuGoohomeRead();
+		break;
+
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
 		OnMenuRssRead();
@@ -2314,6 +2322,9 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 						} else if (strServiceType == "Wassr") {
 							OnMenuWassrUpdate();
 							return TRUE;
+						} else if (strServiceType == "gooHome") {
+							OnMenuGoohomeUpdate();
+							return TRUE;
 						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 							OnMenuMixiEchoUpdate();
 							return TRUE;
@@ -2382,6 +2393,11 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		case ACCESS_WASSR_USER:
 			// 全文表示
 			OnMenuWassrRead();
+			break;
+
+		case ACCESS_GOOHOME_USER:
+			// 全文表示
+			OnMenuGoohomeRead();
 			break;
 
 		case ACCESS_RSS_READER_ITEM:
@@ -3854,6 +3870,29 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			// リンクの下に「URLをコピー」メニューを追加する
 			pSubMenu->AppendMenu( MF_SEPARATOR , ID_REPORT_URL_BASE, _T("-"));
 			pSubMenu->AppendMenu( MF_POPUP , (UINT_PTR)editmenu.GetSafeHmenu() , L"URLをコピー" ); 
+
+			// メニューを開く
+			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		}
+		break;
+
+	case ACCESS_GOOHOME_USER:
+		{
+			CMenu menu;
+			menu.LoadMenu( IDR_BODY_MENU );
+			CMenu* pSubMenu = menu.GetSubMenu(4);	// gooHome用メニューはidx=4
+
+			// リンク
+			int n = (int)bodyItem.m_linkList.size();
+			if( n > 0 ) {
+				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+				for( int i=0; i<n; i++ ) {
+					// 追加
+					CString s;
+					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+				}
+			}
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -7083,4 +7122,51 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 	}
 
 	return true;
+}
+
+/**
+ * gooHome | 読む
+ */
+void CMZ3View::OnMenuGoohomeRead()
+{
+	CMixiData& data = GetSelectedBodyItem();
+
+	// 本文を1行に変換して割り当て。
+	CString item;
+
+	CString v = data.GetBody();;
+	while( v.Replace( L"\r\n", L"" ) );
+	item.Append(v);
+	item.Append(L"\r\n");
+	item.Append(L"----\r\n");
+	
+	item.AppendFormat( L"name : %s\r\n", data.GetName() );
+	item.AppendFormat( L"%s\r\n", data.GetDate() );
+
+	MessageBox( item, data.GetName() );
+}
+
+/**
+ * gooHome | つぶやく
+ */
+void CMZ3View::OnMenuGoohomeUpdate()
+{
+	// モード変更
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE;
+
+	// ボタン名称変更
+	MyUpdateControlStatus();
+
+	// フォーカス移動。
+	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
+}
+
+/**
+ * gooHome | コメントを読む
+ */
+void CMZ3View::OnMenuGoohomeReadComments()
+{
+	CMixiData& data = GetSelectedBodyItem();
+
+	util::OpenBrowserForUrl(data.GetURL());
 }

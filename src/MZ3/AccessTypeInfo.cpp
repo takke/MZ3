@@ -868,8 +868,9 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	// http://home.goo.ne.jp/api/quote/quotes/friends/json
+	// http://home.goo.ne.jp/api/quote/quotes/myself/json
 	// => goohome/quote/quotes_friends.json
-	m_map[type].cacheFilePattern = L"goohome\\quote\\quotes_friends.json";
+	m_map[type].cacheFilePattern = L"goohome\\quote\\quotes_{urlafter:quotes/:friends.json}";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// goohome API => UTF-8
 	m_map[type].serializeKey = "GOOHOME_QUOTE_QUOTES_FRIENDS";
 	m_map[type].defaultCategoryURL = L"http://home.goo.ne.jp/api/quote/quotes/friends/json";

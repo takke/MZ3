@@ -515,11 +515,11 @@ bool GoohomeQuoteQuotesFriendsParser::parse( CMixiDataList& out_, const CHtmlArr
 				continue;
 			}
 			// profile_url
-			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"profile_url", r)) {
-				data.SetBrowseUri( r );
-				data.SetURL( r );
-				continue;
-			}
+//			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"profile_url", r)) {
+//				data.SetBrowseUri( r );
+//				data.SetURL( r );
+//				continue;
+//			}
 			// friends
 			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"friends", r)) {
 				data.SetIntValue(L"friends", _wtoi(r) );
@@ -575,11 +575,29 @@ bool GoohomeQuoteQuotesFriendsParser::parse( CMixiDataList& out_, const CHtmlArr
 			// comments
 			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"comments", r)) {
 				data.SetIntValue(L"comments", _wtoi(r) );
+
+				// コメント数をボディの末尾につける
+				data.AddBody(util::FormatString(L"(%d)", _wtoi(r)));
 				continue;
 			}
 			// created_at
 			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"created_at", r)) {
 				mixi::ParserUtil::ParseDate( r, data );
+				continue;
+			}
+			// id
+			if (GoohomeQuoteQuotesFriendsParser::GetJsonValue(line, L"id", r)) {
+				data.SetTextValue(L"id", r);
+
+				// 閲覧URLとしてひとことのURLを構築して設定しておく
+				// http://home.goo.ne.jp/quote/user/{goo_id}/detail/{id}?cnt={comments}
+				CString url;
+				url.Format(L"http://home.goo.ne.jp/quote/user/%s/detail/%s?cnt=%d",
+						(LPCTSTR)data.GetTextValue(L"goo_id"),
+						(LPCTSTR)r,
+						data.GetIntValue(L"comments",0));
+				data.SetURL(url);
+				data.SetBrowseUri(url);
 				continue;
 			}
 		}

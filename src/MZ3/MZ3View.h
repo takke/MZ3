@@ -404,6 +404,10 @@ public:
 	bool DoAccessEndProcForRssAutoDiscovery(void);
 private:
 	bool DoAccessEndProcForSoftwareUpdateCheck(void);
+public:
+	afx_msg void OnMenuGoohomeRead();
+	afx_msg void OnMenuGoohomeUpdate();
+	afx_msg void OnMenuGoohomeReadComments();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

@@ -130,6 +130,7 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		group.init( L"gooホーム", L"", ACCESS_GROUP_OTHERS );
 		{
 			appendCategoryByIniData( accessTypeInfo, group, "友達・注目の人", ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS );
+			appendCategoryByIniData( accessTypeInfo, group, "自分のひとこと一覧", ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS, "http://home.goo.ne.jp/api/quote/quotes/myself/json" );
 		}
 		this->groups.push_back( group );
 	}
