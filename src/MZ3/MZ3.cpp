@@ -629,6 +629,11 @@ BOOL CMZ3App::InitInstance()
 		ASSERT(theApp.MakeMZ3RegularVersion(L"0.9.3.7")        ==L"0.090320700");
 		ASSERT(theApp.MakeMZ3RegularVersion(L"0.10.2.3")       ==L"0.100220300");
 		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2.3")        ==L"1.000220300");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2")          ==L"1.000220000");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2 Alpha1")   ==L"1.000200001");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2 Alpha2")   ==L"1.000200002");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2 Beta1")    ==L"1.000210001");
+		ASSERT(theApp.MakeMZ3RegularVersion(L"1.0.2 Beta2")    ==L"1.000210002");
 	}
 
 #endif
@@ -1227,20 +1232,47 @@ CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
 {
 	CString strVersionR = strVersion;
 
-	static MyRegex reg;
-	util::CompileRegex(reg, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)( (Alpha|Beta)([0-9]+))?$");
-	if (reg.exec(strVersion) && reg.results.size()>4) {
+	static MyRegex reg1;
+	util::CompileRegex(reg1, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)( (Alpha|Beta)([0-9]+))?$");
+	if (reg1.exec(strVersion) && reg1.results.size()>4) {
 		// AA.BB.CC.DD AlphaEE
-		LPCTSTR AA = reg.results[1].str.c_str();
-		LPCTSTR BB = reg.results[2].str.c_str();
-		LPCTSTR CC = reg.results[3].str.c_str();
-		LPCTSTR DD = reg.results[4].str.c_str();
+		LPCTSTR AA = reg1.results[1].str.c_str();
+		LPCTSTR BB = reg1.results[2].str.c_str();
+		LPCTSTR CC = reg1.results[3].str.c_str();
+		LPCTSTR DD = reg1.results[4].str.c_str();
 
 		CString AlphaBeta = NULL;
 		LPCTSTR EE=L"";
-		if (reg.results.size()==8) {
-			AlphaBeta = reg.results[6].str.c_str();
-			EE        = reg.results[7].str.c_str();
+		if (reg1.results.size()==8) {
+			AlphaBeta = reg1.results[6].str.c_str();
+			EE        = reg1.results[7].str.c_str();
+		}
+		if (AlphaBeta==L"Alpha") {
+			// Alpha Version
+			strVersionR.Format(L"%s.%02s%02s0%02s%02s", AA, BB, CC, DD, EE);
+		} else if (AlphaBeta==L"Beta") {
+			// Beta Version
+			strVersionR.Format(L"%s.%02s%02s1%02s%02s", AA, BB, CC, DD, EE);
+		} else {
+			// Release Version
+			strVersionR.Format(L"%s.%02s%02s2%02s00", AA, BB, CC, DD);
+		}
+	}
+
+	static MyRegex reg2;
+	util::CompileRegex(reg2, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)( (Alpha|Beta)([0-9]+))?$");
+	if (reg2.exec(strVersion) && reg2.results.size()>3) {
+		// AA.BB.CC AlphaEE
+		LPCTSTR AA = reg2.results[1].str.c_str();
+		LPCTSTR BB = reg2.results[2].str.c_str();
+		LPCTSTR CC = reg2.results[3].str.c_str();
+		LPCTSTR DD = L"0";
+
+		CString AlphaBeta = NULL;
+		LPCTSTR EE=L"";
+		if (reg2.results.size()==7) {
+			AlphaBeta = reg2.results[5].str.c_str();
+			EE        = reg2.results[6].str.c_str();
 		}
 		if (AlphaBeta==L"Alpha") {
 			// Alpha Version
