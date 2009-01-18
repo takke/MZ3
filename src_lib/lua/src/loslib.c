@@ -5,7 +5,10 @@
 */
 
 
-#include <errno.h>
+// WM Hack
+//#include <errno.h>
+int errno;
+
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,25 +38,29 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 }
 
 
+#if !defined(_WIN32_WCE)
 static int os_execute (lua_State *L) {
   lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
   return 1;
 }
+#endif
 
-
+#if !defined(_WIN32_WCE)
 static int os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   return os_pushresult(L, remove(filename) == 0, filename);
 }
+#endif
 
-
+#if !defined(_WIN32_WCE)
 static int os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
   return os_pushresult(L, rename(fromname, toname) == 0, fromname);
 }
+#endif
 
-
+#if !defined(_WIN32_WCE)
 static int os_tmpname (lua_State *L) {
   char buff[LUA_TMPNAMBUFSIZE];
   int err;
@@ -63,7 +70,7 @@ static int os_tmpname (lua_State *L) {
   lua_pushstring(L, buff);
   return 1;
 }
-
+#endif
 
 static int os_getenv (lua_State *L) {
   lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
@@ -71,10 +78,12 @@ static int os_getenv (lua_State *L) {
 }
 
 
+#if !defined(_WIN32_WCE)
 static int os_clock (lua_State *L) {
   lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
   return 1;
 }
+#endif
 
 
 /*
@@ -121,6 +130,7 @@ static int getfield (lua_State *L, const char *key, int d) {
 }
 
 
+#if !defined(_WIN32_WCE)
 static int os_date (lua_State *L) {
   const char *s = luaL_optstring(L, 1, "%c");
   time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2, time(NULL));
@@ -165,8 +175,10 @@ static int os_date (lua_State *L) {
   }
   return 1;
 }
+#endif
 
 
+#if !defined(_WIN32_WCE)
 static int os_time (lua_State *L) {
   time_t t;
   if (lua_isnoneornil(L, 1))  /* called without args? */
@@ -190,6 +202,7 @@ static int os_time (lua_State *L) {
     lua_pushnumber(L, (lua_Number)t);
   return 1;
 }
+#endif
 
 
 static int os_difftime (lua_State *L) {
@@ -201,6 +214,7 @@ static int os_difftime (lua_State *L) {
 /* }====================================================== */
 
 
+#if !defined(_WIN32_WCE)
 static int os_setlocale (lua_State *L) {
   static const int cat[] = {LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY,
                       LC_NUMERIC, LC_TIME};
@@ -211,24 +225,33 @@ static int os_setlocale (lua_State *L) {
   lua_pushstring(L, setlocale(cat[op], l));
   return 1;
 }
+#endif
 
 
+#if !defined(_WIN32_WCE)
 static int os_exit (lua_State *L) {
   exit(luaL_optint(L, 1, EXIT_SUCCESS));
 }
+#endif
 
 static const luaL_Reg syslib[] = {
+#if !defined(_WIN32_WCE)
   {"clock",     os_clock},
   {"date",      os_date},
+#endif
   {"difftime",  os_difftime},
+#if !defined(_WIN32_WCE)
   {"execute",   os_execute},
   {"exit",      os_exit},
+#endif
   {"getenv",    os_getenv},
+#if !defined(_WIN32_WCE)
   {"remove",    os_remove},
   {"rename",    os_rename},
   {"setlocale", os_setlocale},
   {"time",      os_time},
   {"tmpname",   os_tmpname},
+#endif
   {NULL, NULL}
 };
 

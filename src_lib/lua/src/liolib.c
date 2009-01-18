@@ -5,7 +5,10 @@
 */
 
 
-#include <errno.h>
+// WM Hack
+//#include <errno.h>
+int errno;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -180,11 +183,13 @@ static int io_popen (lua_State *L) {
 }
 
 
+#if !defined(_WIN32_WCE)
 static int io_tmpfile (lua_State *L) {
   FILE **pf = newfile(L);
   *pf = tmpfile();
   return (*pf == NULL) ? pushresult(L, 0, NULL) : 1;
 }
+#endif
 
 
 static FILE *getiofile (lua_State *L, int findex) {
@@ -452,6 +457,7 @@ static int f_seek (lua_State *L) {
 }
 
 
+#if !defined(_WIN32_WCE)
 static int f_setvbuf (lua_State *L) {
   static const int mode[] = {_IONBF, _IOFBF, _IOLBF};
   static const char *const modenames[] = {"no", "full", "line", NULL};
@@ -461,7 +467,7 @@ static int f_setvbuf (lua_State *L) {
   int res = setvbuf(f, NULL, mode[op], sz);
   return pushresult(L, res == 0, NULL);
 }
-
+#endif
 
 
 static int io_flush (lua_State *L) {
@@ -483,7 +489,9 @@ static const luaL_Reg iolib[] = {
   {"output", io_output},
   {"popen", io_popen},
   {"read", io_read},
+#if !defined(_WIN32_WCE)
   {"tmpfile", io_tmpfile},
+#endif
   {"type", io_type},
   {"write", io_write},
   {NULL, NULL}
@@ -496,7 +504,9 @@ static const luaL_Reg flib[] = {
   {"lines", f_lines},
   {"read", f_read},
   {"seek", f_seek},
+#if !defined(_WIN32_WCE)
   {"setvbuf", f_setvbuf},
+#endif
   {"write", f_write},
   {"__gc", io_gc},
   {"__tostring", io_tostring},

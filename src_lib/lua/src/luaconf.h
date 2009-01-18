@@ -24,9 +24,9 @@
 ** CHANGE it (define it) if you want Lua to avoid the use of any
 ** non-ansi feature or library.
 */
-#if defined(__STRICT_ANSI__)
+//#if defined(__STRICT_ANSI__)
 #define LUA_ANSI
-#endif
+//#endif
 
 
 #if !defined(LUA_ANSI) && defined(_WIN32)
@@ -482,6 +482,10 @@
 #define LUAI_MAXUPVALUES	60
 
 
+#ifndef BUFSIZ
+# define BUFSIZ 512
+#endif
+
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 */
@@ -756,6 +760,20 @@ union luai_Cast { double l_d; long l_l; };
 ** Local configuration. You can use this space to add your redefinitions
 ** without modifying the main part of the file.
 */
+
+/*
+** Windows CE Hacks:
+**  CE do not supports some functions...
+*/
+#if defined(_WIN32) && defined(_WIN32_WCE)
+
+#define strcoll				strcmp
+#define strerror(n)			"file error"
+/* always return NULL */
+#define getenv(t)			NULL
+#define localeconv()		NULL
+
+#endif
 
 
 

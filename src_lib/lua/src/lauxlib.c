@@ -6,7 +6,9 @@
 
 
 #include <ctype.h>
-#include <errno.h>
+// WM Hack
+//#include <errno.h>
+int errno;
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -570,6 +572,7 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
     while ((c = getc(lf.f)) != EOF && c != '\n') ;  /* skip first line */
     if (c == '\n') c = getc(lf.f);
   }
+#if !defined(_WIN32_WCE)
   if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
     lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
     if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
@@ -577,6 +580,7 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
    while ((c = getc(lf.f)) != EOF && c != LUA_SIGNATURE[0]) ;
     lf.extraline = 0;
   }
+#endif
   ungetc(c, lf.f);
   status = lua_load(L, getF, &lf, lua_tostring(L, -1));
   readstatus = ferror(lf.f);
