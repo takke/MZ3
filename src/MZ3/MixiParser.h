@@ -3039,6 +3039,28 @@ public:
 			MZ3LOGGER_ERROR( util::FormatString( L"img not found... : %s", e.getMessage().c_str()) );
 		}
 
+		// 最終ログイン
+		// /html/body/div[2]/div/div/div/div/p
+		try {
+			const xml2stl::Node& logintime = root.getNode( L"html" )
+										   .getNode( L"body" )
+										   .getNode( L"div", 1 )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"div" )
+										   .getNode( L"p" , xml2stl::Property(L"class", L"loginTime"));
+			CString lastlogin = logintime.getTextAll().c_str();
+
+			// プロフィール画面に最終ログインを表示する
+			mixi.AddBody(_T(" "));
+			mixi.AddBody(lastlogin);
+
+			MZ3LOGGER_DEBUG( util::FormatString( L"Login Time : [%s]", lastlogin ) );
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"loginTime not found... : %s", e.getMessage().c_str()) );
+		}
+
 		// 友人関係
 		// /html/body/div[2]/div/div/div/p
 		try {
