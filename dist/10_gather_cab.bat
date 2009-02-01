@@ -6,7 +6,7 @@
 @call 00_set_env.bat
 
 : コピー元/先の CAB ファイル
-@set cab_from=..\src\MZ3cab\Release_WM\MZ3cab.CAB
+@set cab_from=..\src\MZ3cab\Release\MZ3cab.CAB
 @set cab_to=.\MZ3.%MZ3_VERSION%.CAB
 
 :----- CAB ファイルの収集 -----
