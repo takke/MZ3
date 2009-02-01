@@ -763,17 +763,21 @@ union luai_Cast { double l_d; long l_l; };
 
 /*
 ** Windows CE Hacks:
-**  CE do not supports some functions...
+**  CE does not support some functions...
 */
 #if defined(_WIN32) && defined(_WIN32_WCE)
 
 #define strcoll				strcmp
+
+/* TODO report right error message. */
 #define strerror(n)			"file error"
+
 /* always return NULL */
 #define getenv(t)			NULL
 
+/* no locale */
 #ifdef LUA_BUILD_AS_DLL
-#define localeconv			__noop
+# define localeconv			__noop
 #endif
 
 #endif
