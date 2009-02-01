@@ -22,6 +22,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "lzio.h"
+#include "mbenc.h"/* multi-byte encoding support */
 
 
 
@@ -262,8 +263,17 @@ static void read_long_string (LexState *ls, SemInfo *seminfo, int sep) {
         break;
       }
       default: {
+        int is_multibyte = 0;  /* multi-byte support */
+        if ( is_lead_byte( ls->current ) ) {  /* multi-byte support */
+          is_multibyte = 1;
+        }
         if (seminfo) save_and_next(ls);
         else next(ls);
+        if ( is_multibyte && ls->current != EOZ ) {  /* multi-byte support */
+          if (seminfo) save_and_next(ls);
+          else next(ls);
+          is_multibyte = 0;
+        }
       }
     }
   } endloop:
@@ -319,8 +329,18 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
         next(ls);
         continue;
       }
-      default:
+      default: {
+        int is_multibyte = 0; /* multi-byte support */
+        if ( is_lead_byte( ls->current ) ) {  /* multi-byte support */
+          is_multibyte = 1;
+        }
         save_and_next(ls);
+        if ( is_multibyte && ls->current != del && ls->current != EOZ ) {  /* multi-byte support */
+          save_and_next(ls);
+          is_multibyte = 0;
+          continue;
+        }
+      }
     }
   }
   save_and_next(ls);  /* skip delimiter */

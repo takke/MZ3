@@ -1,0 +1,181 @@
+--------------------------------------------------
+
+   Lua 5.1.3 SJIS対応 + VC++(VC6/VC2005)用プロジェクト
+   ほぼLuaBinaries互換版
+
+     by はむ！<VYA04230@nifty.com>
+        http://hammm.blog21.fc2.com/
+
+--------------------------------------------------
+
+○概要
+
+Lua 5.1.3 を日本語(SJIS)化したものです
+
+LuaBinariesのソースを元にしているため、各種モジュールとの相性などが改善されているはずです。
+オリジナルの内容に加え、VC++6用のプロジェクト（mak.vc6以下）と、VC2005で作成した以下のexeがついています。
+
+すべて、Cランタイムはスタティックリンクされています。
+(VCランタイムDLL MSVCR80.DLL の依存が煩わしいため）
+
+lua5.1.exe  ：SJIS対応版 Luaスタンドアロンインタプリタ
+luac5.1.exe ：SJIS対応版 Luaコンパイラ
+bin2c5.1.exe：LuaバイトコードをC言語埋め込み形式に変換するツール
+wlua5.1.exe ：SJIS対応版 Luaスタンドアロンインタプリタ（コンソー
+
+上記までのファイルは、本家LuaBinaries版と異なり、lua5.1.dllを使わないよう、
+スタティックリンクしています。
+以下のexeは、lua5.1.dllを実行時に使用します。
+
+lua5.1dll.exe ：SJIS対応版 LuaDLLを使用するLuaスタンドアロンインタプリタ
+wlua5.1dll.exe ：SJIS対応版 LuaDLLを使用するLuaスタンドアロンインタプリタ（コンソールのウィンドウが出ないバージョン）
+
+なお、Lua用として公開されている各種拡張モジュール(主にKeplerProjectやLuaForgeあたりのもの）を使う場合などは、lua5.1.dllを使うバージョンのほうが、おそらく相性が良いです。
+
+
+○特徴
+
+・文字列やコメントに日本語(SJIS)が使えます。
+・非常に限定的な修正のため、Luaの移植性に影響を与えません。
+・２バイト文字の判定方法をSJIS（デフォルト）/台湾BIG5/ANSIの中から選べます
+
+○注意点
+
+・関数や変数の名前には日本語(SJIS)が使えません。
+・エラーメッセージなどは日本語化していません。
+・EUC,UTF-8をお使いの場合は、オリジナルのままのLuaでも大丈夫です。
+（もちろん本バージョンでも問題ありません）
+
+○修正点について
+
+オリジナルのファイルのうち、修正したのはlex.cのみです。
+ファイルmbenc.hを新規に追加しており、２バイトの判定ルーチンを記述しています。
+
+デフォルトではSJISコード用になっていますが、ANSIライブラリによる判定を行う
+ようにも変更できます。この場合はmbenc.hの中の以下のマクロを修正した上で、
+setlocale等を適切に行ってください。
+
+以下のどれか１つの値を1にすることで２バイト文字の判定方法を選べます。
+#define LUA_USE_ENC_SHIFT_JIS 1
+#define LUA_USE_ENC_BIG5 0
+#define LUA_USE_ENC_ANSI 0
+
+オリジナルからの変更点に相当するパッチファイルを同梱しています。
+lua5_1_3_mbenc.patch
+
+GNUのpatch.exeがあれば、
+patch.exe -p1 < lua5_1_3_mbenc.patch
+
+といった形でオリジナルにパッチを当てられます。
+
+
+○VC++6 プロジェクトファイルおよびライブラリファイルについて
+
+mak.vc6ディレクトリ以下はオリジナルには含まれていないVC++6プロジェクト部分です。
+- Lua.dsw    : ワークスペース（以下の各プロジェクトを含みます）
+- LuaLib.dsp : lua5.1.lib（Luaのコアライブラリ）を作るプロジェクト
+- LuaExe.dsp : lua5.1.exeを作るプロジェクト
+- LuaExeForDll.dsp : lua5.1dll.exeを作るプロジェクト
+- LuaC.dsp   : luac5.1.exeを作るプロジェクト
+- LuaDll.dsp   : lua5.1.dll(Luaコアのダイナミックリンクライブラリ）を作るプロジェクト
+- wLuaExe.dsp : wlua5.1dll.exeを作るプロジェクト
+- wLuaExeForDll.dsp : wlua5.1.exeを作るプロジェクト
+
+ビルドしますと、
+リリース構成では以下のファイルが作られます。
+ bin\lua5.1.exe
+ bin\luac5.1.exe
+ bin\lua5.1.dll
+ bin\lua5.1dll.exe
+ bin\wlua5.1.exe
+ bin\wlua5.1dll.exe
+ lib\lua5.1.lib            : lua5.1.dllを使う場合のインポートライブラリ
+ lib\static\lua5.1.lib     : スタティックリンク版のライブラリ
+
+デバッグ構成では以下のファイルが作られます。
+ dbin\lua5.1.exe
+ dbin\luac5.1.exe
+ dbin\lua5.1.dll
+ dbin\lua5.1dll.exe
+ dbin\wlua5.1.exe
+ dbin\wlua5.1dll.exe
+ dlib\lua5.1.lib           : lua5.1.dllを使う場合のインポートライブラリ
+ dlib\static\lua5.1.lib    : スタティックリンク版のライブラリ
+
+そのほか、pdbファイルなどが作られます。
+
+自作プログラムにLuaを組み込む場合に必要なのは、ライブラリlua5.1.libと
+以下のインクルードファイルのみです。
+C++で使用する場合はextern "C"を忘れないように。
+
+例：
+extern "C" {
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+}
+
+または、
+
+#include "lua.hpp"
+
+なお、ライブラリのコード生成設定はマルチスレッドのスタティックリンクと
+なっていますので、必要に応じプロジェクト設定を修正してリビルドしてください。
+
+lib\lua5.1.lib をリンクするか、lib\static\lua5.1.lib をリンクするかによって、ビルドしたexeの実行時に lua5.1.dll が必要かどうかが変化します。
+
+
+
+○VC++2005 プロジェクトファイルおよびライブラリファイルについて
+
+mak.vc2005ディレクトリ以下はVC++2005用プロジェクト部分です。
+LuaBinariesのものに、以下の修正を加えたものです。
+
+・Cランタイムライブラリ(CRT)をスタティックリンクするようにした。
+
+・lua5.1.exe, wlua5.1.exe, luac5.1.exe の実行時に lua5.1.dllを使わないようにした。（ビルド時に、lib/lua5.1.libではなくlib/static/lua5.1.libをリンク）
+
+・lua5.1.dll を使うバージョンの lua5.1dll.exe を作るプロジェクト lua5.1_exe_for_dll を追加した。
+
+・lua5.1.dll を使うバージョンの wlua5.1dll.exe を作るプロジェクト wlua5.1_exe_for_dll を追加した。
+
+
+
+○リンク
+
+Luaの公式サイトはこちら
+http://www.lua.org/
+
+LuaBinariesの公式サイト
+http://luabinaries.luaforge.net/
+
+オリジナルのLua5.1.3はこちら。
+http://www.lua.org/ftp/lua-5.1.3.tar.gz
+
+今回のパッケージのベースはこちら。
+http://luaforge.net/frs/download.php/3133/lua5_1_3_Sources.zip
+
+Lua5.1の変更点などはこちらにまとめられています
+http://www.inf.puc-rio.br/~roberto/talks/novelties.pdf
+
+Lua5.1.3で修正されたバグはおおよそ以下のページにまとめられています。
+http://www.lua.org/bugs.html#5.1.3
+
+
+○ライセンス
+
+私自身はこの修正に関して著作権を主張するつもりはありませんので、
+Lua/LuaBinariesのオリジナルライセンス(MITライセンス)と同じ条件でどうぞ。
+
+Luaライセンスの詳細：http://www.lua.org/license.html
+LuaBinariesのライセンス：http://luabinaries.luaforge.net/license.html
+
+何か製品をリリースする場合は、中に入っているCOPYRIGHTファイルをドキュメント等に添付する形であれば問題ないはずです。
+
+
+○連絡先
+バグ等ありましたら以下のアドレスにご連絡ください。
+日本語やプロジェクト関連部分であれば対応するかもしれません。
+
+はむ！<VYA04230@nifty.com>
+
