@@ -771,7 +771,10 @@ union luai_Cast { double l_d; long l_l; };
 #define strerror(n)			"file error"
 /* always return NULL */
 #define getenv(t)			NULL
-#define localeconv()		NULL
+
+#ifdef LUA_BUILD_AS_DLL
+#define localeconv			__noop
+#endif
 
 #endif
 
