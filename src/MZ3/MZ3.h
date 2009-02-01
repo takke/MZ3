@@ -73,6 +73,9 @@ class CMZ3App : public CWinApp
 public:
 	AccessTypeInfo	m_accessTypeInfo;	///< アクセス種別毎のMZ3/4の振る舞いを定義する情報
 
+	lua_State*		m_luaState;			///< the Lua object
+
+
 	/// MZ3 で利用しているファイルのパス
 	class FilePath {
 	public:

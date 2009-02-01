@@ -95,4 +95,12 @@
 #include <atlimage.h>
 #endif
 
+// MD5
 #include "../../src_lib/md5-cc/md5.h"
+
+// lua support
+extern "C" {
+#include "../../src_lib/lua/src/lua.h"
+#include "../../src_lib/lua/src/lualib.h"
+#include "../../src_lib/lua/src/lauxlib.h"
+}
