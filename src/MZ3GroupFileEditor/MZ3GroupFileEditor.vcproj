@@ -242,6 +242,14 @@
 					RelativePath="..\MZ3\Mz3GroupData.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\MZ3\util_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\MZ3\util_gui.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

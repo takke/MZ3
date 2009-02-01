@@ -102,8 +102,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)_Win32"
+			IntermediateDirectory="$(ConfigurationName)_Win32"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="1"
@@ -357,8 +357,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)_Win32"
+			IntermediateDirectory="$(ConfigurationName)_Win32"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="1"
@@ -405,7 +405,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1041"
 				AdditionalIncludeDirectories="$(IntDir)"
 			/>
@@ -420,6 +420,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
 				EntryPointSymbol="wWinMainCRTStartup"
 				TargetMachine="0"
 			/>
@@ -950,6 +951,10 @@
 				</File>
 				<File
 					RelativePath=".\util_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util_gui.cpp"
 					>
 				</File>
 				<File
