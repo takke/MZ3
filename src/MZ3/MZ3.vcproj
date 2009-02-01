@@ -429,6 +429,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="$(InputDir)MZ3_win32.exe.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
