@@ -108,6 +108,7 @@ public:
 	afx_msg void OnMenuOpenLocalFile();
 	afx_msg void OnMenuFontMagnify();
 	afx_msg void OnMenuFontShrink();
+	afx_msg void OnMenuReloadLuaScripts();
 };
 
 

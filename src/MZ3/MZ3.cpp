@@ -45,20 +45,7 @@ END_MESSAGE_MAP()
 // lua support
 //-----------------------------------------------
 
-// MZ3 Lua API ライブラリ名
-#define LUA_MZ3LIBNAME	"mz3"
-
 #define MZ3_LUA_LOGGER_HEADER	L"(Lua) "
-
-static int report (lua_State *L, int status) {
-	if (status && !lua_isnil(L, -1)) {
-		const char *msg = lua_tostring(L, -1);
-		if (msg == NULL) msg = "(error object is not a string)";
-		MZ3LOGGER_ERROR(CString(msg));
-		lua_pop(L, 1);
-	}
-	return status;
-}
 
 // MZ3 API : mz3.trace
 int lua_mz3_trace(lua_State *L)
@@ -86,12 +73,6 @@ int lua_mz3_logger_debug(lua_State *L)
 int lua_mz3_logger_info(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
-
-//	lua_Debug d;
-//	if (lua_getinfo(L, "Sl", &d)) {
-//		s.AppendFormat(L"[%s:%d]", d.source, d.currentline);
-//	}
-
 	s.Append( CString(lua_tostring(L, -1)) );
 
 	MZ3LOGGER_INFO(s);
@@ -110,13 +91,82 @@ int lua_mz3_logger_error(lua_State *L)
 	return 0;
 }
 
+// MZ3 API : mz3_data.get_text(data, name)
+int lua_mz3_data_get_text(lua_State *L)
+{
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	const char* name = lua_tostring(L, 2);			// 第2引数
+
+	// 値取得
+	CString value = data->GetTextValue(CString(name));
+
+	// 結果をスタックに戻す
+	lua_pushstring(L, CStringA(value));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+// MZ3 API : mz3_data.set_text(data, name, value)
+int lua_mz3_data_set_text(lua_State *L)
+{
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	const char* name = lua_tostring(L, 2);			// 第2引数
+	const char* value = lua_tostring(L, 3);			// 第3引数
+
+	// 値設定
+	data->SetTextValue(CString(name), CString(value));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+// MZ3 API : mz3_htmlarray.get_count(htmlarray)
+int lua_mz3_htmlarray_get_count(lua_State *L)
+{
+	// 引数取得
+	CHtmlArray* htmlarray = (CHtmlArray*)lua_touserdata(L, 1);	// 第1引数
+
+	// 結果をスタックに積む
+	lua_pushinteger(L, htmlarray->GetCount());
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+// MZ3 API : mz3_htmlarray.get_count(htmlarray, index)
+int lua_mz3_htmlarray_get_at(lua_State *L)
+{
+	// 引数取得
+	CHtmlArray* htmlarray = (CHtmlArray*)lua_touserdata(L, 1);	// 第1引数
+	int index = lua_tointeger(L, 2);							// 第2引数
+
+	// 結果をスタックに積む
+	lua_pushstring(L, CStringA(htmlarray->GetAt(index)));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 // MZ3 Lua API table
 static const luaL_Reg lua_mz3_lib[] = {
-  {"logger_error",		lua_mz3_logger_error},
-  {"logger_info",		lua_mz3_logger_info},
-  {"logger_debug",		lua_mz3_logger_debug},
-  {"trace",				lua_mz3_trace},
-  {NULL, NULL}
+	{"logger_error",	lua_mz3_logger_error},
+	{"logger_info",		lua_mz3_logger_info},
+	{"logger_debug",	lua_mz3_logger_debug},
+	{"trace",			lua_mz3_trace},
+	{NULL, NULL}
+};
+static const luaL_Reg lua_mz3_data_lib[] = {
+	{"get_text",		lua_mz3_data_get_text},
+	{"set_text",		lua_mz3_data_set_text},
+	{NULL, NULL}
+};
+static const luaL_Reg lua_mz3_htmlarray_lib[] = {
+	{"get_count",		lua_mz3_htmlarray_get_count},
+	{"get_at",			lua_mz3_htmlarray_get_at},
+	{NULL, NULL}
 };
 
 
@@ -221,51 +271,7 @@ BOOL CMZ3App::InitInstance()
 	// lua support
 	//-----------------------------------------------
 	// Lua の初期化
-	m_luaState = lua_open();
-	{
-		lua_State* L = m_luaState;
-
-		// Lua 標準ライブラリの組み込み
-		luaL_openlibs(L);
-
-		// MZ3 Lua API の登録
-		luaL_register(L, LUA_MZ3LIBNAME, lua_mz3_lib);
-
-		int r = 0;
-//		r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化開始');");
-//		report(L, r);
-
-		// スクリプト用ディレクトリパス作成
-		CString script_dir;
-		script_dir.Format( L"%s\\script", theApp.GetAppDirPath() );
-		if (!util::ExistFile(script_dir)) {
-			// 開発環境用パス
-			script_dir.Format( L"%s\\..\\script", theApp.GetAppDirPath() );
-		}
-
-		// スクリプト用ディレクトリのLuaへの登録
-		lua_pushstring(L, CStringA(script_dir));
-		lua_setglobal(L, "mz3_script_dir");
-
-		// Lua スクリプトのロード
-		CString path = script_dir + L"\\mz3.lua";
-
-		if (!util::ExistFile(path)) {
-			MZ3LOGGER_FATAL(L"Lua 基本ライブラリを読み込めません");
-		}
-
-		r = luaL_dofile(L, CStringA(path));
-		report(L, r);
-		if (r!=0) {
-			MZ3LOGGER_FATAL(util::FormatString(L"Lua 基本ライブラリを読み込めません[%s] [%d]", path, r));
-		}
-
-//		r = luaL_dostring(L, "mz3.hoge();");
-//		report(L, r);
-
-//		r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化終了');");
-//		report(L, r);
-	}
+	MyLuaInit();
 
 //	exit(0);
 	// lua support exp.
@@ -850,7 +856,7 @@ int CMZ3App::ExitInstance()
 	m_optionMng.Save();
 
 	// Lua 終了処理
-	lua_close(m_luaState);
+	MyLuaClose();
 
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理完了" );
 
@@ -1395,3 +1401,103 @@ CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
 
 	return strVersionR;
 }
+
+/**
+ * Lua 初期化処理(スクリプトロード)
+ */
+bool CMZ3App::MyLuaInit(void)
+{
+	// リロード用にクローズ
+	if (m_luaState!=NULL) {
+		lua_close(m_luaState);
+		m_luaState = NULL;
+	}
+
+	// Lua の初期化
+	m_luaState = lua_open();
+
+	lua_State* L = m_luaState;
+
+	// Lua 標準ライブラリの組み込み
+	luaL_openlibs(L);
+
+	// MZ3 Lua API の登録
+	luaL_register(L, "mz3", lua_mz3_lib);
+	luaL_register(L, "mz3_data", lua_mz3_data_lib);
+	luaL_register(L, "mz3_htmlarray", lua_mz3_htmlarray_lib);
+
+	int r = 0;
+//	r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化開始');");
+//	MyLuaErrorReport(r);
+
+	// スクリプト用ディレクトリパス作成
+	CString script_dir;
+	script_dir.Format( L"%s\\script", theApp.GetAppDirPath() );
+	if (!util::ExistFile(script_dir)) {
+		// 開発環境用パス
+		script_dir.Format( L"%s\\..\\script", theApp.GetAppDirPath() );
+	}
+
+	// スクリプト用ディレクトリのLuaへの登録
+	lua_pushstring(L, CStringA(script_dir));
+	lua_setglobal(L, "mz3_script_dir");
+
+	// Lua スクリプトのロード
+	CString path = script_dir + L"\\mz3.lua";
+
+	if (!util::ExistFile(path)) {
+		MZ3LOGGER_FATAL(L"Lua 基本ライブラリを読み込めません");
+	}
+
+	r = luaL_dofile(L, CStringA(path));
+	MyLuaErrorReport(r);
+	if (r!=0) {
+		MZ3LOGGER_FATAL(util::FormatString(L"Lua 基本ライブラリを読み込めません[%s] [%d]", path, r));
+	}
+
+//	r = luaL_dostring(L, "mz3.hoge();");
+//	MyLuaErrorReport(r);
+
+//	r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化終了');");
+//	MyLuaErrorReport(r);
+
+	return true;
+}
+
+/**
+ * Lua 終了処理
+ */
+bool CMZ3App::MyLuaClose(void)
+{
+	if (m_luaState!=NULL) {
+		lua_close(m_luaState);
+		m_luaState = NULL;
+	}
+
+	return true;
+}
+
+/**
+ * Lua コードの実行(簡易スクリプト呼び出し)
+ */
+bool CMZ3App::MyLuaExecute(LPCTSTR szLuaStatement)
+{
+	int r = luaL_dostring(m_luaState, CStringA(szLuaStatement));
+	MyLuaErrorReport(r);
+
+	return true;
+}
+
+int CMZ3App::MyLuaErrorReport(int status)
+{
+	lua_State* L = m_luaState;
+
+	if (status && !lua_isnil(L, -1)) {
+		const char *msg = lua_tostring(L, -1);
+		if (msg == NULL) msg = "(error object is not a string)";
+		MZ3LOGGER_ERROR(CString(msg));
+		lua_pop(L, 1);
+	}
+	return status;
+}
+

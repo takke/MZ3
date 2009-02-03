@@ -85,6 +85,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_OPEN_LOCAL_FILE, &CMainFrame::OnMenuOpenLocalFile)
 	ON_COMMAND(ID_MENU_FONT_MAGNIFY, &CMainFrame::OnMenuFontMagnify)
 	ON_COMMAND(ID_MENU_FONT_SHRINK, &CMainFrame::OnMenuFontShrink)
+	ON_COMMAND(ID_MENU_RELOAD_LUA_SCRIPTS, &CMainFrame::OnMenuReloadLuaScripts)
 END_MESSAGE_MAP()
 
 
@@ -1228,4 +1229,14 @@ void CMainFrame::OnMenuFontShrink()
 {
 	theApp.m_optionMng.m_fontHeight = option::Option::normalizeFontSize( theApp.m_optionMng.m_fontHeight-1 );
 	ChangeAllViewFont();
+}
+
+/// 「スクリプトのリロード」メニュー
+void CMainFrame::OnMenuReloadLuaScripts()
+{
+	// クローズ
+	theApp.MyLuaClose();
+
+	// 初期化
+	theApp.MyLuaInit();
 }

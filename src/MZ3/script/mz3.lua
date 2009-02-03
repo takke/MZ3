@@ -31,6 +31,7 @@ mz3.hoge = function()
 	show_backtrace();
 end
 
+-- mixi用スクリプトロード
 require("mixi");
 --mixi.hoge();
 

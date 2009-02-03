@@ -149,6 +149,7 @@ BEGIN
                 MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
                 MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
                 MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
+                MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
             END
         END
         MENUITEM SEPARATOR
@@ -424,6 +425,7 @@ BEGIN
             MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
             MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
             MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
+            MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
         END
     END
 END
@@ -511,13 +513,14 @@ BEGIN
     VK_F3,          ID_ACCELERATOR_NEXT_TAB, VIRTKEY, NOINVERT
     VK_F2,          ID_ACCELERATOR_PREV_TAB, VIRTKEY, NOINVERT
     VK_F5,          ID_ACCELERATOR_RELOAD,  VIRTKEY, NOINVERT
+    "1",            ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, VIRTKEY, CONTROL, NOINVERT
     "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
     "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "A",            ID_SELECT_ALL,          VIRTKEY, CONTROL, NOINVERT
-    "1",            ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ID_MENU_RELOAD_LUA_SCRIPTS, VIRTKEY, CONTROL, NOINVERT
 END
 
 

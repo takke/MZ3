@@ -12,6 +12,23 @@
 #include "MixiParser.h"
 #include "TwitterParser.h"
 
+static void my_lua_printstack( lua_State *L )
+{
+	int top = lua_gettop(L);
+	for (int i=1; i<=top; i++) {
+		switch (lua_type(L,i)) {
+		case LUA_TSTRING:
+			printf("%s:%s ", lua_typename(L, lua_type(L,i)), (const char*)lua_tostring(L,i));
+			break;
+
+		case LUA_TNUMBER:
+		default:
+			printf("%s:%d ", lua_typename(L, lua_type(L,i)), (int)lua_tonumber(L,i));
+			break;
+		}
+	}
+	printf("*\n");
+}
 
 /// MZ3用HTMLパーサ
 namespace parser {
@@ -34,7 +51,47 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_DIARY:						return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
-	case ACCESS_LIST_NEW_BBS:					return mixi::NewBbsParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS:
+		{
+			// 引数として parent, body, html を渡す
+
+			// スタックのサイズを覚えておく
+			lua_State* L = theApp.m_luaState;
+			int top = lua_gettop(L);
+
+			// Lua関数名("mixi.bbs_parser")を積む
+			lua_getglobal(L, "mixi");				// "mixi" テーブルをスタックに積む
+			//my_lua_printstack(L);
+			lua_pushstring(L, "bbs_parser");		// 対象変数(関数名)をテーブルに積む
+			//my_lua_printstack(L);
+			lua_gettable(L, -2);					// スタックの2番目の要素("mixi"テーブル)から、
+													// テーブルトップの文字列("bbs_parser")で示されるメンバを
+													// スタックに積む
+//			lua_getglobal(L, "mixi.bbs_parser");
+			//my_lua_printstack(L);
+
+			// 引数を積む
+			lua_pushlightuserdata(L, &parent);
+			lua_pushlightuserdata(L, &body);
+			lua_pushlightuserdata(L, &html);
+
+			// 関数実行
+			int n_arg = 3;
+			int n_ret = 1;
+			int status = lua_pcall(L, n_arg, n_ret, 0);
+
+			if (status != 0) {
+				// TODO エラー処理
+				theApp.MyLuaErrorReport(status);
+			} else {
+				// 返り値取得
+				bool result = lua_toboolean(L, -1);
+				lua_settop(L, top);
+			}
+
+			//theApp.MyLuaExecute(L"mixi.bbs_parser();");
+		}
+		return mixi::NewBbsParser::parse( body, html );
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
 	case ACCESS_LIST_FOOTSTEP:					return mixi::TrackParser::parse( body, html );

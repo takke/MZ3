@@ -210,6 +210,10 @@ public:
 	int pt2px(int pt);
 	int AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& srcImage, const CString& strImagePath);
 	CString MakeMZ3RegularVersion(CString strVersion);
+	bool MyLuaInit(void);
+	bool MyLuaClose(void);
+	bool MyLuaExecute(LPCTSTR szLuaStatement);
+	int MyLuaErrorReport(int status);
 };
 
 extern CMZ3App theApp;
