@@ -67,7 +67,6 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 			lua_gettable(L, -2);					// スタックの2番目の要素("mixi"テーブル)から、
 													// テーブルトップの文字列("bbs_parser")で示されるメンバを
 													// スタックに積む
-//			lua_getglobal(L, "mixi.bbs_parser");
 			//my_lua_printstack(L);
 
 			// 引数を積む
@@ -88,10 +87,10 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 				bool result = lua_toboolean(L, -1);
 				lua_settop(L, top);
 			}
-
-			//theApp.MyLuaExecute(L"mixi.bbs_parser();");
 		}
-		return mixi::NewBbsParser::parse( body, html );
+		return true;
+//		return mixi::NewBbsParser::parse( body, html );
+
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
 	case ACCESS_LIST_FOOTSTEP:					return mixi::TrackParser::parse( body, html );

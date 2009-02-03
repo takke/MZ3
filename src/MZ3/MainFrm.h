@@ -109,6 +109,7 @@ public:
 	afx_msg void OnMenuFontMagnify();
 	afx_msg void OnMenuFontShrink();
 	afx_msg void OnMenuReloadLuaScripts();
+	afx_msg void OnMenuReloadCategoryListLog();
 };
 
 

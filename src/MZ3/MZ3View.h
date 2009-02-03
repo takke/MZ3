@@ -301,6 +301,8 @@ public:
 	BOOL OnKeyDown(MSG* pMsg);
 	BOOL OnKeyUp(MSG* pMsg);
 
+	bool MyLoadCategoryLogfile(CCategoryItem& category);
+
 private:
 	void InsertInitialData();
 
@@ -311,8 +313,6 @@ private:
 
 	void OnUpdateWriteButton(CCmdUI*);
 	void OnMySelchangedCategoryList(void);
-
-	bool MyLoadCategoryLogfile(CCategoryItem& category);
 
 	static unsigned int Initialize_Thread( LPVOID This );
 	static unsigned int CacheCleanup_Thread( LPVOID This );

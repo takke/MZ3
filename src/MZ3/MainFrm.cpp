@@ -86,6 +86,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_FONT_MAGNIFY, &CMainFrame::OnMenuFontMagnify)
 	ON_COMMAND(ID_MENU_FONT_SHRINK, &CMainFrame::OnMenuFontShrink)
 	ON_COMMAND(ID_MENU_RELOAD_LUA_SCRIPTS, &CMainFrame::OnMenuReloadLuaScripts)
+	ON_COMMAND(ID_MENU_RELOAD_CATEGORY_LIST_LOG, &CMainFrame::OnMenuReloadCategoryListLog)
 END_MESSAGE_MAP()
 
 
@@ -1239,4 +1240,11 @@ void CMainFrame::OnMenuReloadLuaScripts()
 
 	// 初期化
 	theApp.MyLuaInit();
+}
+
+/// 「カテゴリログのリロード」メニュー
+void CMainFrame::OnMenuReloadCategoryListLog()
+{
+	// ログのロード
+	theApp.m_pMainView->MyLoadCategoryLogfile( *theApp.m_pMainView->m_selGroup->getSelectedCategory() );
 }

@@ -26,6 +26,7 @@
 #include "MouseGestureManager.h"
 #include "MZ3FileCacheManager.h"
 #include "ChooseClientTypeDlg.h"
+#include "mz3_lua_api.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,134 +41,6 @@
 BEGIN_MESSAGE_MAP(CMZ3App, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CMZ3App::OnAppAbout)
 END_MESSAGE_MAP()
-
-//-----------------------------------------------
-// lua support
-//-----------------------------------------------
-
-#define MZ3_LUA_LOGGER_HEADER	L"(Lua) "
-
-// MZ3 API : mz3.trace
-int lua_mz3_trace(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3_TRACE(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_debug
-int lua_mz3_logger_debug(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3LOGGER_DEBUG(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_info
-int lua_mz3_logger_info(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3LOGGER_INFO(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_error
-int lua_mz3_logger_error(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3LOGGER_ERROR(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3_data.get_text(data, name)
-int lua_mz3_data_get_text(lua_State *L)
-{
-	// 引数取得
-	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
-	const char* name = lua_tostring(L, 2);			// 第2引数
-
-	// 値取得
-	CString value = data->GetTextValue(CString(name));
-
-	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(value));
-
-	// 戻り値の数を返す
-	return 1;
-}
-
-// MZ3 API : mz3_data.set_text(data, name, value)
-int lua_mz3_data_set_text(lua_State *L)
-{
-	// 引数取得
-	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
-	const char* name = lua_tostring(L, 2);			// 第2引数
-	const char* value = lua_tostring(L, 3);			// 第3引数
-
-	// 値設定
-	data->SetTextValue(CString(name), CString(value));
-
-	// 戻り値の数を返す
-	return 0;
-}
-
-// MZ3 API : mz3_htmlarray.get_count(htmlarray)
-int lua_mz3_htmlarray_get_count(lua_State *L)
-{
-	// 引数取得
-	CHtmlArray* htmlarray = (CHtmlArray*)lua_touserdata(L, 1);	// 第1引数
-
-	// 結果をスタックに積む
-	lua_pushinteger(L, htmlarray->GetCount());
-
-	// 戻り値の数を返す
-	return 1;
-}
-
-// MZ3 API : mz3_htmlarray.get_count(htmlarray, index)
-int lua_mz3_htmlarray_get_at(lua_State *L)
-{
-	// 引数取得
-	CHtmlArray* htmlarray = (CHtmlArray*)lua_touserdata(L, 1);	// 第1引数
-	int index = lua_tointeger(L, 2);							// 第2引数
-
-	// 結果をスタックに積む
-	lua_pushstring(L, CStringA(htmlarray->GetAt(index)));
-
-	// 戻り値の数を返す
-	return 1;
-}
-
-// MZ3 Lua API table
-static const luaL_Reg lua_mz3_lib[] = {
-	{"logger_error",	lua_mz3_logger_error},
-	{"logger_info",		lua_mz3_logger_info},
-	{"logger_debug",	lua_mz3_logger_debug},
-	{"trace",			lua_mz3_trace},
-	{NULL, NULL}
-};
-static const luaL_Reg lua_mz3_data_lib[] = {
-	{"get_text",		lua_mz3_data_get_text},
-	{"set_text",		lua_mz3_data_set_text},
-	{NULL, NULL}
-};
-static const luaL_Reg lua_mz3_htmlarray_lib[] = {
-	{"get_count",		lua_mz3_htmlarray_get_count},
-	{"get_at",			lua_mz3_htmlarray_get_at},
-	{NULL, NULL}
-};
 
 
 
@@ -1422,9 +1295,7 @@ bool CMZ3App::MyLuaInit(void)
 	luaL_openlibs(L);
 
 	// MZ3 Lua API の登録
-	luaL_register(L, "mz3", lua_mz3_lib);
-	luaL_register(L, "mz3_data", lua_mz3_data_lib);
-	luaL_register(L, "mz3_htmlarray", lua_mz3_htmlarray_lib);
+	mz3_lua_open_api(L);
 
 	int r = 0;
 //	r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化開始');");
@@ -1500,4 +1371,3 @@ int CMZ3App::MyLuaErrorReport(int status)
 	}
 	return status;
 }
-

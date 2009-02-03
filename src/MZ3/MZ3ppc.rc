@@ -425,7 +425,8 @@ BEGIN
             MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
             MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
             MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
-            MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
+            MENUITEM "スクリプトのリロード\tCtrl+F5",         ID_MENU_RELOAD_LUA_SCRIPTS
+            MENUITEM "カテゴリログのリロード\tCtrl+Shift+F5",  ID_MENU_RELOAD_CATEGORY_LIST_LOG
         END
     END
 END
@@ -519,8 +520,9 @@ BEGIN
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
-    "A",            ID_SELECT_ALL,          VIRTKEY, CONTROL, NOINVERT
     VK_F5,          ID_MENU_RELOAD_LUA_SCRIPTS, VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_SELECT_ALL,          VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ID_MENU_RELOAD_CATEGORY_LIST_LOG, VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
