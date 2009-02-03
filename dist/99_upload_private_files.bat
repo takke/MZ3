@@ -3,7 +3,7 @@
 @set DAT_FILE=99_upload_private_files.dat
 
 : スクリプトファイルの生成
-@echo cd /var/www/mz3/private            > %DAT_FILE%
+@echo cd /data/www/mz3/public/private    > %DAT_FILE%
 @echo put MZ3.%MZ3_VERSION%.CAB x.CAB    >> %DAT_FILE%
 @echo rm MZ3.%MZ3_VERSION%.CAB           >> %DAT_FILE%
 @echo rename x.CAB MZ3.%MZ3_VERSION%.CAB >> %DAT_FILE%
