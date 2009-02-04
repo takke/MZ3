@@ -38,6 +38,7 @@ inline ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	// list Œn
 	if( url.Find( L"list_bookmark.pl?kind=community" ) != -1 ) { return ACCESS_LIST_FAVORITE_COMMUNITY; }
 	if( url.Find( L"list_bookmark.pl" ) != -1 ) { return ACCESS_LIST_FAVORITE_USER; }
+	if( url.Find( L"new_bbs.pl" ) != -1 )		{ return ACCESS_LIST_NEW_BBS; }
 	
 	// •s–¾‚È‚Ì‚Å INVALID ‚Æ‚·‚é
 	return ACCESS_INVALID;

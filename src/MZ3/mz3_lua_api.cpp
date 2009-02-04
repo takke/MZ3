@@ -243,6 +243,21 @@ int lua_mz3_data_list_add(lua_State *L)
 	return 0;
 }
 
+// MZ3 API : mz3_data_list.insert(data_list, index, data)
+int lua_mz3_data_list_insert(lua_State *L)
+{
+	// ˆø”æ“¾
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// ‘æ1ˆø”
+	int index = lua_tointeger(L, 2);								// ‘æ2ˆø”
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 3);					// ‘æ3ˆø”
+
+	// “o˜^
+	data_list->insert(data_list->begin()+index, *data);
+
+	// –ß‚è’l‚Ì”‚ğ•Ô‚·
+	return 0;
+}
+
 //-----------------------------------------------
 // MZ3 HtmlArray API
 //-----------------------------------------------
@@ -298,6 +313,7 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 };
 static const luaL_Reg lua_mz3_data_list_lib[] = {
 	{"add",				lua_mz3_data_list_add},
+	{"insert",			lua_mz3_data_list_insert},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_htmlarray_lib[] = {

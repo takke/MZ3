@@ -51,7 +51,11 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_DIARY:						return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
+
 	case ACCESS_LIST_NEW_BBS:
+//		return mixi::NewBbsParser::parse( body, html );
+	case ACCESS_LIST_NEW_BBS_COMMENT:
+//		return mixi::ListNewBbsCommentParser::parse( body, html );
 		{
 			// à¯êîÇ∆ÇµÇƒ parent, body, html ÇìnÇ∑
 
@@ -89,7 +93,6 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 			}
 		}
 		return true;
-//		return mixi::NewBbsParser::parse( body, html );
 
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
@@ -103,7 +106,6 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_COMMUNITY:					return mixi::ListCommunityParser::parse( body, html );
 	case ACCESS_LIST_INTRO:						return mixi::ShowIntroParser::parse( body, html );
 	case ACCESS_LIST_BBS:						return mixi::ListBbsParser::parse( body, html );
-	case ACCESS_LIST_NEW_BBS_COMMENT:			return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:					return mixi::ShowCalendarParser::parse( body, html );
 	case ACCESS_MIXI_RECENT_ECHO:				return mixi::RecentEchoParser::parse( body, html );
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:		return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );

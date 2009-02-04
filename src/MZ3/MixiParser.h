@@ -1417,6 +1417,7 @@ private:
  * 【コミュニティ最新書き込み一覧】
  * http://mixi.jp/new_bbs.pl
  */
+/*
 class NewBbsParser : public MixiListParser
 {
 public:
@@ -1548,12 +1549,14 @@ private:
 	}
 
 };
+*/
 
 /**
  * [list] new_bbs_comment.pl 用パーサ
  * 【コミュニティコメント記入履歴】
  * http://mixi.jp/new_bbs_comment.pl
  */
+/*
 class ListNewBbsCommentParser : public MixiListParser
 {
 public:
@@ -1568,6 +1571,7 @@ public:
 		return rval;
 	}
 };
+*/
 
 /**
  * [list] list_community.pl 用パーサ。

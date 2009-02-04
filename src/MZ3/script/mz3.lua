@@ -1,13 +1,11 @@
 --------------------------------------------------
--- MZ3 API 基本ライブラリ
+-- MZ3 Script 基本ライブラリ
 --------------------------------------------------
-
 mz3.logger_info('mz3.lua 開始');
 
 -- パッケージロードパスの変更
 -- TODO mz3_plugin_dir support
 --print(package.path);
---package.path = mz3_script_dir .. "\\";
 package.path = mz3_script_dir .. "\\?.lua;" .. mz3_script_dir .. "\\?\\init.lua";
 
 function show_backtrace()
@@ -26,13 +24,7 @@ function show_backtrace()
 	end
 end
 
-mz3.hoge = function()
-	mz3.logger_info('hoge');
-	show_backtrace();
-end
-
 -- mixi用スクリプトロード
 require("mixi");
---mixi.hoge();
 
 mz3.logger_info('mz3.lua 終了');
