@@ -1323,26 +1323,31 @@ bool CMZ3App::MyLuaInit(void)
 
 	// ディレクトリパス作成
 	CString script_dir, plugin_dir, user_script_dir;
+	CString mz3_dir;
 
-	script_dir.Format( L"%s\\scripts", theApp.GetAppDirPath() );
+	script_dir.Format( L"%s\\scripts\\", theApp.GetAppDirPath() );
+	mz3_dir.Format( L"%s\\", theApp.GetAppDirPath() );
 	if (!util::ExistFile(script_dir)) {
 		// 開発環境用パス
-		script_dir.Format( L"%s\\..\\scripts", theApp.GetAppDirPath() );
+		script_dir.Format( L"%s\\..\\scripts\\", theApp.GetAppDirPath() );
+		mz3_dir.Format( L"%s\\..\\", theApp.GetAppDirPath() );
 	}
 
-	plugin_dir.Format( L"%s\\plugins", theApp.GetAppDirPath() );
+	plugin_dir.Format( L"%s\\plugins\\", theApp.GetAppDirPath() );
 	if (!util::ExistFile(plugin_dir)) {
 		// 開発環境用パス
-		plugin_dir.Format( L"%s\\..\\plugins", theApp.GetAppDirPath() );
+		plugin_dir.Format( L"%s\\..\\plugins\\", theApp.GetAppDirPath() );
 	}
 
-	user_script_dir.Format( L"%s\\user_scripts", theApp.GetAppDirPath() );
+	user_script_dir.Format( L"%s\\user_scripts\\", theApp.GetAppDirPath() );
 	if (!util::ExistFile(user_script_dir)) {
 		// 開発環境用パス
-		user_script_dir.Format( L"%s\\..\\user_scripts", theApp.GetAppDirPath() );
+		user_script_dir.Format( L"%s\\..\\user_scripts\\", theApp.GetAppDirPath() );
 	}
 
 	// ディレクトリパスのLuaへの登録
+	lua_pushstring(L, CStringA(mz3_dir));
+	lua_setglobal(L, "mz3_dir");
 	lua_pushstring(L, CStringA(script_dir));
 	lua_setglobal(L, "mz3_script_dir");
 	lua_pushstring(L, CStringA(plugin_dir));
@@ -1351,7 +1356,7 @@ bool CMZ3App::MyLuaInit(void)
 	lua_setglobal(L, "mz3_user_script_dir");
 
 	// Lua スクリプトのロード＆実行
-	CString path = script_dir + L"\\mz3.lua";
+	CString path = script_dir + L"mz3.lua";
 	if (!util::ExistFile(path)) {
 		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトが見つかりません[%s]", path));
 		return false;
@@ -1363,8 +1368,8 @@ bool CMZ3App::MyLuaInit(void)
 	}
 
 	// plugin, user_script フォルダ配下の全Luaファイルのロード＆実行
-	util::FindFileCallback(plugin_dir + L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
-	util::FindFileCallback(user_script_dir + L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
+	util::FindFileCallback(plugin_dir, L"*.lua", LuaLoadCallback, (void*)NULL, 1);
+	util::FindFileCallback(user_script_dir, L"*.lua", LuaLoadCallback, (void*)NULL, 1);
 
 	return true;
 }

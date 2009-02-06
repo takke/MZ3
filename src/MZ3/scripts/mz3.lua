@@ -12,12 +12,12 @@
 mz3.logger_info('mz3.lua start');
 
 -- パッケージロードパスの変更
--- TODO mz3_plugin_dir support
 --print(package.path);
-package.path = mz3_script_dir .. "\\?.lua;" .. mz3_script_dir .. "\\?\\init.lua";
+package.path = ".\\?.lua;" .. mz3_dir .. "\\?.lua;"
+--print(package.path);
 
 -- 各種ビルトインスクリプトロード
-require("util");
-require("mixi");
+require("scripts\\util");
+require("scripts\\mixi");
 
 mz3.logger_info('mz3.lua end');
