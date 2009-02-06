@@ -9,6 +9,7 @@
 --
 -- $Id$
 --------------------------------------------------
+module("mixi", package.seeall)
 
 --------------------------------------------------
 -- 【コミュニティ最新書き込み一覧】
@@ -94,7 +95,7 @@ function new_bbs_parser(parent, body, html)
 			mz3_data.set_integer(data, "id", id);
 
 			-- コミュニティ名
-			name = after:match("</a>.*[(](.*)[)]</dd>");
+			name = after:match("</a>[^(]*[(](.*)[)]</dd>");
 			name = mz3.decode_html_entity(name);
 			mz3_data.set_text(data, "name", name);
 			
