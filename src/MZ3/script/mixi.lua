@@ -9,39 +9,8 @@
 --
 -- $Id$
 --------------------------------------------------
+mz3.logger_debug('mixi.lua start');
 module("mixi", package.seeall)
-
---------------------------------------------------
--- line に指定された全文字列を順に含むか
---------------------------------------------------
-function line_has_strings(line, ...)
-	local args = {...}
-	local p = 1;
-	
-	for i=1, #args do
---		print(args[i]);
-		p = line:find(args[i], p, true);
-		if p==nil then
-			return false;
-		end
-		p = p+1;
-	end
-
-	return true;
-end
-
---------------------------------------------------
--- URLからパラメータを取得する
---------------------------------------------------
-function get_param_from_url(url, param)
-	-- ? 以降を抽出
-	local val = url:match("[\?&]" .. param .. "=([^&]+).*$");
-	if (val == nil) then
-		return "";
-	end
-	
-	return val;
-end
 
 --------------------------------------------------
 -- 次へ、前への抽出処理
@@ -212,3 +181,5 @@ mz3.set_parser("BBS", "mixi.bbs_parser");
 mz3.set_parser("NEW_BBS_COMMENT", "mixi.bbs_parser");
 
 --mz3.set_hook("mixi", "after_parse", after_parse);
+
+mz3.logger_debug('mixi.lua end');
