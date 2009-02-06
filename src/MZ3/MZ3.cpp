@@ -1286,6 +1286,9 @@ bool CMZ3App::MyLuaInit(void)
 		m_luaState = NULL;
 	}
 
+	// Lua ŠÖ˜Aƒƒ“ƒo[•Ï”‚Ì‰Šú‰»
+	m_luaParsers.clear();
+
 	// Lua ‚Ì‰Šú‰»
 	m_luaState = lua_open();
 

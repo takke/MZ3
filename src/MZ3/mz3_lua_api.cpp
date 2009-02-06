@@ -103,6 +103,21 @@ int lua_mz3_estimate_access_type_by_url(lua_State *L)
 	return 1;
 }
 
+// MZ3 API : mz3.set_parser(type, parser)
+int lua_mz3_set_parser(lua_State *L)
+{
+	const char* szType = lua_tostring(L, 1);			// 第1引数:シリアライズキー
+	const char* szParserName = lua_tostring(L, 2);		// 第2引数:パーサ名
+
+	theApp.m_luaParsers[ szType ] = szParserName;
+
+	MZ3LOGGER_DEBUG(util::FormatString(L"Registered new parser [%s] for [%s].", 
+						CString(szParserName), CString(szType)));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 //-----------------------------------------------
 // MZ3 Data API
 //-----------------------------------------------
@@ -229,6 +244,19 @@ int lua_mz3_data_parse_date_line(lua_State *L)
 // MZ3 Data List API
 //-----------------------------------------------
 
+// MZ3 API : mz3_data_list.clear(data_list, data)
+int lua_mz3_data_list_clear(lua_State *L)
+{
+	// 引数取得
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// 第1引数
+
+	// 登録
+	data_list->clear();
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 // MZ3 API : mz3_data_list.add(data_list, data)
 int lua_mz3_data_list_add(lua_State *L)
 {
@@ -298,6 +326,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_tick_count",	lua_mz3_get_tick_count},
 	{"decode_html_entity", lua_mz3_decode_html_entity},
 	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
+	{"set_parser",		lua_mz3_set_parser},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -312,6 +341,7 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_list_lib[] = {
+	{"clear",			lua_mz3_data_list_clear},
 	{"add",				lua_mz3_data_list_add},
 	{"insert",			lua_mz3_data_list_insert},
 	{NULL, NULL}

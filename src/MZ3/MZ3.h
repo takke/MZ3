@@ -182,6 +182,10 @@ public:
 	ULONG_PTR			gdiToken;
 #endif
 
+	//--- MZ3 Script 関連
+public:
+	std::map<std::string, std::string> m_luaParsers;	///< シリアライズキー → パーサ名
+
 public:
 	void ChangeView(CView*);
 	CString GetAppDirPath();
@@ -210,6 +214,8 @@ public:
 	int pt2px(int pt);
 	int AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& srcImage, const CString& strImagePath);
 	CString MakeMZ3RegularVersion(CString strVersion);
+
+	//--- MZ3 Script 関連
 	bool MyLuaInit(void);
 	bool MyLuaClose(void);
 	bool MyLuaExecute(LPCTSTR szLuaStatement);

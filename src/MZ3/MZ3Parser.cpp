@@ -77,6 +77,22 @@ static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserF
 /// リスト系HTMLの解析
 bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
 {
+	// MZ3 Script 用パーサがあれば利用する
+	const char* szSerializeKey = theApp.m_accessTypeInfo.getSerializeKey(aType);
+	if (theApp.m_luaParsers.count(szSerializeKey)!=0) {
+		CStringA strParserName = theApp.m_luaParsers[szSerializeKey].c_str();
+
+		// パーサ名をテーブルと関数名に分離する
+		int idx = strParserName.Find('.');
+		if (idx>0) {
+			CStringA strTable = strParserName.Left(idx);
+			CStringA strFuncName = strParserName.Mid(idx+1);
+//			printf("parser : [%s], [%s]\n", strTable, strFuncName);
+			return CallMZ3ScriptParser(strTable, strFuncName, parent, body, html);
+		}
+	}
+
+
 	// リストの初期化
 	switch (aType) {
 	case ACCESS_TWITTER_FRIENDS_TIMELINE:
@@ -93,13 +109,11 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
 
-	case ACCESS_LIST_NEW_BBS:
+//	case ACCESS_LIST_NEW_BBS:
 //		return mixi::NewBbsParser::parse( body, html );
-		return CallMZ3ScriptParser("mixi", "bbs_parser", parent, body, html);
 
-	case ACCESS_LIST_NEW_BBS_COMMENT:
+//	case ACCESS_LIST_NEW_BBS_COMMENT:
 //		return mixi::ListNewBbsCommentParser::parse( body, html );
-		return CallMZ3ScriptParser("mixi", "bbs_parser", parent, body, html);
 
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );

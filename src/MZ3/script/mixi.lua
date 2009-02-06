@@ -86,6 +86,9 @@ end
 function bbs_parser(parent, body, html)
 	mz3.logger_debug("bbs_parser start");
 	
+	-- ‘SÁ‹
+	mz3_data_list.clear(body);
+	
 	local t1 = mz3.get_tick_count();
 	local in_data_region = false;
 	
@@ -197,6 +200,7 @@ end
 ----------------------------------------
 
 -- ƒRƒ~ƒ…‘ˆê——
---mz3.set_parser("mixi", "BBS", bbs_parser);
+mz3.set_parser("BBS", "mixi.bbs_parser");
+mz3.set_parser("NEW_BBS_COMMENT", "mixi.bbs_parser");
 
 --mz3.set_hook("mixi", "after_parse", after_parse);
