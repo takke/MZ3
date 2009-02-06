@@ -111,8 +111,8 @@ int lua_mz3_set_parser(lua_State *L)
 
 	theApp.m_luaParsers[ szType ] = szParserName;
 
-	MZ3LOGGER_DEBUG(util::FormatString(L"Registered new parser [%s] for [%s].", 
-						CString(szParserName), CString(szType)));
+//	MZ3LOGGER_DEBUG(util::FormatString(L"Registered new parser [%s] for [%s].", 
+//						CString(szParserName), CString(szType)));
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 0;

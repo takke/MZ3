@@ -140,15 +140,6 @@ BOOL CMZ3App::InitInstance()
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" 起動開始 " + util::GetSourceRevision() );
 	MZ3_TRACE(L" sizeof MZ3Data : %d bytes\n", sizeof(MZ3Data));
 
-	//-----------------------------------------------
-	// lua support
-	//-----------------------------------------------
-	// Lua の初期化
-	MyLuaInit();
-
-//	exit(0);
-	// lua support exp.
-
 	// オプション読み込み
 	m_optionMng.Load();
 
@@ -294,6 +285,12 @@ BOOL CMZ3App::InitInstance()
 
 	// 画像キャッシュの初期化
 	m_imageCache.Create();
+
+	//-----------------------------------------------
+	// lua support
+	//-----------------------------------------------
+	// Lua の初期化
+	MyLuaInit();
 
 	// トップページ用の初期化
 	MZ3LOGGER_INFO( L"タブ設定ファイル読み込み開始" );
@@ -1276,6 +1273,26 @@ CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
 }
 
 /**
+ * Lua スクリプトのロード＆実行用コールバック関数
+ */
+static int LuaLoadCallback(const TCHAR* szDirectory,
+						   const WIN32_FIND_DATA* data,
+						   void* pData)
+{
+	std::basic_string< TCHAR > strFile = szDirectory + std::basic_string< TCHAR >(data->cFileName);
+
+	CString path = &strFile[0];
+	int r = luaL_dofile(theApp.m_luaState, CStringA(path));
+	theApp.MyLuaErrorReport(r);
+	if (r!=0) {
+		MZ3LOGGER_FATAL(util::FormatString(L"スクリプトを読み込めません[%s] [%d]", path, r));
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+/**
  * Lua 初期化処理(スクリプトロード)
  */
 bool CMZ3App::MyLuaInit(void)
@@ -1304,36 +1321,50 @@ bool CMZ3App::MyLuaInit(void)
 //	r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化開始');");
 //	MyLuaErrorReport(r);
 
-	// スクリプト用ディレクトリパス作成
-	CString script_dir;
-	script_dir.Format( L"%s\\script", theApp.GetAppDirPath() );
+	// ディレクトリパス作成
+	CString script_dir, plugin_dir, user_script_dir;
+
+	script_dir.Format( L"%s\\scripts", theApp.GetAppDirPath() );
 	if (!util::ExistFile(script_dir)) {
 		// 開発環境用パス
-		script_dir.Format( L"%s\\..\\script", theApp.GetAppDirPath() );
+		script_dir.Format( L"%s\\..\\scripts", theApp.GetAppDirPath() );
 	}
 
-	// スクリプト用ディレクトリのLuaへの登録
+	plugin_dir.Format( L"%s\\plugins", theApp.GetAppDirPath() );
+	if (!util::ExistFile(plugin_dir)) {
+		// 開発環境用パス
+		plugin_dir.Format( L"%s\\..\\plugins", theApp.GetAppDirPath() );
+	}
+
+	user_script_dir.Format( L"%s\\user_scripts", theApp.GetAppDirPath() );
+	if (!util::ExistFile(user_script_dir)) {
+		// 開発環境用パス
+		user_script_dir.Format( L"%s\\..\\user_scripts", theApp.GetAppDirPath() );
+	}
+
+	// ディレクトリパスのLuaへの登録
 	lua_pushstring(L, CStringA(script_dir));
 	lua_setglobal(L, "mz3_script_dir");
+	lua_pushstring(L, CStringA(plugin_dir));
+	lua_setglobal(L, "mz3_plugin_dir");
+	lua_pushstring(L, CStringA(user_script_dir));
+	lua_setglobal(L, "mz3_user_script_dir");
 
-	// Lua スクリプトのロード
+	// Lua スクリプトのロード＆実行
 	CString path = script_dir + L"\\mz3.lua";
-
 	if (!util::ExistFile(path)) {
-		MZ3LOGGER_FATAL(L"Lua 基本ライブラリを読み込めません");
+		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトが見つかりません[%s]", path));
+		return false;
 	}
-
 	r = luaL_dofile(L, CStringA(path));
 	MyLuaErrorReport(r);
 	if (r!=0) {
-		MZ3LOGGER_FATAL(util::FormatString(L"Lua 基本ライブラリを読み込めません[%s] [%d]", path, r));
+		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトを読み込めません[%s] [%d]", path, r));
 	}
 
-//	r = luaL_dostring(L, "mz3.hoge();");
-//	MyLuaErrorReport(r);
-
-//	r = luaL_dostring(L, "mz3.logger_info('Lua Start : Lua初期化終了');");
-//	MyLuaErrorReport(r);
+	// plugin, user_script フォルダ配下の全Luaファイルのロード＆実行
+	util::FindFileCallback(plugin_dir + L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
+	util::FindFileCallback(user_script_dir + L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
 
 	return true;
 }
