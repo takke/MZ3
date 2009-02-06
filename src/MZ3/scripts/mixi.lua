@@ -56,13 +56,17 @@ end
 require("scripts\\mixi\\mixi_new_bbs_parser");
 
 ----------------------------------------
--- フック関数の登録
+-- パーサの登録
 ----------------------------------------
-
--- コミュ書込一覧
-mz3.set_parser("BBS", "mixi.new_bbs_parser");
+-- コミュニティ最新書き込み一覧
+mz3.set_parser("BBS",             "mixi.new_bbs_parser");
+-- コミュニティコメント記入履歴
 mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 
+
+----------------------------------------
+-- イベントフック関数の登録
+----------------------------------------
 --mz3.set_hook("mixi", "after_parse", after_parse);
 
 mz3.logger_debug('mixi.lua end');
