@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
+				PreprocessorDefinitions="_DEBUG"
 				Culture="1041"
 				AdditionalIncludeDirectories="$(IntDir)"
 			/>
