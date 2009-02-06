@@ -33,6 +33,47 @@ static void my_lua_printstack( lua_State *L )
 /// MZ3用HTMLパーサ
 namespace parser {
 
+static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserFuncName, 
+								CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
+{
+	// 引数として parent, body, html を渡す
+
+	// スタックのサイズを覚えておく
+	lua_State* L = theApp.m_luaState;
+	int top = lua_gettop(L);
+
+	// Lua関数名("mixi.bbs_parser")を積む
+	lua_getglobal(L, szServiceType);		// szServiceType テーブルをスタックに積む
+	//my_lua_printstack(L);
+	lua_pushstring(L, szParserFuncName);	// 対象変数(関数名)をテーブルに積む
+	//my_lua_printstack(L);
+	lua_gettable(L, -2);					// スタックの2番目の要素("mixi"テーブル)から、
+											// テーブルトップの文字列("bbs_parser")で示されるメンバを
+											// スタックに積む
+	//my_lua_printstack(L);
+
+	// 引数を積む
+	lua_pushlightuserdata(L, &parent);
+	lua_pushlightuserdata(L, &body);
+	lua_pushlightuserdata(L, &html);
+
+	// 関数実行
+	int n_arg = 3;
+	int n_ret = 1;
+	int status = lua_pcall(L, n_arg, n_ret, 0);
+
+	if (status != 0) {
+		// TODO エラー処理
+		theApp.MyLuaErrorReport(status);
+		return false;
+	} else {
+		// 返り値取得
+		int result = lua_toboolean(L, -1);
+	}
+	lua_settop(L, top);
+	return true;
+}
+
 /// リスト系HTMLの解析
 bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
 {
@@ -54,45 +95,11 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 
 	case ACCESS_LIST_NEW_BBS:
 //		return mixi::NewBbsParser::parse( body, html );
+		return CallMZ3ScriptParser("mixi", "bbs_parser", parent, body, html);
+
 	case ACCESS_LIST_NEW_BBS_COMMENT:
 //		return mixi::ListNewBbsCommentParser::parse( body, html );
-		{
-			// 引数として parent, body, html を渡す
-
-			// スタックのサイズを覚えておく
-			lua_State* L = theApp.m_luaState;
-			int top = lua_gettop(L);
-
-			// Lua関数名("mixi.bbs_parser")を積む
-			lua_getglobal(L, "mixi");				// "mixi" テーブルをスタックに積む
-			//my_lua_printstack(L);
-			lua_pushstring(L, "bbs_parser");		// 対象変数(関数名)をテーブルに積む
-			//my_lua_printstack(L);
-			lua_gettable(L, -2);					// スタックの2番目の要素("mixi"テーブル)から、
-													// テーブルトップの文字列("bbs_parser")で示されるメンバを
-													// スタックに積む
-			//my_lua_printstack(L);
-
-			// 引数を積む
-			lua_pushlightuserdata(L, &parent);
-			lua_pushlightuserdata(L, &body);
-			lua_pushlightuserdata(L, &html);
-
-			// 関数実行
-			int n_arg = 3;
-			int n_ret = 1;
-			int status = lua_pcall(L, n_arg, n_ret, 0);
-
-			if (status != 0) {
-				// TODO エラー処理
-				theApp.MyLuaErrorReport(status);
-			} else {
-				// 返り値取得
-				bool result = lua_toboolean(L, -1);
-				lua_settop(L, top);
-			}
-		}
-		return true;
+		return CallMZ3ScriptParser("mixi", "bbs_parser", parent, body, html);
 
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
