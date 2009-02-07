@@ -1202,6 +1202,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 		switch (pMsg->wParam) {
 		case VK_F1:
 #ifdef WINCE
+/*
 			if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 				// メインメニューのポップアップ
 				RECT rect;
@@ -1222,19 +1223,26 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 				menu.Detach();
 				return TRUE;
 			}
+*/
 #else
 			// ヘルプ表示
 			util::OpenByShellExecute( MZ4_MANUAL_URL );
 #endif
 			break;
 
+/*
+#ifdef WINCE
 		case VK_F2:
-		case VK_F10:
-#ifndef WINCE
-		case VK_APPS:
-#endif
 			PopupWriteBodyMenu();
 			break;
+#endif
+*/
+
+#ifndef WINCE
+		case VK_APPS:
+			PopupWriteBodyMenu();
+			break;
+#endif
 
 		case VK_BACK:
 #ifndef WINCE
@@ -1537,8 +1545,8 @@ void CWriteView::OnInsertEmoji(UINT nID)
  */
 void CWriteView::PopupWriteBodyMenu(void)
 {
-	POINT pt    = util::GetPopupPos();
-	int   flags = util::GetPopupFlags();
+	POINT pt    = util::GetPopupPosForSoftKeyMenu2();
+	int   flags = util::GetPopupFlagsForSoftKeyMenu2();
 
 	CImageList* pGlobalImageList = &theApp.m_imageCache.GetImageList16();
 

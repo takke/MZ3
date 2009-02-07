@@ -39,6 +39,11 @@ public:  // コントロール バー用メンバ
 	CToolBar    m_wndToolBar;
 #endif
 
+#ifdef WINCE
+	HWND		m_hwndMenuBar;
+	HMENU		m_hMenu;
+#endif
+
 	// 生成された、メッセージ割り当て関数
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

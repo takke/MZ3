@@ -155,6 +155,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "終了",                          ID_MENU_CLOSE
     END
+    MENUITEM "アクション",                       ID_MENU_ACTION
 END
 
 IDR_BODY_MENU MENU 

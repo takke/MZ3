@@ -571,7 +571,7 @@ BOOL CDownloadView::OnKeyUp(MSG* pMsg)
 	switch (pMsg->wParam) {
 	case VK_F1:
 #ifdef WINCE
-		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+/*		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
 			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
@@ -592,6 +592,7 @@ BOOL CDownloadView::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
+*/
 #else
 		// ヘルプ表示
 		util::OpenByShellExecute( MZ4_MANUAL_URL );

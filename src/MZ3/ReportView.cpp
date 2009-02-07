@@ -847,7 +847,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 	switch (pMsg->wParam) {
 	case VK_F1:
 #ifdef WINCE
-		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+/*		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
 			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
@@ -868,19 +868,28 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
+*/
 #else
 		// ヘルプ表示
 		util::OpenByShellExecute( MZ4_MANUAL_URL );
 #endif
 		break;
 
+/*
+#ifdef WINCE
 	case VK_F2:
-#ifndef WINCE
-	case VK_APPS:
-#endif
 		// レポートメニューの表示
 		MyPopupReportMenu();
 		return TRUE;
+#endif
+*/
+
+#ifndef WINCE
+	case VK_APPS:
+		// レポートメニューの表示
+		MyPopupReportMenu();
+		return TRUE;
+#endif
 
 	case VK_BACK:				// クリアボタン
 	case VK_ESCAPE:
@@ -2230,8 +2239,8 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	int   flags = flags_;
 
 	if (pt.x==0 && pt.y==0) {
-		pt = util::GetPopupPos();
-		flags = util::GetPopupFlags();
+		pt = util::GetPopupPosForSoftKeyMenu2();
+		flags = util::GetPopupFlagsForSoftKeyMenu2();
 	}
 
 	CMenu menu;

@@ -58,6 +58,7 @@ public:
 #endif
 
 	bool			m_bConfirmOpenURL;			///< URLを開くときに確認する
+	bool			m_bUseClassicToolBar;		///< WM 版で v0.9 以前のツールバーを表示するか
 //	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
@@ -166,6 +167,7 @@ public:
 		, m_reportScrollType( REPORT_SCROLL_TYPE_LINE )
 		, m_reportScrollLine( 7 )
 		, m_bConfirmOpenURL( true )
+		, m_bUseClassicToolBar( false )
 /*
 #ifdef WINCE
 		, m_bConvertUrlForMixiMobile( true )

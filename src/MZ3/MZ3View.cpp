@@ -1658,7 +1658,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	switch (pMsg->wParam) {
 	case VK_F1:
 #ifdef WINCE
-		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
+/*		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
 			// メインメニューのポップアップ
 			RECT rect;
 			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
@@ -1678,19 +1678,27 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 			menu.Detach();
 			return TRUE;
 		}
+*/
 #else
 		// ヘルプ表示
 		util::OpenByShellExecute( MZ4_MANUAL_URL );
 #endif
 		break;
+
+/*
 #ifdef WINCE
 	case VK_F2:
-#endif
-#ifndef WINCE
-	case VK_APPS:
-#endif
 		OnAcceleratorContextMenu();
 		return TRUE;
+#endif
+*/
+
+#ifndef WINCE
+	case VK_APPS:
+		OnAcceleratorContextMenu();
+		return TRUE;
+#endif
+
 	case VK_BACK:
 #ifndef WINCE
 	case VK_ESCAPE:
@@ -3618,8 +3626,8 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	int   flags = flags_;
 
 	if (pt.x==0 && pt.y==0) {
-		pt = util::GetPopupPos();
-		flags = util::GetPopupFlags();
+		pt = util::GetPopupPosForSoftKeyMenu2();
+		flags = util::GetPopupFlagsForSoftKeyMenu2();
 	}
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
@@ -4508,8 +4516,8 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	int   flags = flags_;
 
 	if (pt.x==0 && pt.y==0) {
-		pt = util::GetPopupPos();
-		flags = util::GetPopupFlags();
+		pt = util::GetPopupPosForSoftKeyMenu2();
+		flags = util::GetPopupFlagsForSoftKeyMenu2();
 	}
 
 	CMenu menu;

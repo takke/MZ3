@@ -96,6 +96,7 @@ END_MESSAGE_MAP()
 // コンストラクタ
 // -----------------------------------------------------------------------------
 CMainFrame::CMainFrame()
+	: m_hMenu(NULL)
 {
 
 }
@@ -141,22 +142,27 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_wndCommandBar.SetBarStyle(m_wndCommandBar.GetBarStyle() | CBRS_SIZE_FIXED);
 	}
 
-	if( theApp.m_bSmartphone ) {
-		// Smartphone/Standard Edition の場合はメニューバーを作成する
+	// Smartphone/Standard Edition またはクラシック表示設定以外の場合はメニューバーを作成する
+	if (theApp.m_bSmartphone || theApp.m_optionMng.m_bUseClassicToolBar==false) {
+
+		m_hMenu = LoadMenu(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
+
 		SHMENUBARINFO mbi;
 
 		memset(&mbi, 0, sizeof(SHMENUBARINFO));
 		mbi.cbSize = sizeof(SHMENUBARINFO);
 		mbi.hwndParent = m_hWnd;
-		mbi.nToolBarId = IDR_MAINFRAME;
+		mbi.dwFlags = SHCMBF_HMENU;
+//		mbi.nToolBarId = IDR_MAINFRAME;
+		mbi.nToolBarId = (UINT)m_hMenu;
 		mbi.hInstRes = AfxGetInstanceHandle();
-		mbi.nBmpId = 0;
-		mbi.cBmpImages = 0;
+//		mbi.nBmpId = 0;
+//		mbi.cBmpImages = 0;
 
 		if (SHCreateMenuBar(&mbi)==FALSE) {
 			MZ3LOGGER_FATAL(L"Couldn't create menu bar");
 		}
-		HWND hwndMenuBar = mbi.hwndMB;
+		m_hwndMenuBar = mbi.hwndMB;
 	}
 #endif
 
@@ -1059,6 +1065,32 @@ void CMainFrame::OnOpenMixiMobileByBrowser()
  */
 void CMainFrame::OnMenuAction()
 {
+	CView* pActiveView = GetActiveView();
+
+	if (pActiveView == theApp.m_pMainView) {
+		// メインビュー
+		theApp.m_pMainView->OnAcceleratorContextMenu();
+		return;
+	}
+
+	if (pActiveView == theApp.m_pReportView) {
+		// レポートビュー
+		theApp.m_pReportView->MyPopupReportMenu();
+		return;
+	}
+
+	if (pActiveView == theApp.m_pWriteView) {
+		// Write ビュー
+		theApp.m_pWriteView->PopupWriteBodyMenu();
+		return;
+	}
+
+	if (pActiveView == theApp.m_pDownloadView) {
+		// ダウンロードビュー
+		// 処理なし
+		return;
+	}
+
 }
 
 void CMainFrame::OnDestroy()
@@ -1080,6 +1112,11 @@ void CMainFrame::OnDestroy()
 		theApp.m_optionMng.m_strWindowPos = cb;
 	}
 #endif
+
+	// メニューの破棄
+	if (m_hMenu!=NULL) {
+		DestroyMenu(m_hMenu);
+	}
 }
 
 BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
