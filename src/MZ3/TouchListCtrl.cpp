@@ -37,6 +37,7 @@ CTouchListCtrl::CTouchListCtrl(void)
 	, m_drPanScrollDirection( PAN_SCROLL_DIRECTION_NONE )
 	, m_bCanPanScroll(false)
 	, m_hPanScrollEvent(NULL)
+	, m_bStopDragging(false)
 {
 	// イベントオブジェクト作成
 	m_hPanScrollEvent = CreateEvent( NULL , TRUE , TRUE , NULL );
@@ -104,6 +105,10 @@ BOOL CTouchListCtrl::PreTranslateMessage(MSG* pMsg)
  */
 void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (!m_bDragging && m_bStopDragging) {
+		return;
+	}
+
 	MZ3_TRACE( L"OnLButtonDown()\n");
 
 	// フォーカスを設定する
@@ -171,6 +176,10 @@ void CTouchListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
  */
 void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	if (!m_bDragging && m_bStopDragging) {
+		return;
+	}
+
 	MZ3_TRACE( L"OnLButtonUp(0x%X,%d,%d)\n", nFlags, point.x, point.y);
 	int dx = point.x - m_ptDragStart.x;
 	int dy = point.y - m_ptDragStart.y;
@@ -254,6 +263,10 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
  */
 void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
+	if (!m_bDragging && m_bStopDragging) {
+		return;
+	}
+
 	int dx = point.x - m_ptDragStart.x;
 	int dy = point.y - m_ptDragStart.y;
 

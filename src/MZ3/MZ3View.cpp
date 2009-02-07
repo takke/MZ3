@@ -38,6 +38,7 @@
 #endif
 
 #define TIMERID_INTERVAL_CHECK	101
+#define SPLITTER_HEIGHT			10
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
 LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
@@ -177,14 +178,13 @@ CMZ3View::CMZ3View()
 	, m_bRetryReloadGroupTabByThread(false)
 	, m_pCategorySubMenuList(NULL)
 	, m_bImeCompositioning(false)
+	, m_bDragging(false)
+	, m_preCategory(0)
+	, m_selGroup(NULL)
+	, m_hotList(NULL)
+	, m_bModifyingBodyList(false)
+	, m_abort(FALSE)
 {
-	m_preCategory = 0;
-	m_selGroup = NULL;
-
-	m_hotList = NULL;
-
-	m_bModifyingBodyList = false;
-	m_abort = FALSE;
 }
 
 /**
@@ -635,7 +635,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
 	y += hGroup;
 
-	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory );
+	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory+1 );
 	y += hCategory;
 
 	util::MoveDlgItemWindow( this, IDC_BODY_LIST,   0, y, cx, hBody     );
@@ -1862,12 +1862,23 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 	case WM_RBUTTONDOWN:
 		OnRButtonDown( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
+
 	case WM_RBUTTONUP:
 		OnRButtonUp( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
+
+	case WM_LBUTTONDOWN:
+		OnLButtonDown( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
+
+	case WM_LBUTTONUP:
+		OnLButtonUp( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
+		break;
+
 	case WM_MOUSEWHEEL:
 		OnMouseWheel( LOWORD(pMsg->wParam), HIWORD(pMsg->wParam), CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
+
 	case WM_MOUSEMOVE:
 		OnMouseMove( pMsg->wParam, CPoint(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam)) );
 		break;
@@ -6272,6 +6283,115 @@ void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
 }
 
 /**
+ * 左ボタン押下
+ */
+void CMZ3View::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	{
+		CRect r;
+		m_categoryList.GetWindowRect(&r);
+
+		CPoint pt;
+		GetCursorPos(&pt);
+
+		int dy = pt.y-r.bottom;
+		if (abs(dy)<SPLITTER_HEIGHT) {
+			MZ3LOGGER_INFO(L"ドラッグ開始");
+
+			// カーソル変更
+			SetCursor(LoadCursor(NULL, IDC_SIZENS));
+
+			// ドラッグ開始
+			m_bDragging = true;
+			m_ptDragStart = pt;
+
+			// 子ウィンドウのドラッグ操作停止
+			m_categoryList.m_bStopDragging = true;
+			m_bodyList.m_bStopDragging = true;
+
+			// キャプチャ開始
+			SetCapture();
+
+			return;
+		}
+	}
+	CFormView::OnLButtonDown(nFlags, point);
+}
+
+/**
+ * 左ボタンリリース
+ */
+void CMZ3View::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (m_bDragging) {
+		{
+			// スプリッター変更
+			int& h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+			int& h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
+
+			// オプション値を % に補正
+			int sum = h1 + h2;
+			if (sum>0) {
+				h1 = (int)(h1 * 100.0 / sum);
+				h2 = (int)(h2 * 100.0 / sum);
+				sum = h1 + h2;
+			}
+
+			CRect rw;
+			GetWindowRect(&rw);
+			int cy = rw.Height();
+
+			CPoint pt;
+			GetCursorPos(&pt);
+
+			int dy = pt.y - m_ptDragStart.y +3;
+
+			int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
+			int hGroup    = theApp.GetTabHeight(fontHeight);
+			int hCategory = (cy * h1 / sum) - (hGroup -1);
+			int mh1 = (int)(sum/(double)cy * (hCategory + dy +hGroup -1) - h1);
+			MZ3LOGGER_DEBUG(util::FormatString(L"mh1 : %d  dy : %d", mh1, dy));
+
+			h1 += mh1;
+			h2 -= mh1;
+
+			// 正規化
+			if (h1 < N_HC_MIN || h2 > N_HB_MAX) {
+				// 最小値に設定
+				h1 = N_HC_MIN;
+				h2 = N_HB_MAX;
+			}
+			if (h1 > N_HC_MAX || h2 < N_HB_MIN) {
+				// 最小値に設定
+				h1 = N_HC_MAX;
+				h2 = N_HB_MIN;
+			}
+
+			// 再描画
+			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+			pMainFrame->ChangeAllViewFont();
+		}
+
+		// ドラッグ終了処理
+		MZ3LOGGER_INFO(L"ドラッグ終了");
+
+		// キャプチャ終了
+		ReleaseCapture();
+
+		// マウスカーソルを元に戻す
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+
+		// フラグクリア
+		m_bDragging = false;
+
+		// 子ウィンドウのドラッグ操作再開
+		m_categoryList.m_bStopDragging = false;
+		m_bodyList.m_bStopDragging = false;
+	}
+	CFormView::OnLButtonUp(nFlags, point);
+}
+
+/**
  * マウス移動
  */
 void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
@@ -6279,8 +6399,26 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
 //	MZ3_TRACE( L"CMZ3View::OnMouseMove\n" );
 
 #ifndef WINCE
+	// MZ4 Only
+
+	// スプリッタ
+	{
+		CRect r;
+		m_categoryList.GetWindowRect(&r);
+
+		CPoint pt;
+		GetCursorPos(&pt);
+
+		int dy = pt.y-r.bottom;
+		if (m_bDragging || (dy < 0 && dy>-SPLITTER_HEIGHT)) {
+			SetCursor(LoadCursor(NULL, IDC_SIZENS));
+		} else {
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
+		}
+	}
+
+	// ジェスチャ
 	if (theApp.m_pMouseGestureManager->IsGestureMode()) {
-		// MZ4 Only
 
 		// 閾値以上移動していれば処理実行
 		const CPoint ptLastCmd = theApp.m_pMouseGestureManager->m_posLastCmd;

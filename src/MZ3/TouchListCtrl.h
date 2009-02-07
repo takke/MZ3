@@ -50,6 +50,9 @@ public:
 	};
 	void	StartPanScroll( PAN_SCROLL_DIRECTION direction );
 	BOOL	WaitForPanScroll( DWORD dwMilliseconds );
+
+	bool	m_bStopDragging;		///< ドラッグ操作停止
+
 protected:
 	int		m_offsetPixelY;			///< ピクセル単位スクロールのオフセットピクセル数
 

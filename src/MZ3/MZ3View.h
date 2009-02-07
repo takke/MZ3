@@ -171,6 +171,8 @@ private:
 	CMenu*			m_pCategorySubMenuList;		///< カテゴリ用メニュー
 	bool			m_bImeCompositioning;		///< IME変換中フラグ
 
+	bool	m_bDragging;			///< マウスドラッグ中
+	CPoint	m_ptDragStart;			///< ドラッグ開始位置
 
 public: // シリアル化からのみ作成します。
 	CMZ3View();
@@ -283,6 +285,8 @@ public:
 	afx_msg void OnTabmenuAdd();
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMenuTwitterNewDm();
 	afx_msg void OnMenuTwitterCreateFavourings();
 	afx_msg void OnMenuTwitterDestroyFavourings();
