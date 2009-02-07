@@ -103,13 +103,28 @@ int lua_mz3_estimate_access_type_by_url(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3.set_parser(type, parser)
+// MZ3 API : mz3.get_access_type_by_key(key)
+int lua_mz3_get_access_type_by_key(lua_State *L)
+{
+	const char* key = lua_tostring(L, 1);			// 第1引数
+
+	// 変換
+	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessKeyBySerializeKey(key);
+
+	// 結果をスタックに戻す
+	lua_pushinteger(L, (int)type);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+// MZ3 API : mz3.set_parser(key, parser)
 int lua_mz3_set_parser(lua_State *L)
 {
-	const char* szType = lua_tostring(L, 1);			// 第1引数:シリアライズキー
+	const char* szKey = lua_tostring(L, 1);			// 第1引数:シリアライズキー
 	const char* szParserName = lua_tostring(L, 2);		// 第2引数:パーサ名
 
-	theApp.m_luaParsers[ szType ] = szParserName;
+	theApp.m_luaParsers[ szKey ] = szParserName;
 
 //	MZ3LOGGER_DEBUG(util::FormatString(L"Registered new parser [%s] for [%s].", 
 //						CString(szParserName), CString(szType)));

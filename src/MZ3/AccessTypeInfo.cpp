@@ -15,6 +15,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- グループ系
+	//------------------------------------------------------------------
 	type = ACCESS_GROUP_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP
@@ -71,6 +72,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,リスト系
+	//------------------------------------------------------------------
 	type = ACCESS_LIST_INTRO;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -385,6 +387,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,一般
+	//------------------------------------------------------------------
 	type = ACCESS_LOGIN;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
@@ -577,6 +580,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系
+	//------------------------------------------------------------------
 	type = ACCESS_POST_COMMENT_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
@@ -659,6 +663,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- Twitter 系
+	//------------------------------------------------------------------
 	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -789,6 +794,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- mixi echo 関連
+	//------------------------------------------------------------------
 	type = ACCESS_MIXI_RECENT_ECHO;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -828,6 +834,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- Wassr 系
+	//------------------------------------------------------------------
 	type = ACCESS_WASSR_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -860,6 +867,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- gooホーム 系
+	//------------------------------------------------------------------
 	type = ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -889,9 +897,20 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
 
+	type = ACCESS_GOOHOME_USER;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "gooHome"
+		, L"ひとこと発言"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].serializeKey = "GOOHOME_USER";
+	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
+
 
 	//------------------------------------------------------------------
 	//--- RSS Reader
+	//------------------------------------------------------------------
 	type = ACCESS_RSS_READER_FEED;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -934,6 +953,7 @@ bool AccessTypeInfo::init()
 
 	//------------------------------------------------------------------
 	//--- その他
+	//------------------------------------------------------------------
 	type = ACCESS_INVALID;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_INVALID
@@ -954,9 +974,26 @@ bool AccessTypeInfo::init()
 	m_map[type].cacheFilePattern = L"mz3.jp\\latest_version.xml";
 	m_map[type].defaultCategoryURL = L"http://mz3.jp/latest_version.xml";
 
-	// TODO 必須項目のテスト
 
+	//------------------------------------------------------------------
+	// シリアライズキー → アクセス種別マップ の構築
+	//------------------------------------------------------------------
+	m_serializeKeyToAccessKeyMap.clear();
+	for (ACCESS_TYPE_TO_DATA_MAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
+		ACCESS_TYPE accessType = it->first;
+		std::string serializeKey = it->second.serializeKey;
+		if (!serializeKey.empty()) {
+			m_serializeKeyToAccessKeyMap[ serializeKey ] = accessType;
+		}
+	}
+
+	//------------------------------------------------------------------
+	// TODO 必須項目のテスト
+	//------------------------------------------------------------------
+
+	//------------------------------------------------------------------
 	// Debug モードのとき CSV ダンプする
+	//------------------------------------------------------------------
 #if defined(_DEBUG) && !defined(WINCE)
 	CString tsv_dump_filepath;
 	{
@@ -973,7 +1010,7 @@ bool AccessTypeInfo::init()
 		fwprintf(fp_tsv, L"ACCESS_TYPE,infoType,serviceType,shortText,requestType,requestEncoding,cacheFilePattern,"
 						 L"serializeKey,bCruiseTarget,defaultCategoryURL,bodyHeaderCol1,,bodyHeaderCol2,,bodyHeaderCol3,,"
 						 L"bodyIntegratedLinePattern1,bodyIntegratedLinePattern2\n");
-		for (MYMAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
+		for (ACCESS_TYPE_TO_DATA_MAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
 			const ACCESS_TYPE& accessType = it->first;
 			const Data& data = it->second;
 

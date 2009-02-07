@@ -9,6 +9,7 @@
 #include "constants.h"
 #include <map>
 #include <vector>
+#include <string>
 
 /**
  * アクセス種別に対するMZ3/4の振る舞いを管理するクラス
@@ -180,16 +181,30 @@ public:
 		{}
 	};
 
-	typedef std::map<ACCESS_TYPE, Data> MYMAP;
-	MYMAP m_map;
+	// アクセス種別 → データマップ
+	typedef std::map<ACCESS_TYPE, Data> ACCESS_TYPE_TO_DATA_MAP;
+	ACCESS_TYPE_TO_DATA_MAP m_map;
+
+	// シリアライズキー → アクセス種別マップ
+	typedef std::map<std::string, ACCESS_TYPE> SERIALIZE_KEY_TO_ACCESS_TYPE_MAP;
+	SERIALIZE_KEY_TO_ACCESS_TYPE_MAP m_serializeKeyToAccessKeyMap;
 
 public:
 	bool init();
 
+	/// シリアライズキーからアクセス種別を取得する
+	ACCESS_TYPE getAccessKeyBySerializeKey(const std::string& key) {
+		SERIALIZE_KEY_TO_ACCESS_TYPE_MAP::iterator it = m_serializeKeyToAccessKeyMap.find(key);
+		if (it==m_serializeKeyToAccessKeyMap.end()) {
+			return ACCESS_INVALID;
+		}
+		return it->second;
+	}
+
 	/// カテゴリ系種別一覧の生成
 	std::vector<ACCESS_TYPE> getCategoryTypeList() {
 		std::vector<ACCESS_TYPE> types;
-		for (MYMAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
+		for (ACCESS_TYPE_TO_DATA_MAP::iterator it=m_map.begin(); it!=m_map.end(); it++) {
 			if (it->second.infoType==INFO_TYPE_CATEGORY) {
 				types.push_back(it->first);
 			}
@@ -199,7 +214,7 @@ public:
 
 	/// データ種別
 	INFO_TYPE getInfoType( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return INFO_TYPE_INVALID;
 		}
@@ -208,7 +223,7 @@ public:
 
 	/// サービス種別の取得
 	std::string getServiceType( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return "";
 		}
@@ -217,7 +232,7 @@ public:
 
 	/// リクエスト種別の取得
 	REQUEST_METHOD getRequestMethod( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return REQUEST_METHOD_INVALID;
 		}
@@ -226,7 +241,7 @@ public:
 
 	/// 説明文字列の取得
 	const wchar_t* getShortText( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"<unknown>";
 		}
@@ -235,7 +250,7 @@ public:
 
 	/// シリアライズキーの取得
 	const char* getSerializeKey( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return "";
 		}
@@ -244,7 +259,7 @@ public:
 
 	/// 巡回対象とするか？（巡回予約可能か？）
 	const bool isCruiseTarget( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return false;
 		}
@@ -253,7 +268,7 @@ public:
 
 	/// ボディリストのヘッダー1のカラム名
 	const wchar_t* getBodyHeaderCol1Name( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -262,7 +277,7 @@ public:
 
 	/// ボディリストのヘッダー2のカラム名
 	const wchar_t* getBodyHeaderCol2Name( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -271,7 +286,7 @@ public:
 
 	/// ボディリストのヘッダー3のカラム名
 	const wchar_t* getBodyHeaderCol3Name( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -280,7 +295,7 @@ public:
 
 	/// ボディリストのヘッダー1のカラム種別
 	BODY_INDICATE_TYPE getBodyHeaderCol1Type( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
@@ -289,7 +304,7 @@ public:
 
 	/// ボディリストのヘッダー2のカラム種別
 	BODY_INDICATE_TYPE getBodyHeaderCol2Type( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
@@ -298,7 +313,7 @@ public:
 
 	/// ボディリストのヘッダー3のカラム種別
 	BODY_INDICATE_TYPE getBodyHeaderCol3Type( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return BODY_INDICATE_TYPE_NONE;
 		}
@@ -307,7 +322,7 @@ public:
 
 	/// 統合カラムモード、1行目のパターン
 	const wchar_t* getBodyIntegratedLinePattern1( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -316,7 +331,7 @@ public:
 
 	/// 統合カラムモード、2行目のパターン
 	const wchar_t* getBodyIntegratedLinePattern2( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -325,7 +340,7 @@ public:
 
 	/// デフォルトURL
 	const wchar_t* getDefaultCategoryURL( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -334,7 +349,7 @@ public:
 
 	/// エンコーディング
 	ENCODING getRequestEncoding( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return ENCODING_EUC;
 		}
@@ -343,7 +358,7 @@ public:
 
 	/// キャッシュファイル名のパターン
 	const wchar_t* getCacheFilePattern( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return L"";
 		}
@@ -352,7 +367,7 @@ public:
 
 	/// refererの取得
 /*	const wchar_t* getRefererUrlPattern( ACCESS_TYPE t ) {
-		MYMAP::iterator it = m_map.find(t);
+		ACCESS_TYPE_TO_DATA_MAP::iterator it = m_map.find(t);
 		if (it==m_map.end()) {
 			return NULL;
 		}

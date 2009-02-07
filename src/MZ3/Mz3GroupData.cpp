@@ -232,7 +232,7 @@ void Mz3GroupDataInifileHelper::InitMap(AccessTypeInfo& accessTypeInfo) {
 	category_string2type.InitHashTable( 20 );
 
 	// AccessTypeInfo のシリアライズキーから各種ハッシュテーブルを構築する
-	AccessTypeInfo::MYMAP::iterator it;
+	AccessTypeInfo::ACCESS_TYPE_TO_DATA_MAP::iterator it;
 	for (it=accessTypeInfo.m_map.begin(); it!=accessTypeInfo.m_map.end(); it++) {
 		ACCESS_TYPE accessType = it->first;
 		AccessTypeInfo::Data& data = it->second;
