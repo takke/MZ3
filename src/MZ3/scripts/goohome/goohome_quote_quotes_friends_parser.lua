@@ -35,11 +35,12 @@ function quote_quotes_friends_parser(parent, body, html)
 	local t1 = mz3.get_tick_count();
 	
 	-- wrapperクラス化
+	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 	parent = MZ3Data:create(parent);
 
 	-- 全消去
-	mz3_data_list.clear(body);
+	body:clear();
 
 	-- TODO 新着マージ＋重複防止処理
 --[[
@@ -68,7 +69,7 @@ function quote_quotes_friends_parser(parent, body, html)
 --			mz3.logger_debug(i .. " : " .. line);
 			if in_quote then
 				-- 一つ前の解析結果を登録
-				mz3_data_list.add(body, data.data);
+				body:add(data.data);
 				data:delete();
 				
 				-- 次の要素用データを生成
@@ -186,7 +187,7 @@ function quote_quotes_friends_parser(parent, body, html)
 
 	-- TODO 新着マージ＋重複防止処理
 	if in_quote then
-		mz3_data_list.add(body, data.data);
+		body:add(data.data);
 	end
 --[[
 

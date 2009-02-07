@@ -25,8 +25,12 @@ module("mixi", package.seeall)
 function new_bbs_parser(parent, body, html)
 	mz3.logger_debug("new_bbs_parser start");
 	
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
 	-- 全消去
-	mz3_data_list.clear(body);
+	body:clear();
 	
 	local t1 = mz3.get_tick_count();
 	local in_data_region = false;
@@ -35,11 +39,11 @@ function new_bbs_parser(parent, body, html)
 	local next_data = nil;
 	
 	-- 行数取得
-	local line_count = mz3_htmlarray.get_count(html);
+	local line_count = html:get_count();
 	for i=140, line_count-1 do
-		line = mz3_htmlarray.get_at(html, i);
+		line = html:get_at(i);
 		
---		mz3.logger_debug(i .. " : " .. mz3_htmlarray.get_at(html, i));
+--		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
 		-- 次へ、前への抽出処理
 		-- 項目発見前にのみ存在する
@@ -56,14 +60,14 @@ function new_bbs_parser(parent, body, html)
 			in_data_region = true;
 
 			-- data 生成
-			data = mz3_data.create();
+			data = MZ3Data:create();
 
 			-- 日付のパース
-			mz3_data.parse_date_line(data, line);
+			data:parse_date_line(line);
 			
 			-- 次行取得
 			i = i+1;
-			line2 = mz3_htmlarray.get_at(html, i);
+			line2 = html:get_at(i);
 --			mz3.trace(i .. " : " .. line2);
 			
 			-- 見出し
@@ -80,34 +84,34 @@ function new_bbs_parser(parent, body, html)
 				title = "【＠】" .. title;
 			end
 --			mz3.logger_debug(title);
-			mz3_data.set_text(data, "title", title);
+			data:set_text("title", title);
 			
 			-- URL 取得
 			url = line2:match("href=\"([^\"]+)\"");
 --			mz3.logger_debug(url);
-			mz3_data.set_text(data, "url", url);
+			data:set_text("url", url);
 			
 			-- コメント数
-			mz3_data.set_integer(data, "comment_count", get_param_from_url(url, "comment_count"));
+			data:set_integer("comment_count", get_param_from_url(url, "comment_count"));
 			
 			-- id
 			id = get_param_from_url(url, "id");
-			mz3_data.set_integer(data, "id", id);
+			data:set_integer("id", id);
 
 			-- コミュニティ名
 			name = after:match("</a>[^(]*[(](.*)[)]</dd>");
 			name = mz3.decode_html_entity(name);
-			mz3_data.set_text(data, "name", name);
+			data:set_text("name", name);
 			
 			-- URL に応じてアクセス種別を設定
 			type = mz3.estimate_access_type_by_url(url);
-			mz3_data.set_access_type(data, type);
+			data:set_access_type(type);
 			
 			-- data 追加
-			mz3_data_list.add(body, data);
+			body:add(data.data);
 			
 			-- data 削除
-			mz3_data.delete(data);
+			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
@@ -120,13 +124,13 @@ function new_bbs_parser(parent, body, html)
 	-- 前、次へリンクの追加
 	if back_data~=nil then
 		-- 先頭に挿入
-		mz3_data_list.insert(body, 0, back_data);
-		mz3_data.delete(back_data);
+		body:insert(0, back_data.data);
+		back_data:delete();
 	end
 	if next_data~=nil then
 		-- 末尾に追加
-		mz3_data_list.add(body, next_data);
-		mz3_data.delete(next_data);
+		body:add(next_data.data);
+		next_data:delete();
 	end
 	
 	local t2 = mz3.get_tick_count();

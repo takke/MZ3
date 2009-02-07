@@ -21,7 +21,6 @@ function MZ3Data:create(data)
 	
 	-- メンバー変数の設定
 	if data==nil then
---		mz3.logger_debug("new data");
 		object.data = mz3_data.create();
 	else
 		object.data = data;
@@ -43,6 +42,31 @@ function MZ3Data:add_text_array(name, value)	return mz3_data.add_text_array(self
 function MZ3Data:get_integer(name)				return mz3_data.get_integer(self.data, name);			end
 function MZ3Data:set_integer(name, value)		return mz3_data.set_integer(self.data, name, value);	end
 function MZ3Data:parse_date_line(line)			return mz3_data.parse_date_line(self.data, line);		end
+
+--------------------------------------------------
+-- Wrapper for mz3_data_list
+--------------------------------------------------
+MZ3DataList = {};
+
+function MZ3DataList:create(data_list)
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	if data_list==nil then
+		return nil;
+	else
+		object.data_list = data_list;
+	end
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3DataList });
+	return object;
+end
+
+function MZ3DataList:clear()				return mz3_data_list.clear(self.data_list);					end
+function MZ3DataList:add(data)				return mz3_data_list.add(self.data_list, data);				end
+function MZ3DataList:insert(index, data)	return mz3_data_list.insert(self.data_list, index, data);	end
 
 --------------------------------------------------
 -- Wrapper for mz3_htmlarray

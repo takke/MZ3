@@ -28,21 +28,21 @@ function parse_next_back_link(line, base_url)
 		-- ‘O
 		local url, t = line:match([[href="([^"]+)">(‘O[^<]+)<]]);
 		if url~=nil then
-			back_data = mz3_data.create();
-			mz3_data.set_text(back_data, "title", "<< " .. t .. " >>");
-			mz3_data.set_text(back_data, "url", url);
+			back_data = MZ3Data:create();
+			back_data:set_text("title", "<< " .. t .. " >>");
+			back_data:set_text("url", url);
 			type = mz3.estimate_access_type_by_url(url);
-			mz3_data.set_access_type(back_data, type);
+			back_data:set_access_type(type);
 		end
 		
 		-- ŽŸ
 		local url, t = line:match([[href="([^"]+)">(ŽŸ[^<]+)<]]);
 		if url~=nil then
-			next_data = mz3_data.create();
-			mz3_data.set_text(next_data, "title", "<< " .. t .. " >>");
-			mz3_data.set_text(next_data, "url", url);
+			next_data = MZ3Data:create();
+			next_data:set_text("title", "<< " .. t .. " >>");
+			next_data:set_text("url", url);
 			type = mz3.estimate_access_type_by_url(url);
-			mz3_data.set_access_type(next_data, type);
+			next_data:set_access_type(type);
 		end
 	end
 	
