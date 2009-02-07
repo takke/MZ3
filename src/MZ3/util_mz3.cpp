@@ -10,6 +10,8 @@
 #include "util_base.h"
 #include "util_mixi.h"
 #include "util_mz3.h"
+#include "util_gui.h"
+#include "MainFrm.h"
 
 /// MZ3 用ユーティリティ
 namespace util
@@ -185,6 +187,41 @@ CString MakeImageLogfilePathFromUrlMD5( const CString& url )
 			return L"";
 		}
 	}
+}
+
+POINT GetPopupPosForSoftKeyMenu2()
+{
+	POINT pt;
+
+#ifdef WINCE
+	// MZ3 : 画面の右下でポップアップする
+	// ただし、メニューの高さ分だけ上に表示する
+
+	CRect rectMenuBar;
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	GetWindowRect(pMainFrame->m_hwndMenuBar, &rectMenuBar);
+
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	pt.x = rect.right;
+	pt.y = rect.bottom - rectMenuBar.Height();
+	return pt;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	return GetPopupPos();
+#endif
+}
+
+int GetPopupFlagsForSoftKeyMenu2()
+{
+#ifdef WINCE
+	// MZ3 : 画面の右下でポップアップする
+	return TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	// マウス位置を左上にして表示、右ボタンを有効にする
+	return GetPopupFlags();
+#endif
 }
 
 }

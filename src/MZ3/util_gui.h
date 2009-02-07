@@ -26,8 +26,6 @@ bool IsVisibleOnListBox( CListCtrl& listCtrl, int idx );
 bool GetOpenFolderPath( HWND hWnd, LPCTSTR szTitle, CString& strFolderPath );
 POINT GetPopupPos();
 int GetPopupFlags();
-POINT GetPopupPosForSoftKeyMenu2();
-int GetPopupFlagsForSoftKeyMenu2();
 CSize makeAspectFixedFitSize( int w0, int h0, int w1, int h1 );
 void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ3BackgroundImage& image, int w=16, int h=16 );
 void ModifyStyleDlgItemWindow( CWnd* pParent,int idc, DWORD dwRemove,DWORD dwAdd,UINT nFlags=NULL);
