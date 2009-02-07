@@ -7,7 +7,7 @@
 --------------------------------------------------
 -- MZ3 Script : goohome
 --
--- $Id: mixi.lua 1144 2009-02-06 13:24:01Z takke $
+-- $Id$
 --------------------------------------------------
 mz3.logger_debug('goohome.lua start');
 module("goohome", package.seeall)

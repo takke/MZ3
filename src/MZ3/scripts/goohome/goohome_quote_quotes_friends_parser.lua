@@ -7,7 +7,7 @@
 --------------------------------------------------
 -- MZ3 Script : goohome parsers
 --
--- $Id: mixi_new_bbs_parser.lua 1145 2009-02-06 13:34:56Z takke $
+-- $Id$
 --------------------------------------------------
 module("goohome", package.seeall)
 
