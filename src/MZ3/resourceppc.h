@@ -12,7 +12,6 @@
 #define IDR_MZ3TYPE                     129
 #define IDR_MAINFRAME2                  129
 #define IDR_MAINFRAME_WIN32             130
-#define IDR_TOOLBAR                     131
 #define IDR_BODY_MENU                   134
 #define IDR_REPORT_MENU                 137
 #define IDI_NO_PHOTO_ICON               139
@@ -20,7 +19,6 @@
 #define IDR_IMAGE_MENU                  140
 #define IDR_WRITE_MENU                  141
 #define IDR_DIARY_MENU                  142
-#define IDR_TOOLBAR_QVGA                145
 #define IDD_DEBUG_DIALOG                145
 #define IDD_QUOTE_DIALOG                146
 #define IDR_TOOLBAR_WIN32               146

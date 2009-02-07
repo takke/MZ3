@@ -58,7 +58,6 @@ public:
 #endif
 
 	bool			m_bConfirmOpenURL;			///< URLを開くときに確認する
-	bool			m_bUseClassicToolBar;		///< WM 版で v0.9 以前のツールバーを表示するか
 //	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
@@ -75,7 +74,6 @@ public:
 
 	CString			m_strSkinname;			///< 現在のスキン名（=フォルダ名）
 
-	bool			m_bUseLeftSoftKey;		///< 左ソフトキーによるメニュー表示を利用する？
 	bool			m_bUseXcrawlExtension;	///< Xcrawl の誤動作防止機能
 	bool			m_bUseRunConfirmDlg;	///< ダウンロード後の実行確認画面を表示する？
 
@@ -149,7 +147,6 @@ public:
 #endif
 		, m_bSaveLog( true )
 		, m_totalRecvBytes( 0 )
-		, m_bUseLeftSoftKey( true )
 		, m_bUseXcrawlExtension( false )
 		, m_bUseRunConfirmDlg( true )
 		, m_quoteMark( L"> " )
@@ -167,7 +164,6 @@ public:
 		, m_reportScrollType( REPORT_SCROLL_TYPE_LINE )
 		, m_reportScrollLine( 7 )
 		, m_bConfirmOpenURL( true )
-		, m_bUseClassicToolBar( false )
 /*
 #ifdef WINCE
 		, m_bConvertUrlForMixiMobile( true )

@@ -702,15 +702,14 @@ STYLE DS_SETFONT | WS_POPUP | WS_CAPTION
 CAPTION "操作"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
-    CONTROL         "左ソフトキーでメニューを開く",IDC_USE_LEFTSOFTKEY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,99,10
-    LTEXT           "長押し判定時間",IDC_STATIC,7,26,57,8
-    EDITTEXT        IDC_LONG_RETURN_RANGE_MSEC_EDIT,69,23,20,14,ES_AUTOHSCROLL
-    LTEXT           "[ミリ秒]",IDC_STATIC,93,26,28,8
-    CONTROL         "Xcrawl 拡張機能を有効にする",IDC_USE_XCRAWL_CANCELER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,42,103,10
+    LTEXT           "長押し判定時間",IDC_STATIC,7,11,57,8
+    EDITTEXT        IDC_LONG_RETURN_RANGE_MSEC_EDIT,69,8,20,14,ES_AUTOHSCROLL
+    LTEXT           "[ミリ秒]",IDC_STATIC,93,11,28,8
+    CONTROL         "Xcrawl 拡張機能を有効にする",IDC_USE_XCRAWL_CANCELER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,27,103,10
     CONTROL         "左右スライドで項目やタブを切り替える",IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,59,125,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,125,14
     CONTROL         "項目やタブ切り替えでアニメーション",IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,81,121,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,67,121,10
 END
 
 IDD_OPTIONTAB_LOG DIALOG  0, 0, 139, 116
@@ -1025,7 +1024,7 @@ BEGIN
         RIGHTMARGIN, 132
         TOPMARGIN, 7
         BOTTOMMARGIN, 141
-        HORZGUIDE, 30
+        HORZGUIDE, 15
     END
 
     IDD_OPTIONTAB_LOG, DIALOG
@@ -1138,30 +1137,6 @@ END
 // Toolbar
 //
 
-IDR_TOOLBAR TOOLBAR  32, 32
-BEGIN
-    BUTTON      ID_BACK_BUTTON
-    BUTTON      ID_FORWARD_BUTTON
-    BUTTON      ID_STOP_BUTTON
-    BUTTON      ID_WRITE_BUTTON
-    BUTTON      ID_IMAGE_BUTTON
-    BUTTON      ID_OPEN_BROWSER
-    SEPARATOR
-    BUTTON      ID_APP_ABOUT
-END
-
-IDR_TOOLBAR_QVGA TOOLBAR  16, 16
-BEGIN
-    BUTTON      ID_BACK_BUTTON
-    BUTTON      ID_FORWARD_BUTTON
-    BUTTON      ID_STOP_BUTTON
-    BUTTON      ID_WRITE_BUTTON
-    BUTTON      ID_IMAGE_BUTTON
-    BUTTON      ID_OPEN_BROWSER
-    SEPARATOR
-    BUTTON      ID_APP_ABOUT
-END
-
 IDR_TOOLBAR_WIN32 TOOLBAR  16, 16
 BEGIN
     BUTTON      ID_BACK_BUTTON
@@ -1181,8 +1156,6 @@ END
 // Bitmap
 //
 
-IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
-IDR_TOOLBAR_QVGA        BITMAP                  "res\\toolbarQVGA.bmp"
 IDR_TOOLBAR_WIN32       BITMAP                  "res\\toolbar_win32.bmp"
 IDB_SLIDE_LEFT_BITMAP   BITMAP                  "res\\slide_left_bitmap.bmp"
 IDB_SLIDE_RIGHT_BITMAP  BITMAP                  "res\\slide_right_bitmap.bmp"

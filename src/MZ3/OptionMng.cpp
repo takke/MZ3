@@ -112,7 +112,6 @@ void Option::Sync(bool bSave)
 	SyncIniValue(inifile, bSave, (int&)m_StartupTransitionDoneType, "StartupMessageDoneType", "General" );
 	SyncIniValue(inifile, bSave, m_bConfirmOpenURL, "ConfirmOpenURL", "General" );
 //	SyncIniValue(inifile, bSave, m_bConvertUrlForMixiMobile, "ConvertUrlForMixiMobile", "General" );
-	SyncIniValue(inifile, bSave, m_bUseClassicToolBar, "UseClassicToolBar", "General" );
 
 	// 起動時に絵文字ファイルを自動取得する
 	SyncIniValue(inifile, bSave, m_bAutoDownloadEmojiImageFiles, "AutoDownloadEmojiImageFiles", "General" );
@@ -193,9 +192,6 @@ void Option::Sync(bool bSave)
 
 	// フォント名
 	SyncIniValue(inifile, bSave, m_fontFace, "FontFace", "UI");
-
-	// 左ソフトキー有効？
-	SyncIniValue(inifile, bSave, m_bUseLeftSoftKey, "UseLeftSoftKey", "UI" );
 
 	// Xcrawl 誤動作防止機能
 	SyncIniValue(inifile, bSave, m_bUseXcrawlExtension, "UseXcrawlCanceler", "UI" );

@@ -1656,42 +1656,12 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 {
 	// 共通処理
 	switch (pMsg->wParam) {
+#ifndef WINCE
 	case VK_F1:
-#ifdef WINCE
-/*		if( theApp.m_optionMng.m_bUseLeftSoftKey ) {
-			// メインメニューのポップアップ
-			RECT rect;
-			int flags = TPM_CENTERALIGN | TPM_VCENTERALIGN;
-			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-
-			CMenu menu;
-			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-			if( theApp.m_bPocketPC ) {
-				menu.Attach( pMainFrame->m_wndCommandBar.GetMenu() );
-			}else{
-				menu.LoadMenu(IDR_MAINFRAME);
-			}
-			menu.GetSubMenu(0)->TrackPopupMenu(flags,
-				rect.left,
-				rect.bottom,
-				pMainFrame );
-			menu.Detach();
-			return TRUE;
-		}
-*/
-#else
 		// ヘルプ表示
 		util::OpenByShellExecute( MZ4_MANUAL_URL );
-#endif
 		break;
-
-/*
-#ifdef WINCE
-	case VK_F2:
-		OnAcceleratorContextMenu();
-		return TRUE;
 #endif
-*/
 
 #ifndef WINCE
 	case VK_APPS:

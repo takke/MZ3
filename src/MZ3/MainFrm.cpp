@@ -96,7 +96,9 @@ END_MESSAGE_MAP()
 // コンストラクタ
 // -----------------------------------------------------------------------------
 CMainFrame::CMainFrame()
+#ifdef WINCE
 	: m_hMenu(NULL)
+#endif
 {
 
 }
@@ -120,6 +122,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 #ifdef WINCE
+/*
 	if( theApp.m_bPocketPC ) {
 		// dpi値によってツールバーの画像を変更
 		int id_toolbar = 0;
@@ -141,10 +144,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		m_wndCommandBar.SetBarStyle(m_wndCommandBar.GetBarStyle() | CBRS_SIZE_FIXED);
 	}
+*/
 
-	// Smartphone/Standard Edition またはクラシック表示設定以外の場合はメニューバーを作成する
-	if (theApp.m_bSmartphone || theApp.m_optionMng.m_bUseClassicToolBar==false) {
-
+	// メニューバーを作成する
+	{
 		m_hMenu = LoadMenu(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
 
 		SHMENUBARINFO mbi;
@@ -153,11 +156,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		mbi.cbSize = sizeof(SHMENUBARINFO);
 		mbi.hwndParent = m_hWnd;
 		mbi.dwFlags = SHCMBF_HMENU;
-//		mbi.nToolBarId = IDR_MAINFRAME;
 		mbi.nToolBarId = (UINT)m_hMenu;
 		mbi.hInstRes = AfxGetInstanceHandle();
-//		mbi.nBmpId = 0;
-//		mbi.cBmpImages = 0;
 
 		if (SHCreateMenuBar(&mbi)==FALSE) {
 			MZ3LOGGER_FATAL(L"Couldn't create menu bar");
@@ -1113,10 +1113,12 @@ void CMainFrame::OnDestroy()
 	}
 #endif
 
+#ifdef WINCE
 	// メニューの破棄
 	if (m_hMenu!=NULL) {
 		DestroyMenu(m_hMenu);
 	}
+#endif
 }
 
 BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
