@@ -108,13 +108,8 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_DIARY:						return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
-
-//	case ACCESS_LIST_NEW_BBS:
-//		return mixi::NewBbsParser::parse( body, html );
-
-//	case ACCESS_LIST_NEW_BBS_COMMENT:
-//		return mixi::ListNewBbsCommentParser::parse( body, html );
-
+//	case ACCESS_LIST_NEW_BBS:					return mixi::NewBbsParser::parse( body, html );
+//	case ACCESS_LIST_NEW_BBS_COMMENT:			return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
 	case ACCESS_LIST_FOOTSTEP:					return mixi::TrackParser::parse( body, html );
@@ -134,7 +129,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_TWITTER_DIRECT_MESSAGES:		return parser::TwitterDirectMessagesXmlParser::parse( body, html );
 	case ACCESS_WASSR_FRIENDS_TIMELINE:			return parser::WassrFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_RSS_READER_FEED:				return parser::RssFeedParser::parse( body, html );
-	case ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS:	return parser::GoohomeQuoteQuotesFriendsParser::parse( body, html );
+//	case ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS:	return parser::GoohomeQuoteQuotesFriendsParser::parse( body, html );
 	default:
 		{
 			CString msg;

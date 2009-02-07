@@ -7170,3 +7170,13 @@ void CMZ3View::OnMenuGoohomeReadComments()
 
 	util::OpenBrowserForUrl(data.GetURL());
 }
+
+/// 「カテゴリログのリロード」メニュー
+void CMZ3View::ReloadCategoryListLog()
+{
+	// ログのロード
+	MyLoadCategoryLogfile( *m_selGroup->getSelectedCategory() );
+
+	// ボディリストに設定
+	SetBodyList( m_selGroup->getSelectedCategory()->GetBodyList() );
+}

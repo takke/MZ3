@@ -1245,6 +1245,5 @@ void CMainFrame::OnMenuReloadLuaScripts()
 /// 「カテゴリログのリロード」メニュー
 void CMainFrame::OnMenuReloadCategoryListLog()
 {
-	// ログのロード
-	theApp.m_pMainView->MyLoadCategoryLogfile( *theApp.m_pMainView->m_selGroup->getSelectedCategory() );
+	theApp.m_pMainView->ReloadCategoryListLog();
 }

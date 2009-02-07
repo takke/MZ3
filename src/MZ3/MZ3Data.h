@@ -211,6 +211,20 @@ public:
 
 	//--- 汎用文字列配列コンテナのアクセッサ
 
+	void	ClearTextArray(LPCTSTR key) {
+		m_StringArrayMap.Clear(key);
+	}
+	void	AddTextArray(LPCTSTR key, LPCTSTR value) {
+		m_StringArrayMap.AppendString(key, value);
+	}
+	LPCTSTR	GetTextArrayValue(LPCTSTR key, int idx) {
+		return m_StringArrayMap.GetString(key, idx);
+	}
+	size_t	GetTextArraySize(LPCTSTR key) {
+		return m_StringArrayMap.GetSize(key);
+	}
+
+
 	// body list
 	void	ClearBody()					{ m_StringArrayMap.Clear(L"body"); }
 	void	AddBody(LPCTSTR str)		{ m_StringArrayMap.AppendString(L"body", str); }

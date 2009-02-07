@@ -141,6 +141,7 @@ public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
 
+/*
 class GoohomeQuoteQuotesFriendsParser : public parser::TwitterParserBase
 {
 public:
@@ -161,5 +162,6 @@ public:
 		}
 	}
 };
+*/
 
 }//namespace parser

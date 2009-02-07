@@ -408,6 +408,7 @@ public:
 	afx_msg void OnMenuGoohomeRead();
 	afx_msg void OnMenuGoohomeUpdate();
 	afx_msg void OnMenuGoohomeReadComments();
+	void ReloadCategoryListLog();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

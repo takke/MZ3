@@ -17,7 +17,9 @@ package.path = ".\\?.lua;" .. mz3_dir .. "?.lua;"
 --print(package.path);
 
 -- 各種ビルトインスクリプトロード
-require("scripts\\util");
-require("scripts\\mixi");
+require("scripts\\util");		-- ユーティリティ
+require("scripts\\wrapper");	-- APIラッパークラス
+require("scripts\\mixi");		-- mixi
+require("scripts\\goohome");	-- goohome
 
 mz3.logger_info('mz3.lua end');

@@ -461,6 +461,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
  *
  * http://home.goo.ne.jp/api/quote/quotes/friends/json
  */
+/*
 bool GoohomeQuoteQuotesFriendsParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"GoohomeQuoteQuotesFriendsParser.parse() start." );
@@ -612,5 +613,6 @@ bool GoohomeQuoteQuotesFriendsParser::parse( CMixiDataList& out_, const CHtmlArr
 	MZ3LOGGER_DEBUG( util::FormatString(L"GoohomeQuoteQuotesFriendsParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
 	return true;
 }
+*/
 
 }//namespace parser

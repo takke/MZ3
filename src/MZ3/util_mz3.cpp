@@ -176,8 +176,8 @@ CString MakeImageLogfilePathFromUrlMD5( const CString& url )
 		MD5 md5(ansi_string, len_in_mbs);
 		char* pMD5hexdigest = md5.hex_digest();
 		if ( pMD5hexdigest ) {
-			MZ3_TRACE(L"MakeImageLogfilePathFromUrlMD5(), url[%s], filename[%s]\n", 
-				(LPCTSTR)url, (LPCTSTR)CString(CStringA(pMD5hexdigest)));
+//			MZ3_TRACE(L"MakeImageLogfilePathFromUrlMD5(), url[%s], filename[%s]\n", 
+//				(LPCTSTR)url, (LPCTSTR)CString(CStringA(pMD5hexdigest)));
 			CString LogfilePath = theApp.m_filepath.imageFolder + L"\\" + CString(CStringA(pMD5hexdigest));
 			delete pMD5hexdigest;
 			return LogfilePath;
