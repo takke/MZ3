@@ -368,7 +368,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="mz3.jp ‚©‚çƒŠƒrƒWƒ‡ƒ“‚ðŽæ“¾‚µ mz3_revision.h ‚ð¶¬‚µ‚Ü‚·B"
-				CommandLine="cscript $(SolutionDir)src\MZ3\get_mz3_trunk_revision.vbs"
+				CommandLine="cscript &quot;$(SolutionDir)src\MZ3\get_mz3_trunk_revision.vbs&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

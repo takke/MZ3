@@ -26,6 +26,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_05DF1E8F0A03485D8B8F899474E1DBA1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -68,6 +74,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_95D58EFACC754177A69E7B17307B6C8B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7C86FC78244435090425B4BD08B3A7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,6 +87,12 @@
         "Entry"
         {
         "MsmKey" = "8:_ADDE26C4E25F47DD9BA61DD98D701D47"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C7AF35D090464A7883C9F56912F9307C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -170,6 +188,24 @@
             "TargetName" = "8:emoji.ini"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_05DF1E8F0A03485D8B8F899474E1DBA1"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\goohome\\goohome_quote_quotes_friends_parser.lua"
+            "TargetName" = "8:goohome_quote_quotes_friends_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_F89F108A4B0A4CC9984492D137F83235"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -308,6 +344,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_95D58EFACC754177A69E7B17307B6C8B"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\wrapper.lua"
+            "TargetName" = "8:wrapper.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_A7C86FC78244435090425B4BD08B3A7F"
             {
             "SourcePath" = "8:..\\..\\dist\\toppage_group_sample.ini"
@@ -330,6 +384,24 @@
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\util.lua"
             "TargetName" = "8:util.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_C7AF35D090464A7883C9F56912F9307C"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\goohome.lua"
+            "TargetName" = "8:goohome.lua"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
@@ -547,6 +619,15 @@
                             "Name" = "8:mixi"
                             "Condition" = "8:"
                             "Property" = "8:_452661E83E8B4D9B995B25BEAA7F6F63"
+                                "Folders"
+                                {
+                                }
+                            }
+                            "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_F89F108A4B0A4CC9984492D137F83235"
+                            {
+                            "Name" = "8:goohome"
+                            "Condition" = "8:"
+                            "Property" = "8:_C9153029E98D4BEE93F7DB55BFD4EC85"
                                 "Folders"
                                 {
                                 }

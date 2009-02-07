@@ -20,7 +20,7 @@ require("scripts\\goohome\\goohome_quote_quotes_friends_parser");
 ----------------------------------------
 -- パーサの登録
 ----------------------------------------
--- コミュニティコメント記入履歴
+-- gooホーム 友達・注目の人のひとこと一覧
 mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_parser");
 
 

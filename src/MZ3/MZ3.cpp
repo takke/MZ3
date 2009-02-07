@@ -1365,6 +1365,7 @@ bool CMZ3App::MyLuaInit(void)
 	MyLuaErrorReport(r);
 	if (r!=0) {
 		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトを読み込めません[%s] [%d]", path, r));
+		return false;
 	}
 
 	// plugin, user_script フォルダ配下の全Luaファイルのロード＆実行
@@ -1405,7 +1406,12 @@ int CMZ3App::MyLuaErrorReport(int status)
 	if (status && !lua_isnil(L, -1)) {
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
-		MZ3LOGGER_ERROR(CString(msg));
+		CString user_msg;
+		user_msg.Format(L"スクリプト実行中にエラーが発生しました。\r\n"
+						L"\r\n"
+						L"%s", CString(msg));
+		MZ3LOGGER_ERROR(user_msg);
+		::MessageBox(NULL, user_msg, NULL, MB_OK);
 		lua_pop(L, 1);
 	}
 	return status;

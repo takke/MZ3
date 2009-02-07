@@ -11,8 +11,12 @@
 @echo ■ ファイルを収集します
 copy ..\src\MZ3\Release_Win32\MZ4.exe MZ3_win32\
 copy ..\src\lua\Release\lua.dll MZ3_win32\
-del /Q MZ3_win32\script\*
-copy ..\src\MZ3\script\* MZ3_win32\script\
+del /Q MZ3_win32\scripts\*
+copy ..\src\MZ3\scripts\* MZ3_win32\scripts\
+del /Q MZ3_win32\scripts\mixi\*
+copy ..\src\MZ3\scripts\mixi\* MZ3_win32\scripts\mixi
+del /Q MZ3_win32\scripts\goohome\*
+copy ..\src\MZ3\scripts\goohome\* MZ3_win32\scripts\goohome
 :copy "..\doc\Help Files\MZ4\MZ4.chm" MZ3_win32\
 copy ..\doc\Readme.txt MZ3_win32\
 copy ..\ChangeLog.txt MZ3_win32\
