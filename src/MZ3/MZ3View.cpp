@@ -6304,6 +6304,8 @@ void CMZ3View::OnLButtonDown(UINT nFlags, CPoint point)
 			// ドラッグ開始
 			m_bDragging = true;
 			m_ptDragStart = pt;
+			m_nOriginalH1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
+			m_nOriginalH2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
 
 			// 子ウィンドウのドラッグ操作停止
 			m_categoryList.m_bStopDragging = true;
@@ -6318,59 +6320,68 @@ void CMZ3View::OnLButtonDown(UINT nFlags, CPoint point)
 	CFormView::OnLButtonDown(nFlags, point);
 }
 
+void CMZ3View::ReflectSplitterLineMove()
+{
+	// スプリッター変更
+	int h1 = m_nOriginalH1;
+	int h2 = m_nOriginalH2;
+
+	// オプション値を % に補正
+	int sum = h1 + h2;
+	if (sum>0) {
+		h1 = (int)(h1 * 100.0 / sum);
+		h2 = (int)(h2 * 100.0 / sum);
+		sum = h1 + h2;
+	}
+
+	CRect rw;
+	GetWindowRect(&rw);
+	int cy = rw.Height();
+
+	CPoint pt;
+	GetCursorPos(&pt);
+
+	int dy = pt.y - m_ptDragStart.y +3;
+
+	int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
+	int hGroup    = theApp.GetTabHeight(fontHeight);
+	int hCategory = (cy * h1 / sum) - (hGroup -1);
+	int mh1 = (int)(sum/(double)cy * (hCategory + dy +hGroup -1) - h1);
+	MZ3LOGGER_DEBUG(util::FormatString(L"mh1 : %d  dy : %d", mh1, dy));
+
+	h1 += mh1;
+	h2 -= mh1;
+
+	// 正規化
+	if (h1 < N_HC_MIN || h2 > N_HB_MAX) {
+		// 最小値に設定
+		h1 = N_HC_MIN;
+		h2 = N_HB_MAX;
+	}
+	if (h1 > N_HC_MAX || h2 < N_HB_MIN) {
+		// 最小値に設定
+		h1 = N_HC_MAX;
+		h2 = N_HB_MIN;
+	}
+
+	// オプションに反映
+	theApp.m_optionMng.m_nMainViewCategoryListHeightRatio = h1;
+	theApp.m_optionMng.m_nMainViewBodyListHeightRatio = h2;
+
+	// 再描画
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	pMainFrame->ChangeAllViewFont();
+}
+
+
 /**
  * 左ボタンリリース
  */
 void CMZ3View::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_bDragging) {
-		{
-			// スプリッター変更
-			int& h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
-			int& h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
-
-			// オプション値を % に補正
-			int sum = h1 + h2;
-			if (sum>0) {
-				h1 = (int)(h1 * 100.0 / sum);
-				h2 = (int)(h2 * 100.0 / sum);
-				sum = h1 + h2;
-			}
-
-			CRect rw;
-			GetWindowRect(&rw);
-			int cy = rw.Height();
-
-			CPoint pt;
-			GetCursorPos(&pt);
-
-			int dy = pt.y - m_ptDragStart.y +3;
-
-			int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
-			int hGroup    = theApp.GetTabHeight(fontHeight);
-			int hCategory = (cy * h1 / sum) - (hGroup -1);
-			int mh1 = (int)(sum/(double)cy * (hCategory + dy +hGroup -1) - h1);
-			MZ3LOGGER_DEBUG(util::FormatString(L"mh1 : %d  dy : %d", mh1, dy));
-
-			h1 += mh1;
-			h2 -= mh1;
-
-			// 正規化
-			if (h1 < N_HC_MIN || h2 > N_HB_MAX) {
-				// 最小値に設定
-				h1 = N_HC_MIN;
-				h2 = N_HB_MAX;
-			}
-			if (h1 > N_HC_MAX || h2 < N_HB_MIN) {
-				// 最小値に設定
-				h1 = N_HC_MAX;
-				h2 = N_HB_MIN;
-			}
-
-			// 再描画
-			CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
-			pMainFrame->ChangeAllViewFont();
-		}
+		// 移動反映
+		ReflectSplitterLineMove();
 
 		// ドラッグ終了処理
 		MZ3LOGGER_INFO(L"ドラッグ終了");
@@ -6409,11 +6420,25 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
 		CPoint pt;
 		GetCursorPos(&pt);
 
+		// カテゴリリストの下部付近で有効
 		int dy = pt.y-r.bottom;
 		if (m_bDragging || (dy < 0 && dy>-SPLITTER_HEIGHT)) {
 			SetCursor(LoadCursor(NULL, IDC_SIZENS));
-		} else {
-			SetCursor(LoadCursor(NULL, IDC_ARROW));
+		}
+
+		if (m_bDragging) {
+			// ちょっとだけディレイさせる
+			static DWORD s_dwLastMove = GetTickCount();
+			DWORD dwNow = GetTickCount();
+			if (dwNow > s_dwLastMove +20) {
+				s_dwLastMove = dwNow;
+
+				// スプリッター変更
+				ReflectSplitterLineMove();
+
+				// 再描画
+				m_categoryList.UpdateWindow();
+			}
 		}
 	}
 

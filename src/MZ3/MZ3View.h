@@ -173,6 +173,8 @@ private:
 
 	bool	m_bDragging;			///< マウスドラッグ中
 	CPoint	m_ptDragStart;			///< ドラッグ開始位置
+	int		m_nOriginalH1;			///< ドラッグ開始時のH1
+	int		m_nOriginalH2;			///< ドラッグ開始時のH2
 
 public: // シリアル化からのみ作成します。
 	CMZ3View();
@@ -413,6 +415,8 @@ public:
 	afx_msg void OnMenuGoohomeUpdate();
 	afx_msg void OnMenuGoohomeReadComments();
 	void ReloadCategoryListLog();
+
+	void ReflectSplitterLineMove();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
