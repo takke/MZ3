@@ -321,6 +321,8 @@ BOOL CMZ3App::InitInstance()
 		if (dlg.DoModal()==IDOK) {
 			// İ’è‚³‚ê‚½“à—e‚Å‰Šú‰»
 			m_root.initForTopPage(m_accessTypeInfo, dlg.m_initType);
+		} else {
+			return FALSE;
 		}
 
 		theApp.SaveGroupData();
