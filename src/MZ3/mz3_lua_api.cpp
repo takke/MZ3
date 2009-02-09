@@ -140,13 +140,18 @@ int lua_mz3_set_parser(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3.set_hook(key_event, parser)
-int lua_mz3_set_hook(lua_State *L)
+// MZ3 API : mz3.add_event_listener(key_event, parser)
+int lua_mz3_add_event_listener(lua_State *L)
 {
-	const char* szKeyEvent = lua_tostring(L, 1);	// 第1引数:{シリアライズキー}:{イベント}
+	const char* szEvent = lua_tostring(L, 1);		// 第1引数:イベント
 	const char* szParserName = lua_tostring(L, 2);	// 第2引数:パーサ名
 
-	theApp.m_luaHooks[ szKeyEvent ] = szParserName;
+	if (theApp.m_luaHooks.count(szEvent)!=0) {
+		theApp.m_luaHooks[ szEvent ].push_back(szParserName);
+	} else {
+		theApp.m_luaHooks[ szEvent ] = std::vector<std::string>();
+		theApp.m_luaHooks[ szEvent ].push_back(szParserName);
+	}
 
 	// 戻り値の数を返す
 	return 0;
@@ -517,16 +522,16 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 
 // MZ3 API table
 static const luaL_Reg lua_mz3_lib[] = {
-	{"logger_error",	lua_mz3_logger_error},
-	{"logger_info",		lua_mz3_logger_info},
-	{"logger_debug",	lua_mz3_logger_debug},
-	{"trace",			lua_mz3_trace},
-	{"get_tick_count",	lua_mz3_get_tick_count},
-	{"decode_html_entity", lua_mz3_decode_html_entity},
+	{"logger_error",				lua_mz3_logger_error},
+	{"logger_info",					lua_mz3_logger_info},
+	{"logger_debug",				lua_mz3_logger_debug},
+	{"trace",						lua_mz3_trace},
+	{"get_tick_count",				lua_mz3_get_tick_count},
+	{"decode_html_entity",			lua_mz3_decode_html_entity},
 	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
-	{"get_access_type_by_key", lua_mz3_get_access_type_by_key},
-	{"set_parser",		lua_mz3_set_parser},
-	{"set_hook",		lua_mz3_set_hook},
+	{"get_access_type_by_key",		lua_mz3_get_access_type_by_key},
+	{"set_parser",					lua_mz3_set_parser},
+	{"add_event_listener",			lua_mz3_add_event_listener},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

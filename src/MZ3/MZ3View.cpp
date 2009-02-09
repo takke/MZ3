@@ -1477,27 +1477,16 @@ void CMZ3View::OnEnSetfocusInfoEdit()
 	m_categoryList.SetFocus();
 }
 
-/**
- * MZ3 Script : フック関数の呼び出し
- */
-static bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, void* pUserData)
+static bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData)
 {
-	CStringA strKeyEvent;
-	strKeyEvent.Format("%s:%s", szSerializeKey, szEventName);
-
-	if (theApp.m_luaHooks.count((const char*)strKeyEvent)==0) {
-		// フック関数未登録のため終了
-		return false;
-	}
-
-	CStringA strHookFuncName = theApp.m_luaHooks[(const char*)strKeyEvent].c_str();
+	CStringA strHookFuncName(szFuncName);
 
 	// パーサ名をテーブルと関数名に分離する
 	int idx = strHookFuncName.Find('.');
 	if (idx<=0) {
 		// 関数名不正
 		MZ3LOGGER_ERROR(util::FormatString(L"フック関数名が不正です : [%s], [%s]", 
-			CString(strHookFuncName), CString(strKeyEvent)));
+			CString(strHookFuncName), CString(szEventName)));
 		return false;
 	}
 
@@ -1537,6 +1526,32 @@ static bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* sz
 	}
 	lua_settop(L, top);
 	return result!=0;
+}
+
+/**
+ * MZ3 Script : フック関数の呼び出し
+ */
+static bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, void* pUserData)
+{
+	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
+		// フック関数未登録のため終了
+		return false;
+	}
+
+	const std::vector<std::string>& hookFuncNames = theApp.m_luaHooks[(const char*)szEventName];
+
+	bool rval = false;
+	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
+//		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
+//							CString(hookFuncNames[i].c_str()),
+//							CString(szEventName)));
+
+		if (CallMZ3ScriptHookFunction(szSerializeKey, szEventName, hookFuncNames[i].c_str(), pUserData)) {
+			rval = true;
+			break;
+		}
+	}
+	return rval;
 }
 
 /**
@@ -1600,10 +1615,10 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnMenuWassrRead();
 		break;
 
-	case ACCESS_GOOHOME_USER:
-		// 全文表示
-		OnMenuGoohomeRead();
-		break;
+//	case ACCESS_GOOHOME_USER:
+//		// 全文表示
+//		OnMenuGoohomeRead();
+//		break;
 
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
@@ -2464,10 +2479,10 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			OnMenuWassrRead();
 			break;
 
-		case ACCESS_GOOHOME_USER:
-			// 全文表示
-			OnMenuGoohomeRead();
-			break;
+//		case ACCESS_GOOHOME_USER:
+//			// 全文表示
+//			OnMenuGoohomeRead();
+//			break;
 
 		case ACCESS_RSS_READER_ITEM:
 			// 詳細表示
