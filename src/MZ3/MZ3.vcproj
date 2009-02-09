@@ -662,11 +662,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\MZ4.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				GenerateDebugInformation="false"
 				SubSystem="1"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				EntryPointSymbol="wWinMainCRTStartup"
 				TargetMachine="0"
 			/>

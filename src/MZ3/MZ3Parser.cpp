@@ -33,6 +33,9 @@ static void my_lua_printstack( lua_State *L )
 /// MZ3用HTMLパーサ
 namespace parser {
 
+/**
+ * MZ3 Script : パーサ呼び出し
+ */
 static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserFuncName, 
 								CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
 {

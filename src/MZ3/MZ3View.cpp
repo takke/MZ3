@@ -1478,6 +1478,68 @@ void CMZ3View::OnEnSetfocusInfoEdit()
 }
 
 /**
+ * MZ3 Script : フック関数の呼び出し
+ */
+static bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, void* pUserData)
+{
+	CStringA strKeyEvent;
+	strKeyEvent.Format("%s:%s", szSerializeKey, szEventName);
+
+	if (theApp.m_luaHooks.count((const char*)strKeyEvent)==0) {
+		// フック関数未登録のため終了
+		return false;
+	}
+
+	CStringA strHookFuncName = theApp.m_luaHooks[(const char*)strKeyEvent].c_str();
+
+	// パーサ名をテーブルと関数名に分離する
+	int idx = strHookFuncName.Find('.');
+	if (idx<=0) {
+		// 関数名不正
+		MZ3LOGGER_ERROR(util::FormatString(L"フック関数名が不正です : [%s], [%s]", 
+			CString(strHookFuncName), CString(strKeyEvent)));
+		return false;
+	}
+
+	CStringA strTable    = strHookFuncName.Left(idx);
+	CStringA strFuncName = strHookFuncName.Mid(idx+1);
+
+
+	// スタックのサイズを覚えておく
+	lua_State* L = theApp.m_luaState;
+	int top = lua_gettop(L);
+
+	// Lua関数名("table.name")を積む
+	lua_getglobal(L, strTable);				// テーブル名をスタックに積む
+	lua_pushstring(L, strFuncName);			// 対象変数(関数名)をテーブルに積む
+	lua_gettable(L, -2);					// スタックの2番目の要素(テーブル)から、
+											// テーブルトップの文字列(strFuncName)で示されるメンバを
+											// スタックに積む
+
+	// 引数を積む
+	lua_pushstring(L, szSerializeKey);
+	lua_pushstring(L, szEventName);
+	lua_pushlightuserdata(L, pUserData);
+
+	// 関数実行
+	int n_arg = 3;
+	int n_ret = 1;
+	int status = lua_pcall(L, n_arg, n_ret, 0);
+
+	int result = 0;
+	if (status != 0) {
+		// TODO エラー処理
+		theApp.MyLuaErrorReport(status);
+		return false;
+	} else {
+		// 返り値取得
+		result = lua_toboolean(L, -1);
+	}
+	lua_settop(L, top);
+	return result!=0;
+}
+
+/**
  * ボディリストクリック
  */
 void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1503,6 +1565,15 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	CMixiData& data = GetSelectedBodyItem();
 
 	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
+
+	// MZ3 API : フック関数呼び出し
+	if (CallMZ3ScriptHookFunction(
+			theApp.m_accessTypeInfo.getSerializeKey(data.GetAccessType()),
+			"dblclk_body_list", &data))
+	{
+		// フック関数登録済み＆コール成功のため終了
+		return;
+	}
 
 	switch (data.GetAccessType()) {
 	case ACCESS_LIST_FOOTSTEP:
@@ -2362,6 +2433,15 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		// アクセス中は再アクセス不可
 		if( m_access ) return TRUE;
+
+		// MZ3 API : フック関数呼び出し
+		if (CallMZ3ScriptHookFunction(
+				theApp.m_accessTypeInfo.getSerializeKey(GetSelectedBodyItem().GetAccessType()),
+				"enter_body_list", &GetSelectedBodyItem()))
+		{
+			// フック関数登録済み＆コール成功のため終了
+			return TRUE;
+		}
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:

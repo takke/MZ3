@@ -116,7 +116,7 @@ int lua_mz3_get_access_type_by_key(lua_State *L)
 	const char* key = lua_tostring(L, 1);			// 第1引数
 
 	// 変換
-	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessKeyBySerializeKey(key);
+	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(key);
 
 	// 結果をスタックに戻す
 	lua_pushinteger(L, (int)type);
@@ -129,12 +129,24 @@ int lua_mz3_get_access_type_by_key(lua_State *L)
 int lua_mz3_set_parser(lua_State *L)
 {
 	const char* szKey = lua_tostring(L, 1);			// 第1引数:シリアライズキー
-	const char* szParserName = lua_tostring(L, 2);		// 第2引数:パーサ名
+	const char* szParserName = lua_tostring(L, 2);	// 第2引数:パーサ名
 
 	theApp.m_luaParsers[ szKey ] = szParserName;
 
 //	MZ3LOGGER_DEBUG(util::FormatString(L"Registered new parser [%s] for [%s].", 
 //						CString(szParserName), CString(szType)));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+// MZ3 API : mz3.set_hook(key_event, parser)
+int lua_mz3_set_hook(lua_State *L)
+{
+	const char* szKeyEvent = lua_tostring(L, 1);	// 第1引数:{シリアライズキー}:{イベント}
+	const char* szParserName = lua_tostring(L, 2);	// 第2引数:パーサ名
+
+	theApp.m_luaHooks[ szKeyEvent ] = szParserName;
 
 	// 戻り値の数を返す
 	return 0;
@@ -514,6 +526,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
 	{"get_access_type_by_key", lua_mz3_get_access_type_by_key},
 	{"set_parser",		lua_mz3_set_parser},
+	{"set_hook",		lua_mz3_set_hook},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

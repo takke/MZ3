@@ -193,7 +193,7 @@ public:
 	bool init();
 
 	/// シリアライズキーからアクセス種別を取得する
-	ACCESS_TYPE getAccessKeyBySerializeKey(const std::string& key) {
+	ACCESS_TYPE getAccessTypeBySerializeKey(const std::string& key) {
 		SERIALIZE_KEY_TO_ACCESS_TYPE_MAP::iterator it = m_serializeKeyToAccessKeyMap.find(key);
 		if (it==m_serializeKeyToAccessKeyMap.end()) {
 			return ACCESS_INVALID;
