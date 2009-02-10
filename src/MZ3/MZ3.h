@@ -186,6 +186,7 @@ public:
 public:
 	std::map<std::string, std::string> m_luaParsers;			///< シリアライズキー → パーサ名
 	std::map<std::string, std::vector<std::string>> m_luaHooks;	///< {イベント} → パーサ名
+	std::vector<std::string>						m_luaMenus;	///< 登録済みメニュー項目
 
 public:
 	void ChangeView(CView*);

@@ -35,9 +35,11 @@ end
 function MZ3Data:delete()						return mz3_data.delete(self.data);						end
 function MZ3Data:set_access_type(type)			return mz3_data.set_access_type(self.data, type);		end
 function MZ3Data:get_access_type()				return mz3_data.get_access_type(self.data);				end
+function MZ3Data:get_date()						return mz3_data.get_date(self.data);					end
 function MZ3Data:get_text(name)					return mz3_data.get_text(self.data, name);				end
 function MZ3Data:set_text(name, value)			return mz3_data.set_text(self.data, name, value);		end
-function MZ3Data:get_text_array(name)			return mz3_data.get_text_array(self.data, name);		end
+function MZ3Data:get_text_array(name, idx)		return mz3_data.get_text_array(self.data, name, idx);	end
+function MZ3Data:get_text_array_size(name)		return mz3_data.get_text_array_size(self.data, name);	end
 function MZ3Data:add_text_array(name, value)	return mz3_data.add_text_array(self.data, name, value);	end
 function MZ3Data:get_integer(name)				return mz3_data.get_integer(self.data, name);			end
 function MZ3Data:set_integer(name, value)		return mz3_data.set_integer(self.data, name, value);	end

@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MixiParserUtil.h"
+#include "IniFile.h"
 
 //-----------------------------------------------
 // lua support
@@ -78,6 +79,18 @@ int lua_mz3_get_tick_count(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+// MZ3 API : mz3.alert(msg, title)
+int lua_mz3_alert(lua_State *L)
+{
+	CString msg(lua_tostring(L, 1));		// 第1引数
+	CString title(lua_tostring(L, 2));		// 第2引数
+
+	MessageBox(NULL, msg, title, MB_OK);
+
+	// 戻り値の数を返す
+	return 0;
 }
 
 // MZ3 API : mz3.decode_html_entity(text)
@@ -218,6 +231,26 @@ int lua_mz3_data_get_text(lua_State *L)
 	return 1;
 }
 
+// MZ3 API : mz3_data.get_date(data)
+int lua_mz3_data_get_date(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_date";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに戻す
+	lua_pushstring(L, CStringA(data->GetDate()));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 // MZ3 API : mz3_data.set_text(data, name, value)
 int lua_mz3_data_set_text(lua_State *L)
 {
@@ -260,6 +293,30 @@ int lua_mz3_data_get_text_array(lua_State *L)
 
 	// 結果をスタックに戻す
 	lua_pushstring(L, CStringA(value));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+// MZ3 API : mz3_data.get_text_array_size(data, name)
+int lua_mz3_data_get_text_array_size(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_text_array_size";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* name = lua_tostring(L, 2);			// 第2引数
+
+	// 値取得
+	int size = data->GetTextArraySize(CString(name));
+
+	// 結果をスタックに戻す
+	lua_pushinteger(L, size);
 
 	// 戻り値の数を返す
 	return 1;
@@ -520,6 +577,80 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 	return 1;
 }
 
+// MZ3 API : mz3_menu.regist_menu(hook_function_name)
+int lua_mz3_menu_regist_menu(lua_State *L)
+{
+	const char* func_name = "mz3_menu.regist_menu";
+
+	// 引数取得
+	const char* hook_function_name = lua_tostring(L, 1);	// 第1引数
+
+	// メニュー登録
+	theApp.m_luaMenus.push_back(hook_function_name);
+	int item_id = theApp.m_luaMenus.size()-1;
+
+	// 結果をスタックに積む
+	lua_pushinteger(L, item_id);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+// MZ3 API : mz3_menu.insert_menu(menu, index, title, item_id)
+int lua_mz3_menu_insert_menu(lua_State *L)
+{
+	const char* func_name = "mz3_menu.regist_menu";
+
+	// 引数取得
+	CMenu* pMenu = (CMenu*)lua_touserdata(L, 1);		// 第1引数
+	if (pMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	int index = lua_tointeger(L, 2);					// 第2引数
+	const char* title = lua_tostring(L, 3);				// 第3引数
+	int item_id = lua_tointeger(L, 4);					// 第4引数
+
+	// メニュー作成
+	pMenu->InsertMenu(index, MF_BYPOSITION | MF_STRING, ID_LUA_MENU_BASE +item_id, CString(title));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+// MZ3 API : mz3_inifile.get_value(name, section)
+int lua_mz3_inifile_get_value(lua_State *L)
+{
+	const char* func_name = "mz3_inifile.get_value";
+
+	const char* name = lua_tostring(L, 1);				// 第1引数
+	const char* section = lua_tostring(L, 2);			// 第2引数
+
+	// 読込
+	const CString& fileName = theApp.m_filepath.inifile;
+
+	inifile::IniFile inifile;
+	CFileStatus rStatus;
+	if (CFile::GetStatus(fileName, rStatus) == FALSE) {
+		inifile::StaticMethod::Create( util::my_wcstombs((LPCTSTR)fileName).c_str() );
+	}
+
+	if(! inifile.Load( theApp.m_filepath.inifile ) ) {
+		// 結果(エラーなのでnil)をスタックに積む
+		lua_pushnil(L);
+	} else {
+		// 結果をスタックに積む
+		std::string s = inifile.GetValue(name, section);
+		lua_pushstring(L, s.c_str());
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+
+
 // MZ3 API table
 static const luaL_Reg lua_mz3_lib[] = {
 	{"logger_error",				lua_mz3_logger_error},
@@ -527,6 +658,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"logger_debug",				lua_mz3_logger_debug},
 	{"trace",						lua_mz3_trace},
 	{"get_tick_count",				lua_mz3_get_tick_count},
+	{"alert",						lua_mz3_alert},
 	{"decode_html_entity",			lua_mz3_decode_html_entity},
 	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
 	{"get_access_type_by_key",		lua_mz3_get_access_type_by_key},
@@ -535,9 +667,11 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
+	{"get_date",		lua_mz3_data_get_date},
 	{"get_text",		lua_mz3_data_get_text},
 	{"set_text",		lua_mz3_data_set_text},
 	{"get_text_array",	lua_mz3_data_get_text_array},
+	{"get_text_array_size",	lua_mz3_data_get_text_array_size},
 	{"add_text_array",	lua_mz3_data_add_text_array},
 	{"get_integer",		lua_mz3_data_get_integer},
 	{"set_integer",		lua_mz3_data_set_integer},
@@ -559,6 +693,16 @@ static const luaL_Reg lua_mz3_htmlarray_lib[] = {
 	{"get_at",			lua_mz3_htmlarray_get_at},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_menu_lib[] = {
+	{"regist_menu",		lua_mz3_menu_regist_menu},
+	{"insert_menu",		lua_mz3_menu_insert_menu},
+	{NULL, NULL}
+};
+static const luaL_Reg lua_mz3_inifile_lib[] = {
+	{"get_value",		lua_mz3_inifile_get_value},
+//	{"set_value",		lua_mz3_inifile_set_value},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -566,4 +710,6 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_data", lua_mz3_data_lib);
 	luaL_register(L, "mz3_data_list", lua_mz3_data_list_lib);
 	luaL_register(L, "mz3_htmlarray", lua_mz3_htmlarray_lib);
+	luaL_register(L, "mz3_menu", lua_mz3_menu_lib);
+	luaL_register(L, "mz3_inifile", lua_mz3_inifile_lib);
 }

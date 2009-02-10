@@ -1299,6 +1299,9 @@ static int LuaLoadCallback(const TCHAR* szDirectory,
  */
 bool CMZ3App::MyLuaInit(void)
 {
+	util::StopWatch sw;
+	sw.start();
+
 	// リロード用にクローズ
 	if (m_luaState!=NULL) {
 		lua_close(m_luaState);
@@ -1308,6 +1311,7 @@ bool CMZ3App::MyLuaInit(void)
 	// Lua 関連メンバー変数の初期化
 	m_luaParsers.clear();
 	m_luaHooks.clear();
+	m_luaMenus.clear();
 
 	// Lua の初期化
 	m_luaState = lua_open();
@@ -1375,6 +1379,7 @@ bool CMZ3App::MyLuaInit(void)
 	util::FindFileCallback(plugin_dir+L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
 	util::FindFileCallback(user_script_dir+L"\\", L"*.lua", LuaLoadCallback, (void*)NULL, 1);
 
+	MZ3LOGGER_INFO(util::FormatString(L"スクリプト初期化完了 elapsed: %dms", sw.getElapsedMilliSecUntilNow()));
 	return true;
 }
 

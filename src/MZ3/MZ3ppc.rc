@@ -199,7 +199,6 @@ BEGIN
     BEGIN
         MENUITEM "最新の一覧を取得",                    IDM_CATEGORY_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "全文を読む...",                    ID_MENU_GOOHOME_READ
         MENUITEM "コメントを読む...",                  ID_MENU_GOOHOME_READ_COMMENTS
         MENUITEM "つぶやく",                        ID_MENU_GOOHOME_UPDATE
     END

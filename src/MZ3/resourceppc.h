@@ -332,6 +332,7 @@
 #define ID_REPORT_COPY_URL_BASE         36500
 #define ID_REPORT_COPY_IMAGE            36600
 #define ID_REPORT_COPY_MOVIE            36700
+#define ID_LUA_MENU_BASE				37000
 
 // Next default values for new objects
 // 

@@ -157,9 +157,9 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
-	ON_COMMAND(ID_MENU_GOOHOME_READ, &CMZ3View::OnMenuGoohomeRead)
 	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
 	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
+	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+100, OnLuaMenu)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -1615,11 +1615,6 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnMenuWassrRead();
 		break;
 
-//	case ACCESS_GOOHOME_USER:
-//		// 全文表示
-//		OnMenuGoohomeRead();
-//		break;
-
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
 		OnMenuRssRead();
@@ -2478,11 +2473,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			// 全文表示
 			OnMenuWassrRead();
 			break;
-
-//		case ACCESS_GOOHOME_USER:
-//			// 全文表示
-//			OnMenuGoohomeRead();
-//			break;
 
 		case ACCESS_RSS_READER_ITEM:
 			// 詳細表示
@@ -3977,6 +3967,9 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
 				}
 			}
+
+			// 暫定：メニュー表示直前のフック関数
+			CallMZ3ScriptHookFunction("", "creating_goohome_user_context_menu", pSubMenu);
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -7182,6 +7175,22 @@ void CMZ3View::OnCopyClipboardUrl(UINT nID)
 }
 
 /**
+ * MZ3 API で登録されたメニューのイベント
+ */
+void CMZ3View::OnLuaMenu(UINT nID)
+{
+	UINT idx = nID - ID_LUA_MENU_BASE;
+	if (idx >= theApp.m_luaMenus.size()) {
+		MZ3LOGGER_ERROR(util::FormatString(L"不正なメニューIDです [%d]", nID));
+		return;
+	}
+
+	// Lua関数名取得＆呼び出し
+	const std::string& strFuncName = theApp.m_luaMenus[idx];
+	CallMZ3ScriptHookFunction("", "select_menu", strFuncName.c_str(), &GetSelectedBodyItem());
+}
+
+/**
  * RSS AutoDiscovery URL 取得後の処理
  */
 bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
@@ -7358,28 +7367,6 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 	}
 
 	return true;
-}
-
-/**
- * gooHome | 読む
- */
-void CMZ3View::OnMenuGoohomeRead()
-{
-	CMixiData& data = GetSelectedBodyItem();
-
-	// 本文を1行に変換して割り当て。
-	CString item;
-
-	CString v = data.GetBody();;
-	while( v.Replace( L"\r\n", L"" ) );
-	item.Append(v);
-	item.Append(L"\r\n");
-	item.Append(L"----\r\n");
-	
-	item.AppendFormat( L"name : %s\r\n", data.GetName() );
-	item.AppendFormat( L"%s\r\n", data.GetDate() );
-
-	MessageBox( item, data.GetName() );
 }
 
 /**

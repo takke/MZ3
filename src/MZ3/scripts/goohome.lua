@@ -27,7 +27,7 @@ mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_par
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 -- TODO APIを実装すること
---goohome_user_read_menu_item = mz3_menu.create_item("goohome.on_read_menu_item");
+goohome_user_read_menu_item = mz3_menu.regist_menu("goohome.on_read_menu_item");
 
 ----------------------------------------
 -- イベントフック関数の登録
@@ -42,11 +42,25 @@ function on_event(serialize_key, event_name, data)
 	return true;
 end
 
--- 全文表示メニューまたは
+-- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
-	mz3.logger_debug('dblclk_hook : (' .. serialize_key .. ', ' .. event_name .. ')');
+	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
-	mz3.logger_debug(data:get_text('name'));
+--	mz3.logger_debug(data:get_text('name'));
+	
+	-- 本文を1行に変換して表示
+	item = '';
+	for i=0, data:get_text_array_size('body')-1 do
+		item = item .. data:get_text_array('body', i);
+	end
+	item = item:gsub("\r\n", "");
+	
+	item = item .. "\r\n";
+	item = item .. "----\r\n";
+	item = item .. "name : " .. data:get_text('name') .. "\r\n";
+	item = item .. data:get_date();
+
+	mz3.alert(item, data:get_text('name'));
 
 	return true;
 end
@@ -54,7 +68,7 @@ end
 -- 暫定のイベント：gooホーム用コンテキストメニューの作成
 function on_creating_goohome_user_context_menu(serialize_key, event_name, menu)
 	-- "全文を読む" を追加
-	mz3_menu.insert_item(menu, 1, "全文を読む", goohome_user_read_menu_item);
+	mz3_menu.insert_menu(menu, 2, "全文を読む...", goohome_user_read_menu_item);
 end
 
 -- ボディリストのクリック・ダブルクリックイベントハンドラ登録

@@ -298,6 +298,7 @@ public:
 	afx_msg void OnViewLog();
 	afx_msg void OnCategoryOpen();
 	afx_msg void OnCopyClipboardUrl(UINT);
+	afx_msg void OnLuaMenu(UINT);
 
 	BOOL OnKeydownGroupTab( WORD vKey );
 	BOOL OnKeydownCategoryList( WORD vKey );
@@ -411,7 +412,6 @@ public:
 private:
 	bool DoAccessEndProcForSoftwareUpdateCheck(void);
 public:
-	afx_msg void OnMenuGoohomeRead();
 	afx_msg void OnMenuGoohomeUpdate();
 	afx_msg void OnMenuGoohomeReadComments();
 	void ReloadCategoryListLog();
