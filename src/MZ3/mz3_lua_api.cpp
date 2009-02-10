@@ -87,7 +87,7 @@ int lua_mz3_alert(lua_State *L)
 	CString msg(lua_tostring(L, 1));		// ‘æ1ˆø”
 	CString title(lua_tostring(L, 2));		// ‘æ2ˆø”
 
-	MessageBox(NULL, msg, title, MB_OK);
+	MessageBox(GetActiveWindow(), msg, title, MB_OK);
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 0;
