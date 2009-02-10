@@ -96,8 +96,10 @@ END_MESSAGE_MAP()
 // コンストラクタ
 // -----------------------------------------------------------------------------
 CMainFrame::CMainFrame()
+	: m_bBackPageEnabled(FALSE)
+	, m_bForwardPageEnabled(FALSE)
 #ifdef WINCE
-	: m_hMenu(NULL)
+	, m_hMenu(NULL)
 #endif
 {
 
@@ -280,7 +282,7 @@ void CMainFrame::AssertValid() const
 void CMainFrame::OnBackButton()
 {
 #ifndef WINCE
-	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_BACK_BUTTON )) ){
+	if (!m_bBackPageEnabled) {
 		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
 		return;
 	}
@@ -294,8 +296,8 @@ void CMainFrame::OnBackButton()
 		// 終了処理
 		((CReportView*)pActiveView)->EndProc();
 
-		theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, TRUE );
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
+		m_bForwardPageEnabled = TRUE;
+		m_bBackPageEnabled = FALSE;
 
 		// 戻る
 		::SendMessage( theApp.m_pMainView->m_hWnd, WM_MZ3_CHANGE_VIEW, NULL, NULL );
@@ -321,14 +323,14 @@ void CMainFrame::OnBackButton()
 				theApp.m_pWriteView->SetWriteCompleted(true);
 			}
 
-			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
+			m_bForwardPageEnabled = FALSE;
+			m_bBackPageEnabled = FALSE;
 
 			theApp.ChangeView(theApp.m_pMainView);
 		} else {
 			// Write ビュー（日記以外） → レポートビュー
-			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, TRUE );
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+			m_bForwardPageEnabled = TRUE;
+			m_bBackPageEnabled = TRUE;
 
 			// ReportViewに戻る
 			theApp.ChangeView(theApp.m_pReportView);
@@ -338,8 +340,8 @@ void CMainFrame::OnBackButton()
 
 	if (pActiveView == theApp.m_pDownloadView) {
 		// ダウンロードビュー → メインビュー
-		theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE );
+		m_bForwardPageEnabled = FALSE;
+		m_bBackPageEnabled = FALSE;
 
 		// 戻る
 		theApp.ChangeView(theApp.m_pMainView);
@@ -363,7 +365,7 @@ void CMainFrame::OnBackButton()
 void CMainFrame::OnForwardButton()
 {
 #ifndef WINCE
-	if( !(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled( ID_FORWARD_BUTTON )) ){
+	if (!m_bForwardPageEnabled) {
 		// ボタンが非活性なら処理しない（直接呼ばれる場合があるので）
 		return;
 	}
@@ -375,8 +377,8 @@ void CMainFrame::OnForwardButton()
 		// レポートビュー → 書き込みビュー
 		// 但し、未送信の場合のみ。
 		if (!theApp.m_pWriteView->IsWriteCompleted()) {
-			theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, FALSE);
-			theApp.EnableCommandBarButton(ID_BACK_BUTTON, TRUE);
+			m_bForwardPageEnabled = FALSE;
+			m_bBackPageEnabled = TRUE;
 
 			theApp.ChangeView( theApp.m_pWriteView );
 		}
@@ -393,8 +395,8 @@ void CMainFrame::OnForwardButton()
 
 		// 書き込みビューに行けるなら、NEXT ボタンを有効に。
 		// 送信完了フラグ(IsWriteCompleted())がOFFなら、「書き込みビューに行ける」と判断する
-		theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
-		theApp.EnableCommandBarButton(ID_BACK_BUTTON,    TRUE);
+		m_bForwardPageEnabled = theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE;
+		m_bBackPageEnabled = TRUE;
 
 		theApp.ChangeView(theApp.m_pReportView);
 	}
@@ -424,9 +426,9 @@ void CMainFrame::OnSettingLogin()
 void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 {
 #ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
-	}
+//	if( theApp.m_bPocketPC ) {
+//		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
+//	}
 #else
 	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_STOP_BUTTON));
 #endif
@@ -437,13 +439,7 @@ void CMainFrame::OnUpdateStopButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));  
-	}
-#else
-	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));
-#endif
+	pCmdUI->Enable(m_bBackPageEnabled); 
 }
 
 // -----------------------------------------------------------------------------
@@ -451,12 +447,8 @@ void CMainFrame::OnUpdateBackButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 {
-#ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));  
-	}
-#else
-	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));
+#ifndef WINCE
+	pCmdUI->Enable(m_bForwardPageEnabled);
 #endif
 }
 
@@ -466,9 +458,9 @@ void CMainFrame::OnUpdateForwardButton(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 {
 #ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
-	}
+//	if( theApp.m_bPocketPC ) {
+//		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));  
+//	}
 #else
 	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_IMAGE_BUTTON));
 #endif
@@ -480,9 +472,9 @@ void CMainFrame::OnUpdateImageButton(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
 #ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
-	}
+//	if( theApp.m_bPocketPC ) {
+//		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON) );
+//	}
 #else
 	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));
 #endif
@@ -494,9 +486,9 @@ void CMainFrame::OnUpdateWriteButton(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdateBrowserButton(CCmdUI* pCmdUI)
 {
 #ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
-	}
+//	if( theApp.m_bPocketPC ) {
+//		pCmdUI->Enable(m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));  
+//	}
 #else
 	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_OPEN_BROWSER));
 #endif
@@ -739,25 +731,13 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 /// 画面｜前の画面メニューの制御
 void CMainFrame::OnUpdateMenuBack(CCmdUI *pCmdUI)
 {
-#ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON) );
-	}
-#else
-	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_BACK_BUTTON));
-#endif
+	pCmdUI->Enable(m_bBackPageEnabled);
 }
 
 /// 画面｜次の画面メニューの制御
 void CMainFrame::OnUpdateMenuNext(CCmdUI *pCmdUI)
 {
-#ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		pCmdUI->Enable( m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON) );
-	}
-#else
-	pCmdUI->Enable(m_wndToolBar.GetToolBarCtrl().IsButtonEnabled(ID_FORWARD_BUTTON));
-#endif
+	pCmdUI->Enable(m_bForwardPageEnabled);
 }
 
 /// 定期取得メニュー
@@ -1202,8 +1182,8 @@ void CMainFrame::OnMove(int x, int y)
 
 void CMainFrame::OnDownloadManagerView()
 {
-	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+	m_bForwardPageEnabled = FALSE;
+	m_bBackPageEnabled = TRUE;
 
 	theApp.ChangeView(theApp.m_pDownloadView);
 }

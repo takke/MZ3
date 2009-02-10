@@ -88,8 +88,8 @@ BEGIN
     BEGIN
         POPUP "画面"
         BEGIN
-            MENUITEM "前の画面へ",                       ID_MENU_BACK
-            MENUITEM "次の画面へ",                       ID_MENU_NEXT
+            MENUITEM "戻る",                          ID_MENU_BACK
+            MENUITEM "進む",                          ID_MENU_NEXT
             MENUITEM SEPARATOR
             MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
             MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
@@ -382,8 +382,8 @@ BEGIN
     END
     POPUP "ウィンドウ(&W)"
     BEGIN
-        MENUITEM "前の画面へ",                       ID_MENU_BACK
-        MENUITEM "次の画面へ",                       ID_MENU_NEXT
+        MENUITEM "戻る",                          ID_MENU_BACK
+        MENUITEM "進む",                          ID_MENU_NEXT
         MENUITEM SEPARATOR
         MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
         MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY

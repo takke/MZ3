@@ -2811,13 +2811,14 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
  */
 void CMZ3View::OnUpdateWriteButton(CCmdUI* pCmdUI)
 {
-	if( theApp.m_bPocketPC ) {
+/*	if( theApp.m_bPocketPC ) {
 #ifdef WINCE
 		CMainFrame* pFrame;
 		pFrame = (CMainFrame*)(theApp.GetMainWnd());
 		pCmdUI->Enable(pFrame->m_wndCommandBar.GetToolBarCtrl().IsButtonEnabled(ID_WRITE_BUTTON));  
 #endif
 	}
+*/
 }
 
 /**

@@ -33,7 +33,7 @@ public:
 public:  // コントロール バー用メンバ
 #ifdef WINCE
 	// WindowsMobile の場合はコマンドバー
-	CCommandBar m_wndCommandBar;
+//	CCommandBar m_wndCommandBar;
 #else
 	// Windows の場合はツールバー
 	CToolBar    m_wndToolBar;
@@ -54,6 +54,9 @@ public:
 	afx_msg void OnBackButton();
 	afx_msg void OnForwardButton();
 	afx_msg void OnAutoReloadButton();
+
+	BOOL m_bBackPageEnabled;
+	BOOL m_bForwardPageEnabled;
 
 	inline afx_msg void OnStopButton() {
 		::SendMessage(GetActiveView()->m_hWnd, WM_MZ3_ABORT, NULL, NULL);

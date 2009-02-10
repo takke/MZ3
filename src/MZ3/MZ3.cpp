@@ -880,15 +880,22 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
 {
-#ifdef WINCE
-	if( theApp.m_bPocketPC ) {
-		return ((CMainFrame*)m_pMainWnd)->m_wndCommandBar.GetToolBarCtrl().EnableButton( nID, bEnable);
-	} else {
+	// TODO 本来は各変数の直接変更にすべき
+	switch (nID) {
+	case ID_BACK_BUTTON:
+		((CMainFrame*)m_pMainWnd)->m_bBackPageEnabled = bEnable;
 		return TRUE;
-	}
+	case ID_FORWARD_BUTTON:
+		((CMainFrame*)m_pMainWnd)->m_bForwardPageEnabled = bEnable;
+		return TRUE;
+	default:
+		// ツールバーがあるMZ4のみ有効
+#ifdef WINCE
+		return TRUE;
 #else
-	return ((CMainFrame*)m_pMainWnd)->m_wndToolBar.GetToolBarCtrl().EnableButton( nID, bEnable);
+		return ((CMainFrame*)m_pMainWnd)->m_wndToolBar.GetToolBarCtrl().EnableButton( nID, bEnable);
 #endif
+	}
 }
 
 /**
