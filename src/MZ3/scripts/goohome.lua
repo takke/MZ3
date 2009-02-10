@@ -26,7 +26,6 @@ mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_par
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
--- TODO APIを実装すること
 goohome_user_read_menu_item = mz3_menu.regist_menu("goohome.on_read_menu_item");
 
 ----------------------------------------
@@ -39,7 +38,8 @@ function on_event(serialize_key, event_name, data)
 		return on_read_menu_item(serialize_key, event_name,data);
 	end
 	
-	return true;
+	-- 標準の処理を続行
+	return false;
 end
 
 -- 全文表示メニューまたはダブルクリックイベント
