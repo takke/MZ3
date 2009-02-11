@@ -1,0 +1,1368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li><strong>mz3_lua_api.luadoc</strong></li>
+	
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>mz3_lua_api.luadoc</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#*mz3.get_serialize_key_by_access_type">*mz3.get_serialize_key_by_access_type</a>&nbsp;(type)</td>
+	<td class="summary">アクセス種別からシリアライズキーを取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#*mz3_data.get_serialize_key">*mz3_data.get_serialize_key</a>&nbsp;(data)</td>
+	<td class="summary">シリアライズキーを取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#*mz3_inifile.set_value">*mz3_inifile.set_value</a>&nbsp;(name, section, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#event_listener">event_listener</a>&nbsp;(serialize_key, event_name, data)</td>
+	<td class="summary">フック関数  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.add_event_listener">mz3.add_event_listener</a>&nbsp;(event, event_handler, parser)</td>
+	<td class="summary">各種イベントに対するフック関数を追加する。  同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.alert">mz3.alert</a>&nbsp;(msg, title)</td>
+	<td class="summary">Win32 API の MessageBox() を呼び出す。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.decode_html_entity">mz3.decode_html_entity</a>&nbsp;(text)</td>
+	<td class="summary">HTMLエンティティをデコードした文字列を返す。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.estimate_access_type_by_url">mz3.estimate_access_type_by_url</a>&nbsp;(url)</td>
+	<td class="summary">URLから類推されるアクセス種別を取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_access_type_by_key">mz3.get_access_type_by_key</a>&nbsp;(key)</td>
+	<td class="summary">シリアライズキーからアクセス種別を取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_tick_count">mz3.get_tick_count</a>&nbsp;()</td>
+	<td class="summary">Win32 API の GetTickCount() を呼び出す。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.logger_debug">mz3.logger_debug</a>&nbsp;(msg)</td>
+	<td class="summary">ログ出力(DEBUGレベル)を行う。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.logger_error">mz3.logger_error</a>&nbsp;(msg)</td>
+	<td class="summary">ログ出力(ERRORレベル)を行う。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.logger_info">mz3.logger_info</a>&nbsp;(msg)</td>
+	<td class="summary">ログ出力(INFOレベル)を行う。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.set_parser">mz3.set_parser</a>&nbsp;(key, parser)</td>
+	<td class="summary">パーサを指定する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.trace">mz3.trace</a>&nbsp;(msg)</td>
+	<td class="summary">TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.add_text_array">mz3_data.add_text_array</a>&nbsp;(data, name, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.create">mz3_data.create</a>&nbsp;()</td>
+	<td class="summary">MZ3Data オブジェクトの生成  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.delete">mz3_data.delete</a>&nbsp;(data)</td>
+	<td class="summary">MZ3Data オブジェクトの破棄  注意：Lua 内で create した MZ3Data オブジェクトは必ず delete すること。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_access_type">mz3_data.get_access_type</a>&nbsp;(data)</td>
+	<td class="summary">アクセス種別を取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_date">mz3_data.get_date</a>&nbsp;(data)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_integer">mz3_data.get_integer</a>&nbsp;(data, name)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_text">mz3_data.get_text</a>&nbsp;(data, name)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_text_array">mz3_data.get_text_array</a>&nbsp;(data, name, idx)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_text_array_size">mz3_data.get_text_array_size</a>&nbsp;(data, name)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.parse_date_line">mz3_data.parse_date_line</a>&nbsp;(data, line)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.set_access_type">mz3_data.set_access_type</a>&nbsp;(data, type)</td>
+	<td class="summary">アクセス種別を設定する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.set_integer">mz3_data.set_integer</a>&nbsp;(data, name, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.set_text">mz3_data.set_text</a>&nbsp;(data, name, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.add">mz3_data_list.add</a>&nbsp;(data_list, data)</td>
+	<td class="summary">data_list の末尾に data を追加する。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.clear">mz3_data_list.clear</a>&nbsp;(data_list, data)</td>
+	<td class="summary">data_list の要素をすべて消去する。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.insert">mz3_data_list.insert</a>&nbsp;(data_list, index, data)</td>
+	<td class="summary">data_list の index に data を挿入する。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_htmlarray.get_at">mz3_htmlarray.get_at</a>&nbsp;(htmlarray, index)</td>
+	<td class="summary">index の要素を取得する。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_htmlarray.get_count">mz3_htmlarray.get_count</a>&nbsp;(htmlarray)</td>
+	<td class="summary">データ数を取得する。   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_inifile.get_value">mz3_inifile.get_value</a>&nbsp;(name, section)</td>
+	<td class="summary">ini ファイルから値を取得する  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.insert_menu">mz3_menu.insert_menu</a>&nbsp;(menu, index, title, item_id)</td>
+	<td class="summary">メニューの登録。  2009/02/10 現在、メイン画面のみサポート。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.regist_menu">mz3_menu.regist_menu</a>&nbsp;(hook_function_name)</td>
+	<td class="summary">メニュー用フック関数の登録。  登録した関数は insert_menu で利用可能。  </td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="*mz3.get_serialize_key_by_access_type"></a><strong>*mz3.get_serialize_key_by_access_type</strong>&nbsp;(type)</dt>
+<dd>
+アクセス種別からシリアライズキーを取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: [integer]アクセス種別
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] シリアライズキー 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="*mz3_data.get_serialize_key"></a><strong>*mz3_data.get_serialize_key</strong>&nbsp;(data)</dt>
+<dd>
+シリアライズキーを取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data オブジェクト
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string]シリアライズキー 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="*mz3_inifile.set_value"></a><strong>*mz3_inifile.set_value</strong>&nbsp;(name, section, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  section: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="event_listener"></a><strong>event_listener</strong>&nbsp;(serialize_key, event_name, data)</dt>
+<dd>
+フック関数 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  serialize_key: シリアライズキー
+	</li>
+	
+	<li>
+	  event_name: イベント名
+	</li>
+	
+	<li>
+	  data: データ(イベント毎に内容は異なる)
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[bool] 次のフック関数またはデフォルト動作をさせる場合は false, それ以外は true。 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.add_event_listener"></a><strong>mz3.add_event_listener</strong>&nbsp;(event, event_handler, parser)</dt>
+<dd>
+各種イベントに対するフック関数を追加する。  同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  event: イベント名
+	</li>
+	
+	<li>
+	  event_handler: 
+	</li>
+	
+	<li>
+	  parser: フック関数名({テーブル}.{関数名})
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+<h3>See also:</h3>
+<ul>
+	
+	<li><a href="../files/mz3_lua_api.html#event_listener">
+		event_listener
+	</a>
+	
+</ul>
+
+</dd>
+
+
+
+
+<dt><a name="mz3.alert"></a><strong>mz3.alert</strong>&nbsp;(msg, title)</dt>
+<dd>
+Win32 API の MessageBox() を呼び出す。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: メッセージ
+	</li>
+	
+	<li>
+	  title: タイトル 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.decode_html_entity"></a><strong>mz3.decode_html_entity</strong>&nbsp;(text)</dt>
+<dd>
+HTMLエンティティをデコードした文字列を返す。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.estimate_access_type_by_url"></a><strong>mz3.estimate_access_type_by_url</strong>&nbsp;(url)</dt>
+<dd>
+URLから類推されるアクセス種別を取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  url: [string] URL
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[integer] アクセス種別 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_access_type_by_key"></a><strong>mz3.get_access_type_by_key</strong>&nbsp;(key)</dt>
+<dd>
+シリアライズキーからアクセス種別を取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  key: シリアライズキー
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[integer] アクセス種別 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_tick_count"></a><strong>mz3.get_tick_count</strong>&nbsp;()</dt>
+<dd>
+Win32 API の GetTickCount() を呼び出す。 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+[integer] OS起動時からの経過時間(ms) 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.logger_debug"></a><strong>mz3.logger_debug</strong>&nbsp;(msg)</dt>
+<dd>
+ログ出力(DEBUGレベル)を行う。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: 出力する文字列 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.logger_error"></a><strong>mz3.logger_error</strong>&nbsp;(msg)</dt>
+<dd>
+ログ出力(ERRORレベル)を行う。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: 出力する文字列 
+	</li>
+	
+</ul>
+
+
+
+
+<h3>Usage:</h3>
+mz3.logger_error('text') 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.logger_info"></a><strong>mz3.logger_info</strong>&nbsp;(msg)</dt>
+<dd>
+ログ出力(INFOレベル)を行う。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: 出力する文字列 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.set_parser"></a><strong>mz3.set_parser</strong>&nbsp;(key, parser)</dt>
+<dd>
+パーサを指定する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  key: シリアライズキー
+	</li>
+	
+	<li>
+	  parser: パーサ名({テーブル}.{関数名})
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+なし 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.trace"></a><strong>mz3.trace</strong>&nbsp;(msg)</dt>
+<dd>
+TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: 出力する文字列 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.add_text_array"></a><strong>mz3_data.add_text_array</strong>&nbsp;(data, name, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.create"></a><strong>mz3_data.create</strong>&nbsp;()</dt>
+<dd>
+MZ3Data オブジェクトの生成 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+MZ3Data オブジェクト 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.delete"></a><strong>mz3_data.delete</strong>&nbsp;(data)</dt>
+<dd>
+MZ3Data オブジェクトの破棄  注意：Lua 内で create した MZ3Data オブジェクトは必ず delete すること。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data オブジェクト
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+なし 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_access_type"></a><strong>mz3_data.get_access_type</strong>&nbsp;(data)</dt>
+<dd>
+アクセス種別を取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data オブジェクト
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[integer]アクセス種別 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_date"></a><strong>mz3_data.get_date</strong>&nbsp;(data)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_integer"></a><strong>mz3_data.get_integer</strong>&nbsp;(data, name)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_text"></a><strong>mz3_data.get_text</strong>&nbsp;(data, name)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_text_array"></a><strong>mz3_data.get_text_array</strong>&nbsp;(data, name, idx)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  idx: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_text_array_size"></a><strong>mz3_data.get_text_array_size</strong>&nbsp;(data, name)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.parse_date_line"></a><strong>mz3_data.parse_date_line</strong>&nbsp;(data, line)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  line: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.set_access_type"></a><strong>mz3_data.set_access_type</strong>&nbsp;(data, type)</dt>
+<dd>
+アクセス種別を設定する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data オブジェクト
+	</li>
+	
+	<li>
+	  type: [integer]アクセス種別
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+なし 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.set_integer"></a><strong>mz3_data.set_integer</strong>&nbsp;(data, name, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.set_text"></a><strong>mz3_data.set_text</strong>&nbsp;(data, name, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.add"></a><strong>mz3_data_list.add</strong>&nbsp;(data_list, data)</dt>
+<dd>
+data_list の末尾に data を追加する。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+	<li>
+	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.clear"></a><strong>mz3_data_list.clear</strong>&nbsp;(data_list, data)</dt>
+<dd>
+data_list の要素をすべて消去する。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+	<li>
+	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.insert"></a><strong>mz3_data_list.insert</strong>&nbsp;(data_list, index, data)</dt>
+<dd>
+data_list の index に data を挿入する。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+	<li>
+	  index: 
+	</li>
+	
+	<li>
+	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_htmlarray.get_at"></a><strong>mz3_htmlarray.get_at</strong>&nbsp;(htmlarray, index)</dt>
+<dd>
+index の要素を取得する。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  htmlarray: 
+	</li>
+	
+	<li>
+	  index: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_htmlarray.get_count"></a><strong>mz3_htmlarray.get_count</strong>&nbsp;(htmlarray)</dt>
+<dd>
+データ数を取得する。  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  htmlarray: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_inifile.get_value"></a><strong>mz3_inifile.get_value</strong>&nbsp;(name, section)</dt>
+<dd>
+ini ファイルから値を取得する 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: iniファイル値
+	</li>
+	
+	<li>
+	  section: iniファイル値のセクション
+	</li>
+	
+</ul>
+
+
+
+
+<h3>Usage:</h3>
+<pre> t = mz3_inifile.get_value("UseGlobalProxy", "General") </pre> 
+
+
+
+<h3>Return value:</h3>
+[string] iniの値
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.insert_menu"></a><strong>mz3_menu.insert_menu</strong>&nbsp;(menu, index, title, item_id)</dt>
+<dd>
+メニューの登録。  2009/02/10 現在、メイン画面のみサポート。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  menu: メニュー用オブジェクト
+	</li>
+	
+	<li>
+	  index: 追加位置(0オリジン)
+	</li>
+	
+	<li>
+	  title: タイトル
+	</li>
+	
+	<li>
+	  item_id: insert_menu の返り値 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.regist_menu"></a><strong>mz3_menu.regist_menu</strong>&nbsp;(hook_function_name)</dt>
+<dd>
+メニュー用フック関数の登録。  登録した関数は insert_menu で利用可能。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  hook_function_name: メニュー押下時のフック関数名 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>
