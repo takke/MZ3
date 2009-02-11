@@ -13,24 +13,16 @@ mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
 ----------------------------------------
--- パーサロード
-----------------------------------------
---require("scripts\\twitter\\xxx_parser");
-
-----------------------------------------
--- パーサの登録
-----------------------------------------
-
-----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 twitter_item_read_menu_item = mz3_menu.regist_menu("twitter.on_read_menu_item");
 
 ----------------------------------------
--- イベントフック関数の登録
+-- イベントハンドラ
 ----------------------------------------
--- TODO 整理
-function on_event(serialize_key, event_name, data)
+
+--- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
+function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="TWITTER_USER" then
 		-- 全文表示
 		return on_read_menu_item(serialize_key, event_name, data);
@@ -40,7 +32,7 @@ function on_event(serialize_key, event_name, data)
 	return false;
 end
 
--- 全文表示メニューまたはダブルクリックイベント
+--- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
@@ -78,9 +70,13 @@ function on_creating_twitter_item_context_menu(serialize_key, event_name, menu)
 	mz3_menu.insert_menu(menu, 2, "全文を読む...", twitter_item_read_menu_item);
 end
 
--- ボディリストのクリック・ダブルクリックイベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "twitter.on_event");
-mz3.add_event_listener("enter_body_list",  "twitter.on_event");
+----------------------------------------
+-- イベントハンドラの登録
+----------------------------------------
+
+-- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
+mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
 
 -- 暫定のイベントです。
 mz3.add_event_listener("creating_twitter_item_context_menu",  "twitter.on_creating_twitter_item_context_menu");
