@@ -23,44 +23,23 @@ static CStringA make_invalid_arg_error_string(const char* func_name)
 	return s;
 }
 
+/*
+--- 関数名が * で始まるAPIは未実装
+*/
+
 //-----------------------------------------------
 // MZ3 Core API
 //-----------------------------------------------
 
-// MZ3 API : mz3.trace
-int lua_mz3_trace(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3_TRACE(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_debug
-int lua_mz3_logger_debug(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3LOGGER_DEBUG(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_info
-int lua_mz3_logger_info(lua_State *L)
-{
-	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
-
-	MZ3LOGGER_INFO(s);
-
-	return 0;
-}
-
-// MZ3 API : mz3.logger_error
+/*
+--- ログ出力(ERRORレベル)を行う。
+--
+-- @param msg 出力する文字列
+--
+-- @usage mz3.logger_error('text')
+--
+function mz3.logger_error(msg)
+*/
 int lua_mz3_logger_error(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
@@ -71,7 +50,64 @@ int lua_mz3_logger_error(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3.get_tick_count()
+/*
+--- ログ出力(INFOレベル)を行う。
+--
+-- @param msg 出力する文字列
+--
+function mz3.logger_info(msg)
+*/
+int lua_mz3_logger_info(lua_State *L)
+{
+	CString s( MZ3_LUA_LOGGER_HEADER );
+	s.Append( CString(lua_tostring(L, -1)) );
+
+	MZ3LOGGER_INFO(s);
+
+	return 0;
+}
+
+/*
+--- ログ出力(DEBUGレベル)を行う。 
+--
+-- @param msg 出力する文字列
+--
+function mz3.logger_debug(msg)
+*/
+int lua_mz3_logger_debug(lua_State *L)
+{
+	CString s( MZ3_LUA_LOGGER_HEADER );
+	s.Append( CString(lua_tostring(L, -1)) );
+
+	MZ3LOGGER_DEBUG(s);
+
+	return 0;
+}
+
+/*
+--- TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。 
+--
+-- @param msg 出力する文字列
+--
+function mz3.trace(msg)
+*/
+int lua_mz3_trace(lua_State *L)
+{
+	CString s( MZ3_LUA_LOGGER_HEADER );
+	s.Append( CString(lua_tostring(L, -1)) );
+
+	MZ3_TRACE(s);
+
+	return 0;
+}
+
+/*
+--- Win32 API の GetTickCount() を呼び出す。
+--
+-- @return [integer] OS起動時からの経過時間(ms)
+--
+function mz3.get_tick_count()
+*/
 int lua_mz3_get_tick_count(lua_State *L)
 {
 	// 結果をスタックに積む
@@ -81,7 +117,14 @@ int lua_mz3_get_tick_count(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3.alert(msg, title)
+/*
+--- Win32 API の MessageBox() を呼び出す。
+--
+-- @param msg   メッセージ
+-- @param title タイトル
+--
+function mz3.alert(msg, title)
+*/
 int lua_mz3_alert(lua_State *L)
 {
 	CString msg(lua_tostring(L, 1));		// 第1引数
@@ -93,7 +136,12 @@ int lua_mz3_alert(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3.decode_html_entity(text)
+/*
+--- HTMLエンティティをデコードした文字列を返す。 
+--
+--
+function mz3.decode_html_entity(text)
+*/
 int lua_mz3_decode_html_entity(lua_State *L)
 {
 	CString value(lua_tostring(L, 1));			// 第1引数
@@ -108,7 +156,24 @@ int lua_mz3_decode_html_entity(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3.estimate_access_type_by_url(url)
+/*
+TODO
+--- アクセス種別からシリアライズキーを取得する。
+--
+-- @param type [integer]アクセス種別
+-- @return [string] シリアライズキー
+--
+function *mz3.get_serialize_key_by_access_type(type)
+*/
+
+/*
+--- URLから類推されるアクセス種別を取得する。 
+--
+-- @param url [string] URL
+-- @return [integer] アクセス種別
+--
+function mz3.estimate_access_type_by_url(url)
+*/
 int lua_mz3_estimate_access_type_by_url(lua_State *L)
 {
 	CString url(lua_tostring(L, 1));			// 第1引数
@@ -123,7 +188,14 @@ int lua_mz3_estimate_access_type_by_url(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3.get_access_type_by_key(key)
+/*
+--- シリアライズキーからアクセス種別を取得する。
+--
+-- @param key シリアライズキー
+-- @return [integer] アクセス種別
+--
+function mz3.get_access_type_by_key(key)
+*/
 int lua_mz3_get_access_type_by_key(lua_State *L)
 {
 	const char* key = lua_tostring(L, 1);			// 第1引数
@@ -138,7 +210,15 @@ int lua_mz3_get_access_type_by_key(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3.set_parser(key, parser)
+/*
+--- パーサを指定する。
+--
+-- @param key    シリアライズキー
+-- @param parser パーサ名({テーブル}.{関数名})
+-- @return なし
+--
+function mz3.set_parser(key, parser)
+*/
 int lua_mz3_set_parser(lua_State *L)
 {
 	const char* szKey = lua_tostring(L, 1);			// 第1引数:シリアライズキー
@@ -153,7 +233,27 @@ int lua_mz3_set_parser(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3.add_event_listener(key_event, parser)
+/*
+--- 各種イベントに対するフック関数を追加する。
+--
+-- 同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。
+--
+-- @param event イベント名
+-- @param parser フック関数名({テーブル}.{関数名})
+-- @see event_listener
+-- @rerutn なし
+--
+function mz3.add_event_listener(event, event_handler)
+
+--- フック関数
+--
+-- @param serialize_key シリアライズキー
+-- @param event_name    イベント名
+-- @param data          データ(イベント毎に内容は異なる)
+-- @return [bool] 次のフック関数またはデフォルト動作をさせる場合は false, それ以外は true。
+--
+function event_listener(serialize_key, event_name, data)
+*/
 int lua_mz3_add_event_listener(lua_State *L)
 {
 	const char* szEvent = lua_tostring(L, 1);		// 第1引数:イベント
@@ -174,7 +274,13 @@ int lua_mz3_add_event_listener(lua_State *L)
 // MZ3 Data API
 //-----------------------------------------------
 
-// MZ3 API : mz3_data.create()
+/*
+--- MZ3Data オブジェクトの生成
+--
+-- @return MZ3Data オブジェクト
+--
+function mz3_data.create()
+*/
 int lua_mz3_data_create(lua_State *L)
 {
 	// 生成
@@ -187,7 +293,16 @@ int lua_mz3_data_create(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.delete(data)
+/*
+--- MZ3Data オブジェクトの破棄
+--
+-- 注意：Lua 内で create した MZ3Data オブジェクトは必ず delete すること。
+--
+-- @param  data MZ3Data オブジェクト
+-- @return なし
+--
+function mz3_data.delete(data)
+*/
 int lua_mz3_data_delete(lua_State *L)
 {
 	const char* func_name = "mz3_data.delete";
@@ -207,7 +322,12 @@ int lua_mz3_data_delete(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data.get_text(data, name)
+/*
+--- 
+--
+--
+function mz3_data.get_text(data, name)
+*/
 int lua_mz3_data_get_text(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_text";
@@ -231,7 +351,12 @@ int lua_mz3_data_get_text(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.get_date(data)
+/*
+--- 
+--
+--
+function mz3_data.get_date(data)
+*/
 int lua_mz3_data_get_date(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_date";
@@ -251,7 +376,12 @@ int lua_mz3_data_get_date(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.set_text(data, name, value)
+/*
+--- 
+--
+--
+function mz3_data.set_text(data, name, value)
+*/
 int lua_mz3_data_set_text(lua_State *L)
 {
 	const char* func_name = "mz3_data.set_text";
@@ -273,7 +403,12 @@ int lua_mz3_data_set_text(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data.get_text_array(data, name, idx)
+/*
+--- 
+--
+--
+function mz3_data.get_text_array(data, name, idx)
+*/
 int lua_mz3_data_get_text_array(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_text_array";
@@ -298,7 +433,12 @@ int lua_mz3_data_get_text_array(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.get_text_array_size(data, name)
+/*
+--- 
+--
+--
+function mz3_data.get_text_array_size(data, name)
+*/
 int lua_mz3_data_get_text_array_size(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_text_array_size";
@@ -322,7 +462,12 @@ int lua_mz3_data_get_text_array_size(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.add_text_array(data, name, value)
+/*
+--- 
+--
+--
+function mz3_data.add_text_array(data, name, value)
+*/
 int lua_mz3_data_add_text_array(lua_State *L)
 {
 	const char* func_name = "mz3_data.add_text_array";
@@ -344,7 +489,12 @@ int lua_mz3_data_add_text_array(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data.get_integer(data, name)
+/*
+--- 
+--
+--
+function mz3_data.get_integer(data, name)
+*/
 int lua_mz3_data_get_integer(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_integer";
@@ -368,7 +518,12 @@ int lua_mz3_data_get_integer(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.set_integer(data, name, value)
+/*
+--- 
+--
+--
+function mz3_data.set_integer(data, name, value)
+*/
 int lua_mz3_data_set_integer(lua_State *L)
 {
 	const char* func_name = "mz3_data.set_integer";
@@ -390,7 +545,15 @@ int lua_mz3_data_set_integer(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data.set_access_type(data, type)
+/*
+--- アクセス種別を設定する。
+--
+-- @param data MZ3Data オブジェクト
+-- @param type [integer]アクセス種別
+-- @return なし
+--
+function mz3_data.set_access_type(data, type)
+*/
 int lua_mz3_data_set_access_type(lua_State *L)
 {
 	const char* func_name = "mz3_data.set_access_type";
@@ -411,7 +574,14 @@ int lua_mz3_data_set_access_type(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data.get_access_type(data)
+/*
+--- アクセス種別を取得する。
+--
+-- @param data MZ3Data オブジェクト
+-- @return [integer]アクセス種別
+--
+function mz3_data.get_access_type(data)
+*/
 int lua_mz3_data_get_access_type(lua_State *L)
 {
 	const char* func_name = "mz3_data.get_access_type";
@@ -434,7 +604,22 @@ int lua_mz3_data_get_access_type(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_data.parse_date_line(data, line)
+/*
+TODO
+--- シリアライズキーを取得する。
+--
+-- @param data MZ3Data オブジェクト
+-- @return [string]シリアライズキー
+--
+function *mz3_data.get_serialize_key(data)
+*/
+
+/*
+--- 
+--
+--
+function mz3_data.parse_date_line(data, line)
+*/
 int lua_mz3_data_parse_date_line(lua_State *L)
 {
 	const char* func_name = "mz3_data.parse_date_line";
@@ -459,7 +644,12 @@ int lua_mz3_data_parse_date_line(lua_State *L)
 // MZ3 Data List API
 //-----------------------------------------------
 
-// MZ3 API : mz3_data_list.clear(data_list, data)
+/*
+--- data_list の要素をすべて消去する。
+--
+--
+function mz3_data_list.clear(data_list, data)
+*/
 int lua_mz3_data_list_clear(lua_State *L)
 {
 	const char* func_name = "mz3_data_list.clear";
@@ -479,7 +669,12 @@ int lua_mz3_data_list_clear(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data_list.add(data_list, data)
+/*
+--- data_list の末尾に data を追加する。
+--
+--
+function mz3_data_list.add(data_list, data)
+*/
 int lua_mz3_data_list_add(lua_State *L)
 {
 	const char* func_name = "mz3_data_list.add";
@@ -505,7 +700,12 @@ int lua_mz3_data_list_add(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_data_list.insert(data_list, index, data)
+/*
+--- data_list の index に data を挿入する。
+--
+--
+function mz3_data_list.insert(data_list, index, data)
+*/
 int lua_mz3_data_list_insert(lua_State *L)
 {
 	const char* func_name = "mz3_data_list.insert";
@@ -536,7 +736,12 @@ int lua_mz3_data_list_insert(lua_State *L)
 // MZ3 HtmlArray API
 //-----------------------------------------------
 
-// MZ3 API : mz3_htmlarray.get_count(htmlarray)
+/*
+--- データ数を取得する。
+--
+--
+function mz3_htmlarray.get_count(htmlarray)
+*/
 int lua_mz3_htmlarray_get_count(lua_State *L)
 {
 	const char* func_name = "mz3_htmlarray.get_count";
@@ -556,7 +761,12 @@ int lua_mz3_htmlarray_get_count(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_htmlarray.get_at(htmlarray, index)
+/*
+--- index の要素を取得する。
+--
+--
+function mz3_htmlarray.get_at(htmlarray, index)
+*/
 int lua_mz3_htmlarray_get_at(lua_State *L)
 {
 	const char* func_name = "mz3_htmlarray.get_at";
@@ -577,7 +787,15 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_menu.regist_menu(hook_function_name)
+/*
+--- メニュー用フック関数の登録。
+--
+-- 登録した関数は insert_menu で利用可能。
+--
+-- @param hook_function_name メニュー押下時のフック関数名
+--
+function mz3_menu.regist_menu(hook_function_name)
+*/
 int lua_mz3_menu_regist_menu(lua_State *L)
 {
 	const char* func_name = "mz3_menu.regist_menu";
@@ -596,7 +814,18 @@ int lua_mz3_menu_regist_menu(lua_State *L)
 	return 1;
 }
 
-// MZ3 API : mz3_menu.insert_menu(menu, index, title, item_id)
+/*
+--- メニューの登録。
+--
+-- 2009/02/10 現在、メイン画面のみサポート。
+--
+-- @param menu    メニュー用オブジェクト
+-- @param index   追加位置(0オリジン)
+-- @param title   タイトル
+-- @param item_id insert_menu の返り値
+--
+function mz3_menu.insert_menu(menu, index, title, item_id)
+*/
 int lua_mz3_menu_insert_menu(lua_State *L)
 {
 	const char* func_name = "mz3_menu.regist_menu";
@@ -619,7 +848,18 @@ int lua_mz3_menu_insert_menu(lua_State *L)
 	return 0;
 }
 
-// MZ3 API : mz3_inifile.get_value(name, section)
+/*
+--- ini ファイルから値を取得する
+--
+-- @param name    iniファイル値
+-- @param section iniファイル値のセクション
+-- @return [string] iniの値
+-- @usage <pre>
+-- t = mz3_inifile.get_value("UseGlobalProxy", "General")
+-- </pre>
+--
+function mz3_inifile.get_value(name, section)
+*/
 int lua_mz3_inifile_get_value(lua_State *L)
 {
 	const char* func_name = "mz3_inifile.get_value";
@@ -649,7 +889,11 @@ int lua_mz3_inifile_get_value(lua_State *L)
 	return 1;
 }
 
-
+/*
+TODO
+---
+function *mz3_inifile.set_value(name, section, value)
+*/
 
 // MZ3 API table
 static const luaL_Reg lua_mz3_lib[] = {
