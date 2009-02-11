@@ -123,7 +123,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
-	ON_COMMAND(ID_MENU_TWITTER_READ, &CMZ3View::OnMenuTwitterRead)
 	ON_COMMAND(ID_MENU_TWITTER_REPLY, &CMZ3View::OnMenuTwitterReply)
 	ON_COMMAND(ID_MENU_TWITTER_UPDATE, &CMZ3View::OnMenuTwitterUpdate)
 	ON_COMMAND(ID_MENU_TWITTER_HOME, &CMZ3View::OnMenuTwitterHome)
@@ -1600,11 +1599,6 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnViewBbsList();
 		return;
 
-	case ACCESS_TWITTER_USER:
-		// 全文表示
-		OnMenuTwitterRead();
-		return;
-
 	case ACCESS_MIXI_ECHO_USER:
 		// 全文表示
 		OnMenuMixiEchoRead();
@@ -2457,11 +2451,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		case ACCESS_COMMUNITY:
 			// メニュー表示
 			PopupBodyMenu();
-			break;
-
-		case ACCESS_TWITTER_USER:
-			// 全文表示
-			OnMenuTwitterRead();
 			break;
 
 		case ACCESS_MIXI_ECHO_USER:
@@ -3915,6 +3904,9 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_ENABLED | MF_BYCOMMAND );
 			}
 
+			// 暫定：メニュー表示直前のフック関数
+			CallMZ3ScriptHookFunction("", "creating_twitter_item_context_menu", pSubMenu);
+
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
@@ -5032,37 +5024,6 @@ void CMZ3View::OnAcceleratorReload()
 	if (!RetrieveCategoryItem()) {
 		return;
 	}
-}
-
-/**
- * Twitter | 全文を読む
- */
-void CMZ3View::OnMenuTwitterRead()
-{
-	CMixiData& data = GetSelectedBodyItem();
-
-	// 本文を1行に変換して割り当て。
-	CString item = data.GetBody();
-	while( item.Replace( L"\r\n", L"" ) );
-
-	item.Append( L"\r\n" );
-	item.Append( L"----\r\n" );
-	item.AppendFormat( L"name : %s\r\n", data.GetAuthor() );
-	item.AppendFormat( L"description : %s\r\n", data.GetTitle() );
-	item.AppendFormat( L"%s\r\n", data.GetDate() );
-	item.AppendFormat( L"id : %d\r\n", data.GetID() );
-	item.AppendFormat( L"owner-id : %d\r\n", data.GetOwnerID() );
-
-	if (data.GetChildrenSize()>=1) {
-		// その他の情報を追加
-		for (size_t i=0; i<data.GetChildrenSize(); i++) {
-			CString s = data.GetChild(i).GetBodyItem(0);
-			mixi::ParserUtil::StripAllTags( s );
-			item.Append( s );
-		}
-	}
-
-	MessageBox( item, data.GetName() );
 }
 
 /**

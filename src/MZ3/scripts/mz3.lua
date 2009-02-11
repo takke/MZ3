@@ -20,6 +20,7 @@ package.path = ".\\?.lua;" .. mz3_dir .. "?.lua;"
 require("scripts\\util");		-- ユーティリティ
 require("scripts\\wrapper");	-- APIラッパークラス
 require("scripts\\mixi");		-- mixi
+require("scripts\\twitter");	-- twitter
 require("scripts\\goohome");	-- goohome
 
 mz3.logger_info('mz3.lua end');

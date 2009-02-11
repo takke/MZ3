@@ -746,6 +746,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
+	m_map[type].serializeKey = "TWITTER_USER";
 
 	type = ACCESS_TWITTER_NEW_DM;
 	m_map[type] = AccessTypeInfo::Data(

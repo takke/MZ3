@@ -77,12 +77,9 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 				data.AddBody( strBody );
 
 				// source : status/source
-				// Žq—v‘f‚Æ‚µ‚Ä’Ç‰Á
 				CString source = status.getNode(L"source").getTextAll().c_str();
 				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( source );
-				CMixiData sourceData;
-				sourceData.AddBody( L"source : " + source );
-				data.AddChild( sourceData );
+				data.SetTextValue(L"source", source);
 
 				// name : status/user/screen_name
 				const xml2stl::Node& user = status.getNode( L"user" );

@@ -267,7 +267,6 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnSetRead();
 	afx_msg void OnAcceleratorReload();
-	afx_msg void OnMenuTwitterRead();
 	afx_msg void OnMenuTwitterReply();
 	afx_msg void OnMenuTwitterUpdate();
 	afx_msg void OnMenuTwitterHome();
