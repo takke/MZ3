@@ -56,6 +56,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4C56F9C60F894C29B90FF1DBB6272340"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4F6D2D6F0A244F008EB67FD202F42374"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -276,6 +282,24 @@
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\mixi.lua"
             "TargetName" = "8:mixi.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_4C56F9C60F894C29B90FF1DBB6272340"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\twitter.lua"
+            "TargetName" = "8:twitter.lua"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
