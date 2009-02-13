@@ -1178,7 +1178,7 @@ int lua_mz3_access_type_info_set_body_header(lua_State *L)
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
 	int header_no = lua_tointeger(L, 2);
 	const std::string& header_type = lua_tostring(L, 3);
-	const std::string& header_text = lua_tostring(L, 4);
+	CString header_text(lua_tostring(L, 4));
 
 	AccessTypeInfo::BodyHeaderColumn col;
 	if (header_type=="date") {
@@ -1192,6 +1192,7 @@ int lua_mz3_access_type_info_set_body_header(lua_State *L)
 	} else {
 		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_NONE;
 	}
+	col.title = header_text;
 
 	switch (header_no) {
 	case 1:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol1 = col;	break;

@@ -63,10 +63,9 @@ mz3_access_type_info.set_request_method(type, 'GET');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒ
 mz3_access_type_info.set_cache_file_pattern(type, 'mixi\\show_self_log.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
 mz3_access_type_info.set_request_encoding(type, 'euc-jp');						-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
 mz3_access_type_info.set_default_url(type, 'http://mixi.jp/show_self_log.pl');
-mz3_access_type_info.set_body_header(type, 1, 'title', 'ƒ^ƒCƒgƒ‹');
-mz3_access_type_info.set_body_header(type, 2, 'body', '“à—e>>');
-mz3_access_type_info.set_body_header(type, 3, 'date', '“ú•t>>');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1 \t(%3)');
+mz3_access_type_info.set_body_header(type, 1, 'title', '–¼‘O');
+mz3_access_type_info.set_body_header(type, 2, 'date', '“ú•t');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 --mz3.logger_debug(type);
 
