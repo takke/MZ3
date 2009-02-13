@@ -75,7 +75,8 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 -- メニューへの登録
 ----------------------------------------
 -- TODO
-
+-- local group = mz3_category.get_group_by_name('その他');
+-- mz3_category.append_category(group, "逆あしあと", "MIXI_SHOW_SELF_LOG");
 
 ----------------------------------------
 -- パーサロード

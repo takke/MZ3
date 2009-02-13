@@ -68,6 +68,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_59E47789FAE64DBE8C869A91C1F7DC1A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5ED1D21152934C8B86CB3D8BA86E3DDC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -93,6 +99,12 @@
         "Entry"
         {
         "MsmKey" = "8:_ADDE26C4E25F47DD9BA61DD98D701D47"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BA0A7BCC9D044E5694135E3C5AF61FDA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -332,6 +344,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_59E47789FAE64DBE8C869A91C1F7DC1A"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_show_self_log_parser.lua"
+            "TargetName" = "8:mixi_show_self_log_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_5ED1D21152934C8B86CB3D8BA86E3DDC"
             {
             "SourcePath" = "8:skin\\aluminium\\report_.jpg"
@@ -410,6 +440,24 @@
             "TargetName" = "8:util.lua"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_BA0A7BCC9D044E5694135E3C5AF61FDA"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_new_official_message_parser.lua"
+            "TargetName" = "8:mixi_new_official_message_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
