@@ -81,7 +81,10 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 ----------------------------------------
 -- パーサロード
 ----------------------------------------
+-- コミュニティ最新書込一覧
 require("scripts\\mixi\\mixi_new_bbs_parser");
+-- 逆あしあと
+require("scripts\\mixi\\mixi_show_self_log_parser");
 
 ----------------------------------------
 -- パーサの登録
@@ -90,7 +93,8 @@ require("scripts\\mixi\\mixi_new_bbs_parser");
 mz3.set_parser("BBS",             "mixi.new_bbs_parser");
 -- コミュニティコメント記入履歴
 mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
-
+-- 逆あしあと
+mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
 
 ----------------------------------------
 -- イベントフック関数の登録

@@ -43,7 +43,7 @@ function mixi_show_self_log_parser(parent, body, html)
 	for i=140, line_count-1 do
 		line = html:get_at(i);
 
-		mz3.logger_info( line );
+--		mz3.logger_info( line );
 		
 --		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
