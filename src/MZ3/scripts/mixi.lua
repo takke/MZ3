@@ -54,13 +54,11 @@ end
 -- アクセス種別の登録
 ----------------------------------------
 -- 逆あしあと
--- TODO
---[[
 type = mz3_access_type_info.new_access_type();
 mz3_access_type_info.set_info_type(type, 'category');							-- カテゴリ
 mz3_access_type_info.set_service_type(type, 'mixi');							-- サービス種別
 mz3_access_type_info.set_serialize_key(type, 'MIXI_SHOW_SELF_LOG');				-- シリアライズキー
-mz3_access_type_info.set_short_title(type, '逆あしあと');						-- 短い文字列
+mz3_access_type_info.set_short_title(type, '逆あしあと');						-- 簡易タイトル
 mz3_access_type_info.set_request_method(type, 'GET');							-- リクエストメソッド
 mz3_access_type_info.set_cache_file_pattern(type, 'mixi\\show_self_log.html');	-- キャッシュファイル
 mz3_access_type_info.set_request_encoding(type, 'euc-jp');						-- エンコーディング
@@ -70,7 +68,8 @@ mz3_access_type_info.set_body_header(type, 2, 'body', '内容>>');
 mz3_access_type_info.set_body_header(type, 3, 'date', '日付>>');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1 \t(%3)');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
-]]
+--mz3.logger_debug(type);
+
 
 ----------------------------------------
 -- メニューへの登録

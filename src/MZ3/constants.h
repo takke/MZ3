@@ -180,6 +180,10 @@ enum ACCESS_TYPE {
 	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ
 	ACCESS_ERRORLOG,					///< mz3log.txt 専用の特殊タイプ
 	ACCESS_SOFTWARE_UPDATE_CHECK,		///< バージョンチェック
+
+	//--- API登録
+	ACCESS_TYPE_MZ3_SCRIPT_BASE = 1000,	///< これ以降の番号は全て MZ3 Script API 登録によるアクセス種別。
+										///< 内容は実行時に決定する。
 };
 
 /**

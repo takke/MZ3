@@ -62,6 +62,7 @@ CMZ3App::CMZ3App()
 	, m_bWinMo2003_SE(FALSE)
 	, m_pMouseGestureManager(NULL)
 	, m_luaState(NULL)
+	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
 {
 }
 
@@ -102,9 +103,6 @@ BOOL CMZ3App::InitInstance()
 
 	// 解像度/DPI判定
 	InitResolutionFlags();
-
-	// アクセス種別毎の振る舞い定義を初期化
-	m_accessTypeInfo.init();
 
 	// CAPEDIT および SIPPREF のような Windows Mobile 特有のコントロールを初期化するには、アプリケーションの
 	// 初期化中に SHInitExtraControls を一度呼び出す必要があります。
@@ -1315,10 +1313,14 @@ bool CMZ3App::MyLuaInit(void)
 		m_luaState = NULL;
 	}
 
+	// アクセス種別毎の振る舞い定義を初期化
+	m_accessTypeInfo.init();
+
 	// Lua 関連メンバー変数の初期化
 	m_luaParsers.clear();
 	m_luaHooks.clear();
 	m_luaMenus.clear();
+	m_luaLastRegistedAccessType = ACCESS_TYPE_MZ3_SCRIPT_BASE;
 
 	// Lua の初期化
 	m_luaState = lua_open();

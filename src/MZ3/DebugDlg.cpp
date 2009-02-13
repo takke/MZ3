@@ -67,6 +67,10 @@ BOOL CDebugDlg::OnInitDialog()
 	m_List.SetItemText( idx, 1, theApp.m_accessTypeInfo.getShortText( data->GetAccessType() ) );
 	idx++;
 
+	m_List.InsertItem( idx, L"シリアライズキー" );
+	m_List.SetItemText( idx, 1, CString(theApp.m_accessTypeInfo.getSerializeKey( data->GetAccessType() )) );
+	idx++;
+
 	m_List.InsertItem( idx, L"Date" );
 	m_List.SetItemText( idx, 1, data->GetDate() );
 	idx++;

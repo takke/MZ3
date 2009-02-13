@@ -63,11 +63,6 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#*mz3.get_serialize_key_by_access_type">*mz3.get_serialize_key_by_access_type</a>&nbsp;(type)</td>
-	<td class="summary">アクセス種別からシリアライズキーを取得する。  </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#*mz3_data.get_serialize_key">*mz3_data.get_serialize_key</a>&nbsp;(data)</td>
 	<td class="summary">シリアライズキーを取得する。  </td>
 	</tr>
@@ -108,6 +103,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.get_serialize_key_by_access_type">mz3.get_serialize_key_by_access_type</a>&nbsp;(type)</td>
+	<td class="summary">アクセス種別からシリアライズキーを取得する。  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.get_tick_count">mz3.get_tick_count</a>&nbsp;()</td>
 	<td class="summary">Win32 API の GetTickCount() を呼び出す。  </td>
 	</tr>
@@ -144,52 +144,52 @@
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_body_header">mz3_access_type_info.set_body_header</a>&nbsp;(type, header_no, header_type, header_text)</td>
-	<td class="summary"> </td>
+	<td class="summary">ヘッダー  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_body_integrated_line_pattern">mz3_access_type_info.set_body_integrated_line_pattern</a>&nbsp;(type, line_no, pattern)</td>
-	<td class="summary"> </td>
+	<td class="summary">統合カラムモード(2行表示モード)の行表示パターン  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_cache_file_pattern">mz3_access_type_info.set_cache_file_pattern</a>&nbsp;(type, file_pattern)</td>
-	<td class="summary"> </td>
+	<td class="summary">キャッシュファイルのパターン設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_default_url">mz3_access_type_info.set_default_url</a>&nbsp;(type, url)</td>
-	<td class="summary"> </td>
+	<td class="summary">デフォルトURLの設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_info_type">mz3_access_type_info.set_info_type</a>&nbsp;(type, info_type)</td>
-	<td class="summary"> </td>
+	<td class="summary">アクセス種別の種別の設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_request_encoding">mz3_access_type_info.set_request_encoding</a>&nbsp;(type, encoding)</td>
-	<td class="summary"> </td>
+	<td class="summary">エンコーディングの設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_request_method">mz3_access_type_info.set_request_method</a>&nbsp;(type, method_type)</td>
-	<td class="summary"> </td>
+	<td class="summary">リクエストメソッドの設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_serialize_key">mz3_access_type_info.set_serialize_key</a>&nbsp;(type, serialize_key)</td>
-	<td class="summary"> </td>
+	<td class="summary">シリアライズキーの設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_service_type">mz3_access_type_info.set_service_type</a>&nbsp;(type, service_type)</td>
-	<td class="summary"> </td>
+	<td class="summary">サービス種別の設定  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_short_title">mz3_access_type_info.set_short_title</a>&nbsp;(type, short_title)</td>
-	<td class="summary"> </td>
+	<td class="summary">簡易タイトルの設定  </td>
 	</tr>
 
 	<tr>
@@ -312,35 +312,6 @@
 
 <h2><a name="functions"></a>Functions</h2>
 <dl class="function">
-
-
-
-<dt><a name="*mz3.get_serialize_key_by_access_type"></a><strong>*mz3.get_serialize_key_by_access_type</strong>&nbsp;(type)</dt>
-<dd>
-アクセス種別からシリアライズキーを取得する。 
-
-
-<h3>Parameters</h3>
-<ul>
-	
-	<li>
-	  type: [integer]アクセス種別
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-[string] シリアライズキー 
-
-
-
-</dd>
-
 
 
 
@@ -601,6 +572,35 @@ URLから類推されるアクセス種別を取得する。
 
 
 
+<dt><a name="mz3.get_serialize_key_by_access_type"></a><strong>mz3.get_serialize_key_by_access_type</strong>&nbsp;(type)</dt>
+<dd>
+アクセス種別からシリアライズキーを取得する。 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: [integer]アクセス種別
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] シリアライズキー 
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.get_tick_count"></a><strong>mz3.get_tick_count</strong>&nbsp;()</dt>
 <dd>
 Win32 API の GetTickCount() を呼び出す。 
@@ -783,7 +783,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_body_header"></a><strong>mz3_access_type_info.set_body_header</strong>&nbsp;(type, header_no, header_type, header_text)</dt>
 <dd>
-
+ヘッダー 
 
 
 <h3>Parameters</h3>
@@ -794,15 +794,15 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 	</li>
 	
 	<li>
-	  header_no: 
+	  header_no: ヘッダー番号(1 to 3)
 	</li>
 	
 	<li>
-	  header_type: 
+	  header_type: ヘッダー種別(何を表示するか : 'date', 'title', 'name', 'body', 'none')
 	</li>
 	
 	<li>
-	  header_text: 
+	  header_text: ヘッダーに表示する文字列
 	</li>
 	
 </ul>
@@ -824,7 +824,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_body_integrated_line_pattern"></a><strong>mz3_access_type_info.set_body_integrated_line_pattern</strong>&nbsp;(type, line_no, pattern)</dt>
 <dd>
-
+統合カラムモード(2行表示モード)の行表示パターン 
 
 
 <h3>Parameters</h3>
@@ -835,11 +835,11 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 	</li>
 	
 	<li>
-	  line_no: 
+	  line_no: 行番号(1 or 2)
 	</li>
 	
 	<li>
-	  pattern: 
+	  pattern: パターン
 	</li>
 	
 </ul>
@@ -861,7 +861,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_cache_file_pattern"></a><strong>mz3_access_type_info.set_cache_file_pattern</strong>&nbsp;(type, file_pattern)</dt>
 <dd>
-
+キャッシュファイルのパターン設定 
 
 
 <h3>Parameters</h3>
@@ -894,7 +894,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_default_url"></a><strong>mz3_access_type_info.set_default_url</strong>&nbsp;(type, url)</dt>
 <dd>
-
+デフォルトURLの設定 
 
 
 <h3>Parameters</h3>
@@ -927,7 +927,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_info_type"></a><strong>mz3_access_type_info.set_info_type</strong>&nbsp;(type, info_type)</dt>
 <dd>
-
+アクセス種別の種別の設定 
 
 
 <h3>Parameters</h3>
@@ -938,7 +938,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 	</li>
 	
 	<li>
-	  info_type: 
+	  info_type: アクセス種別の種別(とりあえず'category'のみサポート)
 	</li>
 	
 </ul>
@@ -960,7 +960,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_request_encoding"></a><strong>mz3_access_type_info.set_request_encoding</strong>&nbsp;(type, encoding)</dt>
 <dd>
-
+エンコーディングの設定 
 
 
 <h3>Parameters</h3>
@@ -971,7 +971,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 	</li>
 	
 	<li>
-	  encoding: 
+	  encoding: エンコーディング('sjis', 'euc-jp', 'utf8', 'no-conversion')
 	</li>
 	
 </ul>
@@ -993,7 +993,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_request_method"></a><strong>mz3_access_type_info.set_request_method</strong>&nbsp;(type, method_type)</dt>
 <dd>
-
+リクエストメソッドの設定 
 
 
 <h3>Parameters</h3>
@@ -1004,7 +1004,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 	</li>
 	
 	<li>
-	  method_type: 
+	  method_type: 'GET' or 'POST'
 	</li>
 	
 </ul>
@@ -1026,7 +1026,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_serialize_key"></a><strong>mz3_access_type_info.set_serialize_key</strong>&nbsp;(type, serialize_key)</dt>
 <dd>
-
+シリアライズキーの設定 
 
 
 <h3>Parameters</h3>
@@ -1059,7 +1059,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_service_type"></a><strong>mz3_access_type_info.set_service_type</strong>&nbsp;(type, service_type)</dt>
 <dd>
-
+サービス種別の設定 
 
 
 <h3>Parameters</h3>
@@ -1092,7 +1092,7 @@ TRACE出力を行う。MZ3のコンソール付きバージョンのみで表示可能。
 
 <dt><a name="mz3_access_type_info.set_short_title"></a><strong>mz3_access_type_info.set_short_title</strong>&nbsp;(type, short_title)</dt>
 <dd>
-
+簡易タイトルの設定 
 
 
 <h3>Parameters</h3>

@@ -13,6 +13,8 @@ bool AccessTypeInfo::init()
 {
 	ACCESS_TYPE type;
 
+	m_map.clear();
+
 	//------------------------------------------------------------------
 	//--- グループ系
 	//------------------------------------------------------------------
@@ -974,7 +976,6 @@ bool AccessTypeInfo::init()
 	// http://mz3.jp/latest_version.xml
 	m_map[type].cacheFilePattern = L"mz3.jp\\latest_version.xml";
 	m_map[type].defaultCategoryURL = L"http://mz3.jp/latest_version.xml";
-
 
 	//------------------------------------------------------------------
 	// シリアライズキー → アクセス種別マップ の構築

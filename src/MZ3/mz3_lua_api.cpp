@@ -157,14 +157,26 @@ int lua_mz3_decode_html_entity(lua_State *L)
 }
 
 /*
-TODO
 --- アクセス種別からシリアライズキーを取得する。
 --
 -- @param type [integer]アクセス種別
 -- @return [string] シリアライズキー
 --
-function *mz3.get_serialize_key_by_access_type(type)
+function mz3.get_serialize_key_by_access_type(type)
 */
+int lua_mz3_get_serialize_key_by_access_type(lua_State *L)
+{
+	ACCESS_TYPE type = (ACCESS_TYPE)lua_tointeger(L, 1);	// 第1引数
+
+	// 変換
+	const char* serialize_key = theApp.m_accessTypeInfo.getSerializeKey(type);
+	
+	// 結果をスタックに戻す
+	lua_pushstring(L, serialize_key);
+
+	// 戻り値の数を返す
+	return 1;
+}
 
 /*
 --- URLから類推されるアクセス種別を取得する。 
@@ -895,6 +907,344 @@ TODO
 function *mz3_inifile.set_value(name, section, value)
 */
 
+//-----------------------------------------------
+// MZ3 AccessTypeInfo API
+//-----------------------------------------------
+
+/*
+--- 新しいアクセス種別の作成
+--
+-- @return アクセス種別
+--
+function mz3_access_type_info.new_access_type()
+*/
+int lua_mz3_access_type_info_new_access_type(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.new_access_type";
+
+	// 新しいアクセス種別を払い出す
+	int access_type = ++theApp.m_luaLastRegistedAccessType;
+
+	// アクセス種別登録
+	theApp.m_accessTypeInfo.m_map[(ACCESS_TYPE)access_type] = AccessTypeInfo::Data();
+
+	// 結果をスタックに積む
+	lua_pushinteger(L, access_type);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- アクセス種別の種別の設定
+--
+-- @param type アクセス種別
+-- @param info_type アクセス種別の種別(とりあえず'category'のみサポート)
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_info_type(type, info_type)
+*/
+int lua_mz3_access_type_info_set_info_type(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_info_type";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	const std::string& info_type = lua_tostring(L, 2);
+
+	if (info_type=="category") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_CATEGORY;
+	} else {
+		lua_pushstring(L, "categoryのみサポートしています");
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- サービス種別の設定
+--
+-- @param type アクセス種別
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_service_type(type, service_type)
+*/
+int lua_mz3_access_type_info_set_service_type(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_service_type";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	const std::string& service_type = lua_tostring(L, 2);
+
+	theApp.m_accessTypeInfo.m_map[access_type].serviceType = service_type;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- シリアライズキーの設定
+--
+-- @param type アクセス種別
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_serialize_key(type, serialize_key)
+*/
+int lua_mz3_access_type_info_set_serialize_key(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_serialize_key";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	const std::string& serialize_key = lua_tostring(L, 2);
+
+	theApp.m_accessTypeInfo.m_map[access_type].serializeKey = serialize_key;
+	theApp.m_accessTypeInfo.m_serializeKeyToAccessKeyMap[serialize_key] = access_type;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 簡易タイトルの設定
+--
+-- @param type アクセス種別
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_short_title(type, short_title)
+*/
+int lua_mz3_access_type_info_set_short_title(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_short_title";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	CString short_title(lua_tostring(L, 2));
+
+	theApp.m_accessTypeInfo.m_map[access_type].shortText = short_title;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- リクエストメソッドの設定
+--
+-- @param type アクセス種別
+-- @param method_type 'GET' or 'POST'
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_request_method(type, method_type)
+*/
+int lua_mz3_access_type_info_set_request_method(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_request_method";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	const std::string& method_type = lua_tostring(L, 2);
+
+	if (method_type=="GET") {
+		theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_GET;
+	} else if (method_type=="POST") {
+		theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_POST;
+	} else {
+		theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_INVALID;
+	}
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- キャッシュファイルのパターン設定
+--
+-- @param type アクセス種別
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_cache_file_pattern(type, file_pattern)
+*/
+int lua_mz3_access_type_info_set_cache_file_pattern(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_cache_file_pattern";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	CString file_pattern(lua_tostring(L, 2));
+
+	theApp.m_accessTypeInfo.m_map[access_type].cacheFilePattern = file_pattern;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- エンコーディングの設定
+--
+-- @param type アクセス種別
+-- @param encoding エンコーディング('sjis', 'euc-jp', 'utf8', 'no-conversion')
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_request_encoding(type, encoding)
+*/
+int lua_mz3_access_type_info_set_request_encoding(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_request_encoding";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	const std::string& encoding = lua_tostring(L, 2);
+
+	if (encoding=="sjis") {
+		theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_SJIS;
+	} else if (encoding=="euc-jp") {
+		theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_EUC;
+	} else if (encoding=="utf8") {
+		theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_UTF8;
+	} else {
+		theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_NOCONVERSION;
+	}
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- デフォルトURLの設定
+--
+-- @param type アクセス種別
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_default_url(type, url)
+*/
+int lua_mz3_access_type_info_set_default_url(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_default_url";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	CString url(lua_tostring(L, 2));
+
+	theApp.m_accessTypeInfo.m_map[access_type].defaultCategoryURL = url;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- ヘッダー
+--
+-- @param type アクセス種別
+-- @param header_no ヘッダー番号(1 to 3)
+-- @param header_type ヘッダー種別(何を表示するか : 'date', 'title', 'name', 'body', 'none')
+-- @param header_text ヘッダーに表示する文字列
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_body_header(type, header_no, header_type, header_text)
+*/
+int lua_mz3_access_type_info_set_body_header(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_body_header";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	int header_no = lua_tointeger(L, 2);
+	const std::string& header_type = lua_tostring(L, 3);
+	const std::string& header_text = lua_tostring(L, 4);
+
+	AccessTypeInfo::BodyHeaderColumn col;
+	if (header_type=="date") {
+		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_DATE;
+	} else if (header_type=="title") {
+		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_TITLE;
+	} else if (header_type=="name") {
+		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_NAME;
+	} else if (header_type=="body") {
+		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_BODY;
+	} else {
+		col.type = AccessTypeInfo::BODY_INDICATE_TYPE_NONE;
+	}
+
+	switch (header_no) {
+	case 1:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol1 = col;	break;
+	case 2:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol2 = col;	break;
+	case 3:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol3 = col;	break;
+	default:
+		lua_pushstring(L, "header_no は 1～3 のみサポートしています");
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 統合カラムモード(2行表示モード)の行表示パターン
+--
+-- @param type アクセス種別
+-- @param line_no 行番号(1 or 2)
+-- @param pattern パターン
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_body_integrated_line_pattern(type, line_no, pattern)
+*/
+int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_body_integrated_line_pattern";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	int line_no = lua_tointeger(L, 2);
+	CString pattern(lua_tostring(L, 3));
+
+	switch (line_no) {
+	case 1:	theApp.m_accessTypeInfo.m_map[access_type].bodyIntegratedLinePattern1 = pattern;	break;
+	case 2:	theApp.m_accessTypeInfo.m_map[access_type].bodyIntegratedLinePattern2 = pattern;	break;
+	default:
+		lua_pushstring(L, "line_no は 1～2 のみサポートしています");
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 // MZ3 API table
 static const luaL_Reg lua_mz3_lib[] = {
 	{"logger_error",				lua_mz3_logger_error},
@@ -906,6 +1256,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"decode_html_entity",			lua_mz3_decode_html_entity},
 	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
 	{"get_access_type_by_key",		lua_mz3_get_access_type_by_key},
+	{"get_serialize_key_by_access_type", lua_mz3_get_serialize_key_by_access_type},
 	{"set_parser",					lua_mz3_set_parser},
 	{"add_event_listener",			lua_mz3_add_event_listener},
 	{NULL, NULL}
@@ -947,6 +1298,20 @@ static const luaL_Reg lua_mz3_inifile_lib[] = {
 //	{"set_value",		lua_mz3_inifile_set_value},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_access_type_info_lib[] = {
+	{"new_access_type",		lua_mz3_access_type_info_new_access_type},
+	{"set_info_type",		lua_mz3_access_type_info_set_info_type},
+	{"set_service_type",	lua_mz3_access_type_info_set_service_type},
+	{"set_serialize_key",	lua_mz3_access_type_info_set_serialize_key},
+	{"set_short_title",		lua_mz3_access_type_info_set_short_title},
+	{"set_request_method",	lua_mz3_access_type_info_set_request_method},
+	{"set_cache_file_pattern",	lua_mz3_access_type_info_set_cache_file_pattern},
+	{"set_request_encoding",	lua_mz3_access_type_info_set_request_encoding},
+	{"set_default_url",	lua_mz3_access_type_info_set_default_url},
+	{"set_body_header",	lua_mz3_access_type_info_set_body_header},
+	{"set_body_integrated_line_pattern",	lua_mz3_access_type_info_set_body_integrated_line_pattern},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -956,4 +1321,5 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_htmlarray", lua_mz3_htmlarray_lib);
 	luaL_register(L, "mz3_menu", lua_mz3_menu_lib);
 	luaL_register(L, "mz3_inifile", lua_mz3_inifile_lib);
+	luaL_register(L, "mz3_access_type_info", lua_mz3_access_type_info_lib);
 }
