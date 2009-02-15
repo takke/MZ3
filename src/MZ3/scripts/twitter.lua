@@ -13,9 +13,22 @@ mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
 ----------------------------------------
+-- アクセス種別の登録
+----------------------------------------
+--[[
+type = mz3.get_access_type_by_key('TWITTER_FRIENDS_TIMELINE');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '<small>%2 \t(%3)</small>');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%1');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)</small>');
+]]
+
+
+----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 twitter_item_read_menu_item = mz3_menu.regist_menu("twitter.on_read_menu_item");
+
 
 ----------------------------------------
 -- イベントハンドラ

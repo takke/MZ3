@@ -69,35 +69,46 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 --mz3.logger_debug(type);
 
-
 ----------------------------------------
 -- メニューへの登録
 ----------------------------------------
+
+--- デフォルトのグループリスト生成イベントハンドラ
+--
+-- @param serialize_key シリアライズキー(nil)
+-- @param event_name    'creating_default_group'
+-- @param group         MZ3GroupData
+-- @param services      サービス種別のスペース区切り文字列
+--
+function on_creating_default_group(serialize_key, event_name, group, services)
 -- TODO
 -- local group = mz3_category.get_group_by_name('その他');
--- mz3_category.append_category(group, "逆あしあと", "MIXI_SHOW_SELF_LOG");
+-- mz3_category.append_category(group, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
+end
 
 ----------------------------------------
--- パーサロード
+-- パーサのロード＆登録
 ----------------------------------------
+-- ★リスト系
 -- コミュニティ最新書込一覧
 require("scripts\\mixi\\mixi_new_bbs_parser");
+mz3.set_parser("BBS",             "mixi.new_bbs_parser");
+-- コミュニティコメント記入履歴 : 最新書込一覧と同一
+mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
+
 -- 逆あしあと
 require("scripts\\mixi\\mixi_show_self_log_parser");
-
-----------------------------------------
--- パーサの登録
-----------------------------------------
--- コミュニティ最新書き込み一覧
-mz3.set_parser("BBS",             "mixi.new_bbs_parser");
--- コミュニティコメント記入履歴
-mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
--- 逆あしあと
 mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
+
+-- トップページ
+require("scripts\\mixi\\mixi_home_parser");
+mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
+
 
 ----------------------------------------
 -- イベントフック関数の登録
 ----------------------------------------
---mz3.set_hook("mixi", "after_parse", after_parse);
+-- デフォルトのグループリスト生成
+mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group");
 
 mz3.logger_debug('mixi.lua end');

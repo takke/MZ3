@@ -13,14 +13,10 @@ mz3.logger_debug('goohome.lua start');
 module("goohome", package.seeall)
 
 ----------------------------------------
--- パーサロード
-----------------------------------------
-require("scripts\\goohome\\goohome_quote_quotes_friends_parser");
-
-----------------------------------------
--- パーサの登録
+-- パーサのロード＆登録
 ----------------------------------------
 -- gooホーム 友達・注目の人のひとこと一覧
+require("scripts\\goohome\\goohome_quote_quotes_friends_parser");
 mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_parser");
 
 ----------------------------------------

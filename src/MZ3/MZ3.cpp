@@ -1478,7 +1478,8 @@ void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 	data->SetTextValue(L"owner_id", m_loginMng.GetOwnerID());
 
 	// 共通パース関数を呼び出す
-	parser::MyDoParseMixiHtml(ACCESS_MAIN, *data, *html);
+	MZ3DataList dummy;
+	parser::MyDoParseMixiListHtml(ACCESS_MAIN, *data, dummy, *html);
 
 	// 呼び出し後の処理
 	if (!data->GetTextValue(L"owner_id").IsEmpty()) {

@@ -108,6 +108,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	}
 
 	switch (aType) {
+//	case ACCESS_MAIN:							return mixi::HomeParser::parse( parent, html );
 	case ACCESS_LIST_DIARY:						return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:				return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					return mixi::ListCommentParser::parse( body, html );
@@ -163,7 +164,6 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	}
 
 	switch (aType) {
-	case ACCESS_MAIN:			return mixi::HomeParser::parse( mixi, html );
 	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
