@@ -1293,7 +1293,9 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	case ACCESS_MAIN:
 
-		mixi::HomeParser::parse( html );
+		// ÉpÅ[ÉX
+		MZ3Data data;
+		theApp.DoParseMixiHomeHtml(&data, &html);
 
 		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 			LPCTSTR msg = L"ìäçeÇ…é∏îsÇµÇ‹ÇµÇΩ(2)";

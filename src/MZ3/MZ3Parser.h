@@ -16,7 +16,7 @@ namespace parser {
 
 /// リスト系HTMLの解析
 bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList& body, CHtmlArray& html );
-void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html );
+bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html );
 
 /// 各種パーサの基本クラス
 class MZ3ParserBase 

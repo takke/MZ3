@@ -37,7 +37,7 @@ namespace parser {
  * MZ3 Script : パーサ呼び出し
  */
 static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserFuncName, 
-								CMixiData& parent, CMixiDataList& body, CHtmlArray& html )
+								CMixiData* parent, CMixiDataList* body, CHtmlArray& html )
 {
 	// 引数として parent, body, html を渡す
 
@@ -56,8 +56,8 @@ static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserF
 	//my_lua_printstack(L);
 
 	// 引数を積む
-	lua_pushlightuserdata(L, &parent);
-	lua_pushlightuserdata(L, &body);
+	lua_pushlightuserdata(L, parent);
+	lua_pushlightuserdata(L, body);
 	lua_pushlightuserdata(L, &html);
 
 	// 関数実行
@@ -91,7 +91,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 			CStringA strTable = strParserName.Left(idx);
 			CStringA strFuncName = strParserName.Mid(idx+1);
 //			printf("parser : [%s], [%s]\n", strTable, strFuncName);
-			return CallMZ3ScriptParser(strTable, strFuncName, parent, body, html);
+			return CallMZ3ScriptParser(strTable, strFuncName, &parent, &body, html);
 		}
 	}
 
@@ -145,25 +145,41 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 }
 
 /// View系HTMLの解析
-void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
+bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 {
+	// MZ3 Script 用パーサがあれば利用する
+	const char* szSerializeKey = theApp.m_accessTypeInfo.getSerializeKey(aType);
+	if (theApp.m_luaParsers.count(szSerializeKey)!=0) {
+		CStringA strParserName = theApp.m_luaParsers[szSerializeKey].c_str();
+
+		// パーサ名をテーブルと関数名に分離する
+		int idx = strParserName.Find('.');
+		if (idx>0) {
+			CStringA strTable = strParserName.Left(idx);
+			CStringA strFuncName = strParserName.Mid(idx+1);
+//			printf("parser : [%s], [%s]\n", strTable, strFuncName);
+			return CallMZ3ScriptParser(strTable, strFuncName, &mixi, NULL, html);
+		}
+	}
+
 	switch (aType) {
-	case ACCESS_DIARY:			mixi::ViewDiaryParser::parse( mixi, html );			break;
-	case ACCESS_NEIGHBORDIARY:	mixi::ViewDiaryParser::parse( mixi, html );			break;
-	case ACCESS_BBS:			mixi::ViewBbsParser::parse( mixi, html );			break;
-	case ACCESS_ENQUETE:		mixi::ViewEnqueteParser::parse( mixi, html );		break;
+	case ACCESS_MAIN:			return mixi::HomeParser::parse( mixi, html );
+	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
+	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
+	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
+	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
 	case ACCESS_EVENT_JOIN:
-	case ACCESS_EVENT:			mixi::ViewEventParser::parse( mixi, html );			break;
-	case ACCESS_EVENT_MEMBER:	mixi::ListEventMemberParser::parse( mixi, html );	break;
+	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
+	case ACCESS_EVENT_MEMBER:	return mixi::ListEventMemberParser::parse( mixi, html );
 	case ACCESS_BIRTHDAY:
-	case ACCESS_PROFILE:		mixi::ShowFriendParser::parse( mixi, html );		break;
-	case ACCESS_MYDIARY:		mixi::ViewDiaryParser::parse( mixi, html );			break;
-	case ACCESS_MESSAGE:		mixi::ViewMessageParser::parse( mixi, html );		break;
-	case ACCESS_NEWS:			mixi::ViewNewsParser::parse( mixi, html );			break;
-	case ACCESS_HELP:			parser::HelpParser::parse( mixi, html );				break;
-	case ACCESS_ERRORLOG:		parser::ErrorlogParser::parse( mixi, html );			break;
+	case ACCESS_PROFILE:		return mixi::ShowFriendParser::parse( mixi, html );
+	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
+	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
+	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
+	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
+	case ACCESS_ERRORLOG:		return parser::ErrorlogParser::parse( mixi, html );
 	case ACCESS_SCHEDULE:
-	case ACCESS_PLAIN:			parser::PlainTextParser::parse( mixi, html );			break;
+	case ACCESS_PLAIN:			return parser::PlainTextParser::parse( mixi, html );
 	default:
 		{
 			CString msg;
@@ -171,7 +187,7 @@ void MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 			MZ3LOGGER_ERROR(msg);
 			MessageBox(NULL, msg, NULL, MB_OK);
 		}
-		break;
+		return false;
 	}
 }
 

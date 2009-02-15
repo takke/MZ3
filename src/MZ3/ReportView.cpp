@@ -1672,7 +1672,10 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		{
 			CHtmlArray html;
 			html.Load( theApp.m_filepath.temphtml );
-			mixi::HomeParser::parse( html );
+
+			// パース
+			MZ3Data data;
+			theApp.DoParseMixiHomeHtml(&data, &html);
 
 			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
 				LPCTSTR msg = L"ログインに失敗しました(2)";

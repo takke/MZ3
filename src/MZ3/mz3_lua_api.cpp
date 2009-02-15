@@ -251,7 +251,7 @@ int lua_mz3_set_parser(lua_State *L)
 -- 同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。
 --
 -- @param event イベント名
--- @param parser フック関数名({テーブル}.{関数名})
+-- @param event_handler フック関数名({テーブル}.{関数名})
 -- @see event_listener
 -- @rerutn なし
 --

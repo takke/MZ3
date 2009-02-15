@@ -942,6 +942,44 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
 			fontQuality,				// nQuality
 			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
 			fontFace);					// lpszFacename
+
+		// 小フォント作成
+		newHeight = - theApp.pt2px(fontHeight-2);	// 負数とすることで pixel 値指定とする
+		theApp.m_fontSmall.Detach();
+		theApp.m_fontSmall.CreateFont( 
+			newHeight,					// nHeight
+			0,							// nWidth
+			0,							// nEscapement
+			0,							// nOrientation
+			FW_MEDIUM,					// nWeight
+			FALSE,						// bItalic
+			FALSE,						// bUnderline
+			0,							// cStrikeOut
+			DEFAULT_CHARSET,			// nCharSet
+			OUT_DEFAULT_PRECIS,			// nOutPrecision
+			CLIP_DEFAULT_PRECIS,		// nClipPrecision
+			fontQuality,				// nQuality
+			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+			fontFace);					// lpszFacename
+
+		// 大フォント作成
+		newHeight = - theApp.pt2px(fontHeight+1);	// 負数とすることで pixel 値指定とする
+		theApp.m_fontBig.Detach();
+		theApp.m_fontBig.CreateFont( 
+			newHeight,					// nHeight
+			0,							// nWidth
+			0,							// nEscapement
+			0,							// nOrientation
+			FW_MEDIUM,					// nWeight
+			FALSE,						// bItalic
+			FALSE,						// bUnderline
+			0,							// cStrikeOut
+			DEFAULT_CHARSET,			// nCharSet
+			OUT_DEFAULT_PRECIS,			// nOutPrecision
+			CLIP_DEFAULT_PRECIS,		// nClipPrecision
+			fontQuality,				// nQuality
+			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+			fontFace);					// lpszFacename
 	}
 	return true;
 }
@@ -1432,4 +1470,19 @@ int CMZ3App::MyLuaErrorReport(int status)
 		lua_pop(L, 1);
 	}
 	return status;
+}
+
+void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
+{
+	// 呼び出し前に theApp の値を設定
+	data->SetTextValue(L"owner_id", m_loginMng.GetOwnerID());
+
+	// 共通パース関数を呼び出す
+	parser::MyDoParseMixiHtml(ACCESS_MAIN, *data, *html);
+
+	// 呼び出し後の処理
+	if (!data->GetTextValue(L"owner_id").IsEmpty()) {
+		m_loginMng.SetOwnerID(data->GetTextValue(L"owner_id"));
+		m_loginMng.Write();
+	}
 }

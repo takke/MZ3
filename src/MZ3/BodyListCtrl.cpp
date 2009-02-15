@@ -496,6 +496,23 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if (bEmpty) {
 			strLine1 = L"";
 		}
+
+		// <small>...</small> があれば小さくする
+		// TODO 指定された範囲だけ小さくするように。とりあえず全体を小さくしちゃう
+		CFont* pOriginalFont = NULL;
+		if (strLine1.Find(L"<small>")>=0 && strLine1.Find(L"</small>")>=0) {
+			strLine1.Replace(L"<small>", L"");
+			strLine1.Replace(L"</small>", L"");
+			pOriginalFont = pDC->SelectObject(&theApp.m_fontSmall);
+		}
+		// <big>...</big> があれば大きくする
+		// TODO 指定された範囲だけ大きくするように。とりあえず全体を大きくしちゃう
+		else if (strLine1.Find(L"<big>")>=0 && strLine1.Find(L"</big>")>=0) {
+			strLine1.Replace(L"<big>", L"");
+			strLine1.Replace(L"</big>", L"");
+			pOriginalFont = pDC->SelectObject(&theApp.m_fontBig);
+		}
+
 		// パターンに\tが含まれていれば左右に分割する
 		CString strLine1Left = strLine1;
 		CString strLine1Right = L"";
@@ -517,7 +534,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// 二つに分割した文字列を両端に分けて描画する
 			// 左側文字列は右側文字列分を除いた領域に描画する
 			CRect rcDrawLeft( rcDraw );
-			rcDrawLeft.right -= csDrawRight.cx ; 
+			rcDrawLeft.right -= csDrawRight.cx; 
 			pDC->DrawText(strLine1Left,
 				-1,
 				rcDrawLeft,
@@ -533,6 +550,12 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				-1,
 				rcDraw,
 				DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_END_ELLIPSIS);
+		}
+
+		// フォントを戻す
+		if (pOriginalFont!=NULL) {
+			pDC->SelectObject(pOriginalFont);
+			pOriginalFont = NULL;
 		}
 
 		//--- 2行目の描画
@@ -554,6 +577,21 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		strLine2.Replace(L"%3", strTarget3);
 		if (bEmpty) {
 			strLine2 = L"";
+		}
+
+		// <small>...</small> があれば小さくする
+		// TODO 指定された範囲だけ小さくするように。とりあえず全体を小さくしちゃう
+		if (strLine2.Find(L"<small>")>=0 && strLine2.Find(L"</small>")>=0) {
+			strLine2.Replace(L"<small>", L"");
+			strLine2.Replace(L"</small>", L"");
+			pOriginalFont = pDC->SelectObject(&theApp.m_fontSmall);
+		}
+		// <big>...</big> があれば大きくする
+		// TODO 指定された範囲だけ大きくするように。とりあえず全体を大きくしちゃう
+		else if (strLine2.Find(L"<big>")>=0 && strLine2.Find(L"</big>")>=0) {
+			strLine2.Replace(L"<big>", L"");
+			strLine2.Replace(L"</big>", L"");
+			pOriginalFont = pDC->SelectObject(&theApp.m_fontBig);
 		}
 
 		// 文字列の最後が"(数字)"で終わっていれば分離する
@@ -580,23 +618,29 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// 二つに分割した文字列を両端に分けて描画する
 			// 左側文字列は右側文字列分を除いた領域に描画する
 			CRect rcDrawLeft( rcDraw );
-			rcDrawLeft.right -= csDrawRight.cx ; 
+			rcDrawLeft.right -= csDrawRight.cx; 
 			pDC->DrawText(strLine2Left,
 				-1,
 				rcDrawLeft,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS);
 			// 右側文字列は右寄せで描画する
 			pDC->DrawText(strLine2Right,
 				-1,
 				rcDraw,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_RIGHT | DT_END_ELLIPSIS);
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_RIGHT | DT_END_ELLIPSIS);
 
 		} else {
 			// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま左詰めで描画する
 			pDC->DrawText(strLine2,
 				-1,
 				rcDraw,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_TOP | DT_LEFT | DT_END_ELLIPSIS);
+				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS);
+		}
+
+		// フォントを戻す
+		if (pOriginalFont!=NULL) {
+			pDC->SelectObject(pOriginalFont);
+			pOriginalFont = NULL;
 		}
 
 	} else {

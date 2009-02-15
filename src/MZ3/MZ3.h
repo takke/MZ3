@@ -63,6 +63,7 @@ class CWriteView;
 class CDownloadView;
 class CMZ3BackgroundImage;
 class MouseGestureManager;
+class CHtmlArray;
 
 // CMZ3App:
 // このクラスの実装については、MZ3.cpp を参照してください。
@@ -135,6 +136,8 @@ public:
 
 	//--- UI
 	CFont				m_font;					///< 共通フォント
+	CFont				m_fontSmall;			///< 共通フォント(小) : 共通フォントに対する相対指定
+	CFont				m_fontBig;				///< 共通フォント(大) : 共通フォントに対する相対指定
 	CMZ3View*			m_pMainView;			///< メインビュー
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
@@ -147,10 +150,6 @@ public:
 	CMZ3BackgroundImage	m_bgImageMainCategoryCtrl;	///< メインビュー、カテゴリコントロールの背景用ビットマップ
 	CMZ3BackgroundImage	m_bgImageMainBodyCtrl;		///< メインビュー、ボディコントロールの背景用ビットマップ
 	CMZ3BackgroundImage	m_bgImageReportListCtrl;	///< レポートビュー、リストコントロールの背景用ビットマップ
-
-	int					m_newMessageCount;		///< 新着メッセージ数
-	int					m_newCommentCount;		///< 新着コメント数
- 	int					m_newApplyCount;		///< 承認待ち数
 
 	FilePath			m_filepath;				///< MZ3 で利用しているファイルパス群
 
@@ -223,6 +222,8 @@ public:
 	bool MyLuaClose(void);
 	bool MyLuaExecute(LPCTSTR szLuaStatement);
 	int MyLuaErrorReport(int status);
+
+	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
 };
 
 extern CMZ3App theApp;

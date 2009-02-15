@@ -988,31 +988,33 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			CHtmlArray html;
 			html.Load( theApp.m_filepath.temphtml );
 
-			mixi::HomeParser::parse( html );
+			// パース
+			theApp.DoParseMixiHomeHtml(data, &html);
 
 			if (m_checkNewComment) {
 				// コメント・メッセージ数チェックモード
 
 				// 新着メッセージ、新着コメントの通知
 				CString msg;
-				CString msgTemp;
 
-				if( theApp.m_newMessageCount > 0 ) {
-					msgTemp.Format(_T(" 新着メッセージ:%d件 "),theApp.m_newMessageCount);
-					msg = msgTemp;
+				int n = 0;
+				
+				n = data->GetIntValue(L"new_message_count", 0);
+				if (n > 0) {
+					msg.AppendFormat(_T(" 新着メッセージ:%d件 "), n);
 				}
 
-				if( theApp.m_newCommentCount > 0 ) {
-					msgTemp.Format(_T(" 新着コメント:%d件 "),theApp.m_newCommentCount);
-					msg = msg + msgTemp;
+				n = data->GetIntValue(L"new_comment_count", 0);
+				if (n > 0) {
+					msg.AppendFormat(_T(" 新着コメント:%d件 "), n);
 				}
 
-				if( theApp.m_newApplyCount > 0 ) {
-					msgTemp.Format(_T(" 承認待ち:%d人"),theApp.m_newApplyCount);
-					msg = msg + msgTemp;
+				n = data->GetIntValue(L"new_apply_count", 0);
+				if (n > 0) {
+					msg.AppendFormat(_T(" 承認待ち:%d人"), n);
 				}
 
-				if( msg == "" ) {
+				if (msg.IsEmpty()) {
 					msg = _T("新着メッセージ、コメントはありません");
 				}
 

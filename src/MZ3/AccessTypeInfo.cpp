@@ -398,6 +398,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].cacheFilePattern = L"login.html";
+	m_map[type].serializeKey = "MIXI_LOGIN";
 
 	// トップページ
 	type = ACCESS_MAIN;
@@ -408,6 +409,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].cacheFilePattern = L"home.html";
+	m_map[type].serializeKey = "MIXI_HOME";
 
 	type = ACCESS_DIARY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -419,6 +421,7 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy
 	// url(2) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy&comment_count=8
 	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_DIARY";
 
 	type = ACCESS_NEIGHBORDIARY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -430,6 +433,7 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/neighbor_diary.pl?id=xxx&owner_id=yyy&direction=prev&new_id=zzz
 	// url(2) : http://mixi.jp/neighbor_diary.pl?id=xxx&owner_id=yyy&direction=next&new_id=zzz
 	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:new_id}.html";
+	m_map[type].serializeKey = "MIXI_NEIGHBORDIARY";
 
 	type = ACCESS_NEWS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -440,6 +444,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://news.mixi.jp/view_news.pl?id=132704&media_id=4
 	m_map[type].cacheFilePattern = L"news\\{urlparam:media_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_NEWS";
 
 	type = ACCESS_BBS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -451,6 +456,7 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/view_bbs.pl?id=9360823&comm_id=1198460
 	// url(2) : http://mixi.jp/view_bbs.pl?page=4&comm_id=1198460&id=9360823
 	m_map[type].cacheFilePattern = L"bbs\\{urlparam:comm_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_BBS";
 
 	type = ACCESS_ENQUETE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -461,6 +467,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://mixi.jp/view_enquete.pl?id=13632077&comment_count=1&comm_id=1198460
 	m_map[type].cacheFilePattern = L"enquete\\{urlparam:comm_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_ENQUETE";
 
 	type = ACCESS_EVENT;
 	m_map[type] = AccessTypeInfo::Data(
@@ -471,6 +478,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://mixi.jp/view_event.pl?id=xxx&comment_count=20&comm_id=xxx
 	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_EVENT";
 
 	type = ACCESS_EVENT_JOIN;
 	m_map[type] = AccessTypeInfo::Data(
@@ -481,6 +489,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://mixi.jp/view_event.pl?id=xxx&comment_count=20&comm_id=xxx
 	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_EVENT_JOIN";
 
 	type = ACCESS_EVENT_MEMBER;
 	m_map[type] = AccessTypeInfo::Data(
@@ -489,6 +498,7 @@ bool AccessTypeInfo::init()
 		, L"イベント参加者一覧"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_EVENT_MEMBER";
 
 	type = ACCESS_MYDIARY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -500,6 +510,7 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy
 	// url(2) : http://mixi.jp/view_diary.pl?id=xxx&owner_id=yyy&comment_count=8
 	m_map[type].cacheFilePattern = L"diary\\{urlparam:owner_id}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_MYDIARY";
 
 	type = ACCESS_MESSAGE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -511,6 +522,7 @@ bool AccessTypeInfo::init()
 	// url(1) : http://mixi.jp/view_message.pl?id=xxx&box=inbox
 	// url(2) : http://mixi.jp/view_message.pl?id=xxx&box=outbox
 	m_map[type].cacheFilePattern = L"message\\{urlparam:box}\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_MESSAGE";
 
 	type = ACCESS_IMAGE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -519,6 +531,7 @@ bool AccessTypeInfo::init()
 		, L"画像"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_IMAGE";
 
 	type = ACCESS_MOVIE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -527,6 +540,7 @@ bool AccessTypeInfo::init()
 		, L"動画"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_MOVIE";
 
 	type = ACCESS_DOWNLOAD;
 	m_map[type] = AccessTypeInfo::Data(
@@ -535,6 +549,7 @@ bool AccessTypeInfo::init()
 		, L"ダウンロード"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "DOWNLOAD";
 
 	type = ACCESS_PROFILE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -545,6 +560,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
 	m_map[type].cacheFilePattern = L"profile\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_PROFILE";
 
 	type = ACCESS_BIRTHDAY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -555,6 +571,7 @@ bool AccessTypeInfo::init()
 		);
 	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
 	m_map[type].cacheFilePattern = L"profile\\{urlparam:id}.html";
+	m_map[type].serializeKey = "MIXI_BIRTHDAY";
 
 	type = ACCESS_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -563,6 +580,7 @@ bool AccessTypeInfo::init()
 		, L"コミュニティ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_COMMUNITY";
 
 	type = ACCESS_SCHEDULE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -571,14 +589,7 @@ bool AccessTypeInfo::init()
 		, L"追加した予定"
 		, REQUEST_METHOD_GET
 		);
-
-	type = ACCESS_PLAIN;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY
-		, "mixi"
-		, L"汎用URL"
-		, REQUEST_METHOD_GET
-		);
+	m_map[type].serializeKey = "MIXI_SCHEDULE";
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系
@@ -964,6 +975,7 @@ bool AccessTypeInfo::init()
 		, L"<invalid>"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "INVALID";
 
 	// バージョンチェック
 	type = ACCESS_SOFTWARE_UPDATE_CHECK;
@@ -976,6 +988,16 @@ bool AccessTypeInfo::init()
 	// http://mz3.jp/latest_version.xml
 	m_map[type].cacheFilePattern = L"mz3.jp\\latest_version.xml";
 	m_map[type].defaultCategoryURL = L"http://mz3.jp/latest_version.xml";
+	m_map[type].serializeKey = "MZ3_VERSION_CHECK";
+
+	type = ACCESS_PLAIN;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_BODY
+		, "mixi"
+		, L"汎用URL"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].serializeKey = "PLAIN";
 
 	//------------------------------------------------------------------
 	// シリアライズキー → アクセス種別マップ の構築

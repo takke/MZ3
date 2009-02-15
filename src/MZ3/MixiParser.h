@@ -370,7 +370,7 @@ public:
 	 * <li>theApp.m_newApplyCount
 	 * </ul>
 	 */
-	static bool parse( const CHtmlArray& html_ )
+	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
 	{
 		MZ3LOGGER_DEBUG( L"HomeParser.parse() start." );
 
@@ -379,28 +379,19 @@ public:
 		int index = 0;
 
 		// 新着メッセージ数の取得
-		int messageNum = GetNewMessageCount( html_, 350, count, index);
-		if (messageNum != 0) {
-			theApp.m_newMessageCount = messageNum;
-
-			// バイブしちゃう
-			// NLED_SETTINGS_INFO led;
-			//led.LedNum = ::NLedSetDevice(0, 
-		}
+		int n = 0;
+		n = GetNewMessageCount(html_, 350, count, index);
+		data_.SetIntValue(L"new_message_count", n);
 
 		// 新着コメント数の取得
-		int commentNum = GetNewCommentCount( html_, 350, count, index);
-		if (commentNum != 0) {
-			theApp.m_newCommentCount = commentNum;
-		}
+		n = GetNewCommentCount(html_, 350, count, index);
+		data_.SetIntValue(L"new_comment_count", n);
 
 		// 承認待ち数の取得
-		int applyNum = GetNewAcknowledgmentCount( html_, 350, count, index);
-		if (applyNum != 0) {
-			theApp.m_newApplyCount = applyNum;
-		}
+		n = GetNewAcknowledgmentCount(html_, 350, count, index);
+		data_.SetIntValue(L"new_apply_count", n);
 
-		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+		if (data_.GetTextValue(L"owner_id").IsEmpty()) {
 			// OwnerID が未取得なので解析する
 			MZ3LOGGER_DEBUG( L"OwnerID が未取得なので解析します" );
 
@@ -417,14 +408,13 @@ public:
 						MZ3LOGGER_ERROR( L"add_diary.pl の引数に id 指定がありません。 line[" + line + L"], after[" + after + L"]" );
 					}else{
 						MZ3LOGGER_DEBUG( L"OwnerID = " + id );
-						theApp.m_loginMng.SetOwnerID(id);
-						theApp.m_loginMng.Write();
+						data_.SetTextValue(L"owner_id", id);
 					}
 					break;
 				}
 			}
 
-			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+			if (data_.GetTextValue(L"owner_id").IsEmpty()) {
 				MZ3LOGGER_ERROR( L"OwnerID を取得できませんでした" );
 			}
 		}
