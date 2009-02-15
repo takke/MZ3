@@ -78,7 +78,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#mz3.add_event_listener">mz3.add_event_listener</a>&nbsp;(event, event_handler, parser)</td>
+	<td class="name" nowrap><a href="#mz3.add_event_listener">mz3.add_event_listener</a>&nbsp;(event, event_handler)</td>
 	<td class="summary">各種イベントに対するフック関数を追加する。  同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。  </td>
 	</tr>
 
@@ -273,6 +273,21 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_group_data.get_group_item_by_name">mz3_group_data.get_group_item_by_name</a>&nbsp;(group, name)</td>
+	<td class="summary">タブ名からグループを取得する  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_group_data.get_services">mz3_group_data.get_services</a>&nbsp;(group)</td>
+	<td class="summary">サポートするサービス種別を取得する  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_group_item.append_category">mz3_group_item.append_category</a>&nbsp;(tab, title, serialize_key, url)</td>
+	<td class="summary">カテゴリを追加する  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_htmlarray.get_at">mz3_htmlarray.get_at</a>&nbsp;(htmlarray, index)</td>
 	<td class="summary">index の要素を取得する。   </td>
 	</tr>
@@ -415,7 +430,7 @@
 
 
 
-<dt><a name="mz3.add_event_listener"></a><strong>mz3.add_event_listener</strong>&nbsp;(event, event_handler, parser)</dt>
+<dt><a name="mz3.add_event_listener"></a><strong>mz3.add_event_listener</strong>&nbsp;(event, event_handler)</dt>
 <dd>
 各種イベントに対するフック関数を追加する。  同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。 
 
@@ -428,11 +443,7 @@
 	</li>
 	
 	<li>
-	  event_handler: 
-	</li>
-	
-	<li>
-	  parser: フック関数名({テーブル}.{関数名})
+	  event_handler: フック関数名({テーブル}.{関数名})
 	</li>
 	
 </ul>
@@ -1602,6 +1613,109 @@ data_list の index に data を挿入する。
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_data.get_group_item_by_name"></a><strong>mz3_group_data.get_group_item_by_name</strong>&nbsp;(group, name)</dt>
+<dd>
+タブ名からグループを取得する 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  group: MZ3GroupData
+	</li>
+	
+	<li>
+	  name: タブ名
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+MZ3GroupItem 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_data.get_services"></a><strong>mz3_group_data.get_services</strong>&nbsp;(group)</dt>
+<dd>
+サポートするサービス種別を取得する 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  group: MZ3GroupData
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+サポートするサービス種別のスペース区切り文字列 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_item.append_category"></a><strong>mz3_group_item.append_category</strong>&nbsp;(tab, title, serialize_key, url)</dt>
+<dd>
+カテゴリを追加する 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  tab: [MZ3GroupItem] タブ
+	</li>
+	
+	<li>
+	  title: 表示タイトル
+	</li>
+	
+	<li>
+	  serialize_key: 関連付ける種別のシリアライズキー
+	</li>
+	
+	<li>
+	  url: 取得先URL
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+成功時は true、失敗時は false 
 
 
 
