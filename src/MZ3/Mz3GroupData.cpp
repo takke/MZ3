@@ -5,8 +5,10 @@
  * 2 of the License, or (at your option) any later version.
  */
 #include "stdafx.h"
+#include "MZ3.h"
 #include "Mz3GroupData.h"
 #include "util_base.h"
+#include "util_mz3.h"
 #include "inifile.h"
 
 /**
@@ -18,8 +20,14 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 {
 	this->groups.clear();
 
-	static CGroupItem group;
+	CStringA services;
+	if (initType.bUseMixi)    services.Append(" mixi");
+	if (initType.bUseTwitter) services.Append(" twitter");
+	if (initType.bUseWassr)   services.Append(" wassr");
+	if (initType.bUseGoohome) services.Append(" goohome");
+	this->services = services;
 
+	static CGroupItem group;
 	if (initType.bUseMixi) {
 		// 日記グループ
 		group.init( L"日記", L"list_diary.pl", ACCESS_GROUP_MYDIARY );
@@ -149,6 +157,9 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		}
 		this->groups.push_back( group );
 	}
+
+	// イベントハンドラの呼び出し
+	util::CallMZ3ScriptHookFunctions("", "creating_default_group", this);
 
 	return true;
 }

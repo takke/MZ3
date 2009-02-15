@@ -302,6 +302,6 @@ inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
 	}
 }
 
-bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData);
-bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, void* pUserData);
+bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData1, void* pUserData2=NULL);
+bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventName, void* pUserData1, void* pUserData2=NULL);
 }

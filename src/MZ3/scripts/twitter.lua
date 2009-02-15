@@ -70,7 +70,11 @@ function on_read_menu_item(serialize_key, event_name, data)
 	source = data:get_text('source');
 --	item = item .. "source : " .. source .. "\r\n";
 	s_url, s_name = source:match("href=\"(.*)\".*>(.*)<");
-	item = item .. "source : " .. s_name .. " (" .. s_url .. ")\r\n";
+	if s_url ~= nil then
+		item = item .. "source : " .. s_name .. " (" .. s_url .. ")\r\n";
+	else
+		item = item .. "source : " .. source .. "\r\n";
+	end
 
 	mz3.alert(item, data:get_text('name'));
 

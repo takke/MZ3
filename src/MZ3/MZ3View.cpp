@@ -1507,7 +1507,7 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	TRACE(_T("http://mixi.jp/%s\n"), data.GetURL());
 
 	// MZ3 API : フック関数呼び出し
-	if (util::CallMZ3ScriptHookFunction(
+	if (util::CallMZ3ScriptHookFunctions(
 			  theApp.m_accessTypeInfo.getSerializeKey(data.GetAccessType()),
 			  "dblclk_body_list", &data))
 	{
@@ -2365,7 +2365,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		if( m_access ) return TRUE;
 
 		// MZ3 API : フック関数呼び出し
-		if (util::CallMZ3ScriptHookFunction(
+		if (util::CallMZ3ScriptHookFunctions(
 				theApp.m_accessTypeInfo.getSerializeKey(GetSelectedBodyItem().GetAccessType()),
 				"enter_body_list", &GetSelectedBodyItem()))
 		{
@@ -3831,7 +3831,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			}
 
 			// 暫定：メニュー表示直前のフック関数
-			util::CallMZ3ScriptHookFunction("", "creating_twitter_item_context_menu", pSubMenu);
+			util::CallMZ3ScriptHookFunctions("", "creating_twitter_item_context_menu", pSubMenu);
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -3888,7 +3888,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			}
 
 			// 暫定：メニュー表示直前のフック関数
-			util::CallMZ3ScriptHookFunction("", "creating_goohome_user_context_menu", pSubMenu);
+			util::CallMZ3ScriptHookFunctions("", "creating_goohome_user_context_menu", pSubMenu);
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );

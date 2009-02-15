@@ -69,6 +69,23 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 --mz3.logger_debug(type);
 
+-- 公式メッセージ
+type = mz3_access_type_info.new_access_type();
+mz3_access_type_info.set_info_type(type, 'category');							-- カテゴリ
+mz3_access_type_info.set_service_type(type, 'mixi');							-- サービス種別
+mz3_access_type_info.set_serialize_key(type, 'MIXI_LIST_MESSAGE_OFFICIAL');		-- シリアライズキー
+mz3_access_type_info.set_short_title(type, '公式メッセージ');					-- 簡易タイトル
+mz3_access_type_info.set_request_method(type, 'GET');							-- リクエストメソッド
+mz3_access_type_info.set_cache_file_pattern(type, 'mixi\\list_message_official.html');	-- キャッシュファイル
+mz3_access_type_info.set_request_encoding(type, 'euc-jp');						-- エンコーディング
+mz3_access_type_info.set_default_url(type, 'http://mixi.jp/list_message.pl?box=noticebox');
+mz3_access_type_info.set_body_header(type, 1, 'title', '件名');
+mz3_access_type_info.set_body_header(type, 2, 'name', '差出人>>');
+mz3_access_type_info.set_body_header(type, 3, 'date', '日付>>');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1 %2');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%3');
+
+
 ----------------------------------------
 -- メニューへの登録
 ----------------------------------------
@@ -78,12 +95,21 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
 -- @param serialize_key シリアライズキー(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
--- @param services      サービス種別のスペース区切り文字列
 --
-function on_creating_default_group(serialize_key, event_name, group, services)
--- TODO
--- local group = mz3_category.get_group_by_name('その他');
--- mz3_category.append_category(group, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
+function on_creating_default_group(serialize_key, event_name, group)
+--	mz3.logger_debug('on_creating_default_group');
+	
+	-- サポートするサービス種別の取得(スペース区切り)
+	services = mz3_group_data.get_services(group);
+	if services:find(' mixi', 1, true) ~= nil then
+		-- その他/逆あしあと 追加
+		local tab = mz3_group_data.get_group_item_by_name(group, 'その他');
+		mz3_group_item.append_category(tab, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
+
+		-- メッセージ/公式メッセージ 追加
+		local tab = mz3_group_data.get_group_item_by_name(group, 'メッセージ');
+		mz3_group_item.append_category(tab, "公式メッセージ", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
+	end
 end
 
 ----------------------------------------
@@ -99,6 +125,10 @@ mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 -- 逆あしあと
 require("scripts\\mixi\\mixi_show_self_log_parser");
 mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
+
+-- 公式メッセージ
+require("scripts\\mixi\\mixi_new_official_message_parser");
+mz3.set_parser("MIXI_LIST_MESSAGE_OFFICIAL", "mixi.mixi_new_official_message_parser");
 
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");

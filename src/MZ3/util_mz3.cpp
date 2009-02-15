@@ -227,7 +227,7 @@ int GetPopupFlagsForSoftKeyMenu2()
 /**
  * MZ3 Script : イベントハンドラの呼び出し
  */
-bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData)
+bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData1, void* pUserData2)
 {
 	CStringA strHookFuncName(szFuncName);
 
@@ -258,10 +258,11 @@ bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventNa
 	// 引数を積む
 	lua_pushstring(L, szSerializeKey);
 	lua_pushstring(L, szEventName);
-	lua_pushlightuserdata(L, pUserData);
+	lua_pushlightuserdata(L, pUserData1);
+	lua_pushlightuserdata(L, pUserData2);
 
 	// 関数実行
-	int n_arg = 3;
+	int n_arg = 4;
 	int n_ret = 1;
 	int status = lua_pcall(L, n_arg, n_ret, 0);
 
@@ -281,7 +282,7 @@ bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventNa
 /**
  * MZ3 Script : フック関数の呼び出し
  */
-bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, void* pUserData)
+bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventName, void* pUserData1, void* pUserData2)
 {
 	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
 		// フック関数未登録のため終了
@@ -296,7 +297,7 @@ bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventNa
 //							CString(hookFuncNames[i].c_str()),
 //							CString(szEventName)));
 
-		if (CallMZ3ScriptHookFunction(szSerializeKey, szEventName, hookFuncNames[i].c_str(), pUserData)) {
+		if (CallMZ3ScriptHookFunction(szSerializeKey, szEventName, hookFuncNames[i].c_str(), pUserData1, pUserData2)) {
 			rval = true;
 			break;
 		}

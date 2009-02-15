@@ -12,6 +12,7 @@
 class Mz3GroupData {
 public:
 	std::vector<CGroupItem>	groups;				///< カテゴリリストの項目群
+	std::string				services;			///< サポートするサービス種別のスペース区切り文字列
 
 public:
 	/// コンストラクタ
@@ -64,7 +65,7 @@ public:
 
 	bool initForTopPage(AccessTypeInfo& accessTypeInfo, const InitializeType initType);
 
-	bool appendCategoryByIniData( AccessTypeInfo& accessTypeInfo, 
+	static bool appendCategoryByIniData( AccessTypeInfo& accessTypeInfo, 
 								  CGroupItem& group, 
 								  const std::string& category_name, 
 								  ACCESS_TYPE category_type, 

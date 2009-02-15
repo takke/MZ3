@@ -1246,6 +1246,120 @@ int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
 	return 1;
 }
 
+//-----------------------------------------------
+// MZ3 GroupData API
+//-----------------------------------------------
+
+/*
+--- サポートするサービス種別を取得する
+--
+-- @param group MZ3GroupData
+-- @return サポートするサービス種別のスペース区切り文字列
+--
+function mz3_group_data.get_services(group)
+*/
+int lua_mz3_group_data_get_services(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_data.get_services";
+
+	// 引数取得
+	Mz3GroupData* pGroup = (Mz3GroupData*)lua_touserdata(L, 1);
+	if (pGroup==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに積む
+	lua_pushstring(L, pGroup->services.c_str());
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- タブ名からグループを取得する
+--
+-- @param group MZ3GroupData
+-- @param name  タブ名
+-- @return MZ3GroupItem
+--
+function mz3_group_data.get_group_item_by_name(group, name)
+*/
+int lua_mz3_group_data_get_group_item_by_name(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_data.get_group_item_by_name";
+
+	// 引数取得
+	Mz3GroupData* pGroup = (Mz3GroupData*)lua_touserdata(L, 1);
+	if (pGroup==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CString name(lua_tostring(L, 2));
+
+	CGroupItem* pItem = NULL;
+	size_t n = pGroup->groups.size();
+	for (size_t i=0; i<n; i++) {
+		if (pGroup->groups[i].name==name) {
+			pItem = &pGroup->groups[i];
+		}
+	}
+
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, pItem);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+//-----------------------------------------------
+// MZ3 GroupItem API
+//-----------------------------------------------
+
+/*
+--- カテゴリを追加する
+--
+-- @param tab           [MZ3GroupItem] タブ
+-- @param title         表示タイトル
+-- @param serialize_key 関連付ける種別のシリアライズキー
+-- @param url           取得先URL
+-- @return 成功時は true、失敗時は false
+--
+function mz3_group_item.append_category(tab, title, serialize_key, url);
+*/
+int lua_mz3_group_item_append_category(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_data.append_category";
+
+	// 引数取得
+	CGroupItem* pTab = (CGroupItem*)lua_touserdata(L, 1);
+	if (pTab==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* title = lua_tostring(L, 2);
+	const char* serialize_key = lua_tostring(L, 3);
+	const char* url = lua_tostring(L, 4);
+
+	// アクセス種別の取得
+	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(serialize_key);
+
+	// 追加
+	Mz3GroupData::appendCategoryByIniData(theApp.m_accessTypeInfo, *pTab, title, type, url);
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 // MZ3 API table
 static const luaL_Reg lua_mz3_lib[] = {
 	{"logger_error",				lua_mz3_logger_error},
@@ -1313,6 +1427,17 @@ static const luaL_Reg lua_mz3_access_type_info_lib[] = {
 	{"set_body_integrated_line_pattern",	lua_mz3_access_type_info_set_body_integrated_line_pattern},
 	{NULL, NULL}
 };
+// group data : tabs
+static const luaL_Reg lua_mz3_group_data_lib[] = {
+	{"get_services", lua_mz3_group_data_get_services},
+	{"get_group_item_by_name", lua_mz3_group_data_get_group_item_by_name},
+	{NULL, NULL}
+};
+// group item : tab = categories
+static const luaL_Reg lua_mz3_group_item_lib[] = {
+	{"append_category", lua_mz3_group_item_append_category},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -1323,4 +1448,7 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_menu", lua_mz3_menu_lib);
 	luaL_register(L, "mz3_inifile", lua_mz3_inifile_lib);
 	luaL_register(L, "mz3_access_type_info", lua_mz3_access_type_info_lib);
+
+	luaL_register(L, "mz3_group_data", lua_mz3_group_data_lib);
+	luaL_register(L, "mz3_group_item", lua_mz3_group_item_lib);
 }
