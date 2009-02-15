@@ -82,8 +82,8 @@ mz3_access_type_info.set_default_url(type, 'http://mixi.jp/list_message.pl?box=n
 mz3_access_type_info.set_body_header(type, 1, 'title', 'Œ–¼');
 mz3_access_type_info.set_body_header(type, 2, 'name', '·ol>>');
 mz3_access_type_info.set_body_header(type, 3, 'date', '“ú•t>>');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1 %2');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%3');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%2 %3');
+mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%1');
 
 
 ----------------------------------------
