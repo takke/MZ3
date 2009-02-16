@@ -80,8 +80,12 @@ function mixi_show_self_log_parser(parent, body, html)
 			nickname = after:sub( int_nickname_start, int_nickname_end -1 );
 
 			-- マイミクなら名前の後に "(マイミク)" と付与
-			if after:find( "alt=" ) and nickname ~= nil then
+			mymixi = "\"マイミクシィ\"";
+			mymixi_mymixi = "\"マイミクシィのマイミクシィ\"";
+			if after:find( "alt=" .. mymixi ) and nickname ~= nil then
 				nickname = nickname .. " (マイミク)";
+			elseif after:find( "alt=" .. mymixi_mymixi ) and nickname ~= nil then
+				nickname = nickname .. " (マイミクのマイミク)";
 			end
 
 			nickname = mz3.decode_html_entity(nickname);
