@@ -31,21 +31,17 @@ function mixi_show_self_log_parser(parent, body, html)
 
 	-- 全消去
 	body:clear();
-	
+
 	local t1 = mz3.get_tick_count();
 	local in_data_region = false;
-	
+
 	local back_data = nil;
 	local next_data = nil;
-	
+
 	-- 行数取得
 	local line_count = html:get_count();
 	for i=140, line_count-1 do
 		line = html:get_at(i);
-
---		mz3.logger_info( line );
-		
---		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
 		-- 次へ、前への抽出処理
 		-- 項目発見前にのみ存在する
@@ -54,7 +50,7 @@ function mixi_show_self_log_parser(parent, body, html)
 		end
 
 		-- 項目探索
-		-- <dt class="iconTopic">2007年10月01日&nbsp;22:14</dt>
+		-- <span class="date">02月16日 09:39</span>
 		if line_has_strings(line, "<span", "class", "data") or
 		   line_has_strings(line, "<span", "class", "name") then
 
@@ -64,15 +60,10 @@ function mixi_show_self_log_parser(parent, body, html)
 			data = MZ3Data:create();
 
 			-- 見出し
-			-- <span class="date">02月12日 22:02</span><span class="name"><a href="show_friend.pl?id=xxxxx">user_nickname</a>
-			-- 【チャット】集え！xxx</a> (MZ3 -Mixi for ZERO3-)</dd>
+			-- <span class="date">02月16日 09:39</span><span class="name"><a href="show_friend.pl?id=xxxxx">user_nickname</a>
 			date, after = line:match(">([^<]+)(<.*)$");
 			-- 日付のセット…
 			data:parse_date_line( date );
-			date = mz3.decode_html_entity(title);
-
---			mz3.logger_debug(title);
---			data:set_text("title", title);
 
 			-- URL 取得
 			url = line:match("href=\"([^\"]+)\"");
@@ -83,11 +74,6 @@ function mixi_show_self_log_parser(parent, body, html)
 			data:set_integer("id", id);
 
 			-- ユーザ名
---			nickname = after:match("</a>[^(]*[(](.*)[)]</dd>");
---			nickname = after:match(">[^(]*[(](.*)[)]</a>$");
---			nickname = after:match(">[^(]*[(](.*)[)]</a>$");
---			nickname = after:match("^>.*</a>$");
-
 			int_start, int_end = after:find( id, 1, true )
 			int_nickname_start = int_end +3;
 			int_nickname_end, dummy = after:find( "</a>", 1, true )
@@ -100,14 +86,14 @@ function mixi_show_self_log_parser(parent, body, html)
 
 			nickname = mz3.decode_html_entity(nickname);
 			data:set_text("title", nickname);
-			
+
 			-- URL に応じてアクセス種別を設定
 			type = mz3.estimate_access_type_by_url(url);
 			data:set_access_type(type);
-			
+
 			-- data 追加
 			body:add(data.data);
-			
+
 			-- data 削除
 			data:delete();
 		end
@@ -118,7 +104,7 @@ function mixi_show_self_log_parser(parent, body, html)
 		end
 
 	end
-	
+
 	-- 前、次へリンクの追加
 	if back_data~=nil then
 		-- 先頭に挿入
@@ -130,7 +116,7 @@ function mixi_show_self_log_parser(parent, body, html)
 		body:add(next_data.data);
 		next_data:delete();
 	end
-	
+
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_show_self_log_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
