@@ -528,7 +528,7 @@ CMZ3Doc* CMZ3View::GetDocument() const // デバッグ以外のバージョンはインラインで
 void CMZ3View::OnSize(UINT nType, int cx, int cy)
 {
 	CFormView::OnSize(nType, cx, cy);
-	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );
+//	MZ3LOGGER_DEBUG( L"OnSize( " + util::int2str(nType) + L", " + util::int2str(cx) + L", " + util::int2str(cy) + L" )" );
 
 	MySetLayout( cx, cy );
 }
