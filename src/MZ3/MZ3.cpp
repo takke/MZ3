@@ -1357,8 +1357,7 @@ static int LuaLoadCallback(const TCHAR* szDirectory,
 
 	CString path = &strFile[0];
 	int r = luaL_dofile(theApp.m_luaState, CStringA(path));
-	theApp.MyLuaErrorReport(r);
-	if (r!=0) {
+	if (!theApp.MyLuaErrorReport(r)) {
 		MZ3LOGGER_FATAL(util::FormatString(L"スクリプトを読み込めません[%s] [%d]", path, r));
 		return FALSE;
 	}
@@ -1439,14 +1438,17 @@ bool CMZ3App::MyLuaInit(void)
 	lua_setglobal(L, "mz3_user_script_dir");
 
 	// Lua スクリプトのロード＆実行
-	CString path = script_dir + L"\\mz3.lua";
+	// "mz3.luac" がなければ "mz3.lua" をロードする
+	CString path = script_dir + L"\\mz3.luac";
 	if (!util::ExistFile(path)) {
-		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトが見つかりません[%s]", path));
-		return false;
+		path = script_dir + L"\\mz3.lua";
+		if (!util::ExistFile(path)) {
+			MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトが見つかりません[%s]", path));
+			return false;
+		}
 	}
 	r = luaL_dofile(L, CStringA(path));
-	MyLuaErrorReport(r);
-	if (r!=0) {
+	if (!MyLuaErrorReport(r)) {
 		MZ3LOGGER_FATAL(util::FormatString(L"MZ3 ビルトインスクリプトを読み込めません[%s] [%d]", path, r));
 		return false;
 	}
@@ -1478,12 +1480,13 @@ bool CMZ3App::MyLuaClose(void)
 bool CMZ3App::MyLuaExecute(LPCTSTR szLuaStatement)
 {
 	int r = luaL_dostring(m_luaState, CStringA(szLuaStatement));
-	MyLuaErrorReport(r);
-
-	return true;
+	return MyLuaErrorReport(r);
 }
 
-int CMZ3App::MyLuaErrorReport(int status)
+/**
+ * Lua コード実行後のステータスチェック(エラー発生時はエラー報告する)
+ */
+bool CMZ3App::MyLuaErrorReport(int status)
 {
 	lua_State* L = m_luaState;
 
@@ -1497,8 +1500,10 @@ int CMZ3App::MyLuaErrorReport(int status)
 		MZ3LOGGER_ERROR(user_msg);
 		::MessageBox(NULL, user_msg, NULL, MB_OK);
 		lua_pop(L, 1);
+
+		return false;
 	}
-	return status;
+	return true;
 }
 
 void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)

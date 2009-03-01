@@ -13,7 +13,7 @@ mz3.logger_info('mz3.lua start');
 
 -- パッケージロードパスの変更
 --print(package.path);
-package.path = ".\\?.lua;" .. mz3_dir .. "?.lua;"
+package.path = ".\\?.luac;.\\?.lua;" .. mz3_dir .. "?.luac;" .. mz3_dir .. "?.lua;"
 --print(package.path);
 
 -- 各種ビルトインスクリプトロード

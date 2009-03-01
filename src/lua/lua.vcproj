@@ -346,7 +346,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\Release_WM\&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\Release\&quot;"
 			/>
 			<DeploymentTool
 				ForceDirty="-1"

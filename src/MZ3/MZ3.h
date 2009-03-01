@@ -221,7 +221,7 @@ public:
 	bool MyLuaInit(void);
 	bool MyLuaClose(void);
 	bool MyLuaExecute(LPCTSTR szLuaStatement);
-	int MyLuaErrorReport(int status);
+	bool MyLuaErrorReport(int status);
 
 	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
 };

@@ -346,6 +346,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(SolutionDir)\src\MZ3\scripts&quot;&#x0D;&#x0A;compile.bat"
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
