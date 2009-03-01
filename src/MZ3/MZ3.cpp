@@ -28,6 +28,14 @@
 #include "ChooseClientTypeDlg.h"
 #include "mz3_lua_api.h"
 
+// MZ4 Only
+/*
+#ifndef WINCE
+# include "..\\MZ3HookDLL\\MZ3HookDLL.h"
+# pragma comment( lib, "..\\MZ3HookDLL\\Release\\MZ3Hook.lib" )
+#endif
+*/
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -114,6 +122,13 @@ BOOL CMZ3App::InitInstance()
 	// Win32 用にロケールを設定
 	setlocale( LC_ALL, "Japanese" ); 
 #endif
+
+/*
+#ifndef	WINCE
+	// MZ4 グローバルフック初期化
+	MZ3Hook_StartHook();
+#endif
+*/
 
 	// ファイルパス群を初期化
 	m_filepath.init();
@@ -474,6 +489,12 @@ BOOL CMZ3App::InitInstance()
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
 
+/*
+#ifndef WINCE
+	MZ3Hook_SetMainWindow(m_pMainView->m_hWnd);
+#endif
+*/
+
 //	if( m_bSmartphone ) {
 #ifdef WINCE
 	// 下記の理由からここで再描画
@@ -705,9 +726,6 @@ void CMZ3App::InitResolutionFlags()
 
 int CMZ3App::ExitInstance()
 {
-#ifndef WINCE 
-	::GdiplusShutdown(gdiToken);
-#endif
 //	CString msg;
 //	msg.Format( L"ログファイルを\n%s\nに保存します", logfile );
 //	MessageBox( NULL, msg, 0, MB_OK );
@@ -727,6 +745,17 @@ int CMZ3App::ExitInstance()
 
 	// Lua 終了処理
 	MyLuaClose();
+
+/*
+#ifndef	WINCE
+	// MZ4 グローバルフック完了
+	MZ3Hook_StopHook();
+#endif
+*/
+
+#ifndef WINCE 
+	::GdiplusShutdown(gdiToken);
+#endif
 
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" 終了処理完了" );
 
