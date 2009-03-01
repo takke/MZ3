@@ -49,7 +49,7 @@
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;LUA_BUILD_AS_DLL"
 				MinimalRebuild="true"
-				RuntimeLibrary="1"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -93,7 +93,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\Debug_WM\&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\Debug_WM\&quot;&#x0D;&#x0A;"
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
@@ -321,7 +321,7 @@
 				AdditionalOptions=" /subsystem:windowsce,5.01"
 				OutputFile="$(OutDir)/lua.dll"
 				LinkIncremental="1"
-				DelayLoadDLLs="$(NOINHERIT)"
+				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/lua.pdb"
 				SubSystem="0"

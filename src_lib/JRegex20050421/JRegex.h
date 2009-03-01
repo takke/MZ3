@@ -1,5 +1,6 @@
 #ifndef __INC_JREGEX__
 #define __INC_JREGEX__
+#include "..\..\src\JRegexDLL\JRegexDLL.h"
 #include "jectlib.h"
 #include "JChar.h"
 
@@ -81,10 +82,10 @@ typedef struct _JREG_REP
 }jreg_rep;
 
 
-jreg* jreg_comp   (const t_code *regstr, jreg_opt opt);
-bool  jreg_exec   (jreg *reg,                PATTERN_STR Pattern, u_int start, u_int len, jreg_opt opt);
-bool  jreg_replace(jreg *reg, jreg_rep *rep, PATTERN_STR Pattern, u_int start, u_int len, jreg_opt opt);
-void  jreg_free   (jreg *reg);
+JREGEXDLL_API jreg* jreg_comp   (const t_code *regstr, jreg_opt opt);
+JREGEXDLL_API bool  jreg_exec   (jreg *reg,                PATTERN_STR Pattern, u_int start, u_int len, jreg_opt opt);
+JREGEXDLL_API bool  jreg_replace(jreg *reg, jreg_rep *rep, PATTERN_STR Pattern, u_int start, u_int len, jreg_opt opt);
+JREGEXDLL_API void  jreg_free   (jreg *reg);
 
 
 #ifdef __cplusplus

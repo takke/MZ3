@@ -7,7 +7,7 @@
 #pragma once
 
 #include "locale.h"
-#include "JRegex20050421/JRegex.h"
+#include "../../src_lib/JRegex20050421/JRegex.h"
 #include <string>
 #include <vector>
 
