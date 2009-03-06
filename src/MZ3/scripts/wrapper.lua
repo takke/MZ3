@@ -89,3 +89,36 @@ end
 
 function MZ3HTMLArray:get_count(index)	return mz3_htmlarray.get_count(self.htmlarray);		end
 function MZ3HTMLArray:get_at(index)		return mz3_htmlarray.get_at(self.htmlarray, index);	end
+
+
+--------------------------------------------------
+-- Wrapper for mz3_access_type_info
+--------------------------------------------------
+MZ3AccessTypeInfo = {};
+
+function MZ3AccessTypeInfo:create(type)
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	if type==nil then
+		object.type = mz3_access_type_info.new_access_type();
+	else
+		object.type = type;
+	end
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3AccessTypeInfo });
+	return object;
+end
+
+function MZ3AccessTypeInfo:set_info_type(c)				return mz3_access_type_info.set_info_type(self.type, c);			end
+function MZ3AccessTypeInfo:set_service_type(st)			return mz3_access_type_info.set_service_type(self.type, st);		end
+function MZ3AccessTypeInfo:set_serialize_key(key)		return mz3_access_type_info.set_serialize_key(self.type, key);		end
+function MZ3AccessTypeInfo:set_short_title(title)		return mz3_access_type_info.set_short_title(self.type, title);		end
+function MZ3AccessTypeInfo:set_request_method(m)		return mz3_access_type_info.set_request_method(self.type, m);		end
+function MZ3AccessTypeInfo:set_cache_file_pattern(pat)	return mz3_access_type_info.set_cache_file_pattern(self.type, pat);	end
+function MZ3AccessTypeInfo:set_request_encoding(e)		return mz3_access_type_info.set_request_encoding(self.type, e);		end
+function MZ3AccessTypeInfo:set_default_url(url)			return mz3_access_type_info.set_default_url(self.type, url);		end
+function MZ3AccessTypeInfo:set_body_header(no, t, n)	return mz3_access_type_info.set_body_header(self.type, no, t, n);	end
+function MZ3AccessTypeInfo:set_body_integrated_line_pattern(l, pat)	return mz3_access_type_info.set_body_integrated_line_pattern(self.type, l, pat);	end
