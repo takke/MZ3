@@ -54,19 +54,19 @@ end
 -- アクセス種別の登録
 ----------------------------------------
 -- 逆あしあと
-type = mz3_access_type_info.new_access_type();
-mz3_access_type_info.set_info_type(type, 'category');							-- カテゴリ
-mz3_access_type_info.set_service_type(type, 'mixi');							-- サービス種別
-mz3_access_type_info.set_serialize_key(type, 'MIXI_SHOW_SELF_LOG');				-- シリアライズキー
-mz3_access_type_info.set_short_title(type, '逆あしあと');						-- 簡易タイトル
-mz3_access_type_info.set_request_method(type, 'GET');							-- リクエストメソッド
-mz3_access_type_info.set_cache_file_pattern(type, 'mixi\\show_self_log.html');	-- キャッシュファイル
-mz3_access_type_info.set_request_encoding(type, 'euc-jp');						-- エンコーディング
-mz3_access_type_info.set_default_url(type, 'http://mixi.jp/show_self_log.pl');
-mz3_access_type_info.set_body_header(type, 1, 'title', '名前');
-mz3_access_type_info.set_body_header(type, 2, 'date', '日付');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%2');
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('MIXI_SHOW_SELF_LOG');				-- シリアライズキー
+type:set_short_title('逆あしあと');							-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\show_self_log.html');	-- キャッシュファイル
+type:set_request_encoding('euc-jp');						-- エンコーディング
+type:set_default_url('http://mixi.jp/show_self_log.pl');
+type:set_body_header(1, 'title', '名前');
+type:set_body_header(2, 'date', '日付');
+type:set_body_integrated_line_pattern(1, '%1');
+type:set_body_integrated_line_pattern(2, '%2');
 --mz3.logger_debug(type);
 
 -- 公式メッセージ
