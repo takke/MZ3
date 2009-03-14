@@ -2,10 +2,12 @@
 #pragma comment(linker, "/nodefaultlib:libcd.lib")
 
 // メモ - この値は、ターゲットになっている Windows CE OS バージョンと相互に強く関連付けられていません。
-#ifdef WINCE
-# define WINVER _WIN32_WCE
-#else
-# define WINVER 0x0500
+#ifndef WINVER
+# ifdef WINCE
+#  define WINVER _WIN32_WCE
+# else
+#  define WINVER 0x0500
+# endif
 #endif
 
 #ifndef VC_EXTRALEAN

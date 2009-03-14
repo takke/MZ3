@@ -84,7 +84,7 @@ function mixi_new_official_message_parser(parent, body, html)
 			line3 = html:get_at(i +2);
 			date = line3:match(">([^<]+)(<.*)$");
 			date = mz3.decode_html_entity(date);
-			data:parse_date_line(date);
+			data:set_date(date);
 			
 			-- ŽŸsŽæ“¾
 			i = i+1;

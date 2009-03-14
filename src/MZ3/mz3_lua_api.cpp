@@ -389,6 +389,39 @@ int lua_mz3_data_get_date(lua_State *L)
 }
 
 /*
+--- 日付の設定
+--
+-- 任意の日付(文字列形式)を設定するために利用します。
+--
+-- 通常は mz3_data.parse_date_line を利用して下さい。
+--
+-- @param  data MZ3Data オブジェクト
+-- @param  date 日付文字列
+-- @return なし
+--
+function mz3_data.set_date(data, date)
+*/
+int lua_mz3_data_set_date(lua_State *L)
+{
+	const char* func_name = "mz3_data.set_date";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* date = lua_tostring(L, 2);			// 第2引数
+
+	// 値設定
+	data->SetDate(CString(date));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- 
 --
 --
@@ -1378,6 +1411,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
 	{"get_date",		lua_mz3_data_get_date},
+	{"set_date",		lua_mz3_data_set_date},
 	{"get_text",		lua_mz3_data_get_text},
 	{"set_text",		lua_mz3_data_set_text},
 	{"get_text_array",	lua_mz3_data_get_text_array},

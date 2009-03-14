@@ -35,6 +35,7 @@ end
 function MZ3Data:delete()						return mz3_data.delete(self.data);						end
 function MZ3Data:set_access_type(type)			return mz3_data.set_access_type(self.data, type);		end
 function MZ3Data:get_access_type()				return mz3_data.get_access_type(self.data);				end
+function MZ3Data:set_date(date)					return mz3_data.set_date(self.data, date);				end
 function MZ3Data:get_date()						return mz3_data.get_date(self.data);					end
 function MZ3Data:get_text(name)					return mz3_data.get_text(self.data, name);				end
 function MZ3Data:set_text(name, value)			return mz3_data.set_text(self.data, name, value);		end

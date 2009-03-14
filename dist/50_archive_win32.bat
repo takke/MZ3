@@ -11,6 +11,7 @@
 @echo ■ ファイルを収集します
 copy ..\src\MZ3\Release_Win32\MZ4.exe MZ3_win32\
 copy ..\src\MZ3\Release_Win32_c\MZ4.exe MZ3_win32\MZ4_c.exe
+copy ..\src\JRegexDLL\Release\jregex.dll MZ3_win32\
 copy ..\src\lua\Release\lua.dll MZ3_win32\
 del /Q MZ3_win32\scripts\*
 copy ..\src\MZ3\scripts\* MZ3_win32\scripts\

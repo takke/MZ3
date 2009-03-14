@@ -105,7 +105,7 @@ function mixi_message_inbox_parser(parent, body, html)
 			-- “ú•tŽæ“¾
 			-- <td class="date">03ŒŽ10“ú<a id=
 			date, after = line3:match(">([^<]+)(<.*)$");
-			data:parse_date_line( date );
+			data:set_date( date );
 
 			-- URL Žæ“¾
 			url = line:match("href=\"([^\"]+)\"");
