@@ -323,7 +323,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"Žž");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
+/*
 	type = ACCESS_LIST_MESSAGE_IN;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -340,7 +340,8 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"“ú•t>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-
+*/
+/*
 	type = ACCESS_LIST_MESSAGE_OUT;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -357,7 +358,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"“ú•t>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-
+*/
 	type = ACCESS_LIST_BOOKMARK;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY

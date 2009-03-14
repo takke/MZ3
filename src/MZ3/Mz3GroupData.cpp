@@ -82,8 +82,8 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 		// メッセージグループ
 		group.init( L"メッセージ", L"", ACCESS_GROUP_MESSAGE );
 		{
-			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
-			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
+//			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
+//			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
 		}
 		this->groups.push_back( group );
 

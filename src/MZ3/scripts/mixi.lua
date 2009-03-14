@@ -69,21 +69,6 @@ type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 --mz3.logger_debug(type);
 
--- 公式メッセージ
-type = mz3_access_type_info.new_access_type();
-mz3_access_type_info.set_info_type(type, 'category');							-- カテゴリ
-mz3_access_type_info.set_service_type(type, 'mixi');							-- サービス種別
-mz3_access_type_info.set_serialize_key(type, 'MIXI_LIST_MESSAGE_OFFICIAL');		-- シリアライズキー
-mz3_access_type_info.set_short_title(type, '公式メッセージ');					-- 簡易タイトル
-mz3_access_type_info.set_request_method(type, 'GET');							-- リクエストメソッド
-mz3_access_type_info.set_cache_file_pattern(type, 'mixi\\list_message_official.html');	-- キャッシュファイル
-mz3_access_type_info.set_request_encoding(type, 'euc-jp');						-- エンコーディング
-mz3_access_type_info.set_default_url(type, 'http://mixi.jp/list_message.pl?box=noticebox');
-mz3_access_type_info.set_body_header(type, 1, 'title', '件名');
-mz3_access_type_info.set_body_header(type, 2, 'name', '差出人>>');
-mz3_access_type_info.set_body_header(type, 3, 'date', '日付>>');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%2 %3');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%1');
 
 
 ----------------------------------------
@@ -107,8 +92,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 		mz3_group_item.append_category(tab, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
 
 		-- メッセージ/公式メッセージ 追加
-		local tab = mz3_group_data.get_group_item_by_name(group, 'メッセージ');
-		mz3_group_item.append_category(tab, "公式メッセージ", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
+--		local tab = mz3_group_data.get_group_item_by_name(group, 'メッセージ');
+--		mz3_group_item.append_category(tab, "公式メッセージ", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
 	end
 end
 
@@ -126,14 +111,15 @@ mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 require("scripts\\mixi\\mixi_show_self_log_parser");
 mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
 
--- 公式メッセージ
-require("scripts\\mixi\\mixi_new_official_message_parser");
-mz3.set_parser("MIXI_LIST_MESSAGE_OFFICIAL", "mixi.mixi_new_official_message_parser");
-
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");
 mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
 
+
+-- メッセージ(受信箱, 送信箱),公式メッセージ
+require("scripts\\mixi\\mixi_new_official_message_parser");
+require("scripts\\mixi\\mixi_message_outbox_parser");
+require("scripts\\mixi\\mixi_message_inbox_parser");
 
 ----------------------------------------
 -- イベントフック関数の登録
