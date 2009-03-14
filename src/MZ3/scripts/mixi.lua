@@ -51,53 +51,6 @@ end
 
 
 ----------------------------------------
--- アクセス種別の登録
-----------------------------------------
--- 逆あしあと
-type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- カテゴリ
-type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('MIXI_SHOW_SELF_LOG');				-- シリアライズキー
-type:set_short_title('逆あしあと');							-- 簡易タイトル
-type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\show_self_log.html');	-- キャッシュファイル
-type:set_request_encoding('euc-jp');						-- エンコーディング
-type:set_default_url('http://mixi.jp/show_self_log.pl');
-type:set_body_header(1, 'title', '名前');
-type:set_body_header(2, 'date', '日付');
-type:set_body_integrated_line_pattern(1, '%1');
-type:set_body_integrated_line_pattern(2, '%2');
---mz3.logger_debug(type);
-
-
-
-----------------------------------------
--- メニューへの登録
-----------------------------------------
-
---- デフォルトのグループリスト生成イベントハンドラ
---
--- @param serialize_key シリアライズキー(nil)
--- @param event_name    'creating_default_group'
--- @param group         MZ3GroupData
---
-function on_creating_default_group(serialize_key, event_name, group)
---	mz3.logger_debug('on_creating_default_group');
-	
-	-- サポートするサービス種別の取得(スペース区切り)
-	services = mz3_group_data.get_services(group);
-	if services:find(' mixi', 1, true) ~= nil then
-		-- その他/逆あしあと 追加
-		local tab = mz3_group_data.get_group_item_by_name(group, 'その他');
-		mz3_group_item.append_category(tab, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
-
-		-- メッセージ/公式メッセージ 追加
---		local tab = mz3_group_data.get_group_item_by_name(group, 'メッセージ');
---		mz3_group_item.append_category(tab, "公式メッセージ", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
-	end
-end
-
-----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------
 -- ★リスト系
@@ -107,24 +60,21 @@ mz3.set_parser("BBS",             "mixi.new_bbs_parser");
 -- コミュニティコメント記入履歴 : 最新書込一覧と同一
 mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 
--- 逆あしあと
-require("scripts\\mixi\\mixi_show_self_log_parser");
-mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
-
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");
 mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
 
-
--- メッセージ(受信箱, 送信箱),公式メッセージ
+-- メッセージ(受信箱, 送信箱), 公式メッセージ
 require("scripts\\mixi\\mixi_new_official_message_parser");
 require("scripts\\mixi\\mixi_message_outbox_parser");
 require("scripts\\mixi\\mixi_message_inbox_parser");
 
+-- 逆あしあと
+require("scripts\\mixi\\mixi_show_self_log_parser");
+
+
 ----------------------------------------
 -- イベントフック関数の登録
 ----------------------------------------
--- デフォルトのグループリスト生成
-mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group");
 
 mz3.logger_debug('mixi.lua end');

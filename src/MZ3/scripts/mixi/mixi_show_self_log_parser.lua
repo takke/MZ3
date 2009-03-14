@@ -11,6 +11,25 @@
 --------------------------------------------------
 module("mixi", package.seeall)
 
+----------------------------------------
+-- アクセス種別の登録
+----------------------------------------
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('MIXI_SHOW_SELF_LOG');				-- シリアライズキー
+type:set_short_title('逆あしあと');							-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\show_self_log.html');	-- キャッシュファイル
+type:set_request_encoding('euc-jp');						-- エンコーディング
+type:set_default_url('http://mixi.jp/show_self_log.pl');
+type:set_body_header(1, 'title', '名前');
+type:set_body_header(2, 'date', '日付');
+type:set_body_integrated_line_pattern(1, '%1');
+type:set_body_integrated_line_pattern(2, '%2');
+--mz3.logger_debug(type);
+
 --------------------------------------------------
 -- 【逆あしあと一覧】
 -- [list] show_self_log.pl 用パーサ
@@ -124,3 +143,41 @@ function mixi_show_self_log_parser(parent, body, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_show_self_log_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
+
+
+----------------------------------------
+-- パーサの登録
+----------------------------------------
+-- 逆あしあと
+mz3.set_parser("MIXI_SHOW_SELF_LOG", "mixi.mixi_show_self_log_parser");
+
+
+----------------------------------------
+-- メニューへの登録
+----------------------------------------
+
+--- デフォルトのグループリスト生成イベントハンドラ
+--
+-- @param serialize_key シリアライズキー(nil)
+-- @param event_name    'creating_default_group'
+-- @param group         MZ3GroupData
+--
+function on_creating_default_group_for_mixi_show_self_log(serialize_key, event_name, group)
+
+	-- サポートするサービス種別の取得(スペース区切り)
+	services = mz3_group_data.get_services(group);
+	if services:find(' mixi', 1, true) ~= nil then
+
+		-- その他/逆あしあと 追加
+		local tab = mz3_group_data.get_group_item_by_name(group, 'その他');
+		mz3_group_item.append_category(tab, "逆あしあと", "MIXI_SHOW_SELF_LOG", "http://mixi.jp/show_self_log.pl");
+
+	end
+end
+
+
+----------------------------------------
+-- イベントフック関数の登録
+----------------------------------------
+-- デフォルトのグループリスト生成
+mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group_for_mixi_show_self_log");
