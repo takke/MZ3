@@ -1494,9 +1494,10 @@ bool CMZ3App::MyLuaErrorReport(int status)
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
 		CString user_msg;
+		std::wstring msgw = util::my_mbstowcs(msg);
 		user_msg.Format(L"スクリプト実行中にエラーが発生しました。\r\n"
 						L"\r\n"
-						L"%s", CString(msg));
+						L"%s", msgw.c_str());
 		MZ3LOGGER_ERROR(user_msg);
 		::MessageBox(NULL, user_msg, NULL, MB_OK);
 		lua_pop(L, 1);
