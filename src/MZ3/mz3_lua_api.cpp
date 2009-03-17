@@ -1372,8 +1372,10 @@ int lua_mz3_group_item_append_category(lua_State *L)
 	// 引数取得
 	CGroupItem* pTab = (CGroupItem*)lua_touserdata(L, 1);
 	if (pTab==NULL) {
-		lua_pushstring(L, make_invalid_arg_error_string(func_name));
-		lua_error(L);
+		// 不正なタブが指定された。エラーログを出力し続行する。
+		MZ3LOGGER_ERROR(CString(make_invalid_arg_error_string(func_name)));
+//		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+//		lua_error(L);
 		return 0;
 	}
 	const char* title = lua_tostring(L, 2);

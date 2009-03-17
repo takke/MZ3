@@ -20,12 +20,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_03589C8D140C412E85F3BFFCF71DFBB8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_05DF1E8F0A03485D8B8F899474E1DBA1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -122,12 +116,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_6CD3D9A2D5E4406CA505D988F69DB186"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_70A83056FA42481DAEE4D50085E42AF2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -147,6 +135,12 @@
         "Entry"
         {
         "MsmKey" = "8:_95D58EFACC754177A69E7B17307B6C8B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A1BED9B5C6F4470CBAACBAE1F40FDD50"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1130,33 +1124,7 @@
         }
         "ProjectOutput"
         {
-            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_03589C8D140C412E85F3BFFCF71DFBB8"
-            {
-            "SourcePath" = "8:..\\lua\\Release_wm5_ppc_armv4i\\lua.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:0"
-            "OutputConfiguration" = "8:Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{2D15C884-CA53-4B00-9854-A51ED9FF9FB2}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_6CD3D9A2D5E4406CA505D988F69DB186"
+            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_A1BED9B5C6F4470CBAACBAE1F40FDD50"
             {
             "SourcePath" = "8:..\\JRegexDLL\\Release_wm5_ppc_armv4i\\jregex.dll"
             "TargetName" = "8:"
