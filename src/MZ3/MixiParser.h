@@ -3347,6 +3347,7 @@ public:
  * yƒƒbƒZ[ƒWˆê——z
  * http://mixi.jp/list_message.pl
  */
+/*
 class ListMessageParser : public MixiListParser
 {
 public:
@@ -3436,7 +3437,7 @@ public:
 		return true;
 	}
 };
-
+*/
 
 
 

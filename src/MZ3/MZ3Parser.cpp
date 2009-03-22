@@ -117,8 +117,8 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_MYDIARY:					return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					return mixi::ShowLogParser::parse( body, html );
 	case ACCESS_LIST_FOOTSTEP:					return mixi::TrackParser::parse( body, html );
-	case ACCESS_LIST_MESSAGE_IN:				return mixi::ListMessageParser::parse( body, html );
-	case ACCESS_LIST_MESSAGE_OUT:				return mixi::ListMessageParser::parse( body, html );
+//	case ACCESS_LIST_MESSAGE_IN:				return mixi::ListMessageParser::parse( body, html );
+//	case ACCESS_LIST_MESSAGE_OUT:				return mixi::ListMessageParser::parse( body, html );
 	case ACCESS_LIST_NEWS:						return mixi::ListNewsCategoryParser::parse( body, html );
 	case ACCESS_LIST_FAVORITE_USER:				return mixi::ListBookmarkParser::parse( body, html );
 	case ACCESS_LIST_FAVORITE_COMMUNITY:		return mixi::ListBookmarkParser::parse( body, html );

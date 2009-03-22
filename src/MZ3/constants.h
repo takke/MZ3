@@ -100,8 +100,8 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_DIARY,				///< マイミク最新日記一覧
 	ACCESS_LIST_NEW_COMMENT,		///< 最新コメント一覧
 	ACCESS_LIST_NEW_BBS,			///< コミュニティ書き込み一覧(new_bbs.pl)
-	ACCESS_LIST_MESSAGE_IN,			///< メッセージ一覧（受信箱）
-	ACCESS_LIST_MESSAGE_OUT,		///< メッセージ一覧（受信箱）
+//	ACCESS_LIST_MESSAGE_IN,			///< メッセージ一覧（受信箱）
+//	ACCESS_LIST_MESSAGE_OUT,		///< メッセージ一覧（受信箱）
 	ACCESS_LIST_FOOTSTEP,			///< 足跡
 	ACCESS_LIST_COMMENT,			///< コメント一覧
 	ACCESS_LIST_NEWS,				///< ニュース一覧
