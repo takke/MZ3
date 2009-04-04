@@ -97,6 +97,7 @@ function mixi_message_outbox_parser(parent, body, html)
 			name, after = line2:match(">([^<]+)(<.*)$");
 			name = mz3.decode_html_entity(name);
 			data:set_text("name", name);
+			data:set_text("author", name);
 
 			-- 2si‚Þ
 			i = i +2;

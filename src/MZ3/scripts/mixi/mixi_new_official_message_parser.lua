@@ -111,6 +111,7 @@ function mixi_new_official_message_parser(parent, body, html)
 			sender = line:match(">([^<]+)(<.*)$");
 --			sender = mz3.decode_html_entity(sender);
 			data:set_text("name", sender);
+			data:set_text("author", sender);
 			
 			-- URL に応じてアクセス種別を設定
 			type = mz3.estimate_access_type_by_url(url);
