@@ -64,10 +64,11 @@ mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 require("scripts\\mixi\\mixi_home_parser");
 mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
 
--- メッセージ(受信箱, 送信箱), 公式メッセージ
+-- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
 require("scripts\\mixi\\mixi_new_official_message_parser");
 require("scripts\\mixi\\mixi_message_outbox_parser");
 require("scripts\\mixi\\mixi_message_inbox_parser");
+require("scripts\\mixi\\mixi_view_message_parser");
 
 -- 逆あしあと
 require("scripts\\mixi\\mixi_show_self_log_parser");

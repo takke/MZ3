@@ -3446,6 +3446,7 @@ public:
  * 【メッセージ詳細】
  * http://mixi.jp/view_message.pl
  */
+/*
 class ViewMessageParser : public MixiContentParser
 {
 public:
@@ -3512,6 +3513,7 @@ public:
 		return true;
 	}
 };
+*/
 
 
 //■■■その他■■■

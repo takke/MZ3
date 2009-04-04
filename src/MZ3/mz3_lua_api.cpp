@@ -508,7 +508,7 @@ int lua_mz3_data_get_text_array_size(lua_State *L)
 }
 
 /*
---- 
+--- name という名前の配列に value を追加する。
 --
 --
 function mz3_data.add_text_array(data, name, value)
@@ -529,6 +529,32 @@ int lua_mz3_data_add_text_array(lua_State *L)
 
 	// 値設定
 	data->AddTextArray(CString(name), CString(value));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- value からリンク等を抽出、整形し、HTML の整形をして、body 配列に追加する
+--
+--
+function mz3_data.add_body_with_extract(data, value)
+*/
+int lua_mz3_data_add_body_with_extract(lua_State *L)
+{
+	const char* func_name = "mz3_data.add_body_with_extract";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* value = lua_tostring(L, 2);			// 第2引数
+
+	// 値設定
+	mixi::ParserUtil::AddBodyWithExtract(*data, CString(value));
 
 	// 戻り値の数を返す
 	return 0;
@@ -1419,6 +1445,7 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 	{"get_text_array",	lua_mz3_data_get_text_array},
 	{"get_text_array_size",	lua_mz3_data_get_text_array_size},
 	{"add_text_array",	lua_mz3_data_add_text_array},
+	{"add_body_with_extract",	lua_mz3_data_add_body_with_extract},
 	{"get_integer",		lua_mz3_data_get_integer},
 	{"set_integer",		lua_mz3_data_set_integer},
 	{"set_access_type",	lua_mz3_data_set_access_type},

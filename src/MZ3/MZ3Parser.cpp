@@ -174,7 +174,7 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_BIRTHDAY:
 	case ACCESS_PROFILE:		return mixi::ShowFriendParser::parse( mixi, html );
 	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
-	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
+//	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
 	case ACCESS_ERRORLOG:		return parser::ErrorlogParser::parse( mixi, html );
