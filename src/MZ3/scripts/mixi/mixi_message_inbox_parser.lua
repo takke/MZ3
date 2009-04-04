@@ -28,6 +28,7 @@ type:set_body_header(3, 'date', '日付>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 
+
 --------------------------------------------------
 -- 【mixi メッセージ(受信箱)】
 -- [list] list_message.pl 用パーサ
@@ -180,10 +181,26 @@ function on_creating_default_group_for_mixi_message_inbox(serialize_key, event_n
 
 	end
 end
-
-
-----------------------------------------
 -- イベントフック関数の登録
-----------------------------------------
--- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group_for_mixi_message_inbox");
+
+
+----------------------------------------
+-- estimate 対象に追加
+----------------------------------------
+
+--- estimate 対象判別イベントハンドラ
+--
+-- @param event_name 'estimate_access_type_by_url'
+-- @param url        解析対象URL
+--
+function on_estimate_access_type_by_url_for_mixi_message_inbox(event_name, url, data1, data2)
+
+	if line_has_strings(url, 'list_message.pl', 'box=inbox') then
+		return true, mz3.get_access_type_by_key('MESSAGE_IN');
+	end
+	
+	return false;
+end
+-- イベントフック関数の登録
+mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type_by_url_for_mixi_message_inbox");

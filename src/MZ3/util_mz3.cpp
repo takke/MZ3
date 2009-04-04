@@ -305,4 +305,123 @@ bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventN
 	return rval;
 }
 
+/**
+ * MZ3 Script : イベントハンドラの呼び出し
+ */
+bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName, 
+								const char* szText, void* pUserData1, void* pUserData2, int* pRetVal)
+{
+	CStringA strHookFuncName(szFuncName);
+
+	// パーサ名をテーブルと関数名に分離する
+	int idx = strHookFuncName.Find('.');
+	if (idx<=0) {
+		// 関数名不正
+		MZ3LOGGER_ERROR(util::FormatString(L"フック関数名が不正です : [%s], [%s]", 
+			CString(strHookFuncName), CString(szEventName)));
+		return false;
+	}
+
+	CStringA strTable    = strHookFuncName.Left(idx);
+	CStringA strFuncName = strHookFuncName.Mid(idx+1);
+
+
+	// スタックのサイズを覚えておく
+	lua_State* L = theApp.m_luaState;
+	int top = lua_gettop(L);
+
+	// Lua関数名("table.name")を積む
+	lua_getglobal(L, strTable);				// テーブル名をスタックに積む
+	lua_pushstring(L, strFuncName);			// 対象変数(関数名)をテーブルに積む
+	lua_gettable(L, -2);					// スタックの2番目の要素(テーブル)から、
+											// テーブルトップの文字列(strFuncName)で示されるメンバを
+											// スタックに積む
+
+	// 引数を積む
+	lua_pushstring(L, szEventName);
+	lua_pushstring(L, szText);
+	lua_pushlightuserdata(L, pUserData1);
+	lua_pushlightuserdata(L, pUserData2);
+
+	// 関数実行
+	int n_arg = 4;
+	int n_ret = 2;
+	int status = lua_pcall(L, n_arg, n_ret, 0);
+
+	int result = 0;
+	if (status != 0) {
+		// TODO エラー処理
+		theApp.MyLuaErrorReport(status);
+		return false;
+	} else {
+		// 返り値取得
+		result = lua_toboolean(L, -2);
+		*pRetVal = lua_tointeger(L, -1);
+	}
+	lua_settop(L, top);
+	return result!=0;
+}
+
+
+/**
+ * MZ3 Script : フック関数の呼び出し2
+ */
+bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, void* pUserData1, void* pUserData2, int* pRetVal)
+{
+	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
+		// フック関数未登録のため終了
+		return false;
+	}
+
+	const std::vector<std::string>& hookFuncNames = theApp.m_luaHooks[(const char*)szEventName];
+
+	bool rval = false;
+	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
+		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
+							CString(hookFuncNames[i].c_str()),
+							CString(szEventName)));
+
+		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), szText, pUserData1, pUserData2, pRetVal)) {
+			rval = true;
+			break;
+		}
+	}
+	return rval;
+}
+
+/**
+ * URL からアクセス種別を推定する
+ */
+ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
+{
+	// view 系
+	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // メイン
+	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // 日記内容
+	if( url.Find( L"neighbor_diary.pl" ) != -1 ){ return ACCESS_NEIGHBORDIARY;} // 日記内容(次の日記、前の日記)
+	if( url.Find( L"view_bbs.pl" ) != -1 ) 		{ return ACCESS_BBS;       } // コミュニティ内容
+	if( url.Find( L"view_enquete.pl" ) != -1 ) 	{ return ACCESS_ENQUETE;   } // アンケート
+	if( url.Find( L"view_event.pl" ) != -1 ) 	{ return ACCESS_EVENT;     } // イベント
+	if( url.Find( L"list_event_member.pl" ) != -1 ) { return ACCESS_EVENT_MEMBER; } // イベント参加者一覧
+	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_MYDIARY;   } // 自分の日記内容
+	if( url.Find( L"view_message.pl" ) != -1 ) 	{ return ACCESS_MESSAGE;   } // メッセージ
+	if( url.Find( L"view_news.pl" ) != -1 ) 	{ return ACCESS_NEWS;      } // ニュース内容
+	if( url.Find( L"show_friend.pl" ) != -1 ) 	{ return ACCESS_PROFILE;   } // 個人ページ
+	if( url.Find( L"view_community.pl" ) != -1 ){ return ACCESS_COMMUNITY; } // コミュニティページ
+
+	// list 系
+	if( url.Find( L"list_bookmark.pl?kind=community" ) != -1 ) { return ACCESS_LIST_FAVORITE_COMMUNITY; }
+	if( url.Find( L"list_bookmark.pl" ) != -1 ) { return ACCESS_LIST_FAVORITE_USER; }
+	if( url.Find( L"new_bbs.pl" ) != -1 )		{ return ACCESS_LIST_NEW_BBS; }
+
+	// MZ3 API : フック関数呼び出し
+	int access_type_by_lua = ACCESS_INVALID;
+	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", CStringA(url), NULL, NULL, &access_type_by_lua)) {
+		MZ3LOGGER_DEBUG(util::FormatString(L"estimated access type by lua : %d", access_type_by_lua));
+		return (ACCESS_TYPE)access_type_by_lua;
+	}
+	
+	// 不明なので INVALID とする
+	return ACCESS_INVALID;
+}
+
 }

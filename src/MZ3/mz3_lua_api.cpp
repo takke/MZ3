@@ -257,14 +257,23 @@ int lua_mz3_set_parser(lua_State *L)
 --
 function mz3.add_event_listener(event, event_handler)
 
---- フック関数
+--- フック関数(タイプ1)
 --
 -- @param serialize_key シリアライズキー
 -- @param event_name    イベント名
 -- @param data          データ(イベント毎に内容は異なる)
 -- @return [bool] 次のフック関数またはデフォルト動作をさせる場合は false, それ以外は true。
 --
-function event_listener(serialize_key, event_name, data)
+function event_listener1(serialize_key, event_name, data)
+
+--- フック関数(タイプ2)
+--
+-- @param event_name    イベント名
+-- @param text          文字列
+-- @param data          データ(イベント毎に内容は異なる)
+-- @return [bool, integer] 次のフック関数またはデフォルト動作をさせる場合は false, それ以外は true。true 時は integer を返却可能。
+--
+function event_listener2(event_name, text, data)
 */
 int lua_mz3_add_event_listener(lua_State *L)
 {
