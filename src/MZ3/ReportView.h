@@ -75,7 +75,6 @@ private:
 	CImageList  m_pimgList;
 
 	BOOL		m_nochange;
-	BOOL		m_access;
 
 	int			m_lastIndex;
 	BOOL		m_imageState;

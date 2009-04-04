@@ -86,6 +86,7 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "ÉÅÉjÉÖÅ["
     BEGIN
+        MENUITEM "íÜé~",                          ID_MENU_STOP
         POPUP "âÊñ "
         BEGIN
             MENUITEM "ñﬂÇÈ",                          ID_MENU_BACK

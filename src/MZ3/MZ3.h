@@ -169,6 +169,7 @@ public:
 	ImageCacheManager	m_imageCache;			///< グローバル画像キャッシュ（16x16）
 
 	//--- 通信系
+	bool				m_access;				///< 通信状態
 	CMixiData			m_mixiBeforeRelogin;	///< 再ログイン前の mixi オブジェクト
 	ACCESS_TYPE			m_accessType;			///< 現在のアクセス種別
 

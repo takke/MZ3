@@ -71,6 +71,7 @@ CMZ3App::CMZ3App()
 	, m_pMouseGestureManager(NULL)
 	, m_luaState(NULL)
 	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
+	, m_access(false)
 {
 }
 

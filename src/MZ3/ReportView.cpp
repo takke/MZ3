@@ -370,7 +370,6 @@ void CReportView::SetData(const CMixiData& data)
 {
 	// 初期化処理
 	m_data = data;
-	m_access = FALSE;
 	m_nochange = TRUE;
 	m_lastIndex = 0;
 
@@ -673,8 +672,8 @@ void CReportView::OnLvnItemchangedReportList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	m_imageState = (BOOL)(data->GetImageCount() > 0);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, ((!m_access) & m_imageState));
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, !m_access);
+	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, ((!theApp.m_access) & m_imageState));
+	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, !theApp.m_access);
 
 	m_list.SetRedraw(TRUE);
 
@@ -863,7 +862,7 @@ BOOL CReportView::OnKeyUp(MSG* pMsg)
 	case VK_ESCAPE:
 		// リストの場合は前画面に戻る
 		if (pMsg->hwnd == m_list.m_hWnd) {
-			if (m_access != FALSE) {
+			if (theApp.m_access) {
 				// アクセス中は中断処理
 				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 			} else {
@@ -1214,7 +1213,7 @@ void CReportView::OnLoadImage(UINT nID)
 	CString url = m_currentData->GetImage(nID - ID_REPORT_IMAGE-1);
 	MZ3LOGGER_DEBUG( L"画像ダウンロード開始 url[" + url + L"]" );
 
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
@@ -1244,7 +1243,7 @@ void CReportView::OnLoadMovie(UINT nID)
 	CString url = m_currentData->GetMovie(nID - ID_REPORT_MOVIE-1);
 	MZ3LOGGER_DEBUG( L"動画ダウンロード開始 url[" + url + L"]" );
 
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
@@ -1275,7 +1274,7 @@ void CReportView::OnLoadPageLink(UINT nID)
  */
 bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		return false;
 	}
 
@@ -1305,7 +1304,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 
 		m_infoEdit.ShowWindow(SW_SHOW);
 
-		m_access = TRUE;
+		theApp.m_access = true;
 		m_abort = FALSE;
 
 		// m_data の書き換え
@@ -1363,7 +1362,7 @@ void CReportView::OnReloadPage()
 
 	m_infoEdit.ShowWindow(SW_SHOW);
 
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
@@ -1484,7 +1483,7 @@ void CReportView::OnLoadUrl(UINT nID)
 #endif
 		// MZ3でダウンロード
 		{
-			m_access = TRUE;
+			theApp.m_access = true;
 			m_abort = FALSE;
 
 			// ダウンロードファイルパス
@@ -1558,7 +1557,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			util::MySetInformationText( m_hWnd, _T("完了") );
 
-			m_access = FALSE;
+			theApp.m_access = false;
 
 			// イメージのファイル名を生成
 			CString strFilepath;
@@ -1754,7 +1753,7 @@ LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
@@ -1835,7 +1834,7 @@ LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 	MZ3LOGGER_ERROR( msg );
 
-	m_access = FALSE;
+	theApp.m_access = false;
 	m_infoEdit.ShowWindow(SW_HIDE);
 
 	return TRUE;
@@ -1864,7 +1863,7 @@ LRESULT CReportView::OnGetAbort(WPARAM wParam, LPARAM lParam)
 
 	m_infoEdit.ShowWindow(SW_HIDE);
 
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	return TRUE;
 }
@@ -1894,7 +1893,7 @@ LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	m_infoEdit.ShowWindow(SW_HIDE);
 
-	m_access = FALSE;
+	theApp.m_access = false;
 	return TRUE;
 }
 
@@ -2040,7 +2039,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 
 	m_infoEdit.ShowWindow(SW_SHOW);
 
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );

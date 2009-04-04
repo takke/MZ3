@@ -22,7 +22,6 @@ IMPLEMENT_DYNCREATE(CDownloadView, CFormView)
 
 CDownloadView::CDownloadView()
 	: CFormView(CDownloadView::IDD)
-	, m_access(FALSE)
 	, m_targetItemIndex( -1 )
 {
 }
@@ -243,7 +242,7 @@ int CDownloadView::GetListWidth(void)
 void CDownloadView::MyUpdateControls(void)
 {
 	// 開始・停止ボタンの制御
-	if (m_access) {
+	if (theApp.m_access) {
 		GetDlgItem( IDC_START_STOP_BUTTON )->SetWindowText( L"停止" );
 		GetDlgItem( IDC_START_STOP_BUTTON )->EnableWindow( TRUE );
 	} else {
@@ -261,11 +260,11 @@ void CDownloadView::MyUpdateControls(void)
 	}
 
 	// 戻る・停止アイコン
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, m_access ? FALSE : TRUE );
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, m_access ? TRUE : FALSE );
+	theApp.EnableCommandBarButton( ID_BACK_BUTTON, theApp.m_access ? FALSE : TRUE );
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, theApp.m_access ? TRUE : FALSE );
 
 	// 終了ボタンはアクセス中は無効
-	GetDlgItem( IDC_EXIT_BUTTON )->EnableWindow( m_access ? FALSE : TRUE );
+	GetDlgItem( IDC_EXIT_BUTTON )->EnableWindow( theApp.m_access ? FALSE : TRUE );
 }
 
 /**
@@ -308,7 +307,7 @@ LRESULT CDownloadView::OnFit(WPARAM wParam, LPARAM lParam)
 	} else {
 		GetDlgItem( IDC_EXIT_BUTTON )->SetFocus();
 	}
-	if (!m_access) {
+	if (!theApp.m_access) {
 		// 準備完了
 		util::MySetInformationText( m_hWnd, L"準備完了" );
 	}
@@ -326,7 +325,7 @@ void CDownloadView::OnBnClickedContinueCheck()
  */
 void CDownloadView::OnBnClickedStartStopButton()
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		// 停止処理
 		::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 	} else {
@@ -350,7 +349,7 @@ void CDownloadView::OnBnClickedStartStopButton()
 void CDownloadView::OnBnClickedExitButton()
 {
 	// 通信中は無効
-	if (m_access) {
+	if (theApp.m_access) {
 		return;
 	}
 
@@ -377,7 +376,7 @@ LRESULT CDownloadView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 		// WM_MZ3_GET_ABORT メッセージが来ない場合があるのでここで状態復帰
 		util::MySetInformationText( m_hWnd, _T("中断しました") );
 
-		m_access = FALSE;
+		theApp.m_access = false;
 		m_abortRequested = FALSE;
 		MyUpdateControls();
 		return FALSE;
@@ -415,7 +414,7 @@ LRESULT CDownloadView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ダウンロード完了
-	m_access = FALSE;
+	theApp.m_access = false;
 	MyUpdateControls();
 
 	util::MySetInformationText( m_hWnd, L"ダウンロードが完了しました" );
@@ -435,7 +434,7 @@ LRESULT CDownloadView::OnGetError(WPARAM wParam, LPARAM lParam)
 		// WM_MZ3_GET_ABORT メッセージが来ない場合があるのでここで状態復帰
 		util::MySetInformationText( m_hWnd, _T("中断しました") );
 
-		m_access = FALSE;
+		theApp.m_access = false;
 		m_abortRequested = FALSE;
 		MyUpdateControls();
 		return TRUE;
@@ -450,7 +449,7 @@ LRESULT CDownloadView::OnGetError(WPARAM wParam, LPARAM lParam)
 		L"原因：%s", smsg, theApp.m_inet.GetErrorMessage() );
 	MZ3LOGGER_ERROR( msg );
 
-	m_access = FALSE;
+	theApp.m_access = false;
 	MyUpdateControls();
 
 	return TRUE;
@@ -467,7 +466,7 @@ LRESULT CDownloadView::OnGetAbort(WPARAM wParam, LPARAM lParam)
 	// ボタンを元に戻してメッセージをだして処理終了
 	util::MySetInformationText( m_hWnd, _T("中断しました") );
 
-	m_access = FALSE;
+	theApp.m_access = false;
 	m_abortRequested = FALSE;
 	MyUpdateControls();
 
@@ -489,7 +488,7 @@ LRESULT CDownloadView::OnAbort(WPARAM wParam, LPARAM lParam)
 	util::MySetInformationText( m_hWnd, msg );
 	MZ3LOGGER_DEBUG( msg );
 
-	m_access = FALSE;
+	theApp.m_access = false;
 	m_abortRequested = TRUE;
 	MyUpdateControls();
 
@@ -534,7 +533,7 @@ bool CDownloadView::DoDownloadSelectedItem(void)
 	CString url = m_items[m_targetItemIndex].url;
 	MZ3LOGGER_DEBUG( L"ダウンロード開始 url[" + url + L"]" );
 
-	m_access = TRUE;
+	theApp.m_access = true;
 	MyUpdateControls();
 	mc_progressBar.SetPos( 0 );
 

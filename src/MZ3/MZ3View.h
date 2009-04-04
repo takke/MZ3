@@ -63,7 +63,6 @@ public:
 	CRect				m_rectIcon;				///< アイコン表示領域のRECT
 
 private:
-	BOOL				m_access;				///< アクセス中フラグ
 	bool				m_bModifyingBodyList;	///< SetBodyList で Body リスト生成中？
 	BOOL				m_abort;				///< 中断フラグ
 	bool				m_checkNewComment;		///< 新着コメント＆メッセージチェック中？

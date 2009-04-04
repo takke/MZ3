@@ -232,7 +232,7 @@ void CMZ3View::OnInitialUpdate()
 	// インターネット回線を開く
 //	theApp.m_inet.Open();
 
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// プログレスバー初期化
 	mc_progressBar.SetRange( 0, 1000 );
@@ -429,7 +429,7 @@ bool CMZ3View::DoInitialize()
 	m_hotList = &m_categoryList;
 
 	// ログロード中に移動できないように、アクセスフラグを立てておく
-	m_access = TRUE;
+	theApp.m_access = true;
 
 	// ログのロード
 	MyLoadCategoryLogfile( *m_selGroup->getSelectedCategory() );
@@ -438,7 +438,7 @@ bool CMZ3View::DoInitialize()
 	SetBodyList( m_selGroup->getSelectedCategory()->GetBodyList() );
 
 	// アクセスフラグをおろす
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// ブックマークのロード
 	try{
@@ -699,7 +699,7 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は中止
 		return;
 	}
@@ -729,7 +729,7 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
  */
 void CMZ3View::OnNMDblclkCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
 	}
@@ -861,7 +861,7 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 	}
 
 	// 通信完了（フラグを下げる）
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// カテゴリに応じてTwitter送信モードを初期化
 	MyResetTwitterStylePostMode();
@@ -915,7 +915,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			theApp.m_mixiBeforeRelogin = *data;
 
 			// ログイン実行
-			m_access = TRUE;
+			theApp.m_access = true;
 			m_abort = FALSE;
 
 			// コントロール状態の変更
@@ -969,7 +969,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				// データを待避データに戻す
 				*data = theApp.m_mixiBeforeRelogin;
 
-				m_access = FALSE;
+				theApp.m_access = false;
 
 				// コントロール状態の変更
 				MyUpdateControlStatus();
@@ -1092,7 +1092,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	// 通信完了（フラグを下げる）
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// カテゴリに応じてTwitter送信モードを初期化
 	MyResetTwitterStylePostMode();
@@ -1130,7 +1130,7 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 	MZ3LOGGER_ERROR( msg );
 
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// カテゴリに応じてTwitter送信モードを初期化
 	MyResetTwitterStylePostMode();
@@ -1172,7 +1172,7 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 	m_abort = TRUE;
 	m_cruise.stop();
 
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	// カテゴリに応じてTwitter送信モードを初期化
 	MyResetTwitterStylePostMode();
@@ -1487,7 +1487,7 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 //	MZ3LOGGER_DEBUG( L"OnNMDblclkBodyList start" );
 	*pResult = 0;
 
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
 	}
@@ -1675,7 +1675,7 @@ BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 	case VK_ESCAPE:
 #endif
 		// 中断
-		if (m_access) {
+		if (theApp.m_access) {
 			::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 		}
 		break;
@@ -1965,7 +1965,7 @@ void CMZ3View::OnTcnSelchangeGroupTab(NMHDR *pNMHDR, LRESULT *pResult)
  */
 BOOL CMZ3View::CommandSelectGroupTabBeforeItem()
 {
-	if( m_access ) return TRUE;	// アクセス中は無視
+	if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 	// 横スクロールアニメーションを起動する
 	m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_RIGHT );
@@ -1990,7 +1990,7 @@ BOOL CMZ3View::CommandSelectGroupTabBeforeItem()
  */
 BOOL CMZ3View::CommandSelectGroupTabNextItem()
 {
-	if( m_access ) return TRUE;	// アクセス中は無視
+	if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 	// 横スクロールアニメーションを起動する
 	m_categoryList.StartPanScroll( CTouchListCtrl::PAN_SCROLL_DIRECTION_LEFT );
@@ -2068,7 +2068,7 @@ BOOL CMZ3View::OnKeydownGroupTab( WORD vKey )
 	switch( vKey ) {
 	case VK_UP:
 		// 上キー。
-		if( m_access ) return TRUE;	// アクセス中は無視
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 		// 無視
 		return TRUE;
 	case VK_DOWN:
@@ -2077,12 +2077,12 @@ BOOL CMZ3View::OnKeydownGroupTab( WORD vKey )
 		return CommandSetFocusCategoryList();
 	case VK_LEFT:
 		// 左キー。
-		if( m_access ) return TRUE;	// アクセス中は無視
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 		// 選択変更
 		return CommandSelectGroupTabBeforeItem();
 	case VK_RIGHT:
 		// 右キー。
-		if( m_access ) return TRUE;	// アクセス中は無視
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 		// 選択変更
 		return CommandSelectGroupTabNextItem();
 	case VK_RETURN:
@@ -2164,7 +2164,7 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 
 	switch( vKey ) {
 	case VK_LEFT:
-		if( m_access ) return TRUE;	// アクセス中は無視
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
 		return CommandSelectGroupTabBeforeItem();
@@ -2173,7 +2173,7 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		// グループタブに移動
 //		return CommandSetFocusGroupTab();
 	case VK_RIGHT:
-		if( m_access ) return TRUE;	// アクセス中は無視
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
 		return CommandSelectGroupTabNextItem();
@@ -2189,7 +2189,7 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 			// 非取得で、ログがあるならログから取得。
 
 			// アクセス中は選択不可
-			if (m_access) {
+			if (theApp.m_access) {
 				return TRUE;
 			}
 			m_selGroup->selectedCategory = m_selGroup->focusedCategory;
@@ -2201,7 +2201,7 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 #ifndef WINCE
 	case VK_ESCAPE:
 #endif
-		if( m_access ) {
+		if (theApp.m_access) {
 			// アクセス中は無視
 			return TRUE;
 		}
@@ -2277,7 +2277,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 				// 一番上。
 				// カテゴリに移動
 
-		//		if( m_access ) return TRUE;	// アクセス中は禁止
+//				if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 				// 選択状態を末尾に。以前の選択状態をOffに。
 				util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
@@ -2298,7 +2298,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		case VK_DOWN:
 			if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 				// 一番下なので無視。
-				if( m_access ) return TRUE;	// アクセス中は禁止
+//				if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 				// Twitter モードならつぶやくモードへ。
 				if (m_viewStyle==VIEW_STYLE_TWITTER) {
@@ -2362,7 +2362,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 
 		// アクセス中は再アクセス不可
-		if( m_access ) return TRUE;
+		if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 		// MZ3 API : フック関数呼び出し
 		if (util::CallMZ3ScriptHookFunctions(
@@ -2457,7 +2457,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 #ifndef WINCE
 	case VK_ESCAPE:
 #endif
-		if( m_access ) {
+		if (theApp.m_access) {
 			// アクセス中は無視
 			return TRUE;
 		}
@@ -2517,7 +2517,7 @@ BOOL CMZ3View::OnKeyupBodyList( WORD vKey )
 
 BOOL CMZ3View::CommandMoveUpCategoryList()
 {
-//	if( m_access ) return TRUE;	// アクセス中は無視
+//	if( theApp.m_access ) return TRUE;	// アクセス中は無視
 
 	if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
 		// 一番上の項目なら無視
@@ -2551,7 +2551,7 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 
 BOOL CMZ3View::CommandMoveDownCategoryList()
 {
-//	if( m_access ) return TRUE;	// アクセス中は無視
+//	if( theApp.m_access ) return TRUE;	// アクセス中は無視
 
 	if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
 		// 一番下の項目選択中なら、ボディリストの先頭へ。
@@ -2594,7 +2594,7 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 		// 一番上。
 		// カテゴリに移動
 
-//		if( m_access ) return TRUE;	// アクセス中は禁止
+//		if( theApp.m_access ) return TRUE;	// アクセス中は禁止
 
 		// 選択状態を末尾に。以前の選択状態をOffに。
 		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, false );
@@ -2651,7 +2651,7 @@ BOOL CMZ3View::CommandMoveDownBodyList()
 {
 	if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下なので無視。
-		if( m_access ) return TRUE;	// アクセス中は禁止
+		if( theApp.m_access ) return TRUE;	// アクセス中は禁止
 
 		return TRUE;
 	}else{
@@ -2846,7 +2846,7 @@ void CMZ3View::OnShowDebugInfo()
  */
 bool CMZ3View::DoNewCommentCheck(void)
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return false;
 	}
@@ -2998,7 +2998,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	}
 
 	// アクセス開始
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	// コントロール状態の変更
@@ -3926,7 +3926,7 @@ bool CMZ3View::PrepareViewBbsList(void)
 /// コミュニティの右ソフトキーメニュー｜トピック一覧
 void CMZ3View::OnViewBbsList()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -3942,7 +3942,7 @@ void CMZ3View::OnViewBbsList()
 /// コミュニティの右ソフトキーメニュー｜トピック一覧（ログ）
 void CMZ3View::OnViewBbsListLog()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -4664,7 +4664,7 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 bool CMZ3View::RetrieveCategoryItem(void)
 {
 	// アクセス中は再アクセス不可
-	if (m_access) {
+	if (theApp.m_access) {
 		return false;
 	}
 	if (m_selGroup==NULL) {
@@ -4804,7 +4804,7 @@ bool CMZ3View::MyLoadMiniImage(CMixiData& mixi)
 	CString miniImagePath = util::MakeImageLogfilePath( mixi );
 	if (!miniImagePath.IsEmpty()) {
 		if (!util::ExistFile(miniImagePath)) {
-			if (!m_access) {
+			if (!theApp.m_access) {
 				// アクセス中は禁止
 				// 取得
 				static CMixiData s_data;
@@ -4818,7 +4818,7 @@ bool CMZ3View::MyLoadMiniImage(CMixiData& mixi)
 				theApp.m_accessType = s_data.GetAccessType();
 
 				// アクセス開始
-				m_access = TRUE;
+				theApp.m_access = true;
 				m_abort = FALSE;
 
 				// コントロール状態の変更
@@ -4941,7 +4941,7 @@ BOOL CMZ3View::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
  */
 void CMZ3View::OnAcceleratorReload()
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
 	}
@@ -5090,7 +5090,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
  */
 void CMZ3View::OnBnClickedUpdateButton()
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		return;
 	}
 
@@ -5449,7 +5449,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	}
 
 	// アクセス開始
-	m_access = TRUE;
+	theApp.m_access = true;
 	m_abort = FALSE;
 
 	// コントロール状態の変更
@@ -5477,7 +5477,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	// 通信完了（フラグを下げる）
-	m_access = FALSE;
+	theApp.m_access = false;
 
 	ACCESS_TYPE aType = theApp.m_accessType;
 	switch (theApp.m_accessTypeInfo.getInfoType(aType)) {
@@ -5681,7 +5681,7 @@ void CMZ3View::OnPaint()
 
 void CMZ3View::OnMenuTwitterFriendTimeline()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5711,7 +5711,7 @@ void CMZ3View::OnMenuTwitterFriendTimeline()
  */
 void CMZ3View::OnMenuMixiEchoAddRefUserEchoList()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5743,7 +5743,7 @@ void CMZ3View::OnMenuMixiEchoAddRefUserEchoList()
  */
 void CMZ3View::OnMenuMixiEchoAddUserEchoList()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5773,7 +5773,7 @@ void CMZ3View::OnMenuMixiEchoAddUserEchoList()
 /* Twitter 仕様変更により利用できないためコメントアウト
 void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5859,7 +5859,7 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 /// お気に入り追加
 void CMZ3View::OnMenuTwitterCreateFavourings()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5881,7 +5881,7 @@ void CMZ3View::OnMenuTwitterCreateFavourings()
 /// お気に入り削除
 void CMZ3View::OnMenuTwitterDestroyFavourings()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5903,7 +5903,7 @@ void CMZ3View::OnMenuTwitterDestroyFavourings()
 /// フォローする
 void CMZ3View::OnMenuTwitterCreateFriendships()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -5931,7 +5931,7 @@ void CMZ3View::OnMenuTwitterCreateFriendships()
 /// フォローやめる
 void CMZ3View::OnMenuTwitterDestroyFriendships()
 {
-	if( m_access ) {
+	if( theApp.m_access ) {
 		// アクセス中は禁止
 		return;
 	}
@@ -6149,10 +6149,10 @@ void CMZ3View::OnTabmenuAdd()
 void CMZ3View::MyUpdateControlStatus(void)
 {
 	// 中止ボタン
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, m_access ? TRUE : FALSE );
+	theApp.EnableCommandBarButton( ID_STOP_BUTTON, theApp.m_access ? TRUE : FALSE );
 
 	// プログレスバー
-	if (m_access) {
+	if (theApp.m_access) {
 		// 通信中は受信時に自動表示
 	} else {
 		mc_progressBar.ShowWindow( SW_HIDE );
@@ -6161,13 +6161,13 @@ void CMZ3View::MyUpdateControlStatus(void)
 	// Twitter の更新ボタン
 	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
 	if (pUpdateButton!=NULL) {
-		pUpdateButton->EnableWindow( m_access ? FALSE : TRUE );
+		pUpdateButton->EnableWindow( theApp.m_access ? FALSE : TRUE );
 	}
 
 	// Twitter の入力領域
 	CWnd* pStatusEdit = GetDlgItem( IDC_STATUS_EDIT );
 	if (pStatusEdit!=NULL) {
-		pStatusEdit->EnableWindow( m_access ? FALSE : TRUE );
+		pStatusEdit->EnableWindow( theApp.m_access ? FALSE : TRUE );
 	}
 
 	// Twitterスタイルならボタンの名称をモードにより変更する
@@ -6786,7 +6786,7 @@ void CMZ3View::OnMenuRssRead()
 */
 void CMZ3View::OnCategoryOpen()
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
 	}
@@ -6827,7 +6827,7 @@ void CMZ3View::OnAddRssFeedMenu()
 	 * 5. 4. が成功すればフィードを追加して終了。title タグからタイトルを自動付与すること。
 	 * 6. 4. が失敗すればエラー出力して終了。
 	 */
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
 	}
@@ -7170,7 +7170,7 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
  */
 bool CMZ3View::DoCheckSoftwareUpdate(void)
 {
-	if (m_access) {
+	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return false;
 	}
@@ -7238,7 +7238,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 			s_data.SetAccessType(ACCESS_DOWNLOAD);
 
 			// アクセス開始
-			m_access = TRUE;
+			theApp.m_access = true;
 			m_abort = FALSE;
 
 			// コントロール状態の変更

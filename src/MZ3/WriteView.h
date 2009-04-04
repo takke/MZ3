@@ -167,7 +167,7 @@ public:
 
 private:
 	bool m_abort;		///< 中断フラグ
-	bool m_access;		///< 通信中フラグ
+//	bool m_access;		///< 通信中フラグ
 
 	WRITEVIEW_TYPE m_writeViewType;	///< 処理種別（日記 or コメント or メッセージ）
 public:

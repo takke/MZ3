@@ -118,6 +118,8 @@ public:
 	afx_msg void OnMenuFontShrink();
 	afx_msg void OnMenuReloadLuaScripts();
 	afx_msg void OnMenuReloadCategoryListLog();
+	afx_msg void OnUpdateMenuStop(CCmdUI *pCmdUI);
+	afx_msg void OnMenuStop();
 };
 
 

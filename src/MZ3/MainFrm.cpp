@@ -56,13 +56,13 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_HISTORY_MENU, &CMainFrame::OnHistoryMenu)
 	ON_COMMAND(IDM_START_CRUISE, &CMainFrame::OnStartCruise)
 	ON_COMMAND(IDM_START_CRUISE_UNREAD_ONLY, &CMainFrame::OnStartCruiseUnreadOnly)
-//	ON_COMMAND(IDM_OPEN_MIXI_MOBILE_BY_BROWSER, &CMainFrame::OnOpenMixiMobileByBrowser)
 	ON_COMMAND(ID_ERRORLOG_MENU, &CMainFrame::OnErrorlogMenu)
 	ON_COMMAND(ID_CHANGE_SKIN, &CMainFrame::OnChangeSkin)
 	ON_COMMAND(ID_MENU_ACTION, &CMainFrame::OnMenuAction)
 	ON_COMMAND(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnEnableIntervalCheck)
 	ON_COMMAND(ID_MENU_CHECK_UPDATE, &CMainFrame::OnCheckUpdate)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
+	ON_COMMAND(ID_MENU_STOP, &CMainFrame::OnMenuStop)
     ON_UPDATE_COMMAND_UI(ID_BACK_BUTTON, OnUpdateBackButton)
     ON_UPDATE_COMMAND_UI(ID_FORWARD_BUTTON, OnUpdateForwardButton)
     ON_UPDATE_COMMAND_UI(ID_STOP_BUTTON, OnUpdateStopButton)
@@ -77,6 +77,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnUpdateEnableIntervalCheck)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnUpdateSkinMenuItem)
 	ON_UPDATE_COMMAND_UI(ID_MENU_CHECK_UPDATE, &CMainFrame::OnUpdateCheckUpdate)
+	ON_UPDATE_COMMAND_UI(ID_MENU_STOP, &CMainFrame::OnUpdateMenuStop)
 	ON_WM_ACTIVATE()
 	ON_WM_DESTROY()
 	ON_WM_MOVE()
@@ -1265,4 +1266,20 @@ void CMainFrame::OnMenuReloadLuaScripts()
 void CMainFrame::OnMenuReloadCategoryListLog()
 {
 	theApp.m_pMainView->ReloadCategoryListLog();
+}
+
+/**
+ * ストップメニューの制御
+ */
+void CMainFrame::OnUpdateMenuStop(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable(theApp.m_access ? TRUE : FALSE);
+}
+
+/**
+ * ストップメニュー
+ */
+void CMainFrame::OnMenuStop()
+{
+	::SendMessage(GetActiveView()->m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 }

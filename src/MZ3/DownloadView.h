@@ -51,7 +51,6 @@ public:
 
 	std::vector<DownloadItem> m_items;
 	int				m_targetItemIndex;
-	BOOL			m_access;
 	BOOL			m_abortRequested;	///< ユーザが中断処理を行ったか？
 
 public:

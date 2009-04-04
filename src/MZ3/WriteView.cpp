@@ -33,7 +33,6 @@ IMPLEMENT_DYNCREATE(CWriteView, CFormView)
 // -----------------------------------------------------------------------------
 CWriteView::CWriteView()
 	: CFormView(CWriteView::IDD)
-	, m_access(false)
 	, m_abort(false)
 	, m_bWriteCompleted(true)
 {
@@ -198,7 +197,7 @@ void CWriteView::OnSize(UINT nType, int cx, int cy)
  */
 void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 {
-	m_access = false;
+	theApp.m_access = false;
 	m_abort  = false;
 
 	m_data = pMixi;
@@ -390,7 +389,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 		}
 	}
 
-	m_access = true;
+	theApp.m_access = true;
 	m_abort  = false;
 
 	// コントロール状態の変更
@@ -472,7 +471,7 @@ void CWriteView::StartEntryPost()
 			if( id <= 0 ) {
 				MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
 
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -491,7 +490,7 @@ void CWriteView::StartEntryPost()
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
 
-			m_access = false;
+			theApp.m_access = false;
 			MyUpdateControlStatus();
 			return;
 		}
@@ -508,7 +507,7 @@ void CWriteView::StartEntryPost()
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
-	m_access = true;
+	theApp.m_access = true;
 	m_abort  = false;
 
 	// コントロール状態の変更
@@ -549,7 +548,7 @@ void CWriteView::StartConfirmPost()
 			{
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -568,7 +567,7 @@ void CWriteView::StartConfirmPost()
 			{
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -591,7 +590,7 @@ void CWriteView::StartConfirmPost()
 			if( !mixi::ReplyMessageConfirmGenerator::generate( *m_postData, title, euc_msg, friend_id, reply_message_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -623,7 +622,7 @@ void CWriteView::StartConfirmPost()
 				if( friend_id <= 0 ) {
 					MessageBox( L"送信先ユーザの ID が不明です。メッセージを送信できません。" );
 
-					m_access = false;
+					theApp.m_access = false;
 					MyUpdateControlStatus();
 					return;
 				}
@@ -631,7 +630,7 @@ void CWriteView::StartConfirmPost()
 			if( !mixi::NewMessageConfirmGenerator::generate( *m_postData, title, euc_msg, friend_id ) ) {
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -649,7 +648,7 @@ void CWriteView::StartConfirmPost()
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
 
-			m_access = false;
+			theApp.m_access = false;
 			MyUpdateControlStatus();
 			return;
 		}
@@ -668,7 +667,7 @@ void CWriteView::StartConfirmPost()
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
-	m_access = true;
+	theApp.m_access = true;
 	m_abort  = false;
 
 	// コントロール状態の変更
@@ -705,7 +704,7 @@ LRESULT CWriteView::OnGetError(WPARAM wParam, LPARAM lParam)
 	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 	MZ3LOGGER_ERROR( msg );
 
-	m_access = false;
+	theApp.m_access = false;
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -799,7 +798,7 @@ LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
 		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
 		theApp.m_loginMng.SetOwnerID( L"" );
 
-		m_access = false;
+		theApp.m_access = false;
 		MyUpdateControlStatus();
 
 		return 0;
@@ -858,7 +857,7 @@ LRESULT CWriteView::OnPostConfirmEnd(WPARAM wParam, LPARAM lParam)
 		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
 		theApp.m_loginMng.SetOwnerID( L"" );
 
-		m_access = false;
+		theApp.m_access = false;
 		MyUpdateControlStatus();
 
 		return 0;
@@ -893,7 +892,7 @@ void CWriteView::StartRegistPost()
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
 				// コントロール状態の復帰
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -939,7 +938,7 @@ void CWriteView::StartRegistPost()
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
 				// コントロール状態の復帰
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -962,7 +961,7 @@ void CWriteView::StartRegistPost()
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
 				// コントロール状態の復帰
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -988,7 +987,7 @@ void CWriteView::StartRegistPost()
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
 
 				// コントロール状態の復帰
-				m_access = false;
+				theApp.m_access = false;
 				MyUpdateControlStatus();
 				return;
 			}
@@ -1006,7 +1005,7 @@ void CWriteView::StartRegistPost()
 			MessageBox( s );
 
 			// コントロール状態の復帰
-			m_access = false;
+			theApp.m_access = false;
 			MyUpdateControlStatus();
 			return;
 		}
@@ -1041,7 +1040,7 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	CHtmlArray html;
 	html.Load( theApp.m_filepath.temphtml );
 
-	m_access = false;
+	theApp.m_access = false;
 	m_abort  = false;
 
 	// コントロール状態の変更
@@ -1147,7 +1146,7 @@ bool CWriteView::DumpToTemporaryDraftFile()
  */
 LRESULT CWriteView::OnPostAbort(WPARAM wParam, LPARAM lParam)
 {
-	m_access = false;
+	theApp.m_access = false;
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1179,7 +1178,7 @@ LRESULT CWriteView::OnAbort(WPARAM wParam, LPARAM lParam)
 	// 本文領域にフォーカスを戻す。
 	m_bodyEdit.SetFocus();
 
-	m_access = false;
+	theApp.m_access = false;
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
@@ -1217,7 +1216,7 @@ BOOL CWriteView::PreTranslateMessage(MSG* pMsg)
 #ifndef WINCE
 		case VK_ESCAPE:
 #endif
-			if (m_access) {
+			if (theApp.m_access) {
 				// アクセス中は中断処理
 				::SendMessage(m_hWnd, WM_MZ3_ABORT, NULL, NULL);
 				return TRUE;
@@ -1615,24 +1614,24 @@ void CWriteView::MyUpdateControlStatus(void)
 	theApp.EnableCommandBarButton(ID_WRITE_BUTTON,   FALSE);
 
 	// イメージボタンは画像投稿可能な状態にのみ有効
-	if (m_access) {
+	if (theApp.m_access) {
 		theApp.EnableCommandBarButton(ID_IMAGE_BUTTON, FALSE);
 	} else {
 		theApp.EnableCommandBarButton(ID_IMAGE_BUTTON, IsEnableAttachImageMode() ? TRUE : FALSE);
 	}
 
 	// 中止ボタン：アクセス中は有効
-	theApp.EnableCommandBarButton(ID_STOP_BUTTON, m_access ? TRUE : FALSE);
+	theApp.EnableCommandBarButton(ID_STOP_BUTTON, theApp.m_access ? TRUE : FALSE);
 
 	// 戻るボタン：アクセス中は無効
-	theApp.EnableCommandBarButton(ID_BACK_BUTTON, m_access ? FALSE : TRUE);
+	theApp.EnableCommandBarButton(ID_BACK_BUTTON, theApp.m_access ? FALSE : TRUE);
 
 	// 送信ボタン：アクセス中は無効
-	m_sendButton.EnableWindow(m_access ? FALSE : TRUE);
+	m_sendButton.EnableWindow(theApp.m_access ? FALSE : TRUE);
 
 	// キャンセルボタン：アクセス中は無効
-	m_cancelButton.EnableWindow(m_access ? FALSE : TRUE);
+	m_cancelButton.EnableWindow(theApp.m_access ? FALSE : TRUE);
 
 	// 情報領域：アクセス中は表示
-	m_infoEdit.ShowWindow(m_access ? SW_SHOW : SW_HIDE);
+	m_infoEdit.ShowWindow(theApp.m_access ? SW_SHOW : SW_HIDE);
 }
