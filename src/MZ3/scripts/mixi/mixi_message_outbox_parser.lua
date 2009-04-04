@@ -180,10 +180,26 @@ function on_creating_default_group_for_mixi_message_outbox(serialize_key, event_
 
 	end
 end
-
-
-----------------------------------------
 -- イベントフック関数の登録
-----------------------------------------
--- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group_for_mixi_message_outbox");
+
+
+----------------------------------------
+-- estimate 対象に追加
+----------------------------------------
+
+--- estimate 対象判別イベントハンドラ
+--
+-- @param event_name 'estimate_access_type_by_url'
+-- @param url        解析対象URL
+--
+function on_estimate_access_type_by_url_for_mixi_message_outbox(event_name, url, data1, data2)
+
+	if line_has_strings(url, 'list_message.pl', 'box=outbox') then
+		return true, mz3.get_access_type_by_key('MESSAGE_OUT');
+	end
+	
+	return false;
+end
+-- イベントフック関数の登録
+mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type_by_url_for_mixi_message_outbox");
