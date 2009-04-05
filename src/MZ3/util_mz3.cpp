@@ -394,6 +394,7 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, vo
  */
 ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 {
+	// TODO Lua ‚ÅÄÀ‘•‚·‚é‚±‚Æ«
 	// view Œn
 	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // ƒƒCƒ“
 	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // “ú‹L“à—e

@@ -73,8 +73,13 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#event_listener">event_listener</a>&nbsp;(serialize_key, event_name, data)</td>
-	<td class="summary">ƒtƒbƒNŠÖ”  </td>
+	<td class="name" nowrap><a href="#event_listener1">event_listener1</a>&nbsp;(serialize_key, event_name, data)</td>
+	<td class="summary">ƒtƒbƒNŠÖ”(ƒ^ƒCƒv1)  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#event_listener2">event_listener2</a>&nbsp;(event_name, text, data)</td>
+	<td class="summary">ƒtƒbƒNŠÖ”(ƒ^ƒCƒv2)  </td>
 	</tr>
 
 	<tr>
@@ -193,8 +198,13 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_data.add_body_with_extract">mz3_data.add_body_with_extract</a>&nbsp;(data, value)</td>
+	<td class="summary">value ‚©‚çƒŠƒ“ƒN“™‚ğ’ŠoA®Œ`‚µAHTML ‚Ì®Œ`‚ğ‚µ‚ÄAbody ”z—ñ‚É’Ç‰Á‚·‚é   </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_data.add_text_array">mz3_data.add_text_array</a>&nbsp;(data, name, value)</td>
-	<td class="summary"> </td>
+	<td class="summary">name ‚Æ‚¢‚¤–¼‘O‚Ì”z—ñ‚É value ‚ğ’Ç‰Á‚·‚éB   </td>
 	</tr>
 
 	<tr>
@@ -245,6 +255,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3_data.set_access_type">mz3_data.set_access_type</a>&nbsp;(data, type)</td>
 	<td class="summary">ƒAƒNƒZƒXí•Ê‚ğİ’è‚·‚éB  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.set_date">mz3_data.set_date</a>&nbsp;(data, date)</td>
+	<td class="summary">“ú•t‚Ìİ’è  ”CˆÓ‚Ì“ú•t(•¶š—ñŒ`®)‚ğİ’è‚·‚é‚½‚ß‚É—˜—p‚µ‚Ü‚·B  ’Êí‚Í mz3_data.parse_date_line ‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B  </td>
 	</tr>
 
 	<tr>
@@ -393,9 +408,9 @@
 
 
 
-<dt><a name="event_listener"></a><strong>event_listener</strong>&nbsp;(serialize_key, event_name, data)</dt>
+<dt><a name="event_listener1"></a><strong>event_listener1</strong>&nbsp;(serialize_key, event_name, data)</dt>
 <dd>
-ƒtƒbƒNŠÖ” 
+ƒtƒbƒNŠÖ”(ƒ^ƒCƒv1) 
 
 
 <h3>Parameters</h3>
@@ -422,6 +437,43 @@
 
 <h3>Return value:</h3>
 [bool] Ÿ‚ÌƒtƒbƒNŠÖ”‚Ü‚½‚ÍƒfƒtƒHƒ‹ƒg“®ì‚ğ‚³‚¹‚éê‡‚Í false, ‚»‚êˆÈŠO‚Í trueB 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="event_listener2"></a><strong>event_listener2</strong>&nbsp;(event_name, text, data)</dt>
+<dd>
+ƒtƒbƒNŠÖ”(ƒ^ƒCƒv2) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  event_name: ƒCƒxƒ“ƒg–¼
+	</li>
+	
+	<li>
+	  text: •¶š—ñ
+	</li>
+	
+	<li>
+	  data: ƒf[ƒ^(ƒCƒxƒ“ƒg–ˆ‚É“à—e‚ÍˆÙ‚È‚é)
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[bool, integer] Ÿ‚ÌƒtƒbƒNŠÖ”‚Ü‚½‚ÍƒfƒtƒHƒ‹ƒg“®ì‚ğ‚³‚¹‚éê‡‚Í false, ‚»‚êˆÈŠO‚Í trueBtrue ‚Í integer ‚ğ•Ô‹p‰Â”\B 
 
 
 
@@ -458,7 +510,7 @@
 <h3>See also:</h3>
 <ul>
 	
-	<li><a href="../files/mz3_lua_api.html#event_listener">
+	<li><a href="">
 		event_listener
 	</a>
 	
@@ -1134,9 +1186,39 @@ TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B
 
 
 
+<dt><a name="mz3_data.add_body_with_extract"></a><strong>mz3_data.add_body_with_extract</strong>&nbsp;(data, value)</dt>
+<dd>
+value ‚©‚çƒŠƒ“ƒN“™‚ğ’ŠoA®Œ`‚µAHTML ‚Ì®Œ`‚ğ‚µ‚ÄAbody ”z—ñ‚É’Ç‰Á‚·‚é  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_data.add_text_array"></a><strong>mz3_data.add_text_array</strong>&nbsp;(data, name, value)</dt>
 <dd>
-
+name ‚Æ‚¢‚¤–¼‘O‚Ì”z—ñ‚É value ‚ğ’Ç‰Á‚·‚éB  
 
 
 <h3>Parameters</h3>
@@ -1440,6 +1522,39 @@ MZ3Data ƒIƒuƒWƒFƒNƒg‚Ì”jŠü  ’ˆÓFLua “à‚Å create ‚µ‚½ MZ3Data ƒIƒuƒWƒFƒNƒg‚Í•K‚
 	
 	<li>
 	  type: [integer]ƒAƒNƒZƒXí•Ê
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+‚È‚µ 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.set_date"></a><strong>mz3_data.set_date</strong>&nbsp;(data, date)</dt>
+<dd>
+“ú•t‚Ìİ’è  ”CˆÓ‚Ì“ú•t(•¶š—ñŒ`®)‚ğİ’è‚·‚é‚½‚ß‚É—˜—p‚µ‚Ü‚·B  ’Êí‚Í mz3_data.parse_date_line ‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  date: “ú•t•¶š—ñ
 	</li>
 	
 </ul>
