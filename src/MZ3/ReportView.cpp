@@ -1514,10 +1514,12 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	TRACE(_T("InetAccess End\n"));
 	util::MySetInformationText( m_hWnd, _T("解析中") );
 
-	if (m_abort != FALSE) {
+	if (m_abort) {
 		::SendMessage(m_hWnd, WM_MZ3_GET_ABORT, NULL, lParam);
 		return TRUE;
 	}
+
+	theApp.m_access = false;
 
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
 	if (theApp.m_accessType != ACCESS_LOGIN && theApp.IsMixiLogout(theApp.m_accessType)) {
@@ -1531,8 +1533,6 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 		// ログイン実行
 		theApp.m_accessType = ACCESS_LOGIN;
-//		theApp.m_inet.Initialize( m_hWnd, &theApp.m_mixi4recv );
-//		theApp.m_inet.DoGet(theApp.MakeLoginUrl(), NULL, CInetAccess::FILE_HTML );
 		theApp.StartMixiLoginAccess(m_hWnd, &theApp.m_mixi4recv);
 
 		return TRUE;
@@ -1556,8 +1556,6 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 
 			util::MySetInformationText( m_hWnd, _T("完了") );
-
-			theApp.m_access = false;
 
 			// イメージのファイル名を生成
 			CString strFilepath;
