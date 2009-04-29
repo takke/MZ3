@@ -1259,6 +1259,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	DWORD dwLoadAndResizeMS = 0;
 	int   nLoadAndResize = 0;
 	DWORD dwMakeImageLogfilePathMS = 0;
+	DWORD dwAppendDLMMS = 0;
 
 	sw_generate_icon.start();
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
@@ -1283,23 +1284,52 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 				sw_load_and_resize.start();
 
 				// 未ロードなのでロード
-				CMZ3BackgroundImage image(L"");
-				image.load( miniImagePath );
-				if (image.isEnableImage()) {
-					// リサイズして画像キャッシュに追加する。
-					theApp.AddImageToImageCache(this, image, miniImagePath);
+				bool bLoaded = false;
 
-					bUseExtendedIcon = true;
-				} else {
-					// ロードエラー => ダウンロードマネージャに登録する
-					if (mixi.GetImageCount()>0 && !miniImagePath.IsEmpty()) {
-						CString url = mixi.GetImage(0);
-						DownloadItem item( url, L"絵文字", miniImagePath, true );
-						theApp.m_pDownloadView->AppendDownloadItem( item );
+				// WM だとI/Oが遅いので「存在しないファイルリスト」を参照する
+				bool bExist = false;
+				if (theApp.m_notFoundFileList.count((LPCTSTR)miniImagePath)==0) {
+					if (util::ExistFile(miniImagePath)) {
+						bExist = true;
+					} else {
+						theApp.m_notFoundFileList.insert((LPCTSTR)miniImagePath);
+					}
+				}
+
+				if (bExist) {
+					CMZ3BackgroundImage image(L"");
+					image.load( miniImagePath );
+					if (image.isEnableImage()) {
+						// リサイズして画像キャッシュに追加する。
+						theApp.AddImageToImageCache(this, image, miniImagePath);
+
+						bUseExtendedIcon = true;
+
+						bLoaded = true;
+					} else {
+						// TODO 副作用があるかもしれないので下記のコードは動作確認後に有効化すること
+
+						// ロード失敗は「ファイルが存在しない」とみなし、以後チェックしない
+						//theApp.m_notFoundFileList.insert((LPCTSTR)miniImagePath);
 					}
 				}
 				dwLoadAndResizeMS += sw_load_and_resize.getElapsedMilliSecUntilNow();
 				nLoadAndResize ++;
+
+				if (!bLoaded) {
+					// ロードエラー => ダウンロードマネージャに登録する
+					if (mixi.GetImageCount()>0 && !miniImagePath.IsEmpty()) {
+
+						util::StopWatch sw;
+						sw.start();
+
+						CString url = mixi.GetImage(0);
+						DownloadItem item( url, L"絵文字", miniImagePath, true );
+						theApp.m_pDownloadView->AppendDownloadItem( item );
+
+						dwAppendDLMMS += sw.getElapsedMilliSecUntilNow();
+					}
+				}
 			}
 		}
 	}
@@ -1394,11 +1424,14 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
 	MZ3LOGGER_DEBUG(
-		util::FormatString(L"アイコン生成完了, generate[%dms](load/resize[%dms][%d], path resolve[%dms]), set[%dms]", 
+		util::FormatString(
+			L"アイコン生成完了, generate[%dms](load/resize[%dms][%d], path resolve[%dms], dlm append[%dms]), "
+			L"set[%dms]", 
 			sw_generate_icon.getElapsedMilliSecUntilStoped(),
 			dwLoadAndResizeMS,
 			nLoadAndResize,
 			dwMakeImageLogfilePathMS,
+			dwAppendDLMMS,
 			sw_set_icon.getElapsedMilliSecUntilStoped()));
 }
 

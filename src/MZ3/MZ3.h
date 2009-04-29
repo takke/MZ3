@@ -168,6 +168,9 @@ public:
 	//--- 画像
 	ImageCacheManager	m_imageCache;			///< グローバル画像キャッシュ（16x16）
 
+	std::set<std::wstring> m_notFoundFileList;	///< 存在しないファイルの集合
+												///< ファイルI/OがWMだとやけに遅いのでキャッシュ化
+
 	//--- 通信系
 	bool				m_access;				///< 通信状態
 	CMixiData			m_mixiBeforeRelogin;	///< 再ログイン前の mixi オブジェクト
