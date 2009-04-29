@@ -814,6 +814,11 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 			CString path = util::MakeImageLogfilePathFromUrlMD5( theApp.m_inet.GetURL() );
 			CopyFile( theApp.m_filepath.temphtml, path, FALSE/*bFailIfExists, 上書き*/ );
 
+			// 存在しないファイルリストに登録されていれば削除する
+			if (theApp.m_notFoundFileList.count((LPCTSTR)path)>0) {
+				theApp.m_notFoundFileList.erase((LPCTSTR)path);
+			}
+
 			// アイコン差し替え
 			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 			if (pCategory!=NULL) {

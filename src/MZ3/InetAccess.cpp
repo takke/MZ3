@@ -1046,11 +1046,6 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 				fwrite( &out_buf[0], out_buf.size(), 1, fp_out );
 			}
 			fclose(fp_out);
-
-			// 存在しないファイルリストに登録されていれば削除する
-			if (theApp.m_notFoundFileList.count((LPCTSTR)theApp.m_filepath.temphtml)>0) {
-				theApp.m_notFoundFileList.erase((LPCTSTR)theApp.m_filepath.temphtml);
-			}
 		}
 //		sw.stop();
 //		msg.Format( L"%d [msec]", sw.getElapsedMilliSec() );
