@@ -260,7 +260,7 @@ public:
 		m_StringMap[key] = value;
 	}
 	/// 汎用文字列コンテナからのキー指定による文字列取得
-	CString	GetTextValue(LPCTSTR key) {
+	CString	GetTextValue(LPCTSTR key) const {
 		return FindStringMap(key);
 	}
 

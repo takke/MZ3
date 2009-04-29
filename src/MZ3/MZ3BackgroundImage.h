@@ -6,6 +6,8 @@
  */
 #pragma once
 
+#include "util_base.h"
+
 /**
  * ”wŒi—p‰æ‘œŠÇ—ƒNƒ‰ƒX
  */
@@ -52,6 +54,9 @@ public:
 
 	bool load( LPCTSTR szFilepath )
 	{
+		if (!util::ExistFile(szFilepath)) {
+			return false;
+		}
 		if (!m_hBitmap) {
 			deleteBitmap();
 		}

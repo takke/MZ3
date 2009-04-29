@@ -1257,6 +1257,9 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 
 	// ユーザやコミュニティの画像をアイコン化して表示する
 	DWORD dwLoadAndResizeMS = 0;
+	int   nLoadAndResize = 0;
+	DWORD dwMakeImageLogfilePathMS = 0;
+
 	sw_generate_icon.start();
 	if (theApp.m_optionMng.m_bShowMainViewMiniImage && !bUseDefaultIcon) {
 		// デフォルトアイコンがなかったので、ユーザ・コミュニティアイコン等を作成する
@@ -1265,16 +1268,20 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			if (m_bReloadingGroupTabByThread && m_bRetryReloadGroupTabByThread) {
 				return;
 			}
-
-			CString miniImagePath = util::MakeImageLogfilePath( body[i] );
-
 			const CMixiData& mixi = body[i];
+
+			util::StopWatch sw;
+			sw.start();
+			CString miniImagePath = util::MakeImageLogfilePath( body[i] );
+			dwMakeImageLogfilePathMS += sw.getElapsedMilliSecUntilNow();
+
 			if (theApp.m_imageCache.GetImageIndex(miniImagePath) >= 0) {
 				// ロード済みなのでロード不要
 				bUseExtendedIcon = true;
 			} else {
 				util::StopWatch sw_load_and_resize;
 				sw_load_and_resize.start();
+
 				// 未ロードなのでロード
 				CMZ3BackgroundImage image(L"");
 				image.load( miniImagePath );
@@ -1292,6 +1299,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 					}
 				}
 				dwLoadAndResizeMS += sw_load_and_resize.getElapsedMilliSecUntilNow();
+				nLoadAndResize ++;
 			}
 		}
 	}
@@ -1386,9 +1394,11 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
 	MZ3LOGGER_DEBUG(
-		util::FormatString(L"アイコン生成完了, generate[%dms](load/resize[%dms]), set[%dms]", 
+		util::FormatString(L"アイコン生成完了, generate[%dms](load/resize[%dms][%d], path resolve[%dms]), set[%dms]", 
 			sw_generate_icon.getElapsedMilliSecUntilStoped(),
 			dwLoadAndResizeMS,
+			nLoadAndResize,
+			dwMakeImageLogfilePathMS,
 			sw_set_icon.getElapsedMilliSecUntilStoped()));
 }
 
