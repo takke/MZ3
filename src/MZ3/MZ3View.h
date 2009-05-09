@@ -395,16 +395,16 @@ public:
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
 	afx_msg void OnAddRssFeedMenu();
-	afx_msg void OnMenuMixiEchoUpdate();
+
 	afx_msg void OnMenuMixiEchoShowProfile();
+	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
+	afx_msg void OnMenuMixiEchoAddUserEchoList();
+
 	void ResetViewContent(void);
 	afx_msg void OnAcceleratorToggleIntegratedMode();
 	void MyResetTwitterStylePostMode();
 	afx_msg void OnMenuWassrRead();
 	afx_msg void OnMenuWassrUpdate();
-	afx_msg void OnMenuMixiEchoReply();
-	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
-	afx_msg void OnMenuMixiEchoAddUserEchoList();
 	bool DoAccessEndProcForRssAutoDiscovery(void);
 private:
 	bool DoAccessEndProcForSoftwareUpdateCheck(void);

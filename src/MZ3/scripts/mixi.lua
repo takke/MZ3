@@ -166,7 +166,9 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("separator", "", 0);
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
 	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
-	menu:append_menu("string", "プロフィールページ", 34170 -37000);				-- 34170 : ID_MENU_MIXI_ECHO_SHOW_PROFILE
+
+	ID_MENU_MIXI_ECHO_SHOW_PROFILE = 34170 -37000;
+	menu:append_menu("string", "プロフィールページ", ID_MENU_MIXI_ECHO_SHOW_PROFILE);
 	menu:append_menu("separator", "", 0);
 	
 	-- TODO リンク
@@ -185,14 +187,14 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	]]
 
 	-- ユーザのエコー一覧
-	-- 34192 : ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST
-	menu:append_menu("string", body:get_text('name') .. " さんのエコー", 34192 -37000);
+	ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST = 34192 -37000;
+	menu:append_menu("string", body:get_text('name') .. " さんのエコー", ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST);
 
 	-- 引用ユーザのエコー一覧
 	ref_user_name = body:get_text('ref_user_name');
 	if ref_user_name ~= "" then
-		-- 34193 : ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST
-		menu:append_menu("string", ref_user_name .. " さんのエコー", 34193 -37000);
+		ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST = 34193 -37000;
+		menu:append_menu("string", ref_user_name .. " さんのエコー", ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST);
 	end
 
 	-- ポップアップ

@@ -148,7 +148,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
 
-	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
@@ -2359,7 +2358,10 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 							OnMenuGoohomeUpdate();
 							return TRUE;
 						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
-							OnMenuMixiEchoUpdate();
+
+							// Lua 関数呼び出しで実装
+							theApp.MyLuaExecute(L"mixi.on_mixi_echo_update()");
+
 							return TRUE;
 						}
 					}
@@ -6901,21 +6903,6 @@ void CMZ3View::OnAddRssFeedMenu()
 		AccessProc( &s_data, s_data.GetURL(), CInetAccess::ENCODING_NOCONVERSION );
 	}
 
-}
-
-/**
- * mixiエコー | つぶやく
- */
-void CMZ3View::OnMenuMixiEchoUpdate()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
 
 void CMZ3View::OnMenuMixiEchoShowProfile()
