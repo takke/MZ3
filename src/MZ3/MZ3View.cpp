@@ -3654,7 +3654,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	// MZ3 API : フック関数呼び出し
 	int rval = 0;
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(bodyItem.GetAccessType()));
-	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", serializeKey, &bodyItem, NULL, &rval)) {
+	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", serializeKey, &bodyItem, this, &rval)) {
 		return rval!=0 ? true : false;
 	}
 
@@ -3773,7 +3773,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			break;
 		}
 		break;
-
+/*
 	case ACCESS_MIXI_ECHO_USER:
 		{
 			CMenu* pSubMenu = new CMenu();
@@ -3797,7 +3797,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				}
 			}
 
-			// ユーザ、引用ユーザのエコー一覧
+			// ユーザのエコー一覧
 			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, 
 				util::FormatString(L"%s さんのエコー", bodyItem.GetName()));
 
@@ -3816,6 +3816,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			delete pSubMenu;
 		}
 		break;
+*/
 
 	case ACCESS_WASSR_USER:
 		{

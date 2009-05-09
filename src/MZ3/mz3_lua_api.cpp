@@ -16,10 +16,12 @@
 
 #define MZ3_LUA_LOGGER_HEADER	L"(Lua) "
 
-static CStringA make_invalid_arg_error_string(const char* func_name)
+#define make_invalid_arg_error_string(X)	make_invalid_arg_error_string2(__FILE__, __LINE__, X)
+
+static CStringA make_invalid_arg_error_string2(const char* file, int line, const char* func_name)
 {
 	CStringA s;
-	s.Format("invalid argument for '%s'...", func_name);
+	s.Format("[%s:%d] invalid argument for '%s'...", file, line, func_name);
 	return s;
 }
 
@@ -868,9 +870,31 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 }
 
 /*
+--- メニュー作成
+--
+-- 作成したメニュー(返り値)は必ず mz3_menu.delete() で削除すること
+--
+function mz3_menu.create_popup_menu()
+*/
+int lua_mz3_menu_create_popup_menu(lua_State *L)
+{
+	const char* func_name = "mz3_menu.create_popup_menu";
+
+	// メニュー作成
+	CMenu* pMenu = new CMenu();
+	pMenu->CreatePopupMenu();
+
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, (void*)pMenu);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- メニュー用フック関数の登録。
 --
--- 登録した関数は insert_menu で利用可能。
+-- 登録した関数は insert_menu, append_menu で利用可能。
 --
 -- @param hook_function_name メニュー押下時のフック関数名
 --
@@ -895,7 +919,7 @@ int lua_mz3_menu_regist_menu(lua_State *L)
 }
 
 /*
---- メニューの登録。
+--- メニューの挿入
 --
 -- 2009/02/10 現在、メイン画面のみサポート。
 --
@@ -923,6 +947,105 @@ int lua_mz3_menu_insert_menu(lua_State *L)
 
 	// メニュー作成
 	pMenu->InsertMenu(index, MF_BYPOSITION | MF_STRING, ID_LUA_MENU_BASE +item_id, CString(title));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- メニューの追加
+--
+-- @param menu    メニュー用オブジェクト
+-- @param type    メニュー種別("string", "separator")
+-- @param title   タイトル
+-- @param item_id regist_menu の返り値
+--
+function mz3_menu.append_menu(menu, index, title, item_id)
+*/
+int lua_mz3_menu_append_menu(lua_State *L)
+{
+	const char* func_name = "mz3_menu.append_menu";
+
+	// 引数取得
+	CMenu* pMenu = (CMenu*)lua_touserdata(L, 1);		// 第1引数
+	if (pMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* type = lua_tostring(L, 2);				// 第2引数
+	const char* title = lua_tostring(L, 3);				// 第3引数
+	int item_id = lua_tointeger(L, 4);					// 第4引数
+
+	// メニュー作成
+	UINT flags = MF_STRING;
+	if (strcmp(type, "string")==0) {
+		flags = MF_STRING;
+	} else if (strcmp(type, "separator")==0) {
+		flags = MF_SEPARATOR;
+	}
+	pMenu->AppendMenu(flags, ID_LUA_MENU_BASE +item_id, CString(title));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- メニューのポップアップ
+--
+-- @param menu メニュー用オブジェクト
+-- @param wnd  親ウィンドウ
+--
+function mz3_menu.popup(menu, wnd)
+*/
+int lua_mz3_menu_popup(lua_State *L)
+{
+	const char* func_name = "mz3_menu.popup";
+
+	// 引数取得
+	CMenu* pMenu = (CMenu*)lua_touserdata(L, 1);		// 第1引数
+	if (pMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CWnd* pWnd = (CWnd*)lua_touserdata(L, 2);		// 第2引数
+	if (pWnd==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// メニューを開く
+	POINT pt = util::GetPopupPosForSoftKeyMenu2();
+	UINT flags = util::GetPopupFlagsForSoftKeyMenu2();
+	pMenu->TrackPopupMenu(flags, pt.x, pt.y, pWnd);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- メニューの破棄
+--
+-- @param menu メニュー用オブジェクト
+--
+function mz3_menu.delete(menu)
+*/
+int lua_mz3_menu_delete(lua_State *L)
+{
+	const char* func_name = "mz3_menu.delete";
+
+	// 引数取得
+	CMenu* pMenu = (CMenu*)lua_touserdata(L, 1);		// 第1引数
+	if (pMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// メニューを破棄
+	delete pMenu;
 
 	// 戻り値の数を返す
 	return 0;
@@ -1476,8 +1599,12 @@ static const luaL_Reg lua_mz3_htmlarray_lib[] = {
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_menu_lib[] = {
-	{"regist_menu",		lua_mz3_menu_regist_menu},
-	{"insert_menu",		lua_mz3_menu_insert_menu},
+	{"create_popup_menu",	lua_mz3_menu_create_popup_menu},
+	{"regist_menu",			lua_mz3_menu_regist_menu},
+	{"insert_menu",			lua_mz3_menu_insert_menu},
+	{"append_menu",			lua_mz3_menu_append_menu},
+	{"popup",				lua_mz3_menu_popup},
+	{"delete",				lua_mz3_menu_delete},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_inifile_lib[] = {
