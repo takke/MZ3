@@ -370,6 +370,8 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, vo
 {
 	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
 		// フック関数未登録のため終了
+		MZ3LOGGER_DEBUG(util::FormatString(L"no listeners for %s", 
+							CString(szEventName)));
 		return false;
 	}
 

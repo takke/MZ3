@@ -3650,6 +3650,14 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	}
 
 	CMixiData& bodyItem = GetSelectedBodyItem();
+
+	// MZ3 API : フック関数呼び出し
+	int rval = 0;
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(bodyItem.GetAccessType()));
+	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", serializeKey, &bodyItem, NULL, &rval)) {
+		return rval!=0 ? true : false;
+	}
+
 	switch( bodyItem.GetAccessType() ) {
 	case ACCESS_DIARY:
 	case ACCESS_NEIGHBORDIARY:
@@ -3768,9 +3776,14 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 
 	case ACCESS_MIXI_ECHO_USER:
 		{
-			CMenu menu;
-			menu.LoadMenu( IDR_BODY_MENU );
-			CMenu* pSubMenu = menu.GetSubMenu(2);	// echo用メニューはidx=2
+			CMenu* pSubMenu = new CMenu();
+			pSubMenu->CreatePopupMenu();
+
+			pSubMenu->AppendMenu(MF_STRING, IDM_CATEGORY_OPEN, L"最新の一覧を取得");
+			pSubMenu->AppendMenu(MF_SEPARATOR, 0, L"");
+			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_UPDATE, L"つぶやく");
+			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_SHOW_PROFILE, L"プロフィールページ");
+			pSubMenu->AppendMenu(MF_SEPARATOR, 0, L"");
 
 			// リンク
 			int n = (int)bodyItem.m_linkList.size();
@@ -3785,19 +3798,14 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			}
 
 			// ユーザ、引用ユーザのエコー一覧
-			CString s;
-			s.Format(L"%s さんのエコー", bodyItem.GetName());
-			pSubMenu->ModifyMenu(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, MF_BYCOMMAND, 
-								 ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, s);
+			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, 
+				util::FormatString(L"%s さんのエコー", bodyItem.GetName()));
 
 			// 引用ユーザのエコー一覧
 			CString ref_user_name = bodyItem.GetTextValue(L"ref_user_name");
 			if (!ref_user_name.IsEmpty()) {
-				s.Format(L"%s さんのエコー", ref_user_name);
-				pSubMenu->ModifyMenu(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, MF_BYCOMMAND, 
-									 ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, s);
-			} else {
-				pSubMenu->RemoveMenu(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, MF_BYCOMMAND);
+				pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, 
+					util::FormatString(L"%s さんのエコー", ref_user_name));
 			}
 
 			// 暫定：メニュー表示直前のフック関数
@@ -3805,6 +3813,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+			delete pSubMenu;
 		}
 		break;
 

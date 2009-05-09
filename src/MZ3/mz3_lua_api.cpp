@@ -902,7 +902,7 @@ int lua_mz3_menu_regist_menu(lua_State *L)
 -- @param menu    メニュー用オブジェクト
 -- @param index   追加位置(0オリジン)
 -- @param title   タイトル
--- @param item_id insert_menu の返り値
+-- @param item_id regist_menu の返り値
 --
 function mz3_menu.insert_menu(menu, index, title, item_id)
 */
