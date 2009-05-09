@@ -27,8 +27,9 @@ goohome_user_read_menu_item = mz3_menu.regist_menu("goohome.on_read_menu_item");
 ----------------------------------------
 -- イベントフック関数の登録
 ----------------------------------------
--- TODO 整理
-function on_event(serialize_key, event_name, data)
+
+--- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
+function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="GOOHOME_USER" then
 		-- 全文表示
 		return on_read_menu_item(serialize_key, event_name, data);
@@ -38,7 +39,7 @@ function on_event(serialize_key, event_name, data)
 	return false;
 end
 
--- 全文表示メニューまたはダブルクリックイベント
+--- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
@@ -65,8 +66,8 @@ function on_creating_goohome_user_context_menu(serialize_key, event_name, menu)
 end
 
 -- ボディリストのクリック・ダブルクリックイベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "goohome.on_event");
-mz3.add_event_listener("enter_body_list",  "goohome.on_event");
+mz3.add_event_listener("dblclk_body_list", "goohome.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "goohome.on_body_list_click");
 
 -- 暫定のイベントです。
 mz3.add_event_listener("creating_goohome_user_context_menu",  "goohome.on_creating_goohome_user_context_menu");

@@ -150,7 +150,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 
 	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
-	ON_COMMAND(ID_MENU_MIXI_ECHO_REPLY, &CMZ3View::OnMenuMixiEchoReply)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 
@@ -6911,22 +6910,6 @@ void CMZ3View::OnMenuMixiEchoUpdate()
 {
 	// モード変更
 	m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-}
-
-
-/**
- * mixiエコー | 返信
- */
-void CMZ3View::OnMenuMixiEchoReply()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY;
 
 	// ボタン名称変更
 	MyUpdateControlStatus();

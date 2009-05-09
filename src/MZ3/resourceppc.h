@@ -309,12 +309,9 @@
 #define ID_MENU_WASSR_UPDATE            34177
 #define ID_MENU_FONT_MAGNIFY            34180
 #define ID_MENU_FONT_SHRINK             34181
-#define ID_MENU_MIXI_ECHO_REPLY         34183
-#define ID_34184                        34184
 #define ID_MENU_PREV_DIARY              34185
 #define ID_MENU_NEXT_DIARY              34186
 #define ID_MENU_PREVDIARY               34187
-#define ID_34188                        34188
 #define ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST 34192
 #define ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST 34193
 #define IDM_LOAD_FULL_DIARY             34194
