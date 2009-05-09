@@ -136,3 +136,25 @@ function MZ3AccessTypeInfo:set_request_encoding(e)		return mz3_access_type_info.
 function MZ3AccessTypeInfo:set_default_url(url)			return mz3_access_type_info.set_default_url(self.type, url);		end
 function MZ3AccessTypeInfo:set_body_header(no, t, n)	return mz3_access_type_info.set_body_header(self.type, no, t, n);	end
 function MZ3AccessTypeInfo:set_body_integrated_line_pattern(l, pat)	return mz3_access_type_info.set_body_integrated_line_pattern(self.type, l, pat);	end
+
+
+--------------------------------------------------
+-- Wrapper for mz3_menu
+--------------------------------------------------
+MZ3Menu = {};
+
+function MZ3Menu:create_popup_menu()
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	object.menu = mz3_menu.create_popup_menu();
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3Menu });
+	return object;
+end
+
+function MZ3Menu:append_menu(type, title, item_id)	return mz3_menu.append_menu(self.menu, type, title, item_id);	end
+function MZ3Menu:popup(wnd)							return mz3_menu.popup(self.menu, wnd);	end
+function MZ3Menu:delete()							return mz3_menu.delete(self.menu);	end

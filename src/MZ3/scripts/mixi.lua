@@ -115,10 +115,65 @@ function on_read_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
--- 暫定のイベント：mixi echo用コンテキストメニューの作成
-function on_creating_mixi_echo_item_context_menu(serialize_key, event_name, menu)
-	-- "全文を読む" を追加
-	mz3_menu.insert_menu(menu, 2, "全文を読む...", mixi_echo_item_read_menu_item);
+--- ボディリストのポップアップメニュー表示
+--
+-- @param event_name    'popup_body_menu'
+-- @param serialize_key ボディアイテムのシリアライズキー
+-- @param body          body
+-- @param wnd           wnd
+--
+function on_popup_body_menu(event_name, serialize_key, body, wnd)
+	if serialize_key~="MIXI_RECENT_ECHO_ITEM" then
+		return false;
+	end
+	
+	-- インスタンス化
+	body = MZ3Data:create(body);
+	
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu();
+	
+	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
+	menu:append_menu("string", "最新の一覧を取得", 34164 -37000);				-- 34164 : IDM_CATEGORY_OPEN
+	menu:append_menu("string", "全文を読む...", mixi_echo_item_read_menu_item);
+	menu:append_menu("separator", "", 0);
+	menu:append_menu("string", "つぶやく", 34168 -37000);						-- 34168 : ID_MENU_MIXI_ECHO_UPDATE
+	menu:append_menu("string", "プロフィールページ", 34170 -37000);				-- 34170 : ID_MENU_MIXI_ECHO_SHOW_PROFILE
+	menu:append_menu("separator", "", 0);
+	
+	-- TODO リンク
+	--[[ C++ 版：
+	// リンク
+	int n = (int)bodyItem.m_linkList.size();
+	if( n > 0 ) {
+		pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
+		for( int i=0; i<n; i++ ) {
+			// 追加
+			CString s;
+			s.Format( L"link : %s", bodyItem.m_linkList[i].text );
+			pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
+		}
+	}
+	]]
+
+	-- ユーザのエコー一覧
+	-- 34192 : ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST
+	menu:append_menu("string", body:get_text('name') .. " さんのエコー", 34192 -37000);
+
+	-- 引用ユーザのエコー一覧
+	ref_user_name = body:get_text('ref_user_name');
+	if ref_user_name ~= "" then
+		-- 34193 : ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST
+		menu:append_menu("string", ref_user_name .. " さんのエコー", 34193 -37000);
+	end
+
+	-- ポップアップ
+	menu:popup(wnd);
+	
+	-- メニューリソース削除
+	menu:delete();
+	
+	return true;
 end
 
 
@@ -130,7 +185,7 @@ end
 mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
 
--- 暫定のイベントです。
-mz3.add_event_listener("creating_mixi_echo_item_context_menu",  "mixi.on_creating_mixi_echo_item_context_menu");
+-- ボディリストのポップアップメニュー表示イベントハンドラ登録
+mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
 
 mz3.logger_debug('mixi.lua end');
