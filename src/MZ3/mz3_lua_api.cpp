@@ -10,6 +10,7 @@
 #include "MZ3View.h"
 #include "MixiParserUtil.h"
 #include "IniFile.h"
+#include "util_goo.h"
 
 //-----------------------------------------------
 // lua support
@@ -288,6 +289,160 @@ int lua_mz3_add_event_listener(lua_State *L)
 	} else {
 		theApp.m_luaHooks[ szEvent ] = std::vector<std::string>();
 		theApp.m_luaHooks[ szEvent ].push_back(szParserName);
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- URL を開く
+--
+-- MZ3 の通信処理を開始する
+--
+-- @param wnd		  ウィンドウ(mz3_main_view.get_wnd() 等で取得した値)
+-- @param access_type アクセス種別(アクセス種別に応じて取得メソッド[GET/POST]が自動設定される)
+-- @param url         URL
+-- @param referer     リファラーURL
+-- @param file_type   ファイル種別("text", "binary")
+-- @param user_agent  ユーザエージェント(nil の場合 "MZ3" or "MZ4" が自動設定される)
+-- @param post        POST 用オブジェクト(未サポート)
+--
+-- @return なし
+--
+function mz3.open_url(hwnd, access_type, url, referer, type, user_agent, post)
+*/
+int lua_mz3_open_url(lua_State *L)
+{
+	// 引数の取得
+	CWnd* wnd = (CWnd*)lua_touserdata(L, 1);					// 第1引数
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 2);	// 第2引数
+	const char* url = lua_tostring(L, 3);						// 第3引数
+	const char* referer = lua_tostring(L, 4);					// 第4引数
+	const char* file_type = lua_tostring(L, 5);					// 第5引数
+	const char* user_agent = lua_tostring(L, 6);				// 第6引数
+	CPostData* post = (CPostData*)lua_touserdata(L, 7);			// 第7引数
+
+	HWND hwnd = NULL;
+	if (wnd != NULL) {
+		hwnd = wnd->m_hWnd;
+	}
+
+	// 通信処理開始
+	if (theApp.m_access) {
+		MZ3LOGGER_ERROR(L"通信中のためアクセスを行いません");
+
+		// 戻り値の数を返す
+		return 0;
+	}
+
+	// API 用Dataオブジェクト
+	static MZ3Data s_data;
+	MZ3Data dummy_data;
+	s_data = dummy_data;
+	s_data.SetAccessType(access_type);
+	s_data.SetURL(CString(url));
+	s_data.SetBrowseUri(CString(url));
+
+	theApp.m_mixi4recv = s_data;
+
+	// アクセス種別を設定
+	theApp.m_accessType = access_type;
+
+	// encoding 指定
+	CInetAccess::ENCODING encoding;
+	switch (theApp.m_accessTypeInfo.getRequestEncoding(access_type)) {
+	case AccessTypeInfo::ENCODING_SJIS:
+		encoding = CInetAccess::ENCODING_SJIS;
+		break;
+	case AccessTypeInfo::ENCODING_UTF8:
+		encoding = CInetAccess::ENCODING_UTF8;
+		break;
+	case AccessTypeInfo::ENCODING_NOCONVERSION:
+		encoding = CInetAccess::ENCODING_NOCONVERSION;
+		break;
+	case AccessTypeInfo::ENCODING_EUC:
+	default:
+		encoding = CInetAccess::ENCODING_EUC;
+		break;
+	}
+
+	// 認証情報の設定
+	CString strUser = NULL;
+	CString strPassword = NULL;
+	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="Twitter") {
+		// Twitter API => Basic 認証
+		strUser     = theApp.m_loginMng.GetTwitterId();
+		strPassword = theApp.m_loginMng.GetTwitterPassword();
+
+		// 未指定の場合はエラー出力
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
+			MessageBox(hwnd, L"ログイン設定画面でユーザIDとパスワードを設定してください", NULL, MB_OK);
+			return 0;
+		}
+	}
+	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="Wassr") {
+		// Wassr API => Basic 認証
+		strUser     = theApp.m_loginMng.GetWassrId();
+		strPassword = theApp.m_loginMng.GetWassrPassword();
+
+		// 未指定の場合はエラー出力
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
+			MessageBox(hwnd, L"ログイン設定画面でユーザIDとパスワードを設定してください", NULL, MB_OK);
+			return 0;
+		}
+	}
+	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="gooHome") {
+		// gooHome API => Basic 認証
+		strUser     = theApp.m_loginMng.GetGooId();
+		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
+
+		// 未指定の場合はエラー出力
+		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
+			MessageBox(hwnd, L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください", NULL, MB_OK);
+			return 0;
+		}
+	}
+
+	// アクセス開始
+	theApp.m_access = true;
+
+	// TODO 共通化
+	//m_abort = FALSE;
+
+	// GET/POST 判定
+	bool bPost = false;	// デフォルトはGET
+	switch (theApp.m_accessTypeInfo.getRequestMethod(access_type)) {
+	case AccessTypeInfo::REQUEST_METHOD_POST:
+		bPost = true;
+		break;
+	case AccessTypeInfo::REQUEST_METHOD_GET:
+	case AccessTypeInfo::REQUEST_METHOD_INVALID:
+	default:
+		break;
+	}
+
+	// post が未指定であれば生成する
+	if (bPost && post==NULL) {
+		static CPostData s_post;
+		// 初期化
+		CPostData dummy_post_data;
+		s_post = dummy_post_data;
+		s_post.SetSuccessMessage( WM_MZ3_POST_END );
+		s_post.AppendAdditionalHeader(L"");
+
+		post = &s_post;
+	}
+
+	// UserAgent設定
+	CString strUserAgent(user_agent);
+
+	// GET/POST 開始
+	theApp.m_inet.Initialize(hwnd, &s_data, encoding);
+	if (bPost) {
+		theApp.m_inet.DoPost(CString(url), CString(referer), CInetAccess::FILE_HTML, post, strUser, strPassword, strUserAgent );
+	} else {
+		theApp.m_inet.DoGet(CString(url), CString(referer), CInetAccess::FILE_HTML, strUser, strPassword, strUserAgent );
 	}
 
 	// 戻り値の数を返す
@@ -1630,6 +1785,35 @@ int lua_mz3_main_view_set_focus(lua_State *L)
 	return 0;
 }
 
+/*
+--- 現在選択中の下ペイン要素取得
+--
+function mz3_main_view.get_selected_body_item();
+*/
+int lua_mz3_main_view_get_selected_body_item(lua_State *L)
+{
+	// 結果をスタックに積む
+	MZ3Data& data = theApp.m_pMainView->GetSelectedBodyItem();
+	lua_pushlightuserdata(L, (void*)&data);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- メインビューの取得
+--
+function mz3_main_view.get_wnd();
+*/
+int lua_mz3_main_view_get_wnd(lua_State *L)
+{
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, (void*)theApp.m_pMainView);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 
 
 //-----------------------------------------------
@@ -1648,6 +1832,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_serialize_key_by_access_type", lua_mz3_get_serialize_key_by_access_type},
 	{"set_parser",					lua_mz3_set_parser},
 	{"add_event_listener",			lua_mz3_add_event_listener},
+	{"open_url",					lua_mz3_open_url},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -1722,6 +1907,8 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_post_mode",			lua_mz3_main_view_set_post_mode},
 	{"update_control_status",	lua_mz3_main_view_update_control_status},
 	{"set_focus",				lua_mz3_main_view_set_focus},
+	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
+	{"get_wnd",					lua_mz3_main_view_get_wnd},
 	{NULL, NULL}
 };
 

@@ -13,7 +13,7 @@ mz3.logger_debug('mixi.lua start');
 module("mixi", package.seeall)
 
 --------------------------------------------------
--- 次へ、前への抽出処理
+--- 次へ、前への抽出処理
 --------------------------------------------------
 function parse_next_back_link(line, base_url)
 
@@ -49,6 +49,19 @@ function parse_next_back_link(line, base_url)
 	return back_data, next_data;
 end
 
+--------------------------------------------------
+--- mixi 用URL補完
+--------------------------------------------------
+function complement_mixi_url(url)
+	if (url:find("mixi.jp", 1, true) == nil and
+	    url:find("http://", 1, true) == nil) then
+	    url = "http://mixi.jp/" .. url;
+	end
+	
+	return url;
+end
+
+
 
 ----------------------------------------
 -- パーサのロード＆登録
@@ -78,10 +91,10 @@ require("scripts\\mixi\\mixi_show_self_log_parser");
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 menu_items = {}
-menu_items.mixi_echo_item_read = mz3_menu.regist_menu("mixi.on_read_menu_item");
-menu_items.mixi_echo_update    = mz3_menu.regist_menu("mixi.on_mixi_echo_update");
-menu_items.mixi_echo_reply     = mz3_menu.regist_menu("mixi.on_mixi_echo_reply");
-
+menu_items.mixi_echo_item_read    = mz3_menu.regist_menu("mixi.on_read_menu_item");
+menu_items.mixi_echo_update       = mz3_menu.regist_menu("mixi.on_mixi_echo_update");
+menu_items.mixi_echo_reply        = mz3_menu.regist_menu("mixi.on_mixi_echo_reply");
+menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show_profile");
 
 ----------------------------------------
 -- イベントハンドラ
@@ -109,6 +122,29 @@ function on_mixi_echo_reply(serialize_key, event_name, data)
 
 	-- フォーカス移動
 	mz3_main_view.set_focus('edit');
+end
+
+-- 「プロフィール」メニュー用ハンドラ
+function on_mixi_echo_show_profile(serialize_key, event_name, data)
+
+	-- 選択中の要素取得
+	data = mz3_main_view.get_selected_body_item();
+	data = MZ3Data:create(data);
+	
+	-- URL 取得
+	url = complement_mixi_url(data:get_text('url'));
+--	mz3.alert(url);
+	
+	-- プロフィール取得アクセス開始
+	access_type = mz3.get_access_type_by_key("MIXI_PROFILE");
+	referer = "";
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+
+	-- 表示状態更新
+	mz3_main_view.update_control_status();
+
 end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
@@ -167,8 +203,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
 	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
 
-	ID_MENU_MIXI_ECHO_SHOW_PROFILE = 34170 -37000;
-	menu:append_menu("string", "プロフィールページ", ID_MENU_MIXI_ECHO_SHOW_PROFILE);
+	menu:append_menu("string", body:get_text('name') .. " さんのプロフィール", menu_items.mixi_echo_show_profile);
 	menu:append_menu("separator", "", 0);
 	
 	-- TODO リンク
