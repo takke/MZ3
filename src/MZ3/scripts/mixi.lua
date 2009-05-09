@@ -77,12 +77,39 @@ require("scripts\\mixi\\mixi_show_self_log_parser");
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
-mixi_echo_item_read_menu_item = mz3_menu.regist_menu("mixi.on_read_menu_item");
+menu_items = {}
+menu_items.mixi_echo_item_read = mz3_menu.regist_menu("mixi.on_read_menu_item");
+menu_items.mixi_echo_update    = mz3_menu.regist_menu("mixi.on_mixi_echo_update");
+menu_items.mixi_echo_reply     = mz3_menu.regist_menu("mixi.on_mixi_echo_reply");
 
 
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+-- 「つぶやく」メニュー用ハンドラ
+function on_mixi_echo_update(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
+
+-- 「返信」メニュー用ハンドラ
+function on_mixi_echo_reply(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
@@ -134,10 +161,11 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu = MZ3Menu:create_popup_menu();
 	
 	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
-	menu:append_menu("string", "最新の一覧を取得", 34164 -37000);				-- 34164 : IDM_CATEGORY_OPEN
-	menu:append_menu("string", "全文を読む...", mixi_echo_item_read_menu_item);
+	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "全文を読む...", menu_items.mixi_echo_item_read);
 	menu:append_menu("separator", "", 0);
-	menu:append_menu("string", "つぶやく", 34168 -37000);						-- 34168 : ID_MENU_MIXI_ECHO_UPDATE
+	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
+	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
 	menu:append_menu("string", "プロフィールページ", 34170 -37000);				-- 34170 : ID_MENU_MIXI_ECHO_SHOW_PROFILE
 	menu:append_menu("separator", "", 0);
 	

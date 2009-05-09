@@ -51,12 +51,12 @@ public:
 
 	/// Twitter 風送信項目の種別
 	enum TWITTER_STYLE_POST_MODE {
-		TWITTER_STYLE_POST_MODE_UPDATE,					///< タイムライン用発言入力中
-		TWITTER_STYLE_POST_MODE_DM,						///< DM入力中
-		TWITTER_STYLE_POST_MODE_MIXI_ECHO,				///< mixiエコー入力中
-		TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY,		///< mixiエコー入力中(返信)
-		TWITTER_STYLE_POST_MODE_WASSR_UPDATE,			///< Wassr 用発言入力中
-		TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE,	///< gooホームひとこと入力中
+		TWITTER_STYLE_POST_MODE_TWITTER_UPDATE		 = 0,	///< タイムライン用発言入力中
+		TWITTER_STYLE_POST_MODE_TWITTER_DM			 = 1,	///< DM入力中
+		TWITTER_STYLE_POST_MODE_MIXI_ECHO			 = 2,	///< mixiエコー入力中
+		TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY		 = 3,	///< mixiエコー入力中(返信)
+		TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
+		TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
 	};
 	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
 

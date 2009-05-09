@@ -147,14 +147,16 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
+
 	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
-	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
-	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
-	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_REPLY, &CMZ3View::OnMenuMixiEchoReply)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
+
+	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
+	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
+	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
 	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
@@ -5008,7 +5010,7 @@ void CMZ3View::OnAcceleratorReload()
 void CMZ3View::OnMenuTwitterReply()
 {
 	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
 
 	// ボタン名称変更
 	MyUpdateControlStatus();
@@ -5041,7 +5043,7 @@ void CMZ3View::OnMenuTwitterReply()
 void CMZ3View::OnMenuTwitterNewDm()
 {
 	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_DM;
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_DM;
 
 	// ボタン名称変更
 	MyUpdateControlStatus();
@@ -5056,7 +5058,7 @@ void CMZ3View::OnMenuTwitterNewDm()
 void CMZ3View::OnMenuTwitterUpdate()
 {
 	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
 
 	// ボタン名称変更
 	MyUpdateControlStatus();
@@ -5164,7 +5166,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// 未入力時の処理
 	if (strStatus.IsEmpty()) {
 		switch (m_twitterPostMode) {
-		case TWITTER_STYLE_POST_MODE_DM:
+		case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 		case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 			// 未入力はNG
 			return;
@@ -5172,7 +5174,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
 		case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
 		case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
-		case TWITTER_STYLE_POST_MODE_UPDATE:
+		case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 		default:
 			// 未入力なので最新取得
 			RetrieveCategoryItem();
@@ -5215,7 +5217,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
-	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 		{
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
@@ -5232,7 +5234,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 		{
 			CMixiData& data = pCategory->GetSelectedBody();
 			CString msg;
@@ -5297,8 +5299,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// ヘッダーを設定
 	switch (m_twitterPostMode) {
-	case TWITTER_STYLE_POST_MODE_DM:
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client: %s", MZ3_APP_NAME ) );
 		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-URL: %s", L"http://mz3.jp/" ) );
 		post.AppendAdditionalHeader( util::FormatString( L"X-Twitter-Client-Version: %s", MZ3_VERSION_TEXT_SHORT ) );
@@ -5349,7 +5351,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
-	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 		{
 			CMixiData& data = pCategory->GetSelectedBody();
 			int	twitterDirectMessageRecipientId = data.GetOwnerID();
@@ -5385,7 +5387,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 	default:
 		post.AppendPostBody( "status=" );
 		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
@@ -5410,7 +5412,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		url = L"http://mixi.jp/add_echo.pl";
 		break;
 
-	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 		url = L"http://twitter.com/direct_messages/new.xml";
 		break;
 
@@ -5422,7 +5424,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		url = L"http://home.goo.ne.jp/api/quote/quotes/post/json";
 		break;
 
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 	default:
 		url = L"http://twitter.com/statuses/update.xml";
 		break;
@@ -5436,8 +5438,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
 		break;
 
-	case TWITTER_STYLE_POST_MODE_DM:
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 		// Twitter API => Basic 認証
 		strUser     = theApp.m_loginMng.GetTwitterId();
 		strPassword = theApp.m_loginMng.GetTwitterPassword();
@@ -5480,7 +5482,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		theApp.m_accessType = ACCESS_MIXI_ADD_ECHO;
 		break;
 
-	case TWITTER_STYLE_POST_MODE_DM:
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
 		break;
 
@@ -5492,7 +5494,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		theApp.m_accessType = ACCESS_GOOHOME_QUOTE_UPDATE;
 		break;
 
-	case TWITTER_STYLE_POST_MODE_UPDATE:
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 	default:
 		theApp.m_accessType = ACCESS_TWITTER_UPDATE;
 		break;
@@ -6225,7 +6227,7 @@ void CMZ3View::MyUpdateControlStatus(void)
 	case VIEW_STYLE_TWITTER:
 		if (pUpdateButton!=NULL) {
 			switch (m_twitterPostMode) {
-			case TWITTER_STYLE_POST_MODE_DM:
+			case TWITTER_STYLE_POST_MODE_TWITTER_DM:
 				pUpdateButton->SetWindowTextW( L"DM" );
 				break;
 			case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
@@ -6240,7 +6242,7 @@ void CMZ3View::MyUpdateControlStatus(void)
 			case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
 				pUpdateButton->SetWindowTextW( L"ひとこと" );
 				break;
-			case TWITTER_STYLE_POST_MODE_UPDATE:
+			case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
 			default:
 				pUpdateButton->SetWindowTextW( L"更新" );
 				break;
@@ -6998,7 +7000,7 @@ void CMZ3View::MyResetTwitterStylePostMode()
 
 		if (strServiceType == "Twitter") {
 			// Twitter系
-			m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+			m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
 		} else if (strServiceType == "Wassr") {
 			// Wassr系
 			m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
@@ -7013,7 +7015,7 @@ void CMZ3View::MyResetTwitterStylePostMode()
 		}
 	} else {
 		// デフォルトは Twitter
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
 	}
 
 	// 指定されたアクセス種別に応じて初期化
@@ -7031,7 +7033,7 @@ void CMZ3View::MyResetTwitterStylePostMode()
 
 	default:
 		// Twitter「更新」に戻す
-		m_twitterPostMode = TWITTER_STYLE_POST_MODE_UPDATE;
+		m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
 		break;
 	}
 */

@@ -7,6 +7,7 @@
 
 #include "stdafx.h"
 #include "MZ3.h"
+#include "MZ3View.h"
 #include "MixiParserUtil.h"
 #include "IniFile.h"
 
@@ -869,6 +870,10 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 	return 1;
 }
 
+//-----------------------------------------------
+// MZ3 Menu API
+//-----------------------------------------------
+
 /*
 --- メニュー作成
 --
@@ -1050,6 +1055,10 @@ int lua_mz3_menu_delete(lua_State *L)
 	// 戻り値の数を返す
 	return 0;
 }
+
+//-----------------------------------------------
+// MZ3 Inifile API
+//-----------------------------------------------
 
 /*
 --- ini ファイルから値を取得する
@@ -1553,7 +1562,79 @@ int lua_mz3_group_item_append_category(lua_State *L)
 	return 1;
 }
 
+//-----------------------------------------------
+// MZ3 MainView API
+//-----------------------------------------------
+
+/*
+--- 書き込み用モード変更(書き込み先URL/API識別用)
+--
+-- @param mode モード値
+--
+function mz3_main_view.set_post_mode(mode);
+*/
+int lua_mz3_main_view_set_post_mode(lua_State *L)
+{
+	const char* func_name = "mz3_main_view.set_post_mode";
+
+	// 引数の取得
+	int mode = lua_tointeger(L, 1);
+
+	// モード設定
+	theApp.m_pMainView->m_twitterPostMode = (CMZ3View::TWITTER_STYLE_POST_MODE)mode;
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- コントロールの再配置
+--
+function mz3_main_view.update_control_status(mode);
+*/
+int lua_mz3_main_view_update_control_status(lua_State *L)
+{
+	theApp.m_pMainView->MyUpdateControlStatus();
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- フォーカス移動
+--
+-- @param focus_control フォーカス移動先コントロール("edit", "category_list", "body_list")
+--
+function mz3_main_view.set_focus(focus_control);
+*/
+int lua_mz3_main_view_set_focus(lua_State *L)
+{
+	// 引数の取得
+	CStringA focus_control(lua_tostring(L, 1));
+
+	// フォーカス移動
+	int idc = 0;
+	if (focus_control=="edit") {
+		idc = IDC_STATUS_EDIT;
+	} else if (focus_control=="category_list") {
+		idc = IDC_HEADER_LIST;
+	} else if (focus_control=="body_list") {
+		idc = IDC_BODY_LIST;
+	}
+	CWnd* pWnd = theApp.m_pMainView->GetDlgItem(idc);
+	if (pWnd!=NULL) {
+		pWnd->SetFocus();
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+
+
+//-----------------------------------------------
 // MZ3 API table
+//-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
 	{"logger_error",				lua_mz3_logger_error},
 	{"logger_info",					lua_mz3_logger_info},
@@ -1637,6 +1718,12 @@ static const luaL_Reg lua_mz3_group_item_lib[] = {
 	{"append_category", lua_mz3_group_item_append_category},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_main_view_lib[] = {
+	{"set_post_mode",			lua_mz3_main_view_set_post_mode},
+	{"update_control_status",	lua_mz3_main_view_update_control_status},
+	{"set_focus",				lua_mz3_main_view_set_focus},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -1650,4 +1737,6 @@ void mz3_lua_open_api(lua_State *L)
 
 	luaL_register(L, "mz3_group_data", lua_mz3_group_data_lib);
 	luaL_register(L, "mz3_group_item", lua_mz3_group_item_lib);
+
+	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
 }
