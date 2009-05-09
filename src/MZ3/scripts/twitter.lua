@@ -52,10 +52,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 --	mz3.logger_debug(data:get_text('name'));
 	
 	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
-	item = '';
-	for i=0, data:get_text_array_size('body')-1 do
-		item = item .. data:get_text_array('body', i);
-	end
+	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 	
 	item = item .. "\r\n";

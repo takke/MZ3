@@ -47,6 +47,18 @@ function MZ3Data:get_integer(name)				return mz3_data.get_integer(self.data, nam
 function MZ3Data:set_integer(name, value)		return mz3_data.set_integer(self.data, name, value);	end
 function MZ3Data:parse_date_line(line)			return mz3_data.parse_date_line(self.data, line);		end
 
+-- text_array を全て連結した文字列を返すヘルパー
+function MZ3Data:get_text_array_joined_text(name)
+	item = '';
+	n = mz3_data.get_text_array_size(self.data, name);
+	for i=0, n-1 do
+		item = item .. self:get_text_array(name, i);
+	end
+
+	return item;
+end
+
+
 --------------------------------------------------
 -- Wrapper for mz3_data_list
 --------------------------------------------------

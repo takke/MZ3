@@ -845,6 +845,7 @@ bool AccessTypeInfo::init()
 		, L"mixiÉGÉRÅ[î≠åæ"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_RECENT_ECHO_ITEM";
 
 
 	//------------------------------------------------------------------

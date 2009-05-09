@@ -147,7 +147,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
-	ON_COMMAND(ID_MENU_MIXI_ECHO_READ, &CMZ3View::OnMenuMixiEchoRead)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_UPDATE, &CMZ3View::OnMenuMixiEchoUpdate)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
@@ -1573,11 +1572,6 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnViewBbsList();
 		return;
 
-	case ACCESS_MIXI_ECHO_USER:
-		// 全文表示
-		OnMenuMixiEchoRead();
-		return;
-
 	case ACCESS_WASSR_USER:
 		// 全文表示
 		OnMenuWassrRead();
@@ -2425,11 +2419,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		case ACCESS_COMMUNITY:
 			// メニュー表示
 			PopupBodyMenu();
-			break;
-
-		case ACCESS_MIXI_ECHO_USER:
-			// 全文表示
-			OnMenuMixiEchoRead();
 			break;
 
 		case ACCESS_WASSR_USER:
@@ -3810,6 +3799,9 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			} else {
 				pSubMenu->RemoveMenu(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, MF_BYCOMMAND);
 			}
+
+			// 暫定：メニュー表示直前のフック関数
+			util::CallMZ3ScriptHookFunctions("", "creating_mixi_echo_item_context_menu", pSubMenu);
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -6898,25 +6890,6 @@ void CMZ3View::OnAddRssFeedMenu()
 		AccessProc( &s_data, s_data.GetURL(), CInetAccess::ENCODING_NOCONVERSION );
 	}
 
-}
-
-void CMZ3View::OnMenuMixiEchoRead()
-{
-	CMixiData& data = GetSelectedBodyItem();
-
-	// 本文を1行に変換して割り当て。
-	CString item;
-
-	CString v = data.GetBody();;
-	while( v.Replace( L"\r\n", L"" ) );
-	item.Append(v);
-	item.Append(L"\r\n");
-	item.Append(L"----\r\n");
-	
-	item.AppendFormat( L"name : %s\r\n", data.GetName() );
-	item.AppendFormat( L"%s\r\n", data.GetDate() );
-
-	MessageBox( item, data.GetName() );
 }
 
 /**

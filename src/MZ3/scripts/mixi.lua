@@ -75,7 +75,62 @@ require("scripts\\mixi\\mixi_show_self_log_parser");
 
 
 ----------------------------------------
+-- メニュー項目登録(静的に用意すること)
+----------------------------------------
+mixi_echo_item_read_menu_item = mz3_menu.regist_menu("mixi.on_read_menu_item");
+
+
+----------------------------------------
+-- イベントハンドラ
+----------------------------------------
+
+--- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
+function on_body_list_click(serialize_key, event_name, data)
+	if serialize_key=="MIXI_RECENT_ECHO_ITEM" then
+		-- 全文表示
+		return on_read_menu_item(serialize_key, event_name, data);
+	end
+	
+	-- 標準の処理を続行
+	return false;
+end
+
+--- 全文表示メニューまたはダブルクリックイベント
+function on_read_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
+	data = MZ3Data:create(data);
+--	mz3.logger_debug(data:get_text('name'));
+	
+	-- 本文を1行に変換して表示
+	item = data:get_text_array_joined_text('body');
+	item = item:gsub("\r\n", "");
+	
+	item = item .. "\r\n";
+	item = item .. "----\r\n";
+	item = item .. "name : " .. data:get_text('name') .. "\r\n";
+	item = item .. data:get_date();
+
+	mz3.alert(item, data:get_text('name'));
+
+	return true;
+end
+
+-- 暫定のイベント：mixi echo用コンテキストメニューの作成
+function on_creating_mixi_echo_item_context_menu(serialize_key, event_name, menu)
+	-- "全文を読む" を追加
+	mz3_menu.insert_menu(menu, 2, "全文を読む...", mixi_echo_item_read_menu_item);
+end
+
+
+----------------------------------------
 -- イベントフック関数の登録
 ----------------------------------------
+
+-- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
+mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
+
+-- 暫定のイベントです。
+mz3.add_event_listener("creating_mixi_echo_item_context_menu",  "mixi.on_creating_mixi_echo_item_context_menu");
 
 mz3.logger_debug('mixi.lua end');
