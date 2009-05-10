@@ -28,8 +28,19 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 menu_items = {}
-menu_items.twitter_item_read = mz3_menu.regist_menu("twitter.on_read_menu_item");
-menu_items.twitter_item_retweet = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
+menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
+menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
+menu_items.update                = 34016 - 37000;	-- ID_MENU_TWITTER_UPDATE
+menu_items.reply                 = 34014 - 37000;	-- ID_MENU_TWITTER_REPLY
+menu_items.new_dm                = 34143 - 37000;	-- ID_MENU_TWITTER_NEW_DM
+menu_items.create_favourings     = 34146 - 37000;	-- ID_MENU_TWITTER_CREATE_FAVOURINGS
+menu_items.destroy_favourings    = 34147 - 37000;	-- ID_MENU_TWITTER_DESTROY_FAVOURINGS
+menu_items.create_friendships    = 34151 - 37000;	-- ID_MENU_TWITTER_CREATE_FRIENDSHIPS
+menu_items.destroy_friendships   = 34152 - 37000;	-- ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
+menu_items.friend_timeline       = 34025 - 37000;	-- ID_MENU_TWITTER_FRIEND_TIMELINE
+menu_items.open_home             = 34020 - 37000;	-- ID_MENU_TWITTER_HOME
+menu_items.open_friend_favorites = 34021 - 37000;	-- ID_MENU_TWITTER_FAVORITES
+menu_items.open_friend_site      = 34022 - 37000;	-- ID_MENU_TWITTER_SITE
 
 
 ----------------------------------------
@@ -99,12 +110,87 @@ function on_read_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
--- 暫定のイベント：Twitter用コンテキストメニューの作成
-function on_creating_twitter_item_context_menu(serialize_key, event_name, menu)
-	-- "全文を読む" を追加
-	mz3_menu.insert_menu(menu, 2, "全文を読む...", menu_items.twitter_item_read);
-	-- "RT" を追加
-	mz3_menu.insert_menu(menu, 3, "ReTweet...", menu_items.twitter_item_retweet);
+--- ボディリストのポップアップメニュー表示
+--
+-- @param event_name    'popup_body_menu'
+-- @param serialize_key ボディアイテムのシリアライズキー
+-- @param body          body
+-- @param wnd           wnd
+--
+function on_popup_body_menu(event_name, serialize_key, body, wnd)
+	if serialize_key~="TWITTER_USER" then
+		return false;
+	end
+
+	-- インスタンス化
+	body = MZ3Data:create(body);
+	
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu();
+	
+	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "全文を読む...", menu_items.read);
+
+	menu:append_menu("separator");
+
+	menu:append_menu("string", "つぶやく", menu_items.update);
+
+	name = body:get_text('name');
+
+	menu:append_menu("string", "@" .. name .. " さんに返信", menu_items.reply);
+	menu:append_menu("string", "@" .. name .. " さんにメッセージ送信", menu_items.new_dm);
+
+	menu:append_menu("separator");
+
+	menu:append_menu("string", "ReTweet...", menu_items.retweet);
+	
+	-- カテゴリが「timeline」のみ、お気に入り登録を表示
+	category_access_type = mz3_main_view.get_selected_category_access_type();
+	category_key = mz3.get_serialize_key_by_access_type(category_access_type);
+	if category_key == "TWITTER_FRIENDS_TIMELINE" then
+		menu:append_menu("string", "お気に入り登録（ふぁぼる）", menu_items.create_favourings);
+	end
+	
+	-- カテゴリが「お気に入り」のみ、お気に入り削除を表示
+	if category_key == "TWITTER_FAVORITES" then
+		menu:append_menu("string", "お気に入り削除", menu_items.destroy_favourings);
+	end
+
+	menu:append_menu("string", "フォローする", menu_items.create_friendships);
+	menu:append_menu("string", "フォローやめる", menu_items.destroy_friendships);
+
+	menu:append_menu("separator");
+
+	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.friend_timeline);
+
+	menu:append_menu("separator");
+
+	menu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
+	menu:append_menu("string", "@" .. name .. " のFavoritesをブラウザで開く", menu_items.open_friend_favorites);
+
+	-- URL が空でなければ「サイト」を追加
+	url = body:get_text('url');
+	if url~=nil and url:len()>0 then
+		menu:append_menu("string", "@" .. name .. " のサイトをブラウザで開く", menu_items.open_friend_site);
+	end
+
+	-- リンク追加
+	n = body:get_link_list_size();
+	if n > 0 then
+		menu:append_menu("separator");
+		for i=0, n-1 do
+			id = ID_REPORT_URL_BASE+(i+1);
+			menu:append_menu("string", "link : " .. body:get_link_list_text(i), id);
+		end
+	end
+
+	-- ポップアップ
+	menu:popup(wnd);
+	
+	-- メニューリソース削除
+	menu:delete();
+	
+	return true;
 end
 
 ----------------------------------------
@@ -115,7 +201,7 @@ end
 mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
 
--- 暫定のイベントです。
-mz3.add_event_listener("creating_twitter_item_context_menu",  "twitter.on_creating_twitter_item_context_menu");
+-- ボディリストのポップアップメニュー表示イベントハンドラ登録
+mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
 
 mz3.logger_debug('twitter.lua end');

@@ -177,7 +177,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "ブラウザで開く",                     ID_OPEN_BROWSER
     END
-    MENUITEM "dummy",                       65535
+    MENUITEM "dummy",                       ID_DUMMY
     POPUP "Wassr用メニュー"
     BEGIN
         MENUITEM "最新の一覧を取得",                    IDM_CATEGORY_OPEN
@@ -418,29 +418,6 @@ BEGIN
             MENUITEM "スクリプトのリロード\tCtrl+F5",         ID_MENU_RELOAD_LUA_SCRIPTS
             MENUITEM "カテゴリログのリロード\tCtrl+Shift+F5",  ID_MENU_RELOAD_CATEGORY_LIST_LOG
         END
-    END
-END
-
-IDR_TWITTER_MENU MENU 
-BEGIN
-    POPUP "TwitterContextMenu"
-    BEGIN
-        MENUITEM "最新の一覧を取得",                    IDM_CATEGORY_OPEN
-        MENUITEM SEPARATOR
-        MENUITEM "つぶやく",                        ID_MENU_TWITTER_UPDATE
-        MENUITEM "言い返す",                        ID_MENU_TWITTER_REPLY
-        MENUITEM "メッセージ送信",                     ID_MENU_TWITTER_NEW_DM
-        MENUITEM SEPARATOR
-        MENUITEM "お気に入り登録（ふぁぼる）",               ID_MENU_TWITTER_CREATE_FAVOURINGS
-        MENUITEM "お気に入り削除",                     ID_MENU_TWITTER_DESTROY_FAVOURINGS
-        MENUITEM "フォローする",                      ID_MENU_TWITTER_CREATE_FRIENDSHIPS
-        MENUITEM "フォローやめる",                     ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
-        MENUITEM SEPARATOR
-        MENUITEM "友達のタイムライン",                   ID_MENU_TWITTER_FRIEND_TIMELINE
-        MENUITEM SEPARATOR
-        MENUITEM "友達のホーム",                      ID_MENU_TWITTER_HOME
-        MENUITEM "友達のFavorites",                ID_MENU_TWITTER_FAVORITES
-        MENUITEM "友達のサイト",                      ID_MENU_TWITTER_SITE
     END
 END
 

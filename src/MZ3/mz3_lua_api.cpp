@@ -878,6 +878,111 @@ int lua_mz3_data_parse_date_line(lua_State *L)
 	return 0;
 }
 
+/*
+--- link_list の個数を取得する
+--
+--
+function mz3_data.get_link_list_size(data)
+*/
+int lua_mz3_data_get_link_list_size(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_link_list_size";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 値取得
+	int size = (int)data->m_linkList.size();
+
+	// 結果をスタックに戻す
+	lua_pushinteger(L, size);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- link_list から URL を取得する
+--
+-- @param data MZ3Data オブジェクト
+-- @param idx  インデックス
+--
+-- @return idx が不正な場合は nil、それ以外は URL 文字列を返す
+--
+function mz3_data.get_link_list_url(data, idx)
+*/
+int lua_mz3_data_get_link_list_url(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_link_list_url";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	int idx = lua_tointeger(L, 2);	// 第2引数
+
+	// 値取得
+	if (0<=idx && idx<data->m_linkList.size()) {
+		CStringA url( data->m_linkList[idx].url );
+
+		// 結果をスタックに戻す
+		lua_pushstring(L, url);
+	} else {
+		// インデックス不正
+		lua_pushnil(L);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- link_list から TEXT(キャプション) を取得する
+--
+-- @param data MZ3Data オブジェクト
+-- @param idx  インデックス
+--
+-- @return idx が不正な場合は nil、それ以外は URL 文字列を返す
+--
+function mz3_data.get_link_list_text(data, idx)
+*/
+int lua_mz3_data_get_link_list_text(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_link_list_text";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	int idx = lua_tointeger(L, 2);	// 第2引数
+
+	// 値取得
+	if (0<=idx && idx<data->m_linkList.size()) {
+		CStringA text( data->m_linkList[idx].text );
+
+		// 結果をスタックに戻す
+		lua_pushstring(L, text);
+	} else {
+		// インデックス不正
+		lua_pushnil(L);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+
 //-----------------------------------------------
 // MZ3 Data List API
 //-----------------------------------------------
@@ -1801,6 +1906,26 @@ int lua_mz3_main_view_get_selected_body_item(lua_State *L)
 }
 
 /*
+--- 現在選択中の上ペイン要素の種別取得
+--
+function mz3_main_view.get_selected_category_access_type();
+*/
+int lua_mz3_main_view_get_selected_category_access_type(lua_State *L)
+{
+	// 結果をスタックに積む
+	CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
+		lua_pushnil(L);
+	} else {
+		ACCESS_TYPE access_type = pCategory->m_mixi.GetAccessType();
+		lua_pushinteger(L, access_type);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- メインビューの取得
 --
 function mz3_main_view.get_wnd();
@@ -1854,21 +1979,24 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
-	{"get_date",		lua_mz3_data_get_date},
-	{"set_date",		lua_mz3_data_set_date},
-	{"get_text",		lua_mz3_data_get_text},
-	{"set_text",		lua_mz3_data_set_text},
-	{"get_text_array",	lua_mz3_data_get_text_array},
+	{"get_date",			lua_mz3_data_get_date},
+	{"set_date",			lua_mz3_data_set_date},
+	{"get_text",			lua_mz3_data_get_text},
+	{"set_text",			lua_mz3_data_set_text},
+	{"get_text_array",		lua_mz3_data_get_text_array},
 	{"get_text_array_size",	lua_mz3_data_get_text_array_size},
-	{"add_text_array",	lua_mz3_data_add_text_array},
+	{"add_text_array",		lua_mz3_data_add_text_array},
 	{"add_body_with_extract",	lua_mz3_data_add_body_with_extract},
-	{"get_integer",		lua_mz3_data_get_integer},
-	{"set_integer",		lua_mz3_data_set_integer},
-	{"set_access_type",	lua_mz3_data_set_access_type},
-	{"get_access_type",	lua_mz3_data_get_access_type},
-	{"create",			lua_mz3_data_create},
-	{"delete",			lua_mz3_data_delete},
-	{"parse_date_line",	lua_mz3_data_parse_date_line},
+	{"get_integer",			lua_mz3_data_get_integer},
+	{"set_integer",			lua_mz3_data_set_integer},
+	{"set_access_type",		lua_mz3_data_set_access_type},
+	{"get_access_type",		lua_mz3_data_get_access_type},
+	{"create",				lua_mz3_data_create},
+	{"delete",				lua_mz3_data_delete},
+	{"parse_date_line",		lua_mz3_data_parse_date_line},
+	{"get_link_list_url",	lua_mz3_data_get_link_list_url},
+	{"get_link_list_text",	lua_mz3_data_get_link_list_text},
+	{"get_link_list_size",	lua_mz3_data_get_link_list_size},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_list_lib[] = {
@@ -1926,6 +2054,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"update_control_status",	lua_mz3_main_view_update_control_status},
 	{"set_focus",				lua_mz3_main_view_set_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
+	{"get_selected_category_access_type",	lua_mz3_main_view_get_selected_category_access_type},
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
 	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
 	{NULL, NULL}

@@ -3843,53 +3843,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		}
 		break;
 
-	case ACCESS_TWITTER_USER:
-		{
-			CMenu menu;
-			menu.LoadMenu( IDR_TWITTER_MENU );
-			CMenu* pSubMenu = menu.GetSubMenu(0);	// メニューはidx=0
-
-			// リンク
-			int n = (int)bodyItem.m_linkList.size();
-			if( n > 0 ) {
-				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
-				for( int i=0; i<n; i++ ) {
-					// 追加
-					CString s;
-					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
-					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
-				}
-			}
-
-			ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
-
-			// 「お気に入り」であれば「外す」メニューを有効化
-			if (categoryType == ACCESS_TWITTER_FAVORITES) {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
-			} else {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_DESTROY_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
-			}
-			// 「ステータス」であれば「ふぁぼる」メニューを無効化
-			if (categoryType == ACCESS_TWITTER_FRIENDS_TIMELINE) {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_ENABLED | MF_BYCOMMAND );
-			} else {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_CREATE_FAVOURINGS, MF_GRAYED | MF_BYCOMMAND );
-			}
-			// URL が空であれば「友達のサイト」を無効化
-			if (GetSelectedBodyItem().GetURL().IsEmpty()) {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_GRAYED | MF_BYCOMMAND );
-			} else {
-				pSubMenu->EnableMenuItem( ID_MENU_TWITTER_SITE, MF_ENABLED | MF_BYCOMMAND );
-			}
-
-			// 暫定：メニュー表示直前のフック関数
-			util::CallMZ3ScriptHookFunctions("", "creating_twitter_item_context_menu", pSubMenu);
-
-			// メニューを開く
-			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
-		}
-		break;
-
 	case ACCESS_RSS_READER_ITEM:
 		{
 			CMenu menu;

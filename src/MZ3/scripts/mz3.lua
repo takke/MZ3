@@ -22,6 +22,7 @@ package.path = ".\\?.luac;.\\?.lua;" .. mz3_dir .. "?.luac;" .. mz3_dir .. "?.lu
 
 -- mz3_menu.append_menu 用定数
 IDM_CATEGORY_OPEN = 34164 -37000;	-- 最新の一覧を取得
+ID_REPORT_URL_BASE = 36100 -37000;	-- URLを開く
 
 -- mz3_main_view.set_post_mode 用定数
 MAIN_VIEW_POST_MODE_TWITTER_UPDATE 			= 0;

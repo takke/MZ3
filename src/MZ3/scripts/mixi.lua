@@ -198,26 +198,11 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
 	menu:append_menu("string", "全文を読む...", menu_items.mixi_echo_item_read);
-	menu:append_menu("separator", "", 0);
+	menu:append_menu("separator");
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
 	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
 	menu:append_menu("string", body:get_text('name') .. " さんのプロフィール", menu_items.mixi_echo_show_profile);
-	menu:append_menu("separator", "", 0);
-	
-	-- TODO リンク
-	--[[ C++ 版：
-	// リンク
-	int n = (int)bodyItem.m_linkList.size();
-	if( n > 0 ) {
-		pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
-		for( int i=0; i<n; i++ ) {
-			// 追加
-			CString s;
-			s.Format( L"link : %s", bodyItem.m_linkList[i].text );
-			pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
-		}
-	}
-	]]
+	menu:append_menu("separator");
 
 	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
 
@@ -232,6 +217,16 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", ref_user_name .. " さんのエコー", ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST);
 	end
 
+	-- リンク追加
+	n = body:get_link_list_size();
+	if n > 0 then
+		menu:append_menu("separator");
+		for i=0, n-1 do
+			id = ID_REPORT_URL_BASE+(i+1);
+			menu:append_menu("string", "link : " .. body:get_link_list_text(i), id);
+		end
+	end
+	
 	-- ポップアップ
 	menu:popup(wnd);
 	
@@ -243,7 +238,7 @@ end
 
 
 ----------------------------------------
--- イベントフック関数の登録
+-- イベントハンドラの登録
 ----------------------------------------
 
 -- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
