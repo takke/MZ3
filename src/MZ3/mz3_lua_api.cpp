@@ -1926,6 +1926,50 @@ int lua_mz3_main_view_get_selected_category_access_type(lua_State *L)
 }
 
 /*
+--- カテゴリの追加
+--
+-- @param title タイトル
+-- @param url   URL
+-- @param key   シリアライズキー
+--
+function mz3_main_view.append_category(title, url, key);
+*/
+int lua_mz3_main_view_append_category(lua_State *L)
+{
+	// 引数の取得
+	CString title(lua_tostring(L, 1));
+	CString url(lua_tostring(L, 2));
+	const char* key = lua_tostring(L, 3);
+
+	ACCESS_TYPE access_type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(key);
+	if (access_type==ACCESS_INVALID) {
+		lua_pushstring(L, "不正なシリアライズキーです");
+		lua_error(L);
+		return 0;
+	}
+
+	// 追加
+	CMZ3View* pView = theApp.m_pMainView;
+
+	CCategoryItem categoryItem;
+	categoryItem.init( 
+		// 名前
+		title,
+		// URL
+		url, 
+		access_type, 
+		pView->m_selGroup->categories.size()+1,
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(access_type),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(access_type),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(access_type),
+		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+	pView->AppendCategoryList(categoryItem);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- メインビューの取得
 --
 function mz3_main_view.get_wnd();
@@ -2055,6 +2099,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_focus",				lua_mz3_main_view_set_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
 	{"get_selected_category_access_type",	lua_mz3_main_view_get_selected_category_access_type},
+	{"append_category",			lua_mz3_main_view_append_category},
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
 	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
 	{NULL, NULL}

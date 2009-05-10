@@ -273,7 +273,6 @@ public:
 	afx_msg void OnMenuTwitterSite();
 	afx_msg void OnLoadUrl(UINT);
 	afx_msg void OnPaint();
-	afx_msg void OnMenuTwitterFriendTimeline();
 //	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
 	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTabmenuDelete();

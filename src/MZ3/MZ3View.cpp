@@ -132,7 +132,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
 	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
 	ON_WM_PAINT()
-	ON_COMMAND(ID_MENU_TWITTER_FRIEND_TIMELINE, &CMZ3View::OnMenuTwitterFriendTimeline)
 	ON_COMMAND(ID_TABMENU_DELETE, &CMZ3View::OnTabmenuDelete)
 	ON_COMMAND_RANGE(ID_APPEND_MENU_BEGIN, ID_APPEND_MENU_END, &CMZ3View::OnAppendCategoryMenu)
 	ON_COMMAND(ID_REMOVE_CATEGORY_ITEM, &CMZ3View::OnRemoveCategoryItem)
@@ -157,7 +156,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
 	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
-	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+100, OnLuaMenu)
+	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -5682,33 +5681,6 @@ void CMZ3View::OnPaint()
 		}
 		break;
 	}
-}
-
-void CMZ3View::OnMenuTwitterFriendTimeline()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	// タイムライン項目の追加
-	CMixiData& bodyItem = GetSelectedBodyItem();
-	CCategoryItem categoryItem;
-	categoryItem.init( 
-		// 名前
-		util::FormatString( L"@%sのタイムライン", bodyItem.GetName() ),
-		util::FormatString( L"http://twitter.com/statuses/user_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
-		ACCESS_TWITTER_FRIENDS_TIMELINE, 
-		m_selGroup->categories.size()+1,
-		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
-	AppendCategoryList(categoryItem);
-
-	// 取得開始
-	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
-	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
 }
 
 /**

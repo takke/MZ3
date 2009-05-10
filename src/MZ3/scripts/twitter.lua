@@ -30,6 +30,16 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)
 menu_items = {}
 menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
 menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
+
+-- 発言内の @xxx 抽出者のTL(5人まで)
+menu_items.show_follower_tl = {}
+menu_items.show_follower_tl[1]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_1");
+menu_items.show_follower_tl[2]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_2");
+menu_items.show_follower_tl[3]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_3");
+menu_items.show_follower_tl[4]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_4");
+menu_items.show_follower_tl[5]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_5");
+follower_names = {}
+
 menu_items.update                = 34016 - 37000;	-- ID_MENU_TWITTER_UPDATE
 menu_items.reply                 = 34014 - 37000;	-- ID_MENU_TWITTER_REPLY
 menu_items.new_dm                = 34143 - 37000;	-- ID_MENU_TWITTER_NEW_DM
@@ -37,7 +47,7 @@ menu_items.create_favourings     = 34146 - 37000;	-- ID_MENU_TWITTER_CREATE_FAVO
 menu_items.destroy_favourings    = 34147 - 37000;	-- ID_MENU_TWITTER_DESTROY_FAVOURINGS
 menu_items.create_friendships    = 34151 - 37000;	-- ID_MENU_TWITTER_CREATE_FRIENDSHIPS
 menu_items.destroy_friendships   = 34152 - 37000;	-- ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
-menu_items.friend_timeline       = 34025 - 37000;	-- ID_MENU_TWITTER_FRIEND_TIMELINE
+menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
 menu_items.open_home             = 34020 - 37000;	-- ID_MENU_TWITTER_HOME
 menu_items.open_friend_favorites = 34021 - 37000;	-- ID_MENU_TWITTER_FAVORITES
 menu_items.open_friend_site      = 34022 - 37000;	-- ID_MENU_TWITTER_SITE
@@ -46,6 +56,50 @@ menu_items.open_friend_site      = 34022 - 37000;	-- ID_MENU_TWITTER_SITE
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+--- 「@xxx のタイムライン」メニュー用ハンドラ
+function on_show_friend_timeline(serialize_key, event_name, data)
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	name = body:get_text('name');
+	
+	-- カテゴリ追加
+	title = "@" .. name .. "のタイムライン";
+	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	key = "TWITTER_FRIENDS_TIMELINE";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+--- 「@xxx のタイムライン」(フォロワー)メニュー用ハンドラ
+function on_show_follower_tl_1(serialize_key, event_name, data)	show_follower_tl(1) end
+function on_show_follower_tl_2(serialize_key, event_name, data)	show_follower_tl(2) end
+function on_show_follower_tl_3(serialize_key, event_name, data)	show_follower_tl(3) end
+function on_show_follower_tl_4(serialize_key, event_name, data)	show_follower_tl(4) end
+function on_show_follower_tl_5(serialize_key, event_name, data)	show_follower_tl(5) end
+function show_follower_tl(num)
+	-- 発言内の num 番目の @xxx ユーザの TL を表示する
+	name = follower_names[num];
+	
+	-- カテゴリ追加
+	title = "@" .. name .. "のタイムライン";
+	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	key = "TWITTER_FRIENDS_TIMELINE";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
 
 --- 「ReTweet」メニュー用ハンドラ
 function on_retweet_menu_item(serialize_key, event_name, data)
@@ -161,7 +215,22 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 	menu:append_menu("separator");
 
-	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.friend_timeline);
+	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
+	
+	-- 発言内の @XXX を抽出し、メニュー化
+	body_text = body:get_text_array_joined_text('body');
+	i = 1;
+	for f_name in body_text:gmatch("@([0-9a-zA-Z_]+)") do
+		mz3.logger_debug(f_name);
+		-- Lua 変数に名前を保存しておく
+		follower_names[i] = f_name;
+		menu:append_menu("string", "@" .. f_name .. " のタイムライン", menu_items.show_follower_tl[i]);
+		-- 最大5人までサポート
+		i = i+1;
+		if i>5 then
+			break;
+		end
+	end
 
 	menu:append_menu("separator");
 
