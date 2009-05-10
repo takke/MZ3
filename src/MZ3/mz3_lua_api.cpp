@@ -1814,6 +1814,24 @@ int lua_mz3_main_view_get_wnd(lua_State *L)
 	return 1;
 }
 
+/*
+--- edit ƒGƒŠƒA‚Ö‚Ì•¶š—ñİ’è
+--
+-- @param text İ’è‚·‚é•¶š—ñ
+--
+function mz3_main_view.set_edit_text(text);
+*/
+int lua_mz3_main_view_set_edit_text(lua_State *L)
+{
+	// ˆø”‚Ìæ“¾
+	CString text(lua_tostring(L, 1));
+
+	// •¶š—ñİ’è
+	theApp.m_pMainView->SetDlgItemText(IDC_STATUS_EDIT, text);
+
+	// –ß‚è’l‚Ì”‚ğ•Ô‚·
+	return 0;
+}
 
 
 //-----------------------------------------------
@@ -1909,6 +1927,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_focus",				lua_mz3_main_view_set_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
+	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
 	{NULL, NULL}
 };
 

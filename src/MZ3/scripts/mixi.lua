@@ -91,7 +91,7 @@ require("scripts\\mixi\\mixi_show_self_log_parser");
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 menu_items = {}
-menu_items.mixi_echo_item_read    = mz3_menu.regist_menu("mixi.on_read_menu_item");
+menu_items.mixi_echo_item_read    = mz3_menu.regist_menu("mixi.on_mixi_echo_read_menu_item");
 menu_items.mixi_echo_update       = mz3_menu.regist_menu("mixi.on_mixi_echo_update");
 menu_items.mixi_echo_reply        = mz3_menu.regist_menu("mixi.on_mixi_echo_reply");
 menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show_profile");
@@ -151,7 +151,7 @@ end
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="MIXI_RECENT_ECHO_ITEM" then
 		-- 全文表示
-		return on_read_menu_item(serialize_key, event_name, data);
+		return on_mixi_echo_read_menu_item(serialize_key, event_name, data);
 	end
 	
 	-- 標準の処理を続行
@@ -159,8 +159,8 @@ function on_body_list_click(serialize_key, event_name, data)
 end
 
 --- 全文表示メニューまたはダブルクリックイベント
-function on_read_menu_item(serialize_key, event_name, data)
-	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
+function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_mixi_echo_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
@@ -196,13 +196,11 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- メニュー生成
 	menu = MZ3Menu:create_popup_menu();
 	
-	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
 	menu:append_menu("string", "全文を読む...", menu_items.mixi_echo_item_read);
 	menu:append_menu("separator", "", 0);
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
 	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
-
 	menu:append_menu("string", body:get_text('name') .. " さんのプロフィール", menu_items.mixi_echo_show_profile);
 	menu:append_menu("separator", "", 0);
 	
@@ -220,6 +218,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		}
 	}
 	]]
+
+	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
 
 	-- ユーザのエコー一覧
 	ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST = 34192 -37000;

@@ -27,12 +27,33 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
-twitter_item_read_menu_item = mz3_menu.regist_menu("twitter.on_read_menu_item");
+menu_items = {}
+menu_items.twitter_item_read = mz3_menu.regist_menu("twitter.on_read_menu_item");
+menu_items.twitter_item_retweet = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
 
 
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+--- 「ReTweet」メニュー用ハンドラ
+function on_retweet_menu_item(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- エディットコントロールに文字列設定
+	data = mz3_main_view.get_selected_body_item();
+	data = MZ3Data:create(data);
+	text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
+	text = text:gsub("\r\n", "");
+	mz3_main_view.set_edit_text(text);
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
@@ -81,7 +102,9 @@ end
 -- 暫定のイベント：Twitter用コンテキストメニューの作成
 function on_creating_twitter_item_context_menu(serialize_key, event_name, menu)
 	-- "全文を読む" を追加
-	mz3_menu.insert_menu(menu, 2, "全文を読む...", twitter_item_read_menu_item);
+	mz3_menu.insert_menu(menu, 2, "全文を読む...", menu_items.twitter_item_read);
+	-- "RT" を追加
+	mz3_menu.insert_menu(menu, 3, "ReTweet...", menu_items.twitter_item_retweet);
 end
 
 ----------------------------------------
