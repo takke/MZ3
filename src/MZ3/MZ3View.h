@@ -396,7 +396,6 @@ public:
 	void MyOpenUrl(void);
 	afx_msg void OnAddRssFeedMenu();
 
-	afx_msg void OnMenuMixiEchoShowProfile();
 	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
 	afx_msg void OnMenuMixiEchoAddUserEchoList();
 

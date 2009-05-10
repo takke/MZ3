@@ -148,7 +148,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
 
-	ON_COMMAND(ID_MENU_MIXI_ECHO_SHOW_PROFILE, &CMZ3View::OnMenuMixiEchoShowProfile)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 
@@ -2852,11 +2851,11 @@ void CMZ3View::OnOpenBrowser()
 					}
 				}
 			}
-			util::OpenBrowserForUser( url, name );
+			util::OpenUrlByBrowserWithConfirmForUser( url, name );
 		}
 		break;
 	default:
-		util::OpenBrowserForUrl( url );
+		util::OpenUrlByBrowserWithConfirm( url );
 		break;
 	}
 }
@@ -5074,7 +5073,7 @@ void CMZ3View::OnMenuTwitterUpdate()
 void CMZ3View::OnMenuTwitterHome()
 {
 	CMixiData& data = GetSelectedBodyItem();
-	util::OpenBrowserForUrl( util::FormatString(L"http://twitter.com/%s", data.GetName()) );
+	util::OpenUrlByBrowserWithConfirm( util::FormatString(L"http://twitter.com/%s", data.GetName()) );
 }
 
 /**
@@ -5083,7 +5082,7 @@ void CMZ3View::OnMenuTwitterHome()
 void CMZ3View::OnMenuTwitterFavorites()
 {
 	CMixiData& data = GetSelectedBodyItem();
-	util::OpenBrowserForUrl( util::FormatString(L"http://twitter.com/%s/favorites", data.GetName()) );
+	util::OpenUrlByBrowserWithConfirm( util::FormatString(L"http://twitter.com/%s/favorites", data.GetName()) );
 }
 
 /**
@@ -5092,7 +5091,7 @@ void CMZ3View::OnMenuTwitterFavorites()
 void CMZ3View::OnMenuTwitterSite()
 {
 	CMixiData& data = GetSelectedBodyItem();
-	util::OpenBrowserForUrl( data.GetURL() );
+	util::OpenUrlByBrowserWithConfirm( data.GetURL() );
 }
 
 /**
@@ -5685,7 +5684,7 @@ void CMZ3View::OnLoadUrl(UINT nID)
 	LPCTSTR text = data.m_linkList[idx].text;
 
 	// 確認画面
-	util::OpenBrowserForUrl( url );
+	util::OpenUrlByBrowserWithConfirm( url );
 }
 
 void CMZ3View::OnPaint()
@@ -6905,15 +6904,6 @@ void CMZ3View::OnAddRssFeedMenu()
 
 }
 
-void CMZ3View::OnMenuMixiEchoShowProfile()
-{
-	static CMixiData s_data;
-
-	s_data = GetSelectedBodyItem();
-	s_data.SetAccessType(ACCESS_PROFILE);
-	AccessProc( &s_data, util::CreateMixiUrl(s_data.GetURL()));
-}
-
 /**
  * 表示内容の再設定
  *
@@ -7282,7 +7272,7 @@ void CMZ3View::OnMenuGoohomeReadComments()
 {
 	CMixiData& data = GetSelectedBodyItem();
 
-	util::OpenBrowserForUrl(data.GetURL());
+	util::OpenUrlByBrowserWithConfirm(data.GetURL());
 }
 
 /// 「カテゴリログのリロード」メニュー

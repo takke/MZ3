@@ -209,7 +209,7 @@ inline CString ConvertToMixiAutoLoginUrl( LPCTSTR url )
 /**
  * 指定されたURLをブラウザで開く（確認画面付き）
  */
-inline void OpenBrowserForUrl( LPCTSTR url )
+inline void OpenUrlByBrowserWithConfirm( LPCTSTR url )
 {
 	if( theApp.m_optionMng.m_bConfirmOpenURL) {
 		// 確認画面
@@ -247,7 +247,7 @@ inline void OpenBrowserForUrl( LPCTSTR url )
 /**
  * 指定されたユーザのプロフィールページをブラウザで開く（確認画面付き）
  */
-inline void OpenBrowserForUser( LPCTSTR url, LPCTSTR szUserName )
+inline void OpenUrlByBrowserWithConfirmForUser( LPCTSTR url, LPCTSTR szUserName )
 {
 	// 確認画面
 	CString msg;

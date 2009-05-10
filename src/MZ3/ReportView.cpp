@@ -1466,16 +1466,7 @@ void CReportView::OnLoadUrl(UINT nID)
 					commandparam += L"\"";
 
 					// Google Maps‚ð‹N“®
-					SHELLEXECUTEINFO sei;
-					sei.cbSize       = sizeof(sei);
-					sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
-					sei.hwnd         = 0;
-					sei.lpVerb       = _T("open");
-					sei.lpFile       = commandline;
-					sei.lpParameters = commandparam;
-					sei.lpDirectory  = NULL;
-					sei.nShow        = SW_NORMAL;
-					ShellExecuteEx(&sei);
+					util::OpenUrlByBrowser(commandline, commandparam);
 					break;
 				}
 			}
@@ -2052,7 +2043,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
  */
 void CReportView::OnOpenBrowser()
 {
-	util::OpenBrowserForUrl( m_data.GetBrowseUri() );
+	util::OpenUrlByBrowserWithConfirm( m_data.GetBrowseUri() );
 }
 
 /**
@@ -2077,7 +2068,7 @@ void CReportView::OnOpenBrowserUser()
 	url.Format( L"http://mixi.jp/show_friend.pl?id=%d", nUserId );
 
 	// ŠJ‚­
-	util::OpenBrowserForUser( url, strUserName );
+	util::OpenUrlByBrowserWithConfirmForUser( url, strUserName );
 }
 
 /**

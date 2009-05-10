@@ -16,10 +16,10 @@
 namespace util
 {
 
-bool OpenByShellExecute( LPCTSTR target );
+bool OpenByShellExecute( LPCTSTR target, LPCTSTR param=NULL );
+void OpenUrlByBrowser( LPCTSTR url, LPCTSTR param=NULL );
 bool ExistFile( LPCTSTR szFilepath );
 bool RemoveWhenExist( LPCTSTR szFilepath );
-void OpenUrlByBrowser( LPCTSTR url );
 CStringW int2str( int n );
 CStringA int2str_a( int n );
 int GetBetweenSubString( const CString& str, LPCTSTR szLeft, LPCTSTR szRight, CString& result );

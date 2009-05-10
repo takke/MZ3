@@ -18,7 +18,7 @@ namespace util
 /**
  * ファイルを開く
  */
-bool OpenByShellExecute( LPCTSTR target )
+bool OpenByShellExecute( LPCTSTR target, LPCTSTR param )
 {
 	// ファイルを開く
 	SHELLEXECUTEINFO sei;
@@ -27,10 +27,19 @@ bool OpenByShellExecute( LPCTSTR target )
 	sei.hwnd         = 0;
 	sei.lpVerb       = _T("open");
 	sei.lpFile       = target;
-	sei.lpParameters = NULL;
+	sei.lpParameters = param;
 	sei.lpDirectory  = NULL;
 	sei.nShow        = SW_NORMAL;
+
 	return ShellExecuteEx( &sei ) == TRUE;
+}
+
+/**
+ * 指定された URL を既定のブラウザで開く
+ */
+void OpenUrlByBrowser( LPCTSTR url, LPCTSTR param )
+{
+	OpenByShellExecute(url, param);
 }
 
 /**
@@ -60,25 +69,6 @@ bool RemoveWhenExist( LPCTSTR szFilepath )
 		return false;
 	}
 	return true;
-}
-
-/**
- * 指定された URL を既定のブラウザで開く
- */
-void OpenUrlByBrowser( LPCTSTR url )
-{
-	SHELLEXECUTEINFO sei;
-
-	sei.cbSize       = sizeof(sei);
-	sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
-	sei.hwnd         = 0;
-	sei.lpVerb       = _T("open");
-	sei.lpFile       = url;
-	sei.lpParameters = NULL;
-	sei.lpDirectory  = NULL;
-	sei.nShow        = SW_NORMAL;
-
-	ShellExecuteEx(&sei);
 }
 
 /// int 型数値を文字列に変換する

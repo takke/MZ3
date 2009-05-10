@@ -310,7 +310,7 @@ int lua_mz3_add_event_listener(lua_State *L)
 --
 -- @return ‚È‚µ
 --
-function mz3.open_url(hwnd, access_type, url, referer, type, user_agent, post)
+function mz3.open_url(wnd, access_type, url, referer, type, user_agent, post)
 */
 int lua_mz3_open_url(lua_State *L)
 {
