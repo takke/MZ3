@@ -1052,9 +1052,13 @@ void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
 			if (pCategory!=NULL && 0 <= idx && idx < (int)pCategory->m_body.size()) {
 				CMixiData* data = &pCategory->m_body[ idx ];
+
+				// アイコン領域クリック通知
+				// TODO API 化
 				if (data->GetAccessType()==ACCESS_TWITTER_USER) {
-					// 親ビューに通知
-					theApp.m_pMainView->OnMenuTwitterReply();
+
+					// Lua 関数呼び出しで仮実装
+					theApp.MyLuaExecute(L"twitter.on_twitter_reply()");
 				}
 			}
 		}

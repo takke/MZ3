@@ -449,6 +449,44 @@ int lua_mz3_open_url(lua_State *L)
 	return 0;
 }
 
+/*
+--- キーボード操作
+--
+-- @param key   キー値
+-- @param state "keydown" or "keyup"
+--
+function mz3.keybd_event(key, state)
+*/
+int lua_mz3_keybd_event(lua_State *L)
+{
+	int key(lua_tointeger(L, 1));			// 第1引数
+	CStringA state(lua_tostring(L, 2));		// 第2引数
+
+	DWORD s = 0;
+	if (state=="keyup") {
+		s = KEYEVENTF_KEYUP;
+	}
+	keybd_event( key, 0, s, 0 );
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- URL をブラウザで開く
+--
+function mz3.open_url_by_browser_with_confirm(url)
+*/
+int lua_mz3_open_url_by_browser_with_confirm(lua_State *L)
+{
+	CString url(lua_tostring(L, 1));		// 第1引数
+
+	util::OpenUrlByBrowserWithConfirm( url );
+	
+	// 戻り値の数を返す
+	return 0;
+}
+
 //-----------------------------------------------
 // MZ3 Data API
 //-----------------------------------------------
@@ -2002,24 +2040,44 @@ int lua_mz3_main_view_set_edit_text(lua_State *L)
 	return 0;
 }
 
+/*
+--- edit エリアの文字列取得
+--
+function mz3_main_view.get_edit_text();
+*/
+int lua_mz3_main_view_get_edit_text(lua_State *L)
+{
+	// 文字列取得
+	CString text;
+	theApp.m_pMainView->GetDlgItemText(IDC_STATUS_EDIT, text);
+
+	// 設定
+	lua_pushstring(L, CStringA(text));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 
 //-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
-	{"logger_error",				lua_mz3_logger_error},
-	{"logger_info",					lua_mz3_logger_info},
-	{"logger_debug",				lua_mz3_logger_debug},
-	{"trace",						lua_mz3_trace},
-	{"get_tick_count",				lua_mz3_get_tick_count},
-	{"alert",						lua_mz3_alert},
-	{"decode_html_entity",			lua_mz3_decode_html_entity},
-	{"estimate_access_type_by_url", lua_mz3_estimate_access_type_by_url},
-	{"get_access_type_by_key",		lua_mz3_get_access_type_by_key},
-	{"get_serialize_key_by_access_type", lua_mz3_get_serialize_key_by_access_type},
-	{"set_parser",					lua_mz3_set_parser},
-	{"add_event_listener",			lua_mz3_add_event_listener},
-	{"open_url",					lua_mz3_open_url},
+	{"logger_error",						lua_mz3_logger_error},
+	{"logger_info",							lua_mz3_logger_info},
+	{"logger_debug",						lua_mz3_logger_debug},
+	{"trace",								lua_mz3_trace},
+	{"get_tick_count",						lua_mz3_get_tick_count},
+	{"alert",								lua_mz3_alert},
+	{"decode_html_entity",					lua_mz3_decode_html_entity},
+	{"estimate_access_type_by_url",			lua_mz3_estimate_access_type_by_url},
+	{"get_access_type_by_key",				lua_mz3_get_access_type_by_key},
+	{"get_serialize_key_by_access_type",	lua_mz3_get_serialize_key_by_access_type},
+	{"set_parser",							lua_mz3_set_parser},
+	{"add_event_listener",					lua_mz3_add_event_listener},
+	{"open_url",							lua_mz3_open_url},
+	{"keybd_event",							lua_mz3_keybd_event},
+	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -2102,6 +2160,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"append_category",			lua_mz3_main_view_append_category},
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
 	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
+	{"get_edit_text",			lua_mz3_main_view_get_edit_text},
 	{NULL, NULL}
 };
 

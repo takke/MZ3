@@ -40,22 +40,75 @@ menu_items.show_follower_tl[4]   = mz3_menu.regist_menu("twitter.on_show_followe
 menu_items.show_follower_tl[5]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_5");
 follower_names = {}
 
-menu_items.update                = 34016 - 37000;	-- ID_MENU_TWITTER_UPDATE
-menu_items.reply                 = 34014 - 37000;	-- ID_MENU_TWITTER_REPLY
-menu_items.new_dm                = 34143 - 37000;	-- ID_MENU_TWITTER_NEW_DM
-menu_items.create_favourings     = 34146 - 37000;	-- ID_MENU_TWITTER_CREATE_FAVOURINGS
-menu_items.destroy_favourings    = 34147 - 37000;	-- ID_MENU_TWITTER_DESTROY_FAVOURINGS
-menu_items.create_friendships    = 34151 - 37000;	-- ID_MENU_TWITTER_CREATE_FRIENDSHIPS
-menu_items.destroy_friendships   = 34152 - 37000;	-- ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
+menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
+menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
+menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
+menu_items.create_favourings     = 34146 - 37000;	-- TODO ID_MENU_TWITTER_CREATE_FAVOURINGS
+menu_items.destroy_favourings    = 34147 - 37000;	-- TODO ID_MENU_TWITTER_DESTROY_FAVOURINGS
+menu_items.create_friendships    = 34151 - 37000;	-- TODO ID_MENU_TWITTER_CREATE_FRIENDSHIPS
+menu_items.destroy_friendships   = 34152 - 37000;	-- TODO ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
 menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
-menu_items.open_home             = 34020 - 37000;	-- ID_MENU_TWITTER_HOME
-menu_items.open_friend_favorites = 34021 - 37000;	-- ID_MENU_TWITTER_FAVORITES
-menu_items.open_friend_site      = 34022 - 37000;	-- ID_MENU_TWITTER_SITE
+menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
+menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
+menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
 
 
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+-- 「つぶやく」メニュー用ハンドラ
+function on_twitter_update(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
+
+-- 「返信」メニュー用ハンドラ
+function on_twitter_reply(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- 入力領域にユーザのスクリーン名を追加
+	text = mz3_main_view.get_edit_text();
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	-- すでに含まれていれば追加しない
+	if text:find("@" .. name, 1, true)~=nil then
+		return;
+	end
+	text = text .. "@" .. name .. " ";
+	
+	mz3_main_view.set_edit_text(text);
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+
+	-- 末尾へ移動
+	VK_END = 0x23;
+	mz3.keybd_event(VK_END, "keydown");
+	mz3.keybd_event(VK_END, "keyup");
+end
+
+-- 「メッセージ送信」メニュー用ハンドラ
+function on_twitter_new_dm(serialize_key, event_name, data)
+	-- モード変更
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_DM);
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
 
 --- 「@xxx のタイムライン」メニュー用ハンドラ
 function on_show_friend_timeline(serialize_key, event_name, data)
@@ -120,6 +173,31 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
+--- 「ホーム」メニュー用ハンドラ
+function on_open_home(serialize_key, event_name, data)
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	
+	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name'));
+end
+
+--- 「友達のお気に入り」メニュー用ハンドラ
+function on_open_friend_favorites(serialize_key, event_name, data)
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	
+	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name') .. "/favorites");
+end
+
+--- 「友達のサイト」メニュー用ハンドラ
+function on_open_friend_site(serialize_key, event_name, data)
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	
+	mz3.open_url_by_browser_with_confirm(body:get_text('url'));
+end
+
+
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="TWITTER_USER" then
@@ -143,7 +221,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	
 	item = item .. "\r\n";
 	item = item .. "----\r\n";
-	item = item .. "name : " .. data:get_text('name') .. "\r\n";
+	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
 	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 	item = item .. data:get_date() .. "\r\n";
 	item = item .. "id : " .. data:get_integer('id') .. "\r\n";

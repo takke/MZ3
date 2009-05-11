@@ -266,11 +266,6 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnSetRead();
 	afx_msg void OnAcceleratorReload();
-	afx_msg void OnMenuTwitterReply();
-	afx_msg void OnMenuTwitterUpdate();
-	afx_msg void OnMenuTwitterHome();
-	afx_msg void OnMenuTwitterFavorites();
-	afx_msg void OnMenuTwitterSite();
 	afx_msg void OnLoadUrl(UINT);
 	afx_msg void OnPaint();
 //	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
@@ -286,7 +281,6 @@ public:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMenuTwitterNewDm();
 	afx_msg void OnMenuTwitterCreateFavourings();
 	afx_msg void OnMenuTwitterDestroyFavourings();
 	afx_msg void OnMenuTwitterCreateFriendships();

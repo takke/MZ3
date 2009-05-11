@@ -124,11 +124,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_PREV_TAB, &CMZ3View::OnAcceleratorPrevTab)
 	ON_COMMAND(IDM_SET_READ, &CMZ3View::OnSetRead)
 	ON_COMMAND(ID_ACCELERATOR_RELOAD, &CMZ3View::OnAcceleratorReload)
-	ON_COMMAND(ID_MENU_TWITTER_REPLY, &CMZ3View::OnMenuTwitterReply)
-	ON_COMMAND(ID_MENU_TWITTER_UPDATE, &CMZ3View::OnMenuTwitterUpdate)
-	ON_COMMAND(ID_MENU_TWITTER_HOME, &CMZ3View::OnMenuTwitterHome)
-	ON_COMMAND(ID_MENU_TWITTER_FAVORITES, &CMZ3View::OnMenuTwitterFavorites)
-	ON_COMMAND(ID_MENU_TWITTER_SITE, &CMZ3View::OnMenuTwitterSite)
 	ON_BN_CLICKED(IDC_UPDATE_BUTTON, &CMZ3View::OnBnClickedUpdateButton)
 	ON_COMMAND_RANGE(ID_REPORT_URL_BASE+1, ID_REPORT_URL_BASE+50, OnLoadUrl)
 	ON_WM_PAINT()
@@ -138,14 +133,14 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_EDIT_CATEGORY_ITEM, &CMZ3View::OnEditCategoryItem)
 	ON_COMMAND(ID_TABMENU_EDIT, &CMZ3View::OnTabmenuEdit)
 	ON_COMMAND(ID_TABMENU_ADD, &CMZ3View::OnTabmenuAdd)
-	ON_COMMAND(ID_MENU_TWITTER_NEW_DM, &CMZ3View::OnMenuTwitterNewDm)
+	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
+	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
+	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
+
 	ON_COMMAND(ID_MENU_TWITTER_CREATE_FAVOURINGS, &CMZ3View::OnMenuTwitterCreateFavourings)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FAVOURINGS, &CMZ3View::OnMenuTwitterDestroyFavourings)
 	ON_COMMAND(ID_MENU_TWITTER_CREATE_FRIENDSHIPS, &CMZ3View::OnMenuTwitterCreateFriendships)
 	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FRIENDSHIPS, &CMZ3View::OnMenuTwitterDestroyFriendships)
-	ON_COMMAND(ID_MENU_RSS_READ, &CMZ3View::OnMenuRssRead)
-	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
-	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
 
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
@@ -2347,7 +2342,10 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 					if (pCategory!=NULL) {
 						std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
 						if (strServiceType == "Twitter") {
-							OnMenuTwitterUpdate();
+
+							// Lua 関数呼び出しで実装
+							theApp.MyLuaExecute(L"twitter.on_twitter_update()");
+
 							return TRUE;
 						} else if (strServiceType == "Wassr") {
 							OnMenuWassrUpdate();
@@ -4954,96 +4952,6 @@ void CMZ3View::OnAcceleratorReload()
 	if (!RetrieveCategoryItem()) {
 		return;
 	}
-}
-
-/**
- * Twitter | 言い返す
- */
-void CMZ3View::OnMenuTwitterReply()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// 入力領域にユーザのスクリーン名を追加。
-	CString strStatus;
-	GetDlgItemText( IDC_STATUS_EDIT, strStatus );
-
-	// すでに含まれていれば追加しない
-	CMixiData& data = GetSelectedBodyItem();
-	if (strStatus.Find( util::FormatString(L"@%s", (LPCTSTR)data.GetName() ))!=-1) {
-		return;
-	}
-
-	strStatus.AppendFormat( L"@%s ", (LPCTSTR)data.GetName() );
-
-	SetDlgItemText( IDC_STATUS_EDIT, strStatus );
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-
-	// End へ移動
-	keybd_event( VK_END, 0, 0, 0 );
-	keybd_event( VK_END, 0, KEYEVENTF_KEYUP, 0 );
-}
-
-/**
- * Twitter | メッセージ送信
- */
-void CMZ3View::OnMenuTwitterNewDm()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_DM;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-}
-
-/**
- * Twitter | つぶやく
- */
-void CMZ3View::OnMenuTwitterUpdate()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_TWITTER_UPDATE;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-}
-
-/**
- * Twitter | ホーム
- */
-void CMZ3View::OnMenuTwitterHome()
-{
-	CMixiData& data = GetSelectedBodyItem();
-	util::OpenUrlByBrowserWithConfirm( util::FormatString(L"http://twitter.com/%s", data.GetName()) );
-}
-
-/**
- * Twitter | Favorites
- */
-void CMZ3View::OnMenuTwitterFavorites()
-{
-	CMixiData& data = GetSelectedBodyItem();
-	util::OpenUrlByBrowserWithConfirm( util::FormatString(L"http://twitter.com/%s/favorites", data.GetName()) );
-}
-
-/**
- * Twitter | サイト
- */
-void CMZ3View::OnMenuTwitterSite()
-{
-	CMixiData& data = GetSelectedBodyItem();
-	util::OpenUrlByBrowserWithConfirm( data.GetURL() );
 }
 
 /**
