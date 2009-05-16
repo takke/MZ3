@@ -281,10 +281,6 @@ public:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMenuTwitterCreateFavourings();
-	afx_msg void OnMenuTwitterDestroyFavourings();
-	afx_msg void OnMenuTwitterCreateFriendships();
-	afx_msg void OnMenuTwitterDestroyFriendships();
 	afx_msg void OnMenuRssRead();
 	afx_msg void OnViewLog();
 	afx_msg void OnCategoryOpen();

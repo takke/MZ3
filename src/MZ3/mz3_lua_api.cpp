@@ -141,6 +141,46 @@ int lua_mz3_alert(lua_State *L)
 }
 
 /*
+--- 確認画面
+--
+-- @param msg   メッセージ
+-- @param title タイトル
+-- @param type  "yes_no", "yes_no_cancel"
+-- @return "yes", "no", "cancel"
+--
+function mz3.confirm(msg, title, type)
+*/
+int lua_mz3_confirm(lua_State *L)
+{
+	const char* func_name = "mz3.confirm";
+	CString msg(lua_tostring(L, 1));		// 第1引数
+	CString title(lua_tostring(L, 2));		// 第2引数
+	CStringA type(lua_tostring(L, 3));		// 第3引数
+
+	UINT uType = MB_YESNO;
+	if (type=="yes_no") {
+		uType = MB_YESNO;
+	} else if (type=="yes_no_cancel") {
+		uType = MB_YESNOCANCEL;
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	int rval = MessageBox(GetActiveWindow(), msg, title, uType);
+	switch (rval) {
+	case IDYES:		lua_pushstring(L, "yes");		break;
+	case IDNO:		lua_pushstring(L, "no");		break;
+	case IDCANCEL:	lua_pushstring(L, "cancel");	break;
+	default:		lua_pushstring(L, "");			break;
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- HTMLエンティティをデコードした文字列を返す。 
 --
 --
@@ -430,6 +470,9 @@ int lua_mz3_open_url(lua_State *L)
 		s_post = dummy_post_data;
 		s_post.SetSuccessMessage( WM_MZ3_POST_END );
 		s_post.AppendAdditionalHeader(L"");
+
+		// "Content-Type: multipart/form-data"で。
+		s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
 
 		post = &s_post;
 	}
@@ -2069,6 +2112,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"trace",								lua_mz3_trace},
 	{"get_tick_count",						lua_mz3_get_tick_count},
 	{"alert",								lua_mz3_alert},
+	{"confirm",								lua_mz3_confirm},
 	{"decode_html_entity",					lua_mz3_decode_html_entity},
 	{"estimate_access_type_by_url",			lua_mz3_estimate_access_type_by_url},
 	{"get_access_type_by_key",				lua_mz3_get_access_type_by_key},

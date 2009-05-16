@@ -137,11 +137,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
 
-	ON_COMMAND(ID_MENU_TWITTER_CREATE_FAVOURINGS, &CMZ3View::OnMenuTwitterCreateFavourings)
-	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FAVOURINGS, &CMZ3View::OnMenuTwitterDestroyFavourings)
-	ON_COMMAND(ID_MENU_TWITTER_CREATE_FRIENDSHIPS, &CMZ3View::OnMenuTwitterCreateFriendships)
-	ON_COMMAND(ID_MENU_TWITTER_DESTROY_FRIENDSHIPS, &CMZ3View::OnMenuTwitterDestroyFriendships)
-
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 
@@ -5739,106 +5734,6 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	m_bodyList.UpdateWindow();
 
 	return true;
-}
-
-/// お気に入り追加
-void CMZ3View::OnMenuTwitterCreateFavourings()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	static CMixiData s_data;
-	s_data.SetAccessType( ACCESS_TWITTER_FAVOURINGS_CREATE );
-
-	// URL 設定
-	CString url;
-	int id = GetSelectedBodyItem().GetID();
-	url.Format( L"http://twitter.com/favourings/create/%d.xml", id );
-	s_data.SetURL( url );
-	s_data.SetBrowseUri( url );
-
-	// 通信開始
-	AccessProc( &s_data, s_data.GetURL() );
-}
-
-/// お気に入り削除
-void CMZ3View::OnMenuTwitterDestroyFavourings()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	static CMixiData s_data;
-	s_data.SetAccessType( ACCESS_TWITTER_FAVOURINGS_DESTROY );
-
-	// URL 設定
-	CString url;
-	int id = GetSelectedBodyItem().GetID();
-	url.Format( L"http://twitter.com/favourings/destroy/%d.xml", id );
-	s_data.SetURL( url );
-	s_data.SetBrowseUri( url );
-
-	// 通信開始
-	AccessProc( &s_data, s_data.GetURL() );
-}
-
-/// フォローする
-void CMZ3View::OnMenuTwitterCreateFriendships()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	static CMixiData s_data;
-	s_data.SetAccessType( ACCESS_TWITTER_FRIENDSHIPS_CREATE );
-
-	CMixiData& item = GetSelectedBodyItem();
-	CString msg = util::FormatString(L"%s さんをフォローします。よろしいですか？", (LPCTSTR)item.GetName());
-	if (MessageBox(msg, NULL, MB_YESNO)!=IDYES) {
-		return;
-	}
-
-	// URL 設定
-	CString url;
-	int id = item.GetOwnerID();
-	url.Format( L"http://twitter.com/friendships/create/%d.xml", id );
-	s_data.SetURL( url );
-	s_data.SetBrowseUri( url );
-
-	// 通信開始
-	AccessProc( &s_data, s_data.GetURL() );
-}
-
-/// フォローやめる
-void CMZ3View::OnMenuTwitterDestroyFriendships()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	static CMixiData s_data;
-	s_data.SetAccessType( ACCESS_TWITTER_FRIENDSHIPS_DESTROY );
-
-	CMixiData& item = GetSelectedBodyItem();
-	CString msg = util::FormatString(L"%s さんのフォローを解除します。よろしいですか？", (LPCTSTR)item.GetName());
-	if (MessageBox(msg, NULL, MB_YESNO)!=IDYES) {
-		return;
-	}
-
-	// URL 設定
-	CString url;
-	int id = item.GetOwnerID();
-	url.Format( L"http://twitter.com/friendships/destroy/%d.xml", id );
-	s_data.SetURL( url );
-	s_data.SetBrowseUri( url );
-
-	// 通信開始
-	AccessProc( &s_data, s_data.GetURL() );
 }
 
 /**

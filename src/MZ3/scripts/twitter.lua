@@ -43,10 +43,10 @@ follower_names = {}
 menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
 menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
 menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
-menu_items.create_favourings     = 34146 - 37000;	-- TODO ID_MENU_TWITTER_CREATE_FAVOURINGS
-menu_items.destroy_favourings    = 34147 - 37000;	-- TODO ID_MENU_TWITTER_DESTROY_FAVOURINGS
-menu_items.create_friendships    = 34151 - 37000;	-- TODO ID_MENU_TWITTER_CREATE_FRIENDSHIPS
-menu_items.destroy_friendships   = 34152 - 37000;	-- TODO ID_MENU_TWITTER_DESTROY_FRIENDSHIPS
+menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_create_favourings");
+menu_items.destroy_favourings    = mz3_menu.regist_menu("twitter.on_twitter_destroy_favourings");
+menu_items.create_friendships    = mz3_menu.regist_menu("twitter.on_twitter_create_friendships");
+menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_destroy_friendships");
 menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
 menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
 menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
@@ -108,6 +108,84 @@ function on_twitter_new_dm(serialize_key, event_name, data)
 
 	-- フォーカス移動
 	mz3_main_view.set_focus('edit');
+end
+
+-- 「お気に入り登録」メニュー用ハンドラ
+function on_twitter_create_favourings(serialize_key, event_name, data)
+	-- URL 生成
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	id = body:get_integer('id');
+	url = "http://twitter.com/favourings/create/" .. id .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_FAVOURINGS_CREATE";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+-- 「お気に入り削除」メニュー用ハンドラ
+function on_twitter_destroy_favourings(serialize_key, event_name, data)
+	-- URL 生成
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	id = body:get_integer('id');
+	url = "http://twitter.com/favourings/destroy/" .. id .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_FAVOURINGS_DESTROY";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+-- 「フォローする」メニュー用ハンドラ
+function on_twitter_create_friendships(serialize_key, event_name, data)
+
+	-- 確認
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	if mz3.confirm(name .. " さんをフォローします。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	url = "http://twitter.com/friendships/create/" .. name .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_FRIENDSHIPS_CREATE";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+-- 「フォローやめる」メニュー用ハンドラ
+function on_twitter_destroy_friendships(serialize_key, event_name, data)
+
+	-- 確認
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	if mz3.confirm(name .. " さんのフォローを解除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	url = "http://twitter.com/friendships/destroy/" .. name .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_FRIENDSHIPS_DESTROY";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
 --- 「@xxx のタイムライン」メニュー用ハンドラ
