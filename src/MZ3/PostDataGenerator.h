@@ -125,7 +125,8 @@ public:
 		// POST 電文の生成
 		post.ClearPostBody();
 
-		if (mixi.GetContentType() == CONTENT_TYPE_MULTIPART) {
+		CString strContentType = mixi.GetContentType();
+		if (strContentType == CONTENT_TYPE_MULTIPART) {
 			// マルチパートの時は下記電文を送信する
 			post.AppendPostBodyWithCRLF( "-----------------------------7d62ee108071e" );
 			post.AppendPostBodyWithCRLF( "Content-Disposition: form-data; name=\"comment\"" );
@@ -156,7 +157,7 @@ public:
 		}
 
 		// Content-Type を設定する
-		post.SetContentType( mixi.GetContentType() );
+		post.SetContentType( strContentType );
 
 		return true;
 	}

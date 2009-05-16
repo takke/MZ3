@@ -207,11 +207,15 @@ enum WRITEVIEW_TYPE {
 };
 
 /// 送信する Content-Type の種別
-enum CONTENT_TYPE {
-	CONTENT_TYPE_INVALID = -1,			///< 初期値
-	CONTENT_TYPE_MULTIPART = 0,			///< Content-Type: multipart/form-data
-	CONTENT_TYPE_FORM_URLENCODED = 1,	///< Content-Type: application/x-www-form-urlencoded
-};
+typedef LPCTSTR CONTENT_TYPE;
+
+///< 初期値
+#define CONTENT_TYPE_INVALID L""
+
+/// Content-Type: multipart/form-data
+#define CONTENT_TYPE_MULTIPART L"multipart/form-data; boundary=---------------------------7d62ee108071e"
+/// Content-Type: application/x-www-form-urlencoded
+#define CONTENT_TYPE_FORM_URLENCODED L"application/x-www-form-urlencoded"
 
 /// コンパイル失敗メッセージ
 #define FAILED_TO_COMPILE_REGEX_MSG		L"コンパイル失敗"

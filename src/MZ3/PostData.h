@@ -26,7 +26,7 @@ private:
 	CString		 m_postkey;		///< 確認画面の post_type 値（mixi の認証キー？）
 	CString		 m_packed;		///< 確認画面の packed 値（mixi の認証キー？）
 
-	CONTENT_TYPE m_contentType;	///< Content-Type
+	CString		 m_contentType;	///< Content-Type
 	int			 m_procType;	///< 処理タイプ（MZ3_POST_* 定数）。
 								///< 成功時に CInternetAccess スレッドから送信されるメッセージ種別になる。
 	CString		 m_confirmUri;	///< 確認URI
@@ -118,7 +118,9 @@ public:
 	LPCTSTR GetPostKey() { return m_postkey; }
 
 	/// Content-Type の設定
-	void SetContentType(CONTENT_TYPE value) { m_contentType = value; }
+	void SetContentType(CONTENT_TYPE value) {
+		m_contentType = value;
+	}
 
 	/// Content-Type の取得
 	CONTENT_TYPE GetContentType() { return m_contentType; }

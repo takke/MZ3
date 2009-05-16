@@ -99,8 +99,6 @@ protected:
 	CString				m_dateText;			///< 日付時刻（文字列）：GetDate() で優先して返却される
 	CTime				m_dateRaw;			///< 日付時刻（メタ情報）
 
-	CONTENT_TYPE		m_contentType;		///< Content-Type
-
 	MZ3DataList			m_children;			///< 子要素（コメントなど）
 											///< コミュニティページ要素の場合は、
 											///< 要素0に list_bbs.pl のデータを持つ。
@@ -130,7 +128,6 @@ public:
 	 */
 	MZ3Data()
 		: m_accessType(ACCESS_INVALID) // 初期値
-		, m_contentType(CONTENT_TYPE_INVALID)
 	{
 		g_nMZ3DataInstances ++;
 	}
@@ -166,10 +163,6 @@ public:
 	// アクセス種別のアクセッサ
 	void SetAccessType(ACCESS_TYPE type)	{ m_accessType = type; }
 	ACCESS_TYPE GetAccessType()	const		{ return m_accessType; }
-
-	// Content-Typeのアクセッサ
-	void SetContentType(CONTENT_TYPE value)	{ m_contentType = value; }
-	CONTENT_TYPE GetContentType() const		{ return m_contentType; }
 
 public:
 	//--- 汎用数値コンテナのアクセッサ
@@ -294,15 +287,19 @@ public:
 
 	// next_diary : 次の日記
 	void	SetNextDiary(LPCTSTR url)		{ m_StringMap[L"next_diary"] = url; }
-	CString GetNextDiary()				{ return FindStringMap(L"next_diary"); }
+	CString GetNextDiary()					{ return FindStringMap(L"next_diary"); }
 
 	// prev_diary : 前の日記
 	void	SetPrevDiary(LPCTSTR url)		{ m_StringMap[L"prev_diary"] = url; }
-	CString GetPrevDiary()				{ return FindStringMap(L"prev_diary"); }
+	CString GetPrevDiary()					{ return FindStringMap(L"prev_diary"); }
 
 	// full_diary : 全てを表示
 	void	SetFullDiary(LPCTSTR url)		{ m_StringMap[L"full_diary"] = url; }
-	CString GetFullDiary()				{ return FindStringMap(L"full_diary"); }
+	CString GetFullDiary()					{ return FindStringMap(L"full_diary"); }
+
+	// Content-Typeのアクセッサ
+	void SetContentType(CONTENT_TYPE value)	{ SetTextValue(L"content_type", value); }
+	CString GetContentType() const			{ return FindStringMap(L"content_type"); }
 
 	//--- 子要素操作
 	void	ClearChildren()					{ m_children.clear(); }				///< 子要素の削除

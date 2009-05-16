@@ -738,59 +738,34 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 		try {
 			BOOL bRet = FALSE;
-			switch (m_postData->GetContentType() ) {
-			case CONTENT_TYPE_MULTIPART:
-				{
-					// multiform
-					TCHAR pszContentType_Multi[] = 
-						_T("Content-Type: multipart/form-data; boundary=---------------------------7d62ee108071e\r\n");
-					bRet = ::HttpSendRequest(m_hRequest,
-						pszContentType_Multi,
-						lstrlen(pszContentType_Multi),
-						buf.empty() ? "" : &buf[0],
-						buf.size() );
-					if( bRet == FALSE ) {
-						// ヘッダ送信失敗
-						// m_hRequest, m_hConnection を閉じる。
-						CloseInternetHandles();
-						m_strErrorMsg = L"ヘッダ送信失敗";
-						MZ3LOGGER_ERROR( m_strErrorMsg );
-						return WM_MZ3_GET_ERROR;
-					}
-				}
-				break;
+			LPCTSTR pszContentType = m_postData->GetContentType();
 
-			case CONTENT_TYPE_FORM_URLENCODED:
-				{
-					// urlencode
-					TCHAR pszContentType_UrlEncoded[] = 
-						_T("Content-Type: application/x-www-form-urlencoded\r\n");
-					bRet = ::HttpSendRequest(m_hRequest,
-						pszContentType_UrlEncoded,
-						lstrlen(pszContentType_UrlEncoded),
-						buf.empty() ? "" : &buf[0],
-						buf.size() );
-					if( bRet == FALSE ) {
-						// POSTメッセージ送信失敗
-						// m_hRequest, m_hConnection を閉じる。
-						CloseInternetHandles();
-						m_strErrorMsg = L"POSTメッセージ送信中にエラーが発生しました";
-						MZ3LOGGER_ERROR( m_strErrorMsg );
-						return WM_MZ3_GET_ERROR;
-					}
-				}
-				break;
+			MZ3LOGGER_DEBUG( util::FormatString(L"Content-Type: %s", pszContentType) );
 
-			default:
-				{
-					// 未サポートのContent-Typeなのでエラーとする。
-					m_strErrorMsg.Format( 
-						L"アプリケーションエラー\r\n"
-						L"未サポートのContent-Type [%d]", m_postData->GetContentType() );
+			if (lstrlen(pszContentType)>0) {
+				CString strContentType;
+				strContentType.Format(L"Content-Type: %s\r\n", pszContentType);
+
+				bRet = ::HttpSendRequest(m_hRequest,
+					strContentType,
+					strContentType.GetLength(),
+					buf.empty() ? "" : &buf[0],
+					buf.size() );
+				if( bRet == FALSE ) {
+					// POSTメッセージ送信失敗
+					// m_hRequest, m_hConnection を閉じる。
+					CloseInternetHandles();
+					m_strErrorMsg = L"POSTメッセージ送信中にエラーが発生しました";
 					MZ3LOGGER_ERROR( m_strErrorMsg );
 					return WM_MZ3_GET_ERROR;
 				}
-				break;
+			} else {
+				// 未サポートのContent-Typeなのでエラーとする。
+				m_strErrorMsg.Format( 
+					L"アプリケーションエラー\r\n"
+					L"未サポートのContent-Type [%s]", m_postData->GetContentType() );
+				MZ3LOGGER_ERROR( m_strErrorMsg );
+				return WM_MZ3_GET_ERROR;
 			}
 		}
 		catch (CException &) {

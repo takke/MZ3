@@ -117,7 +117,7 @@ BOOL CDebugDlg::OnInitDialog()
 	idx++;
 
 	m_List.InsertItem( idx, L"POST種別" );
-	m_List.SetItemText( idx, 1, util::int2str( data->GetContentType() ) );
+	m_List.SetItemText( idx, 1, data->GetContentType() );
 	idx++;
 
 	m_List.InsertItem( idx, L"オーナーID" );
