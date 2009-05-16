@@ -11,6 +11,7 @@
 #include "MixiParserUtil.h"
 #include "IniFile.h"
 #include "util_goo.h"
+#include "url_encoder.h"
 
 //-----------------------------------------------
 // lua support
@@ -34,6 +35,22 @@ static CStringA make_invalid_arg_error_string2(const char* file, int line, const
 //-----------------------------------------------
 // MZ3 Core API
 //-----------------------------------------------
+
+/*
+--- アプリケーション名("MZ3", "MZ4")を返す
+--
+-- @return [string] アプリケーション名
+--
+function mz3.get_app_name()
+*/
+int lua_mz3_get_app_name(lua_State *L)
+{
+	// 結果をスタックに積む
+	lua_pushstring(L, CStringA(MZ3_APP_NAME));
+
+	// 戻り値の数を返す
+	return 1;
+}
 
 /*
 --- ログ出力(ERRORレベル)を行う。
@@ -201,6 +218,38 @@ int lua_mz3_decode_html_entity(lua_State *L)
 }
 
 /*
+--- URL エンコードした文字列を返す
+--
+-- @param text     対象文字列
+-- @param encoding "utf8"
+--
+function mz3.url_encode(text, encoding)
+*/
+int lua_mz3_url_encode(lua_State *L)
+{
+	const char* func_name = "mz3_data.url_encode";
+
+	CString text(lua_tostring(L, 1));			// 第1引数
+	CStringA encoding(lua_tostring(L, 2));		// 第2引数
+
+	// 変換
+	CString url_encoded_text;
+	if (encoding=="utf8") {
+		url_encoded_text = URLEncoder::encode_utf8(text);
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに戻す
+	lua_pushstring(L, CStringA(url_encoded_text));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- アクセス種別からシリアライズキーを取得する。
 --
 -- @param type [integer]アクセス種別
@@ -261,6 +310,29 @@ int lua_mz3_get_access_type_by_key(lua_State *L)
 
 	// 結果をスタックに戻す
 	lua_pushinteger(L, (int)type);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- シリアライズキーからアクセス種別を取得する。
+--
+-- @param key シリアライズキー
+-- @return [string] サービス種別
+--
+function mz3.get_service_type(key)
+*/
+int lua_mz3_get_service_type(lua_State *L)
+{
+	const char* key = lua_tostring(L, 1);			// 第1引数
+
+	// 変換
+	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(key);
+	CStringA service_type = theApp.m_accessTypeInfo.getServiceType(type).c_str();
+
+	// 結果をスタックに戻す
+	lua_pushstring(L, service_type);
 
 	// 戻り値の数を返す
 	return 1;
@@ -471,7 +543,7 @@ int lua_mz3_open_url(lua_State *L)
 		s_post.SetSuccessMessage( WM_MZ3_POST_END );
 		s_post.AppendAdditionalHeader(L"");
 
-		// "Content-Type: multipart/form-data"で。
+		// デフォルトは "Content-Type: multipart/form-data"で。
 		s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
 
 		post = &s_post;
@@ -1151,6 +1223,65 @@ int lua_mz3_data_list_insert(lua_State *L)
 
 	// 登録
 	data_list->insert(data_list->begin()+index, *data);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+//-----------------------------------------------
+// MZ3 Post Data API
+//-----------------------------------------------
+
+/*
+--- PostData の生成
+--
+-- スレッドセーフではない点に注意！
+--
+--
+function mz3_post_data.create()
+*/
+int lua_mz3_post_data_create(lua_State *L)
+{
+	static CPostData s_post;
+	// 初期化
+	CPostData dummy_post_data;
+	s_post = dummy_post_data;
+	s_post.SetSuccessMessage( WM_MZ3_POST_END );
+	s_post.AppendAdditionalHeader(L"");
+
+	// デフォルトは "Content-Type: multipart/form-data"で。
+	s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
+
+	// 結果をスタックに戻す
+	lua_pushlightuserdata(L, (void*)&s_post);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- POST する文字列の追加
+--
+-- @param post        POST 用オブジェクト
+-- @param text        追加する文字列
+--
+function mz3_post_data.append_post_body(post, text)
+*/
+int lua_mz3_post_data_append_post_body(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.append_post_body";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CStringA text = lua_tostring(L, 2);
+
+	// 追加
+	post->AppendPostBody(text);
 
 	// 戻り値の数を返す
 	return 0;
@@ -2101,11 +2232,31 @@ int lua_mz3_main_view_get_edit_text(lua_State *L)
 	return 1;
 }
 
+/*
+--- info エリアへの文字列設定
+--
+-- @param text 設定する文字列
+--
+function mz3_main_view.set_info_text(text);
+*/
+int lua_mz3_main_view_set_info_text(lua_State *L)
+{
+	// 引数の取得
+	CString text(lua_tostring(L, 1));
+
+	// 文字列設定
+	util::MySetInformationText( theApp.m_pMainView->m_hWnd, text);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
+	{"get_app_name",						lua_mz3_get_app_name},
 	{"logger_error",						lua_mz3_logger_error},
 	{"logger_info",							lua_mz3_logger_info},
 	{"logger_debug",						lua_mz3_logger_debug},
@@ -2117,11 +2268,13 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"estimate_access_type_by_url",			lua_mz3_estimate_access_type_by_url},
 	{"get_access_type_by_key",				lua_mz3_get_access_type_by_key},
 	{"get_serialize_key_by_access_type",	lua_mz3_get_serialize_key_by_access_type},
+	{"get_service_type",					lua_mz3_get_service_type},
 	{"set_parser",							lua_mz3_set_parser},
 	{"add_event_listener",					lua_mz3_add_event_listener},
 	{"open_url",							lua_mz3_open_url},
 	{"keybd_event",							lua_mz3_keybd_event},
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
+	{"url_encode",							lua_mz3_url_encode},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -2205,6 +2358,12 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
 	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
 	{"get_edit_text",			lua_mz3_main_view_get_edit_text},
+	{"set_info_text",			lua_mz3_main_view_set_info_text},
+	{NULL, NULL}
+};
+static const luaL_Reg lua_mz3_post_data_lib[] = {
+	{"create",					lua_mz3_post_data_create},
+	{"append_post_body",		lua_mz3_post_data_append_post_body},
 	{NULL, NULL}
 };
 
@@ -2222,4 +2381,5 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_group_item", lua_mz3_group_item_lib);
 
 	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
+	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
 }

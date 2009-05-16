@@ -53,6 +53,38 @@ menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_
 menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
 
 
+
+----------------------------------------
+-- サービス用関数
+----------------------------------------
+
+--- ステータスコード解析
+function get_http_status_error_status(http_status)
+
+	if http_status==200 or http_status==304 then
+		-- 200 OK: 成功
+		-- 304 Not Modified: 新しい情報はない
+		return nil;
+	elseif http_status==400 then		-- Bad Request:
+		return "API の実行回数制限に引っ掛かった、などの理由でリクエストを却下した";
+	elseif http_status==401 then		-- Not Authorized:
+		return "認証失敗";
+	elseif http_status==403 then		-- Forbidden:
+		return "権限がないAPI を実行しようとした";
+	elseif http_status==404 then		-- Not Found:
+		return "存在しない API を実行しようとした、存在しないユーザを引数で指定して API を実行しようとした";
+	elseif http_status==500 then		-- Internal Server Error:
+		return "Twitter 側で何らかの問題が発生しています";
+	elseif http_status==502 then		-- Bad Gateway:
+		return "Twitter のサーバが止まっています（メンテ中かもしれません）";
+	elseif http_status==503 then		-- Service Unavailable:
+		return "Twitter のサーバの負荷が高すぎて、リクエストを裁き切れない状態になっています";
+	end
+
+	return nil;
+end
+
+
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
@@ -320,6 +352,111 @@ function on_read_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
+--- POST 完了イベント
+--
+-- @param event_name    'post_end'
+-- @param serialize_key 完了項目のシリアライズキー
+-- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param wnd           wnd
+--
+function on_post_end(event_name, serialize_key, http_status)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="Twitter" then
+		return false;
+	end
+
+	-- Twitter投稿処理完了
+
+	-- ステータスコードチェック
+	msg = get_http_status_error_status(http_status);
+	if msg ~= nil then
+		-- エラーアリなので中断するために true を返す
+		mz3.logger_error(msg);
+		mz3_main_view.set_info_text(msg);
+		return true;
+	end
+
+	-- リクエストの種別に応じてメッセージを表示
+	if serialize_key == "TWITTER_NEW_DM" then
+		mz3_main_view.set_info_text("メッセージ送信終了");
+	elseif serialize_key == "TWITTER_FAVOURINGS_CREATE" then
+		mz3_main_view.set_info_text("ふぁぼった！");
+	elseif serialize_key == "TWITTER_FAVOURINGS_DESTROY" then
+		mz3_main_view.set_info_text("ふぁぼるのやめた！");
+	elseif serialize_key == "TWITTER_FRIENDSHIPS_CREATE" then
+		mz3_main_view.set_info_text("フォローした！");
+	elseif serialize_key == "TWITTER_FRIENDSHIPS_DESTROY" then
+		mz3_main_view.set_info_text("フォローやめた！");
+	else 
+		-- TWITTER_UPDATE
+		mz3_main_view.set_info_text("ステータス送信終了");
+	end
+
+	-- Wassr への投稿(クロスポスト)
+--[[
+	if serialize_key == "TWITTER_UPDATE" then
+
+		text = mz3_main_view.get_edit_text();
+		msg = "Wassr にも投稿しますか？\r\n";
+		msg = msg .. "----\r\n";
+		msg = msg .. text .. "\r\n";
+		msg = msg .. "----\r\n";
+		
+		if mz3.confirm(msg, nil, "yes_no") == "yes" then
+		
+			-- URL 生成
+			url = "http://api.wassr.jp/statuses/update.json";
+			post = mz3_post_data.create();
+			mz3_post_data.append_post_body(post, "status=");
+			mz3_post_data.append_post_body(post, mz3.url_encode(text, 'utf8'));
+			mz3_post_data.append_post_body(post, "&source=");
+			mz3_post_data.append_post_body(post, mz3.get_app_name());
+			
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("WASSR_UPDATE");
+			referer = '';
+			user_agent = nil;
+			mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+			return true;
+		end
+	end
+]]
+
+	-- 入力値を消去
+	mz3_main_view.set_edit_text("");
+	
+	return true;
+end
+
+--- GET 完了イベント
+--
+-- @param event_name    'get_end'
+-- @param serialize_key 完了項目のシリアライズキー
+-- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param wnd           wnd
+--
+function on_get_end(event_name, serialize_key, http_status)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="Twitter" then
+		return false;
+	end
+
+	-- ステータスコードチェックのみ行う
+	msg = get_http_status_error_status(http_status);
+	if msg ~= nil then
+		-- エラーアリなので中断するために true を返す
+		mz3.logger_error(msg);
+		mz3_main_view.set_info_text(msg);
+		mz3.alert("サーバエラー(" .. http_status .. ") : " .. msg);
+		return true;
+	end
+	-- エラーなしなので続行する(後続の解析処理等を継続)
+
+	return false;
+end
+
 --- ボディリストのポップアップメニュー表示
 --
 -- @param event_name    'popup_body_menu'
@@ -428,5 +565,9 @@ mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
 
 -- ボディリストのポップアップメニュー表示イベントハンドラ登録
 mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
+
+-- POST完了イベントハンドラ登録
+mz3.add_event_listener("post_end", "twitter.on_post_end");
+mz3.add_event_listener("get_end",  "twitter.on_get_end");
 
 mz3.logger_debug('twitter.lua end');

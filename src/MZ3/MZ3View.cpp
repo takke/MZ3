@@ -5411,84 +5411,65 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		// 投稿処理
 		// --------------------------------------------------
 		MZ3_TRACE(L"POST Status[%d]\n", theApp.m_inet.m_dwHttpStatus);
-		if (theApp.m_accessTypeInfo.getServiceType(aType)=="Twitter") {
-			// Twitter投稿処理
-			// HTTPステータスチェックを行う。
-			LPCTSTR szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-			if (szStatusErrorMessage!=NULL) {
-				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-				util::MySetInformationText( m_hWnd, msg );
-				MZ3LOGGER_ERROR( msg );
-			} else {
-				switch (aType) {
-				case ACCESS_TWITTER_NEW_DM:
-					util::MySetInformationText( m_hWnd, L"メッセージ送信終了" );
-					break;
-				case ACCESS_TWITTER_FAVOURINGS_CREATE:
-					util::MySetInformationText( m_hWnd, L"ふぁぼった！" );
-					break;
-				case ACCESS_TWITTER_FAVOURINGS_DESTROY:
-					util::MySetInformationText( m_hWnd, L"ふぁぼるのやめた！" );
-					break;
-				case ACCESS_TWITTER_FRIENDSHIPS_CREATE:
-					util::MySetInformationText( m_hWnd, L"フォローした！" );
-					break;
-				case ACCESS_TWITTER_FRIENDSHIPS_DESTROY:
-					util::MySetInformationText( m_hWnd, L"フォローやめた！" );
-					break;
-				case ACCESS_TWITTER_UPDATE:
-				default:
-					util::MySetInformationText( m_hWnd, L"ステータス送信終了" );
-					break;
-				}
 
-				// 入力値を消去
-				SetDlgItemText( IDC_STATUS_EDIT, L"" );
-			}
-		} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "Wassr") {
-			// HTTPステータスチェックを行う。
-			if (theApp.m_inet.m_dwHttpStatus==200) {
-				// OK
-
-				// 入力値を消去
-				SetDlgItemText( IDC_STATUS_EDIT, L"" );
+		{
+			// MZ3 API : イベントハンドラ関数呼び出し
+			int rval = 0;
+			CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
+			if (util::CallMZ3ScriptHookFunctions3("post_end", &rval, 
+					util::MyLuaData(serializeKey),
+					util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
+			{
+				// イベントハンドラ完了
 			} else {
-				LPCTSTR szStatusErrorMessage = L"?";
-				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-				util::MySetInformationText( m_hWnd, msg );
-				MZ3LOGGER_ERROR( msg );
-			}
-		} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "gooHome") {
-			// HTTPステータスチェックを行う。
-			if (theApp.m_inet.m_dwHttpStatus==200) {
-				// OK
+				if (theApp.m_accessTypeInfo.getServiceType(aType) == "Wassr") {
+					// HTTPステータスチェックを行う。
+					if (theApp.m_inet.m_dwHttpStatus==200) {
+						// OK
 
-				// 入力値を消去
-				SetDlgItemText( IDC_STATUS_EDIT, L"" );
-			} else {
-				LPCTSTR szStatusErrorMessage = L"?";
-				CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-				util::MySetInformationText( m_hWnd, msg );
-				MZ3LOGGER_ERROR( msg );
-			}
-		} else {
-			// Twitter 以外
-			switch (aType) {
-			case ACCESS_MIXI_ADD_ECHO:
-				// ログアウトチェック
-				if (theApp.IsMixiLogout(aType)) {
-					// ログアウト状態になっている
-					MessageBox(L"未ログインです。エコー一覧をリロードし、mixiにログインして下さい。");
+						// 入力値を消去
+						SetDlgItemText( IDC_STATUS_EDIT, L"" );
+					} else {
+						LPCTSTR szStatusErrorMessage = L"?";
+						CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+						util::MySetInformationText( m_hWnd, msg );
+						MZ3LOGGER_ERROR( msg );
+					}
+				} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "gooHome") {
+					// HTTPステータスチェックを行う。
+					if (theApp.m_inet.m_dwHttpStatus==200) {
+						// OK
+
+						// 入力値を消去
+						SetDlgItemText( IDC_STATUS_EDIT, L"" );
+					} else {
+						LPCTSTR szStatusErrorMessage = L"?";
+						CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
+						util::MySetInformationText( m_hWnd, msg );
+						MZ3LOGGER_ERROR( msg );
+					}
 				} else {
-					util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
-					// 入力値を消去
-					SetDlgItemText( IDC_STATUS_EDIT, L"" );
-				}
-				break;
+					// Twitter 以外
+					switch (aType) {
+					case ACCESS_MIXI_ADD_ECHO:
+						// ログアウトチェック
+						if (theApp.IsMixiLogout(aType)) {
+							// ログアウト状態になっている
+							MessageBox(L"未ログインです。エコー一覧をリロードし、mixiにログインして下さい。");
+						} else {
+							util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
+							// 入力値を消去
+							SetDlgItemText( IDC_STATUS_EDIT, L"" );
+						}
+						break;
 
-			default:
-				// アクセス種別不明
-				break;
+					default:
+						// アクセス種別不明
+						break;
+					}
+				}
+
+				// 非Luaスクリプト処理ここまで
 			}
 		}
 		break;
@@ -6265,15 +6246,24 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
  */
 bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 {
-	// ステータスコードチェック
 	MZ3_TRACE(L"DoAccessEndProcForBody(), HTTP Status[%d], [%s]\n", 
 		theApp.m_inet.m_dwHttpStatus,
 		(LPCTSTR)CString(theApp.m_accessTypeInfo.getServiceType(aType).c_str()));
+
+	// MZ3 API : イベントハンドラ関数呼び出し
+	int rval = 0;
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
+	if (util::CallMZ3ScriptHookFunctions3("get_end", &rval, 
+			util::MyLuaData(serializeKey),
+			util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
+	{
+		// イベントハンドラ完了
+		return false;
+	}
+
+	// ステータスコードチェック
 	LPCTSTR szStatusErrorMessage = NULL;	// 非NULLの場合はエラー発生
-	if (theApp.m_accessTypeInfo.getServiceType(aType)=="Twitter") {
-		// Twitter
-		szStatusErrorMessage = twitter::CheckHttpResponseStatus( theApp.m_inet.m_dwHttpStatus );
-	} else if (theApp.m_accessTypeInfo.getServiceType(aType)=="Wassr") {
+	if (theApp.m_accessTypeInfo.getServiceType(aType)=="Wassr") {
 		// Wassr
 		if (theApp.m_inet.m_dwHttpStatus==200) {
 			// OK

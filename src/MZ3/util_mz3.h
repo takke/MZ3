@@ -19,6 +19,56 @@
 namespace util
 {
 
+class MyLuaData
+{
+public:
+	enum MyLuaDataType
+	{
+		MyLuaDataType_Invalid  = -1,
+		MyLuaDataType_String   = 0,
+		MyLuaDataType_Integer  = 1,
+		MyLuaDataType_UserData = 2,
+	};
+
+	MyLuaDataType	m_type;
+	CStringA		m_pszText;
+	int				m_number;
+	void*			m_pUserData;
+
+	MyLuaData()
+		: m_type(MyLuaDataType_Invalid)
+		, m_pszText("")
+		, m_number(0)
+		, m_pUserData(NULL)
+	{
+	}
+
+	MyLuaData(const char* szText)
+		: m_type(MyLuaDataType_String)
+		, m_pszText(szText)
+		, m_number(0)
+		, m_pUserData(NULL)
+	{
+	}
+
+	MyLuaData(int number)
+		: m_type(MyLuaDataType_Integer)
+		, m_pszText("")
+		, m_number(number)
+		, m_pUserData(NULL)
+	{
+	}
+
+	MyLuaData(void* pUserData)
+		: m_type(MyLuaDataType_UserData)
+		, m_pszText("")
+		, m_number(0)
+		, m_pUserData(pUserData)
+	{
+	}
+};
+typedef const MyLuaData* MyLuaDataPtr;
+
 CString MakeLogfilePath( const CMixiData& data );
 
 /// URL から画像ファイルのパスを生成する
@@ -305,4 +355,10 @@ inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
 bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData1, void* pUserData2=NULL);
 bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventName, void* pUserData1, void* pUserData2=NULL);
 bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, void* pUserData1, void* pUserData2, int* pRetVal);
+bool CallMZ3ScriptHookFunctions3(const char* szEventName, 
+								int* pRetVal,
+								const MyLuaData& pData1, 
+								const MyLuaData& pData2, 
+								const MyLuaData& pData3=MyLuaData(), 
+								const MyLuaData& pData4=MyLuaData());
 }

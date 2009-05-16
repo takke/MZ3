@@ -308,8 +308,12 @@ bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventN
 /**
  * MZ3 Script : イベントハンドラの呼び出し
  */
-bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName, 
-								const char* szText, void* pUserData1, void* pUserData2, int* pRetVal)
+bool CallMZ3ScriptHookFunction3(const char* szEventName, const char* szFuncName, 
+								int* pRetVal,
+								const MyLuaData& data1, 
+								const MyLuaData& data2, 
+								const MyLuaData& data3, 
+								const MyLuaData& data4)
 {
 	CStringA strHookFuncName(szFuncName);
 
@@ -338,13 +342,32 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 											// スタックに積む
 
 	// 引数を積む
+	int n_arg = 1;
 	lua_pushstring(L, szEventName);
-	lua_pushstring(L, szText);
-	lua_pushlightuserdata(L, pUserData1);
-	lua_pushlightuserdata(L, pUserData2);
+
+	MyLuaDataPtr data_args[] = {&data1, &data2, &data3, &data4, NULL};
+	for (int i=0; data_args[i]!=NULL; i++) {
+		MyLuaDataPtr pData = data_args[i];
+		switch (pData->m_type) {
+		case MyLuaData::MyLuaDataType_String:
+			lua_pushstring(L, pData->m_pszText);
+			n_arg ++;
+			break;
+		case MyLuaData::MyLuaDataType_Integer:
+			lua_pushnumber(L, pData->m_number);
+			n_arg ++;
+			break;
+		case MyLuaData::MyLuaDataType_UserData:
+			lua_pushlightuserdata(L, pData->m_pUserData);
+			n_arg ++;
+			break;
+		default:
+			// skip
+			break;
+		}
+	}
 
 	// 関数実行
-	int n_arg = 4;
 	int n_ret = 2;
 	int status = lua_pcall(L, n_arg, n_ret, 0);
 
@@ -377,13 +400,50 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, vo
 
 	const std::vector<std::string>& hookFuncNames = theApp.m_luaHooks[(const char*)szEventName];
 
+	MyLuaData data1(szText);
+	MyLuaData data2(pUserData1);
+	MyLuaData data3(pUserData2);
+
 	bool rval = false;
 	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
 		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
 							CString(hookFuncNames[i].c_str()),
 							CString(szEventName)));
 
-		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), szText, pUserData1, pUserData2, pRetVal)) {
+		if (CallMZ3ScriptHookFunction3(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, NULL)) {
+			rval = true;
+			break;
+		}
+	}
+	return rval;
+}
+
+/**
+ * MZ3 Script : フック関数の呼び出し3
+ */
+bool CallMZ3ScriptHookFunctions3(const char* szEventName, 
+								 int* pRetVal,
+								 const MyLuaData& data1, 
+								 const MyLuaData& data2, 
+								 const MyLuaData& data3, 
+								 const MyLuaData& data4)
+{
+	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
+		// フック関数未登録のため終了
+		MZ3LOGGER_DEBUG(util::FormatString(L"no listeners for %s", 
+							CString(szEventName)));
+		return false;
+	}
+
+	const std::vector<std::string>& hookFuncNames = theApp.m_luaHooks[(const char*)szEventName];
+
+	bool rval = false;
+	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
+		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
+							CString(hookFuncNames[i].c_str()),
+							CString(szEventName)));
+
+		if (CallMZ3ScriptHookFunction3(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, data4)) {
 			rval = true;
 			break;
 		}
