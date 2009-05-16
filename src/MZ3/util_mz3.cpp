@@ -306,9 +306,9 @@ bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventN
 }
 
 /**
- * MZ3 Script : イベントハンドラの呼び出し
+ * MZ3 Script : イベントハンドラの呼び出し2
  */
-bool CallMZ3ScriptHookFunction3(const char* szEventName, const char* szFuncName, 
+bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName, 
 								int* pRetVal,
 								const MyLuaData& data1, 
 								const MyLuaData& data2, 
@@ -389,39 +389,7 @@ bool CallMZ3ScriptHookFunction3(const char* szEventName, const char* szFuncName,
 /**
  * MZ3 Script : フック関数の呼び出し2
  */
-bool CallMZ3ScriptHookFunctions2(const char* szEventName, const char* szText, void* pUserData1, void* pUserData2, int* pRetVal)
-{
-	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
-		// フック関数未登録のため終了
-		MZ3LOGGER_DEBUG(util::FormatString(L"no listeners for %s", 
-							CString(szEventName)));
-		return false;
-	}
-
-	const std::vector<std::string>& hookFuncNames = theApp.m_luaHooks[(const char*)szEventName];
-
-	MyLuaData data1(szText);
-	MyLuaData data2(pUserData1);
-	MyLuaData data3(pUserData2);
-
-	bool rval = false;
-	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
-		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
-							CString(hookFuncNames[i].c_str()),
-							CString(szEventName)));
-
-		if (CallMZ3ScriptHookFunction3(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, NULL)) {
-			rval = true;
-			break;
-		}
-	}
-	return rval;
-}
-
-/**
- * MZ3 Script : フック関数の呼び出し3
- */
-bool CallMZ3ScriptHookFunctions3(const char* szEventName, 
+bool CallMZ3ScriptHookFunctions2(const char* szEventName, 
 								 int* pRetVal,
 								 const MyLuaData& data1, 
 								 const MyLuaData& data2, 
@@ -443,7 +411,7 @@ bool CallMZ3ScriptHookFunctions3(const char* szEventName,
 							CString(hookFuncNames[i].c_str()),
 							CString(szEventName)));
 
-		if (CallMZ3ScriptHookFunction3(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, data4)) {
+		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, data4)) {
 			rval = true;
 			break;
 		}
@@ -478,7 +446,8 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 
 	// MZ3 API : フック関数呼び出し
 	int access_type_by_lua = ACCESS_INVALID;
-	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", CStringA(url), NULL, NULL, &access_type_by_lua)) {
+	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", &access_type_by_lua, 
+			util::MyLuaData(CStringA(url)))) {
 		MZ3LOGGER_DEBUG(util::FormatString(L"estimated access type by lua : %d", access_type_by_lua));
 		return (ACCESS_TYPE)access_type_by_lua;
 	}

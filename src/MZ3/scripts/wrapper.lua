@@ -159,5 +159,6 @@ function MZ3Menu:create_popup_menu()
 end
 
 function MZ3Menu:append_menu(type, title, item_id)	return mz3_menu.append_menu(self.menu, type, title, item_id);	end
+function MZ3Menu:append_submenu(title, submenu)		return mz3_menu.append_submenu(self.menu, title, submenu.menu);	end
 function MZ3Menu:popup(wnd)							return mz3_menu.popup(self.menu, wnd);	end
 function MZ3Menu:delete()							return mz3_menu.delete(self.menu);	end

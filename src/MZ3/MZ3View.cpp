@@ -3648,7 +3648,11 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	// MZ3 API : フック関数呼び出し
 	int rval = 0;
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(bodyItem.GetAccessType()));
-	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", serializeKey, &bodyItem, this, &rval)) {
+	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", &rval, 
+			util::MyLuaData(serializeKey), 
+			util::MyLuaData(&bodyItem), 
+			util::MyLuaData(this)))
+	{
 		return rval!=0 ? true : false;
 	}
 
@@ -5416,7 +5420,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			// MZ3 API : イベントハンドラ関数呼び出し
 			int rval = 0;
 			CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
-			if (util::CallMZ3ScriptHookFunctions3("post_end", &rval, 
+			if (util::CallMZ3ScriptHookFunctions2("post_end", &rval, 
 					util::MyLuaData(serializeKey),
 					util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
 			{
@@ -6253,7 +6257,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	// MZ3 API : イベントハンドラ関数呼び出し
 	int rval = 0;
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
-	if (util::CallMZ3ScriptHookFunctions3("get_end", &rval, 
+	if (util::CallMZ3ScriptHookFunctions2("get_end", &rval, 
 			util::MyLuaData(serializeKey),
 			util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
 	{

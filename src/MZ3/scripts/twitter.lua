@@ -50,6 +50,7 @@ menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_dest
 menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
 menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
 menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
+menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_open_friend_favorites_by_browser");
 menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
 
 
@@ -292,7 +293,7 @@ function on_open_home(serialize_key, event_name, data)
 end
 
 --- 「友達のお気に入り」メニュー用ハンドラ
-function on_open_friend_favorites(serialize_key, event_name, data)
+function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	
@@ -307,6 +308,26 @@ function on_open_friend_site(serialize_key, event_name, data)
 	mz3.open_url_by_browser_with_confirm(body:get_text('url'));
 end
 
+--- 「友達のお気に入り」メニュー用ハンドラ
+function on_open_friend_favorites(serialize_key, event_name, data)
+
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	name = body:get_text('name');
+	
+	-- カテゴリ追加
+	title = "@" .. name .. "のお気に入り";
+	url = "http://twitter.com/favorites/" .. name .. ".xml";
+	key = "TWITTER_FRIENDS_TIMELINE";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
@@ -474,6 +495,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	-- メニュー生成
 	menu = MZ3Menu:create_popup_menu();
+	submenu = MZ3Menu:create_popup_menu();
 	
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
 	menu:append_menu("string", "全文を読む...", menu_items.read);
@@ -503,9 +525,6 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", "お気に入り削除", menu_items.destroy_favourings);
 	end
 
-	menu:append_menu("string", "フォローする", menu_items.create_friendships);
-	menu:append_menu("string", "フォローやめる", menu_items.destroy_friendships);
-
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
@@ -525,15 +544,19 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 	end
 
-	menu:append_menu("separator");
-
-	menu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
-	menu:append_menu("string", "@" .. name .. " のFavoritesをブラウザで開く", menu_items.open_friend_favorites);
+--	menu:append_menu("separator");
+	
+	submenu:append_menu("string", "@" .. name .. " をフォローする", menu_items.create_friendships);
+	submenu:append_menu("string", "@" .. name .. " のフォローをやめる", menu_items.destroy_friendships);
+	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
+	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
+	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
+	menu:append_submenu("その他", submenu);
 
 	-- URL が空でなければ「サイト」を追加
 	url = body:get_text('url');
 	if url~=nil and url:len()>0 then
-		menu:append_menu("string", "@" .. name .. " のサイトをブラウザで開く", menu_items.open_friend_site);
+		submenu:append_menu("string", "@" .. name .. " のサイトをブラウザで開く", menu_items.open_friend_site);
 	end
 
 	-- リンク追加
@@ -551,6 +574,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	-- メニューリソース削除
 	menu:delete();
+	submenu:delete();
 	
 	return true;
 end

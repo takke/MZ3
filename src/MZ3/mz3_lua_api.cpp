@@ -1437,7 +1437,7 @@ int lua_mz3_menu_insert_menu(lua_State *L)
 -- @param title   タイトル
 -- @param item_id regist_menu の返り値
 --
-function mz3_menu.append_menu(menu, index, title, item_id)
+function mz3_menu.append_menu(menu, type, title, item_id)
 */
 int lua_mz3_menu_append_menu(lua_State *L)
 {
@@ -1462,6 +1462,41 @@ int lua_mz3_menu_append_menu(lua_State *L)
 		flags = MF_SEPARATOR;
 	}
 	pMenu->AppendMenu(flags, ID_LUA_MENU_BASE +item_id, CString(title));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- サブメニューの追加
+--
+-- @param menu    メニュー用オブジェクト
+-- @param title   タイトル
+-- @param submenu サブメニュー用オブジェクト
+--
+function mz3_menu.append_submenu(menu, title, submenu)
+*/
+int lua_mz3_menu_append_submenu(lua_State *L)
+{
+	const char* func_name = "mz3_menu.append_submenu";
+
+	// 引数取得
+	CMenu* pMenu = (CMenu*)lua_touserdata(L, 1);		// 第1引数
+	if (pMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* title = lua_tostring(L, 2);				// 第2引数
+	CMenu* pSubMenu = (CMenu*)lua_touserdata(L, 3);		// 第3引数
+	if (pSubMenu==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// メニュー作成
+	pMenu->AppendMenu(MF_POPUP, (UINT)pSubMenu->m_hMenu, CString(title));
 
 	// 戻り値の数を返す
 	return 0;
@@ -2314,6 +2349,7 @@ static const luaL_Reg lua_mz3_menu_lib[] = {
 	{"regist_menu",			lua_mz3_menu_regist_menu},
 	{"insert_menu",			lua_mz3_menu_insert_menu},
 	{"append_menu",			lua_mz3_menu_append_menu},
+	{"append_submenu",		lua_mz3_menu_append_submenu},
 	{"popup",				lua_mz3_menu_popup},
 	{"delete",				lua_mz3_menu_delete},
 	{NULL, NULL}
