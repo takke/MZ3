@@ -1387,6 +1387,7 @@ bool CMZ3App::MyLuaInit(void)
 	m_luaParsers.clear();
 	m_luaHooks.clear();
 	m_luaMenus.clear();
+	m_luaServices.clear();
 	m_luaLastRegistedAccessType = ACCESS_TYPE_MZ3_SCRIPT_BASE;
 
 	// Lua ÇÃèâä˙âª

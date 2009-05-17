@@ -29,7 +29,7 @@ static CStringA make_invalid_arg_error_string2(const char* file, int line, const
 }
 
 /*
---- 関数名が * で始まるAPIは未実装
+--- 関数名が * で終わるAPIは未実装
 */
 
 //-----------------------------------------------
@@ -50,6 +50,27 @@ int lua_mz3_get_app_name(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+/*
+--- サービス登録(タブの初期化用)
+--
+-- @param service_name     サービス名
+-- @param default_selected デフォルト状態で選択済みにするかどうか
+--
+function mz3.regist_service(service_name, default_selected)
+*/
+int lua_mz3_regist_service(lua_State *L)
+{
+	// 引数の取得
+	const char* name = lua_tostring(L, 1);
+	bool selected = lua_toboolean(L, 2) != 0 ? true : false;
+
+	// 登録
+	theApp.m_luaServices.push_back(CMZ3App::Service(name, selected));
+
+	// 戻り値の数を返す
+	return 0;
 }
 
 /*
@@ -364,14 +385,20 @@ int lua_mz3_set_parser(lua_State *L)
 /*
 --- 各種イベントに対するフック関数を追加する。
 --
+-- call_first が true の場合、
 -- 同一イベントに対して複数のフック関数が登録されている場合、最後に登録された関数から順に呼び出す。
+-- false の場合は逆順に呼び出す。
 --
--- @param event イベント名
+-- @param event         イベント名
 -- @param event_handler フック関数名({テーブル}.{関数名})
--- @see event_listener
+-- @param call_first    コール順序(未指定時はtrueとみなす)
+--
+-- @see event_listener1
+-- @see event_listener2
+--
 -- @rerutn なし
 --
-function mz3.add_event_listener(event, event_handler)
+function mz3.add_event_listener(event, event_handler, call_first)
 
 --- フック関数(タイプ1)
 --
@@ -396,11 +423,19 @@ int lua_mz3_add_event_listener(lua_State *L)
 	const char* szEvent = lua_tostring(L, 1);		// 第1引数:イベント
 	const char* szParserName = lua_tostring(L, 2);	// 第2引数:パーサ名
 
-	if (theApp.m_luaHooks.count(szEvent)!=0) {
+	bool call_first = true;	// デフォルトは true
+	if (!lua_isnil(L, 3)) {
+		call_first = lua_toboolean(L, 3) != 0 ? true : false;
+	}
+
+	if (theApp.m_luaHooks.count(szEvent)==0) {
+		theApp.m_luaHooks[ szEvent ] = std::vector<std::string>();
+	}
+
+	if (call_first) {
 		theApp.m_luaHooks[ szEvent ].push_back(szParserName);
 	} else {
-		theApp.m_luaHooks[ szEvent ] = std::vector<std::string>();
-		theApp.m_luaHooks[ szEvent ].push_back(szParserName);
+		theApp.m_luaHooks[ szEvent ].insert(theApp.m_luaHooks[ szEvent ].begin(), szParserName);
 	}
 
 	// 戻り値の数を返す
@@ -1002,7 +1037,7 @@ TODO
 -- @param data MZ3Data オブジェクト
 -- @return [string]シリアライズキー
 --
-function *mz3_data.get_serialize_key(data)
+function mz3_data.get_serialize_key*(data)
 */
 
 /*
@@ -1611,7 +1646,7 @@ int lua_mz3_inifile_get_value(lua_State *L)
 /*
 TODO
 ---
-function *mz3_inifile.set_value(name, section, value)
+function mz3_inifile.set_value*(name, section, value)
 */
 
 //-----------------------------------------------
@@ -1965,7 +2000,7 @@ int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
 --- サポートするサービス種別を取得する
 --
 -- @param group MZ3GroupData
--- @return サポートするサービス種別のスペース区切り文字列
+-- @return サポートするサービス種別のスペース区切り文字列。サービス種別は mz3.regist_service() で登録した文字列。
 --
 function mz3_group_data.get_services(group)
 */
@@ -2027,9 +2062,69 @@ int lua_mz3_group_data_get_group_item_by_name(lua_State *L)
 	return 1;
 }
 
+/*
+--- タブをグループに追加する
+--
+-- @param group MZ3GroupData
+-- @param tab   MZ3GroupItem
+--
+function mz3_group_data.append_tab(group, tab)
+*/
+int lua_mz3_group_data_append_tab(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_data.append_tab";
+
+	// 引数取得
+	Mz3GroupData* pGroup = (Mz3GroupData*)lua_touserdata(L, 1);
+	if (pGroup==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CGroupItem* pTab = (CGroupItem*)lua_touserdata(L, 2);
+	if (pTab==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	pGroup->groups.push_back(*pTab);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 //-----------------------------------------------
 // MZ3 GroupItem API
 //-----------------------------------------------
+
+/*
+--- タブを作成する
+--
+-- @param title         タブの名称
+--
+-- @return [MZ3GroupItem] tab
+--
+function mz3_group_item.create(title);
+*/
+int lua_mz3_group_item_create(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_item.create";
+
+	// 引数取得
+	const char* title = lua_tostring(L, 1);
+
+	CGroupItem* pTab = new CGroupItem();
+	pTab->init(CString(title), L"", ACCESS_GROUP_OTHERS);
+
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, pTab);
+
+	// 戻り値の数を返す
+	return 1;
+}
 
 /*
 --- カテゴリを追加する
@@ -2045,7 +2140,7 @@ function mz3_group_item.append_category(tab, title, serialize_key, url);
 int lua_mz3_group_item_append_category(lua_State *L)
 {
 	// 引数取得
-	const char* func_name = "mz3_group_data.append_category";
+	const char* func_name = "mz3_group_item.append_category";
 
 	// 引数取得
 	CGroupItem* pTab = (CGroupItem*)lua_touserdata(L, 1);
@@ -2071,6 +2166,33 @@ int lua_mz3_group_item_append_category(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+/*
+--- MZ3GroupItem オブジェクトの削除
+--
+-- @param tab           [MZ3GroupItem] タブ
+--
+function mz3_group_item.delete(tab);
+*/
+int lua_mz3_group_item_delete(lua_State *L)
+{
+	// 引数取得
+	const char* func_name = "mz3_group_item.delete";
+
+	// 引数取得
+	CGroupItem* pTab = (CGroupItem*)lua_touserdata(L, 1);
+	if (pTab==NULL) {
+		// 不正なタブが指定された。
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	delete pTab;
+
+	// 戻り値の数を返す
+	return 0;
 }
 
 //-----------------------------------------------
@@ -2296,6 +2418,7 @@ int lua_mz3_main_view_set_info_text(lua_State *L)
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
 	{"get_app_name",						lua_mz3_get_app_name},
+	{"regist_service",						lua_mz3_regist_service},
 	{"logger_error",						lua_mz3_logger_error},
 	{"logger_info",							lua_mz3_logger_info},
 	{"logger_debug",						lua_mz3_logger_debug},
@@ -2379,13 +2502,16 @@ static const luaL_Reg lua_mz3_access_type_info_lib[] = {
 };
 // group data : tabs
 static const luaL_Reg lua_mz3_group_data_lib[] = {
-	{"get_services", lua_mz3_group_data_get_services},
-	{"get_group_item_by_name", lua_mz3_group_data_get_group_item_by_name},
+	{"get_services",			lua_mz3_group_data_get_services},
+	{"get_group_item_by_name",	lua_mz3_group_data_get_group_item_by_name},
+	{"append_tab",				lua_mz3_group_data_append_tab},
 	{NULL, NULL}
 };
 // group item : tab = categories
 static const luaL_Reg lua_mz3_group_item_lib[] = {
+	{"create",			lua_mz3_group_item_create},
 	{"append_category", lua_mz3_group_item_append_category},
+	{"delete",			lua_mz3_group_item_delete},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_main_view_lib[] = {

@@ -145,12 +145,6 @@ enum ACCESS_TYPE {
 
 	//--- Twitter Favorites Œn
 	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] ‚¨‹C‚É“ü‚èŽæ“¾
-	ACCESS_TWITTER_FAVOURINGS_CREATE,	///< ‚¨‹C‚É“ü‚è“o˜^
-	ACCESS_TWITTER_FAVOURINGS_DESTROY,	///< ‚¨‹C‚É“ü‚è‚©‚çŠO‚·
-
-	//--- Twitter Friend Œn
-	ACCESS_TWITTER_FRIENDSHIPS_CREATE,	///< add
-	ACCESS_TWITTER_FRIENDSHIPS_DESTROY,	///< remove
 
 	//----------------------------------------------
 	// Wassr

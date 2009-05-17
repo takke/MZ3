@@ -9,6 +9,4 @@
 --
 -- $Id$
 --------------------------------------------------
-module("mixi", package.seeall)
-
 -- nothing to do.

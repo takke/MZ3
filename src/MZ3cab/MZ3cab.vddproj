@@ -98,6 +98,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5B894F25D849448E9E7CDBC73A2C53D1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5ED1D21152934C8B86CB3D8BA86E3DDC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -116,6 +122,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_6F0E02521DC74E949B57B8C640B3A8C5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_70A83056FA42481DAEE4D50085E42AF2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -123,6 +135,12 @@
         "Entry"
         {
         "MsmKey" = "8:_74CDFA05EA2D451AABB0AA9DA81E1DA1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_81C9804E30354FEFB089876AD772D0A0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -189,6 +207,12 @@
         "Entry"
         {
         "MsmKey" = "8:_C8A7425E99AF47348301322208D348CD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D88021CE7DE442D8BABB8096080B93F9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -560,6 +584,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_5B894F25D849448E9E7CDBC73A2C53D1"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\RSS.lua"
+            "TargetName" = "8:RSS.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_5ED1D21152934C8B86CB3D8BA86E3DDC"
             {
             "SourcePath" = "8:skin\\aluminium\\report_.jpg"
@@ -614,6 +656,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_6F0E02521DC74E949B57B8C640B3A8C5"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\RSS.luac"
+            "TargetName" = "8:RSS.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_70A83056FA42481DAEE4D50085E42AF2"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_message_inbox_parser.luac"
@@ -638,6 +698,24 @@
             "TargetName" = "8:mixi_new_bbs_parser.luac"
             "Tag" = "8:"
             "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_81C9804E30354FEFB089876AD772D0A0"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\wassr.luac"
+            "TargetName" = "8:wassr.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -818,6 +896,24 @@
             "TargetName" = "8:header.jpg"
             "Tag" = "8:"
             "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_D88021CE7DE442D8BABB8096080B93F9"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\wassr.lua"
+            "TargetName" = "8:wassr.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"

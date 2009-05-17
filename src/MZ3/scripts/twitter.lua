@@ -13,6 +13,11 @@ mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
 ----------------------------------------
+-- サービスの登録(タブ初期化用)
+----------------------------------------
+mz3.regist_service('Twitter', true);
+
+----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
 --[[
@@ -612,6 +617,30 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	return true;
 end
 
+--- デフォルトのグループリスト生成イベントハンドラ
+--
+-- @param serialize_key シリアライズキー(nil)
+-- @param event_name    'creating_default_group'
+-- @param group         MZ3GroupData
+--
+function on_creating_default_group(serialize_key, event_name, group)
+
+	-- サポートするサービス種別の取得(スペース区切り)
+	services = mz3_group_data.get_services(group);
+	if services:find(' Twitter', 1, true) ~= nil then
+
+		-- Twitterタブ追加
+		local tab = MZ3GroupItem:create("Twitter");
+		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
+		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
+		tab:append_category("お気に入り", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
+		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
+		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+	end
+end
+
 ----------------------------------------
 -- イベントハンドラの登録
 ----------------------------------------
@@ -626,5 +655,8 @@ mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
 -- POST完了イベントハンドラ登録
 mz3.add_event_listener("post_end", "twitter.on_post_end");
 mz3.add_event_listener("get_end",  "twitter.on_get_end");
+
+-- デフォルトのグループリスト生成
+mz3.add_event_listener("creating_default_group", "twitter.on_creating_default_group", false);
 
 mz3.logger_debug('twitter.lua end');

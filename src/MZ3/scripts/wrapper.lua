@@ -162,3 +162,23 @@ function MZ3Menu:append_menu(type, title, item_id)	return mz3_menu.append_menu(s
 function MZ3Menu:append_submenu(title, submenu)		return mz3_menu.append_submenu(self.menu, title, submenu.menu);	end
 function MZ3Menu:popup(wnd)							return mz3_menu.popup(self.menu, wnd);	end
 function MZ3Menu:delete()							return mz3_menu.delete(self.menu);	end
+
+--------------------------------------------------
+-- Wrapper for mz3_group_item (TAB)
+--------------------------------------------------
+MZ3GroupItem = {};
+
+function MZ3GroupItem:create(name)
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	object.item = mz3_group_item.create(name);
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3GroupItem });
+	return object;
+end
+
+function MZ3GroupItem:append_category(title, key, url)	return mz3_group_item.append_category(self.item, title, key, url);	end
+function MZ3GroupItem:delete()							return mz3_group_item.delete(self.item);	end

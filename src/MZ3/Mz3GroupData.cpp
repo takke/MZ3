@@ -19,143 +19,14 @@
 bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const InitializeType initType)
 {
 	this->groups.clear();
+	this->services = initType.strSelectedServices;
 
-	CStringA services;
-	if (initType.bUseMixi)    services.Append(" mixi");
-	if (initType.bUseTwitter) services.Append(" twitter");
-	if (initType.bUseWassr)   services.Append(" wassr");
-	if (initType.bUseGoohome) services.Append(" goohome");
-	this->services = services;
-
-	static CGroupItem group;
-	if (initType.bUseMixi) {
-		// 日記グループ
-		group.init( L"日記", L"list_diary.pl", ACCESS_GROUP_MYDIARY );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "最近の日記", ACCESS_LIST_MYDIARY );
-			appendCategoryByIniData( accessTypeInfo, group, "最近のコメント", ACCESS_LIST_COMMENT );
-			appendCategoryByIniData( accessTypeInfo, group, "マイミク最新日記", ACCESS_LIST_DIARY );
-			appendCategoryByIniData( accessTypeInfo, group, "日記コメント記入履歴", ACCESS_LIST_NEW_COMMENT );
+	// サービスが空の場合は全選択とみなし全サービスを追加する
+	if (this->services.empty()) {
+		for (size_t idx=0; idx<theApp.m_luaServices.size(); idx++) {
+			this->services += " ";
+			this->services += theApp.m_luaServices[idx].name;
 		}
-		this->groups.push_back( group );
-
-		// コミュニティグループ
-		group.init( L"コミュニティ", L"", ACCESS_GROUP_COMMUNITY );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "最新書き込み一覧", ACCESS_LIST_NEW_BBS );
-			appendCategoryByIniData( accessTypeInfo, group, "コミュコメント履歴", ACCESS_LIST_NEW_BBS_COMMENT );
-			appendCategoryByIniData( accessTypeInfo, group, "コミュニティ一覧", ACCESS_LIST_COMMUNITY );
-		}
-		this->groups.push_back( group );
-
-		// ニュースグループ
-		group.init( L"ニュース", L"", ACCESS_GROUP_NEWS );
-		{
-			//--- カテゴリ群の追加
-
-			struct NEWS_CATEGORY
-			{
-				LPCSTR title;
-				LPCSTR url;
-			};
-			NEWS_CATEGORY news_list[] = {
-				{"注目のピックアップ",    "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn"	},
-				{"国内",				  "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1"	},
-				{"政治",				  "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1"	},
-				{"経済",				  "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1"	},
-				{"地域",				  "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1"	},
-				{"海外",				  "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1"	},
-				{"スポーツ",			  "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1"	},
-				{"エンターテインメント",  "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1"	},
-				{"IT",					  "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1"	},
-				{"ゲーム・アニメ",		  "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1"	},
-				{"コラム",				  "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1"	},
-				{NULL, NULL}
-			};
-
-			for( int i=0; news_list[i].title != NULL; i++ ) {
-				appendCategoryByIniData( accessTypeInfo, group, news_list[i].title, ACCESS_LIST_NEWS, news_list[i].url );
-			}
-		}
-		this->groups.push_back( group );
-
-		// メッセージグループ
-		group.init( L"メッセージ", L"", ACCESS_GROUP_MESSAGE );
-		{
-//			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（受信箱）", ACCESS_LIST_MESSAGE_IN );
-//			appendCategoryByIniData( accessTypeInfo, group, "メッセージ（送信箱）", ACCESS_LIST_MESSAGE_OUT );
-		}
-		this->groups.push_back( group );
-
-		// echoグループ
-		group.init( L"エコー", L"", ACCESS_GROUP_OTHERS );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "みんなのエコー", ACCESS_MIXI_RECENT_ECHO );
-			appendCategoryByIniData( accessTypeInfo, group, "自分への返信一覧", ACCESS_MIXI_RECENT_ECHO, "http://mixi.jp/res_echo.pl" );
-			appendCategoryByIniData( accessTypeInfo, group, "自分の一覧", ACCESS_MIXI_RECENT_ECHO, "http://mixi.jp/list_echo.pl?id={owner_id}" );
-		}
-		this->groups.push_back( group );
-
-		// その他グループ
-		group.init( L"その他", L"", ACCESS_GROUP_OTHERS );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "マイミク一覧", ACCESS_LIST_FRIEND );
-			appendCategoryByIniData( accessTypeInfo, group, "紹介文", ACCESS_LIST_INTRO );
-			appendCategoryByIniData( accessTypeInfo, group, "足あと", ACCESS_LIST_FOOTSTEP );
-			appendCategoryByIniData( accessTypeInfo, group, "カレンダー", ACCESS_LIST_CALENDAR, "show_calendar.pl" );
-			appendCategoryByIniData( accessTypeInfo, group, "ブックマーク", ACCESS_LIST_BOOKMARK );
-			appendCategoryByIniData( accessTypeInfo, group, "お気に入りユーザー", ACCESS_LIST_FAVORITE_USER, "list_bookmark.pl" );
-			appendCategoryByIniData( accessTypeInfo, group, "お気に入りコミュ", ACCESS_LIST_FAVORITE_COMMUNITY, "list_bookmark.pl?kind=community" );
-		}
-		this->groups.push_back( group );
-	}
-
-	if (initType.bUseTwitter) {
-		// Twitterグループ
-		group.init( L"Twitter", L"", ACCESS_GROUP_TWITTER );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "タイムライン", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/friends_timeline.xml" );
-			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_TWITTER_FRIENDS_TIMELINE, "http://twitter.com/statuses/replies.xml" );
-			appendCategoryByIniData( accessTypeInfo, group, "お気に入り", ACCESS_TWITTER_FAVORITES, "http://twitter.com/favorites.xml" );
-			appendCategoryByIniData( accessTypeInfo, group, "受信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages.xml" );
-			appendCategoryByIniData( accessTypeInfo, group, "送信メッセージ", ACCESS_TWITTER_DIRECT_MESSAGES, "http://twitter.com/direct_messages/sent.xml" );
-		}
-		this->groups.push_back( group );
-	}
-
-	if (initType.bUseWassr) {
-		// Wassrグループ
-		group.init( L"Wassr", L"", ACCESS_GROUP_OTHERS );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "タイムライン", ACCESS_WASSR_FRIENDS_TIMELINE );
-			appendCategoryByIniData( accessTypeInfo, group, "返信一覧", ACCESS_WASSR_FRIENDS_TIMELINE, "http://api.wassr.jp/statuses/replies.xml" );
-		}
-		this->groups.push_back( group );
-	}
-
-	if (initType.bUseGoohome) {
-		// gooホームグループ
-		group.init( L"gooホーム", L"", ACCESS_GROUP_OTHERS );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, "友達・注目の人", ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS );
-			appendCategoryByIniData( accessTypeInfo, group, "自分のひとこと一覧", ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS, "http://home.goo.ne.jp/api/quote/quotes/myself/json" );
-		}
-		this->groups.push_back( group );
-	}
-
-//	if (initType.bUseRss) {
-	{
-		// RSSグループ
-		group.init( L"RSS", L"", ACCESS_GROUP_OTHERS );
-		{
-			appendCategoryByIniData( accessTypeInfo, group, 
-				"はてブ 最近の人気エントリー", ACCESS_RSS_READER_FEED, "http://b.hatena.ne.jp/hotentry?mode=rss");
-//			appendCategoryByIniData( accessTypeInfo, group, 
-//				"しょこたん☆ぶろぐ", ACCESS_RSS_READER_FEED, "http://blog.excite.co.jp/shokotan/index.xml");
-			appendCategoryByIniData( accessTypeInfo, group, 
-				"CNET Japan ", ACCESS_RSS_READER_FEED, "http://japan.cnet.com/rss/index.rdf");
-		}
-		this->groups.push_back( group );
 	}
 
 	// イベントハンドラの呼び出し

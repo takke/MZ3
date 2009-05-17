@@ -38,7 +38,9 @@ MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 require("scripts\\util");		-- ユーティリティ
 require("scripts\\wrapper");	-- APIラッパークラス
 require("scripts\\mixi");		-- mixi
-require("scripts\\twitter");	-- twitter
+require("scripts\\twitter");	-- Twitter
+require("scripts\\wassr");		-- Wassr
 require("scripts\\goohome");	-- goohome
+require("scripts\\RSS");		-- RSS
 
 mz3.logger_info('mz3.lua end');

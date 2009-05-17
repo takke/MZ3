@@ -22,6 +22,7 @@ public:
 
 	Mz3GroupData::InitializeType m_initType;
 
+	CListCtrl mc_serviceList;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
 

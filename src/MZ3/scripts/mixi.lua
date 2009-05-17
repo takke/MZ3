@@ -12,6 +12,11 @@
 mz3.logger_debug('mixi.lua start');
 module("mixi", package.seeall)
 
+----------------------------------------
+-- サービスの登録(タブ初期化用)
+----------------------------------------
+mz3.regist_service('mixi', true);
+
 --------------------------------------------------
 --- 次へ、前への抽出処理
 --------------------------------------------------
@@ -60,31 +65,6 @@ function complement_mixi_url(url)
 	
 	return url;
 end
-
-
-
-----------------------------------------
--- パーサのロード＆登録
-----------------------------------------
--- ★リスト系
--- コミュニティ最新書込一覧
-require("scripts\\mixi\\mixi_new_bbs_parser");
-mz3.set_parser("BBS",             "mixi.new_bbs_parser");
--- コミュニティコメント記入履歴 : 最新書込一覧と同一
-mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
-
--- トップページ
-require("scripts\\mixi\\mixi_home_parser");
-mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
-
--- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
-require("scripts\\mixi\\mixi_new_official_message_parser");
-require("scripts\\mixi\\mixi_message_outbox_parser");
-require("scripts\\mixi\\mixi_message_inbox_parser");
-require("scripts\\mixi\\mixi_view_message_parser");
-
--- 逆あしあと
-require("scripts\\mixi\\mixi_show_self_log_parser");
 
 
 ----------------------------------------
@@ -236,6 +216,81 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	return true;
 end
 
+--- デフォルトのグループリスト生成イベントハンドラ
+--
+-- @param serialize_key シリアライズキー(nil)
+-- @param event_name    'creating_default_group'
+-- @param group         MZ3GroupData
+--
+function on_creating_default_group(serialize_key, event_name, group)
+
+	-- サポートするサービス種別の取得(スペース区切り)
+	services = mz3_group_data.get_services(group);
+	if services:find(' mixi', 1, true) ~= nil then
+
+		-- 各種タブ追加
+
+		-- 日記
+		local tab = MZ3GroupItem:create("日記");
+		tab:append_category("最近の日記", "MYDIARY");
+		tab:append_category("最近のコメント", "COMMENT");
+		tab:append_category("マイミク最新日記", "DIARY");
+		tab:append_category("日記コメント記入履歴", "NEW_COMMENT");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+
+		-- コミュニティ
+		local tab = MZ3GroupItem:create("コミュニティ");
+		tab:append_category("最新書き込み一覧", "BBS");
+		tab:append_category("コミュコメント履歴", "NEW_BBS_COMMENT");
+		tab:append_category("コミュニティ一覧", "COMMUNITY");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+
+		-- ニュース
+		local tab = MZ3GroupItem:create("ニュース");
+		tab:append_category("注目のピックアップ",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn");
+		tab:append_category("国内",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1");
+		tab:append_category("政治",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1");
+		tab:append_category("経済",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1");
+		tab:append_category("地域",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1");
+		tab:append_category("海外",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1");
+		tab:append_category("スポーツ",			  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1");
+		tab:append_category("エンターテインメント",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1");
+		tab:append_category("IT",					"NEWS", "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1");
+		tab:append_category("ゲーム・アニメ",		"NEWS", "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1");
+		tab:append_category("コラム",				"NEWS", "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+
+		-- メッセージ
+		local tab = MZ3GroupItem:create("メッセージ");
+		-- カテゴリは各パーサが追加する
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+
+		-- echo
+		local tab = MZ3GroupItem:create("エコー");
+		tab:append_category("みんなのエコー", "MIXI_RECENT_ECHO");
+		tab:append_category("自分への返信一覧", "MIXI_RECENT_ECHO", "http://mixi.jp/res_echo.pl");
+		tab:append_category("自分の一覧", "MIXI_RECENT_ECHO", "http://mixi.jp/list_echo.pl?id={owner_id}");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+
+		-- その他
+		local tab = MZ3GroupItem:create("その他");
+		tab:append_category("マイミク一覧", "FRIEND");
+		tab:append_category("紹介文", "INTRO");
+		tab:append_category("足あと", "FOOTSTEP");
+		tab:append_category("カレンダー", "CALENDAR", "show_calendar.pl");
+		tab:append_category("ブックマーク", "BOOKMARK");
+		tab:append_category("お気に入りユーザー", "FAVORITE", "list_bookmark.pl");
+		tab:append_category("お気に入りコミュ", "FAVORITE_COMMUNITY", "list_bookmark.pl?kind=community");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+	end
+end
+
 
 ----------------------------------------
 -- イベントハンドラの登録
@@ -247,5 +302,33 @@ mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
 
 -- ボディリストのポップアップメニュー表示イベントハンドラ登録
 mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
+
+-- デフォルトのグループリスト生成
+mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group", false);
+
+
+----------------------------------------
+-- パーサのロード＆登録
+----------------------------------------
+-- ★リスト系
+-- コミュニティ最新書込一覧
+require("scripts\\mixi\\mixi_new_bbs_parser");
+mz3.set_parser("BBS",             "mixi.new_bbs_parser");
+-- コミュニティコメント記入履歴 : 最新書込一覧と同一
+mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
+
+-- トップページ
+require("scripts\\mixi\\mixi_home_parser");
+mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
+
+-- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
+require("scripts\\mixi\\mixi_new_official_message_parser");
+require("scripts\\mixi\\mixi_message_outbox_parser");
+require("scripts\\mixi\\mixi_message_inbox_parser");
+require("scripts\\mixi\\mixi_view_message_parser");
+
+-- 逆あしあと
+require("scripts\\mixi\\mixi_show_self_log_parser");
+
 
 mz3.logger_debug('mixi.lua end');

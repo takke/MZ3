@@ -187,9 +187,18 @@ public:
 
 	//--- MZ3 Script 関連
 public:
-	std::map<std::string, std::string> m_luaParsers;			///< シリアライズキー → パーサ名
-	std::map<std::string, std::vector<std::string>> m_luaHooks;	///< {イベント} → パーサ名
-	std::vector<std::string>						m_luaMenus;	///< 登録済みメニュー項目
+	struct Service
+	{
+		std::string name;		///< サービス名
+		bool        selected;	///< デフォルト状態で選択済かどうか
+
+		Service() : selected(false) {}
+		Service(const std::string& a_name, bool a_selected) : name(a_name), selected(a_selected) {}
+	};
+	std::map<std::string, std::string> m_luaParsers;				///< シリアライズキー → パーサ名
+	std::map<std::string, std::vector<std::string>> m_luaHooks;		///< {イベント} → パーサ名
+	std::vector<std::string>						m_luaMenus;		///< 登録済みメニュー項目
+	std::vector<Service>							m_luaServices;	///< 登録済みサービス群
 	int								   m_luaLastRegistedAccessType;	///< 利用済みアクセス種別
 
 public:

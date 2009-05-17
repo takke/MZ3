@@ -172,6 +172,8 @@
 #define IDC_TWITTER_POST_FOOTER_TEXT_EDIT 1076
 #define IDC_STATIC_FDQ_TEXT             1077
 #define IDC_STATIC_FDQ_COPYRIGHT        1078
+#define IDC_NOTICE_STATIC               1079
+#define IDC_SERVICE_LIST                1084
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_SETTING_LOGIN                32775
@@ -324,7 +326,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        174
 #define _APS_NEXT_COMMAND_VALUE         34210
-#define _APS_NEXT_CONTROL_VALUE         1079
+#define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

@@ -13,6 +13,11 @@ mz3.logger_debug('goohome.lua start');
 module("goohome", package.seeall)
 
 ----------------------------------------
+-- サービスの登録(タブ初期化用)
+----------------------------------------
+mz3.regist_service('goohome', false);
+
+----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------
 -- gooホーム 友達・注目の人のひとこと一覧
@@ -25,7 +30,7 @@ mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_par
 goohome_user_read_menu_item = mz3_menu.regist_menu("goohome.on_read_menu_item");
 
 ----------------------------------------
--- イベントフック関数の登録
+-- イベントハンドラ
 ----------------------------------------
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
@@ -65,11 +70,41 @@ function on_creating_goohome_user_context_menu(serialize_key, event_name, menu)
 	mz3_menu.insert_menu(menu, 2, "全文を読む...", goohome_user_read_menu_item);
 end
 
+
+--- デフォルトのグループリスト生成イベントハンドラ
+--
+-- @param serialize_key シリアライズキー(nil)
+-- @param event_name    'creating_default_group'
+-- @param group         MZ3GroupData
+--
+function on_creating_default_group(serialize_key, event_name, group)
+
+	-- サポートするサービス種別の取得(スペース区切り)
+	services = mz3_group_data.get_services(group);
+	if services:find(' goohome', 1, true) ~= nil then
+
+		-- Wassrタブ追加
+		local tab = MZ3GroupItem:create("gooホーム");
+		tab:append_category("友達・注目の人", "GOOHOME_QUOTE_QUOTES_FRIENDS");
+		tab:append_category("自分のひとこと一覧", "GOOHOME_QUOTE_QUOTES_FRIENDS", "http://home.goo.ne.jp/api/quote/quotes/myself/json");
+		mz3_group_data.append_tab(group, tab.item);
+		tab:delete();
+	end
+end
+
+
+----------------------------------------
+-- イベントハンドラの登録
+----------------------------------------
+
 -- ボディリストのクリック・ダブルクリックイベントハンドラ登録
 mz3.add_event_listener("dblclk_body_list", "goohome.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "goohome.on_body_list_click");
 
 -- 暫定のイベントです。
 mz3.add_event_listener("creating_goohome_user_context_menu",  "goohome.on_creating_goohome_user_context_menu");
+
+-- デフォルトのグループリスト生成
+mz3.add_event_listener("creating_default_group", "goohome.on_creating_default_group", false);
 
 mz3.logger_debug('goohome.lua end');

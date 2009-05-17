@@ -21,16 +21,9 @@ public:
 
 	struct InitializeType
 	{
-		bool bUseMixi;		///< mixi
-		bool bUseTwitter;	///< Twitter
-		bool bUseWassr;		///< Wassr
-		bool bUseGoohome;	///< gooHome
+		std::string strSelectedServices;
 
-		InitializeType(bool a_bUseMixi=true, bool a_bUseTwitter=true, bool a_bUseWassr=true, bool a_bUseGoohome=true)
-			: bUseMixi(a_bUseMixi)
-			, bUseTwitter(a_bUseTwitter)
-			, bUseWassr(a_bUseWassr)
-			, bUseGoohome(a_bUseGoohome)
+		InitializeType()
 		{
 		}
 	};
