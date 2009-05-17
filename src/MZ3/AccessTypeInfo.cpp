@@ -773,46 +773,6 @@ bool AccessTypeInfo::init()
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_NEW_DM";
 
-	type = ACCESS_TWITTER_FAVOURINGS_CREATE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"お気に入り登録"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FAVOURINGS_CREATE";
-
-	type = ACCESS_TWITTER_FAVOURINGS_DESTROY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"お気に入り削除"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FAVOURINGS_DESTROY";
-
-	type = ACCESS_TWITTER_FRIENDSHIPS_CREATE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"フォロー登録"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FRIENDSHIPS_CREATE";
-
-	type = ACCESS_TWITTER_FRIENDSHIPS_DESTROY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"フォロー解除"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FRIENDSHIPS_DESTROY";
-
 	//------------------------------------------------------------------
 	//--- mixi echo 関連
 	//------------------------------------------------------------------

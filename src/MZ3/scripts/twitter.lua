@@ -23,6 +23,39 @@ mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
 mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)</small>');
 ]]
 
+-- POST用アクセス種別登録
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_FAVOURINGS_CREATE');		-- シリアライズキー
+type:set_short_title('お気に入り登録');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_FAVOURINGS_DESTROY');		-- シリアライズキー
+type:set_short_title('お気に入り削除');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_FRIENDSHIPS_CREATE');		-- シリアライズキー
+type:set_short_title('フォロー登録');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_FRIENDSHIPS_DESTROY');		-- シリアライズキー
+type:set_short_title('フォロー解除');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -318,7 +351,7 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 	-- カテゴリ追加
 	title = "@" .. name .. "のお気に入り";
 	url = "http://twitter.com/favorites/" .. name .. ".xml";
-	key = "TWITTER_FRIENDS_TIMELINE";
+	key = "TWITTER_FAVORITES";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始

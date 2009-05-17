@@ -1646,7 +1646,7 @@ int lua_mz3_access_type_info_new_access_type(lua_State *L)
 --- アクセス種別の種別の設定
 --
 -- @param type アクセス種別
--- @param info_type アクセス種別の種別(とりあえず'category'のみサポート)
+-- @param info_type アクセス種別の種別('category', 'body', 'post')
 -- @return [bool] 成功時は true、失敗時は false
 --
 function mz3_access_type_info.set_info_type(type, info_type)
@@ -1661,8 +1661,12 @@ int lua_mz3_access_type_info_set_info_type(lua_State *L)
 
 	if (info_type=="category") {
 		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_CATEGORY;
+	} else if (info_type=="body") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_BODY;
+	} else if (info_type=="post") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_POST;
 	} else {
-		lua_pushstring(L, "categoryのみサポートしています");
+		lua_pushstring(L, "サポート外のinfo_typeです");
 		lua_error(L);
 		return 0;
 	}
