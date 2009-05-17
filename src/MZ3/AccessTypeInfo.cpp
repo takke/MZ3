@@ -18,43 +18,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- グループ系
 	//------------------------------------------------------------------
-	type = ACCESS_GROUP_COMMUNITY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP
-		, ""
-		, L"コミュニティG"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "COMMUNITY";
-
-	type = ACCESS_GROUP_MESSAGE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP
-		, ""
-		, L"メッセージG"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "MESSAGE";
-
-	type = ACCESS_GROUP_MYDIARY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP
-		, ""
-		, L"日記G"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "MYDIARY";
-
-	type = ACCESS_GROUP_NEWS;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP
-		, ""
-		, L"ニュースG"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "NEWS";
-
-	type = ACCESS_GROUP_OTHERS;
+	type = ACCESS_GROUP_GENERAL;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_GROUP
 		, ""
@@ -62,15 +26,6 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "OTHERS";
-
-	type = ACCESS_GROUP_TWITTER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_GROUP
-		, ""
-		, L"TwitterG"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "TWITTER";
 
 	//------------------------------------------------------------------
 	//--- mixi,リスト系

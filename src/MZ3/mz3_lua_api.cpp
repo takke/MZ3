@@ -2117,7 +2117,7 @@ int lua_mz3_group_item_create(lua_State *L)
 	const char* title = lua_tostring(L, 1);
 
 	CGroupItem* pTab = new CGroupItem();
-	pTab->init(CString(title), L"", ACCESS_GROUP_OTHERS);
+	pTab->init(CString(title), L"", ACCESS_GROUP_GENERAL);
 
 	// 結果をスタックに積む
 	lua_pushlightuserdata(L, pTab);

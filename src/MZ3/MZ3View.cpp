@@ -5887,7 +5887,7 @@ void CMZ3View::OnTabmenuAdd()
 	if (dlg.DoModal()==IDOK) {
 		// データ構造追加
 		CGroupItem group;
-		group.init( dlg.mc_strEdit, L"", ACCESS_GROUP_OTHERS );
+		group.init( dlg.mc_strEdit, L"", ACCESS_GROUP_GENERAL );
 		theApp.m_root.groups.push_back( group );
 
 		// グループタブに追加

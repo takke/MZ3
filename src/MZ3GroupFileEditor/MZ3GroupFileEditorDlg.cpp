@@ -684,7 +684,7 @@ void CMZ3GroupFileEditorDlg::OnAddTab()
 	dlg.mc_strName = L"êVãKÉ^Éu";
 	if (dlg.DoModal() == IDOK) {
 		CGroupItem group;
-		group.init( dlg.mc_strName, L"", ACCESS_GROUP_OTHERS );
+		group.init( dlg.mc_strName, L"", ACCESS_GROUP_GENERAL );
 
 		std::vector<CGroupItem>& groups = theApp.m_group_info.groups;
 		groups.insert( groups.begin()+idx, group );

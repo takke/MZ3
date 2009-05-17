@@ -88,12 +88,7 @@ enum ACCESS_TYPE {
 	ACCESS_PLAIN,				///< 汎用テキストデータ
 
 	//--- GROUP 系：グループタブの項目。
-	ACCESS_GROUP_MYDIARY,		///< 日記 グループ
-	ACCESS_GROUP_COMMUNITY,		///< コミュニティ グループ
-	ACCESS_GROUP_MESSAGE,		///< メッセージ グループ
-	ACCESS_GROUP_NEWS,			///< ニュースグループ
-	ACCESS_GROUP_OTHERS,		///< その他 グループ
-	ACCESS_GROUP_TWITTER,		///< Twitter グループ
+	ACCESS_GROUP_GENERAL,		///< グループ 一般
 
 	//--- LIST 系：カテゴリリストの項目。
 	ACCESS_LIST_MYDIARY,			///< 自分の日記一覧
