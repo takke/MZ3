@@ -70,9 +70,6 @@ public:
 class Mz3GroupDataInifileHelper {
 
 private:
-	/// グループ種別文字列 → グループ種別 マップ
-	CMap<CString,LPCTSTR,ACCESS_TYPE,ACCESS_TYPE> group_string2type;
-
 	/// カテゴリ種別文字列 → カテゴリ種別 マップ
 	CMap<CString,LPCTSTR,ACCESS_TYPE,ACCESS_TYPE> category_string2type;
 
@@ -90,20 +87,6 @@ private:
 	void InitMap(AccessTypeInfo& accessTypeInfo);
 
 public:
-
-	/**
-	 * グループ種別文字列 → グループ種別 変換
-	 */
-	ACCESS_TYPE GroupString2Type( LPCTSTR group_string ) {
-		// 要素がなければ ACCESS_INVALID を返す。
-		ACCESS_TYPE value;
-		if( group_string2type.Lookup( group_string, value ) == FALSE ) {
-			return ACCESS_INVALID;
-		}
-
-		// マップから種別変換
-		return value;
-	}
 
 	/**
 	 * カテゴリ種別文字列 → カテゴリ種別 変換

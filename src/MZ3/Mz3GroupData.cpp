@@ -104,12 +104,9 @@ bool Mz3GroupData::appendCategoryByIniData(
 /**
  * 下記のマップを生成する。
  *
- * グループ種別文字列 ←→ グループ種別
  * カテゴリ種別文字列 ←→ カテゴリ種別
  */
 void Mz3GroupDataInifileHelper::InitMap(AccessTypeInfo& accessTypeInfo) {
-	group_string2type.RemoveAll();
-	group_string2type.InitHashTable( 10 );
 	category_string2type.RemoveAll();
 	category_string2type.InitHashTable( 20 );
 
@@ -120,13 +117,6 @@ void Mz3GroupDataInifileHelper::InitMap(AccessTypeInfo& accessTypeInfo) {
 		AccessTypeInfo::Data& data = it->second;
 
 		switch (data.infoType) {
-		case AccessTypeInfo::INFO_TYPE_GROUP:
-			// group_string2type の構築
-			if (!data.serializeKey.empty()) {
-				group_string2type[ util::my_mbstowcs(data.serializeKey.c_str()).c_str() ] = accessType;
-			}
-			break;
-
 		case AccessTypeInfo::INFO_TYPE_CATEGORY:
 			// category_string2type の構築
 			if (!data.serializeKey.empty()) {
@@ -187,12 +177,8 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 		}
 
 		// "Type" の値を取得し、グループ種別とする。
-		// グループ種別名→グループ種別変換を行う。
-		std::wstring type_value = util::my_mbstowcs(inifile.GetValue( "Type", section_name )).c_str();
-		ACCESS_TYPE group_type = helper.GroupString2Type( type_value.c_str() );
-		if( group_type == ACCESS_INVALID ) {
-			continue;
-		}
+		// →グループの種別は廃止。全て GROUP_GENERAL とする。
+		ACCESS_TYPE group_type = ACCESS_GROUP_GENERAL;
 
 		// "Url" の値を取得し、URLとする。
 		std::string url = inifile.GetValue( "Url", section_name );
@@ -285,8 +271,8 @@ bool Mz3GroupDataWriter::save( AccessTypeInfo& accessTypeInfo, const Mz3GroupDat
 		// Name 出力
 		inifile.SetValue( L"Name", group.name, strSectionName );
 
-		// Type 出力
-		inifile.SetValue( "Type", accessTypeInfo.getSerializeKey(group.mixi.GetAccessType()), (LPCSTR)strSectionName );
+		// Type 出力(常に GROUP_GENERAL とする)
+		inifile.SetValue( "Type", accessTypeInfo.getSerializeKey(ACCESS_GROUP_GENERAL), (LPCSTR)strSectionName );
 
 		// Url 出力
 		inifile.SetValue( L"Url", group.mixi.GetURL(), strSectionName );
