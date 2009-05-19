@@ -136,3 +136,8 @@ function new_bbs_parser(parent, body, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("new_bbs_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
+
+-- コミュニティ最新書込一覧
+mz3.set_parser("BBS",             "mixi.new_bbs_parser");
+-- コミュニティコメント記入履歴 : 最新書込一覧と同一
+mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");

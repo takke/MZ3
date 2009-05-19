@@ -3262,7 +3262,7 @@ private:
 
 /**
  * [content] view_news.pl 用パーサ
- * 【ニュース詳細】
+ * 【ニュース記事】
  * http://mixi.jp/view_news.pl
  */
 class ViewNewsParser : public MixiContentParser
@@ -3331,6 +3331,11 @@ public:
 
 			ParserUtil::AddBodyWithExtract( data_, line );
 		}
+
+		int id = _wtoi(util::GetParamFromURL(data_.GetURL(), L"id"));
+		data_.m_linkPage.push_back(
+			MZ3Data::Link(util::FormatString(L"http://news.mixi.jp/list_quote_diary.pl?id=%d", id), 
+						  L"関連日記"));
 
 		MZ3LOGGER_DEBUG( L"ViewNewsParser.parse() finished." );
 		return true;

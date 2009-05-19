@@ -291,6 +291,21 @@ function on_creating_default_group(serialize_key, event_name, group)
 	end
 end
 
+--- estimate 対象判別イベントハンドラ
+--
+-- @param event_name 'estimate_access_type_by_url'
+-- @param url        解析対象URL
+--
+function on_estimate_access_type(event_name, url, data1, data2)
+
+    -- 関連ニュース
+	if line_has_strings(url, 'http://news.mixi.jp/list_quote_diary.pl?') then
+		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
+	end
+
+	return false;
+end
+
 
 ----------------------------------------
 -- イベントハンドラの登録
@@ -306,6 +321,9 @@ mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
 -- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group", false);
 
+-- estimate 対象の追加
+mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type");
+
 
 ----------------------------------------
 -- パーサのロード＆登録
@@ -313,13 +331,9 @@ mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group
 -- ★リスト系
 -- コミュニティ最新書込一覧
 require("scripts\\mixi\\mixi_new_bbs_parser");
-mz3.set_parser("BBS",             "mixi.new_bbs_parser");
--- コミュニティコメント記入履歴 : 最新書込一覧と同一
-mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");
 
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");
-mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
 
 -- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
 require("scripts\\mixi\\mixi_new_official_message_parser");
@@ -330,5 +344,7 @@ require("scripts\\mixi\\mixi_view_message_parser");
 -- 逆あしあと
 require("scripts\\mixi\\mixi_show_self_log_parser");
 
+-- ニュース関連日記
+require("scripts\\mixi\\mixi_news_quote_diary_parser");
 
 mz3.logger_debug('mixi.lua end');

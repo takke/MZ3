@@ -37,6 +37,7 @@ MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 -------------------------------------------------
 require("scripts\\util");		-- ユーティリティ
 require("scripts\\wrapper");	-- APIラッパークラス
+-- 各サービス用スクリプトロード
 require("scripts\\mixi");		-- mixi
 require("scripts\\twitter");	-- Twitter
 require("scripts\\wassr");		-- Wassr

@@ -49,6 +49,8 @@ function MZ3Data:parse_date_line(line)			return mz3_data.parse_date_line(self.da
 function MZ3Data:get_link_list_size()			return mz3_data.get_link_list_size(self.data);			end
 function MZ3Data:get_link_list_url(idx)			return mz3_data.get_link_list_url(self.data, idx);		end
 function MZ3Data:get_link_list_text(idx)		return mz3_data.get_link_list_text(self.data, idx);		end
+function MZ3Data:clear()						return mz3_data.clear(self.data);						end
+function MZ3Data:add_child(child)				return mz3_data.add_child(self.data, child.data);		end
 
 -- text_array を全て連結した文字列を返すヘルパー
 function MZ3Data:get_text_array_joined_text(name)

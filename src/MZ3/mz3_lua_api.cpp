@@ -972,6 +972,61 @@ int lua_mz3_data_set_integer(lua_State *L)
 }
 
 /*
+--- 各リスト、子要素の削除
+--
+--
+function mz3_data.clear(data)
+*/
+int lua_mz3_data_clear(lua_State *L)
+{
+	const char* func_name = "mz3_data.clear";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	data->ClearAllList();
+	data->ClearChildren();
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- 子要素の追加
+--
+--
+function mz3_data.add_child(data, child)
+*/
+int lua_mz3_data_add_child(lua_State *L)
+{
+	const char* func_name = "mz3_data.add_child";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	MZ3Data* child = (MZ3Data*)lua_touserdata(L, 2);	// 第2引数
+	if (child==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	data->AddChild(*child);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- アクセス種別を設定する。
 --
 -- @param data MZ3Data オブジェクト
@@ -2454,6 +2509,8 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 	{"get_access_type",		lua_mz3_data_get_access_type},
 	{"create",				lua_mz3_data_create},
 	{"delete",				lua_mz3_data_delete},
+	{"clear",				lua_mz3_data_clear},
+	{"add_child",			lua_mz3_data_add_child},
 	{"parse_date_line",		lua_mz3_data_parse_date_line},
 	{"get_link_list_url",	lua_mz3_data_get_link_list_url},
 	{"get_link_list_text",	lua_mz3_data_get_link_list_text},

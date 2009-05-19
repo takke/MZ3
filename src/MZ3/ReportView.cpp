@@ -1279,20 +1279,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 	}
 
 	ACCESS_TYPE estimatedAccessType = util::EstimateAccessTypeByUrl( link.url );
-	switch (estimatedAccessType) {
-	case ACCESS_MYDIARY:
-	case ACCESS_DIARY:
-	case ACCESS_NEIGHBORDIARY:
-	case ACCESS_BBS:
-	case ACCESS_ENQUETE:
-	case ACCESS_EVENT:
-	case ACCESS_EVENT_JOIN:
-	case ACCESS_EVENT_MEMBER:
-	case ACCESS_PROFILE:
-	case ACCESS_BIRTHDAY:
-	case ACCESS_MESSAGE:
-	case ACCESS_NEWS:
-
+	if (theApp.m_accessTypeInfo.getInfoType(estimatedAccessType)==AccessTypeInfo::INFO_TYPE_BODY) {
 		// 既読位置を保存
 		SaveIndex();
 
@@ -1330,8 +1317,8 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 		theApp.m_accessType = m_data.GetAccessType();
 		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
 		return true;
+	} else {
 
-	default:
 		m_infoEdit.ShowWindow(SW_SHOW);
 		util::MySetInformationText( m_hWnd, L"未サポートのURLです：" + link.url );
 		return false;
@@ -2206,6 +2193,15 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	menu.LoadMenu(IDR_REPORT_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
 
+	// 「進む」削除
+	int idxPage = 7;		// 「ページ」メニュー（次へが有効の場合は-1となる）
+	int idxDiarySeparator = 5;
+	if( theApp.m_pWriteView->IsWriteCompleted() ) {
+		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
+		idxPage --;
+		idxDiarySeparator--;
+	}
+
 	// 「書き込み」に関する処理
 	switch( m_data.GetAccessType() ) {
 	case ACCESS_MESSAGE:
@@ -2224,6 +2220,8 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	case ACCESS_NEWS:
 		// ニュースなら書き込み無効
 		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
+		idxPage --;
+		idxDiarySeparator --;
 		break;
 	}
 
@@ -2231,15 +2229,6 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 //	if (m_data.IsOtherDiary() != FALSE) {
 //		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
 //	}
-
-	// 「進む」無効化
-	int idxPage = 7;		// 「ページ」メニュー（次へが有効の場合は-1となる）
-	int idxDiarySeparator = 5;
-	if( theApp.m_pWriteView->IsWriteCompleted() ) {
-		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
-		idxPage = idxPage-1;
-		idxDiarySeparator--;
-	}
 
 	// 前の日記、次の日記の処理
 	switch( m_data.GetAccessType() ) {
@@ -2275,14 +2264,21 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		}
 		break;
 	default:
+		// 前の日記へ
 		pcThisMenu->RemoveMenu(ID_MENU_PREV_DIARY, MF_BYCOMMAND);
 		idxPage--;
 		idxDiarySeparator--;
+
+		// 次の日記へ
 		pcThisMenu->RemoveMenu(ID_MENU_NEXT_DIARY, MF_BYCOMMAND);
 		idxPage--;
 		idxDiarySeparator--;
+
+		// 次の日記へ、の後のセパレータ
 		pcThisMenu->RemoveMenu(idxDiarySeparator, MF_BYPOSITION);
 		idxPage--;
+
+		// ページ｜全てを表示
 		pcThisMenu->RemoveMenu(IDM_LOAD_FULL_DIARY, MF_BYCOMMAND);
 	}
 

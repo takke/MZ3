@@ -132,3 +132,5 @@ function mixi_home_parser(parent, body, html)
 
 	return true;
 end
+
+mz3.set_parser("MIXI_HOME", "mixi.mixi_home_parser");
