@@ -36,7 +36,9 @@ inline int GetUserIdFromAuthorOrOwnerID( const CMixiData& mixi )
 inline CString CreateMixiUrl(LPCTSTR str)
 {
 	if( wcsstr( str, L"mixi.jp" ) == NULL &&
-		wcsstr( str, L"http://" ) == NULL)
+		wcsstr( str, L"http://" ) == NULL &&
+		wcsstr( str, L"https://" ) == NULL
+		)
 	{
 		CString uri;
 		uri.Format(_T("http://mixi.jp/%s"), str);

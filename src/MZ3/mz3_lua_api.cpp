@@ -248,7 +248,7 @@ function mz3.url_encode(text, encoding)
 */
 int lua_mz3_url_encode(lua_State *L)
 {
-	const char* func_name = "mz3_data.url_encode";
+	const char* func_name = "mz3.url_encode";
 
 	CString text(lua_tostring(L, 1));			// ‘æ1ˆø”
 	CStringA encoding(lua_tostring(L, 2));		// ‘æ2ˆø”
