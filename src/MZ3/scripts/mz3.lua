@@ -68,6 +68,7 @@ require("scripts\\wrapper");	-- APIラッパークラス
 -- 各サービス用スクリプトロード
 require("scripts\\mixi");		-- mixi
 require("scripts\\twitter");	-- Twitter
+require("scripts\\gmail");		-- GMail
 require("scripts\\wassr");		-- Wassr
 require("scripts\\goohome");	-- goohome
 require("scripts\\RSS");		-- RSS
