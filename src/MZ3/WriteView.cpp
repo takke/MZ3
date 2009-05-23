@@ -395,7 +395,7 @@ void CWriteView::OnBnClickedWriteSendButton()
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+	if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 		MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する(1)" );
 
 		// ログイン実行
@@ -562,7 +562,7 @@ void CWriteView::StartConfirmPost()
 		// 日記の投稿確認
 		{
 			// 電文生成
-			if( !mixi::DiaryConfirmGenerator::generate( *m_postData, theApp.m_loginMng.GetOwnerID(), euc_msg, 
+			if( !mixi::DiaryConfirmGenerator::generate( *m_postData, theApp.m_loginMng.GetMixiOwnerID(), euc_msg, 
 													    m_photo1_filepath, m_photo2_filepath, m_photo3_filepath ) )
 			{
 				MessageBox( GENERATE_POSTMSG_FAILED_MESSAGE );
@@ -796,7 +796,7 @@ LRESULT CWriteView::OnPostEntryEnd(WPARAM wParam, LPARAM lParam)
 		MZ3LOGGER_ERROR( msg );
 
 		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
-		theApp.m_loginMng.SetOwnerID( L"" );
+		theApp.m_loginMng.SetMixiOwnerID( L"" );
 
 		theApp.m_access = false;
 		MyUpdateControlStatus();
@@ -855,7 +855,7 @@ LRESULT CWriteView::OnPostConfirmEnd(WPARAM wParam, LPARAM lParam)
 		MZ3LOGGER_ERROR( msg );
 
 		MZ3LOGGER_ERROR( L"書き込みに失敗したため、念のためOwnerIDを初期化します" );
-		theApp.m_loginMng.SetOwnerID( L"" );
+		theApp.m_loginMng.SetMixiOwnerID( L"" );
 
 		theApp.m_access = false;
 		MyUpdateControlStatus();
@@ -1269,7 +1269,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		// ログインしたかどうかの確認
 		if( mixi::HomeParser::IsLoginSucceeded(html) ) {
 			// ログイン成功
-			if (wcslen(theApp.m_loginMng.GetOwnerID()) != 0) {
+			if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) != 0) {
 				MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
 			} else {
 				MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
@@ -1296,7 +1296,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		MZ3Data data;
 		theApp.DoParseMixiHomeHtml(&data, &html);
 
-		if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+		if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 			LPCTSTR msg = L"投稿に失敗しました(2)";
 			util::MySetInformationText( m_hWnd, msg );
 

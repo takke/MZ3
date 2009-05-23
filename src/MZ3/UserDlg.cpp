@@ -45,13 +45,13 @@ BOOL CUserDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_MIXI,    L"mixi" );
-	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_TWITTER, L"Twitter" );
-	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_WASSR,	  L"Wassr" );
-	mc_comboType.InsertString( USER_DLG_COMBO_INDEX_TYPE_GOOHOME, L"gooホーム" );
+	for (size_t i=0; i<theApp.m_luaAccounts.size(); i++) {
+		CString strServiceName(theApp.m_luaAccounts[i].service_name.c_str());
+		mc_comboType.InsertString( i, strServiceName );
+	}
 
-	mc_comboType.SetCurSel( USER_DLG_COMBO_INDEX_TYPE_MIXI );
-	m_idxSelectedCombo = USER_DLG_COMBO_INDEX_TYPE_MIXI;
+	mc_comboType.SetCurSel( 0 );
+	m_idxSelectedCombo = 0;
 
 	MyLoadControlData();
 
@@ -70,41 +70,30 @@ void CUserDlg::OnCbnSelchangeTypeCombo()
 {
 	MySaveControlData();
 
-	m_idxSelectedCombo = (USER_DLG_COMBO_INDEX_TYPE)mc_comboType.GetCurSel();
+	m_idxSelectedCombo = mc_comboType.GetCurSel();
 
 	MyLoadControlData();
 }
 
 bool CUserDlg::MySaveControlData(void)
 {
-	CString buf;
+	// 選択中のサービス用データを保存
+	// m_idxSelectedCombo により、選択変更通知後でも「変更前」に選択していたサービス用のデータを保存する。
+	CString strServiceName;
+	mc_comboType.GetLBText( m_idxSelectedCombo, strServiceName );
 
-	switch( m_idxSelectedCombo ) {
-	case USER_DLG_COMBO_INDEX_TYPE_TWITTER:
-		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
-		theApp.m_loginMng.SetTwitterId( buf );
+	CString id;
+	GetDlgItemText( IDC_LOGIN_MAIL_EDIT, id );
+	theApp.m_loginMng.SetId( strServiceName, id );
 
-		GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, buf );
-		theApp.m_loginMng.SetTwitterPassword( buf );
-		break;
+	CString password;
+	GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, password );
+	theApp.m_loginMng.SetPassword( strServiceName, password );
 
-	case USER_DLG_COMBO_INDEX_TYPE_WASSR:
-		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
-		theApp.m_loginMng.SetWassrId( buf );
-
-		GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, buf );
-		theApp.m_loginMng.SetWassrPassword( buf );
-		break;
-
-	case USER_DLG_COMBO_INDEX_TYPE_GOOHOME:
-		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
-		theApp.m_loginMng.SetGooId( buf );
-
-		GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, buf );
-		theApp.m_loginMng.SetGoohomeQuoteMailAddress( buf );
-
+	// TODO gooホーム専用コードなのでプラグイン化(MZ3 API化)すること
+	if (strServiceName==L"gooホーム") {
 		// 投稿アドレス形式チェック
-		if (!gooutil::IsValidQuoteMailAddress(buf)) {
+		if (!password.IsEmpty() && !gooutil::IsValidQuoteMailAddress(password)) {
 			CString msg = L"gooホームひとこと投稿アドレスは下記の形式です。\n"
 						  L" quote-XXXXXXXXXXXX@home.goo.ne.jp\n"
 						  L"\n"
@@ -114,18 +103,9 @@ bool CUserDlg::MySaveControlData(void)
 			}
 			return false;
 		}
-		break;
-
-	case USER_DLG_COMBO_INDEX_TYPE_MIXI:
-	default:
-		GetDlgItemText( IDC_LOGIN_MAIL_EDIT, buf );
-		theApp.m_loginMng.SetEmail( buf );
-		
-		GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, buf );
-		theApp.m_loginMng.SetPassword( buf );
-		break;
 	}
 
+	// 保存
 	theApp.m_loginMng.Write();
 
 	return true;
@@ -133,34 +113,18 @@ bool CUserDlg::MySaveControlData(void)
 
 void CUserDlg::MyLoadControlData(void)
 {
-	switch( m_idxSelectedCombo ) {
-	case USER_DLG_COMBO_INDEX_TYPE_TWITTER:
-		SetDlgItemText( IDC_ID_STATIC, L"ID" );
-		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetTwitterId() );
-		SetDlgItemText( IDC_PASSWORD_STATIC, L"パスワード" );
-		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetTwitterPassword() );
-		break;
+	CString strServiceName;
+	mc_comboType.GetLBText( m_idxSelectedCombo, strServiceName );
+	CStringA strServiceNameA(strServiceName);
 
-	case USER_DLG_COMBO_INDEX_TYPE_WASSR:
-		SetDlgItemText( IDC_ID_STATIC, L"ID" );
-		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetWassrId() );
-		SetDlgItemText( IDC_PASSWORD_STATIC, L"パスワード" );
-		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetWassrPassword() );
-		break;
-
-	case USER_DLG_COMBO_INDEX_TYPE_GOOHOME:
-		SetDlgItemText( IDC_ID_STATIC, L"gooID" );
-		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetGooId() );
-		SetDlgItemText( IDC_PASSWORD_STATIC, L"gooホーム ひとことメール投稿アドレス" );
-		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
-		break;
-
-	case USER_DLG_COMBO_INDEX_TYPE_MIXI:
-	default:
-		SetDlgItemText( IDC_ID_STATIC, L"メールアドレス" );
-		SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetEmail() );
-		SetDlgItemText( IDC_PASSWORD_STATIC, L"パスワード" );
-		SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetPassword() );
-		break;
+	for (size_t i=0; i<theApp.m_luaAccounts.size(); i++) {
+		const CMZ3App::AccountData& data = theApp.m_luaAccounts[i];
+		if (data.service_name.c_str()==strServiceNameA) {
+			SetDlgItemText( IDC_ID_STATIC, CString(data.id_name.c_str()) );
+			SetDlgItemText( IDC_LOGIN_MAIL_EDIT, theApp.m_loginMng.GetId(strServiceName) );
+			SetDlgItemText( IDC_PASSWORD_STATIC, CString(data.password_name.c_str()) );
+			SetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, theApp.m_loginMng.GetPassword(strServiceName) );
+		}
 	}
+
 }

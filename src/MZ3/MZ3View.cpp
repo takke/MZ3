@@ -882,6 +882,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 
+	// 通信完了（フラグを下げる）
+	theApp.m_access = false;
+
 	if (lParam == NULL) {
 		// データがNULLの場合
 		LPCTSTR msg = L"内部エラーが発生しました(LPARAM=NULL)";
@@ -941,7 +944,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			if( mixi::HomeParser::IsLoginSucceeded(html) ) {
 				// ログイン成功
-				if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+				if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 					// オーナーＩＤを取得する
 					data->SetAccessType(ACCESS_MAIN); // アクセス種別を設定
 					AccessProc(data, _T("http://mixi.jp/check.pl?n=%2Fhome.pl"));
@@ -960,8 +963,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 				// データを待避データに戻す
 				*data = theApp.m_mixiBeforeRelogin;
-
-				theApp.m_access = false;
 
 				// コントロール状態の変更
 				MyUpdateControlStatus();
@@ -1082,9 +1083,6 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
-
-	// 通信完了（フラグを下げる）
-	theApp.m_access = false;
 
 	// カテゴリに応じてTwitter送信モードを初期化
 	MyResetTwitterStylePostMode();
@@ -1949,7 +1947,7 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
  */
 void CMZ3View::OnWriteDiary()
 {
-	if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+	if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 		// オーナーＩＤを取得する
 		// 日記一覧から取得
 
@@ -1965,7 +1963,7 @@ void CMZ3View::OnWriteDiary()
 				if( category.GetBodyList().size() > 0 ) {
 					CMixiData& mixi = category.GetBodyList()[0];
 					CString& url = mixi.GetURL();
-					theApp.m_loginMng.SetOwnerID(
+					theApp.m_loginMng.SetMixiOwnerID(
 						mixi::MixiUrlParser::GetOwnerID( url ) );
 
 					theApp.m_loginMng.Write();
@@ -2954,7 +2952,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 	// 【API 用】
 	// URL 内のID置換
-	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetOwnerID() );
+	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetMixiOwnerID() );
 	uri.Replace( L"{wassr:id}", theApp.m_loginMng.GetWassrId() );
 
 	data->SetBrowseUri(uri);

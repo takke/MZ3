@@ -638,6 +638,89 @@ int lua_mz3_open_url_by_browser_with_confirm(lua_State *L)
 }
 
 //-----------------------------------------------
+// MZ3 Account Provider API
+//-----------------------------------------------
+
+/*
+--- アカウント情報登録(各プラグインでどのような情報が必要か)
+--
+-- @param service_name サービス名
+-- @param param_name   パラメータ名('id_name', 'password_name')
+-- @param param_value  パラメータ値
+--
+function mz3_account_provider.set_param(service_name, param_name, param_value)
+*/
+int lua_mz3_account_provider_set_param(lua_State *L)
+{
+	const char* func_name = "mz3_account_provider.set_param";
+
+	// 引数の取得
+	const char* service_name = lua_tostring(L, 1);
+	std::string param_name   = lua_tostring(L, 2);
+	const char* param_value  = lua_tostring(L, 3);
+
+	CMZ3App::AccountData* pData = NULL;
+	for (size_t i=0; i<theApp.m_luaAccounts.size(); i++) {
+		if (theApp.m_luaAccounts[i].service_name==service_name) {
+			pData = &theApp.m_luaAccounts[i];
+			break;
+		}
+	}
+	if (pData==NULL) {
+		theApp.m_luaAccounts.push_back( CMZ3App::AccountData(service_name) );
+
+		pData = &theApp.m_luaAccounts[ theApp.m_luaAccounts.size()-1 ];
+	}
+
+	if (param_name=="id_name") {
+		// ログイン設定画面の ID の表示名
+		pData->id_name = param_value;
+	} else if (param_name=="password_name") {
+		// ログイン設定画面の パスワード の表示名
+		pData->password_name = param_value;
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- アカウント情報の取得(ユーザ設定値の取得)
+--
+-- @param service_name サービス名
+-- @param param_name   パラメータ名('id', 'password')
+--
+function mz3_account_provider.get_value(service_name, param_name)
+*/
+int lua_mz3_account_provider_get_value(lua_State *L)
+{
+	const char* func_name = "mz3_account_provider.get_value";
+
+	// 引数の取得
+	const char* service_name = lua_tostring(L, 1);
+	std::string param_name   = lua_tostring(L, 2);
+
+	if (param_name=="id") {
+		CStringA v( theApp.m_loginMng.GetId(CString(service_name)) );
+		lua_pushstring(L, v);
+	} else if (param_name=="password") {
+		CStringA v( theApp.m_loginMng.GetPassword(CString(service_name)) );
+		lua_pushstring(L, v);
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+//-----------------------------------------------
 // MZ3 Data API
 //-----------------------------------------------
 
@@ -2589,6 +2672,11 @@ static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"append_post_body",		lua_mz3_post_data_append_post_body},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_account_provider_lib[] = {
+	{"set_param",				lua_mz3_account_provider_set_param},
+	{"get_value",				lua_mz3_account_provider_get_value},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -2605,4 +2693,6 @@ void mz3_lua_open_api(lua_State *L)
 
 	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
 	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
+
+	luaL_register(L, "mz3_account_provider", lua_mz3_account_provider_lib);
 }

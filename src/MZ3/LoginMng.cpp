@@ -23,7 +23,7 @@ namespace option {
 
 Login::Login()
 {
-	m_ownerId = _T("");
+	m_mixiOwnerId = _T("");
 }
 
 Login::~Login()
@@ -40,9 +40,7 @@ void Login::Read()
 	// ----------------------------------------
 
 	// 初期値設定
-	m_loginMail = _T("");
-	m_loginPwd = _T("");
-	m_ownerId = _T("");
+	m_idList.clear();
 
 	// 実行ファイルのパスからデータファイル名を作成
 	CString fileName = theApp.GetAppDirPath() + _T("\\user.dat");
@@ -59,21 +57,34 @@ void Login::Read()
 		}
 
 		// mixi
-		m_loginMail   = Read(fp);
-		m_loginPwd    = Read(fp);
-		CString dummy = Read(fp);		// 旧オーナーID（互換性確保のためのパディング）
+		CString s;
+		SetMixiEmail( ReadItem(fp) );
+		SetMixiPassword( ReadItem(fp) );
+		CString dummy = ReadItem(fp);		// 旧オーナーID（互換性確保のためのパディング）
 
 		// Twitter
-		m_twitterId	  = Read(fp);
-		m_twitterPwd  = Read(fp);
+		SetTwitterId( ReadItem(fp) );
+		SetTwitterPassword( ReadItem(fp) );
 
 		// Wassr
-		m_wassrId	  = Read(fp);
-		m_wassrPwd    = Read(fp);
+		SetWassrId( ReadItem(fp) );
+		SetWassrPassword( ReadItem(fp) );
 
 		// gooホーム
-		m_gooId					  = Read(fp);
-		m_goohomeQuoteMailAddress = Read(fp);
+		SetGooId( ReadItem(fp) );
+		SetGoohomeQuoteMailAddress( ReadItem(fp) );
+
+		//--- 以上の9項目は旧バージョンとの互換用データ。
+		//--- v1.0.0 以降は下記の汎用データ構造を正とし、上書きする。
+
+		// その他の汎用ID
+		// シリアライズした形式で保存されているのでデコードする
+		CString serializedId = ReadItem(fp, true);
+
+		UnserializeId(serializedId);
+
+//		MZ3LOGGER_DEBUG(serializedId);
+//		MZ3LOGGER_DEBUG(util::FormatString(L"serializedId len: %d", serializedId.GetLength()));
 
 		fclose(fp);
 	}
@@ -90,41 +101,40 @@ void Login::Write()
 	// ----------------------------------------
 	// エンコード処理
 	// ----------------------------------------
-	if (m_loginMail.GetLength() == 0 && m_loginPwd.GetLength() == 0 &&
-		m_twitterId.GetLength() == 0 && m_twitterPwd.GetLength() == 0 &&
-		m_wassrId.GetLength() == 0 && m_wassrPwd.GetLength() == 0
-		)
-	{
-		return;
-	}
-
 	FILE* fp = _wfopen(fileName, _T("wb"));
 	if (fp == NULL) {
 		return;
 	}
 
 	// mixi
-	Write( fp, m_loginMail );
-	Write( fp, m_loginPwd  );
+	WriteItem( fp, GetMixiEmail() );
+	WriteItem( fp, GetMixiPassword() );
 	CString dummyId;
-	Write( fp, dummyId );
+	WriteItem( fp, dummyId );
 
 	// Twitter
-	Write( fp, m_twitterId );
-	Write( fp, m_twitterPwd );
+	WriteItem( fp, GetTwitterId() );
+	WriteItem( fp, GetTwitterPassword() );
 
 	// Wassr
-	Write( fp, m_wassrId );
-	Write( fp, m_wassrPwd );
+	WriteItem( fp, GetWassrId() );
+	WriteItem( fp, GetWassrPassword() );
 
 	// gooホーム
-	Write( fp, m_gooId );
-	Write( fp, m_goohomeQuoteMailAddress );
+	WriteItem( fp, GetGooId() );
+	WriteItem( fp, GetGoohomeQuoteMailAddress() );
+
+	//--- 以上の9項目は旧バージョンとの互換用データ。
+	//--- v1.0.0 以降は下記の汎用データ構造を正する。
+
+	// その他の汎用ID
+	CString serializedId = SerializeId();
+	WriteItem( fp, serializedId, true );
 
 	fclose(fp);
 }
 
-CString Login::Read(FILE* fp)
+CString Login::ReadItem(FILE* fp, bool bSupportOver255)
 {
 	// blowfishの初期化
 	char key[256];
@@ -136,31 +146,42 @@ CString Login::Read(FILE* fp)
 
 	CString ret = _T("");
 
-	int len = (int)fgetc(fp);
+	DWORD len = 0;
+	if (bSupportOver255) {
+		BYTE l = (BYTE)fgetc(fp);
+		BYTE h = (BYTE)fgetc(fp);
+		len = MAKEWORD(l, h);
+
+//		MZ3LOGGER_DEBUG(util::FormatString(L" ReadItem, len[%d]", len));
+	} else {
+		len = fgetc(fp);
+	}
 
 	// 一文字目を抜き出す
-	char buf[256];
-	memset(buf, 0x00, sizeof(char) * 256);
-	int num = (int)fread(buf, sizeof(char), ((len/8)+1)*8, fp);
+	std::vector<char> buf;
+	int p_len = ((len/8)+1)*8;
+	buf.resize(p_len);
 
+	char* p = &buf[0];
+	memset(p, 0x00, sizeof(char) * p_len);
+	int num = (int)fread(p, sizeof(char), p_len, fp);
+
+	CStringA ret_mbs;
 	for (int i=0; i<(int)(len / 8) + 1; i++) {
 		char dBuf[9];
 		memset(dBuf, 0x00, sizeof(char) * 9);
-		memcpy(dBuf, buf+i*8, 8);
+		memcpy(dBuf, p+i*8, 8);
 		bf.decrypt((unsigned char*)dBuf);
 
-		TCHAR str[256];
-		memset(str, 0x00, sizeof(TCHAR) * 256);
-		mbstowcs(str, dBuf, 8);
-		ret += str;
+		ret_mbs += dBuf;
 	}
-
-	return ret.Mid(0, len);
+	ret = CString(ret_mbs.Mid(0, len));
+	return ret;
 }
 
-void Login::Write(FILE* fp, LPCTSTR tmp)
+void Login::WriteItem(FILE* fp, LPCTSTR tmp, bool bSupportOver255)
 {
-	CString str = tmp;
+	CStringA str_mbs(tmp);
 
 	// blowfishの初期化
 	char key[256];
@@ -170,24 +191,226 @@ void Login::Write(FILE* fp, LPCTSTR tmp)
 	bf::bf bf;
 	bf.init((unsigned char*)key, strlen(key)); // 初期化処理
 
-	int len = wcslen(tmp);
-	fputc(len, fp);
+	int len = str_mbs.GetLength();//wcslen(tmp);
+	if (bSupportOver255) {
+//		MZ3LOGGER_DEBUG(util::FormatString(L" WriteItem, len[%d]", len));
+
+		BYTE l = LOBYTE(len);
+		BYTE h = HIBYTE(len);
+		fputc(l, fp);
+		fputc(h, fp);
+	} else {
+		fputc(len, fp);
+	}
 
 	// パティング処理
 	for (int i=0; i<(((len / 8) + 1) * 8) - len; i++) {
-		str += _T("0");
+		str_mbs += _T("0");
 	}
+
 	for (int i=0; i<(int)(len / 8) + 1; i++) {
-		CString buf = str.Mid(i * 8, 8);
+		CStringA buf = str_mbs.Mid(i * 8, 8);
 
 		char mchar[256];
 		memset(mchar, '\0', sizeof(char) * 9);
-		wcstombs(mchar, buf, 8);
+		memcpy(mchar, buf, 8);
 
 		bf.encrypt((unsigned char*)mchar);
 
 		fwrite(mchar, sizeof(char), 8, fp);
 	}
 }
+
+inline CString my_simple_url_encode(CString s)
+{
+	s.Replace(L"%", L"%25");
+	s.Replace(L"<", L"%3C");
+	s.Replace(L">", L"%3E");
+	s.Replace(L",", L"%2C");
+
+//	MZ3LOGGER_DEBUG(s);
+	return s;
+}
+
+inline CString my_simple_url_decode(CString s)
+{
+	s.Replace(L"%2C", L",");
+	s.Replace(L"%3E", L">");
+	s.Replace(L"%3C", L"<");
+	s.Replace(L"%25", L"%");
+
+	return s;
+}
+
+/// m_idList をシリアライズする
+CString Login::SerializeId()
+{
+	// test 
+/*	m_idList.clear();
+	Data d;
+	d.strServiceName = L"mixi";
+	d.strId          = L"takke@takke.com";
+	d.strPassword    = L"pa55W04d";
+	d.strDummy1      = L"";
+	d.strDummy2      = L"";
+	m_idList.push_back(d);
+	d.strServiceName = L"gooホーム";
+	d.strId          = L"<>----%22";
+	d.strPassword    = L"__%,XX";
+	d.strDummy1      = L"aaa";
+	d.strDummy2      = L"bbb";
+	m_idList.push_back(d);
+	d.strServiceName = L"GMail";
+	d.strId          = L"takke30@gmail.com";
+	d.strPassword    = L"--__abc%%%<,>";
+	d.strDummy1      = L"%3C%3E%2C%25";
+	d.strDummy2      = L"%3C%3E%2C%25";
+	m_idList.push_back(d);
+*/
+	/*
+	 * シリアライズ形式：
+	 *   "<service_name,id,pw,d1,d2><service_name,id,pw,d1,d2>..."
+	 *   ただし、service_name 等の要素内の "<>,%" はそれぞれ "%3C%3E%2C%25" (URL Encoding) に変換する。
+	 */
+	CString result = L"";
+	for (size_t i=0; i<m_idList.size(); i++) {
+		Data d = m_idList[i];
+		result += L"<";
+		result += my_simple_url_encode(d.strServiceName);
+		result += L",";
+		result += my_simple_url_encode(d.strId);
+		result += L",";
+		result += my_simple_url_encode(d.strPassword);
+		result += L",";
+		result += my_simple_url_encode(d.strDummy1);
+		result += L",";
+		result += my_simple_url_encode(d.strDummy2);
+		result += L">";
+	}
+
+//	MessageBox(NULL, result, NULL, MB_OK);
+
+	return result;
+}
+
+/// serializedId をアンシリアライズして m_idList を生成する
+void Login::UnserializeId(const CString& serializedId)
+{
+//	MessageBox(NULL, serializedId, NULL, MB_OK);
+//	m_idList.clear();
+	
+	CString s(serializedId);
+
+	// s : "<name,id,pw,d1,d2><name,id,pw,d1,d2>...<name,id,pw,d1,d2>"
+	// <> を切り出し、それぞれを , で区切る
+	int start = 0;
+	int pos = 0;
+	while ((pos=s.Find('>', start))!=-1) {
+		// s[start] が '<' であること。
+		if (s.GetLength()>start && s[start]=='<') {
+			CString items = s.Mid(start+1, pos-start-1);
+
+			Data d;
+
+			int idx1 = 0, idx2 = 0;
+			idx2 = items.Find(',', idx1);
+			if (idx2==-1) {
+				MZ3LOGGER_ERROR(L"user.dat形式エラー");
+				break;
+			}
+			d.strServiceName = my_simple_url_decode(items.Mid(idx1, idx2-idx1));
+			idx1 = idx2+1;
+
+			idx2 = items.Find(',', idx1);
+			if (idx2==-1) {
+				MZ3LOGGER_ERROR(L"user.dat形式エラー");
+				break;
+			}
+			d.strId = my_simple_url_decode(items.Mid(idx1, idx2-idx1));
+			idx1 = idx2+1;
+
+			idx2 = items.Find(',', idx1);
+			if (idx2==-1) {
+				MZ3LOGGER_ERROR(L"user.dat形式エラー");
+				break;
+			}
+			d.strPassword = my_simple_url_decode(items.Mid(idx1, idx2-idx1));
+			idx1 = idx2+1;
+
+			idx2 = items.Find(',', idx1);
+			if (idx2==-1) {
+				MZ3LOGGER_ERROR(L"user.dat形式エラー");
+				break;
+			}
+			d.strDummy1 = my_simple_url_decode(items.Mid(idx1, idx2-idx1));
+			idx1 = idx2+1;
+
+			d.strDummy2 = my_simple_url_decode(items.Mid(idx1));
+
+/*			MessageBox(NULL, 
+				util::FormatString(
+					L"sn : [%s]\r\n"
+					L"id : [%s]\r\n"
+					L"pw : [%s]\r\n"
+					L"d1 : [%s]\r\n"
+					L"d2 : [%s]", d.strServiceName, d.strId, d.strPassword, d.strDummy1, d.strDummy2), 
+				NULL, MB_OK);
+*/
+			m_idList.push_back(d);
+
+			start = pos+1;
+		} else {
+			MZ3LOGGER_ERROR(L"user.dat形式エラー");
+			break;
+		}
+	}
+}
+
+/// ID 設定
+void Login::SetId(LPCTSTR szServiceName, LPCTSTR id)
+{
+	for (size_t i=0; i<m_idList.size(); i++) {
+		if (m_idList[i].strServiceName == szServiceName) {
+			m_idList[i].strId = id;
+			return;
+		}
+	}
+	m_idList.push_back(Data(szServiceName, id, L""));
+}
+
+/// Password 設定
+void Login::SetPassword(LPCTSTR szServiceName, LPCTSTR pw)
+{
+	for (size_t i=0; i<m_idList.size(); i++) {
+		if (m_idList[i].strServiceName == szServiceName) {
+			m_idList[i].strPassword = pw;
+			return;
+		}
+	}
+	m_idList.push_back(Data(szServiceName, L"", pw));
+}
+
+/// ID 取得 (未登録時は NULLを返す)
+LPCTSTR Login::GetId(LPCTSTR szServiceName)
+{
+	for (size_t i=0; i<m_idList.size(); i++) {
+		if (m_idList[i].strServiceName == szServiceName) {
+			return m_idList[i].strId;
+		}
+	}
+	return NULL;
+}
+
+/// Password 取得 (未登録時は NULLを返す)
+LPCTSTR Login::GetPassword(LPCTSTR szServiceName)
+{
+	for (size_t i=0; i<m_idList.size(); i++) {
+		if (m_idList[i].strServiceName == szServiceName) {
+			return m_idList[i].strPassword;
+		}
+	}
+	return NULL;
+}
+
 
 }// namespace option

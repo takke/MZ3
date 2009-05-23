@@ -26,16 +26,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	/// コンボボックスのインデックスと種別の対応
-	enum USER_DLG_COMBO_INDEX_TYPE {
-		USER_DLG_COMBO_INDEX_TYPE_MIXI    = 0,
-		USER_DLG_COMBO_INDEX_TYPE_TWITTER = 1,
-		USER_DLG_COMBO_INDEX_TYPE_WASSR   = 2,
-		USER_DLG_COMBO_INDEX_TYPE_GOOHOME = 3,
-	};
-
 	CComboBox					mc_comboType;
-	USER_DLG_COMBO_INDEX_TYPE	m_idxSelectedCombo;
+	int							m_idxSelectedCombo;
 
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();

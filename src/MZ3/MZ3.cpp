@@ -473,10 +473,7 @@ BOOL CMZ3App::InitInstance()
 
 	// 初回起動時（ユーザID、パスワード未設定時）は
 	// ユーザ設定画面を表示する。
-	if ((wcslen(m_loginMng.GetEmail()) == 0 && wcslen(m_loginMng.GetPassword()) == 0) &&
-		(wcslen(m_loginMng.GetTwitterId()) == 0 && wcslen(m_loginMng.GetTwitterPassword()) == 0)
-		)
-	{
+	if (m_loginMng.IsAllEmpty()) {
 		CString msg;
 		msg += MZ3_APP_NAME;
 		msg += L" をダウンロードしていただきありがとうございます！\n\n";
@@ -877,10 +874,10 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 
 	post_data.ClearPostBody();
 	post_data.AppendPostBody(L"email=");
-	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetEmail() ));
+	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetMixiEmail() ));
 	post_data.AppendPostBody(L"&");
 	post_data.AppendPostBody(L"password=");
-	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetPassword() ));
+	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetMixiPassword() ));
 	post_data.AppendPostBody(L"&");
 	post_data.AppendPostBody(L"next_url=");
 	post_data.AppendPostBody(URLEncoder::encode_euc( nextUrl ));
@@ -1215,7 +1212,7 @@ bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 	if (util::IsMixiAccessType(aType)) {
 		if (mixi::MixiParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
 			return true;
-		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetOwnerID())==0) {
+		} else if (aType != ACCESS_MAIN && wcslen(theApp.m_loginMng.GetMixiOwnerID())==0) {
 			// オーナーID未取得の場合もログアウトとみなす。
 			return true;
 		}
@@ -1388,7 +1385,15 @@ bool CMZ3App::MyLuaInit(void)
 	m_luaHooks.clear();
 	m_luaMenus.clear();
 	m_luaServices.clear();
+	m_luaAccounts.clear();
 	m_luaLastRegistedAccessType = ACCESS_TYPE_MZ3_SCRIPT_BASE;
+
+	// アカウントの初期値設定(旧バージョン互換用)
+	m_luaAccounts.push_back(CMZ3App::AccountData("mixi",      "メールアドレス", "パスワード"));
+	m_luaAccounts.push_back(CMZ3App::AccountData("Twitter",   "ID",             "パスワード"));
+	m_luaAccounts.push_back(CMZ3App::AccountData("Wassr",     "ID",             "パスワード"));
+	m_luaAccounts.push_back(CMZ3App::AccountData("gooホーム", "gooID",          "gooホーム ひとことメール投稿アドレス"));
+
 
 	// Lua の初期化
 	m_luaState = lua_open();
@@ -1512,7 +1517,7 @@ bool CMZ3App::MyLuaErrorReport(int status)
 void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 {
 	// 呼び出し前に theApp の値を設定
-	data->SetTextValue(L"owner_id", m_loginMng.GetOwnerID());
+	data->SetTextValue(L"owner_id", m_loginMng.GetMixiOwnerID());
 
 	// 共通パース関数を呼び出す
 	MZ3DataList dummy;
@@ -1520,7 +1525,7 @@ void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 
 	// 呼び出し後の処理
 	if (!data->GetTextValue(L"owner_id").IsEmpty()) {
-		m_loginMng.SetOwnerID(data->GetTextValue(L"owner_id"));
+		m_loginMng.SetMixiOwnerID(data->GetTextValue(L"owner_id"));
 		m_loginMng.Write();
 	}
 }

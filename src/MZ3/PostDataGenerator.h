@@ -325,7 +325,7 @@ public:
 		post.AppendPostBody( "&post_key=" );
 		post.AppendPostBody( post.GetPostKey() );
 		post.AppendPostBody( "&news_id=&id=" );
-		post.AppendPostBody( theApp.m_loginMng.GetOwnerID() );
+		post.AppendPostBody( theApp.m_loginMng.GetMixiOwnerID() );
 		post.AppendPostBody( "&diary_title=" );
 
 		// ƒ^ƒCƒgƒ‹‚ð EUC-JP URL Encoded String ‚É•ÏŠ·‚·‚é

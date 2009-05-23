@@ -195,10 +195,20 @@ public:
 		Service() : selected(false) {}
 		Service(const std::string& a_name, bool a_selected) : name(a_name), selected(a_selected) {}
 	};
+	struct AccountData
+	{
+		std::string service_name;		///< サービス名
+		std::string id_name;			///< IDの表示名
+		std::string password_name;		///< Passwordの表示名
+
+		AccountData(const std::string& sn="", const std::string& idn="", const std::string& pwn="")
+			: service_name(sn), id_name(idn), password_name(pwn) {}
+	};
 	std::map<std::string, std::string> m_luaParsers;				///< シリアライズキー → パーサ名
 	std::map<std::string, std::vector<std::string>> m_luaHooks;		///< {イベント} → パーサ名
 	std::vector<std::string>						m_luaMenus;		///< 登録済みメニュー項目
 	std::vector<Service>							m_luaServices;	///< 登録済みサービス群
+	std::vector<AccountData>						m_luaAccounts;	///< 登録済みアカウント情報(ログイン設定用)
 	int								   m_luaLastRegistedAccessType;	///< 利用済みアクセス種別
 
 public:

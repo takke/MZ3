@@ -1621,7 +1621,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			html.Load( theApp.m_filepath.temphtml );
 			if( mixi::HomeParser::IsLoginSucceeded(html) ) {
 				// ログイン成功
-				if (wcslen(theApp.m_loginMng.GetOwnerID()) != 0) {
+				if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) != 0) {
 					MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
 				} else {
 					MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
@@ -1652,7 +1652,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			MZ3Data data;
 			theApp.DoParseMixiHomeHtml(&data, &html);
 
-			if (wcslen(theApp.m_loginMng.GetOwnerID()) == 0) {
+			if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 				LPCTSTR msg = L"ログインに失敗しました(2)";
 				util::MySetInformationText( m_hWnd, msg );
 
