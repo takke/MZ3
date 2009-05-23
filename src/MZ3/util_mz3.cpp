@@ -407,9 +407,9 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 
 	bool rval = false;
 	for (int i=(int)hookFuncNames.size()-1; i>=0; i--) {
-		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
-							CString(hookFuncNames[i].c_str()),
-							CString(szEventName)));
+//		MZ3LOGGER_DEBUG(util::FormatString(L"call %s on %s", 
+//							CString(hookFuncNames[i].c_str()),
+//							CString(szEventName)));
 
 		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, data4)) {
 			rval = true;

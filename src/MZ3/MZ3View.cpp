@@ -294,22 +294,28 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_iconImageListSmall.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 6);
+		m_iconImageListSmall.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 9);
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_MAIL_NEW_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_MAIL_OPENED_ICON) );
+		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_RSS_ICON) );
 		m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
 
-		m_iconImageListLarge.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 6);
+		m_iconImageListLarge.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 9);
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_EVENT_JOIN_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_BIRTHDAY_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_SCHEDULE_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_MAIL_NEW_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_MAIL_OPENED_ICON) );
+		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_RSS_ICON) );
 
 		// カラム作成
 		// いずれも初期化時に再設定するので仮の幅を指定しておく。
@@ -362,17 +368,16 @@ void CMZ3View::OnInitialUpdate()
  */
 inline int MyGetBodyListDefaultIconIndex( const CMixiData& mixi )
 {
-	int iconIndex = -1;
-	switch (mixi.GetAccessType()) {
-	case ACCESS_BBS:		iconIndex = 0;	break;
-	case ACCESS_EVENT:		iconIndex = 1;	break;
-	case ACCESS_ENQUETE:	iconIndex = 2;	break;
-	case ACCESS_EVENT_JOIN:	iconIndex = 3;	break;
-	case ACCESS_BIRTHDAY:	iconIndex = 4;	break;
-	case ACCESS_SCHEDULE:	iconIndex = 5;  break;
-	default:				iconIndex = -1;	break;	// アイコンなし
+	// MZ3 API : フック関数呼び出し
+	int rval = 0;
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(mixi.GetAccessType()));
+	if (util::CallMZ3ScriptHookFunctions2("get_body_list_default_icon_index", &rval, 
+			util::MyLuaData(serializeKey), 
+			util::MyLuaData((void*)&mixi)))
+	{
+		return rval;
 	}
-	return iconIndex;
+	return -1;
 }
 
 /**

@@ -47,6 +47,9 @@
 #define IDB_SLIDE_LEFT_BITMAP           170
 #define IDB_SLIDE_RIGHT_BITMAP          172
 #define IDI_SCHEDULE_ICON               173
+#define IDI_MAIL_NEW_ICON               177
+#define IDI_MAIL_OPENED_ICON            178
+#define IDI_RSS_ICON                    179
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
@@ -324,7 +327,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        174
+#define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         34210
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118

@@ -32,6 +32,34 @@ MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY 		= 3;
 MAIN_VIEW_POST_MODE_WASSR_UPDATE			= 4;
 MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 
+----------------------------------------------------------------------
+-- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)
+----------------------------------------------------------------------
+
+--- ボディリストのアイコンのインデックス取得
+--
+-- @param event_name    'creating_default_group'
+-- @param serialize_key シリアライズキー(nil)
+-- @param body          body data
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] アイコンインデックス
+--
+function on_get_body_list_default_icon_index(event_name, serialize_key, body)
+
+	if serialize_key == "MIXI_BBS"        then return true, 0; end
+	if serialize_key == "MIXI_EVENT"      then return true, 1; end
+	if serialize_key == "MIXI_ENQUETE"    then return true, 2; end
+	if serialize_key == "MIXI_EVENT_JOIN" then return true, 3; end
+	if serialize_key == "MIXI_BIRTHDAY"   then return true, 4; end
+	if serialize_key == "MIXI_SCHEDULE"   then return true, 5; end
+	if serialize_key == "MIXI_MESSAGE"    then return true, 7; end
+	if serialize_key == "RSS_ITEM"        then return true, 8; end
+
+	return false;
+end
+mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
+
 -------------------------------------------------
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------

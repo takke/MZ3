@@ -875,6 +875,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_INVALID
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;
+	m_map[type].serializeKey = "RSS_ITEM";
 
 	type = ACCESS_RSS_READER_AUTO_DISCOVERY;
 	m_map[type] = AccessTypeInfo::Data(

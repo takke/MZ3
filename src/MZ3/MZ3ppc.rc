@@ -76,6 +76,9 @@ IDI_EVENT_JOIN_ICON     ICON                    "res\\event_join.ico"
 IDI_BIRTHDAY_ICON       ICON                    "res\\birthday.ico"
 IDI_EVENT_ICON          ICON                    "res\\event.ico"
 IDI_SCHEDULE_ICON       ICON                    "res\\schedule.ico"
+IDI_MAIL_NEW_ICON       ICON                    "res\\mail_new.ico"
+IDI_MAIL_OPENED_ICON    ICON                    "res\\mail_opened.ico"
+IDI_RSS_ICON            ICON                    "res\\RSS.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

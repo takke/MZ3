@@ -1598,6 +1598,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\mail_new.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\mail_opened.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\MZ3.ico"
 				>
 			</File>
@@ -1623,6 +1631,10 @@
 			</File>
 			<File
 				RelativePath=".\res\photo.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\RSS.ico"
 				>
 			</File>
 			<File
