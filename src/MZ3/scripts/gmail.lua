@@ -31,7 +31,7 @@ type = MZ3AccessTypeInfo.create();
 type:set_info_type('category');									-- カテゴリ
 type:set_service_type('gmail');									-- サービス種別
 type:set_serialize_key('GMAIL_INBOX');							-- シリアライズキー
-type:set_short_title('gmail 受信トレイ');						-- 簡易タイトル
+type:set_short_title('GMail 受信トレイ');						-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
 type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');				-- キャッシュファイル
 type:set_request_encoding('utf8');								-- エンコーディング
@@ -48,7 +48,7 @@ type = MZ3AccessTypeInfo.create();
 type:set_info_type('category');									-- カテゴリ
 type:set_service_type('gmail');									-- サービス種別
 type:set_serialize_key('GMAIL_LOGIN');							-- シリアライズキー
-type:set_short_title('gmail ログイン');							-- 簡易タイトル
+type:set_short_title('GMail ログイン');							-- 簡易タイトル
 type:set_request_method('POST');								-- リクエストメソッド
 type:set_cache_file_pattern('gmail\\login.html');				-- キャッシュファイル
 type:set_request_encoding('sjis');								-- エンコーディング
@@ -58,7 +58,7 @@ type = MZ3AccessTypeInfo.create();
 type:set_info_type('body');										-- カテゴリ
 type:set_service_type('gmail');									-- サービス種別
 type:set_serialize_key('GMAIL_MAIL');							-- シリアライズキー
-type:set_short_title('gmail メール');							-- 簡易タイトル
+type:set_short_title('GMail メール');							-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
 type:set_cache_file_pattern('gmail\\mail.html');				-- キャッシュファイル
 type:set_request_encoding('utf8');								-- エンコーディング
@@ -264,8 +264,9 @@ function gmail_inbox_parser(parent, body, html)
 							data:set_integer('is_new', 1);
 						else
 							data:set_integer('is_new', 0);
---							title = '[NEW] ' .. title;
 						end
+						title = title:gsub('<.->', '');
+						data:set_text("title", mz3.decode_html_entity(title));
 
 						-- URL 生成 : base_url と結合して生成
 						url = base_url .. href;
@@ -276,7 +277,6 @@ function gmail_inbox_parser(parent, body, html)
 						-- 名前
 						name = name:gsub('<b>', '');
 						name = name:gsub('</b>', '');
-						data:set_text("title", mz3.decode_html_entity(title));
 						data:set_text("name", mz3.decode_html_entity(name));
 						data:set_text("author", name);
 		
