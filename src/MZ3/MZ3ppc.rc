@@ -181,14 +181,8 @@ BEGIN
         MENUITEM "ブラウザで開く",                     ID_OPEN_BROWSER
     END
     MENUITEM "dummy",                       ID_DUMMY
+    MENUITEM "dummy",                       ID_DUMMY34210
     MENUITEM "dummy",                       65535
-    POPUP "gooホーム用メニュー"
-    BEGIN
-        MENUITEM "最新の一覧を取得",                    IDM_CATEGORY_OPEN
-        MENUITEM SEPARATOR
-        MENUITEM "コメントを読む...",                  ID_MENU_GOOHOME_READ_COMMENTS
-        MENUITEM "つぶやく",                        ID_MENU_GOOHOME_UPDATE
-    END
 END
 
 IDR_REPORT_MENU MENU 

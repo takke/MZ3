@@ -304,13 +304,12 @@
 #define IDM_LOAD_FULL_DIARY             34194
 #define ID_MENU_CHECK_UPDATE            34196
 #define ID_MENU_GOOHOME_READ            34197
-#define ID_MENU_GOOHOME_UPDATE          34198
-#define ID_MENU_GOOHOME_READ_COMMENTS   34200
 #define ID_MENU_RELOAD_LUA_SCRIPTS      34202
 #define ID_MENU_RELOAD_CATEGORY_LIST_LOG 34204
 #define ID_STOP_MENU                    34207
 #define ID_MENU_STOP                    34208
 #define ID_DUMMY                        34209
+#define ID_DUMMY34210                   34210
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -326,7 +325,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
-#define _APS_NEXT_COMMAND_VALUE         34210
+#define _APS_NEXT_COMMAND_VALUE         34211
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

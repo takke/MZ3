@@ -395,8 +395,6 @@ public:
 private:
 	bool DoAccessEndProcForSoftwareUpdateCheck(void);
 public:
-	afx_msg void OnMenuGoohomeUpdate();
-	afx_msg void OnMenuGoohomeReadComments();
 	void ReloadCategoryListLog();
 
 	void ReflectSplitterLineMove();

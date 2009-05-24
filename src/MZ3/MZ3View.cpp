@@ -142,8 +142,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
-	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
-	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
 	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
 END_MESSAGE_MAP()
 
@@ -2345,7 +2343,10 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 							return TRUE;
 						} else if (strServiceType == "gooHome") {
-							OnMenuGoohomeUpdate();
+							
+							// Lua 関数呼び出しで実装
+							theApp.MyLuaExecute(L"goohome.on_goohome_update()");
+
 							return TRUE;
 						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 
@@ -3791,32 +3792,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			// リンクの下に「URLをコピー」メニューを追加する
 			pSubMenu->AppendMenu( MF_SEPARATOR , ID_REPORT_URL_BASE, _T("-"));
 			pSubMenu->AppendMenu( MF_POPUP , (UINT_PTR)editmenu.GetSafeHmenu() , L"URLをコピー" ); 
-
-			// メニューを開く
-			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
-		}
-		break;
-
-	case ACCESS_GOOHOME_USER:
-		{
-			CMenu menu;
-			menu.LoadMenu( IDR_BODY_MENU );
-			CMenu* pSubMenu = menu.GetSubMenu(4);	// gooHome用メニューはidx=4
-
-			// リンク
-			int n = (int)bodyItem.m_linkList.size();
-			if( n > 0 ) {
-				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
-				for( int i=0; i<n; i++ ) {
-					// 追加
-					CString s;
-					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
-					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
-				}
-			}
-
-			// 暫定：メニュー表示直前のフック関数
-			util::CallMZ3ScriptHookFunctions("", "creating_goohome_user_context_menu", pSubMenu);
 
 			// メニューを開く
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -6860,31 +6835,6 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 	}
 
 	return true;
-}
-
-/**
- * gooHome | つぶやく
- */
-void CMZ3View::OnMenuGoohomeUpdate()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
-}
-
-/**
- * gooHome | コメントを読む
- */
-void CMZ3View::OnMenuGoohomeReadComments()
-{
-	CMixiData& data = GetSelectedBodyItem();
-
-	util::OpenUrlByBrowserWithConfirm(data.GetURL());
 }
 
 /// 「カテゴリログのリロード」メニュー
