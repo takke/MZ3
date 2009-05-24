@@ -80,7 +80,7 @@ menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show
 -- イベントハンドラ
 ----------------------------------------
 
--- 「つぶやく」メニュー用ハンドラ
+--- 「つぶやく」メニュー用ハンドラ
 function on_mixi_echo_update(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO);
@@ -92,7 +92,7 @@ function on_mixi_echo_update(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
--- 「返信」メニュー用ハンドラ
+--- 「返信」メニュー用ハンドラ
 function on_mixi_echo_reply(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY);
@@ -104,7 +104,7 @@ function on_mixi_echo_reply(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
--- 「プロフィール」メニュー用ハンドラ
+--- 「プロフィール」メニュー用ハンドラ
 function on_mixi_echo_show_profile(serialize_key, event_name, data)
 
 	-- 選択中の要素取得

@@ -127,8 +127,8 @@ function gmail_inbox_parser(parent, body, html)
 	
 	local t1 = mz3.get_tick_count();
 	
+	-- ログイン判定
 	is_logged_in = false;
-	
 	GALX = '';
 	continue_value = '';
 	local line_count = html:get_count();
@@ -165,136 +165,9 @@ function gmail_inbox_parser(parent, body, html)
 		for i=0, line_count-1 do
 			line = line .. html:get_at(i);
 		end
-		
---		print(line);
 
-		-- <base href="https://mail.google.com/mail/h/xxx/">
-		base_url = line:match('<base href="(.-)">');
---		mz3.alert(base_url);
-
-		pos = line:find('<tr ', 1, true);
-		if pos ~= nil then
-			pos = pos + 1;
-			while true do
-				found = line:find('<tr ', pos, true);
-				
-				if found ~= nil then
-					w = line:sub(pos, found-1);
-
---[[
-<tr bgcolor="#E8EEF7"> 
-  <td width="1%" nowrap> 
-    <input type="checkbox" name="t" value="1216cfad69f86322"> 
-      <img src="/mail/images/cleardot.gif" width="15" height="15" border="0" alt=""> 
-  </td> 
-  <td width="25%"> Twitter (2)</td> 
-  <td width="73%"> 
-    <a href="?v=c&th=xxx"> 
-    <span class="ts">
-    <font size="1">
-    <font color="#006633"> 
-    </font>
-    </font> 
-    xxxからダイレクトメッセージが届きました 
-    <font color="#7777CC"> 
-    xxx
-    </font>
-    </span> 
-    </a>
-    </td> 
-    <td width="1%" nowrap> 19:18 
-
-<tr bgcolor="#ffffff"> 
-  <td width="1%" nowrap> 
-    <input type="checkbox" name="t" value="xx"> 
-      <img src="/mail/images/cleardot.gif" width="15" height="15" border="0" alt=""> 
-  </td> 
-#以上、無視
-  <td width="25%"> 
-    <b>xxx</b>
-  </td> 
-#以上、name
-  <td width="73%"> 
-    <a href="?v=c&th=xx"> 
-#上記、URL の一部
-      <span class="ts">
-        <font size="1">
-          <font color="#006633"> 
-          </font>
-        </font> 
-        <b>たいとる</b> 
-# 上記 <b> タグ、title
-        <font color="#7777CC"> 
-ほんぶんばっすい
-ほんぶんばっすい &hellip;
-        </font>
-# 上記、quote
-      </span> 
-    </a>
-  </td> 
-  <td width="1%" nowrap> 
-    <b>0:55</b> 
-# 上記、日付時刻
-<tr bgcolor="#ffffff"> <td> 
-...
-]]
-					name, href, span, date
-						= w:match('<td.->.-</td>.-<td.-> (.-)</td>.-href="(.-)">.-<span.->(.-)</span>.-<td.->(.-)$');
-
-					if name~=nil then
-
-						-- data 生成
-						data = MZ3Data:create();
-						
-						--mz3.logger_debug(span);
-						--mz3.logger_debug(date);
-						
-						-- span には title, quote が含まれるが、とりあえず全部 title に入れる
-						title = span;
-						title = title:gsub('&hellip;', '...');
-
-						-- 未読・既読判定：<b> タグの有無で。
-						is_new = line_has_strings(title, '<b>');
-						title = title:gsub('<b>', '');
-						title = title:gsub('</b>', '');
-						if is_new then
-							data:set_integer('is_new', 1);
-						else
-							data:set_integer('is_new', 0);
-						end
-						title = title:gsub('<.->', '');
-						title = title:gsub('^ *', '');
-						data:set_text("title", mz3.decode_html_entity(title));
-
-						-- URL 生成 : base_url と結合して生成
-						url = base_url .. href;
-						data:set_text("url", url);
-						date = date:gsub('<.->', '');
-						data:set_date(date);
-
-						-- 名前
-						name = name:gsub('<b>', '');
-						name = name:gsub('</b>', '');
-						data:set_text("name", mz3.decode_html_entity(name));
-						data:set_text("author", name);
-		
-						-- URL に応じてアクセス種別を設定
-						type = mz3.get_access_type_by_key('GMAIL_MAIL');
-						data:set_access_type(type);
-		
-						-- data 追加
-						body:add(data.data);
-						
-						-- data 削除
-						data:delete();
-					end
-				else
---					mz3.logger_debug('BREAK!!');
-					break;
-				end
-				pos = found + 1;
-			end
-		end
+		-- ログイン済みのHTMLのパース
+		parse_gmail_inbox(parent, body, line);
 	else
 		-- ログイン処理
 
@@ -338,6 +211,153 @@ function gmail_inbox_parser(parent, body, html)
 	mz3.logger_debug("gmail_inbox_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("GMAIL_INBOX", "gmail.gmail_inbox_parser");
+
+
+--- ログイン済みの GMail 受信トレイの解析
+--
+-- @param parent 上ペインの選択オブジェクト(MZ3Data*)
+-- @param body   下ペインのオブジェクト群(MZ3DataList*)
+-- @param line   HTML 全文を1行に結合した文字列
+--
+function parse_gmail_inbox(parent, body, line)
+	mz3.logger_debug("parse_gmail_inbox start");
+
+	-- <base href="https://mail.google.com/mail/h/xxx/">
+	base_url = line:match('<base href="(.-)">');
+--	mz3.alert(base_url);
+
+	-- 1メールは '<tr ' で始まる
+	pos = line:find('<tr ', 1, true);
+	if pos == nil then
+		-- 解析中止
+		return;
+	end
+
+	pos = pos + 1;
+	looping = true;
+	while looping do
+		found = line:find('<tr ', pos, true);
+		if found == nil then
+			looping = false;
+			-- 最後のメールのあとは </table> が来る
+			found = line:find('</table>', pos, true);
+			if found == nil then
+				-- </table> すら見つからないのは怪しいので中止
+				break;
+			end
+		end
+
+		-- 1メールの抽出
+		w = line:sub(pos, found-1);
+--[[
+<tr bgcolor="#E8EEF7"> 
+<td width="1%" nowrap> 
+<input type="checkbox" name="t" value="1216cfad69f86322"> 
+<img src="/mail/images/cleardot.gif" width="15" height="15" border="0" alt=""> 
+</td> 
+<td width="25%"> Twitter (2)</td> 
+<td width="73%"> 
+<a href="?v=c&th=xxx"> 
+<span class="ts">
+<font size="1">
+<font color="#006633"> 
+</font>
+</font> 
+xxxからダイレクトメッセージが届きました 
+<font color="#7777CC"> 
+xxx
+</font>
+</span> 
+</a>
+</td> 
+<td width="1%" nowrap> 19:18 
+
+<tr bgcolor="#ffffff"> 
+<td width="1%" nowrap> 
+<input type="checkbox" name="t" value="xx"> 
+<img src="/mail/images/cleardot.gif" width="15" height="15" border="0" alt=""> 
+</td> 
+#以上、無視
+<td width="25%"> 
+<b>xxx</b>
+</td> 
+#以上、name
+<td width="73%"> 
+<a href="?v=c&th=xx"> 
+#上記、URL の一部
+<span class="ts">
+<font size="1">
+<font color="#006633"> 
+</font>
+</font> 
+<b>たいとる</b> 
+# 上記 <b> タグ、title
+<font color="#7777CC"> 
+ほんぶんばっすい
+ほんぶんばっすい &hellip;
+</font>
+# 上記、quote
+</span> 
+</a>
+</td> 
+<td width="1%" nowrap> 
+<b>0:55</b> 
+# 上記、日付時刻
+<tr bgcolor="#ffffff"> <td> 
+...
+]]
+		name, href, span, date
+			= w:match('<td.->.-</td>.-<td.-> (.-)</td>.-href="(.-)">.-<span.->(.-)</span>.-<td.->(.-)$');
+
+		if name~=nil then
+
+			-- data 生成
+			data = MZ3Data:create();
+			
+			--mz3.logger_debug(span);
+			--mz3.logger_debug(date);
+			
+			-- span には title, quote が含まれるが、とりあえず全部 title に入れる
+			title = span;
+			title = title:gsub('&hellip;', '...');
+
+			-- 未読・既読判定：<b> タグの有無で。
+			is_new = line_has_strings(title, '<b>');
+			if is_new then
+				data:set_integer('is_new', 1);
+			else
+				data:set_integer('is_new', 0);
+			end
+			title = title:gsub('<.->', '');
+			title = title:gsub('^ *', '');
+			title = mz3.decode_html_entity(title);
+			data:set_text("title", title);
+
+			-- URL 生成 : base_url と結合して生成
+			url = base_url .. href;
+			data:set_text("url", url);
+			date = date:gsub('<.->', '');
+			data:set_date(date);
+
+			-- 名前
+			name = name:gsub('<b>', '');
+			name = name:gsub('</b>', '');
+			data:set_text("name", mz3.decode_html_entity(name));
+			data:set_text("author", name);
+
+			-- URL に応じてアクセス種別を設定
+			type = mz3.get_access_type_by_key('GMAIL_MAIL');
+			data:set_access_type(type);
+
+			-- data 追加
+			body:add(data.data);
+			
+			-- data 削除
+			data:delete();
+		end
+		pos = found + 1;
+	end
+end
 
 
 --------------------------------------------------
