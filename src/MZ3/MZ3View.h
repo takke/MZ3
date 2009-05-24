@@ -391,8 +391,6 @@ public:
 	void ResetViewContent(void);
 	afx_msg void OnAcceleratorToggleIntegratedMode();
 	void MyResetTwitterStylePostMode();
-	afx_msg void OnMenuWassrRead();
-	afx_msg void OnMenuWassrUpdate();
 	bool DoAccessEndProcForRssAutoDiscovery(void);
 private:
 	bool DoAccessEndProcForSoftwareUpdateCheck(void);

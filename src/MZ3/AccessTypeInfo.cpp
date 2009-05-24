@@ -802,6 +802,15 @@ bool AccessTypeInfo::init()
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
 	m_map[type].serializeKey = "WASSR_UPDATE";
 
+	type = ACCESS_WASSR_USER;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "Wassr"
+		, L"Wassrî≠åæ"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].serializeKey = "WASSR_USER";
+
 	//------------------------------------------------------------------
 	//--- gooÉzÅ[ÉÄ ån
 	//------------------------------------------------------------------

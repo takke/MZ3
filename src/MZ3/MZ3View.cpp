@@ -141,8 +141,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
 
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
-	ON_COMMAND(ID_MENU_WASSR_READ, &CMZ3View::OnMenuWassrRead)
-	ON_COMMAND(ID_MENU_WASSR_UPDATE, &CMZ3View::OnMenuWassrUpdate)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND(ID_MENU_GOOHOME_UPDATE, &CMZ3View::OnMenuGoohomeUpdate)
 	ON_COMMAND(ID_MENU_GOOHOME_READ_COMMENTS, &CMZ3View::OnMenuGoohomeReadComments)
@@ -1563,11 +1561,6 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnViewBbsList();
 		return;
 
-	case ACCESS_WASSR_USER:
-		// 全文表示
-		OnMenuWassrRead();
-		break;
-
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
 		OnMenuRssRead();
@@ -2346,7 +2339,10 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 							return TRUE;
 						} else if (strServiceType == "Wassr") {
-							OnMenuWassrUpdate();
+
+							// Lua 関数呼び出しで実装
+							theApp.MyLuaExecute(L"wassr.on_wassr_update()");
+
 							return TRUE;
 						} else if (strServiceType == "gooHome") {
 							OnMenuGoohomeUpdate();
@@ -2416,11 +2412,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		case ACCESS_COMMUNITY:
 			// メニュー表示
 			PopupBodyMenu();
-			break;
-
-		case ACCESS_WASSR_USER:
-			// 全文表示
-			OnMenuWassrRead();
 			break;
 
 		case ACCESS_RSS_READER_ITEM:
@@ -3772,73 +3763,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			}
 
 			break;
-		}
-		break;
-/*
-	case ACCESS_MIXI_ECHO_USER:
-		{
-			CMenu* pSubMenu = new CMenu();
-			pSubMenu->CreatePopupMenu();
-
-			pSubMenu->AppendMenu(MF_STRING, IDM_CATEGORY_OPEN, L"最新の一覧を取得");
-			pSubMenu->AppendMenu(MF_SEPARATOR, 0, L"");
-			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_UPDATE, L"つぶやく");
-			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_SHOW_PROFILE, L"プロフィールページ");
-			pSubMenu->AppendMenu(MF_SEPARATOR, 0, L"");
-
-			// リンク
-			int n = (int)bodyItem.m_linkList.size();
-			if( n > 0 ) {
-				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
-				for( int i=0; i<n; i++ ) {
-					// 追加
-					CString s;
-					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
-					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
-				}
-			}
-
-			// ユーザのエコー一覧
-			pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, 
-				util::FormatString(L"%s さんのエコー", bodyItem.GetName()));
-
-			// 引用ユーザのエコー一覧
-			CString ref_user_name = bodyItem.GetTextValue(L"ref_user_name");
-			if (!ref_user_name.IsEmpty()) {
-				pSubMenu->AppendMenu(MF_STRING, ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, 
-					util::FormatString(L"%s さんのエコー", ref_user_name));
-			}
-
-			// 暫定：メニュー表示直前のフック関数
-			util::CallMZ3ScriptHookFunctions("", "creating_mixi_echo_item_context_menu", pSubMenu);
-
-			// メニューを開く
-			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
-			delete pSubMenu;
-		}
-		break;
-*/
-
-	case ACCESS_WASSR_USER:
-		{
-			CMenu menu;
-			menu.LoadMenu( IDR_BODY_MENU );
-			CMenu* pSubMenu = menu.GetSubMenu(3);	// Wassr用メニューはidx=3
-
-			// リンク
-			int n = (int)bodyItem.m_linkList.size();
-			if( n > 0 ) {
-				pSubMenu->AppendMenu(MF_SEPARATOR, ID_REPORT_URL_BASE, _T("-"));
-				for( int i=0; i<n; i++ ) {
-					// 追加
-					CString s;
-					s.Format( L"link : %s", bodyItem.m_linkList[i].text );
-					pSubMenu->AppendMenu( MF_STRING, ID_REPORT_URL_BASE+(i+1), s);
-				}
-			}
-			
-			// メニューを開く
-			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
 		break;
 
@@ -6722,43 +6646,6 @@ void CMZ3View::MyResetTwitterStylePostMode()
 		break;
 	}
 */
-}
-
-/**
- * Wassr | 読む
- */
-void CMZ3View::OnMenuWassrRead()
-{
-	CMixiData& data = GetSelectedBodyItem();
-
-	// 本文を1行に変換して割り当て。
-	CString item;
-
-	CString v = data.GetBody();;
-	while( v.Replace( L"\r\n", L"" ) );
-	item.Append(v);
-	item.Append(L"\r\n");
-	item.Append(L"----\r\n");
-	
-	item.AppendFormat( L"name : %s\r\n", data.GetName() );
-	item.AppendFormat( L"%s\r\n", data.GetDate() );
-
-	MessageBox( item, data.GetName() );
-}
-
-/**
- * Wassr | つぶやく
- */
-void CMZ3View::OnMenuWassrUpdate()
-{
-	// モード変更
-	m_twitterPostMode = TWITTER_STYLE_POST_MODE_WASSR_UPDATE;
-
-	// ボタン名称変更
-	MyUpdateControlStatus();
-
-	// フォーカス移動。
-	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
 }
 
 /**

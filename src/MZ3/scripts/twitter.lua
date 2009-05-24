@@ -382,7 +382,6 @@ end
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
---	mz3.logger_debug(data:get_text('name'));
 	
 	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
 	item = data:get_text_array_joined_text('body');

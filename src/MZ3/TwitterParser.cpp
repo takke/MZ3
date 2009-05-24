@@ -359,18 +359,6 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strBody );
 				data.AddBody( strBody );
 
-				// source : status/source
-/*				try {
-					// 子要素として追加
-					CString source = status.getNode(L"source").getTextAll().c_str();
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( source );
-					CMixiData sourceData;
-					sourceData.AddBody( L"source : " + source );
-					data.AddChild( sourceData );
-				} catch (xml2stl::NodeNotFoundException& e) {
-					MZ3LOGGER_INFO( e.getMessage().c_str() );
-				} 
-*/
 				// name : status/user/screen_name
 				const xml2stl::Node& user = status.getNode( L"user" );
 				CString strName = user.getNode(L"screen_name").getTextAll().c_str();
@@ -378,25 +366,6 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 				data.SetName( strName );
 				data.SetAuthor( data.GetName() );
 
-				// author : status/user/name
-/*				try {
-					CString strAuthor = user.getNode(L"name").getTextAll().c_str();
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strAuthor );
-					data.SetAuthor( strAuthor );
-				} catch (xml2stl::NodeNotFoundException& e) {
-					MZ3LOGGER_INFO( e.getMessage().c_str() );
-				}
-*/
-/*				// description : status/user/description
-				try {
-					// title に入れるのは苦肉の策・・・
-					CString strTitle = user.getNode(L"description").getTextAll().c_str();
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter( strTitle );
-					data.SetTitle( strTitle );
-				} catch (xml2stl::NodeNotFoundException& e) {
-					MZ3LOGGER_INFO( e.getMessage().c_str() );
-				}
-*/
 				// id : status/id
 				int id = _wtoi( status.getNode(L"id").getTextAll().c_str() );
 				data.SetID( id );
@@ -408,11 +377,6 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 
 				// owner-id : status/user_login_id
 				data.SetOwnerID( _wtoi( status.getNode(L"user_login_id").getTextAll().c_str() ) );
-
-				// URL : status/user/url
-//				CString url = user.getNode( L"url" ).getTextAll().c_str();
-//				data.SetURL( url );
-//				data.SetBrowseUri( url );
 
 				// Image : status/user/profile_image_url
 				CString strImage = user.getNode( L"profile_image_url" ).getTextAll().c_str();

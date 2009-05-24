@@ -294,8 +294,6 @@
 #define IDM_CATEGORY_OPEN               34164
 #define ID_ADD_RSS_FEED_MENU            34166
 #define ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE 34171
-#define ID_MENU_WASSR_READ              34175
-#define ID_MENU_WASSR_UPDATE            34177
 #define ID_MENU_FONT_MAGNIFY            34180
 #define ID_MENU_FONT_SHRINK             34181
 #define ID_MENU_PREV_DIARY              34185
