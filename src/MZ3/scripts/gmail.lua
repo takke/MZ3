@@ -68,11 +68,11 @@ type:set_request_encoding('utf8');								-- エンコーディング
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 menu_items = {}
---menu_items.read_mail    = mz3_menu.regist_menu("gmail.on_mail_read_menu_item");
+menu_items.read               = mz3_menu.regist_menu("gmail.on_read_menu_item");
+menu_items.read_by_reportview = mz3_menu.regist_menu("gmail.on_read_by_reportview_menu_item");
+menu_items.open_by_browser    = mz3_menu.regist_menu("gmail.on_open_by_browser_menu_item");
+--menu_items.add_star           = mz3_menu.regist_menu("gmail.on_add_star_menu_item");
 
-----------------------------------------
--- イベントハンドラ
-----------------------------------------
 
 ----------------------------------------
 -- メニューへの登録
@@ -254,6 +254,8 @@ function gmail_inbox_parser(parent, body, html)
 						title = title:gsub('<font.->', '');
 						title = title:gsub('</font>', '');
 						title = title:gsub('^ *', '');
+						title = title:gsub('&hellip;', '...');
+
 						-- 未読・既読判定：<b> タグの有無で。
 						is_new = line_has_strings(title, '<b>');
 						title = title:gsub('<b>', '');
@@ -339,6 +341,7 @@ function gmail_inbox_parser(parent, body, html)
 end
 mz3.set_parser("GMAIL_INBOX", "gmail.gmail_inbox_parser");
 
+
 --------------------------------------------------
 -- 【ログイン】
 --
@@ -392,6 +395,7 @@ function gmail_login_parser(parent, body, html)
 end
 mz3.set_parser("GMAIL_LOGIN", "gmail.gmail_login_parser");
 
+
 --------------------------------------------------
 -- 【メール】
 --
@@ -420,9 +424,29 @@ function gmail_mail_parser(data, dimmy, html)
 		line = line .. html:get_at(i);
 	end
 	
+	-- TODO 複数スレッド対応
+	
+	-- タイトル
+	-- <h2><font size="+1"><b>たいとる</b></font></h2>
+	title = line:match('<h2><font size=.-><b>(.-)</b>');
+	data:set_text('title', mz3.decode_html_entity(title));
+	
+	-- 名前
+	-- <h3><font color="#00681C"> <b>なまえ</b> </font></h3>
+	name = line:match('<h3><font color=.-> <b>(.-)</b>');
+	data:set_text("name", mz3.decode_html_entity(name));
+	data:set_text("author", name);
+	
+	-- 日付
+	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
+	date = line:match('<td align="right" valign="top"> (.-) <');
+	data:set_date(date);
+	
 	-- 本文
 	-- <tr bgcolor="#ffffff">...<a name="m_">
 	body = line:match('<tr bgcolor="#ffffff">(.-)<a name="m_">');
+	body = body:gsub('^ *', '');
+	data:add_text_array("body", "\r\n");
 	data:add_body_with_extract(body);
 
 	local t2 = mz3.get_tick_count();
@@ -430,6 +454,10 @@ function gmail_mail_parser(data, dimmy, html)
 end
 mz3.set_parser("GMAIL_MAIL", "gmail.gmail_mail_parser");
 
+
+----------------------------------------
+-- イベントハンドラ
+----------------------------------------
 
 --- ボディリストのアイコンのインデックス取得
 --
@@ -455,19 +483,109 @@ end
 mz3.add_event_listener("get_body_list_default_icon_index", "gmail.on_get_body_list_default_icon_index");
 
 
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
+--- 全文表示メニューまたはダブルクリックイベント
+function on_read_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
--- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
---mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
---mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
+	data = MZ3Data:create(data);
+	
+	item = '';
+	item = item .. "名前 : " .. data:get_text('name') .. "\r\n";
+	item = item .. "日付 : " .. data:get_date() .. "\r\n";
+	item = item .. "----\r\n";
 
--- ボディリストのポップアップメニュー表示イベントハンドラ登録
---mz3.add_event_listener("popup_body_menu",  "gmail.on_popup_body_menu");
+	item = item .. data:get_text('title') .. "\r\n";
+	
+	item = item .. "\r\n";
+	item = item .. data:get_text('url') .. "\r\n";
+	
+	mz3.alert(item, data:get_text('name'));
 
--- estimate 対象の追加
---mz3.add_event_listener("estimate_access_type_by_url", "gmail.on_estimate_access_type");
+	return true;
+end
+
+
+--- レポートビューで開く
+function on_read_by_reportview_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_read_by_reportview_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	data = MZ3Data:create(data);
+
+	-- 通信開始
+	url = data:get_text('url');
+	key = "GMAIL_MAIL";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+
+	return true;
+end
+
+
+--- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
+function on_body_list_click(serialize_key, event_name, data)
+
+	-- ダブルクリックで全文表示したい場合は下記のコメントを外すこと
+--	if serialize_key=="GMAIL_MAIL" then
+--		-- 全文表示
+--		return on_read_menu_item(serialize_key, event_name, data);
+--	end
+	
+	-- 標準の処理を続行
+	return false;
+end
+mz3.add_event_listener("dblclk_body_list", "gmail.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "gmail.on_body_list_click");
+
+
+--- 「ホーム」メニュー用ハンドラ
+function on_open_by_browser_menu_item(serialize_key, event_name, data)
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+
+	mz3.open_url_by_browser_with_confirm(body:get_text('url'));
+end
+
+
+--- ボディリストのポップアップメニュー表示
+--
+-- @param event_name    'popup_body_menu'
+-- @param serialize_key ボディアイテムのシリアライズキー
+-- @param body          body
+-- @param wnd           wnd
+--
+function on_popup_body_menu(event_name, serialize_key, body, wnd)
+	if serialize_key~="GMAIL_MAIL" then
+		return false;
+	end
+
+	-- インスタンス化
+	body = MZ3Data:create(body);
+	
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu();
+	
+	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "本文を読む...", menu_items.read_by_reportview);
+	menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
+
+--	menu:append_menu("separator");
+--	menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+
+	menu:append_menu("separator");
+	menu:append_menu("string", "メールのプロパティ...", menu_items.read);
+
+	-- ポップアップ
+	menu:popup(wnd);
+	
+	-- メニューリソース削除
+	menu:delete();
+	
+	return true;
+end
+mz3.add_event_listener("popup_body_menu",  "gmail.on_popup_body_menu");
 
 
 mz3.logger_debug('gmail.lua end');

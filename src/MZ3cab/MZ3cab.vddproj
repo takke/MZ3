@@ -56,6 +56,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3095CFCE5205422B8702FB992595332F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3183679E24D6419EB5EAC43E0F652BE2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -147,6 +153,12 @@
         "Entry"
         {
         "MsmKey" = "8:_74CDFA05EA2D451AABB0AA9DA81E1DA1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_751FB0856A4948F697F69A26694DDF83"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -482,6 +494,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_3095CFCE5205422B8702FB992595332F"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\gmail.lua"
+            "TargetName" = "8:gmail.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_3183679E24D6419EB5EAC43E0F652BE2"
             {
             "SourcePath" = "8:..\\MZ3\\plugins\\dummy_plugin.lua"
@@ -758,6 +788,24 @@
             "TargetName" = "8:mixi_new_bbs_parser.luac"
             "Tag" = "8:"
             "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_751FB0856A4948F697F69A26694DDF83"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\gmail.luac"
+            "TargetName" = "8:gmail.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
