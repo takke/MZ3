@@ -251,9 +251,6 @@ function gmail_inbox_parser(parent, body, html)
 						
 						-- span には title, quote が含まれるが、とりあえず全部 title に入れる
 						title = span;
-						title = title:gsub('<font.->', '');
-						title = title:gsub('</font>', '');
-						title = title:gsub('^ *', '');
 						title = title:gsub('&hellip;', '...');
 
 						-- 未読・既読判定：<b> タグの有無で。
@@ -266,6 +263,7 @@ function gmail_inbox_parser(parent, body, html)
 							data:set_integer('is_new', 0);
 						end
 						title = title:gsub('<.->', '');
+						title = title:gsub('^ *', '');
 						data:set_text("title", mz3.decode_html_entity(title));
 
 						-- URL 生成 : base_url と結合して生成
