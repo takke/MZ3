@@ -444,6 +444,11 @@ function gmail_mail_parser(data, dimmy, html)
 	
 	-- TODO 複数スレッド対応
 	
+	-- base url の解析
+	-- <base href="https://mail.google.com/mail/h/xxx/">
+	base_url  = line:match('<base href="(.-)">');
+	base_host = base_url:match('(https?://.-)/');
+	
 	-- タイトル
 	-- <h2><font size="+1"><b>たいとる</b></font></h2>
 	title = line:match('<h2><font size=.-><b>(.-)</b>');
@@ -458,12 +463,42 @@ function gmail_mail_parser(data, dimmy, html)
 	-- 日付
 	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
 	date = line:match('<td align="right" valign="top"> (.-) <');
+	date = date:gsub('<.->', '');
 	data:set_date(date);
 	
 	-- 本文
 	-- <tr bgcolor="#ffffff">...<a name="m_">
 	body = line:match('<tr bgcolor="#ffffff">(.-)<a name="m_">');
+
+	-- 簡易HTML解析
+	body = body:gsub('<WBR>', '');
+	body = body:gsub('<a [^>]*></a>', "");
+	body = body:gsub('<b .->', "<b>");
+	body = body:gsub('<b>', "\n<b>\n<br>");
+	body = body:gsub('</b>', "<br>\n</b>\n");
+	body = body:gsub('<br ?/>', "<br>");
+	body = body:gsub('<font .->', "");
+	body = body:gsub('</font>', "");
+	body = body:gsub('<hr>', "----------------------------------------<br>");
+
+	body = body:gsub('<tr[^>]*>', "");
+	body = body:gsub('<td[^>]*>', "");
+	body = body:gsub('</tr>', "<br>");
+	body = body:gsub('</td>', "");
+	body = body:gsub('<table[^>]*>', "");
+	body = body:gsub('</table>', "");
+
+	-- 内部リンクの補完(/で始まる場合にホストを補完する)
+	body = body:gsub('(<a .-href=")/(.-")', '%1' .. base_host .. '%2');
+	body = body:gsub('(<img .-src=")/(.-")', '%1' .. base_host .. '%2');
+	-- 内部リンクの補完(?で始まる場合にbaseを補完する)
+	body = body:gsub('(<a .-href=")(\?.-")', '%1' .. base_host .. '%2');
+	body = body:gsub('(<img .-src=")\?(.-")', '%1' .. base_url .. '%2');
+	body = body:gsub("\r\n", "\n");
 	body = body:gsub('^ *', '');
+
+--	print(body);
+
 	data:add_text_array("body", "\r\n");
 	data:add_body_with_extract(body);
 
