@@ -489,8 +489,8 @@ function gmail_mail_parser(data, dimmy, html)
 	body = body:gsub('</table>', "");
 
 	-- 内部リンクの補完(/で始まる場合にホストを補完する)
-	body = body:gsub('(<a .-href=")/(.-")', '%1' .. base_host .. '%2');
-	body = body:gsub('(<img .-src=")/(.-")', '%1' .. base_host .. '%2');
+	body = body:gsub('(<a .-href=")(/.-")', '%1' .. base_host .. '%2');
+	body = body:gsub('(<img .-src=")(/.-")', '%1' .. base_host .. '%2');
 	-- 内部リンクの補完(?で始まる場合にbaseを補完する)
 	body = body:gsub('(<a .-href=")(\?.-")', '%1' .. base_host .. '%2');
 	body = body:gsub('(<img .-src=")\?(.-")', '%1' .. base_url .. '%2');
