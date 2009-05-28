@@ -1240,10 +1240,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\twitter_util.h"
-				>
-			</File>
-			<File
 				RelativePath=".\version.h"
 				>
 			</File>
