@@ -83,7 +83,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 	html = MZ3HTMLArray:create(html);
 
 	-- 全消去しない
-	body:clear();
+--	body:clear();
 	
 	-- 重複防止用の id 一覧を生成。
 	id_set = {};
@@ -112,14 +112,14 @@ function twitter_friends_timeline_parser(parent, body, html)
 			status = status .. line;
 			
 			-- id : status/id
-			s = status:match('<id>(.-)</id>');
+			id = status:match('<id>(.-)</id>');
 			
 			-- 同一IDがあれば追加しない。
 			if id_set[ id ] == nil then
 				-- data 生成
 				data = MZ3Data:create();
 				
-				data:set_integer('id', s);
+				data:set_integer('id', id);
 				
 				type = mz3.get_access_type_by_key('TWITTER_USER');
 				data:set_access_type(type);
@@ -192,7 +192,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 				-- URL を抽出し、リンクにする
 				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 					data:add_link_list(url, url);
-					mz3.logger_debug(url);
+--					mz3.logger_debug(url);
 				end
 
 				-- 一時リストに追加
