@@ -12,6 +12,8 @@
 mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
+ID_REPORT_URL_BASE = 36100 -37000;	-- URLを開く
+
 ----------------------------------------
 -- サービスの登録(タブ初期化用)
 ----------------------------------------
@@ -60,6 +62,167 @@ type:set_serialize_key('TWITTER_FRIENDSHIPS_DESTROY');		-- シリアライズキー
 type:set_short_title('フォロー解除');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
+
+
+--------------------------------------------------
+-- [list] タイムライン用パーサ
+--
+-- http://twitter.com/statuses/friends_timeline.xml
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function twitter_friends_timeline_parser(parent, body, html)
+	mz3.logger_debug("twitter_friends_timeline_parser start");
+	
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去しない
+	body:clear();
+	
+	-- 重複防止用の id 一覧を生成。
+	id_set = {};
+	n = body:get_count();
+	for i=0, n-1 do
+		id = mz3_data.get_integer(body:get_data(i), 'id');
+--		mz3.logger_debug(id);
+		id_set[ id ] = true;
+	end
+
+	local t1 = mz3.get_tick_count();
+	
+	-- 一時リスト
+	new_list = MZ3DataList:create();
+	
+	-- 複数行に分かれているので1行に結合
+	line = '';
+	local line_count = html:get_count();
+	status = '';
+	for i=0, line_count-1 do
+		line = html:get_at(i);
+		
+		if line_has_strings(line, '<status>') then
+			status = line;
+		elseif line_has_strings(line, '</status>') then
+			status = status .. line;
+			
+			-- id : status/id
+			s = status:match('<id>(.-)</id>');
+			
+			-- 同一IDがあれば追加しない。
+			if id_set[ id ] == nil then
+				-- data 生成
+				data = MZ3Data:create();
+				
+				data:set_integer('id', s);
+				
+				type = mz3.get_access_type_by_key('TWITTER_USER');
+				data:set_access_type(type);
+				
+				-- text : status/text
+				text = status:match('<text>(.-)</text>');
+				text = mz3.decode_html_entity(text);
+				data:add_text_array('body', text);
+				
+				-- source : status/source
+				s = status:match('<source>(.-)</source>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('source', s);
+				
+				-- name : status/user/screen_name
+				user = status:match('<user>.-</user>');
+				s = user:match('<screen_name>(.-)</screen_name>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('name', s);
+				
+				-- author : status/user/name
+				s = user:match('<name>(.-)</name>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('author', s);
+
+				-- description : status/user/description
+				-- title に入れるのは苦肉の策・・・
+				s = user:match('<description>(.-)</description>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('title', s);
+
+				-- owner-id : status/user/id
+				data:set_integer('owner_id', user:match('<id>(.-)</id>'));
+
+				-- URL : status/user/url
+				url = user:match('<url>(.-)</url>');
+				data:set_text('url', url);
+				data:set_text('browse_uri', url);
+
+				-- Image : status/user/profile_image_url
+				profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
+				profile_image_url = mz3.decode_html_entity(profile_image_url);
+--				mz3.logger_debug(profile_image_url);
+
+				-- ファイル名のみをURLエンコード
+--				int idx = strImage.ReverseFind( '/' );
+--				if (idx >= 0) {
+--					CString strFileName = strImage.Mid( idx +1 );
+--					strFileName = URLEncoder::encode_utf8( strFileName );
+--					strImage = strImage.Left(idx + 1);
+--					strImage += strFileName;
+--				}
+				data:add_text_array('image', profile_image_url);
+
+--				<location>East Tokyo United</location>
+				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
+--				<followers_count>555</followers_count>
+				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
+--				<friends_count>596</friends_count>
+				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
+--				<favourites_count>361</favourites_count>
+				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
+--				<statuses_count>7889</statuses_count>
+				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
+
+				-- updated : status/created_at
+				s = status:match('<created_at>(.-)</created_at>');
+				data:parse_date_line(s);
+				
+				-- URL を抽出し、リンクにする
+				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+					data:add_link_list(url, url);
+					mz3.logger_debug(url);
+				end
+
+				-- 一時リストに追加
+				new_list:add(data.data);
+				
+				-- data 削除
+				data:delete();
+
+			end
+
+			-- 次の status 取得
+			status = '';
+		elseif status ~= '' then	-- status が空であれば <status> 未発見なので読み飛ばす
+			status = status .. line;
+		end
+	end
+	
+	-- 生成したデータを出力に反映
+	body:merge(new_list);
+	--TwitterParserBase::MergeNewList(out_, new_list);
+
+	new_list:delete();
+	
+	-- 新着件数を parent(カテゴリの m_mixi) に設定する
+	parent:set_integer('new_count', new_count);
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("twitter_friends_timeline_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("TWITTER_FRIENDS_TIMELINE", "twitter.twitter_friends_timeline_parser");
 
 
 ----------------------------------------
@@ -382,6 +545,7 @@ end
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
+--	mz3.logger_debug(data:get_text('name'));
 	
 	-- 本文を1行に変換して表示
 	item = data:get_text_array_joined_text('body');
@@ -392,8 +556,23 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
 	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 	item = item .. data:get_date() .. "\r\n";
-	item = item .. "id : " .. data:get_integer('id') .. "\r\n";
-	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+--	item = item .. "id : " .. data:get_integer('id') .. "\r\n";
+--	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+
+	if data:get_text('location') ~= '' then
+		item = item .. "location : " .. data:get_text('location') .. "\r\n";
+	end
+	
+	if data:get_integer('friends_count') ~= -1 then
+		item = item .. "followings : " .. data:get_integer('friends_count')
+		            .. ", "
+		            .. "followers : " .. data:get_integer('followers_count')
+		            .. ", "
+		            .. "fav : " .. data:get_integer('favourites_count')
+		            .. ", "
+		            .. "発言 : " .. data:get_integer('statuses_count')
+		            .. "\r\n";
+	end
 	
 	-- ソース
 	source = data:get_text('source');

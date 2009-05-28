@@ -31,7 +31,6 @@
 #include "util_gui.h"
 #include "util_goo.h"
 #include "url_encoder.h"
-#include "twitter_util.h"
 #include "MixiParser.h"
 
 #ifdef _DEBUG

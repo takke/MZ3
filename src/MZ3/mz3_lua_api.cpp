@@ -9,6 +9,7 @@
 #include "MZ3.h"
 #include "MZ3View.h"
 #include "MixiParserUtil.h"
+#include "TwitterParser.h"
 #include "IniFile.h"
 #include "util_goo.h"
 #include "url_encoder.h"
@@ -1308,10 +1309,81 @@ int lua_mz3_data_get_link_list_text(lua_State *L)
 	return 1;
 }
 
+/*
+--- link_list に追加する
+--
+-- @param data MZ3Data オブジェクト
+-- @param url  URL
+-- @param text Text
+--
+function mz3_data.add_link_list(data, url, text)
+*/
+int lua_mz3_data_add_link_list(lua_State *L)
+{
+	const char* func_name = "mz3_data.add_link_list";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* url = lua_tostring(L, 2);	// 第2引数
+	const char* text = lua_tostring(L, 3);	// 第3引数
+
+	data->m_linkList.push_back(CMixiData::Link(CString(url), CString(text)));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 Data List API
 //-----------------------------------------------
+
+/*
+--- data_list の生成
+--
+--
+function mz3_data_list.create()
+*/
+int lua_mz3_data_list_create(lua_State *L)
+{
+	const char* func_name = "mz3_data_list.create";
+
+	MZ3DataList* data_list = new MZ3DataList();
+	lua_pushlightuserdata(L, data_list);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- data_list の消去
+--
+--
+function mz3_data_list.delete(data_list)
+*/
+int lua_mz3_data_list_delete(lua_State *L)
+{
+	const char* func_name = "mz3_data_list.delete";
+
+	// 引数取得
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// 第1引数
+	if (data_list==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 登録
+	delete data_list;
+
+	// 戻り値の数を返す
+	return 0;
+}
 
 /*
 --- data_list の要素をすべて消去する。
@@ -1400,6 +1472,85 @@ int lua_mz3_data_list_insert(lua_State *L)
 	// 戻り値の数を返す
 	return 0;
 }
+
+/*
+--- data_list の個数取得
+--
+function mz3_data_list.get_count(data_list)
+*/
+int lua_mz3_data_list_get_count(lua_State *L)
+{
+	const char* func_name = "mz3_data_list.get_count";
+
+	// 引数取得
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// 第1引数
+	if (data_list==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 個数
+	lua_pushinteger(L, data_list->size());
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- data_list の要素取得
+--
+function mz3_data_list.get_data(data_list, idx)
+*/
+int lua_mz3_data_list_get_data(lua_State *L)
+{
+	const char* func_name = "mz3_data_list.get_data";
+
+	// 引数取得
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// 第1引数
+	if (data_list==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	int idx = lua_tointeger(L, 2);	// 第2引数
+
+	lua_pushlightuserdata(L, (void*)&((*data_list)[idx]));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- data_list のmerge
+--
+--
+function mz3_data_list.merge(data_list, new_list)
+*/
+int lua_mz3_data_list_merge(lua_State *L)
+{
+	const char* func_name = "mz3_data_list.merge";
+
+	// 引数取得
+	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// 第1引数
+	if (data_list==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	MZ3DataList* new_list = (MZ3DataList*)lua_touserdata(L, 2);	// 第2引数
+	if (new_list==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	parser::TwitterParserBase::MergeNewList(*data_list, *new_list);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 Post Data API
@@ -2598,12 +2749,18 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 	{"get_link_list_url",	lua_mz3_data_get_link_list_url},
 	{"get_link_list_text",	lua_mz3_data_get_link_list_text},
 	{"get_link_list_size",	lua_mz3_data_get_link_list_size},
+	{"add_link_list",		lua_mz3_data_add_link_list},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_list_lib[] = {
 	{"clear",			lua_mz3_data_list_clear},
 	{"add",				lua_mz3_data_list_add},
 	{"insert",			lua_mz3_data_list_insert},
+	{"get_count",		lua_mz3_data_list_get_count},
+	{"get_data",		lua_mz3_data_list_get_data},
+	{"merge",			lua_mz3_data_list_merge},
+	{"create",			lua_mz3_data_list_create},
+	{"delete",			lua_mz3_data_list_delete},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_htmlarray_lib[] = {

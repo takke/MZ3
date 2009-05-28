@@ -49,6 +49,7 @@ function MZ3Data:parse_date_line(line)			return mz3_data.parse_date_line(self.da
 function MZ3Data:get_link_list_size()			return mz3_data.get_link_list_size(self.data);			end
 function MZ3Data:get_link_list_url(idx)			return mz3_data.get_link_list_url(self.data, idx);		end
 function MZ3Data:get_link_list_text(idx)		return mz3_data.get_link_list_text(self.data, idx);		end
+function MZ3Data:add_link_list(url, text)		return mz3_data.add_link_list(self.data, url, text);	end
 function MZ3Data:clear()						return mz3_data.clear(self.data);						end
 function MZ3Data:add_child(child)				return mz3_data.add_child(self.data, child.data);		end
 
@@ -75,7 +76,7 @@ function MZ3DataList:create(data_list)
 	
 	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
 	if data_list==nil then
-		return nil;
+		object.data_list = mz3_data_list.create();
 	else
 		object.data_list = data_list;
 	end
@@ -88,6 +89,11 @@ end
 function MZ3DataList:clear()				return mz3_data_list.clear(self.data_list);					end
 function MZ3DataList:add(data)				return mz3_data_list.add(self.data_list, data);				end
 function MZ3DataList:insert(index, data)	return mz3_data_list.insert(self.data_list, index, data);	end
+function MZ3DataList:get_count()			return mz3_data_list.get_count(self.data_list);				end
+function MZ3DataList:get_data(index)		return mz3_data_list.get_data(self.data_list, index);		end
+function MZ3DataList:delete()				return mz3_data_list.delete(self.data_list);				end
+function MZ3DataList:merge(new_list)		return mz3_data_list.merge(self.data_list, new_list.data_list);	end
+
 
 --------------------------------------------------
 -- Wrapper for mz3_htmlarray

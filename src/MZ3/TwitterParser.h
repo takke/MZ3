@@ -13,7 +13,7 @@ namespace parser {
 
 class TwitterParserBase : public parser::MZ3ParserBase
 {
-protected:
+public:
 	/**
 	 * out_ ‚Æ new_ ‚ğƒ}[ƒW‚·‚é
 	 *
