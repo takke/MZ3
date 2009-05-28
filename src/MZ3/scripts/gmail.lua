@@ -472,14 +472,15 @@ function gmail_mail_parser(data, dimmy, html)
 
 	-- 簡易HTML解析
 	body = body:gsub('<WBR>', '');
-	body = body:gsub('<a [^>]*></a>', "");
 	body = body:gsub('<b .->', "<b>");
+	body = body:gsub('<p .->', "<p>");
 	body = body:gsub('<b>', "\n<b>\n<br>");
 	body = body:gsub('</b>', "<br>\n</b>\n");
 	body = body:gsub('<br ?/>', "<br>");
 	body = body:gsub('<font .->', "");
 	body = body:gsub('</font>', "");
-	body = body:gsub('<hr>', "----------------------------------------<br>");
+	body = body:gsub('<hr .->', "<hr>");
+	body = body:gsub('<hr>', "<br>----------------------------------------<br>");
 
 	body = body:gsub('<tr[^>]*>', "");
 	body = body:gsub('<td[^>]*>', "");
@@ -487,6 +488,7 @@ function gmail_mail_parser(data, dimmy, html)
 	body = body:gsub('</td>', "");
 	body = body:gsub('<table[^>]*>', "");
 	body = body:gsub('</table>', "");
+	body = body:gsub('<map.-</map>', '');
 
 	-- 内部リンクの補完(/で始まる場合にホストを補完する)
 	body = body:gsub('(<a .-href=")(/.-")', '%1' .. base_host .. '%2');
@@ -497,10 +499,29 @@ function gmail_mail_parser(data, dimmy, html)
 	body = body:gsub("\r\n", "\n");
 	body = body:gsub('^ *', '');
 
---	print(body);
+	-- <img タグだが src がないものは削除
+	start = 1;
+	body2 = '';
+	while true do
+		pos = body:find('<img', start, true);
+		if pos == nil then
+			body2 = body2 .. body:sub(start);
+			break;
+		else
+			body2 = body2 .. body:sub(start, pos-1);
+			img = body:match('<img .->', start);
+			if line_has_strings(img, 'src=') then
+				body2 = body2 .. img;
+			end
+			start = pos + img:len();
+		end
+	end
+
+	body2 = body2:gsub('<a [^>]*></a>', "");
+--	print(body2);
 
 	data:add_text_array("body", "\r\n");
-	data:add_body_with_extract(body);
+	data:add_body_with_extract(body2);
 
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("gmail_mail_parser end; elapsed : " .. (t2-t1) .. "[msec]");
