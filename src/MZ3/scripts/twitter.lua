@@ -91,7 +91,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 	for i=0, n-1 do
 		id = mz3_data.get_integer(body:get_data(i), 'id');
 --		mz3.logger_debug(id);
-		id_set[ id ] = true;
+		id_set[ "" .. id ] = true;
 	end
 
 	local t1 = mz3.get_tick_count();
@@ -115,7 +115,12 @@ function twitter_friends_timeline_parser(parent, body, html)
 			id = status:match('<id>(.-)</id>');
 			
 			-- “¯ˆêID‚ª‚ ‚ê‚Î’Ç‰Á‚µ‚È‚¢B
-			if id_set[ id ] == nil then
+--			mz3.logger_debug('id : ');
+--			mz3.logger_debug(id);
+--			mz3.logger_debug(id_set[id]);
+			if id_set[ id ] then
+--				mz3.logger_debug('id[' .. id .. '] ‚ÍŠù‚É‘¶İ‚·‚é‚Ì‚Åskip‚·‚é');
+			else
 				-- data ¶¬
 				data = MZ3Data:create();
 				
