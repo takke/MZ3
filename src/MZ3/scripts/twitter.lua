@@ -99,7 +99,6 @@ function twitter_friends_timeline_parser(parent, body, html)
 	-- 一時リスト
 	new_list = MZ3DataList:create();
 	
-	-- 複数行に分かれているので1行に結合
 	line = '';
 	local line_count = html:get_count();
 	status = '';
@@ -115,9 +114,6 @@ function twitter_friends_timeline_parser(parent, body, html)
 			id = status:match('<id>(.-)</id>');
 			
 			-- 同一IDがあれば追加しない。
---			mz3.logger_debug('id : ');
---			mz3.logger_debug(id);
---			mz3.logger_debug(id_set[id]);
 			if id_set[ id ] then
 --				mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
 			else
@@ -228,6 +224,172 @@ function twitter_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("twitter_friends_timeline_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("TWITTER_FRIENDS_TIMELINE", "twitter.twitter_friends_timeline_parser");
+
+
+--------------------------------------------------
+-- [list] DM用パーサ
+--
+-- http://twitter.com/direct_messages.xml
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function twitter_direct_messages_parser(parent, body, html)
+	mz3.logger_debug("twitter_direct_messages_parser start");
+	
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 'sent.xml' があれば「送信メッセージ」
+	category_url = parent:get_text('url');
+	is_sent = line_has_strings(category_url, 'sent.xml');
+
+	-- 全消去しない
+--	body:clear();
+	
+	-- 重複防止用の id 一覧を生成。
+	id_set = {};
+	n = body:get_count();
+	for i=0, n-1 do
+		id = mz3_data.get_integer(body:get_data(i), 'id');
+		id_set[ "" .. id ] = true;
+	end
+
+	local t1 = mz3.get_tick_count();
+	
+	-- 一時リスト
+	new_list = MZ3DataList:create();
+	
+	line = '';
+	local line_count = html:get_count();
+	direct_message = '';
+	for i=0, line_count-1 do
+		line = html:get_at(i);
+		
+		if line_has_strings(line, '<direct_message>') then
+			direct_message = line;
+		elseif line_has_strings(line, '</direct_message>') then
+			direct_message = direct_message .. line;
+			
+			-- id : direct_message/id
+			id = direct_message:match('<id>(.-)</id>');
+			
+			-- 同一IDがあれば追加しない。
+			if id_set[ id ] then
+--				mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
+			else
+				-- data 生成
+				data = MZ3Data:create();
+				
+				data:set_integer('id', id);
+				
+				type = mz3.get_access_type_by_key('TWITTER_USER');
+				data:set_access_type(type);
+				
+				-- text : direct_message/text
+				text = direct_message:match('<text>(.-)</text>');
+				text = mz3.decode_html_entity(text);
+				data:add_text_array('body', text);
+				
+				-- updated : status/created_at
+				s = direct_message:match('<created_at>(.-)</created_at>');
+				data:parse_date_line(s);
+				
+				-- URL を抽出し、リンクにする
+				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+					data:add_link_list(url, url);
+--					mz3.logger_debug(url);
+				end
+				
+
+				if is_sent then
+					user = direct_message:match('<recipient>.-</recipient>');
+				else
+					user = direct_message:match('<sender>.-</sender>');
+				end
+				
+				-- name : direct_message/user/screen_name
+				s = user:match('<screen_name>(.-)</screen_name>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('name', s);
+				
+				-- author : direct_message/user/name
+				s = user:match('<name>(.-)</name>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('author', s);
+
+				-- description : direct_message/user/description
+				-- title に入れるのは苦肉の策・・・
+				s = user:match('<description>(.-)</description>');
+				s = mz3.decode_html_entity(s);
+				data:set_text('title', s);
+
+				-- owner-id : direct_message/user/id
+				data:set_integer('owner_id', user:match('<id>(.-)</id>'));
+
+				-- URL : direct_message/user/url
+				url = user:match('<url>(.-)</url>');
+				data:set_text('url', url);
+				data:set_text('browse_uri', url);
+
+				-- Image : direct_message/user/profile_image_url
+				profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
+				profile_image_url = mz3.decode_html_entity(profile_image_url);
+--				mz3.logger_debug(profile_image_url);
+
+				-- ファイル名のみをURLエンコード
+--				int idx = strImage.ReverseFind( '/' );
+--				if (idx >= 0) {
+--					CString strFileName = strImage.Mid( idx +1 );
+--					strFileName = URLEncoder::encode_utf8( strFileName );
+--					strImage = strImage.Left(idx + 1);
+--					strImage += strFileName;
+--				}
+				data:add_text_array('image', profile_image_url);
+
+--				<location>East Tokyo United</location>
+				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
+--				<followers_count>555</followers_count>
+				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
+--				<friends_count>596</friends_count>
+				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
+--				<favourites_count>361</favourites_count>
+				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
+--				<statuses_count>7889</statuses_count>
+				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
+
+				-- 一時リストに追加
+				new_list:add(data.data);
+				
+				-- data 削除
+				data:delete();
+
+			end
+
+			-- 次の direct_message 取得
+			direct_message = '';
+		elseif direct_message ~= '' then	-- direct_message が空であれば <direct_message> 未発見なので読み飛ばす
+			direct_message = direct_message .. line;
+		end
+	end
+	
+	-- 生成したデータを出力に反映
+	body:merge(new_list);
+	--TwitterParserBase::MergeNewList(out_, new_list);
+
+	new_list:delete();
+	
+	-- 新着件数を parent(カテゴリの m_mixi) に設定する
+	parent:set_integer('new_count', new_count);
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("twitter_direct_messages_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parser");
 
 
 ----------------------------------------

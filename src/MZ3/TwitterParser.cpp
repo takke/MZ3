@@ -20,6 +20,7 @@ namespace parser {
  * 【タイムライン】
  * http://twitter.com/statuses/friends_timeline.xml
  */
+/*
 bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
@@ -164,6 +165,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
 			) );
 	return true;
 }
+*/
 
 /**
  * [list] DM用パーサ
@@ -171,6 +173,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& o
  * 【メッセージ】
  * http://twitter.com/direct_messages.xml
  */
+/*
 bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"TwitterDirectMessagesXmlParser.parse() start." );
@@ -301,6 +304,8 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
 	MZ3LOGGER_DEBUG( L"TwitterDirectMessagesXmlParser.parse() finished." );
 	return true;
 }
+*/
+
 
 /**
  * [list] タイムライン用パーサ

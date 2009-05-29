@@ -123,17 +123,21 @@ public:
 */
 };
 
+/*
 class TwitterFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiData& parent, CMixiDataList& out_, const CHtmlArray& html_ );
 };
+*/
 
+/*
 class TwitterDirectMessagesXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
+*/
 
 class WassrFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
