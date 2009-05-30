@@ -33,7 +33,7 @@ type:set_service_type('gmail');									-- サービス種別
 type:set_serialize_key('GMAIL_INBOX');							-- シリアライズキー
 type:set_short_title('GMail 受信トレイ');						-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');				-- キャッシュファイル
+type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');	-- キャッシュファイル
 type:set_request_encoding('utf8');								-- エンコーディング
 type:set_default_url('https://mail.google.com/mail/h/');
 --type:set_default_url('https://integration.auone.jp/login/CMN2101E01.do');
@@ -90,7 +90,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 	services = mz3_group_data.get_services(group);
 	if services:find(' gmail', 1, true) ~= nil then
 		-- 受信トレイ
-		local tab = MZ3GroupItem:create("gmail");
+		local tab = MZ3GroupItem:create("GMail");
 
 		tab:append_category("受信トレイ", "GMAIL_INBOX");
 		tab:append_category("スター付き", "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=r');
@@ -105,6 +105,10 @@ function on_creating_default_group(serialize_key, event_name, group)
 end
 mz3.add_event_listener("creating_default_group", "gmail.on_creating_default_group");
 
+
+----------------------------------------
+-- パーサ
+----------------------------------------
 
 --------------------------------------------------
 -- 【受信トレイ】
@@ -614,7 +618,7 @@ mz3.add_event_listener("dblclk_body_list", "gmail.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "gmail.on_body_list_click");
 
 
---- 「ホーム」メニュー用ハンドラ
+--- 「ブラウザで開く」メニュー用ハンドラ
 function on_open_by_browser_menu_item(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());

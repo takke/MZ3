@@ -224,6 +224,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("twitter_friends_timeline_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("TWITTER_FRIENDS_TIMELINE", "twitter.twitter_friends_timeline_parser");
+mz3.set_parser("TWITTER_FAVORITES", "twitter.twitter_friends_timeline_parser");
 
 
 --------------------------------------------------

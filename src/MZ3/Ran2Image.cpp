@@ -86,7 +86,7 @@ bool Ran2Image::PrepareAnimation()
    m_pPropertyItem = (PropertyItem*) malloc(nSize);
    GetPropertyItem(PropertyTagFrameDelay, nSize, m_pPropertyItem);
 
-   delete  pDimensionIDs;
+   delete[] pDimensionIDs;
 
    return(m_nFrameCount > 1);
 }

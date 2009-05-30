@@ -755,6 +755,8 @@ int CMZ3App::ExitInstance()
 	::GdiplusShutdown(gdiToken);
 #endif
 
+	delete m_pMouseGestureManager;
+
 	MZ3LOGGER_DEBUG( MZ3_APP_NAME L" I—¹ˆ—Š®—¹" );
 
 	MZ3LOGGER_INFO( MZ3_APP_NAME L" I—¹" );
