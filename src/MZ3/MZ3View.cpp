@@ -6701,6 +6701,9 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 			theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 		AppendCategoryList(categoryItem);
 
+		// グループ定義ファイルの保存
+		theApp.SaveGroupData();
+
 		nAppendedFeed = 1;
 	} else {
 		MZ3LOGGER_INFO( L"RSS じゃないので、RSS AutoDiscovery してみるよ" );
@@ -6724,6 +6727,9 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 					theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 				AppendCategoryList(categoryItem);
 			}
+
+			// グループ定義ファイルの保存
+			theApp.SaveGroupData();
 
 			nAppendedFeed = items.size();
 		}
