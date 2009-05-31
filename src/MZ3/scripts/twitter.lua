@@ -470,7 +470,26 @@ end
 -- イベントハンドラ
 ----------------------------------------
 
--- 「つぶやく」メニュー用ハンドラ
+--- BASIC 認証設定
+function on_set_basic_auth_account(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Twitter' then
+		id       = mz3_account_provider.get_value('Twitter', 'id');
+		password = mz3_account_provider.get_value('Twitter', 'password');
+		
+		if id=='' or password=='' then
+			mz3.alert('ログイン設定画面でユーザIDとパスワードを設定してください');
+			return true, 1;
+		end
+		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
+		return true, 0, id, password;
+	end
+	return false;
+end
+mz3.add_event_listener("set_basic_auth_account", "twitter.on_set_basic_auth_account");
+
+
+--- 「つぶやく」メニュー用ハンドラ
 function on_twitter_update(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
@@ -482,7 +501,7 @@ function on_twitter_update(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
--- 「返信」メニュー用ハンドラ
+--- 「返信」メニュー用ハンドラ
 function on_twitter_reply(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
@@ -511,7 +530,7 @@ function on_twitter_reply(serialize_key, event_name, data)
 	mz3.keybd_event(VK_END, "keyup");
 end
 
--- 「メッセージ送信」メニュー用ハンドラ
+--- 「メッセージ送信」メニュー用ハンドラ
 function on_twitter_new_dm(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_DM);
@@ -523,7 +542,7 @@ function on_twitter_new_dm(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
--- 「お気に入り登録」メニュー用ハンドラ
+--- 「お気に入り登録」メニュー用ハンドラ
 function on_twitter_create_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -539,7 +558,7 @@ function on_twitter_create_favourings(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
--- 「お気に入り削除」メニュー用ハンドラ
+--- 「お気に入り削除」メニュー用ハンドラ
 function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -555,7 +574,7 @@ function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
--- 「フォローする」メニュー用ハンドラ
+--- 「フォローする」メニュー用ハンドラ
 function on_twitter_create_friendships(serialize_key, event_name, data)
 
 	-- 確認
@@ -578,7 +597,7 @@ function on_twitter_create_friendships(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
--- 「フォローやめる」メニュー用ハンドラ
+--- 「フォローやめる」メニュー用ハンドラ
 function on_twitter_destroy_friendships(serialize_key, event_name, data)
 
 	-- 確認

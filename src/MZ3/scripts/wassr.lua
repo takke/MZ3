@@ -176,6 +176,25 @@ mz3.set_parser("WASSR_FRIENDS_TIMELINE", "wassr.wassr_friends_timeline_parser");
 ----------------------------------------
 
 
+--- BASIC 認証設定
+function on_set_basic_auth_account(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Wassr' then
+		id       = mz3_account_provider.get_value('Wassr', 'id');
+		password = mz3_account_provider.get_value('Wassr', 'password');
+		
+		if id=='' or password=='' then
+			mz3.alert('ログイン設定画面でユーザIDとパスワードを設定してください');
+			return true, 1;
+		end
+		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
+		return true, 0, id, password;
+	end
+	return false;
+end
+mz3.add_event_listener("set_basic_auth_account", "wassr.on_set_basic_auth_account");
+
+
 -- 「つぶやく」メニュー用ハンドラ
 function on_wassr_update(serialize_key, event_name, data)
 	-- モード変更

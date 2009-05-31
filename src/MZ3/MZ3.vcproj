@@ -1291,10 +1291,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\util_goo.h"
-					>
-				</File>
-				<File
 					RelativePath=".\util_gui.h"
 					>
 				</File>

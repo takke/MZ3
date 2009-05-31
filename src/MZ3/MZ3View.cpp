@@ -2985,33 +2985,9 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		break;
 	}
 
-	// 認証情報の設定
+	// MZ3 API : BASIC認証設定
 	CString strUser = NULL;
 	CString strPassword = NULL;
-	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Twitter") {
-		// Twitter API => Basic 認証
-		strUser     = theApp.m_loginMng.GetTwitterId();
-		strPassword = theApp.m_loginMng.GetTwitterPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
-			return;
-		}
-	}
-	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="Wassr") {
-		// Wassr API => Basic 認証
-		strUser     = theApp.m_loginMng.GetWassrId();
-		strPassword = theApp.m_loginMng.GetWassrPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
-			return;
-		}
-	}
-
-	// MZ3 API : BASIC認証設定
 	util::MyLuaDataList rvals;
 	rvals.push_back(util::MyLuaData(0));	// is_cancel
 	rvals.push_back(util::MyLuaData(""));	// id
@@ -5222,51 +5198,9 @@ void CMZ3View::OnBnClickedUpdateButton()
 		break;
 	}
 
-	// BASIC 認証設定 : TODO 全てAPI化すること
+	// MZ3 API : BASIC認証設定
 	CString strUser = NULL;
 	CString strPassword = NULL;
-	switch (m_twitterPostMode) {
-	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
-	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
-		break;
-
-	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
-	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
-		// Twitter API => Basic 認証
-		strUser     = theApp.m_loginMng.GetTwitterId();
-		strPassword = theApp.m_loginMng.GetTwitterPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
-			return;
-		}
-		break;
-
-	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
-		// Wassr API => Basic 認証
-		strUser     = theApp.m_loginMng.GetWassrId();
-		strPassword = theApp.m_loginMng.GetWassrPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でユーザIDとパスワードを設定してください" );
-			return;
-		}
-		break;
-
-/*	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
-		// gooHome API => Basic 認証
-		strUser     = theApp.m_loginMng.GetGooId();
-		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください" );
-			return;
-		}
-*/	}
-	// MZ3 API : BASIC認証設定
 	util::MyLuaDataList rvals;
 	rvals.push_back(util::MyLuaData(0));	// is_cancel
 	rvals.push_back(util::MyLuaData(""));	// id

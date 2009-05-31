@@ -514,33 +514,9 @@ int lua_mz3_open_url(lua_State *L)
 		break;
 	}
 
-	// 認証情報の設定
+	// MZ3 API : BASIC認証設定
 	CString strUser = NULL;
 	CString strPassword = NULL;
-	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="Twitter") {
-		// Twitter API => Basic 認証
-		strUser     = theApp.m_loginMng.GetTwitterId();
-		strPassword = theApp.m_loginMng.GetTwitterPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox(hwnd, L"ログイン設定画面でユーザIDとパスワードを設定してください", NULL, MB_OK);
-			return 0;
-		}
-	}
-	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="Wassr") {
-		// Wassr API => Basic 認証
-		strUser     = theApp.m_loginMng.GetWassrId();
-		strPassword = theApp.m_loginMng.GetWassrPassword();
-
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox(hwnd, L"ログイン設定画面でユーザIDとパスワードを設定してください", NULL, MB_OK);
-			return 0;
-		}
-	}
-
-	// MZ3 API : BASIC認証設定
 	util::MyLuaDataList rvals;
 	rvals.push_back(util::MyLuaData(0));	// is_cancel
 	rvals.push_back(util::MyLuaData(""));	// id
