@@ -179,15 +179,15 @@ function twitter_friends_timeline_parser(parent, body, html)
 --				}
 				data:add_text_array('image', profile_image_url);
 
---				<location>East Tokyo United</location>
+				-- <location>East Tokyo United</location>
 				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
---				<followers_count>555</followers_count>
+				-- <followers_count>555</followers_count>
 				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
---				<friends_count>596</friends_count>
+				-- <friends_count>596</friends_count>
 				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
---				<favourites_count>361</favourites_count>
+				-- <favourites_count>361</favourites_count>
 				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
---				<statuses_count>7889</statuses_count>
+				-- <statuses_count>7889</statuses_count>
 				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
 
 				-- updated : status/created_at
@@ -217,12 +217,11 @@ function twitter_friends_timeline_parser(parent, body, html)
 	
 	-- 生成したデータを出力に反映
 	body:merge(new_list);
-	--TwitterParserBase::MergeNewList(out_, new_list);
 
-	new_list:delete();
-	
 	-- 新着件数を parent(カテゴリの m_mixi) に設定する
-	parent:set_integer('new_count', new_count);
+	parent:set_integer('new_count', new_list:get_count());
+	
+	new_list:delete();
 	
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("twitter_friends_timeline_parser end; elapsed : " .. (t2-t1) .. "[msec]");

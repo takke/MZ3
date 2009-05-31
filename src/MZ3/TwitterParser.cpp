@@ -313,6 +313,7 @@ bool TwitterDirectMessagesXmlParser::parse( CMixiDataList& out_, const CHtmlArra
  * 【タイムライン】
  * http://api.wassr.jp/statuses/friends_timeline.xml
  */
+/*
 bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"WassrFriendsTimelineXmlParser.parse() start." );
@@ -421,6 +422,7 @@ bool WassrFriendsTimelineXmlParser::parse( CMixiDataList& out_, const CHtmlArray
 	MZ3LOGGER_DEBUG( util::FormatString(L"WassrFriendsTimelineXmlParser.parse() finished. elapsed:%d[msec]", sw.getElapsedMilliSecUntilNow()) );
 	return true;
 }
+*/
 
 /**
  * [list] gooホーム 友達・注目の人のひとこと一覧パーサ

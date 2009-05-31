@@ -139,11 +139,13 @@ public:
 };
 */
 
+/*
 class WassrFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
+*/
 
 /*
 class GoohomeQuoteQuotesFriendsParser : public parser::TwitterParserBase

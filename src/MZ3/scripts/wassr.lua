@@ -34,6 +34,138 @@ menu_items.update                = mz3_menu.regist_menu("wassr.on_wassr_update")
 -- サービス用関数
 ----------------------------------------
 
+
+----------------------------------------
+-- パーサ
+----------------------------------------
+
+--------------------------------------------------
+-- [list] タイムライン用パーサ
+--
+-- http://api.wassr.jp/statuses/friends_timeline.xml
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function wassr_friends_timeline_parser(parent, body, html)
+	mz3.logger_debug("wassr_friends_timeline_parser start");
+	
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去しない
+--	body:clear();
+	
+	-- 重複防止用の id 一覧を生成。
+	id_set = {};
+	n = body:get_count();
+	for i=0, n-1 do
+		id = mz3_data.get_integer(body:get_data(i), 'id');
+--		mz3.logger_debug(id);
+		id_set[ "" .. id ] = true;
+	end
+
+	local t1 = mz3.get_tick_count();
+	
+	-- 一時リスト
+	new_list = MZ3DataList:create();
+	
+	line = '';
+	local line_count = html:get_count();
+	for i=0, line_count-1 do
+		line = line .. html:get_at(i);
+	end
+	
+	while true do
+		status, after = line:match('<status>(.-)</status>(.*)$');
+		if status == nil or after == nil then
+			break;
+		end
+		line = after;
+
+		-- id : status/id
+		id = status:match('<id>(.-)</id>');
+		
+		-- 同一IDがあれば追加しない。
+		if id_set[ id ] then
+--			mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
+		else
+			-- data 生成
+			data = MZ3Data:create();
+			
+			data:set_integer('id', id);
+			
+			type = mz3.get_access_type_by_key('WASSR_USER');
+			data:set_access_type(type);
+			
+			-- text : status/text
+			text = status:match('<text>(.-)</text>');
+			text = text:gsub('&amp;', '&');
+			text = mz3.decode_html_entity(text);
+			data:add_text_array('body', text);
+			
+			-- name : status/user/screen_name
+			user = status:match('<user>.-</user>');
+			s = user:match('<screen_name>(.-)</screen_name>');
+			s = s:gsub('&amp;', '&');
+			s = mz3.decode_html_entity(s);
+			data:set_text('name', s);
+			
+			-- owner-id : status/user/id
+			data:set_integer('owner_id', status:match('<user_login_id>(.-)</user_login_id>'));
+
+			-- URL : status/user/url
+			url = user:match('<url>(.-)</url>');
+			data:set_text('url', url);
+			data:set_text('browse_uri', url);
+
+			-- Image : status/user/profile_image_url
+			profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
+			profile_image_url = mz3.decode_html_entity(profile_image_url);
+--			mz3.logger_debug(profile_image_url);
+
+			-- ファイル名のみをURLエンコード
+--			int idx = strImage.ReverseFind( '/' );
+--			if (idx >= 0) {
+--				CString strFileName = strImage.Mid( idx +1 );
+--				strFileName = URLEncoder::encode_utf8( strFileName );
+--				strImage = strImage.Left(idx + 1);
+--				strImage += strFileName;
+--			}
+			data:add_text_array('image', profile_image_url);
+
+			-- updated : status/epoch
+			s = status:match('<epoch>(.-)</epoch>');
+			data:parse_date_line(s);
+			
+			-- URL を抽出し、リンクにする
+			for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+				data:add_link_list(url, url);
+			end
+
+			-- 一時リストに追加
+			new_list:add(data.data);
+			
+			-- data 削除
+			data:delete();
+		end
+	end
+	
+	-- 生成したデータを出力に反映
+	body:merge(new_list);
+
+	new_list:delete();
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("wassr_friends_timeline_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("WASSR_FRIENDS_TIMELINE", "wassr.wassr_friends_timeline_parser");
+
+
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------

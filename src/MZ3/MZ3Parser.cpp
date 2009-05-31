@@ -131,7 +131,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 //	case ACCESS_TWITTER_FRIENDS_TIMELINE:		return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
 //	case ACCESS_TWITTER_FAVORITES:				return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// Žb’è
 //	case ACCESS_TWITTER_DIRECT_MESSAGES:		return parser::TwitterDirectMessagesXmlParser::parse( body, html );
-	case ACCESS_WASSR_FRIENDS_TIMELINE:			return parser::WassrFriendsTimelineXmlParser::parse( body, html );
+//	case ACCESS_WASSR_FRIENDS_TIMELINE:			return parser::WassrFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_RSS_READER_FEED:				return parser::RssFeedParser::parse( body, html );
 //	case ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS:	return parser::GoohomeQuoteQuotesFriendsParser::parse( body, html );
 	default:
