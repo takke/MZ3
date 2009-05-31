@@ -502,6 +502,19 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "twitter.on_reset_twitter_style_post_mode");
 
 
+--- Twitterスタイルのボタン名称の更新
+function on_update_twitter_update_button(event_name, serialize_key)
+	if serialize_key == 'TWITTER_NEW_DM' then
+		return true, 'DM';
+	elseif serialize_key == 'TWITTER_UPDATE' then
+		return true, '更新';
+	end
+	
+	return false;
+end
+mz3.add_event_listener("update_twitter_update_button", "twitter.on_update_twitter_update_button");
+
+
 --- 「つぶやく」メニュー用ハンドラ
 function on_twitter_update(serialize_key, event_name, data)
 	-- モード変更
@@ -767,19 +780,6 @@ function on_body_list_click(serialize_key, event_name, data)
 end
 mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
-
-
---- Twitterスタイルのボタン名称の更新
-function on_update_twitter_update_button(event_name, serialize_key)
-	if serialize_key == 'TWITTER_NEW_DM' then
-		return true, 'DM';
-	elseif serialize_key == 'TWITTER_UPDATE' then
-		return true, '更新';
-	end
-	
-	return false;
-end
-mz3.add_event_listener("update_twitter_update_button", "twitter.on_update_twitter_update_button");
 
 
 --- 全文表示メニューまたはダブルクリックイベント

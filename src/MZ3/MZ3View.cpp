@@ -5220,6 +5220,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 					// Twitter 以外
 					switch (aType) {
 					case ACCESS_MIXI_ADD_ECHO:
+					case ACCESS_MIXI_ADD_ECHO_REPLY:
 						// ログアウトチェック
 						if (theApp.IsMixiLogout(aType)) {
 							// ログアウト状態になっている
@@ -5712,21 +5713,6 @@ void CMZ3View::MyUpdateControlStatus(void)
 			{
 				// イベントハンドラ完了
 				pUpdateButton->SetWindowTextW( CString(rvals[0].m_strText) );
-				break;
-			}
-
-			switch (m_twitterPostAccessType) {
-			case ACCESS_MIXI_ADD_ECHO:
-				pUpdateButton->SetWindowTextW( L"echo" );
-				break;
-			case ACCESS_MIXI_ADD_ECHO_REPLY:
-				pUpdateButton->SetWindowTextW( L"返信" );
-				break;
-			case ACCESS_WASSR_UPDATE:
-				pUpdateButton->SetWindowTextW( L"Wassr" );
-				break;
-			case ACCESS_GOOHOME_QUOTE_UPDATE:
-				pUpdateButton->SetWindowTextW( L"ひとこと" );
 				break;
 			}
 		}

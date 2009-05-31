@@ -755,9 +755,19 @@ bool AccessTypeInfo::init()
 		INFO_TYPE_POST
 		, "mixi"
 		, L"èëÇ´çûÇﬁ"
-		, REQUEST_METHOD_GET
+		, REQUEST_METHOD_POST
 		);
 	m_map[type].serializeKey = "MIXI_ADD_ECHO";
+
+	// add_echo.pl(ï‘êM)
+	type = ACCESS_MIXI_ADD_ECHO_REPLY;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_POST
+		, "mixi"
+		, L"èëÇ´çûÇﬁ(ï‘êM)"
+		, REQUEST_METHOD_POST
+		);
+	m_map[type].serializeKey = "MIXI_ADD_ECHO_REPLY";
 
 	// echo î≠åæ
 	type = ACCESS_MIXI_ECHO_USER;

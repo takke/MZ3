@@ -110,6 +110,17 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "goohome.on_reset_twitter_style_post_mode");
 
 
+--- Twitterスタイルのボタン名称の更新
+function on_update_twitter_update_button(event_name, serialize_key)
+	if serialize_key == 'GOOHOME_QUOTE_UPDATE' then
+		return true, 'ひとこと';
+	end
+	
+	return false;
+end
+mz3.add_event_listener("update_twitter_update_button", "goohome.on_update_twitter_update_button");
+
+
 --- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
