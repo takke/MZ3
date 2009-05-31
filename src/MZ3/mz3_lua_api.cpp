@@ -11,7 +11,6 @@
 #include "MixiParserUtil.h"
 #include "TwitterParser.h"
 #include "IniFile.h"
-#include "util_goo.h"
 #include "url_encoder.h"
 
 //-----------------------------------------------

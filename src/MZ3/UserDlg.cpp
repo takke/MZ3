@@ -11,7 +11,6 @@
 #include "MZ3.h"
 #include "UserDlg.h"
 #include "util_base.h"
-#include "util_goo.h"
 #include "util_mz3.h"
 
 // CUserDlg ダイアログ

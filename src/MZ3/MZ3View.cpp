@@ -29,7 +29,6 @@
 #include "util.h"
 #include "util_mz3.h"
 #include "util_gui.h"
-#include "util_goo.h"
 #include "url_encoder.h"
 #include "MixiParser.h"
 
