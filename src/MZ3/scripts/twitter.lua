@@ -363,15 +363,15 @@ function twitter_direct_messages_parser(parent, body, html)
 --				}
 				data:add_text_array('image', profile_image_url);
 
---				<location>East Tokyo United</location>
+				-- <location>East Tokyo United</location>
 				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
---				<followers_count>555</followers_count>
+				-- <followers_count>555</followers_count>
 				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
---				<friends_count>596</friends_count>
+				-- <friends_count>596</friends_count>
 				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
---				<favourites_count>361</favourites_count>
+				-- <favourites_count>361</favourites_count>
 				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
---				<statuses_count>7889</statuses_count>
+				-- <statuses_count>7889</statuses_count>
 				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
 
 				-- 一時リストに追加
@@ -434,7 +434,6 @@ menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_o
 menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
 
 
-
 ----------------------------------------
 -- サービス用関数
 ----------------------------------------
@@ -489,10 +488,24 @@ end
 mz3.add_event_listener("set_basic_auth_account", "twitter.on_set_basic_auth_account");
 
 
+--- Twitter風書き込みモードの初期化
+function on_reset_twitter_style_post_mode(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Twitter' then
+		-- モード変更
+		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE'));
+		
+		return true;
+	end
+	return false;
+end
+mz3.add_event_listener("reset_twitter_style_post_mode", "twitter.on_reset_twitter_style_post_mode");
+
+
 --- 「つぶやく」メニュー用ハンドラ
 function on_twitter_update(serialize_key, event_name, data)
 	-- モード変更
-	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
+	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE'));
 
 	-- モード変更反映(ボタン名称変更)
 	mz3_main_view.update_control_status();
@@ -500,6 +513,7 @@ function on_twitter_update(serialize_key, event_name, data)
 	-- フォーカス移動
 	mz3_main_view.set_focus('edit');
 end
+
 
 --- 「返信」メニュー用ハンドラ
 function on_twitter_reply(serialize_key, event_name, data)
@@ -530,6 +544,7 @@ function on_twitter_reply(serialize_key, event_name, data)
 	mz3.keybd_event(VK_END, "keyup");
 end
 
+
 --- 「メッセージ送信」メニュー用ハンドラ
 function on_twitter_new_dm(serialize_key, event_name, data)
 	-- モード変更
@@ -541,6 +556,7 @@ function on_twitter_new_dm(serialize_key, event_name, data)
 	-- フォーカス移動
 	mz3_main_view.set_focus('edit');
 end
+
 
 --- 「お気に入り登録」メニュー用ハンドラ
 function on_twitter_create_favourings(serialize_key, event_name, data)
@@ -558,6 +574,7 @@ function on_twitter_create_favourings(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
+
 --- 「お気に入り削除」メニュー用ハンドラ
 function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
@@ -573,6 +590,7 @@ function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
+
 
 --- 「フォローする」メニュー用ハンドラ
 function on_twitter_create_friendships(serialize_key, event_name, data)
@@ -597,6 +615,7 @@ function on_twitter_create_friendships(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
+
 --- 「フォローやめる」メニュー用ハンドラ
 function on_twitter_destroy_friendships(serialize_key, event_name, data)
 
@@ -620,6 +639,7 @@ function on_twitter_destroy_friendships(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
+
 --- 「@xxx のタイムライン」メニュー用ハンドラ
 function on_show_friend_timeline(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
@@ -639,6 +659,7 @@ function on_show_friend_timeline(serialize_key, event_name, data)
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
+
 
 --- 「@xxx のタイムライン」(フォロワー)メニュー用ハンドラ
 function on_show_follower_tl_1(serialize_key, event_name, data)	show_follower_tl(1) end
@@ -664,6 +685,7 @@ function show_follower_tl(num)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
+
 --- 「ReTweet」メニュー用ハンドラ
 function on_retweet_menu_item(serialize_key, event_name, data)
 	-- モード変更
@@ -683,6 +705,7 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
+
 --- 「ホーム」メニュー用ハンドラ
 function on_open_home(serialize_key, event_name, data)
 
@@ -690,6 +713,7 @@ function on_open_home(serialize_key, event_name, data)
 	
 	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name'));
 end
+
 
 --- 「友達のお気に入り」メニュー用ハンドラ
 function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
@@ -699,6 +723,7 @@ function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
 	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name') .. "/favorites");
 end
 
+
 --- 「友達のサイト」メニュー用ハンドラ
 function on_open_friend_site(serialize_key, event_name, data)
 
@@ -706,6 +731,7 @@ function on_open_friend_site(serialize_key, event_name, data)
 	
 	mz3.open_url_by_browser_with_confirm(body:get_text('url'));
 end
+
 
 --- 「友達のお気に入り」メニュー用ハンドラ
 function on_open_friend_favorites(serialize_key, event_name, data)
@@ -728,6 +754,7 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
+
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="TWITTER_USER" then
@@ -738,6 +765,22 @@ function on_body_list_click(serialize_key, event_name, data)
 	-- 標準の処理を続行
 	return false;
 end
+mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
+
+
+--- Twitterスタイルのボタン名称の更新
+function on_update_twitter_update_button(event_name, serialize_key)
+	if serialize_key == 'TWITTER_NEW_DM' then
+		return true, 'DM';
+	elseif serialize_key == 'TWITTER_UPDATE' then
+		return true, '更新';
+	end
+	
+	return false;
+end
+mz3.add_event_listener("update_twitter_update_button", "twitter.on_update_twitter_update_button");
+
 
 --- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
@@ -786,6 +829,101 @@ function on_read_menu_item(serialize_key, event_name, data)
 
 	return true;
 end
+
+
+--- 更新ボタン押下イベント
+--
+-- @param event_name    'click_update_button'
+-- @param serialize_key Twitter風書き込みモードのシリアライズキー
+--
+function on_click_update_button(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="Twitter" then
+		return false;
+	end
+
+	-- 入力文字列を取得
+	text = mz3_main_view.get_edit_text();
+
+	-- 未入力時の処理
+	if text == '' then
+		if serialize_key == 'TWITTER_NEW_DM' then
+			-- 未入力はNG => 何もせずに終了
+			return true;
+		elseif serialize_key == 'TWITTER_UPDATE' then
+			-- 最新取得
+			mz3_main_view.retrieve_category_item();
+			return true;
+		end
+	end
+
+	-- 確認
+	data = mz3_main_view.get_selected_body_item();
+	data = MZ3Data:create(data);
+	if serialize_key == 'TWITTER_NEW_DM' then
+		msg = data:get_text('name') .. ' さんに以下のメッセージを送信します。\n'
+		   .. '----\n'
+		   .. text .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	elseif serialize_key == 'TWITTER_UPDATE' then
+		msg = 'Twitterで発言します。\n'
+		   .. '----\n'
+		   .. text .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	end
+
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
+
+	-- POST パラメータを設定
+	if serialize_key == 'TWITTER_NEW_DM' then
+		post:append_post_body('text=');
+		post:append_post_body(mz3.url_encode(text, 'utf8'));
+		post:append_post_body('&user=');
+		post:append_post_body(data:get_integer('owner_id'));
+	elseif serialize_key == 'TWITTER_UPDATE' then
+		post:append_post_body('status=');
+		post:append_post_body(mz3.url_encode(text, 'utf8'));
+		
+		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
+		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+		end
+		post:append_post_body('&source=');
+		post:append_post_body(mz3.get_app_name());
+	end
+
+	-- POST先URL設定
+	url = '';
+	if serialize_key == 'TWITTER_NEW_DM' then
+		url = 'http://twitter.com/direct_messages/new.xml';
+	elseif serialize_key == 'TWITTER_UPDATE' then
+		url = 'http://twitter.com/statuses/update.xml';
+	end
+	
+	-- 通信開始
+	access_type = mz3.get_access_type_by_key(serialize_key);
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+
+	return true;
+end
+mz3.add_event_listener("click_update_button", "twitter.on_click_update_button");
+
 
 --- POST 完了イベント
 --
@@ -863,6 +1001,8 @@ function on_post_end(event_name, serialize_key, http_status)
 	
 	return true;
 end
+mz3.add_event_listener("post_end", "twitter.on_post_end");
+
 
 --- GET 完了イベント
 --
@@ -891,6 +1031,8 @@ function on_get_end(event_name, serialize_key, http_status)
 
 	return false;
 end
+mz3.add_event_listener("get_end",  "twitter.on_get_end");
+
 
 --- ボディリストのポップアップメニュー表示
 --
@@ -992,6 +1134,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	return true;
 end
+mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
+
 
 --- デフォルトのグループリスト生成イベントハンドラ
 --
@@ -1016,23 +1160,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 	end
 end
-
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
-
--- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
-mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
-
--- ボディリストのポップアップメニュー表示イベントハンドラ登録
-mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
-
--- POST完了イベントハンドラ登録
-mz3.add_event_listener("post_end", "twitter.on_post_end");
-mz3.add_event_listener("get_end",  "twitter.on_get_end");
-
--- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "twitter.on_creating_default_group", false);
+
 
 mz3.logger_debug('twitter.lua end');

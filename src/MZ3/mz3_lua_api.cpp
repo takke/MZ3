@@ -12,6 +12,7 @@
 #include "TwitterParser.h"
 #include "IniFile.h"
 #include "url_encoder.h"
+#include "version.h"
 
 //-----------------------------------------------
 // lua support
@@ -47,6 +48,22 @@ int lua_mz3_get_app_name(lua_State *L)
 {
 	// 結果をスタックに積む
 	lua_pushstring(L, CStringA(MZ3_APP_NAME));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- アプリケーションのバージョン("1.0.0 Beta13")を返す
+--
+-- @return [string] バージョン文字列
+--
+function mz3.get_app_version()
+*/
+int lua_mz3_get_app_version(lua_State *L)
+{
+	// 結果をスタックに積む
+	lua_pushstring(L, CStringA(MZ3_VERSION_TEXT_SHORT));
 
 	// 戻り値の数を返す
 	return 1;
@@ -567,6 +584,9 @@ int lua_mz3_open_url(lua_State *L)
 
 	// UserAgent設定
 	CString strUserAgent(user_agent);
+
+	// コントロール状態の変更
+	theApp.m_pMainView->MyUpdateControlStatus();
 
 	// GET/POST 開始
 	theApp.m_inet.Initialize(hwnd, &s_data, encoding);
@@ -1606,6 +1626,35 @@ int lua_mz3_post_data_append_post_body(lua_State *L)
 	return 0;
 }
 
+/*
+--- POST するヘッダーの追加
+--
+-- @param post        POST 用オブジェクト
+-- @param text        追加する文字列
+--
+function mz3_post_data.append_additional_header(post, text)
+*/
+int lua_mz3_post_data_append_additional_header(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.append_additional_header";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CString text(lua_tostring(L, 2));
+
+	// 追加
+	post->AppendAdditionalHeader(text);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+
 //-----------------------------------------------
 // MZ3 HtmlArray API
 //-----------------------------------------------
@@ -2484,7 +2533,7 @@ int lua_mz3_group_item_delete(lua_State *L)
 //-----------------------------------------------
 
 /*
---- 書き込み用モード変更(書き込み先URL/API識別用)
+--- Twitter 風書き込み用モードの変更(書き込み先URL/API識別用) : いわゆるアクセス種別と同じ値
 --
 -- @param mode モード値
 --
@@ -2498,7 +2547,40 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 	int mode = lua_tointeger(L, 1);
 
 	// モード設定
-	theApp.m_pMainView->m_twitterPostMode = (CMZ3View::TWITTER_STYLE_POST_MODE)mode;
+	theApp.m_pMainView->m_twitterPostAccessType = (ACCESS_TYPE)mode;//(CMZ3View::TWITTER_STYLE_POST_MODE)mode;
+
+	// 旧バージョン互換用(TODO Lua 側の修正が終わったら削除すること)
+	switch (theApp.m_pMainView->m_twitterPostAccessType) {
+	case 0:
+		//TWITTER_STYLE_POST_MODE_TWITTER_UPDATE		 = 0,	///< タイムライン用発言入力中
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_UPDATE;
+		break;
+
+	case 1:
+		//TWITTER_STYLE_POST_MODE_TWITTER_DM			 = 1,	///< DM入力中
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_NEW_DM;
+		break;
+
+	case 2:
+		//TWITTER_STYLE_POST_MODE_MIXI_ECHO			 = 2,	///< mixiエコー入力中
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_ECHO;
+		break;
+
+	case 3:
+		//TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY		 = 3,	///< mixiエコー入力中(返信)
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_ECHO_REPLY;
+		break;
+
+	case 4:
+		//TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_WASSR_UPDATE;
+		break;
+
+	case 5:
+		//TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
+		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_GOOHOME_QUOTE_UPDATE;
+		break;
+	}
 
 	// 戻り値の数を返す
 	return 0;
@@ -2696,12 +2778,27 @@ int lua_mz3_main_view_set_info_text(lua_State *L)
 	return 0;
 }
 
+/*
+--- カテゴリの再読み込み
+--
+function mz3_main_view.retrieve_category_item();
+*/
+int lua_mz3_main_view_retrieve_category_item(lua_State *L)
+{
+	// 文字列設定
+	theApp.m_pMainView->RetrieveCategoryItem();
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
 	{"get_app_name",						lua_mz3_get_app_name},
+	{"get_app_version",						lua_mz3_get_app_version},
 	{"regist_service",						lua_mz3_regist_service},
 	{"logger_error",						lua_mz3_logger_error},
 	{"logger_info",							lua_mz3_logger_info},
@@ -2818,11 +2915,13 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_edit_text",			lua_mz3_main_view_set_edit_text},
 	{"get_edit_text",			lua_mz3_main_view_get_edit_text},
 	{"set_info_text",			lua_mz3_main_view_set_info_text},
+	{"retrieve_category_item",	lua_mz3_main_view_retrieve_category_item},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
 	{"append_post_body",		lua_mz3_post_data_append_post_body},
+	{"append_additional_header",lua_mz3_post_data_append_additional_header},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_account_provider_lib[] = {

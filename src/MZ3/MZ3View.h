@@ -50,7 +50,7 @@ public:
 	VIEW_STYLE			m_viewStyle;			///< 表示スタイル
 
 	/// Twitter 風送信項目の種別
-	enum TWITTER_STYLE_POST_MODE {
+/*	enum TWITTER_STYLE_POST_MODE {
 		TWITTER_STYLE_POST_MODE_TWITTER_UPDATE		 = 0,	///< タイムライン用発言入力中
 		TWITTER_STYLE_POST_MODE_TWITTER_DM			 = 1,	///< DM入力中
 		TWITTER_STYLE_POST_MODE_MIXI_ECHO			 = 2,	///< mixiエコー入力中
@@ -59,6 +59,9 @@ public:
 		TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
 	};
 	TWITTER_STYLE_POST_MODE	m_twitterPostMode;	///< Twitter 用送信種別
+*/
+	ACCESS_TYPE			m_twitterPostAccessType;///< Twitter 風送信アクセス種別
+
 
 	CRect				m_rectIcon;				///< アイコン表示領域のRECT
 

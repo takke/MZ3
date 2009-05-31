@@ -327,7 +327,11 @@ BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* p
 		// ‰Šú’l‰ğŒˆ
 		strUserAgent = theApp.m_optionMng.m_strUserAgent;
 	}
-	MZ3_TRACE(L"CInetAccess::DoPost(), uri[%s], ref[%s], UA[%s], m_strUserAgent[%s]\n", uri, ref, strUserAgent, m_strUserAgent);
+	MZ3_TRACE(L"CInetAccess::DoPost(), uri[%s], ref[%s], ID[%s], PW[%s], UA[%s], m_strUserAgent[%s]\n",
+		uri, ref, 
+		m_strUserId,
+		(m_strPassword.IsEmpty() ? L"" : L"********"),
+		strUserAgent, m_strUserAgent);
 	if (m_strUserAgent!=strUserAgent) {
 		CloseInternetHandles();
 		// Internet ƒnƒ“ƒhƒ‹‚à•Â‚¶‚é

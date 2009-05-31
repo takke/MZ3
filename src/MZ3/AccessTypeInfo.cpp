@@ -703,7 +703,7 @@ bool AccessTypeInfo::init()
 		INFO_TYPE_POST
 		, "Twitter"
 		, L"更新"
-		, REQUEST_METHOD_GET
+		, REQUEST_METHOD_POST
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_UPDATE";
@@ -723,7 +723,7 @@ bool AccessTypeInfo::init()
 		INFO_TYPE_POST
 		, "Twitter"
 		, L"メッセージ送信"
-		, REQUEST_METHOD_GET
+		, REQUEST_METHOD_POST
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_NEW_DM";
@@ -757,6 +757,7 @@ bool AccessTypeInfo::init()
 		, L"書き込む"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_ADD_ECHO";
 
 	// echo 発言
 	type = ACCESS_MIXI_ECHO_USER;

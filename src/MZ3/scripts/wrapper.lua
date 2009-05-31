@@ -171,6 +171,7 @@ function MZ3Menu:append_submenu(title, submenu)		return mz3_menu.append_submenu(
 function MZ3Menu:popup(wnd)							return mz3_menu.popup(self.menu, wnd);	end
 function MZ3Menu:delete()							return mz3_menu.delete(self.menu);	end
 
+
 --------------------------------------------------
 -- Wrapper for mz3_group_item (TAB)
 --------------------------------------------------
@@ -190,3 +191,28 @@ end
 
 function MZ3GroupItem:append_category(title, key, url)	return mz3_group_item.append_category(self.item, title, key, url);	end
 function MZ3GroupItem:delete()							return mz3_group_item.delete(self.item);	end
+
+
+--------------------------------------------------
+-- Wrapper for mz3_post_data
+--------------------------------------------------
+MZ3PostData = {};
+
+function MZ3PostData:create(post_data)
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	if post_data == nil then
+		object.post_data = mz3_post_data.create();
+	else
+		object.post_data = post_data;
+	end
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3PostData });
+	return object;
+end
+
+function MZ3PostData:append_post_body(text)	return mz3_post_data.append_post_body(self.post_data, text);	end
+function MZ3PostData:append_additional_header(header)	return mz3_post_data.append_additional_header(self.post_data, header);	end

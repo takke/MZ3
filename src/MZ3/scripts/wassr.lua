@@ -195,6 +195,20 @@ end
 mz3.add_event_listener("set_basic_auth_account", "wassr.on_set_basic_auth_account");
 
 
+--- Twitter風書き込みモードの初期化
+function on_reset_twitter_style_post_mode(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Wassr' then
+		-- モード変更
+		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('WASSR_UPDATE'));
+		
+		return true;
+	end
+	return false;
+end
+mz3.add_event_listener("reset_twitter_style_post_mode", "wassr.on_reset_twitter_style_post_mode");
+
+
 -- 「つぶやく」メニュー用ハンドラ
 function on_wassr_update(serialize_key, event_name, data)
 	-- モード変更

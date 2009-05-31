@@ -113,6 +113,7 @@ enum ACCESS_TYPE {
 	//--- mixi echo 関連
 	ACCESS_MIXI_RECENT_ECHO,			///< みんなのエコー：recent_echo.pl
 	ACCESS_MIXI_ADD_ECHO,				///< エコー書き込む：add_echo.pl
+	ACCESS_MIXI_ADD_ECHO_REPLY,			///< エコー返信：add_echo.pl
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 	ACCESS_POST_COMMENT_CONFIRM,		///< コメント投稿（確認画面）

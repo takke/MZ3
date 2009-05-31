@@ -96,6 +96,20 @@ end
 mz3.add_event_listener("set_basic_auth_account", "goohome.on_set_basic_auth_account");
 
 
+--- Twitter風書き込みモードの初期化
+function on_reset_twitter_style_post_mode(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='gooHome' then
+		-- モード変更
+		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('GOOHOME_QUOTE_UPDATE'));
+		
+		return true;
+	end
+	return false;
+end
+mz3.add_event_listener("reset_twitter_style_post_mode", "goohome.on_reset_twitter_style_post_mode");
+
+
 --- 全文表示メニューまたはダブルクリックイベント
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');

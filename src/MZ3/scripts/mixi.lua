@@ -85,6 +85,20 @@ menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show
 -- イベントハンドラ
 ----------------------------------------
 
+--- Twitter風書き込みモードの初期化
+function on_reset_twitter_style_post_mode(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='mixi' then
+		-- モード変更
+		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('MIXI_ADD_ECHO'));
+		
+		return true;
+	end
+	return false;
+end
+mz3.add_event_listener("reset_twitter_style_post_mode", "mixi.on_reset_twitter_style_post_mode");
+
+
 --- 「つぶやく」メニュー用ハンドラ
 function on_mixi_echo_update(serialize_key, event_name, data)
 	-- モード変更
