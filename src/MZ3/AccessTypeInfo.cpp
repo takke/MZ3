@@ -841,6 +841,7 @@ bool AccessTypeInfo::init()
 		, L"‚Ð‚Æ‚±‚ÆXV"
 		, REQUEST_METHOD_POST
 		);
+	m_map[type].serializeKey = "GOOHOME_QUOTE_UPDATE";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
 
 	type = ACCESS_GOOHOME_USER;

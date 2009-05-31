@@ -50,6 +50,7 @@ end
 -- イベントハンドラ
 ----------------------------------------
 
+
 --- ユーザ入力アカウントチェック
 function on_check_account(event_name, service_name, id, password)
 --	mz3.alert(service_name);
@@ -71,6 +72,28 @@ function on_check_account(event_name, service_name, id, password)
 	end
 	return false;
 end
+mz3.add_event_listener("check_account", "goohome.on_check_account");
+
+
+--- BASIC 認証設定
+function on_set_basic_auth_account(event_name, serialize_key)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='gooHome' then
+		id       = mz3_account_provider.get_value('gooホーム', 'id');
+		password = mz3_account_provider.get_value('gooホーム', 'password');
+		
+		password = get_api_key_from_quote_mail_address(password);
+		
+		if id=='' or password=='' then
+			mz3.alert('ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください');
+			return true, 1;
+		end
+		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
+		return true, 0, id, password;
+	end
+	return false;
+end
+mz3.add_event_listener("set_basic_auth_account", "goohome.on_set_basic_auth_account");
 
 
 --- 全文表示メニューまたはダブルクリックイベント
@@ -128,6 +151,8 @@ function on_body_list_click(serialize_key, event_name, data)
 	-- 標準の処理を続行
 	return false;
 end
+mz3.add_event_listener("dblclk_body_list", "goohome.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "goohome.on_body_list_click");
 
 
 --- デフォルトのグループリスト生成イベントハンドラ
@@ -150,6 +175,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 	end
 end
+mz3.add_event_listener("creating_default_group", "goohome.on_creating_default_group", false);
 
 
 --- ボディリストのポップアップメニュー表示
@@ -196,24 +222,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	return true;
 end
-
-
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
-
--- ボディリストのクリック・ダブルクリックイベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "goohome.on_body_list_click");
-mz3.add_event_listener("enter_body_list",  "goohome.on_body_list_click");
-
--- ボディリストのポップアップメニュー表示イベントハンドラ登録
 mz3.add_event_listener("popup_body_menu",  "goohome.on_popup_body_menu");
-
--- デフォルトのグループリスト生成
-mz3.add_event_listener("creating_default_group", "goohome.on_creating_default_group", false);
-
--- ユーザ入力アカウントチェック
-mz3.add_event_listener("check_account", "goohome.on_check_account");
 
 
 ----------------------------------------

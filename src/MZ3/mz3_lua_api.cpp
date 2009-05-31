@@ -540,16 +540,21 @@ int lua_mz3_open_url(lua_State *L)
 			return 0;
 		}
 	}
-	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="gooHome") {
-		// gooHome API => Basic 認証
-		strUser     = theApp.m_loginMng.GetGooId();
-		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
 
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox(hwnd, L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください", NULL, MB_OK);
+	// MZ3 API : BASIC認証設定
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// is_cancel
+	rvals.push_back(util::MyLuaData(""));	// id
+	rvals.push_back(util::MyLuaData(""));	// password
+	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(access_type))))
+	{
+		int is_cancel = rvals[0].m_number;
+		if (is_cancel) {
 			return 0;
 		}
+		strUser     = rvals[1].m_strText;
+		strPassword = rvals[2].m_strText;
 	}
 
 	// アクセス開始

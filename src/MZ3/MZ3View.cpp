@@ -3011,16 +3011,21 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			return;
 		}
 	}
-	if (theApp.m_accessTypeInfo.getServiceType(data->GetAccessType())=="gooHome") {
-		// gooHome API => Basic 認証
-		strUser     = theApp.m_loginMng.GetGooId();
-		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
 
-		// 未指定の場合はエラー出力
-		if (strUser.IsEmpty() || strPassword.IsEmpty()) {
-			MessageBox( L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください" );
+	// MZ3 API : BASIC認証設定
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// is_cancel
+	rvals.push_back(util::MyLuaData(""));	// id
+	rvals.push_back(util::MyLuaData(""));	// password
+	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(data->GetAccessType()))))
+	{
+		int is_cancel = rvals[0].m_number;
+		if (is_cancel) {
 			return;
 		}
+		strUser     = rvals[1].m_strText;
+		strPassword = rvals[2].m_strText;
 	}
 
 	// アクセス開始
@@ -5193,7 +5198,32 @@ void CMZ3View::OnBnClickedUpdateButton()
 		break;
 	}
 
-	// BASIC 認証設定
+	// アクセス種別を設定
+	switch (m_twitterPostMode) {
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
+	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
+		theApp.m_accessType = ACCESS_MIXI_ADD_ECHO;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
+		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
+		theApp.m_accessType = ACCESS_WASSR_UPDATE;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+		theApp.m_accessType = ACCESS_GOOHOME_QUOTE_UPDATE;
+		break;
+
+	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
+	default:
+		theApp.m_accessType = ACCESS_TWITTER_UPDATE;
+		break;
+	}
+
+	// BASIC 認証設定 : TODO 全てAPI化すること
 	CString strUser = NULL;
 	CString strPassword = NULL;
 	switch (m_twitterPostMode) {
@@ -5226,7 +5256,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 		break;
 
-	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
+/*	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
 		// gooHome API => Basic 認証
 		strUser     = theApp.m_loginMng.GetGooId();
 		strPassword = gooutil::GetAPIKeyFromQuoteMailAddress( theApp.m_loginMng.GetGoohomeQuoteMailAddress() );
@@ -5236,31 +5266,21 @@ void CMZ3View::OnBnClickedUpdateButton()
 			MessageBox( L"ログイン設定画面でgooIDとひとこと投稿アドレスを設定してください" );
 			return;
 		}
-	}
-
-	// アクセス種別を設定
-	switch (m_twitterPostMode) {
-	case TWITTER_STYLE_POST_MODE_MIXI_ECHO:
-	case TWITTER_STYLE_POST_MODE_MIXI_ECHO_REPLY:
-		theApp.m_accessType = ACCESS_MIXI_ADD_ECHO;
-		break;
-
-	case TWITTER_STYLE_POST_MODE_TWITTER_DM:
-		theApp.m_accessType = ACCESS_TWITTER_NEW_DM;
-		break;
-
-	case TWITTER_STYLE_POST_MODE_WASSR_UPDATE:
-		theApp.m_accessType = ACCESS_WASSR_UPDATE;
-		break;
-
-	case TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE:
-		theApp.m_accessType = ACCESS_GOOHOME_QUOTE_UPDATE;
-		break;
-
-	case TWITTER_STYLE_POST_MODE_TWITTER_UPDATE:
-	default:
-		theApp.m_accessType = ACCESS_TWITTER_UPDATE;
-		break;
+*/	}
+	// MZ3 API : BASIC認証設定
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// is_cancel
+	rvals.push_back(util::MyLuaData(""));	// id
+	rvals.push_back(util::MyLuaData(""));	// password
+	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(theApp.m_accessType))))
+	{
+		int is_cancel = rvals[0].m_number;
+		if (is_cancel) {
+			return;
+		}
+		strUser     = rvals[1].m_strText;
+		strPassword = rvals[2].m_strText;
 	}
 
 	// アクセス開始
