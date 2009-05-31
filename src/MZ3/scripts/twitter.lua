@@ -19,6 +19,11 @@ ID_REPORT_URL_BASE = 36100 -37000;	-- URLを開く
 ----------------------------------------
 mz3.regist_service('Twitter', true);
 
+-- ログイン設定画面のプルダウン名、表示名の設定
+mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
+mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
+
+
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------

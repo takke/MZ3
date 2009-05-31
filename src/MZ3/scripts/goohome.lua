@@ -17,6 +17,10 @@ module("goohome", package.seeall)
 ----------------------------------------
 mz3.regist_service('goohome', false);
 
+-- ログイン設定画面のプルダウン名、表示名の設定
+mz3_account_provider.set_param('gooホーム', 'id_name', 'gooID');
+mz3_account_provider.set_param('gooホーム', 'password_name', 'gooホーム ひとことメール投稿アドレス');
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)

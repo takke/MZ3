@@ -1390,13 +1390,6 @@ bool CMZ3App::MyLuaInit(void)
 	m_luaAccounts.clear();
 	m_luaLastRegistedAccessType = ACCESS_TYPE_MZ3_SCRIPT_BASE;
 
-	// アカウントの初期値設定(旧バージョン互換用)
-	m_luaAccounts.push_back(CMZ3App::AccountData("mixi",      "メールアドレス", "パスワード"));
-	m_luaAccounts.push_back(CMZ3App::AccountData("Twitter",   "ID",             "パスワード"));
-	m_luaAccounts.push_back(CMZ3App::AccountData("Wassr",     "ID",             "パスワード"));
-	m_luaAccounts.push_back(CMZ3App::AccountData("gooホーム", "gooID",          "gooホーム ひとことメール投稿アドレス"));
-
-
 	// Lua の初期化
 	m_luaState = lua_open();
 

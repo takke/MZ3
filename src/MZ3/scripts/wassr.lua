@@ -17,6 +17,11 @@ module("wassr", package.seeall)
 ----------------------------------------
 mz3.regist_service('Wassr', false);
 
+-- ログイン設定画面のプルダウン名、表示名の設定
+mz3_account_provider.set_param('Wassr', 'id_name', 'ID');
+mz3_account_provider.set_param('Wassr', 'password_name', 'パスワード');
+
+
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------

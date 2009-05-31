@@ -17,6 +17,11 @@ module("mixi", package.seeall)
 ----------------------------------------
 mz3.regist_service('mixi', true);
 
+-- ログイン設定画面のプルダウン名、表示名の設定
+mz3_account_provider.set_param('mixi', 'id_name', 'メールアドレス');
+mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
+
+
 --------------------------------------------------
 --- 次へ、前への抽出処理
 --------------------------------------------------
