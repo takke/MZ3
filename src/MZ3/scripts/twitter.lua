@@ -127,6 +127,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 				
 				-- text : status/text
 				text = status:match('<text>(.-)</text>');
+				text = text:gsub('&amp;', '&');
 				text = mz3.decode_html_entity(text);
 				data:add_text_array('body', text);
 				
@@ -138,17 +139,20 @@ function twitter_friends_timeline_parser(parent, body, html)
 				-- name : status/user/screen_name
 				user = status:match('<user>.-</user>');
 				s = user:match('<screen_name>(.-)</screen_name>');
+				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
 				data:set_text('name', s);
 				
 				-- author : status/user/name
 				s = user:match('<name>(.-)</name>');
+				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
 				data:set_text('author', s);
 
 				-- description : status/user/description
 				-- title に入れるのは苦肉の策・・・
 				s = user:match('<description>(.-)</description>');
+				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
 				data:set_text('title', s);
 
@@ -293,6 +297,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				
 				-- text : direct_message/text
 				text = direct_message:match('<text>(.-)</text>');
+				text = text:gsub('&amp;', '&');
 				text = mz3.decode_html_entity(text);
 				data:add_text_array('body', text);
 				
@@ -315,6 +320,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				
 				-- name : direct_message/user/screen_name
 				s = user:match('<screen_name>(.-)</screen_name>');
+				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
 				data:set_text('name', s);
 				
@@ -326,6 +332,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				-- description : direct_message/user/description
 				-- title に入れるのは苦肉の策・・・
 				s = user:match('<description>(.-)</description>');
+				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
 				data:set_text('title', s);
 
