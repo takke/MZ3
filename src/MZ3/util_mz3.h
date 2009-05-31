@@ -31,13 +31,13 @@ public:
 	};
 
 	MyLuaDataType	m_type;
-	CStringA		m_pszText;
+	CStringA		m_strText;
 	int				m_number;
 	void*			m_pUserData;
 
 	MyLuaData()
 		: m_type(MyLuaDataType_Invalid)
-		, m_pszText("")
+		, m_strText("")
 		, m_number(0)
 		, m_pUserData(NULL)
 	{
@@ -45,7 +45,7 @@ public:
 
 	MyLuaData(const char* szText)
 		: m_type(MyLuaDataType_String)
-		, m_pszText(szText)
+		, m_strText(szText)
 		, m_number(0)
 		, m_pUserData(NULL)
 	{
@@ -53,7 +53,7 @@ public:
 
 	MyLuaData(int number)
 		: m_type(MyLuaDataType_Integer)
-		, m_pszText("")
+		, m_strText("")
 		, m_number(number)
 		, m_pUserData(NULL)
 	{
@@ -61,13 +61,14 @@ public:
 
 	MyLuaData(void* pUserData)
 		: m_type(MyLuaDataType_UserData)
-		, m_pszText("")
+		, m_strText("")
 		, m_number(0)
 		, m_pUserData(pUserData)
 	{
 	}
 };
 typedef const MyLuaData* MyLuaDataPtr;
+typedef std::vector<MyLuaData> MyLuaDataList;
 
 CString MakeLogfilePath( const CMixiData& data );
 
@@ -355,7 +356,7 @@ inline bool CompileRegex( MyRegex& reg, LPCTSTR szPattern )
 bool CallMZ3ScriptHookFunction(const char* szSerializeKey, const char* szEventName, const char* szFuncName, void* pUserData1, void* pUserData2=NULL);
 bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventName, void* pUserData1, void* pUserData2=NULL);
 bool CallMZ3ScriptHookFunctions2(const char* szEventName, 
-								int* pRetVal,
+								MyLuaDataList* pRetValList,
 								const MyLuaData& pData1, 
 								const MyLuaData& pData2=MyLuaData(), 
 								const MyLuaData& pData3=MyLuaData(), 

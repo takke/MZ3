@@ -309,7 +309,7 @@ bool CallMZ3ScriptHookFunctions(const char* szSerializeKey, const char* szEventN
  * MZ3 Script : イベントハンドラの呼び出し2
  */
 bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName, 
-								int* pRetVal,
+								MyLuaDataList* pRetValList,
 								const MyLuaData& data1, 
 								const MyLuaData& data2, 
 								const MyLuaData& data3, 
@@ -350,7 +350,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 		MyLuaDataPtr pData = data_args[i];
 		switch (pData->m_type) {
 		case MyLuaData::MyLuaDataType_String:
-			lua_pushstring(L, pData->m_pszText);
+			lua_pushstring(L, pData->m_strText);
 			n_arg ++;
 			break;
 		case MyLuaData::MyLuaDataType_Integer:
@@ -368,7 +368,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 	}
 
 	// 関数実行
-	int n_ret = 2;
+	int n_ret = 1 + pRetValList->size();
 	int status = lua_pcall(L, n_arg, n_ret, 0);
 
 	int result = 0;
@@ -378,8 +378,35 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 		return false;
 	} else {
 		// 返り値取得
-		result = lua_toboolean(L, -2);
-		*pRetVal = lua_tointeger(L, -1);
+		//
+		// a, b, c = lua_func();
+		// a = -3;
+		// b = -2;
+		// c = -1;
+		//
+
+		// result = a
+		result = lua_toboolean(L, -n_ret);
+
+		for (u_int i=0; i<pRetValList->size(); i++) {
+			MyLuaData& rdata = (*pRetValList)[i];
+			int idx = -n_ret + i + 1;
+
+			switch (rdata.m_type) {
+			case MyLuaData::MyLuaDataType_String:
+				rdata.m_strText = lua_tostring(L, idx);
+				break;
+			case MyLuaData::MyLuaDataType_Integer:
+				rdata.m_number = lua_tointeger(L, idx);
+				break;
+			case MyLuaData::MyLuaDataType_UserData:
+				rdata.m_pUserData = lua_touserdata(L, idx);
+				break;
+			default:
+				// skip
+				break;
+			}
+		}
 	}
 	lua_settop(L, top);
 	return result!=0;
@@ -390,7 +417,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
  * MZ3 Script : フック関数の呼び出し2
  */
 bool CallMZ3ScriptHookFunctions2(const char* szEventName, 
-								 int* pRetVal,
+								 MyLuaDataList* pRetValList,
 								 const MyLuaData& data1, 
 								 const MyLuaData& data2, 
 								 const MyLuaData& data3, 
@@ -411,7 +438,7 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 //							CString(hookFuncNames[i].c_str()),
 //							CString(szEventName)));
 
-		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), pRetVal, data1, data2, data3, data4)) {
+		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), pRetValList, data1, data2, data3, data4)) {
 			rval = true;
 			break;
 		}
@@ -445,9 +472,11 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	if( url.Find( L"new_bbs.pl" ) != -1 )		{ return ACCESS_LIST_NEW_BBS; }
 
 	// MZ3 API : フック関数呼び出し
-	int access_type_by_lua = ACCESS_INVALID;
-	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", &access_type_by_lua, 
+	MyLuaDataList rvals;
+	rvals.push_back(MyLuaData((int)ACCESS_INVALID));
+	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", &rvals, 
 			util::MyLuaData(CStringA(url)))) {
+		int access_type_by_lua = rvals[0].m_number;
 		MZ3LOGGER_DEBUG(util::FormatString(L"estimated access type by lua : %d", access_type_by_lua));
 		return (ACCESS_TYPE)access_type_by_lua;
 	}

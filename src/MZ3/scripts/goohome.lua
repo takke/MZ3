@@ -27,9 +27,46 @@ menu_items.read_comments = mz3_menu.regist_menu("goohome.on_read_comments_menu_i
 menu_items.update        = mz3_menu.regist_menu("goohome.on_goohome_update");
 
 
+-- ひとこと投稿アドレスからAPI KEYを取得する
+function get_api_key_from_quote_mail_address(address)
+	key = address:match('^quote%-([0-9a-zA-Z-_]*)@home%.goo%.ne%.jp$');
+	if key==nil or string.len(key)~=12 then
+		return '';
+	end
+	
+	return key;
+end
+
+-- "quote-XXXXXXXXXXXX@home.goo.ne.jp" の形式であることを確認する
+function is_valid_quote_mail_address(password)
+	return get_api_key_from_quote_mail_address(password)~='';
+end
+
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+--- ユーザ入力アカウントチェック
+function on_check_account(event_name, service_name, id, password)
+--	mz3.alert(service_name);
+	if service_name == 'gooホーム' then
+		if password ~= '' and is_valid_quote_mail_address(password)==false then
+			msg = "gooホームひとこと投稿アドレスは下記の形式です。\n"
+			    .." quote-XXXXXXXXXXXX@home.goo.ne.jp\n"
+			    .."入力されたアドレス：\n"
+			    .." " .. password
+			    .."\n"
+			    .."確認するURLを開きますか？";
+			if (mz3.confirm(msg, nil, 'yes_no')=='yes') then
+				url = "http://home.goo.ne.jp/config/quote";
+				mz3.open_url_by_browser(url);
+			end
+
+			return true;
+		end
+	end
+	return false;
+end
 
 
 --- 全文表示メニューまたはダブルクリックイベント
@@ -170,6 +207,9 @@ mz3.add_event_listener("popup_body_menu",  "goohome.on_popup_body_menu");
 
 -- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "goohome.on_creating_default_group", false);
+
+-- ユーザ入力アカウントチェック
+mz3.add_event_listener("check_account", "goohome.on_check_account");
 
 
 ----------------------------------------

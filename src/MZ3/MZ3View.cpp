@@ -364,13 +364,14 @@ void CMZ3View::OnInitialUpdate()
 inline int MyGetBodyListDefaultIconIndex( const CMixiData& mixi )
 {
 	// MZ3 API : フック関数呼び出し
-	int rval = 0;
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(mixi.GetAccessType()));
-	if (util::CallMZ3ScriptHookFunctions2("get_body_list_default_icon_index", &rval, 
+	if (util::CallMZ3ScriptHookFunctions2("get_body_list_default_icon_index", &rvals, 
 			util::MyLuaData(serializeKey), 
 			util::MyLuaData((void*)&mixi)))
 	{
-		return rval;
+		return rvals[0].m_number;
 	}
 	return -1;
 }
@@ -3640,13 +3641,15 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	CMixiData& bodyItem = GetSelectedBodyItem();
 
 	// MZ3 API : フック関数呼び出し
-	int rval = 0;
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(bodyItem.GetAccessType()));
-	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", &rval, 
+	if (util::CallMZ3ScriptHookFunctions2("popup_body_menu", &rvals, 
 			util::MyLuaData(serializeKey), 
 			util::MyLuaData(&bodyItem), 
 			util::MyLuaData(this)))
 	{
+		int rval = rvals[0].m_number;
 		return rval!=0 ? true : false;
 	}
 
@@ -5319,9 +5322,10 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 		{
 			// MZ3 API : イベントハンドラ関数呼び出し
-			int rval = 0;
+			util::MyLuaDataList rvals;
+			rvals.push_back(util::MyLuaData(0));
 			CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
-			if (util::CallMZ3ScriptHookFunctions2("post_end", &rval, 
+			if (util::CallMZ3ScriptHookFunctions2("post_end", &rvals, 
 					util::MyLuaData(serializeKey),
 					util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
 			{
@@ -6156,9 +6160,10 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		(LPCTSTR)CString(theApp.m_accessTypeInfo.getServiceType(aType).c_str()));
 
 	// MZ3 API : イベントハンドラ関数呼び出し
-	int rval = 0;
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
 	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
-	if (util::CallMZ3ScriptHookFunctions2("get_end", &rval, 
+	if (util::CallMZ3ScriptHookFunctions2("get_end", &rvals, 
 			util::MyLuaData(serializeKey),
 			util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
 	{

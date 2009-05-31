@@ -1164,10 +1164,6 @@
 					RelativePath=".\MZ3Parser.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\TwitterParser.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

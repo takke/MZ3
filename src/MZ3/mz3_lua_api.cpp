@@ -624,7 +624,7 @@ int lua_mz3_keybd_event(lua_State *L)
 }
 
 /*
---- URL をブラウザで開く
+--- URL をブラウザで開く(確認付き)
 --
 function mz3.open_url_by_browser_with_confirm(url)
 */
@@ -633,6 +633,21 @@ int lua_mz3_open_url_by_browser_with_confirm(lua_State *L)
 	CString url(lua_tostring(L, 1));		// 第1引数
 
 	util::OpenUrlByBrowserWithConfirm( url );
+	
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- URL をブラウザで開く
+--
+function mz3.open_url_by_browser(url)
+*/
+int lua_mz3_open_url_by_browser(lua_State *L)
+{
+	CString url(lua_tostring(L, 1));		// 第1引数
+
+	util::OpenUrlByBrowser( url );
 	
 	// 戻り値の数を返す
 	return 0;
@@ -2725,6 +2740,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"open_url",							lua_mz3_open_url},
 	{"keybd_event",							lua_mz3_keybd_event},
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
+	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
 	{"url_encode",							lua_mz3_url_encode},
 	{NULL, NULL}
 };

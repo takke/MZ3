@@ -12,6 +12,7 @@
 #include "UserDlg.h"
 #include "util_base.h"
 #include "util_goo.h"
+#include "util_mz3.h"
 
 // CUserDlg ダイアログ
 
@@ -90,19 +91,16 @@ bool CUserDlg::MySaveControlData(void)
 	GetDlgItemText( IDC_LOGIN_PASSWORD_EDIT, password );
 	theApp.m_loginMng.SetPassword( strServiceName, password );
 
-	// TODO gooホーム専用コードなのでプラグイン化(MZ3 API化)すること
-	if (strServiceName==L"gooホーム") {
-		// 投稿アドレス形式チェック
-		if (!password.IsEmpty() && !gooutil::IsValidQuoteMailAddress(password)) {
-			CString msg = L"gooホームひとこと投稿アドレスは下記の形式です。\n"
-						  L" quote-XXXXXXXXXXXX@home.goo.ne.jp\n"
-						  L"\n"
-						  L"確認するURLを開きますか？";
-			if (MessageBox(msg, NULL, MB_YESNO)==IDYES) {
-				util::OpenUrlByBrowser(L"http://home.goo.ne.jp/config/quote");
-			}
-			return false;
-		}
+	// MZ3 API : イベントハンドラ関数呼び出し
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("check_account", &rvals, 
+			util::MyLuaData(CStringA(strServiceName)),
+			util::MyLuaData(CStringA(id)),
+			util::MyLuaData(CStringA(password))
+			))
+	{
+		// イベントハンドラ完了
+		return false;
 	}
 
 	// 保存
