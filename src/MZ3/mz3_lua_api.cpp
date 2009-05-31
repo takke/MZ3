@@ -338,7 +338,7 @@ int lua_mz3_get_access_type_by_key(lua_State *L)
 }
 
 /*
---- シリアライズキーからアクセス種別を取得する。
+--- シリアライズキーからサービス種別を取得する。
 --
 -- @param key シリアライズキー
 -- @return [string] サービス種別
