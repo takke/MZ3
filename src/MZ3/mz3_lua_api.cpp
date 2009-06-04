@@ -13,6 +13,7 @@
 #include "IniFile.h"
 #include "url_encoder.h"
 #include "version.h"
+#include "PostDataGenerator.h"
 
 //-----------------------------------------------
 // lua support
@@ -651,6 +652,76 @@ int lua_mz3_open_url_by_browser(lua_State *L)
 	
 	// 戻り値の数を返す
 	return 0;
+}
+
+/*
+--- ファイル選択画面の表示
+--
+-- @param wnd		   ウィンドウ(mz3_main_view.get_wnd() 等で取得した値)
+-- @param title        キャプション
+-- @param filter       ファイルフィルタ("JPEGﾌｧｲﾙ (*.jpg)%0*.jpg;*.jpeg%0すべてのﾌｧｲﾙ (*.*)%0*.*%0%0"など)
+--                     "\0" は引き渡し時に無視されるため "%0" で指定すること。
+-- @param flags        ファイルオープンフラグ(OPENFILENAME:Flags の値)
+-- @param initial_dir  初期ディレクトリ
+-- @param initial_file 初期ファイル
+--
+-- @return (string) 選択ファイルパス, ユーザキャンセル時は nil
+--
+function mz3.get_open_file_name(wnd, caption, title, flags, initial_dir, initial_file)
+*/
+int lua_mz3_get_open_file_name(lua_State *L)
+{
+	// 引数の取得
+	CWnd* wnd = (CWnd*)lua_touserdata(L, 1);
+	CString title(lua_tostring(L, 2));
+	CString filter0(lua_tostring(L, 3));
+	int flags = lua_tointeger(L, 4);
+	CString initial_dir(lua_tostring(L, 5));
+	CString initial_file(lua_tostring(L, 6));
+
+	// filter の \0 の復元
+	std::vector<WCHAR> szFilter;
+	int n = filter0.GetLength();
+	for (int i=0; i<n; i++) {
+		if (filter0[i]=='%' && i+1<n && filter0[i+1]=='0') {
+			szFilter.push_back('\0');
+			i++;
+		} else {
+			szFilter.push_back(filter0[i]);
+		}
+	}
+//	std::wstring filter = filter0;
+//	filter.Replace(L"%0", L"\0");
+//	filter = L"JPEGﾌｧｲﾙ (*.jpg)\0*.jpg;*.jpeg\0すべてのﾌｧｲﾙ (*.*)\0*.*\0\0";
+
+	HWND hwnd = NULL;
+	if (wnd != NULL) {
+		hwnd = wnd->m_hWnd;
+	}
+
+	WCHAR szFile[MAX_PATH] = L"\0";
+	if (!initial_file.IsEmpty()) {
+		wcscpy(szFile, initial_file);
+	}
+
+	OPENFILENAME ofn;
+	memset( &(ofn), 0, sizeof(ofn) );
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = MAX_PATH; 
+	ofn.lpstrTitle = title;
+	ofn.lpstrFilter = &szFilter[0];
+	ofn.Flags = flags;
+	ofn.lpstrInitialDir = initial_dir;
+	if (GetOpenFileName(&ofn) == IDOK) {
+		lua_pushstring(L, CStringA(szFile));
+	} else {
+		lua_pushnil(L);
+	}
+
+	// 戻り値の数を返す
+	return 1;
 }
 
 //-----------------------------------------------
@@ -1599,6 +1670,34 @@ int lua_mz3_post_data_create(lua_State *L)
 }
 
 /*
+--- Content-Type の設定
+--
+-- @param post         POST 用オブジェクト
+-- @param content_type Content-Type 値
+--
+function mz3_post_data.set_content_type(post, content_type)
+*/
+int lua_mz3_post_data_set_content_type(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.set_content_type";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CString content_type(lua_tostring(L, 2));
+
+	// 追加
+	post->SetContentType(content_type);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- POST する文字列の追加
 --
 -- @param post        POST 用オブジェクト
@@ -1652,6 +1751,36 @@ int lua_mz3_post_data_append_additional_header(lua_State *L)
 
 	// 戻り値の数を返す
 	return 0;
+}
+
+/*
+--- ファイル(バイナリファイル)を追加
+--
+-- @param post        POST 用オブジェクト
+-- @param filename    ファイル名
+--
+function mz3_post_data.append_file(post, filename)
+*/
+int lua_mz3_post_data_append_file(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.append_file";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	CString filename(lua_tostring(L, 2));
+
+	// 追加
+	bool rval = mixi::PostDataGeneratorBase::appendFile(*post, filename);
+
+	lua_pushboolean(L, rval ? 1 : 0);
+
+	// 戻り値の数を返す
+	return 1;
 }
 
 
@@ -2818,6 +2947,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"keybd_event",							lua_mz3_keybd_event},
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
 	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
+	{"get_open_file_name",					lua_mz3_get_open_file_name},
 	{"url_encode",							lua_mz3_url_encode},
 	{NULL, NULL}
 };
@@ -2920,8 +3050,10 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 };
 static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
+	{"set_content_type",		lua_mz3_post_data_set_content_type},
 	{"append_post_body",		lua_mz3_post_data_append_post_body},
 	{"append_additional_header",lua_mz3_post_data_append_additional_header},
+	{"append_file",				lua_mz3_post_data_append_file},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_account_provider_lib[] = {

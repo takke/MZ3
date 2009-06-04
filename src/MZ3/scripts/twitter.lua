@@ -68,6 +68,18 @@ type:set_short_title('フォロー解除');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_UPDATE_WITH_TWITPIC');		-- シリアライズキー
+type:set_short_title('twitpic投稿');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+-- ファイル名
+twitpic_target_file = nil;
+
+
 
 --------------------------------------------------
 -- [list] タイムライン用パーサ
@@ -421,6 +433,7 @@ menu_items.show_follower_tl[5]   = mz3_menu.regist_menu("twitter.on_show_followe
 follower_names = {}
 
 menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
+menu_items.update_with_twitpic   = mz3_menu.regist_menu("twitter.on_twitter_update_with_twitpic");
 menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
 menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
 menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_create_favourings");
@@ -473,6 +486,10 @@ end
 function on_set_basic_auth_account(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Twitter' then
+		if serialize_key=='TWITTER_UPDATE_WITH_TWITPIC' then
+			-- twitpic は BASIC 認証不要
+			return true, 0, '', '';
+		end
 		id       = mz3_account_provider.get_value('Twitter', 'id');
 		password = mz3_account_provider.get_value('Twitter', 'password');
 		
@@ -508,6 +525,8 @@ function on_update_twitter_update_button(event_name, serialize_key)
 		return true, 'DM';
 	elseif serialize_key == 'TWITTER_UPDATE' then
 		return true, '更新';
+	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
+		return true, 'TwitPic';
 	end
 	
 	return false;
@@ -519,6 +538,36 @@ mz3.add_event_listener("update_twitter_update_button", "twitter.on_update_twitte
 function on_twitter_update(serialize_key, event_name, data)
 	-- モード変更
 	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE'));
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
+
+--- 「写真を投稿」メニュー用ハンドラ
+function on_twitter_update_with_twitpic(serialize_key, event_name, data)
+
+	-- ファイル選択画面
+	OFN_EXPLORER = 0x00080000;
+	OFN_FILEMUSTEXIST = 0x00001000;
+	flags = OFN_EXPLORER + OFN_FILEMUSTEXIST;
+	filter = "JPEGﾌｧｲﾙ (*.jpg)%0*.jpg;*.jpeg%0%0";
+--	filter = "JPEGﾌｧｲﾙ (*.jpg)%0*.jpg;*.jpeg%0すべてのﾌｧｲﾙ (*.*)%0*.*%0%0";
+	twitpic_target_file = mz3.get_open_file_name(mz3_main_view.get_wnd(),
+												 "JPEGﾌｧｲﾙを開く...", 
+												 filter,
+												 flags,
+												 "");
+--	mz3.alert(twitpic_target_file);
+	if twitpic_target_file == nil then
+		-- 中止
+		return;
+	end
+
+	-- モード変更
+	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE_WITH_TWITPIC'));
 
 	-- モード変更反映(ボタン名称変更)
 	mz3_main_view.update_control_status();
@@ -831,6 +880,42 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
+--- Twitter に投稿する
+function do_post_to_twitter(text)
+
+	serialize_key = 'TWITTER_UPDATE'
+
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
+
+	-- POST パラメータを設定
+	post:append_post_body('status=');
+	post:append_post_body(mz3.url_encode(text, 'utf8'));
+	
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
+	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+	end
+	post:append_post_body('&source=');
+	post:append_post_body(mz3.get_app_name());
+
+	-- POST先URL設定
+	url = 'http://twitter.com/statuses/update.xml';
+	
+	-- 通信開始
+	access_type = mz3.get_access_type_by_key(serialize_key);
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+
+	return true;
+end
+
+
 --- 更新ボタン押下イベント
 --
 -- @param event_name    'click_update_button'
@@ -855,6 +940,8 @@ function on_click_update_button(event_name, serialize_key)
 			-- 最新取得
 			mz3_main_view.retrieve_category_item();
 			return true;
+		elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
+			-- 未入力もOK => 続行
 		end
 	end
 
@@ -879,6 +966,22 @@ function on_click_update_button(event_name, serialize_key)
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
+	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
+		msg = 'twitpicで投稿します。\n'
+		   .. '---- 発言 ----\n'
+		   .. text .. '\n'
+		   .. '---- ファイル ----\n'
+		   .. twitpic_target_file .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	end
+
+	if serialize_key == 'TWITTER_UPDATE' then
+		-- 通常の投稿は共通化
+		return do_post_to_twitter(text);
 	end
 
 	-- ヘッダーの設定
@@ -893,25 +996,63 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body(mz3.url_encode(text, 'utf8'));
 		post:append_post_body('&user=');
 		post:append_post_body(data:get_integer('owner_id'));
-	elseif serialize_key == 'TWITTER_UPDATE' then
-		post:append_post_body('status=');
-		post:append_post_body(mz3.url_encode(text, 'utf8'));
+	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
+		id       = mz3_account_provider.get_value('Twitter', 'id');
+		password = mz3_account_provider.get_value('Twitter', 'password');
+
+		post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
 		
+		-- id
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="username"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode(id, 'utf8') .. '\r\n');
+		
+		-- password
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="password"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode(password, 'utf8') .. '\r\n');
+		
+--[[
+		-- メッセージは文字化けするので画像投稿後に再度POSTする
+		-- message
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="message"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode(text, 'utf8'));
 		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
-		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
-			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
-			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+--		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+--			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+--			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+--		end
+		post:append_post_body('\r\n');
+]]
+
+		-- media (image binary)
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="media"; filename="photo.jpg"' .. '\r\n');
+		post:append_post_body('Content-Type: image/jpeg' .. '\r\n');
+		post:append_post_body('\r\n');
+		
+		if post:append_file(twitpic_target_file) == false then
+			mz3.alert('画像ファイルの読み込みに失敗しました');
+			return true;
 		end
-		post:append_post_body('&source=');
-		post:append_post_body(mz3.get_app_name());
+
+		post:append_post_body('\r\n');
+		
+		-- end of post data
+		post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
+
 	end
 
 	-- POST先URL設定
 	url = '';
 	if serialize_key == 'TWITTER_NEW_DM' then
 		url = 'http://twitter.com/direct_messages/new.xml';
-	elseif serialize_key == 'TWITTER_UPDATE' then
-		url = 'http://twitter.com/statuses/update.xml';
+	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
+		url = 'http://twitpic.com/api/upload';
 	end
 	
 	-- 通信開始
@@ -930,9 +1071,10 @@ mz3.add_event_listener("click_update_button", "twitter.on_click_update_button");
 -- @param event_name    'post_end'
 -- @param serialize_key 完了項目のシリアライズキー
 -- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param filename      レスポンスファイル
 -- @param wnd           wnd
 --
-function on_post_end(event_name, serialize_key, http_status)
+function on_post_end(event_name, serialize_key, http_status, filename)
 
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type~="Twitter" then
@@ -940,7 +1082,7 @@ function on_post_end(event_name, serialize_key, http_status)
 	end
 
 	-- Twitter投稿処理完了
-
+	
 	-- ステータスコードチェック
 	msg = get_http_status_error_status(http_status);
 	if msg ~= nil then
@@ -961,7 +1103,9 @@ function on_post_end(event_name, serialize_key, http_status)
 		mz3_main_view.set_info_text("フォローした！");
 	elseif serialize_key == "TWITTER_FRIENDSHIPS_DESTROY" then
 		mz3_main_view.set_info_text("フォローやめた！");
-	else 
+	elseif serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
+		mz3_main_view.set_info_text("twitpic 画像投稿完了");
+	else
 		-- TWITTER_UPDATE
 		mz3_main_view.set_info_text("ステータス送信終了");
 	end
@@ -995,6 +1139,27 @@ function on_post_end(event_name, serialize_key, http_status)
 		end
 	end
 ]]
+
+	-- twitpic なら続行(パーサまで渡す)
+	if serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
+		f = io.open(filename, 'r');
+		file = f:read('*a');
+		f:close();
+		
+		-- 投稿したファイルのURL取得
+		twitpic_url = file:match('<mediaurl>(.-)<');
+		if twitpic_url == '' then
+			mz3.alert('投稿に失敗した可能性があります。再度投稿してください。');
+			return true;
+		end
+--		mz3.alert(twitpic_url);
+		
+		-- 再度POSTする
+		text = mz3_main_view.get_edit_text();
+		do_post_to_twitter(twitpic_url .. ' - ' .. text);
+		
+		return true;
+	end
 
 	-- 入力値を消去
 	mz3_main_view.set_edit_text("");
@@ -1059,6 +1224,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "つぶやく", menu_items.update);
+	menu:append_menu("string", "写真を投稿(twitpic)...", menu_items.update_with_twitpic);
 
 	name = body:get_text('name');
 

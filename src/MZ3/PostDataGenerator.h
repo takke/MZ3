@@ -13,7 +13,7 @@ namespace mixi {
 
 /// PostData を生成するクラス群の基底クラス
 class PostDataGeneratorBase {
-protected:
+public:
 
 	/**
 	 * 画像データを埋め込む

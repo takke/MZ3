@@ -4845,6 +4845,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
+			// TODO Luaスクリプト化
 			std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
 			if (strServiceType == "Twitter") {
 				// Twitter系であれば Twitter スタイル
@@ -4907,6 +4908,9 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 	}
 
+	//----------------------------------------------------------------
+	// TODO 以下のコードを Twitter に倣って Luaスクリプト化すること 
+	//----------------------------------------------------------------
 
 	// 入力文字列を取得
 	CString strStatus;
@@ -4932,7 +4936,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		}
 	}
 
-	// DMモードであれば、送信先確認
+	// 送信先確認
 	switch (m_twitterPostAccessType) {
 	case ACCESS_MIXI_ADD_ECHO:
 		{
@@ -5135,9 +5139,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 		L"", 
 		CInetAccess::FILE_HTML, 
 		&post, strUser, strPassword );
-
-//	CPostData::post_array& buf = post.GetPostBody();
-//	MessageBox( CStringW(&buf[0], buf.size()) );
 }
 
 /**
@@ -5186,7 +5187,8 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(aType));
 			if (util::CallMZ3ScriptHookFunctions2("post_end", &rvals, 
 					util::MyLuaData(serializeKey),
-					util::MyLuaData(theApp.m_inet.m_dwHttpStatus)))
+					util::MyLuaData(theApp.m_inet.m_dwHttpStatus),
+					util::MyLuaData(CStringA(theApp.m_filepath.temphtml))))
 			{
 				// イベントハンドラ完了
 			} else {

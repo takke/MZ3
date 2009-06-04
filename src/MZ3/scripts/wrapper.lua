@@ -214,5 +214,7 @@ function MZ3PostData:create(post_data)
 	return object;
 end
 
+function MZ3PostData:set_content_type(ct)	return mz3_post_data.set_content_type(self.post_data, ct);	end
 function MZ3PostData:append_post_body(text)	return mz3_post_data.append_post_body(self.post_data, text);	end
 function MZ3PostData:append_additional_header(header)	return mz3_post_data.append_additional_header(self.post_data, header);	end
+function MZ3PostData:append_file(filename)	return mz3_post_data.append_file(self.post_data, filename);	end
