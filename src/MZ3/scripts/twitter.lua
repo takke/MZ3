@@ -1014,20 +1014,18 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body('\r\n');
 		post:append_post_body(mz3.url_encode(password, 'utf8') .. '\r\n');
 		
---[[
-		-- メッセージは文字化けするので画像投稿後に再度POSTする
+		-- メッセージはUTF8で埋め込む
 		-- message
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="message"' .. '\r\n');
 		post:append_post_body('\r\n');
-		post:append_post_body(mz3.url_encode(text, 'utf8'));
+		post:append_post_body(mz3.convert_encoding(text, 'sjis', 'utf8'));
 		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
---		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
---			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
---			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
---		end
+		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+			post:append_post_body(mz3.convert_encoding(footer_text, 'sjis', 'utf8'));
+		end
 		post:append_post_body('\r\n');
-]]
 
 		-- media (image binary)
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
@@ -1052,7 +1050,7 @@ function on_click_update_button(event_name, serialize_key)
 	if serialize_key == 'TWITTER_NEW_DM' then
 		url = 'http://twitter.com/direct_messages/new.xml';
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
-		url = 'http://twitpic.com/api/upload';
+		url = 'http://twitpic.com/api/uploadAndPost';
 	end
 	
 	-- 通信開始
@@ -1140,7 +1138,8 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	end
 ]]
 
-	-- twitpic なら続行(パーサまで渡す)
+	-- twitpic の 写真投稿のみを行う場合は下記のコードで POST する
+--[[
 	if serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
 		f = io.open(filename, 'r');
 		file = f:read('*a');
@@ -1160,6 +1159,7 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		
 		return true;
 	end
+]]
 
 	-- 入力値を消去
 	mz3_main_view.set_edit_text("");

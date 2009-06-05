@@ -289,6 +289,47 @@ int lua_mz3_url_encode(lua_State *L)
 }
 
 /*
+--- 文字コード変換
+--
+-- @param text         対象文字列
+-- @param in_encoding  "utf8", "sjis"
+-- @param out_encoding "utf8", "sjis"
+--
+function mz3.convert_encoding(text, in_encoding, out_encoding)
+*/
+int lua_mz3_convert_encoding(lua_State *L)
+{
+	const char* func_name = "mz3.convert_encoding";
+
+	CStringA text(lua_tostring(L, 1));				// 第1引数
+	CStringA in_encoding(lua_tostring(L, 2));		// 第2引数
+	CStringA out_encoding(lua_tostring(L, 3));		// 第3引数
+
+	// 変換
+	if (in_encoding == "sjis" && out_encoding == "utf8") {
+		CStringA result;
+		kfm::ucs2_to_utf8(CString(text), result);
+		lua_pushstring(L, result);
+	} else if (in_encoding == "utf8" && out_encoding == "sjis") {
+		kfm::kf_buf_type result;
+		kfm::kf_buf_type in_text;
+
+		in_text.resize(text.GetLength()+1);
+		strncpy((char*)&in_text[0], (const char*)text, text.GetLength());
+
+		kfm::utf8_to_mbcs(in_text, result);
+		lua_pushstring(L, (char*)&result[0]);
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- アクセス種別からシリアライズキーを取得する。
 --
 -- @param type [integer]アクセス種別
@@ -2949,6 +2990,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
 	{"get_open_file_name",					lua_mz3_get_open_file_name},
 	{"url_encode",							lua_mz3_url_encode},
+	{"convert_encoding",					lua_mz3_convert_encoding},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
