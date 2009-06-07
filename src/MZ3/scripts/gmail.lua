@@ -478,6 +478,7 @@ function gmail_mail_parser(data, dimmy, html)
 	body = body:gsub('<WBR>', '');
 	body = body:gsub('<b .->', "<b>");
 	body = body:gsub('<p .->', "<p>");
+	body = body:gsub('<h2.->(.-)</h2>', '<b>%1</b>');
 	body = body:gsub('<b>', "\n<b>\n<br>");
 	body = body:gsub('</b>', "<br>\n</b>\n");
 	body = body:gsub('<br ?/>', "<br>");
