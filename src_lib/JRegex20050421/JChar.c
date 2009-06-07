@@ -86,24 +86,24 @@ tc_type _tctype(w_code ch)
 	default:
 		if(_iskanji(ch))
 		{
-			if(__range((w_code)_T('ÇÅ'), (w_code)_T('Çö'), ch)) {return(tc_mblcalpha);}
-			if(__range((w_code)_T('Ç`'), (w_code)_T('Çy'), ch)) {return(tc_mbucalpha);}
-			if(__range((w_code)_T('ÇO'), (w_code)_T('ÇX'), ch)) {return(tc_mbnum);}
-			if(__range((w_code)_T('É@'), (w_code)_T('Éñ'), ch)) {return(tc_mbkana);}
-			if(__range((w_code)_T('Çü'), (w_code)_T('ÇÒ'), ch)) {return(tc_mbhira);}
+			if(jregex__range((w_code)_T('ÇÅ'), (w_code)_T('Çö'), ch)) {return(tc_mblcalpha);}
+			if(jregex__range((w_code)_T('Ç`'), (w_code)_T('Çy'), ch)) {return(tc_mbucalpha);}
+			if(jregex__range((w_code)_T('ÇO'), (w_code)_T('ÇX'), ch)) {return(tc_mbnum);}
+			if(jregex__range((w_code)_T('É@'), (w_code)_T('Éñ'), ch)) {return(tc_mbkana);}
+			if(jregex__range((w_code)_T('Çü'), (w_code)_T('ÇÒ'), ch)) {return(tc_mbhira);}
 
-			if(__range((w_code)_T('Éü'), (w_code)_T('É÷'), ch)) {return(tc_mbgreece);}
-			if(__range((w_code)_T('Ñp'), (w_code)_T('Ñë'), ch)) {return(tc_mblcrussia);}
-			if(__range((w_code)_T('Ñ@'), (w_code)_T('Ñ`'), ch)) {return(tc_mbucrussia);}
+			if(jregex__range((w_code)_T('Éü'), (w_code)_T('É÷'), ch)) {return(tc_mbgreece);}
+			if(jregex__range((w_code)_T('Ñp'), (w_code)_T('Ñë'), ch)) {return(tc_mblcrussia);}
+			if(jregex__range((w_code)_T('Ñ@'), (w_code)_T('Ñ`'), ch)) {return(tc_mbucrussia);}
 			return(tc_mbother);
 		}
 		else
 		{
-			if(__range((t_code)_T('a'), (t_code)_T('z'), ch)) {return(tc_lcalpha);}
-			if(__range((t_code)_T('A'), (t_code)_T('Z'), ch)) {return(tc_ucalpha);}
-			if(__range((t_code)_T('0'), (t_code)_T('9'), ch)) {return(tc_num);}
+			if(jregex__range((t_code)_T('a'), (t_code)_T('z'), ch)) {return(tc_lcalpha);}
+			if(jregex__range((t_code)_T('A'), (t_code)_T('Z'), ch)) {return(tc_ucalpha);}
+			if(jregex__range((t_code)_T('0'), (t_code)_T('9'), ch)) {return(tc_num);}
 
-			if(__range((t_code)_T('°'), (t_code)_T('ﬂ'), ch)) {return(tc_kana);}
+			if(jregex__range((t_code)_T('°'), (t_code)_T('ﬂ'), ch)) {return(tc_kana);}
 			return(tc_other);
 		}
 		break;
@@ -165,7 +165,7 @@ u_int _tcprev(t_code *str, u_int cnt)
 		w_code ch = (w_code)*(str - 1);
 		if(ch <= 0x3F || 0xFD <= ch || ch == 0x7F || cnt == 1) {return(1);}
 		ch = (w_code)*(str - 2);
-		if(__range(0x81, 0x9F, ch) || __range(0xE0, 0xFC, ch)) {return(2);}
+		if(jregex__range(0x81, 0x9F, ch) || jregex__range(0xE0, 0xFC, ch)) {return(2);}
 	}
 	return(1);
 }

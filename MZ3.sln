@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MZ3", "src\MZ3\MZ3.vcproj", "{E9AB75B4-EAC6-4E6C-99D7-0FD76EA0E79C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2D15C884-CA53-4B00-9854-A51ED9FF9FB2} = {2D15C884-CA53-4B00-9854-A51ED9FF9FB2}

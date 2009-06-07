@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="shift_jis"?>
 <VisualStudioUserFile
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	ShowAllFiles="false"
 	>
 	<Configurations>
@@ -69,41 +69,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Windows Mobile 6 Standard SDK (ARMV4I)"
-			>
-			<DebugSettings
-				Command="$(TargetPath)"
-				WorkingDirectory=""
-				CommandArguments=""
-				Attach="false"
-				DebuggerType="3"
-				Remote="1"
-				RemoteMachine="TM-1"
-				RemoteCommand=""
-				HttpUrl=""
-				PDBPath=""
-				SQLDebugging=""
-				Environment=""
-				EnvironmentMerge="true"
-				DebuggerFlavor=""
-				MPIRunCommand=""
-				MPIRunArguments=""
-				MPIRunWorkingDirectory=""
-				ApplicationCommand=""
-				ApplicationArguments=""
-				ShimCommand=""
-				MPIAcceptMode=""
-				MPIAcceptFilter=""
-			/>
-			<DeploymentTool
-				DeploymentDevice="69128d6a-9156-4472-88e7-d6476cfc36cf"
-			/>
-			<DebuggerTool
-				RemoteExecutable=""
-				Arguments=""
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			>
 			<DebugSettings
@@ -167,41 +132,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Windows Mobile 6 Standard SDK (ARMV4I)"
-			>
-			<DebugSettings
-				Command="$(TargetPath)"
-				WorkingDirectory=""
-				CommandArguments=""
-				Attach="false"
-				DebuggerType="3"
-				Remote="1"
-				RemoteMachine="TM-1"
-				RemoteCommand=""
-				HttpUrl=""
-				PDBPath=""
-				SQLDebugging=""
-				Environment=""
-				EnvironmentMerge="true"
-				DebuggerFlavor=""
-				MPIRunCommand=""
-				MPIRunArguments=""
-				MPIRunWorkingDirectory=""
-				ApplicationCommand=""
-				ApplicationArguments=""
-				ShimCommand=""
-				MPIAcceptMode=""
-				MPIAcceptFilter=""
-			/>
-			<DeploymentTool
-				DeploymentDevice="a573bbb0-70cf-4466-91a7-5e4dbd1c1c41"
-			/>
-			<DebuggerTool
-				RemoteExecutable=""
-				Arguments=""
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release_Win32_c|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			>
 			<DebugSettings
@@ -262,41 +192,6 @@
 				ShimCommand=""
 				MPIAcceptMode=""
 				MPIAcceptFilter=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release_Win32_c|Windows Mobile 6 Standard SDK (ARMV4I)"
-			>
-			<DebugSettings
-				Command="$(TargetPath)"
-				WorkingDirectory=""
-				CommandArguments=""
-				Attach="false"
-				DebuggerType="3"
-				Remote="1"
-				RemoteMachine="TM-1"
-				RemoteCommand=""
-				HttpUrl=""
-				PDBPath=""
-				SQLDebugging=""
-				Environment=""
-				EnvironmentMerge="true"
-				DebuggerFlavor=""
-				MPIRunCommand=""
-				MPIRunArguments=""
-				MPIRunWorkingDirectory=""
-				ApplicationCommand=""
-				ApplicationArguments=""
-				ShimCommand=""
-				MPIAcceptMode=""
-				MPIAcceptFilter=""
-			/>
-			<DeploymentTool
-				DeploymentDevice="a573bbb0-70cf-4466-91a7-5e4dbd1c1c41"
-			/>
-			<DebuggerTool
-				RemoteExecutable=""
-				Arguments=""
 			/>
 		</Configuration>
 	</Configurations>

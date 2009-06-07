@@ -72,13 +72,13 @@ typedef byte t_code;
 
 	//- 文字変換マクロ
 #define _tclc(c) \
-	(__range(_T('A'), _T('Z'), c) ? c + _T('a') - _T('A') : c)
+	(jregex__range(_T('A'), _T('Z'), c) ? c + _T('a') - _T('A') : c)
 #define _tcuc(c) \
-	(__range(_T('a'), _T('z'), c) ? c - _T('a') + _T('A') : c)
+	(jregex__range(_T('a'), _T('z'), c) ? c - _T('a') + _T('A') : c)
 
 	//- 文字列操作マクロ
 #ifdef UNICODE
-#define _iskanji(n) (__range(0x0100, 0xFF5E, n))
+#define _iskanji(n) (jregex__range(0x0100, 0xFF5E, n))
 #define _tccnt(p)   1
 #define _tccntb(n)  1
 #define _tccode(p)  *(p)
@@ -92,8 +92,8 @@ typedef byte t_code;
 #define _wc2tc_dup(p)  _tcsdup(p)
 #else
 #define _iskanji(n)     (_iskanji1(((n) >> 8) & 0xFF) && _iskanji2((n) & 0xFF))
-#define _iskanji1(n)    (__range(0x81, 0x9F, n) || __range(0xE0, 0xFC, n))
-#define _iskanji2(n)    ((n) != 0x7F && __range(0x40, 0xFC, n))
+#define _iskanji1(n)    (jregex__range(0x81, 0x9F, n) || jregex__range(0xE0, 0xFC, n))
+#define _iskanji2(n)    ((n) != 0x7F && jregex__range(0x40, 0xFC, n))
 #define _mkkanji(n1,n2) ((w_code)((n1) << 8 | (n2)))
 #define _tcset(p,n) \
 	do{ \

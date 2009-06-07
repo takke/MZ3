@@ -77,8 +77,8 @@ void* _db_malloc(u_int size);
 #define _min(a,b)      ((a) <= (b) ? (a) : (b))
 #define _swap(a,b)     ((a) ^= (b) ^= (a) ^= (b))
 #define _abs(a)        ((a) < 0 ? -(a) : (a))
-#define _range(a,b,c)  __range(_min(a, b), _max(a, b), c)
-#define __range(a,b,c) ((a) <= (c) && (c) <= (b))
+#define jregex_range(a,b,c)  jregex__range(_min(a, b), _max(a, b), c)
+#define jregex__range(a,b,c) ((a) <= (c) && (c) <= (b))
 	//- デバッグ用メモリチェックマクロ
 #define malloc(size)   _db_malloc((u_int)(size))
 

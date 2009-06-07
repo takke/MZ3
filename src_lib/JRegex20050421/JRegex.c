@@ -49,7 +49,7 @@ static u_int _rstrprev(jreg *reg, u_int cnt)
 		w_code ch = _rstr2ch(reg, cnt - 1);
 		if(ch <= 0x3F || 0xFD <= ch || ch == 0x7F || cnt == 1) {return(1);}
 		ch = _rstr2ch(reg, cnt - 2);
-		if(__range(0x81, 0x9F, ch) || __range(0xE0, 0xFC, ch)) {return(2);}
+		if(jregex__range(0x81, 0x9F, ch) || jregex__range(0xE0, 0xFC, ch)) {return(2);}
 	}
 	return(1);
 }
@@ -541,9 +541,9 @@ static JREGCC jreg_meta(jreg *reg, t_code *regstr, u_int *cnt, w_code *ch, u_int
 			*ch = _tccode(regstr + *cnt);
 			while(1)
 			{
-				if(     __range(_T('0'), _T('9'), *ch)) {num = (word)(*ch - _T('0') + num * 16);}
-				else if(__range(_T('a'), _T('f'), *ch)) {num = (word)(*ch - _T('a') + 10 + num * 16);}
-				else if(__range(_T('A'), _T('F'), *ch)) {num = (word)(*ch - _T('A') + 10 + num * 16);}
+				if(     jregex__range(_T('0'), _T('9'), *ch)) {num = (word)(*ch - _T('0') + num * 16);}
+				else if(jregex__range(_T('a'), _T('f'), *ch)) {num = (word)(*ch - _T('a') + 10 + num * 16);}
+				else if(jregex__range(_T('A'), _T('F'), *ch)) {num = (word)(*ch - _T('A') + 10 + num * 16);}
 				else {break;}
 				*cnt += _tccnt (regstr + *cnt);
 				*ch  =  _tccode(regstr + *cnt);
@@ -557,7 +557,7 @@ static JREGCC jreg_meta(jreg *reg, t_code *regstr, u_int *cnt, w_code *ch, u_int
 			word num = 0;
 
 			*ch = _tccode(regstr + *cnt);
-			while(__range(_T('0'), _T('7'), *ch))
+			while(jregex__range(_T('0'), _T('7'), *ch))
 			{
 				num  =  (word)(*ch - _T('0') + num * 8);
 				*cnt += _tccnt (regstr + *cnt);
@@ -576,7 +576,7 @@ static JREGCC jreg_meta(jreg *reg, t_code *regstr, u_int *cnt, w_code *ch, u_int
 			{
 				num = (word)(*ch - _T('0') + num * 10);
 				*ch = _tccode(regstr + *cnt);
-				if(!__range(_T('0'), _T('9'), *ch)) {break;}
+				if(!jregex__range(_T('0'), _T('9'), *ch)) {break;}
 				*cnt += _tccnt(regstr + *cnt);
 			}while(1);
 			if(opt) {*opt = (u_int)num;}
@@ -612,7 +612,7 @@ static JREGCC jreg_metax(jreg *reg, t_code *regstr, u_int *cnt, w_code *ch, u_in
 			{
 				num = (word)(*ch - _T('0') + num * 10);
 				*ch = _tccode(regstr + *cnt);
-				if(!__range(_T('0'), _T('9'), *ch)) {break;}
+				if(!jregex__range(_T('0'), _T('9'), *ch)) {break;}
 				*cnt += _tccnt(regstr + *cnt);
 			}while(1);
 			if(opt) {*opt = (u_int)num;}
@@ -836,9 +836,9 @@ static bool jreg_iscc(jreg *reg, u_int *cnt, t_code *str, u_int len, bool isnot)
 					ch2 = _rstr2tc(reg, *cnt);
 					if(reg->execopt & JREG_ICASE)
 					{
-						if(_range(ch, range, _tclc(ch2)) || _range(ch, range, _tcuc(ch2))) {goto __CC_MATCH__;}
+						if(jregex_range(ch, range, _tclc(ch2)) || jregex_range(ch, range, _tcuc(ch2))) {goto __CC_MATCH__;}
 					}
-					else if(_range(ch, range, ch2)) {goto __CC_MATCH__;}
+					else if(jregex_range(ch, range, ch2)) {goto __CC_MATCH__;}
 				}
 			}
 			break;
@@ -1053,13 +1053,13 @@ static bool jreg_parse(jreg *reg, JNODE *par_node, t_code endch, u_int *cnt, JRE
 			u_int   loopnum;
 
 			if(!node) {return(false);}
-			if(!__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt)))) {return(false);}
+			if(!jregex__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt)))) {return(false);}
 			loopnum = 0;
 			do
 			{
 				loopnum =  ch - _T('0') + loopnum * 10;
 				*cnt    += _tccnt(reg->regstr + *cnt);
-			}while(__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))));
+			}while(jregex__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))));
 			*cnt += _tccnt(reg->regstr + *cnt);
 			node->Data.Closure.lower  = loopnum;
 			node->Data.Closure.loopno = reg->closurecnt++;
@@ -1071,14 +1071,14 @@ static bool jreg_parse(jreg *reg, JNODE *par_node, t_code endch, u_int *cnt, JRE
 				break;
 			case _T(','): //# {n,} ‚Ü‚½‚Í {n,m} ‚Ì‰ğß
 				node->Data.Closure.upper = JREG_REPEAT_INFINITE;
-				if(__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))))
+				if(jregex__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))))
 				{
 					loopnum = 0;
 					do
 					{
 						loopnum =  ch - _T('0') + loopnum * 10;
 						*cnt    += _tccnt(reg->regstr + *cnt);
-					}while(__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))));
+					}while(jregex__range(_T('0'), _T('9'), (ch = _tccode(reg->regstr + *cnt))));
 					node->Data.Closure.upper = _max(node->Data.Closure.lower, loopnum);
 					node->Data.Closure.lower = _min(node->Data.Closure.lower, loopnum);
 				}
@@ -1227,7 +1227,7 @@ static u_int jreg_isbm_node(JBM *bm, const JNODE *node)
 				w_code ch  = _tccode(node->Data.String.str + i);
 				u_int  len = _tccntb(ch);
 				
-				if(!__range(0, BM_CHAR_LIMIT, ch)) {return(i);}
+				if(!jregex__range(0, BM_CHAR_LIMIT, ch)) {return(i);}
 				if(bm)
 				{
 					if(bm->len + len > BM_LEN_MAX) {return(i);}
@@ -1244,7 +1244,7 @@ static u_int jreg_isbm_node(JBM *bm, const JNODE *node)
 		{
 			w_code ch = node->Data.Meta.metacode;
 			
-			if(!__range(0, BM_CHAR_LIMIT, ch)) {return(0);}
+			if(!jregex__range(0, BM_CHAR_LIMIT, ch)) {return(0);}
 			if(bm)
 			{
 				if(bm->len + _tccntb(ch) > BM_LEN_MAX) {return(0);}

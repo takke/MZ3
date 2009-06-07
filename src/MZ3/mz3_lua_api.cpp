@@ -1384,7 +1384,7 @@ int lua_mz3_data_get_link_list_url(lua_State *L)
 	int idx = lua_tointeger(L, 2);	// 第2引数
 
 	// 値取得
-	if (0<=idx && idx<data->m_linkList.size()) {
+	if (0<=idx && (unsigned int)idx<data->m_linkList.size()) {
 		CStringA url( data->m_linkList[idx].url );
 
 		// 結果をスタックに戻す
@@ -1422,7 +1422,7 @@ int lua_mz3_data_get_link_list_text(lua_State *L)
 	int idx = lua_tointeger(L, 2);	// 第2引数
 
 	// 値取得
-	if (0<=idx && idx<data->m_linkList.size()) {
+	if (0<=idx && (unsigned int)idx<data->m_linkList.size()) {
 		CStringA text( data->m_linkList[idx].text );
 
 		// 結果をスタックに戻す
