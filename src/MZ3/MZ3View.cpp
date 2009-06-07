@@ -141,6 +141,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
+	ON_COMMAND(ID_TABMENU_MOVE_TO_RIGHT, &CMZ3View::OnTabmenuMoveToRight)
+	ON_COMMAND(ID_TABMENU_MOVE_TO_LEFT, &CMZ3View::OnTabmenuMoveToLeft)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -159,7 +161,9 @@ CMZ3View::CMZ3View()
 	, m_bRetryReloadGroupTabByThread(false)
 	, m_pCategorySubMenuList(NULL)
 	, m_bImeCompositioning(false)
+#ifndef WINCE
 	, m_bDragging(false)
+#endif
 	, m_preCategory(0)
 	, m_selGroup(NULL)
 	, m_hotList(NULL)
@@ -5535,6 +5539,16 @@ bool CMZ3View::PopupTabMenu(POINT pt_, int flags_)
 	// 削除の有効・無効
 	pSubMenu->CheckMenuItem( ID_TABMENU_DELETE, MF_BYCOMMAND | (m_selGroup->bSaveToGroupFile ? MF_UNCHECKED : MF_CHECKED) );
 
+	// 左端なら「左に移動」を無効化
+	if (m_groupTab.GetCurSel()==0) {
+		pSubMenu->EnableMenuItem(ID_TABMENU_MOVE_TO_LEFT, MF_GRAYED | MF_BYCOMMAND);
+	}
+
+	// 右端なら「右に移動」を無効化
+	if (m_groupTab.GetCurSel()==m_groupTab.GetItemCount()-1) {
+		pSubMenu->EnableMenuItem(ID_TABMENU_MOVE_TO_RIGHT, MF_GRAYED | MF_BYCOMMAND);
+	}
+
 	// メニュー表示
 	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
 
@@ -5785,6 +5799,7 @@ void CMZ3View::OnRButtonUp(UINT nFlags, CPoint point)
  */
 void CMZ3View::OnLButtonDown(UINT nFlags, CPoint point)
 {
+#ifndef WINCE
 	{
 		CRect r;
 		m_categoryList.GetWindowRect(&r);
@@ -5815,6 +5830,8 @@ void CMZ3View::OnLButtonDown(UINT nFlags, CPoint point)
 			return;
 		}
 	}
+#endif
+
 	CFormView::OnLButtonDown(nFlags, point);
 }
 
@@ -5877,6 +5894,7 @@ void CMZ3View::ReflectSplitterLineMove()
  */
 void CMZ3View::OnLButtonUp(UINT nFlags, CPoint point)
 {
+#ifndef WINCE
 	if (m_bDragging) {
 		// 移動反映
 		ReflectSplitterLineMove();
@@ -5897,6 +5915,8 @@ void CMZ3View::OnLButtonUp(UINT nFlags, CPoint point)
 		m_categoryList.m_bStopDragging = false;
 		m_bodyList.m_bStopDragging = false;
 	}
+#endif
+
 	CFormView::OnLButtonUp(nFlags, point);
 }
 
@@ -6675,4 +6695,53 @@ void CMZ3View::ReloadCategoryListLog()
 
 	// ボディリストに設定
 	SetBodyList( m_selGroup->getSelectedCategory()->GetBodyList() );
+}
+
+/// タブ｜右に移動
+void CMZ3View::OnTabmenuMoveToRight()
+{
+	MoveTabItem(m_groupTab.GetCurSel(), m_groupTab.GetCurSel()+1);
+}
+
+/// タブ｜左に移動
+void CMZ3View::OnTabmenuMoveToLeft()
+{
+	MoveTabItem(m_groupTab.GetCurSel(), m_groupTab.GetCurSel()-1);
+}
+
+/// タブの移動
+void CMZ3View::MoveTabItem(int oldTabIndex, int newTabIndex)
+{
+	if (newTabIndex < 0 || newTabIndex > m_groupTab.GetItemCount()-1) {
+		return;
+	}
+
+	if (theApp.m_access) {
+		return;
+	}
+
+	// 名称交換
+	CString oldTabName = theApp.m_root.groups[oldTabIndex].name;
+	CGroupItem oldGroupItem = theApp.m_root.groups[oldTabIndex];
+	theApp.m_root.groups[oldTabIndex] = theApp.m_root.groups[newTabIndex];
+	theApp.m_root.groups[newTabIndex] = oldGroupItem;
+
+	TCITEM tcItem;
+	TCHAR buffer[256] = {0};
+	tcItem.pszText = buffer;
+	tcItem.cchTextMax = 256;
+	tcItem.mask = TCIF_TEXT;
+	wcsncpy( tcItem.pszText, theApp.m_root.groups[oldTabIndex].name, 255 );
+	m_groupTab.SetItem(oldTabIndex, &tcItem);
+	wcsncpy( tcItem.pszText, theApp.m_root.groups[newTabIndex].name, 255 );
+	m_groupTab.SetItem(newTabIndex, &tcItem);
+
+	// 選択変更
+	m_groupTab.SetCurSel( newTabIndex );
+
+	// カテゴリーリストを初期化する
+	OnSelchangedGroupTab();
+
+	// グループ定義ファイルの保存
+	theApp.SaveGroupData();
 }

@@ -162,7 +162,9 @@ private:
 	CMenu*			m_pCategorySubMenuList;		///< カテゴリ用メニュー
 	bool			m_bImeCompositioning;		///< IME変換中フラグ
 
+#ifndef WINCE
 	bool	m_bDragging;			///< マウスドラッグ中
+#endif
 	CPoint	m_ptDragStart;			///< ドラッグ開始位置
 	int		m_nOriginalH1;			///< ドラッグ開始時のH1
 	int		m_nOriginalH2;			///< ドラッグ開始時のH2
@@ -390,6 +392,9 @@ public:
 	void ReloadCategoryListLog();
 
 	void ReflectSplitterLineMove();
+	afx_msg void OnTabmenuMoveToRight();
+	afx_msg void OnTabmenuMoveToLeft();
+	void MoveTabItem(int oldTabIndex, int newTabIndex);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
