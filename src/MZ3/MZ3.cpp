@@ -931,85 +931,81 @@ BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
  * pBaseFont をベースに、高さを fontHeight, フォント名を fontFace に変更したフォントを作成し、
  * m_font とする。
  */
-bool CMZ3App::MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace )
+bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontFace )
 {
-	CFont *pFont = pBaseFont;
-	if (pFont)
-	{
 #ifdef WINCE
-		int iDPI = ::GetDeviceCaps(NULL, LOGPIXELSY);
-		BYTE fontQuality = NONANTIALIASED_QUALITY;
-		if (iDPI==192) {
-			// VGA(非RealVGA) ならClearType指定
-			fontQuality = CLEARTYPE_QUALITY;
-		}
-#else
-		// DPI 値の取得
-		int iDPI = theApp.GetDPI();
-
-		BYTE fontQuality = DEFAULT_QUALITY;
-#endif
-		int newHeight = - theApp.pt2px(fontHeight);	// 負数とすることで pixel 値指定とする
-
-		MZ3LOGGER_DEBUG( 
-			util::FormatString(L"CMZ3App::MakeNewFont(), dpi[%d], fontHeight[%d], newHeight[%d]",
-				iDPI, fontHeight, newHeight) );
-
-		theApp.m_font.Detach();
-		theApp.m_font.CreateFont( 
-			newHeight,					// nHeight
-			0,							// nWidth
-			0,							// nEscapement
-			0,							// nOrientation
-			FW_MEDIUM,					// nWeight
-			FALSE,						// bItalic
-			FALSE,						// bUnderline
-			0,							// cStrikeOut
-			DEFAULT_CHARSET,			// nCharSet
-			OUT_DEFAULT_PRECIS,			// nOutPrecision
-			CLIP_DEFAULT_PRECIS,		// nClipPrecision
-			fontQuality,				// nQuality
-			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
-			fontFace);					// lpszFacename
-
-		// 小フォント作成
-		newHeight = - theApp.pt2px(fontHeight-2);	// 負数とすることで pixel 値指定とする
-		theApp.m_fontSmall.Detach();
-		theApp.m_fontSmall.CreateFont( 
-			newHeight,					// nHeight
-			0,							// nWidth
-			0,							// nEscapement
-			0,							// nOrientation
-			FW_MEDIUM,					// nWeight
-			FALSE,						// bItalic
-			FALSE,						// bUnderline
-			0,							// cStrikeOut
-			DEFAULT_CHARSET,			// nCharSet
-			OUT_DEFAULT_PRECIS,			// nOutPrecision
-			CLIP_DEFAULT_PRECIS,		// nClipPrecision
-			fontQuality,				// nQuality
-			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
-			fontFace);					// lpszFacename
-
-		// 大フォント作成
-		newHeight = - theApp.pt2px(fontHeight+1);	// 負数とすることで pixel 値指定とする
-		theApp.m_fontBig.Detach();
-		theApp.m_fontBig.CreateFont( 
-			newHeight,					// nHeight
-			0,							// nWidth
-			0,							// nEscapement
-			0,							// nOrientation
-			FW_MEDIUM,					// nWeight
-			FALSE,						// bItalic
-			FALSE,						// bUnderline
-			0,							// cStrikeOut
-			DEFAULT_CHARSET,			// nCharSet
-			OUT_DEFAULT_PRECIS,			// nOutPrecision
-			CLIP_DEFAULT_PRECIS,		// nClipPrecision
-			fontQuality,				// nQuality
-			DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
-			fontFace);					// lpszFacename
+	int iDPI = ::GetDeviceCaps(NULL, LOGPIXELSY);
+	BYTE fontQuality = NONANTIALIASED_QUALITY;
+	if (iDPI==192) {
+		// VGA(非RealVGA) ならClearType指定
+		fontQuality = CLEARTYPE_QUALITY;
 	}
+#else
+	// DPI 値の取得
+	int iDPI = theApp.GetDPI();
+
+	BYTE fontQuality = DEFAULT_QUALITY;
+#endif
+	int newHeight = - theApp.pt2px(fontHeight);	// 負数とすることで pixel 値指定とする
+
+	MZ3LOGGER_DEBUG( 
+		util::FormatString(L"CMZ3App::MakeNewFont(), dpi[%d], fontHeight[%d], newHeight[%d]",
+			iDPI, fontHeight, newHeight) );
+
+	theApp.m_font.Detach();
+	theApp.m_font.CreateFont( 
+		newHeight,					// nHeight
+		0,							// nWidth
+		0,							// nEscapement
+		0,							// nOrientation
+		FW_MEDIUM,					// nWeight
+		FALSE,						// bItalic
+		FALSE,						// bUnderline
+		0,							// cStrikeOut
+		DEFAULT_CHARSET,			// nCharSet
+		OUT_DEFAULT_PRECIS,			// nOutPrecision
+		CLIP_DEFAULT_PRECIS,		// nClipPrecision
+		fontQuality,				// nQuality
+		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		fontFace);					// lpszFacename
+
+	// 小フォント作成
+	newHeight = - theApp.pt2px(fontHeight-2);	// 負数とすることで pixel 値指定とする
+	theApp.m_fontSmall.Detach();
+	theApp.m_fontSmall.CreateFont( 
+		newHeight,					// nHeight
+		0,							// nWidth
+		0,							// nEscapement
+		0,							// nOrientation
+		FW_MEDIUM,					// nWeight
+		FALSE,						// bItalic
+		FALSE,						// bUnderline
+		0,							// cStrikeOut
+		DEFAULT_CHARSET,			// nCharSet
+		OUT_DEFAULT_PRECIS,			// nOutPrecision
+		CLIP_DEFAULT_PRECIS,		// nClipPrecision
+		fontQuality,				// nQuality
+		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		fontFace);					// lpszFacename
+
+	// 大フォント作成
+	newHeight = - theApp.pt2px(fontHeight+1);	// 負数とすることで pixel 値指定とする
+	theApp.m_fontBig.Detach();
+	theApp.m_fontBig.CreateFont( 
+		newHeight,					// nHeight
+		0,							// nWidth
+		0,							// nEscapement
+		0,							// nOrientation
+		FW_MEDIUM,					// nWeight
+		FALSE,						// bItalic
+		FALSE,						// bUnderline
+		0,							// cStrikeOut
+		DEFAULT_CHARSET,			// nCharSet
+		OUT_DEFAULT_PRECIS,			// nOutPrecision
+		CLIP_DEFAULT_PRECIS,		// nClipPrecision
+		fontQuality,				// nQuality
+		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		fontFace);					// lpszFacename
 	return true;
 }
 
