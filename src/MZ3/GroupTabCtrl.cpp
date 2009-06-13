@@ -51,6 +51,7 @@ void CGroupTabCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 #else
 	// ドラッグでタブの移動(順序変更)
 	m_bDragging = true;
+	m_ptDragStart = point;
 
 	// キャプチャ開始
 	SetCapture();
@@ -63,22 +64,27 @@ void CGroupTabCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
 #ifndef WINCE
 	if (m_bDragging) {
-		// マウス座標が右または左の要素を超えたら移動
-		int idx = GetCurSel();
-		if (idx+1<GetItemCount()) {
-			CRect r;
-			GetItemRect(idx+1, r);
-			CPoint ptCenter = r.CenterPoint();
-			if (point.x > ptCenter.x) {
-				theApp.m_pMainView->MoveTabItem(idx, idx+1);
+		// マウスカーソル変更
+		SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+
+		// マウス座標が最初の位置より少しずれていて、かつ、右または左の要素を超えたら移動
+		if (abs((point-m_ptDragStart).cx)>10) {
+			int idx = GetCurSel();
+			if (idx+1<GetItemCount()) {
+				CRect r;
+				GetItemRect(idx+1, r);
+				CPoint ptCenter = r.CenterPoint();
+				if (point.x > ptCenter.x) {
+					theApp.m_pMainView->MoveTabItem(idx, idx+1);
+				}
 			}
-		}
-		if (idx-1>=0) {
-			CRect r;
-			GetItemRect(idx-1, r);
-			CPoint ptCenter = r.CenterPoint();
-			if (point.x < ptCenter.x) {
-				theApp.m_pMainView->MoveTabItem(idx, idx-1);
+			if (idx-1>=0) {
+				CRect r;
+				GetItemRect(idx-1, r);
+				CPoint ptCenter = r.CenterPoint();
+				if (point.x < ptCenter.x) {
+					theApp.m_pMainView->MoveTabItem(idx, idx-1);
+				}
 			}
 		}
 	}
@@ -93,6 +99,9 @@ void CGroupTabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_bDragging) {
 		// キャプチャ終了
 		ReleaseCapture();
+
+		// マウスカーソルを元に戻す
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
 
 		// フラグクリア
 		m_bDragging = false;

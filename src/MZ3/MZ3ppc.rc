@@ -292,6 +292,9 @@ BEGIN
         BEGIN
             MENUITEM "↑カテゴリリストを狭くする",               IDM_LAYOUT_CATEGORY_MAKE_NARROW
             MENUITEM "↓カテゴリリストを広くする",               IDM_LAYOUT_CATEGORY_MAKE_WIDE
+            MENUITEM SEPARATOR
+            MENUITEM "タブを右に移動",                     ID_TABMENU_MOVE_TO_RIGHT
+            MENUITEM "タブを左に移動",                     ID_TABMENU_MOVE_TO_LEFT
         END
         POPUP "項目を追加"
         BEGIN
