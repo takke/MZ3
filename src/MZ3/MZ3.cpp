@@ -83,18 +83,18 @@ CMZ3App::~CMZ3App()
 #ifndef WINCE
 	return;
 #endif
-	if( m_pReportView != NULL ) {
-		delete m_pReportView;
-		m_pReportView = NULL;
-	}
+//	if( m_pReportView != NULL ) {
+//		delete m_pReportView;
+//		m_pReportView = NULL;
+//	}
 //	if( m_pWriteView != NULL ) {
 //		delete m_pWriteView;
 //		m_pWriteView = NULL;
 //	}
-	if (m_pMouseGestureManager != NULL) {
-		delete m_pMouseGestureManager;
-		m_pMouseGestureManager = NULL;
-	}
+//	if (m_pMouseGestureManager != NULL) {
+//		delete m_pMouseGestureManager;
+//		m_pMouseGestureManager = NULL;
+//	}
 }
 
 // 唯一の CMZ3App オブジェクトです。

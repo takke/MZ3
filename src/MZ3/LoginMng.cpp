@@ -148,23 +148,43 @@ CString Login::ReadItem(FILE* fp, bool bSupportOver255)
 
 	DWORD len = 0;
 	if (bSupportOver255) {
-		BYTE l = (BYTE)fgetc(fp);
-		BYTE h = (BYTE)fgetc(fp);
-		len = MAKEWORD(l, h);
+		int lo = fgetc(fp);
+		if (lo==EOF) {
+			MZ3LOGGER_INFO(L"ファイル終端のため終了します");
+			return L"";
+		}
+		int hi = fgetc(fp);
+		if (hi==EOF) {
+			MZ3LOGGER_INFO(L"ファイル終端のため終了します");
+			return L"";
+		}
+		len = MAKEWORD((BYTE)lo, (BYTE)hi);
 
 //		MZ3LOGGER_DEBUG(util::FormatString(L" ReadItem, len[%d]", len));
 	} else {
 		len = fgetc(fp);
+		if (len==EOF) {
+			MZ3LOGGER_INFO(L"ファイル終端のため終了します");
+			return L"";
+		}
 	}
 
 	// 一文字目を抜き出す
 	std::vector<char> buf;
 	int p_len = ((len/8)+1)*8;
+	if (p_len==0) {
+		MZ3LOGGER_ERROR(L"長さ不正のため終了します");
+		return L"";
+	}
 	buf.resize(p_len);
 
 	char* p = &buf[0];
 	memset(p, 0x00, sizeof(char) * p_len);
 	int num = (int)fread(p, sizeof(char), p_len, fp);
+	if (num==0) {
+		MZ3LOGGER_INFO(L"ファイル終端のため終了します");
+		return L"";
+	}
 
 	CStringA ret_mbs;
 	for (int i=0; i<(int)(len / 8) + 1; i++) {
