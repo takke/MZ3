@@ -54,7 +54,8 @@ public:
 		int insert_pos = old_list_size;	// ‰Šú’lFnew_[0].id ‚ª out_ ‚Ì’†‚ÅÅ¬‚Ìê‡‚Ì‘}“üˆÊ’u
 		int max_id_on_new = new_[0].GetID();
 		for (size_t i=0; i<old_list_size; i++) {
-			if (max_id_on_new > out_[i].GetID()) {
+			int id = out_[i].GetID();
+			if (max_id_on_new > id) {
 				insert_pos = i;
 				break;
 			}

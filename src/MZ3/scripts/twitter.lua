@@ -24,6 +24,17 @@ mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
 mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
 
 
+--- MZ3内部IDをTwitterIDに変換する
+function id2realid(n)
+	return n+2147483648;
+end
+
+--- TwitterIDをMZ3内部IDに変換する
+function realid2id(n)
+	return n-2147483648;
+end
+
+
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
@@ -128,10 +139,10 @@ function twitter_friends_timeline_parser(parent, body, html)
 			status = status .. line;
 			
 			-- id : status/id
-			id = status:match('<id>(.-)</id>');
-			
+			id = realid2id(status:match('<id>(.-)</id>'));
+--			mz3.logger_debug('id : ' .. id);
 			-- 同一IDがあれば追加しない。
-			if id_set[ id ] then
+			if id_set[ "" .. id ] then
 --				mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
 			else
 				-- data 生成
@@ -624,7 +635,7 @@ end
 function on_twitter_create_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	id = body:get_integer('id');
+	id = id2realid(body:get_integer('id'));
 	url = "http://twitter.com/favourings/create/" .. id .. ".xml";
 
 	-- 通信開始
@@ -641,7 +652,7 @@ end
 function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	id = body:get_integer('id');
+	id = id2realid(body:get_integer('id'));
 	url = "http://twitter.com/favourings/destroy/" .. id .. ".xml";
 
 	-- 通信開始
@@ -846,7 +857,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
 	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 	item = item .. data:get_date() .. "\r\n";
---	item = item .. "id : " .. data:get_integer('id') .. "\r\n";
+	item = item .. "id : " .. id2realid(data:get_integer('id')) .. "\r\n";
 --	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 	if data:get_text('location') ~= '' then
