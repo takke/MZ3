@@ -22,3 +22,4 @@
 :----- luadoc ƒtƒ@ƒCƒ‹‚Ì¶¬ -----
 @call 60_make_mz3_luadoc.bat
 
+pause

@@ -38,4 +38,4 @@ copy ..\src\MZ3GroupFileEditor\Release\MZ3GroupFileEditor.exe MZ3_win32\
 @echo %archive% ÅÀ %archive_to%
 @move %archive% %archive_to%
 @cd %dist_dir%
-pause
+:pause
