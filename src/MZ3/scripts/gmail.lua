@@ -426,8 +426,13 @@ mz3.set_parser("GMAIL_LOGIN", "gmail.gmail_login_parser");
 --   dummy: NULL
 --   html:  HTMLデータ(CHtmlArray*)
 --------------------------------------------------
-function gmail_mail_parser(data, dimmy, html)
+function gmail_mail_parser(data, dummy, html)
 	mz3.logger_debug("gmail_mail_parser start");
+
+	-- メインビュー、ボディリストのアイコンを既読にする
+	mz3_data.set_integer(mz3_main_view.get_selected_body_item(), 'is_new', 0);
+	mz3_main_view.redraw_body_images();
+	
 	
 	-- wrapperクラス化
 	data = MZ3Data:create(data);
@@ -446,92 +451,191 @@ function gmail_mail_parser(data, dimmy, html)
 		line = line .. html:get_at(i);
 	end
 	
-	-- TODO 複数スレッド対応
-	
 	-- base url の解析
 	-- <base href="https://mail.google.com/mail/h/xxx/">
 	base_url  = line:match('<base href="(.-)">');
 	base_host = base_url:match('(https?://.-)/');
+	
+	-- 「全て展開」=全スレッド表示対応
+	-- ※無限ループ対策のため、メイン画面から遷移した場合のみ実施する
+	if read_gmail_mail_first then
+		read_gmail_mail_first = false;
+
+		-- <a href="?v=c&d=e&th=xxx" class="nu">
+		-- <img src="/mail/images/expand_icon.gif" width="16" height="16" border="0" alt="すべてのメッセージを展開">
+		-- &nbsp;<span class="u">すべて展開</span></a>
+		
+		if line_has_strings(line, 'alt="すべてのメッセージを展開"') then
+			expand_url = line:match('<a href="([^">]+)"[^>]+><img[^>]+>&nbsp;<span[^>]+>すべて展開');
+--			mz3.alert(expand_url);
+--			expand_url = nil;
+			if expand_url ~= nil then
+				mz3.logger_debug('全スレッドを取得します');
+
+				data:add_text_array("body", "全スレッドを取得しています。しばらくお待ち下さい。。。");
+
+				data = MZ3Data:create(data);
+
+				-- 通信開始
+				url = base_url .. expand_url;
+				key = "GMAIL_MAIL";
+				access_type = mz3.get_access_type_by_key(key);
+				referer = '';
+				user_agent = nil;
+				post = nil;
+				mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+				return;
+			end
+		end
+	end
 	
 	-- タイトル
 	-- <h2><font size="+1"><b>たいとる</b></font></h2>
 	title = line:match('<h2><font size=.-><b>(.-)</b>');
 	data:set_text('title', mz3.decode_html_entity(title));
 	
-	-- 名前
-	-- <h3><font color="#00681C"> <b>なまえ</b> </font></h3>
-	name = line:match('<h3><font color=.-> <b>(.-)</b>');
-	data:set_text("name", mz3.decode_html_entity(name));
-	data:set_text("author", name);
+	-- スレッド分離
+	-- 特定のtableと「返信開始タグ」で分離する
 	
-	-- 日付
-	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
-	date = line:match('<td align="right" valign="top"> (.-) <');
-	date = date:gsub('<.->', '');
-	data:set_date(date);
+	one_mail_start_tags = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#efefef"> <tr> <td> ';
+	reply_start_tags    = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#e0ecff" class="qr"> <tr> ';
 	
-	-- 本文
-	-- <tr bgcolor="#ffffff">...<a name="m_">
-	body = line:match('<tr bgcolor="#ffffff">(.-)<a name="m_">');
-
-	-- 簡易HTML解析
-	body = body:gsub('<WBR>', '');
-	body = body:gsub('<b .->', "<b>");
-	body = body:gsub('<p .->', "<p>");
-	body = body:gsub('<h2.->(.-)</h2>', '<b>%1</b>');
-	body = body:gsub('<b>', "\n<b>\n<br>");
-	body = body:gsub('</b>', "<br>\n</b>\n");
-	body = body:gsub('<br ?/>', "<br>");
-	body = body:gsub('<font .->', "");
-	body = body:gsub('</font>', "");
-	body = body:gsub('<hr .->', "<hr>");
-	body = body:gsub('<hr>', "<br>----------------------------------------<br>");
-
-	body = body:gsub('<tr[^>]*>', "");
-	body = body:gsub('<td[^>]*>', "");
-	body = body:gsub('</tr>', "<br>");
-	body = body:gsub('</td>', "");
-	body = body:gsub('<table[^>]*>', "");
-	body = body:gsub('</table>', "");
-	body = body:gsub('<map.-</map>', '');
-
-	-- 内部リンクの補完(/で始まる場合にホストを補完する)
-	body = body:gsub('(<a .-href=")(/.-")', '%1' .. base_host .. '%2');
-	body = body:gsub('(<img .-src=")(/.-")', '%1' .. base_host .. '%2');
-	-- 内部リンクの補完(?で始まる場合にbaseを補完する)
-	body = body:gsub('(<a .-href=")(\?.-")', '%1' .. base_host .. '%2');
-	body = body:gsub('(<img .-src=")\?(.-")', '%1' .. base_url .. '%2');
-	body = body:gsub("\r\n", "\n");
-	body = body:gsub('^ *', '');
-
-	-- <img タグだが src がないものは削除
-	start = 1;
-	body2 = '';
+	local one_mail = '';
+	local mail_count = 0;
+	local start = 1;
+	local pos = 1;
 	while true do
-		pos = body:find('<img', start, true);
+		-- メール開始タグを探す
+		pos = line:find(one_mail_start_tags, start, true);
 		if pos == nil then
-			body2 = body2 .. body:sub(start);
+			-- 「返信開始タグ」までを1通とする
+			pos = line:find(reply_start_tags, start, true);
+			if pos == nil then
+				-- 「返信開始タグ」がないので最後まで。
+				one_mail = line:sub(start);
+			else
+				one_mail = line:sub(start, pos-1);
+			end
+
+			-- 整形、Data化
+			parse_one_mail(data, one_mail, mail_count);
 			break;
 		else
-			body2 = body2 .. body:sub(start, pos-1);
-			img = body:match('<img .->', start);
-			if line_has_strings(img, 'src=') then
-				body2 = body2 .. img;
-			end
-			start = pos + img:len();
+			one_mail = line:sub(start, pos-1);
+			
+			-- 整形、Data化
+			parse_one_mail(data, one_mail, mail_count);
+			
+			start = pos + one_mail_start_tags:len();
+			mail_count = mail_count +1;
 		end
 	end
-
-	body2 = body2:gsub('<a [^>]*></a>', "");
---	print(body2);
-
-	data:add_text_array("body", "\r\n");
-	data:add_body_with_extract(body2);
-
+	
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("gmail_mail_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("GMAIL_MAIL", "gmail.gmail_mail_parser");
+
+
+--- スレッド内の1通のメールを解析し、data に設定する
+--
+-- @param data MZ3Data オブジェクト
+-- @param line 1通のメールに対応するHTML
+--
+function parse_one_mail(data, line, count)
+
+	mz3.logger_debug("parse_one_mail(" .. count .. ")");
+
+	if count==0 then
+		-- 最初はヘッダーなので無視
+		return;
+	end
+
+	if count>=2 then
+		-- 2件目以降は子要素として投入する
+		child = MZ3Data:create();
+		parse_one_mail(child, line, 1);
+		data:add_child(child);
+		child:delete();
+		return;
+	end
+--	mz3.logger_debug(line);
+
+	-- 名前
+	-- <h3>... <b>なまえ</b> ...</h3>
+	name = line:match('<h3>.-<b>(.-)</b>');
+	data:set_text("name", mz3.decode_html_entity(name));
+	data:set_text("author", mz3.decode_html_entity(name));
+	
+	-- 日付
+	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
+	date = line:match('<td align="right" valign="top"> (.-) <');
+	if date ~= nil then
+		date = date:gsub('<.->', '');
+		data:set_date(date);
+	end
+	
+	-- 本文
+	body = line:match('<div class="msg"> ?(.*)$');
+	
+	if body ~= nil then
+		-- 簡易HTML解析
+		body = body:gsub('<WBR>', '');
+		body = body:gsub('<b .->', "<b>");
+		body = body:gsub('<p .->', "<p>");
+		body = body:gsub('<h2.->(.-)</h2>', '<b>%1</b>');
+		body = body:gsub('<b>', "\n<b>\n<br>");
+		body = body:gsub('</b>', "<br>\n</b>\n");
+		body = body:gsub('<br ?/>', "<br>");
+		body = body:gsub('<font .->', "");
+		body = body:gsub('</font>', "");
+		body = body:gsub('<hr .->', "<hr>");
+		body = body:gsub('<hr>', "<br>----------------------------------------<br>");
+
+		body = body:gsub('<tr[^>]*>', "");
+		body = body:gsub('<td[^>]*>', "");
+		body = body:gsub('</tr>', "<br>");
+		body = body:gsub('</td>', "");
+		body = body:gsub('<table[^>]*>', "");
+		body = body:gsub('</table>', "");
+		body = body:gsub('<map.-</map>', '');
+
+		-- 内部リンクの補完(/で始まる場合にホストを補完する)
+		body = body:gsub('(<a .-href=")(/.-")', '%1' .. base_host .. '%2');
+		body = body:gsub('(<img .-src=")(/.-")', '%1' .. base_host .. '%2');
+		-- 内部リンクの補完(?で始まる場合にbaseを補完する)
+		body = body:gsub('(<a .-href=")(\?.-")', '%1' .. base_host .. '%2');
+		body = body:gsub('(<img .-src=")\?(.-")', '%1' .. base_url .. '%2');
+		body = body:gsub("\r\n", "\n");
+		body = body:gsub('^ *', '');
+
+		-- <img タグだが src がないものは削除
+		local post = 1;
+		local start = 1;
+		local body2 = '';
+		while true do
+			pos = body:find('<img', start, true);
+			if pos == nil then
+				body2 = body2 .. body:sub(start);
+				break;
+			else
+				body2 = body2 .. body:sub(start, pos-1);
+				img = body:match('<img .->', start);
+				if line_has_strings(img, 'src=') then
+					body2 = body2 .. img;
+				end
+				start = pos + img:len();
+			end
+		end
+
+		body2 = body2:gsub('<a [^>]*></a>', "");
+--		print(body2);
+
+		data:add_text_array("body", "\r\n");
+		data:add_body_with_extract(body2);
+	end
+
+end
 
 
 ----------------------------------------
@@ -585,8 +689,12 @@ end
 
 
 --- レポートビューで開く
+read_gmail_mail_first = true;
 function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_by_reportview_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	-- メールパーサ内無限ループ対策のため、「メイン画面からの遷移フラグ」を立てておく
+	read_gmail_mail_first = true;
 
 	data = MZ3Data:create(data);
 
@@ -598,7 +706,7 @@ function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
-
+	
 	return true;
 end
 
@@ -606,11 +714,14 @@ end
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
 
-	-- ダブルクリックで全文表示したい場合は下記のコメントを外すこと
---	if serialize_key=="GMAIL_MAIL" then
---		-- 全文表示
+	if serialize_key=="GMAIL_MAIL" then
+		-- レポートビューで開く
+		return on_read_by_reportview_menu_item(serialize_key, event_name, data);
+
+		-- ダブルクリックで全文表示したい場合は下記のコメントを外すこと
+		-- 全文表示
 --		return on_read_menu_item(serialize_key, event_name, data);
---	end
+	end
 	
 	-- 標準の処理を続行
 	return false;

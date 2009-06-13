@@ -810,17 +810,8 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 				theApp.m_notFoundFileList.erase((LPCTSTR)path);
 			}
 
-			// アイコン差し替え
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-			if (pCategory!=NULL) {
-				int idx = pCategory->selectedBody;
-
-				// CImageList::Replace が効かないので、リロードしてしまう。
-				SetBodyImageList( pCategory->GetBodyList() );
-			}
-
-			// アイコン再描画
-			InvalidateRect( m_rectIcon, FALSE );
+			// 再描画
+			MyRedrawBodyImages();
 		}
 		break;
 
@@ -6744,4 +6735,19 @@ void CMZ3View::MoveTabItem(int oldTabIndex, int newTabIndex)
 
 	// グループ定義ファイルの保存
 	theApp.SaveGroupData();
+}
+
+void CMZ3View::MyRedrawBodyImages(void)
+{
+	// アイコン差し替え
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory!=NULL) {
+		int idx = pCategory->selectedBody;
+
+		// CImageList::Replace が効かないので、リロードしてしまう。
+		SetBodyImageList( pCategory->GetBodyList() );
+	}
+
+	// アイコン再描画
+	InvalidateRect( m_rectIcon, FALSE );
 }

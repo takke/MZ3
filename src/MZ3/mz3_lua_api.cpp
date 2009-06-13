@@ -2962,6 +2962,19 @@ int lua_mz3_main_view_retrieve_category_item(lua_State *L)
 	return 0;
 }
 
+/*
+--- 下ペインアイコンの再描画
+--
+function mz3_main_view.redraw_body_images();
+*/
+int lua_mz3_main_view_redraw_body_images(lua_State *L)
+{
+	theApp.m_pMainView->MyRedrawBodyImages();
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 API table
@@ -3088,6 +3101,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"get_edit_text",			lua_mz3_main_view_get_edit_text},
 	{"set_info_text",			lua_mz3_main_view_set_info_text},
 	{"retrieve_category_item",	lua_mz3_main_view_retrieve_category_item},
+	{"redraw_body_images",		lua_mz3_main_view_redraw_body_images},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_post_data_lib[] = {

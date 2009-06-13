@@ -395,6 +395,7 @@ public:
 	afx_msg void OnTabmenuMoveToRight();
 	afx_msg void OnTabmenuMoveToLeft();
 	void MoveTabItem(int oldTabIndex, int newTabIndex);
+	void MyRedrawBodyImages(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン
