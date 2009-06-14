@@ -143,6 +143,8 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
 	ON_COMMAND(ID_TABMENU_MOVE_TO_RIGHT, &CMZ3View::OnTabmenuMoveToRight)
 	ON_COMMAND(ID_TABMENU_MOVE_TO_LEFT, &CMZ3View::OnTabmenuMoveToLeft)
+	ON_COMMAND(ID_CATEGORYMENU_MOVE_UP, &CMZ3View::OnCategorymenuMoveUp)
+	ON_COMMAND(ID_CATEGORYMENU_MOVE_DOWN, &CMZ3View::OnCategorymenuMoveDown)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -6711,12 +6713,13 @@ void CMZ3View::MoveTabItem(int oldTabIndex, int newTabIndex)
 		return;
 	}
 
-	// 名称交換
+	// 交換(theApp.m_rootの変更)
 	CString oldTabName = theApp.m_root.groups[oldTabIndex].name;
 	CGroupItem oldGroupItem = theApp.m_root.groups[oldTabIndex];
 	theApp.m_root.groups[oldTabIndex] = theApp.m_root.groups[newTabIndex];
 	theApp.m_root.groups[newTabIndex] = oldGroupItem;
 
+	// コントロールへの反映
 	TCITEM tcItem;
 	TCHAR buffer[256] = {0};
 	tcItem.pszText = buffer;
@@ -6750,4 +6753,47 @@ void CMZ3View::MyRedrawBodyImages(void)
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );
+}
+
+/// カテゴリ｜上に移動
+void CMZ3View::OnCategorymenuMoveUp()
+{
+	MoveCategoryItem(m_selGroup->focusedCategory, m_selGroup->focusedCategory-1);
+}
+
+/// カテゴリ｜下に移動
+void CMZ3View::OnCategorymenuMoveDown()
+{
+	MoveCategoryItem(m_selGroup->focusedCategory, m_selGroup->focusedCategory+1);
+}
+
+/// カテゴリの移動
+void CMZ3View::MoveCategoryItem(int oldCategoryIndex, int newCategoryIndex)
+{
+	if (newCategoryIndex<0 || newCategoryIndex>=m_selGroup->categories.size()) {
+		return;
+	}
+
+	if (theApp.m_access) {
+		return;
+	}
+
+	// 交換
+	CCategoryItem tmp = m_selGroup->categories[oldCategoryIndex];
+	m_selGroup->categories[oldCategoryIndex] = m_selGroup->categories[newCategoryIndex];
+	m_selGroup->categories[newCategoryIndex] = tmp;
+
+	// indexの再設定
+	m_selGroup->categories[oldCategoryIndex].SetIndexOnList(newCategoryIndex);
+	m_selGroup->categories[newCategoryIndex].SetIndexOnList(oldCategoryIndex);
+
+	// 選択状態変更
+	m_selGroup->selectedCategory = m_selGroup->focusedCategory = newCategoryIndex;
+	m_preCategory = newCategoryIndex;
+
+	// コントロールへの反映 → 安全のためタブ単位の再構築で強制反映
+	OnSelchangedGroupTab();
+
+	// グループ定義ファイルの保存
+	theApp.SaveGroupData();
 }

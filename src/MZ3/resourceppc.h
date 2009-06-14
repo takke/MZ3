@@ -312,6 +312,8 @@
 #define ID_DUMMY34210                   34210
 #define ID_TABMENU_MOVE_TO_RIGHT        34213
 #define ID_TABMENU_MOVE_TO_LEFT         34214
+#define ID_CATEGORYMENU_MOVE_DOWN       34219
+#define ID_CATEGORYMENU_MOVE_UP         34221
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -327,7 +329,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
-#define _APS_NEXT_COMMAND_VALUE         34218
+#define _APS_NEXT_COMMAND_VALUE         34226
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
