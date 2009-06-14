@@ -6770,7 +6770,7 @@ void CMZ3View::OnCategorymenuMoveDown()
 /// ƒJƒeƒSƒŠ‚ÌˆÚ“®
 void CMZ3View::MoveCategoryItem(int oldCategoryIndex, int newCategoryIndex)
 {
-	if (newCategoryIndex<0 || newCategoryIndex>=m_selGroup->categories.size()) {
+	if (newCategoryIndex<0 || newCategoryIndex>=(int)m_selGroup->categories.size()) {
 		return;
 	}
 

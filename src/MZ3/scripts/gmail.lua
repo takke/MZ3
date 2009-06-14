@@ -474,8 +474,6 @@ function gmail_mail_parser(data, dummy, html)
 
 				data:add_text_array("body", "全スレッドを取得しています。しばらくお待ち下さい。。。");
 
-				data = MZ3Data:create(data);
-
 				-- 通信開始
 				url = base_url .. expand_url;
 				key = "GMAIL_MAIL";
