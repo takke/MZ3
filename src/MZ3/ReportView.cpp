@@ -1198,14 +1198,6 @@ void CReportView::OnDelBookmark()
  */
 void CReportView::OnLoadImage(UINT nID)
 {
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-
 	if (m_currentData==NULL) {
 		return;
 	}
@@ -1221,6 +1213,8 @@ void CReportView::OnLoadImage(UINT nID)
 	// イメージURLをCGIから取得
 	theApp.m_accessType = ACCESS_IMAGE;
 	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_HTML );
+
+	MyUpdateControlStatus();
 }
 
 /**
@@ -1228,14 +1222,6 @@ void CReportView::OnLoadImage(UINT nID)
  */
 void CReportView::OnLoadMovie(UINT nID)
 {
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-
 	if (m_currentData==NULL) {
 		return;
 	}
@@ -1251,6 +1237,8 @@ void CReportView::OnLoadMovie(UINT nID)
 	// 動画URLをCGIから取得
 	theApp.m_accessType = ACCESS_MOVIE;
 	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+
+	MyUpdateControlStatus();
 }
 
 
@@ -1283,16 +1271,10 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 		// 既読位置を保存
 		SaveIndex();
 
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-		m_infoEdit.ShowWindow(SW_SHOW);
-
 		theApp.m_access = true;
 		m_abort = FALSE;
+
+		MyUpdateControlStatus();
 
 		// m_data の書き換え
 		{
@@ -1341,14 +1323,6 @@ void CReportView::OnReloadPage()
 	// 既読位置を保存
 	SaveIndex();
 
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-
 	theApp.m_access = true;
 	m_abort = FALSE;
 
@@ -1356,6 +1330,8 @@ void CReportView::OnReloadPage()
 
 	theApp.m_accessType = m_data.GetAccessType();
 	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
+
+	MyUpdateControlStatus();
 }
 
 /**
@@ -1465,16 +1441,10 @@ void CReportView::OnLoadUrl(UINT nID)
 			m_abort = FALSE;
 
 			// ダウンロードファイルパス
-			m_infoEdit.ShowWindow(SW_SHOW);
 			theApp.m_inet.Initialize( m_hWnd, NULL );
 			theApp.m_accessType = ACCESS_DOWNLOAD;
 
-			// ボタン状態の変更
-			theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-			theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-			theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-			theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-			theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
+			MyUpdateControlStatus();
 
 			theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
 		}
@@ -1704,16 +1674,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	if( bRetry == false ) {
-		theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, m_imageState);
-		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
-
-		// プログレスバーを非表示
-		mc_progressBar.ShowWindow( SW_HIDE );
-
-		m_infoEdit.ShowWindow(SW_HIDE);
+		MyUpdateControlStatus();
 	}
 
 	return TRUE;
@@ -1731,16 +1692,24 @@ LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 
 	theApp.m_access = false;
 
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, m_imageState);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
+	MyUpdateControlStatus();
 
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
+	// MZ3 API : イベントハンドラ関数呼び出し
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(theApp.m_accessType));
+	if (util::CallMZ3ScriptHookFunctions2("get_end_binary_report_view", &rvals, 
+			util::MyLuaData(serializeKey),
+			util::MyLuaData(theApp.m_inet.m_dwHttpStatus),
+			util::MyLuaData(CStringA(theApp.m_inet.GetURL())),
+			util::MyLuaData(CStringA(theApp.m_filepath.temphtml))
+			))
+			
+	{
+		// イベントハンドラ完了
+		return TRUE;
+	}
 
-	m_infoEdit.ShowWindow(SW_HIDE);
 
 	// 保存ファイルにコピー
 	// パス生成
@@ -1795,11 +1764,6 @@ LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
  */
 LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 {
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-
 	LPCTSTR smsg = L"エラーが発生しました";
 	util::MySetInformationText( m_hWnd, smsg );
 
@@ -1811,7 +1775,8 @@ LRESULT CReportView::OnGetError(WPARAM wParam, LPARAM lParam)
 	MZ3LOGGER_ERROR( msg );
 
 	theApp.m_access = false;
-	m_infoEdit.ShowWindow(SW_HIDE);
+
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -1828,18 +1793,9 @@ LRESULT CReportView::OnGetAbort(WPARAM wParam, LPARAM lParam)
 	// ボタンを元に戻してメッセージをだして処理終了
 	util::MySetInformationText( m_hWnd, _T("中断しました") );
 
-	// 中止ボタンを使用不可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, m_imageState);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-
-	// プログレスバーを非表示
-	mc_progressBar.ShowWindow( SW_HIDE );
-
-	m_infoEdit.ShowWindow(SW_HIDE);
-
 	theApp.m_access = false;
+
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -1860,16 +1816,10 @@ LRESULT CReportView::OnAbort(WPARAM wParam, LPARAM lParam)
 	util::MySetInformationText( m_hWnd, msg );
 //	::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONSTOP | MB_OK);
 
-	// 中止ボタンを使用不可にする
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, m_imageState);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
-
-	m_infoEdit.ShowWindow(SW_HIDE);
-
 	theApp.m_access = false;
+
+	MyUpdateControlStatus();
+
 	return TRUE;
 }
 
@@ -2007,20 +1957,14 @@ LRESULT CReportView::OnChangeView(WPARAM wParam, LPARAM lParam)
  */
 LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 {
-	theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
-	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
-
-	m_infoEdit.ShowWindow(SW_SHOW);
-
 	theApp.m_access = true;
 	m_abort = FALSE;
 
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 	theApp.m_accessType = m_data.GetAccessType();
 	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
+
+	MyUpdateControlStatus();
 
 	return TRUE;
 }
@@ -3042,5 +2986,33 @@ void CReportView::OnUpdateLoadFullDiary(CCmdUI *pCmdUI)
 	pCmdUI->Enable( false );
 	if( !m_data.GetFullDiary().IsEmpty() ){
 		pCmdUI->Enable( true );
+	}
+}
+
+void CReportView::MyUpdateControlStatus(void)
+{
+	if (theApp.m_access) {
+		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
+		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
+
+		m_infoEdit.ShowWindow(SW_SHOW);
+
+		// プログレスバーを表示
+		mc_progressBar.ShowWindow( SW_SHOW );
+
+	} else {
+		theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
+		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
+		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
+		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, m_imageState);
+		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE);
+
+		// プログレスバーを非表示
+		mc_progressBar.ShowWindow( SW_HIDE );
+
+		m_infoEdit.ShowWindow(SW_HIDE);
 	}
 }

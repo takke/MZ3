@@ -1241,8 +1241,9 @@ ProcessStateEnum Ran2View::SetRowProperty(HtmlRecord* hashRecord,
 			processState = ProcessState_FollowOfLine;
 		}else{
 			newGaiji = new GaijiProperty();
-			// [m:xx] から xx を抽出し、リソースIDとする
-			newGaiji->resourceID = hashRecord->value.Mid(3, hashRecord->value.GetLength()-4);	// リソース名の置換を行う場合はここでやっちゃって！
+			// [g:xx] から xx を抽出し、リソースIDとする
+			newGaiji->resourceID = hashRecord->value.Mid(3, hashRecord->value.GetLength()-4);
+			// リソース名の置換を行う場合はここでやっちゃって！
 
 			// 出力領域の設定
 			int sx = bigBridgeInfo->startWidth + (gaijiWidthOffset);
@@ -1863,7 +1864,7 @@ MainInfo* Ran2View::ParseDatData2(CStringArray* datArray,int width)
 		HtmlRecord*	hashRecord = new HtmlRecord();
 
 		// 文字、絵文字の振り分け
-		if( wcsncmp(lineStr, TEXT("[m:"), 3) == 0){
+		if( wcsncmp(lineStr, TEXT("[g:"), 3) == 0){
 			// 数値, インデックスチェックが通れば外字、それ以外はテキストとみなす
 			CString code = lineStr.Mid(3,lineStr.GetLength()-4);
 			for (int i=0; i<code.GetLength(); i++) {

@@ -63,6 +63,15 @@ type:set_request_method('GET');									-- リクエストメソッド
 type:set_cache_file_pattern('gmail\\mail.html');				-- キャッシュファイル
 type:set_request_encoding('utf8');								-- エンコーディング
 
+-- 絵文字
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');									-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_EMOJI');							-- シリアライズキー
+type:set_short_title('GMail 絵文字');							-- 簡易タイトル
+type:set_request_method('GET');									-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -498,6 +507,9 @@ function gmail_mail_parser(data, dummy, html)
 	one_mail_start_tags = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#efefef"> <tr> <td> ';
 	reply_start_tags    = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#e0ecff" class="qr"> <tr> ';
 	
+	-- 絵文字URLリスト
+	-- 例) emoji_urls[0] = 'https://mail.google.com/mail/e/ezweb_ne_jp/B60';
+	emoji_urls = {}
 	local one_mail = '';
 	local mail_count = 0;
 	local start = 1;
@@ -529,10 +541,35 @@ function gmail_mail_parser(data, dummy, html)
 		end
 	end
 	
+--	for k, v in pairs(emoji_urls) do
+--		print(k, v);
+--	end
+--	print(#emoji_urls);
+	-- 未ロードの絵文字があればロード開始
+	get_next_emoji_url();
+	
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("gmail_mail_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("GMAIL_MAIL", "gmail.gmail_mail_parser");
+
+
+--- emoji_urls の先頭要素に対してリクエストする
+function get_next_emoji_url()
+	if #emoji_urls >= 1 then
+		-- 通信開始
+		url = emoji_urls[1];
+--		mz3.alert(url);
+		access_type = mz3.get_access_type_by_key("GMAIL_EMOJI");
+		referer = '';
+		user_agent = nil;
+		post = nil;
+		mz3.open_url(mz3_report_view.get_wnd(), access_type, url, referer, "binary", user_agent, post);
+		return true;
+	else
+		return false;
+	end
+end
 
 
 --- スレッド内の1通のメールを解析し、data に設定する
@@ -579,6 +616,7 @@ function parse_one_mail(data, line, count)
 	if body ~= nil then
 		-- 簡易HTML解析
 		body = body:gsub('<WBR>', '');
+		body = body:gsub('<wbr />', '');
 		body = body:gsub('<b .->', "<b>");
 		body = body:gsub('<p .->', "<p>");
 		body = body:gsub('<h2.->(.-)</h2>', '<b>%1</b>');
@@ -620,7 +658,23 @@ function parse_one_mail(data, line, count)
 				body2 = body2 .. body:sub(start, pos-1);
 				img = body:match('<img .->', start);
 				if line_has_strings(img, 'src=') then
-					body2 = body2 .. img;
+					-- さらに絵文字であれば変換
+					-- <img src="https://mail.google.com/mail/e/ezweb_ne_jp/B60" goomoji="ezweb_ne_jp.B60" ... />
+					emoji_url, goomoji = img:match('src="(https://mail.google.com/mail/e/ezweb_ne_jp/.-)" goomoji="(.-)"');
+					if emoji_url ~= nil and goomoji ~= nil then
+						-- 未ロードの絵文字があればダウンロードする
+						local idx = mz3_image_cache.get_image_index_by_url(emoji_url);
+						if idx==-1 then
+							-- 未ロードなのでダウンロード(予約)する
+							table.insert(emoji_urls, emoji_url);
+							body2 = body2 .. "[loading...]";
+						else
+							-- ロード済みなのでidxをらんらんビュー形式に変換する
+							body2 = body2 .. "[g:" .. idx .. "]";
+						end
+					else
+						body2 = body2 .. img;
+					end
 				end
 				start = pos + img:len();
 			end
@@ -639,6 +693,49 @@ end
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+--- ボディリストのアイコンのインデックス取得
+--
+-- @param event_name    'get_end_binary_report_view'
+-- @param serialize_key シリアライズキー(nil)
+-- @param http_status   http status
+-- @param url           url
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+--
+function on_get_end_binary_report_view(event_name, serialize_key, http_status, url, filename)
+
+	mz3.logger_debug('on_get_end_binary_report_view', event_name, serialize_key, http_status, url, filename);
+	if serialize_key == "GMAIL_EMOJI" then
+		-- 保存
+		local path = mz3.make_image_logfile_path_from_url_md5(url);
+		mz3.logger_debug(path);
+--		mz3.alert(path);
+		mz3.copy_file(filename, path);
+		
+		-- 絵文字リストから削除
+		table.remove(emoji_urls, 1);
+
+		-- 未ロードの絵文字があればロード開始
+		if get_next_emoji_url()==false then
+			-- 全ロード完了
+			-- とりあえず再度メールを受信する
+			-- TODO 画面再描画のみにしたい
+			url = mail_url;
+			key = "GMAIL_MAIL";
+			access_type = mz3.get_access_type_by_key(key);
+			referer = '';
+			user_agent = nil;
+			post = nil;
+			mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+		end
+
+		return true;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_end_binary_report_view", "gmail.on_get_end_binary_report_view");
 
 --- ボディリストのアイコンのインデックス取得
 --
@@ -705,6 +802,10 @@ function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 	
+	-- 絵文字ロード後の再ロード用
+	-- TODO 画面再描画のみにしたい
+	mail_url = url;
+
 	return true;
 end
 

@@ -67,6 +67,7 @@ public:
 	XcrawlCanceler		m_xcrawl;				///< Xcrawl 制御
 	int					m_nKeydownRepeatCount;	///< WM_KEYDOWN の回数
 	int					m_scrollBarHeight;		// 垂直スクロールバーが扱える行数
+	BOOL m_abort;
 
 private:
 	CMixiData*	m_focusBodyItem;
@@ -121,7 +122,6 @@ private:
 	afx_msg LRESULT OnGetListItemCount(WPARAM, LPARAM);
 
 	CProgressCtrl mc_progressBar;
-	BOOL m_abort;
 
 	int m_scrollLine;
 	afx_msg void OnShowDebugInfo();
@@ -169,6 +169,7 @@ public:
 	afx_msg void OnUpdateMenuPrevDiary(CCmdUI *pCmdUI);
 	afx_msg void OnLoadFullDiary();
 	afx_msg void OnUpdateLoadFullDiary(CCmdUI *pCmdUI);
+	void MyUpdateControlStatus(void);
 };
 
 

@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MZ3View.h"
+#include "ReportView.h"
 #include "MixiParserUtil.h"
 #include "TwitterParser.h"
 #include "IniFile.h"
@@ -330,6 +331,53 @@ int lua_mz3_convert_encoding(lua_State *L)
 }
 
 /*
+--- 画像ファイルパス生成(MD5型)
+--
+-- @param url url
+-- @return パス
+--
+function mz3.make_image_logfile_path_from_url_md5(url)
+*/
+int lua_mz3_make_image_logfile_path_from_url_md5(lua_State *L)
+{
+	CString url(lua_tostring(L, 1));				// 第1引数
+
+	CStringA path(util::MakeImageLogfilePathFromUrlMD5( url ));
+	lua_pushstring(L, path);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- ファイルコピー
+--
+-- @param from_path コピー元パス
+-- @param to_path   コピー先パス
+--
+function mz3.copy_file(from_path, to_path)
+*/
+int lua_mz3_copy_file(lua_State *L)
+{
+	// 引数取得
+	CString from_path(lua_tostring(L, 1));
+	CString to_path(lua_tostring(L, 2));
+
+	// ファイルコピー
+	CopyFile( from_path, to_path, FALSE/*bFailIfExists, 上書き*/ );
+
+	// 存在しないファイルリストに登録されていれば削除する
+	if (theApp.m_notFoundFileList.count((LPCTSTR)to_path)>0) {
+		theApp.m_notFoundFileList.erase((LPCTSTR)to_path);
+	}
+
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- アクセス種別からシリアライズキーを取得する。
 --
 -- @param type [integer]アクセス種別
@@ -525,7 +573,7 @@ int lua_mz3_open_url(lua_State *L)
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 2);	// 第2引数
 	const char* url = lua_tostring(L, 3);						// 第3引数
 	const char* referer = lua_tostring(L, 4);					// 第4引数
-	const char* file_type = lua_tostring(L, 5);					// 第5引数
+	CStringA file_type = lua_tostring(L, 5);					// 第5引数
 	const char* user_agent = lua_tostring(L, 6);				// 第6引数
 	CPostData* post = (CPostData*)lua_touserdata(L, 7);			// 第7引数
 
@@ -596,6 +644,8 @@ int lua_mz3_open_url(lua_State *L)
 
 	// TODO 共通化
 	//m_abort = FALSE;
+	theApp.m_pMainView->m_abort = FALSE;
+	theApp.m_pReportView->m_abort = FALSE;
 
 	// GET/POST 判定
 	bool bPost = false;	// デフォルトはGET
@@ -629,13 +679,21 @@ int lua_mz3_open_url(lua_State *L)
 
 	// コントロール状態の変更
 	theApp.m_pMainView->MyUpdateControlStatus();
+	theApp.m_pReportView->MyUpdateControlStatus();
+
+	CInetAccess::FILE_TYPE type = CInetAccess::FILE_HTML;
+	if (file_type=="text") {
+		type = CInetAccess::FILE_HTML;
+	} else if (file_type=="binary") {
+		type = CInetAccess::FILE_BINARY;
+	}
 
 	// GET/POST 開始
 	theApp.m_inet.Initialize(hwnd, &s_data, encoding);
 	if (bPost) {
-		theApp.m_inet.DoPost(CString(url), CString(referer), CInetAccess::FILE_HTML, post, strUser, strPassword, strUserAgent );
+		theApp.m_inet.DoPost(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
 	} else {
-		theApp.m_inet.DoGet(CString(url), CString(referer), CInetAccess::FILE_HTML, strUser, strPassword, strUserAgent );
+		theApp.m_inet.DoGet(CString(url), CString(referer), type, strUser, strPassword, strUserAgent );
 	}
 
 	// 戻り値の数を返す
@@ -843,6 +901,42 @@ int lua_mz3_account_provider_get_value(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+//-----------------------------------------------
+// MZ3 Image Cache API
+//-----------------------------------------------
+
+/*
+--- URLに相当するキャッシュインデックスを取得する
+--
+-- @param url 画像URL
+--
+function mz3_image_cache.get_image_index_by_url(url)
+*/
+int lua_mz3_image_cache_get_image_index_by_url(lua_State *L)
+{
+	// 引数の取得
+	CString url(lua_tostring(L, 1));
+
+	CString path = util::MakeImageLogfilePathFromUrlMD5( url );
+	int imageIndex = theApp.m_imageCache.GetImageIndex(path);
+	if (imageIndex == -1) {
+		// 未ロードなのでロードする
+		CMZ3BackgroundImage image(L"");
+		if (!image.load( path )) {
+			// ロードエラー
+			MZ3LOGGER_ERROR(util::FormatString(L"画像ロード失敗 [%s][%s]", path, url));
+		} else {
+			// リサイズして画像キャッシュに追加する。
+			imageIndex = theApp.AddImageToImageCache(theApp.m_pMainView, image, path);
+		}
+	}
+
+	lua_pushinteger(L, imageIndex);
 
 	// 戻り値の数を返す
 	return 1;
@@ -2184,7 +2278,7 @@ int lua_mz3_access_type_info_new_access_type(lua_State *L)
 --- アクセス種別の種別の設定
 --
 -- @param type アクセス種別
--- @param info_type アクセス種別の種別('category', 'body', 'post')
+-- @param info_type アクセス種別の種別('category', 'body', 'post', 'other')
 -- @return [bool] 成功時は true、失敗時は false
 --
 function mz3_access_type_info.set_info_type(type, info_type)
@@ -2203,6 +2297,8 @@ int lua_mz3_access_type_info_set_info_type(lua_State *L)
 		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_BODY;
 	} else if (info_type=="post") {
 		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_POST;
+	} else if (info_type=="other") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_OTHER;
 	} else {
 		lua_pushstring(L, "サポート外のinfo_typeです");
 		lua_error(L);
@@ -2698,6 +2794,7 @@ int lua_mz3_group_item_delete(lua_State *L)
 	return 0;
 }
 
+
 //-----------------------------------------------
 // MZ3 MainView API
 //-----------------------------------------------
@@ -2977,6 +3074,25 @@ int lua_mz3_main_view_redraw_body_images(lua_State *L)
 
 
 //-----------------------------------------------
+// MZ3 ReportView API
+//-----------------------------------------------
+
+/*
+--- レポートビューの取得
+--
+function mz3_report_view.get_wnd();
+*/
+int lua_mz3_report_view_get_wnd(lua_State *L)
+{
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, (void*)theApp.m_pReportView);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+
+//-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
@@ -3004,6 +3120,8 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_open_file_name",					lua_mz3_get_open_file_name},
 	{"url_encode",							lua_mz3_url_encode},
 	{"convert_encoding",					lua_mz3_convert_encoding},
+	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
+	{"copy_file",							lua_mz3_copy_file},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -3104,6 +3222,10 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"redraw_body_images",		lua_mz3_main_view_redraw_body_images},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_report_view_lib[] = {
+	{"get_wnd",					lua_mz3_report_view_get_wnd},
+	{NULL, NULL}
+};
 static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
 	{"set_content_type",		lua_mz3_post_data_set_content_type},
@@ -3115,6 +3237,10 @@ static const luaL_Reg lua_mz3_post_data_lib[] = {
 static const luaL_Reg lua_mz3_account_provider_lib[] = {
 	{"set_param",				lua_mz3_account_provider_set_param},
 	{"get_value",				lua_mz3_account_provider_get_value},
+	{NULL, NULL}
+};
+static const luaL_Reg lua_mz3_image_cache_lib[] = {
+	{"get_image_index_by_url",	lua_mz3_image_cache_get_image_index_by_url},
 	{NULL, NULL}
 };
 
@@ -3132,7 +3258,8 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_group_item", lua_mz3_group_item_lib);
 
 	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
+	luaL_register(L, "mz3_report_view", lua_mz3_report_view_lib);
 	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
-
 	luaL_register(L, "mz3_account_provider", lua_mz3_account_provider_lib);
+	luaL_register(L, "mz3_image_cache", lua_mz3_image_cache_lib);
 }

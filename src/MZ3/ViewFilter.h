@@ -200,8 +200,12 @@ public:
 	static void ReplaceHTMLTagToRan2Tags( CString& line, CStringArray& bodyArray, EmojiMapList& emojiMap, CWnd* pWnd )
 	{
 		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if (!util::CompileRegex( reg, L"(\\[m:[0-9]+?\\])" )) {
+		static MyRegex reg_emoji;
+		if (!util::CompileRegex( reg_emoji, L"(\\[m:[0-9]+?\\])" )) {
+			return;
+		}
+		static MyRegex reg_emoji2;
+		if (!util::CompileRegex( reg_emoji2, L"(\\[g:[0-9]+?\\])" )) {
 			return;
 		}
 
@@ -210,14 +214,19 @@ public:
 		line = L"";
 		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
 			int emojioffset = -1;
+			int emoji2offset = -1;
 			int tagoffset = -1;
 			CString toTag = L"";
 			int taglen = 0;
 
 			// 絵文字検索
-			if( reg.exec(target) && reg.results.size() == 2 ) {
+			if( reg_emoji.exec(target) && reg_emoji.results.size() == 2 ) {
 				// 発見。
-				emojioffset = reg.results[0].start;
+				emojioffset = reg_emoji.results[0].start;
+			}
+			if( reg_emoji2.exec(target) && reg_emoji2.results.size() == 2 ) {
+				// 発見。
+				emoji2offset = reg_emoji2.results[0].start;
 			}
 
 			// タグ検索
@@ -226,7 +235,9 @@ public:
 				if( tagoffset < 0 ){
 					break;
 				}
-				if( emojioffset >=0 && tagoffset > emojioffset ) {
+				if( emojioffset >=0 && tagoffset > emojioffset &&
+					emoji2offset >= 0 && tagoffset > emoji2offset)
+				{
 					// 絵文字より後ろなら未発見扱い
 					tagoffset = -1;
 					break;
@@ -277,43 +288,62 @@ public:
 				}
 			}
 
-			if( emojioffset < 0 && tagoffset < 0 ){
+			if (emojioffset < 0 && emoji2offset < 0 && tagoffset < 0) {
 				// 未発見。
 				// 残りの文字列を代入して終了。
 				bodyArray.Add(target);
 				break;
 
-			} else if( tagoffset < 0 || ( emojioffset >=0 && emojioffset < tagoffset ) ){
-				// 絵文字を先に発見。
-				std::vector<MyRegex::Result>& results = reg.results;
+			} else if( tagoffset < 0 || 
+				       (emojioffset >=0 && emojioffset < tagoffset) ||
+				       (emoji2offset >=0 && emoji2offset < tagoffset)
+					   )
+			{
+				if (emojioffset>=0 && emojioffset < emoji2offset) {
+					// 絵文字を先に発見。
+					std::vector<MyRegex::Result>& results = reg_emoji.results;
 
-				// マッチ文字列全体の左側を出力
-				bodyArray.Add( CString( target, results[0].start ) );
+					// マッチ文字列全体の左側を出力
+					bodyArray.Add( CString( target, results[0].start ) );
 
-				// 絵文字を追加
-				const std::wstring& emoji_code = results[1].str;
-				size_t n = emojiMap.size();
-				for (size_t j=0; j<n; j++) {
-					if (emojiMap[j].code == emoji_code.c_str()) {
-						CString path = util::MakeImageLogfilePathFromUrl( emojiMap[j].url );
-						int imageIndex = theApp.m_imageCache.GetImageIndex(path);
-						if (imageIndex == -1) {
-							// 未ロードなのでロードする
-							CMZ3BackgroundImage image(L"");
-							if (!image.load( path )) {
-								// ロードエラー
-								break;
+					// 絵文字を追加
+					const std::wstring& emoji_code = results[1].str;
+					size_t n = emojiMap.size();
+					for (size_t j=0; j<n; j++) {
+						if (emojiMap[j].code == emoji_code.c_str()) {
+							CString path = util::MakeImageLogfilePathFromUrl( emojiMap[j].url );
+							int imageIndex = theApp.m_imageCache.GetImageIndex(path);
+							if (imageIndex == -1) {
+								// 未ロードなのでロードする
+								CMZ3BackgroundImage image(L"");
+								if (!image.load( path )) {
+									// ロードエラー
+									break;
+								}
+
+								// リサイズして画像キャッシュに追加する。
+								imageIndex = theApp.AddImageToImageCache(pWnd, image, path);
 							}
-
-							// リサイズして画像キャッシュに追加する。
-							imageIndex = theApp.AddImageToImageCache(pWnd, image, path);
+							bodyArray.Add( util::FormatString( L"[g:%d]", imageIndex ) );
+							break;
 						}
-						bodyArray.Add( util::FormatString( L"[m:%d]", imageIndex ) );
-						break;
 					}
+					// ターゲットを更新。
+					target.Delete( 0, results[0].end );
+				} else {
+					// 絵文字2を先に発見
+					std::vector<MyRegex::Result>& results = reg_emoji2.results;
+
+					// マッチ文字列全体の左側を出力
+					bodyArray.Add( CString( target, results[0].start ) );
+
+					// 絵文字を追加
+					const std::wstring& emoji_code = results[1].str;
+					bodyArray.Add( emoji_code.c_str() );
+
+					// ターゲットを更新。
+					target.Delete( 0, results[0].end );
 				}
-				// ターゲットを更新。
-				target.Delete( 0, results[0].end );
 
 			} else {
 				// タグを先に発見
