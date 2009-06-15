@@ -141,19 +141,21 @@ public:
 		}
 		else {
 			// urlencodeの場合は、エンコードされたメッセージをそのまま設定
-			CString body;
 			switch (mixi.GetAccessType()) {
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
 			case ACCESS_NEIGHBORDIARY:
-				body.Format(L"owner_id=%d&comment_body=%s", mixi.GetOwnerID(), msg);
+				post.AppendPostBody(util::FormatString(L"owner_id=%d", mixi.GetOwnerID()));
+				post.AppendPostBody(L"&comment_body=");
+				post.AppendPostBody(msg);
+				post.AppendPostBodyWithCRLF(L"");
 				break;
 			case ACCESS_ENQUETE:
-				body.Format(L"submit=main&comment=%s", msg);
+				post.AppendPostBody(L"submit=main&comment=");
+				post.AppendPostBody(msg);
+				post.AppendPostBodyWithCRLF(L"");
 				break;
 			}
-
-			post.AppendPostBodyWithCRLF( body );
 		}
 
 		// Content-Type を設定する
@@ -500,21 +502,6 @@ public:
 
 		return true;
 	}
-
-/*	static CStringA generateNewPostKey() {
-		CStringA postKey;
-
-		const char chars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
-		srand( (int)GetTickCount() );
-		for( int i=0; i<22; i++ ) {
-			int idx = rand() % 36;
-
-			postKey.AppendChar( chars[idx] );
-		}
-
-		return postKey;
-	}
-*/
 };
 
 /**
