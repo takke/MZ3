@@ -554,8 +554,15 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 	util::MySetInformationText( m_hwnd, _T("サイトに接続しました") );
 
-	// タイムアウト値を30秒に設定
-	int timeout = 30000;
+	// タイムアウト値
+	int timeout = 0;
+	if (execType == EXEC_SENDRECV_TYPE_GET) {
+		// GET のタイムアウト時間は短くする
+		timeout = 2000;
+	} else {
+		// POST のタイムアウト時間は長めにする
+		timeout = 20000;
+	}
 	::InternetSetOption(m_hConnection, INTERNET_OPTION_CONNECT_TIMEOUT, (LPVOID)timeout, sizeof(timeout));
 
 	// プロクシ設定がONの場合、IDとパスワードをセット
