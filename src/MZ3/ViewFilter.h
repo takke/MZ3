@@ -213,33 +213,35 @@ public:
 		CString target = line;
 		line = L"";
 		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
-			int emojioffset = -1;
-			int emoji2offset = -1;
-			int tagoffset = -1;
+			int emojioffset  = INT_MAX;
+			int emoji2offset = INT_MAX;
+			int tagoffset    = INT_MAX;
+
 			CString toTag = L"";
 			int taglen = 0;
 
 			// 絵文字検索
-			if( reg_emoji.exec(target) && reg_emoji.results.size() == 2 ) {
+			if (reg_emoji.exec(target) && reg_emoji.results.size() == 2) {
 				// 発見。
 				emojioffset = reg_emoji.results[0].start;
 			}
-			if( reg_emoji2.exec(target) && reg_emoji2.results.size() == 2 ) {
+			if (reg_emoji2.exec(target) && reg_emoji2.results.size() == 2) {
 				// 発見。
 				emoji2offset = reg_emoji2.results[0].start;
 			}
 
 			// タグ検索
 			tagoffset = target.Find( L"<" );
-			for( int j=0 ; j<MZ3_INFINITE_LOOP_MAX_COUNT; j++ ){	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
+			for (int j=0 ; j<MZ3_INFINITE_LOOP_MAX_COUNT; j++) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
 				if( tagoffset < 0 ){
+					tagoffset = INT_MAX;
 					break;
 				}
 				if( emojioffset >=0 && tagoffset > emojioffset &&
 					emoji2offset >= 0 && tagoffset > emoji2offset)
 				{
 					// 絵文字より後ろなら未発見扱い
-					tagoffset = -1;
+					tagoffset = INT_MAX;
 					break;
 				}
 				// タグの判定（これでいいのか？＞私
@@ -288,18 +290,14 @@ public:
 				}
 			}
 
-			if (emojioffset < 0 && emoji2offset < 0 && tagoffset < 0) {
+			if (emojioffset==INT_MAX && emoji2offset==INT_MAX && tagoffset==INT_MAX) {
 				// 未発見。
 				// 残りの文字列を代入して終了。
 				bodyArray.Add(target);
 				break;
 
-			} else if( tagoffset < 0 || 
-				       (emojioffset >=0 && emojioffset < tagoffset) ||
-				       (emoji2offset >=0 && emoji2offset < tagoffset)
-					   )
-			{
-				if (emojioffset>=0 && emojioffset < emoji2offset) {
+			} else if (emojioffset < tagoffset || emoji2offset < tagoffset) {
+				if (emojioffset < emoji2offset) {
 					// 絵文字を先に発見。
 					std::vector<MyRegex::Result>& results = reg_emoji.results;
 
