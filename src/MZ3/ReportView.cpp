@@ -1455,7 +1455,7 @@ void CReportView::OnLoadUrl(UINT nID)
 }
 
 /**
- * アクセス終了通知受信(HTML)
+ * アクセス終了通知(HTML)
  */
 LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 {
@@ -2152,7 +2152,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		// メッセージなら、送信箱か受信箱かによって処理が異なる
 		if( m_data.GetURL().Find( L"&box=outbox" ) != -1 ) {
 			// 送信箱なので、書き込み無効
-			pcThisMenu->RemoveMenu( ID_WRITE_COMMENT, MF_BYCOMMAND);
+			pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
 		}else{
 			// 受信箱なので、「メッセージ返信」に変更
 			pcThisMenu->ModifyMenu( ID_WRITE_COMMENT,
@@ -2161,12 +2161,25 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 				_T("メッセージ返信"));
 		}
 		break;
+
+	case ACCESS_DIARY:
+	case ACCESS_NEIGHBORDIARY:
+	case ACCESS_MYDIARY:
+	case ACCESS_BBS:
+	case ACCESS_ENQUETE:
+	case ACCESS_EVENT:
+	case ACCESS_EVENT_JOIN:
+		// 日記、トピ等であれば有効
+		break;
+
 	case ACCESS_NEWS:
-		// ニュースなら書き込み無効
+	default:
+		// ニュース等なら書き込み無効
 		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
 		idxPage --;
 		idxDiarySeparator --;
 		break;
+
 	}
 
 	// 外部ブログなら、書き込み無効
@@ -2840,6 +2853,7 @@ void CReportView::OnCopyClipboardUrl(UINT nID)
 	case ACCESS_MESSAGE:
 	case ACCESS_NEWS:
 		url = util::CreateMixiUrl(link.url);
+		break;
 	}
 
 	util::SetClipboardDataTextW( url );
@@ -2998,10 +3012,10 @@ void CReportView::MyUpdateControlStatus(void)
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
-		m_infoEdit.ShowWindow(SW_SHOW);
-
 		// プログレスバーを表示
 		mc_progressBar.ShowWindow( SW_SHOW );
+
+		m_infoEdit.ShowWindow(SW_SHOW);
 
 	} else {
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
