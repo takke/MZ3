@@ -206,7 +206,12 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 	// 内容をクリア
 	SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"" );
 	SetDlgItemText( IDC_WRITE_BODY_EDIT, L"" );
+	m_titleEdit.SetReadOnly(FALSE);
 	m_viewlimitCombo.ResetContent();
+	m_viewlimitCombo.EnableWindow(FALSE);
+
+	// 初期フォーカス
+	m_bodyEdit.SetFocus();
 
 	// 種別を保存
 	m_writeViewType = writeViewType;
@@ -214,75 +219,85 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 	// 書きかけであることを設定
 	m_bWriteCompleted = false;
 
-	switch( writeViewType ) {
-	case WRITEVIEW_TYPE_REPLYMESSAGE:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("init_write_view", &rvals, 
+			util::MyLuaData(m_writeViewType),
+			util::MyLuaData(m_data)
+			)) {
+		// サポートしているので続行
+	} else {
+		// Lua 側でサポートしていないので従来のコード。
+		switch( writeViewType ) {
+		case WRITEVIEW_TYPE_REPLYMESSAGE:
+			// タイトル変更：有効
+			m_titleEdit.SetReadOnly(FALSE);
 
-		if (m_data != NULL) {
-			// タイトルの初期値を設定
-			SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
+			if (m_data != NULL) {
+				// タイトルの初期値を設定
+				SetDlgItemText( IDC_WRITE_TITLE_EDIT, L"Re : " + m_data->GetTitle() );
+			}
+
+			// 公開範囲コンボボックス：無効
+			m_viewlimitCombo.EnableWindow(FALSE);
+
+			// フォーカス：本文から開始
+			m_bodyEdit.SetFocus();
+			break;
+
+		case WRITEVIEW_TYPE_NEWMESSAGE:
+			// タイトル変更：有効
+			m_titleEdit.SetReadOnly(FALSE);
+
+			// 公開範囲コンボボックス：無効
+			m_viewlimitCombo.EnableWindow(FALSE);
+
+			// フォーカス：タイトルから開始
+			m_titleEdit.SetFocus();
+			break;
+
+		case WRITEVIEW_TYPE_COMMENT:
+			// タイトル変更：無効
+			m_titleEdit.SetReadOnly(TRUE);
+
+			if (m_data != NULL) {
+				// タイトルを設定
+				SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
+			}
+
+			// 公開範囲コンボボックス：無効
+			m_viewlimitCombo.EnableWindow(FALSE);
+
+			// フォーカス：本文から開始
+			m_bodyEdit.SetFocus();
+			break;
+
+		case WRITEVIEW_TYPE_NEWDIARY:
+			// タイトル変更：有効
+			m_titleEdit.SetReadOnly(FALSE);
+
+			// 公開範囲コンボボックス
+			iComboIndex = m_viewlimitCombo.AddString( L"標準の公開設定" );
+			m_viewlimitCombo.SetItemData( iComboIndex , 0 );
+			iComboIndex = m_viewlimitCombo.AddString( L"非公開" );
+			m_viewlimitCombo.SetItemData( iComboIndex , 1 );
+			iComboIndex = m_viewlimitCombo.AddString( L"友人まで公開" );
+			m_viewlimitCombo.SetItemData( iComboIndex , 2 );
+			iComboIndex = m_viewlimitCombo.AddString( L"友人の友人まで公開" );
+			m_viewlimitCombo.SetItemData( iComboIndex , 3 );
+			iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
+			m_viewlimitCombo.SetItemData( iComboIndex , 4 );
+			m_viewlimitCombo.SetCurSel( 0 );
+			m_viewlimitCombo.EnableWindow(TRUE);
+
+			// フォーカス：タイトルから開始
+			m_titleEdit.SetFocus();
+			break;
+
+		default:
+			MessageBox( L"アプリケーション内部エラー：未対応の書き込み画面種別です" );
+			return;
 		}
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：本文から開始
-		m_bodyEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_NEWMESSAGE:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：タイトルから開始
-		m_titleEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_COMMENT:
-		// タイトル変更：無効
-		m_titleEdit.SetReadOnly(TRUE);
-
-		if (m_data != NULL) {
-			// タイトルを設定
-			SetDlgItemText( IDC_WRITE_TITLE_EDIT, m_data->GetTitle() );
-		}
-
-		// 公開範囲コンボボックス：無効
-		m_viewlimitCombo.EnableWindow(FALSE);
-
-		// フォーカス：本文から開始
-		m_bodyEdit.SetFocus();
-		break;
-
-	case WRITEVIEW_TYPE_NEWDIARY:
-		// タイトル変更：有効
-		m_titleEdit.SetReadOnly(FALSE);
-
-		// 公開範囲コンボボックス
-		iComboIndex = m_viewlimitCombo.AddString( L"標準の公開設定" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 0 );
-		iComboIndex = m_viewlimitCombo.AddString( L"非公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 1 );
-		iComboIndex = m_viewlimitCombo.AddString( L"友人まで公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 2 );
-		iComboIndex = m_viewlimitCombo.AddString( L"友人の友人まで公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 3 );
-		iComboIndex = m_viewlimitCombo.AddString( L"全体に公開" );
-		m_viewlimitCombo.SetItemData( iComboIndex , 4 );
-		m_viewlimitCombo.SetCurSel( 0 );
-		m_viewlimitCombo.EnableWindow(TRUE);
-
-		// フォーカス：タイトルから開始
-		m_titleEdit.SetFocus();
-		break;
-
-	default:
-		MessageBox( L"アプリケーション内部エラー：未対応の書き込み画面種別です" );
-		return;
 	}
 
 	// コントロール状態の変更
@@ -322,6 +337,18 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
  */
 void CWriteView::OnBnClickedWriteSendButton()
 {
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("click_write_view_send_button", &rvals, 
+			util::MyLuaData(m_writeViewType),
+			util::MyLuaData(m_data)
+			)) {
+
+		// キー押下イベントを奪うためにフォーカスを取得する
+		SetFocus();
+		return;
+	}
+
 	CString msg;
 	GetDlgItemText( IDC_WRITE_BODY_EDIT, msg );
 
@@ -1475,26 +1502,20 @@ void CWriteView::OnAttachPhoto()
 /// 画像が添付可能なモードであるかを返す
 bool CWriteView::IsEnableAttachImageMode(void)
 {
-	switch( m_writeViewType ) {
-	case WRITEVIEW_TYPE_REPLYMESSAGE:
-	case WRITEVIEW_TYPE_NEWMESSAGE:
-		return false;
-
-	case WRITEVIEW_TYPE_COMMENT:
-		switch (m_data->GetAccessType()) {
-		case ACCESS_BBS:
-		case ACCESS_EVENT:
-		case ACCESS_EVENT_JOIN:
-			return true;
-		}
-		return false;
-
-	case WRITEVIEW_TYPE_NEWDIARY:
-		return true;
-
-	default:
-		return false;
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData((int)0));
+	if (util::CallMZ3ScriptHookFunctions2("is_enable_write_view_attach_image_mode", &rvals, 
+			util::MyLuaData(m_writeViewType),
+			util::MyLuaData(m_data)
+			)) {
+		int is_enable_attach_image_mode = rvals[0].m_number;
+		MZ3LOGGER_DEBUG(util::FormatString(L"estimated attach type by lua : %d", is_enable_attach_image_mode));
+		return is_enable_attach_image_mode ? true : false;
 	}
+	MZ3LOGGER_INFO(L"Lua 側で処理がないので「添付不可」とみなす");
+
+	return false;
 }
 
 /// 絵文字挿入
@@ -1530,73 +1551,79 @@ void CWriteView::PopupWriteBodyMenu(void)
 	}
 
 	// 絵文字メニュー
-	const int SUBMENU_MAX = 20;
-	int iSubMenu = 0;
-	CWMMenu emojiSubMenu[SUBMENU_MAX] = {
-		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
-		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
-		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
-		CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
-	};
+	// mixi のみサポート
+	if (theApp.m_accessTypeInfo.getServiceType(m_writeViewType)=="mixi") {
+		const int SUBMENU_MAX = 20;
+		int iSubMenu = 0;
+		CWMMenu emojiSubMenu[SUBMENU_MAX] = {
+			CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+			CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+			CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+			CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), CWMMenu(pGlobalImageList), 
+		};
 
-	std::vector<WMMENUBITMAP> menuBitmapArray;
-	// ダミーを削除
-	CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
-	emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
+		std::vector<WMMENUBITMAP> menuBitmapArray;
+		// ダミーを削除
+		CMenu* emojiMenu = pcThisMenu->GetSubMenu(1);
+		emojiMenu->DeleteMenu( IDM_INSERT_EMOJI_BEGIN, MF_BYCOMMAND );
 
-	// N個ずつメニューにして追加
-	const int MENU_SPLIT_COUNT = 20;
-	if (!theApp.m_emoji.empty()) {
-		emojiSubMenu[iSubMenu].CreatePopupMenu();
+		// N個ずつメニューにして追加
+		const int MENU_SPLIT_COUNT = 20;
+		if (!theApp.m_emoji.empty()) {
+			emojiSubMenu[iSubMenu].CreatePopupMenu();
 
-		for (size_t i=0; i<theApp.m_emoji.size(); i++) {
-			if (i%MENU_SPLIT_COUNT == 0 && 
-				emojiSubMenu[iSubMenu].GetMenuItemCount()>0 && 
-				iSubMenu<SUBMENU_MAX-1)
-			{
+			for (size_t i=0; i<theApp.m_emoji.size(); i++) {
+				if (i%MENU_SPLIT_COUNT == 0 && 
+					emojiSubMenu[iSubMenu].GetMenuItemCount()>0 && 
+					iSubMenu<SUBMENU_MAX-1)
+				{
+					// 親に追加
+					emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu[iSubMenu].m_hMenu, util::FormatString(L"%d", iSubMenu+1) );
+					iSubMenu++;
+					emojiSubMenu[iSubMenu].CreatePopupMenu();
+				}
+
+				// テキスト設定
+				int idItem = IDM_INSERT_EMOJI_BEGIN+i;
+				emojiSubMenu[iSubMenu].AppendMenu( MF_STRING, idItem, theApp.m_emoji[i].text );
+
+				// 絵文字ロード
+				// とりあえず Win32 限定
+				// （アドエスでなぜか ToOwnerDraw 内で落ちるため・・・）
+#ifndef WINCE
+				CString path = util::MakeImageLogfilePathFromUrl( theApp.m_emoji[i].url );
+
+				// ロード済みか判定
+				int imageIndex = theApp.m_imageCache.GetImageIndex( path );
+				if (imageIndex<0) {
+					// 未ロードなのでロード
+					CMZ3BackgroundImage image(L"");
+					image.load( path );
+					if (image.isEnableImage()) {
+						// リサイズして画像キャッシュに追加する。
+						imageIndex = theApp.AddImageToImageCache(this, image, path);
+					}
+				}
+				if (imageIndex>=0) {
+					// メニュー用ビットマップリソースに追加
+					WMMENUBITMAP menuBmp = { idItem, imageIndex };
+					menuBitmapArray.push_back(menuBmp);
+				}
+#endif
+			}
+			if (emojiSubMenu[iSubMenu].GetMenuItemCount() > 0) {
 				// 親に追加
 				emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu[iSubMenu].m_hMenu, util::FormatString(L"%d", iSubMenu+1) );
-				iSubMenu++;
-				emojiSubMenu[iSubMenu].CreatePopupMenu();
 			}
-
-			// テキスト設定
-			int idItem = IDM_INSERT_EMOJI_BEGIN+i;
-			emojiSubMenu[iSubMenu].AppendMenu( MF_STRING, idItem, theApp.m_emoji[i].text );
-
-			// 絵文字ロード
-			// とりあえず Win32 限定
-			// （アドエスでなぜか ToOwnerDraw 内で落ちるため・・・）
-#ifndef WINCE
-			CString path = util::MakeImageLogfilePathFromUrl( theApp.m_emoji[i].url );
-
-			// ロード済みか判定
-			int imageIndex = theApp.m_imageCache.GetImageIndex( path );
-			if (imageIndex<0) {
-				// 未ロードなのでロード
-				CMZ3BackgroundImage image(L"");
-				image.load( path );
-				if (image.isEnableImage()) {
-					// リサイズして画像キャッシュに追加する。
-					imageIndex = theApp.AddImageToImageCache(this, image, path);
-				}
-			}
-			if (imageIndex>=0) {
-				// メニュー用ビットマップリソースに追加
-				WMMENUBITMAP menuBmp = { idItem, imageIndex };
-				menuBitmapArray.push_back(menuBmp);
-			}
-#endif
 		}
-		if (emojiSubMenu[iSubMenu].GetMenuItemCount() > 0) {
-			// 親に追加
-			emojiMenu->AppendMenu( MF_POPUP, (UINT)emojiSubMenu[iSubMenu].m_hMenu, util::FormatString(L"%d", iSubMenu+1) );
-		}
-	}
 
-	// オーナードロー準備（ビットマップの設定）
-	if (!menuBitmapArray.empty() ) {
-		menu.PrepareOwnerDraw( &menuBitmapArray[0], menuBitmapArray.size() );
+		// オーナードロー準備（ビットマップの設定）
+		if (!menuBitmapArray.empty() ) {
+			menu.PrepareOwnerDraw( &menuBitmapArray[0], menuBitmapArray.size() );
+		}
+	} else {
+		// mixi 以外では非サポート
+		pcThisMenu->DeleteMenu( 1, MF_BYPOSITION );
 	}
 
 	// メニュー表示

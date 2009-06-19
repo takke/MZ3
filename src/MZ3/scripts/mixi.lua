@@ -350,8 +350,8 @@ mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_t
 
 --- レポート画面からの書き込み種別の判定
 --
--- @param event_name  'estimate_access_type_by_url'
--- @param report_item 解析対象URL
+-- @param event_name  'get_write_view_type_by_report_item_access_type'
+-- @param report_item [MZ3Data] レポート画面の要素
 --
 function on_get_write_view_type_by_report_item_access_type(event_name, report_item)
 
@@ -360,7 +360,6 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	serialize_key = report_item:get_serialize_key();
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='mixi' then
-		-- 
 		if serialize_key=='MIXI_MESSAGE' then
 			-- メッセージ返信の書き込み種別
 			return true, mz3.get_access_type_by_key('MIXI_POST_REPLYMESSAGE_ENTRY');
@@ -373,6 +372,51 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	return false;
 end
 mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "mixi.on_get_write_view_type_by_report_item_access_type");
+
+
+--- 書き込み画面で「画像が添付可能なモードか」の判定
+--
+-- @param event_name      'is_enable_write_view_attach_image_mode'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type=='mixi' then
+		if write_view_key=="MIXI_POST_REPLYMESSAGE_ENTRY" or
+		   write_view_key=="MIXI_POST_NEWMESSAGE_ENTRY" then
+			-- メッセージ、メッセージ返信は添付不可
+			return true, 0;
+		end
+		
+		if write_view_key=="MIXI_POST_COMMENT_CONFIRM" then
+			local serialize_key = write_item:get_serialize_key();
+			if serialize_key=="MIXI_BBS" or
+			   serialize_key=="MIXI_EVENT" or
+			   serialize_key=="MIXI_EVENT_JOIN" then
+				-- コメントの BBS, EVENT であれば添付可
+				return true, 1;
+			else
+				-- 上記以外(日記コメント、アンケートコメント等)は添付不可
+				return true, 0;
+			end
+		end
+		
+		if write_view_key=="MIXI_POST_NEWDIARY_CONFIRM" then
+			-- 日記は添付可
+			return true, 1;
+		end
+		
+		return false;
+	end
+
+	return false;
+end
+mz3.add_event_listener("is_enable_write_view_attach_image_mode", "mixi.on_is_enable_write_view_attach_image_mode");
 
 
 ----------------------------------------

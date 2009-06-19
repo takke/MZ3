@@ -472,8 +472,8 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	if( url.Find( L"new_bbs.pl" ) != -1 )		{ return ACCESS_LIST_NEW_BBS; }
 
 	// MZ3 API : フック関数呼び出し
-	MyLuaDataList rvals;
-	rvals.push_back(MyLuaData((int)ACCESS_INVALID));
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData((int)ACCESS_INVALID));
 	if (util::CallMZ3ScriptHookFunctions2("estimate_access_type_by_url", &rvals, 
 			util::MyLuaData(CStringA(url)))) {
 		int access_type_by_lua = rvals[0].m_number;
