@@ -9,6 +9,7 @@
 #include "MZ3.h"
 #include "MZ3View.h"
 #include "ReportView.h"
+#include "WriteView.h"
 #include "MixiParserUtil.h"
 #include "TwitterParser.h"
 #include "IniFile.h"
@@ -680,6 +681,7 @@ int lua_mz3_open_url(lua_State *L)
 	// コントロール状態の変更
 	theApp.m_pMainView->MyUpdateControlStatus();
 	theApp.m_pReportView->MyUpdateControlStatus();
+	theApp.m_pWriteView->MyUpdateControlStatus();
 
 	CInetAccess::FILE_TYPE type = CInetAccess::FILE_HTML;
 	if (file_type=="text") {
@@ -821,6 +823,38 @@ int lua_mz3_get_open_file_name(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+/*
+--- ビュー切り替え
+--
+-- @param view_name ビュー名('main_view', 'report_view', 'write_view')
+--
+function mz3.change_view(view_name)
+*/
+int lua_mz3_change_view(lua_State *L)
+{
+	const char* func_name = "mz3.change_view";
+
+	// 引数取得
+	CStringA view_name(lua_tostring(L, 1));
+
+	HWND hwndTarget = NULL;
+	if (view_name=="report_view") {
+		hwndTarget = theApp.m_pReportView->m_hWnd;
+	} else if (view_name=="main_view") {
+		hwndTarget = theApp.m_pMainView->m_hWnd;
+	} else if (view_name=="write_view") {
+		hwndTarget = theApp.m_pWriteView->m_hWnd;
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	::SendMessage(hwndTarget, WM_MZ3_CHANGE_VIEW, NULL, NULL);
+
+	// 戻り値の数を返す
+	return 0;
 }
 
 //-----------------------------------------------
@@ -3093,6 +3127,92 @@ int lua_mz3_report_view_get_wnd(lua_State *L)
 
 
 //-----------------------------------------------
+// MZ3 WriteView API
+//-----------------------------------------------
+
+/*
+--- 書き込み画面の取得
+--
+function mz3_write_view.get_wnd();
+*/
+int lua_mz3_write_view_get_wnd(lua_State *L)
+{
+	// 結果をスタックに積む
+	lua_pushlightuserdata(L, (void*)theApp.m_pWriteView);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 書き込み画面の要素の取得
+--
+-- @param name 取得したい要素名('title_edit', 'body_edit')
+--
+function mz3_write_view.get_text(name);
+*/
+int lua_mz3_write_view_get_text(lua_State *L)
+{
+	const char* func_name = "mz3_write_view.get_text";
+
+	// 引数の取得
+	CString name(lua_tostring(L, 1));
+
+	if (name=="title_edit") {
+		CString s;
+		theApp.m_pWriteView->GetDlgItemText(IDC_WRITE_TITLE_EDIT, s);
+
+		lua_pushstring(L, CStringA(s));
+	
+	} else if (name=="body_edit") {
+		CString s;
+		theApp.m_pWriteView->GetDlgItemText(IDC_WRITE_BODY_EDIT, s);
+
+		lua_pushstring(L, CStringA(s));
+	
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+
+/*
+--- 書き込み画面の要素の設定
+--
+-- @param name  設定したい要素名('title_edit', 'body_edit')
+-- @param value 設定したい文字列
+--
+function mz3_write_view.set_text(name, text);
+*/
+int lua_mz3_write_view_set_text(lua_State *L)
+{
+	const char* func_name = "mz3_write_view.set_text";
+
+	// 引数の取得
+	CString name(lua_tostring(L, 1));
+	CString value(lua_tostring(L, 2));
+
+	if (name=="title_edit") {
+		theApp.m_pWriteView->SetDlgItemText(IDC_WRITE_TITLE_EDIT, value);
+	
+	} else if (name=="body_edit") {
+		theApp.m_pWriteView->SetDlgItemText(IDC_WRITE_BODY_EDIT, value);
+	
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+
+//-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
@@ -3122,6 +3242,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"convert_encoding",					lua_mz3_convert_encoding},
 	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
 	{"copy_file",							lua_mz3_copy_file},
+	{"change_view",							lua_mz3_change_view},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
@@ -3226,6 +3347,12 @@ static const luaL_Reg lua_mz3_report_view_lib[] = {
 	{"get_wnd",					lua_mz3_report_view_get_wnd},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_write_view_lib[] = {
+	{"get_text",				lua_mz3_write_view_get_text},
+	{"set_text",				lua_mz3_write_view_set_text},
+	{"get_wnd",					lua_mz3_write_view_get_wnd},
+	{NULL, NULL}
+};
 static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
 	{"set_content_type",		lua_mz3_post_data_set_content_type},
@@ -3259,6 +3386,7 @@ void mz3_lua_open_api(lua_State *L)
 
 	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
 	luaL_register(L, "mz3_report_view", lua_mz3_report_view_lib);
+	luaL_register(L, "mz3_write_view", lua_mz3_write_view_lib);
 	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
 	luaL_register(L, "mz3_account_provider", lua_mz3_account_provider_lib);
 	luaL_register(L, "mz3_image_cache", lua_mz3_image_cache_lib);

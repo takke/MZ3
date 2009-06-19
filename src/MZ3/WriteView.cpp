@@ -516,7 +516,9 @@ void CWriteView::StartEntryPost()
 			CString s;
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
+			MZ3LOGGER_ERROR(s);
 
+			// コントロール状態の復帰
 			theApp.m_access = false;
 			MyUpdateControlStatus();
 			return;
@@ -674,7 +676,9 @@ void CWriteView::StartConfirmPost()
 			CString s;
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
+			MZ3LOGGER_ERROR(s);
 
+			// コントロール状態の復帰
 			theApp.m_access = false;
 			MyUpdateControlStatus();
 			return;
@@ -1030,6 +1034,7 @@ void CWriteView::StartRegistPost()
 			CString s;
 			s.Format( L"未サポートの送信種別です [%d]", m_writeViewType );
 			MessageBox( s );
+			MZ3LOGGER_ERROR(s);
 
 			// コントロール状態の復帰
 			theApp.m_access = false;
@@ -1072,6 +1077,19 @@ LRESULT CWriteView::OnPostEnd(WPARAM wParam, LPARAM lParam)
 
 	// コントロール状態の変更
 	MyUpdateControlStatus();
+
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("post_end_write_view", &rvals, 
+			util::MyLuaData(m_writeViewType),
+			util::MyLuaData(m_data),
+			util::MyLuaData(theApp.m_inet.m_dwHttpStatus),
+			util::MyLuaData(CStringA(theApp.m_filepath.temphtml))
+			))
+	{
+		m_bWriteCompleted = true;
+		return TRUE;
+	}
 
 	// 投稿完了チェック
 	if (html.IsPostSucceeded(m_writeViewType) != FALSE) {
@@ -1291,61 +1309,83 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 
-	switch (((CMixiData*)lParam)->GetAccessType()) {
-	case ACCESS_LOGIN:
-		// ログインしたかどうかの確認
-		if( mixi::HomeParser::IsLoginSucceeded(html) ) {
-			// ログイン成功
-			if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) != 0) {
-				MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
-			} else {
-				MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
+	theApp.m_access = false;
+	m_abort  = false;
 
-				((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
-				theApp.m_accessType = ACCESS_MAIN;
-				theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
-				return TRUE;
-			}
-		} else {
-			// ログイン失敗
-			LPCTSTR msg = L"ログインに失敗しました";
-			util::MySetInformationText( m_hWnd, msg );
-			::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONERROR);
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
-			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
-			return TRUE;
-		}
-		break;
-
-	case ACCESS_MAIN:
-
-		// パース
-		MZ3Data data;
-		theApp.DoParseMixiHomeHtml(&data, &html);
-
-		if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
-			LPCTSTR msg = L"投稿に失敗しました(2)";
-			util::MySetInformationText( m_hWnd, msg );
-
-			MZ3LOGGER_ERROR( msg );
-
-			CString s;
-			s.Format( 
-				L"%s\n\n"
-				L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
-			::MessageBox(m_hWnd, s, MZ3_APP_NAME, MB_ICONERROR);
-
-			// 失敗したのでダンプする
-			DumpToTemporaryDraftFile();
-
-			::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
-			return TRUE;
-		}
-		break;
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("get_end_write_view", &rvals, 
+			util::MyLuaData(m_writeViewType),
+			util::MyLuaData(m_data),
+			util::MyLuaData(theApp.m_inet.m_dwHttpStatus),
+			util::MyLuaData(CStringA(theApp.m_filepath.temphtml))
+			))
+	{
+		m_bWriteCompleted = true;
+		return TRUE;
 	}
 
-	// POST 処理を続行
-	StartEntryPost();
+	ACCESS_TYPE access_type = ((CMixiData*)lParam)->GetAccessType();
+	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="mixi") {
+		switch (access_type) {
+		case ACCESS_LOGIN:
+			// ログインしたかどうかの確認
+			if( mixi::HomeParser::IsLoginSucceeded(html) ) {
+				// ログイン成功
+				if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) != 0) {
+					MZ3LOGGER_DEBUG( L"OwnerID 取得済み" );
+				} else {
+					MZ3LOGGER_INFO( L"OwnerIDが未取得なので、ログインし、取得する (2)" );
+
+					((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
+					theApp.m_accessType = ACCESS_MAIN;
+					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
+					return TRUE;
+				}
+			} else {
+				// ログイン失敗
+				LPCTSTR msg = L"ログインに失敗しました";
+				util::MySetInformationText( m_hWnd, msg );
+				::MessageBox(m_hWnd, msg, MZ3_APP_NAME, MB_ICONERROR);
+
+				::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
+				return TRUE;
+			}
+			break;
+
+		case ACCESS_MAIN:
+
+			// パース
+			MZ3Data data;
+			theApp.DoParseMixiHomeHtml(&data, &html);
+
+			if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
+				LPCTSTR msg = L"投稿に失敗しました(2)";
+				util::MySetInformationText( m_hWnd, msg );
+
+				MZ3LOGGER_ERROR( msg );
+
+				CString s;
+				s.Format( 
+					L"%s\n\n"
+					L"%s に今回の書き込み内容を保存しました。", msg, theApp.m_filepath.tempdraftfile );
+				::MessageBox(m_hWnd, s, MZ3_APP_NAME, MB_ICONERROR);
+
+				// 失敗したのでダンプする
+				DumpToTemporaryDraftFile();
+
+				::SendMessage(m_hWnd, WM_MZ3_POST_ABORT, NULL, lParam);
+				return TRUE;
+			}
+			break;
+		}
+
+		// POST 処理を続行
+		StartEntryPost();
+	}
 
 	return TRUE;
 }

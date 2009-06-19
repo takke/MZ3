@@ -72,6 +72,15 @@ type:set_short_title('GMail 絵文字');							-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
+-- メール送信
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_SEND');							-- シリアライズキー
+type:set_short_title('GMail 送信');								-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -209,7 +218,7 @@ function gmail_inbox_parser(parent, body, html)
 		mz3_post_data.append_post_body(post, "rmShown=1&");
 		mz3_post_data.append_post_body(post, "continue=" .. mz3.url_encode(continue_value, 'utf8'));
 		
-		continue_value = continue_value:gsub('&amp;', '&');
+--		continue_value = continue_value:gsub('&amp;', '&');
 --		mz3.alert('continue_value : ' .. mz3.url_encode(continue_value, 'utf8'));
 --		mz3.alert(url);
 		
@@ -463,7 +472,10 @@ function gmail_mail_parser(data, dummy, html)
 	-- base url の解析
 	-- <base href="https://mail.google.com/mail/h/xxx/">
 	base_url  = line:match('<base href="(.-)">');
-	base_host = base_url:match('(https?://.-)/');
+	data:set_text('base_url', base_url);
+	if base_url~=nil then
+		base_host = base_url:match('(https?://.-)/');
+	end
 	
 	-- 「全て展開」=全スレッド表示対応
 	-- ※無限ループ対策のため、メイン画面から遷移した場合のみ実施する
@@ -539,6 +551,16 @@ function gmail_mail_parser(data, dummy, html)
 			start = pos + one_mail_start_tags:len();
 			mail_count = mail_count +1;
 		end
+	end
+	
+	if pos ~= nil then
+		-- 「返信開始タグ」以降を用いて返信フォームを取得
+		reply_form = line:sub(pos);
+		-- 最初の <form>..</form> が返信フォーム。
+		reply_form = reply_form:match('<form.-</form>');
+		-- data にフォームをそのまま埋め込んでおく
+		-- 返信実行時にこのフォームの内容を利用する
+		data:set_text('reply_form', reply_form);
 	end
 	
 --	for k, v in pairs(emoji_urls) do
@@ -875,6 +897,297 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	return true;
 end
 mz3.add_event_listener("popup_body_menu",  "gmail.on_popup_body_menu");
+
+
+--- レポートビューのポップアップメニュー表示
+--
+-- @param event_name    'popup_report_menu'
+-- @param serialize_key レポートアイテムのシリアライズキー
+-- @param report_item   レポートアイテム
+-- @param sub_item_idx  選択アイテムのインデックス
+-- @param wnd           wnd
+--
+function on_popup_report_menu(event_name, serialize_key, report_item, sub_item_idx, wnd)
+	if serialize_key~="GMAIL_MAIL" then
+		return false;
+	end
+
+	-- インスタンス化
+	report_item = MZ3Data:create(report_item);
+	
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu();
+	menu_edit = MZ3Menu:create_popup_menu();
+	menu_layout = MZ3Menu:create_popup_menu();
+	
+	menu:append_menu("string", "戻る", ID_BACK_MENU);
+	menu:append_menu("separator");
+	
+	menu:append_menu("string", "返信", ID_WRITE_COMMENT);
+
+	-- 「再読込」すると文字化けが発生するので対応しない
+--	menu:append_menu("string", "再読込", IDM_RELOAD_PAGE);
+
+	menu_edit:append_menu("string", "コピー", ID_EDIT_COPY);
+	menu:append_submenu("編集", menu_edit);
+	
+	menu:append_menu("string", "ブラウザで開く（このページ）...", ID_OPEN_BROWSER);
+
+	-- TODO 共通化
+	menu:append_menu("separator");
+	menu_layout:append_menu("string", "↑リストを狭くする", IDM_LAYOUT_REPORTLIST_MAKE_NARROW);
+	menu_layout:append_menu("string", "↓リストを広くする", IDM_LAYOUT_REPORTLIST_MAKE_WIDE);
+	menu:append_submenu("画面レイアウト", menu_layout);
+
+	-- ポップアップ
+	menu:popup(wnd);
+	
+	-- メニューリソース削除
+	menu:delete();
+	menu_edit:delete();
+	menu_layout:delete();
+	
+	return true;
+end
+mz3.add_event_listener("popup_report_menu",  "gmail.on_popup_report_menu");
+
+
+--- レポート画面からの返信時の書き込み種別の判定
+--
+-- @param event_name  'get_write_view_type_by_report_item_access_type'
+-- @param report_item [MZ3Data] レポート画面の要素
+--
+function on_get_write_view_type_by_report_item_access_type(event_name, report_item)
+
+	report_item = MZ3Data:create(report_item);
+	
+	serialize_key = report_item:get_serialize_key();
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='gmail' then
+		if serialize_key=='GMAIL_MAIL' then
+			return true, mz3.get_access_type_by_key('GMAIL_SEND');
+		end
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "gmail.on_get_write_view_type_by_report_item_access_type");
+
+
+--- 書き込み画面の初期化イベント
+--
+-- @param event_name      'init_write_view'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+function on_init_write_view(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if write_view_key=='GMAIL_SEND' then
+		-- TODO タイトル変更：有効化
+
+		-- タイトルの初期値設定
+		local title = 'Re: ' .. write_item:get_text('title');
+		mz3_write_view.set_text('title_edit', title);
+		
+		-- TODO 公開範囲コンボボックス：無効
+		
+		-- TODO フォーカス：本文から開始
+		
+		return true;
+	end
+
+	return false;
+end
+mz3.add_event_listener("init_write_view", "gmail.on_init_write_view");
+
+
+--- 書き込み画面で「画像が添付可能なモードか」の判定
+--
+-- @param event_name      'is_enable_write_view_attach_image_mode'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type=='gmail' then
+		-- とりあえず添付不可
+		return true, 0;
+	end
+
+	return false;
+end
+mz3.add_event_listener("is_enable_write_view_attach_image_mode", "gmail.on_is_enable_write_view_attach_image_mode");
+
+
+--- 書き込み画面の書き込みボタン押下イベント
+--
+-- @param event_name      'click_write_view_send_button'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+function on_click_write_view_send_button(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type=='gmail' then
+		-- 送信処理
+		
+		local title = mz3_write_view.get_text('title_edit');
+		local body  = mz3_write_view.get_text('body_edit');
+		
+		if title=='' then
+			mz3.alert('タイトルを入力してください');
+			return true;
+		end
+		
+		local reply_form = write_item:get_text('reply_form');
+		if reply_form==nil then
+			mz3.alert('返信できません');
+			return true;
+		end
+		
+		-- <b>To:</b> <input type="hidden" name="qrr" value="o"> xxx@xxx.jp</td>
+		local mail_to = reply_form:match('<input type="hidden" name="qrr" value="o"> ?(.-)</');
+		msg = mail_to .. ' にメールを送信します。よろしいですか？' .. "\r\n";
+		msg = msg .. '----' .. "\r\n";
+		msg = msg .. title .. "\r\n";
+--		msg = msg .. '----';
+		if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
+			return true;
+		end
+		
+		------------------------------------------
+		-- POST パラメータ生成
+		------------------------------------------
+
+		-- URL 取得
+		-- <form action="?v=b&qrt=n&..." name="qrf" method="POST"> 
+		local url = reply_form:match('<form action="(.-)"');
+		if url==nil then
+			mz3.alert('返信できません(送信先url取得失敗)');
+			return true;
+		end
+		url = write_item:get_text('base_url') .. url;
+		--mz3.alert(url);
+		
+		-- hidden 値の収集
+		local redir = reply_form:match('<input type="hidden" name="redir" value="(.-)"');
+		redir = redir:gsub('&amp;', '&');
+		local qrr   = reply_form:match('<input type="hidden" name="qrr" value="(.-)"');
+		
+		
+		-- POSTパラメータ生成
+		post = MZ3PostData:create();
+		post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
+		
+		-- nvp_bu_send
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode('送信', 'utf8') .. '\r\n');
+		
+		-- redir
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="redir"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode(redir, 'utf8') .. '\r\n');
+
+		-- qrr
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="qrr"' .. '\r\n');
+		post:append_post_body('\r\n');
+		post:append_post_body(mz3.url_encode(qrr, 'utf8') .. '\r\n');
+		
+		-- subject
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="subject"' .. '\r\n');
+		post:append_post_body('\r\n');
+--		post:append_post_body(mz3.url_encode(title, 'utf8') .. '\r\n');
+		post:append_post_body(mz3.convert_encoding(title, 'sjis', 'utf8'));
+		post:append_post_body('\r\n');
+		
+		-- body
+		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+		post:append_post_body('Content-Disposition: form-data; name="body"' .. '\r\n');
+		post:append_post_body('\r\n');
+--		post:append_post_body(mz3.url_encode(body, 'utf8') .. '\r\n');
+		post:append_post_body(mz3.convert_encoding(body, 'sjis', 'utf8'));
+		post:append_post_body('\r\n');
+		
+		-- end of post data
+		post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
+		
+		-- 通信開始
+		access_type = mz3.get_access_type_by_key("GMAIL_SEND");
+		referer = write_item:get_text('url');
+		user_agent = nil;
+		mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+		return true;
+	end
+
+	return false;
+end
+mz3.add_event_listener("click_write_view_send_button", "gmail.on_click_write_view_send_button");
+
+
+--- 書き込み画面の書き込み完了イベント
+--
+-- @param event_name      'is_enable_write_view_attach_image_mode'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+-- @param http_status     HTTP Status Code (200, 404, etc...)
+-- @param filename        レスポンスファイル
+-- 
+--
+function on_get_end_write_view(event_name, write_view_type, write_item, http_status, filename)
+	-- GMail メール送信では投稿後にリダイレクトするため get_end になる。
+	
+	-- CWriteView::OnPostEnd と同様の処理を行う。
+	
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type~='gmail' then
+		return false;
+	end
+
+	-- 投稿完了チェック
+	if http_status==200 then
+		-- 成功
+		
+		-- メッセージ表示
+		mz3.alert('送信しました');
+		
+		-- 初期化
+		mz3_write_view.set_text('title_edit', '');
+		mz3_write_view.set_text('body_edit', '');
+		
+		-- 前の画面に戻る
+		mz3.change_view('main_view');
+		
+	else
+		-- 失敗
+		mz3.logger_error('失敗:' .. http_status);
+		
+		mz3.alert('投稿に失敗しました。');
+		
+		-- TODO バックアップ
+	end
+	
+	return true;
+end
+mz3.add_event_listener("get_end_write_view", "gmail.on_get_end_write_view");
 
 
 mz3.logger_debug('gmail.lua end');

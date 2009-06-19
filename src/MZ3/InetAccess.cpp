@@ -975,7 +975,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 							msg.Format( L"リダイレクト：[%s]", (LPCTSTR)m_uri );
 							MZ3LOGGER_DEBUG( msg );
 						}
-						return ExecSendRecv( execType );
+						// POST で 30x なら GET に変更する
+						return ExecSendRecv( EXEC_SENDRECV_TYPE_GET );
 					}
 				}
 			}
