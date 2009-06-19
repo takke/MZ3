@@ -299,6 +299,12 @@ unsigned int CInetAccess::ExecGet_Thread(LPVOID This)
 	CInetAccess* inet = (CInetAccess*)This;
 	inet->m_bAccessing = true;
 	int msg = inet->ExecSendRecv( EXEC_SENDRECV_TYPE_GET );
+	if (msg==WM_MZ3_GET_ERROR) {
+		if (inet->m_hInternet != NULL) {
+			InternetCloseHandle( inet->m_hInternet );
+			inet->m_hInternet = NULL;
+		}
+	}
 	::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
 	inet->m_bAccessing = false;
 
@@ -357,6 +363,12 @@ unsigned int CInetAccess::ExecPost_Thread(LPVOID This)
 	CInetAccess* inet = (CInetAccess*)This;
 	inet->m_bAccessing = true;
 	int msg = inet->ExecSendRecv( EXEC_SENDRECV_TYPE_POST );
+	if (msg==WM_MZ3_GET_ERROR) {
+		if (inet->m_hInternet != NULL) {
+			InternetCloseHandle( inet->m_hInternet );
+			inet->m_hInternet = NULL;
+		}
+	}
 	::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
 	inet->m_bAccessing = false;
 
@@ -471,6 +483,25 @@ bool CInetAccess::IsNetworkConnected()
 	}
 }
 
+static DWORD WINAPI HttpSendRequestWorker(LPVOID pThreadParam)
+{
+	HINTERNET* phRequest = (HINTERNET*) pThreadParam;
+
+	try {
+		BOOL bRet = HttpSendRequest(*phRequest,
+			NULL,    // 追加ヘッダなし
+			0,       // ヘッダ長
+			NULL,    // ボディなし
+			0);      // ボディ長
+
+		if (bRet == TRUE) {
+			return 0;	// success;
+		}
+	} catch (CException &) {
+	}
+	return 1;	// failure
+}
+
 /**
  * 送受信処理を行う。
  *
@@ -544,7 +575,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 	}
 
 	if( m_hConnection==NULL ) {
-		// 接続ＮＧ
+		// 接続NG
 		// m_hRequest, m_hConnection を閉じる。
 		CloseInternetHandles();
 		m_strErrorMsg = L"コネクションなし";
@@ -555,6 +586,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 	util::MySetInformationText( m_hwnd, _T("サイトに接続しました") );
 
 	// タイムアウト値
+	// → WM の HttpSendRequest バグ回避のためスレッドで監視する
+	/*
 	int timeout = 0;
 	if (execType == EXEC_SENDRECV_TYPE_GET) {
 		// GET のタイムアウト時間は短くする
@@ -564,6 +597,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		timeout = 20000;
 	}
 	::InternetSetOption(m_hConnection, INTERNET_OPTION_CONNECT_TIMEOUT, (LPVOID)timeout, sizeof(timeout));
+	*/
 
 	// プロクシ設定がONの場合、IDとパスワードをセット
 	if (theApp.m_optionMng.IsUseProxy() ) {
@@ -681,7 +715,69 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			MZ3LOGGER_DEBUG( msg );
 		}
 
-		try {
+		// HttpSendRequest をスレッド内で実行する
+		// (WMのバグ回避のため)
+		DWORD dwThreadID = 0;
+		HANDLE hThread = CreateThread(NULL,	// security attributes
+									  0,	// initial thread stack size
+									  HttpSendRequestWorker,	// thread func.
+									  &m_hRequest,				// arg. for the new thread
+									  0,						// flags
+									  &dwThreadID);
+		
+		DWORD dwTimeout = 10000;	// in msec.
+		if (WaitForSingleObject(hThread, dwTimeout) == WAIT_TIMEOUT) {
+			// m_hRequest, m_hConnection を閉じる。
+			InternetCloseHandle( m_hRequest );
+			InternetCloseHandle( m_hConnection );
+
+			// スレッド停止待ち
+			MZ3LOGGER_ERROR(util::FormatString(L"タイムアウトしたため接続をキャンセルしています(0x%X)", m_hRequest));
+			//WaitForSingleObject(hThread, INFINITE);
+			CloseHandle(hThread);
+
+			m_hRequest = NULL;
+			m_hConnection = NULL;
+
+			if (m_abort == FALSE) {
+				m_strErrorMsg = L"タイムアウトが発生しました";
+				MZ3LOGGER_ERROR( m_strErrorMsg );
+				return WM_MZ3_GET_ERROR;
+			} else {
+				return WM_MZ3_GET_ABORT;
+			}
+		}
+
+		DWORD dwExitCode = 0;
+		if (!GetExitCodeThread(hThread, &dwExitCode)) {
+			// m_hRequest, m_hConnection を閉じる。
+			CloseInternetHandles();
+
+			CloseHandle(hThread);
+			if (m_abort == FALSE) {
+				m_strErrorMsg = L"HttpSendRequest失敗(1)";
+				MZ3LOGGER_ERROR( m_strErrorMsg );
+				return WM_MZ3_GET_ERROR;
+			} else {
+				return WM_MZ3_GET_ABORT;
+			}
+		}
+
+		CloseHandle(hThread);
+
+		if (dwExitCode) {
+			// m_hRequest, m_hConnection を閉じる。
+			CloseInternetHandles();
+			if (m_abort == FALSE) {
+				m_strErrorMsg = L"HttpSendRequest失敗(2)";
+				MZ3LOGGER_ERROR( m_strErrorMsg );
+				return WM_MZ3_GET_ERROR;
+			} else {
+				return WM_MZ3_GET_ABORT;
+			}
+		}
+
+/*		try {
 
 			BOOL bRet = HttpSendRequest(m_hRequest,
 				NULL,    // 追加ヘッダなし
@@ -710,7 +806,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 				return WM_MZ3_GET_ABORT;
 			}
 		}
-		//--- リクエスト送信成功
+*/		//--- リクエスト送信成功
 	}else{
 		//--- POST メソッドなので「データ送信」を実行
 		util::MySetInformationText( m_hwnd, _T("データ送信中") );
