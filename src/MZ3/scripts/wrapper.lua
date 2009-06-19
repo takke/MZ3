@@ -64,6 +64,10 @@ function MZ3Data:get_text_array_joined_text(name)
 	return item;
 end
 
+-- シリアライズキーの取得
+function MZ3Data:get_serialize_key()
+	return mz3.get_serialize_key_by_access_type(self:get_access_type());
+end
 
 --------------------------------------------------
 -- Wrapper for mz3_data_list

@@ -169,6 +169,9 @@ function on_body_list_click(serialize_key, event_name, data)
 	-- 標準の処理を続行
 	return false;
 end
+mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
+
 
 --- 全文表示メニューまたはダブルクリックイベント
 function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
@@ -189,6 +192,7 @@ function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 
 	return true;
 end
+
 
 --- ボディリストのポップアップメニュー表示
 --
@@ -247,6 +251,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	return true;
 end
+mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
+
 
 --- デフォルトのグループリスト生成イベントハンドラ
 --
@@ -322,6 +328,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 	end
 end
+mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group", false);
+
 
 --- estimate 対象判別イベントハンドラ
 --
@@ -337,24 +345,34 @@ function on_estimate_access_type(event_name, url, data1, data2)
 
 	return false;
 end
-
-
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
-
--- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
-mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
-
--- ボディリストのポップアップメニュー表示イベントハンドラ登録
-mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
-
--- デフォルトのグループリスト生成
-mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group", false);
-
--- estimate 対象の追加
 mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type");
+
+
+--- レポート画面からの書き込み種別の判定
+--
+-- @param event_name  'estimate_access_type_by_url'
+-- @param report_item 解析対象URL
+--
+function on_get_write_view_type_by_report_item_access_type(event_name, report_item)
+
+	report_item = MZ3Data:create(report_item);
+	
+	serialize_key = report_item:get_serialize_key();
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='mixi' then
+		-- 
+		if serialize_key=='MIXI_MESSAGE' then
+			-- メッセージ返信の書き込み種別
+			return true, mz3.get_access_type_by_key('MIXI_POST_REPLYMESSAGE_ENTRY');
+		else
+			-- コメント返信の書き込み種別
+			return true, mz3.get_access_type_by_key('MIXI_POST_COMMENT_CONFIRM');
+		end
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "mixi.on_get_write_view_type_by_report_item_access_type");
 
 
 ----------------------------------------

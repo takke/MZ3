@@ -557,6 +557,7 @@ bool AccessTypeInfo::init()
 		, L"コメント投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_COMMENT_CONFIRM";
 
 	type = ACCESS_POST_COMMENT_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
@@ -565,6 +566,7 @@ bool AccessTypeInfo::init()
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_COMMENT_REGIST";
 
 	type = ACCESS_POST_REPLYMESSAGE_ENTRY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -573,6 +575,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ返信（入力）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_REPLYMESSAGE_ENTRY";
 
 	type = ACCESS_POST_REPLYMESSAGE_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
@@ -581,6 +584,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ返信（確認）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_REPLYMESSAGE_CONFIRM";
 
 	type = ACCESS_POST_REPLYMESSAGE_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
@@ -589,6 +593,7 @@ bool AccessTypeInfo::init()
 		, L"メッセージ返信（書込）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_REPLYMESSAGE_REGIST";
 
 	type = ACCESS_POST_NEWMESSAGE_ENTRY;
 	m_map[type] = AccessTypeInfo::Data(
@@ -597,6 +602,7 @@ bool AccessTypeInfo::init()
 		, L"新規メッセージ（入力）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_NEWMESSAGE_ENTRY";
 
 	type = ACCESS_POST_NEWMESSAGE_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
@@ -605,6 +611,7 @@ bool AccessTypeInfo::init()
 		, L"新規メッセージ（確認）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_NEWMESSAGE_CONFIRM";
 
 	type = ACCESS_POST_NEWMESSAGE_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
@@ -613,6 +620,7 @@ bool AccessTypeInfo::init()
 		, L"新規メッセージ（書込）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_NEWMESSAGE_REGIST";
 
 	type = ACCESS_POST_NEWDIARY_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
@@ -621,6 +629,7 @@ bool AccessTypeInfo::init()
 		, L"日記投稿（確認）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_NEWDIARY_CONFIRM";
 
 	type = ACCESS_POST_NEWDIARY_REGIST;
 	m_map[type] = AccessTypeInfo::Data(
@@ -629,6 +638,7 @@ bool AccessTypeInfo::init()
 		, L"コメント投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
+	m_map[type].serializeKey = "MIXI_POST_NEWDIARY_REGIST";
 
 	//------------------------------------------------------------------
 	//--- Twitter 系

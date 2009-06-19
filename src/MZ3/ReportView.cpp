@@ -123,6 +123,7 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_UPDATE_COMMAND_UI(ID_MENU_PREV_DIARY, &CReportView::OnUpdateMenuPrevDiary)
 	ON_COMMAND(IDM_LOAD_FULL_DIARY, &CReportView::OnLoadFullDiary)
 	ON_UPDATE_COMMAND_UI(IDM_LOAD_FULL_DIARY, &CReportView::OnUpdateLoadFullDiary)
+	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
 END_MESSAGE_MAP()
 
 
@@ -496,6 +497,8 @@ void CReportView::SetData(const CMixiData& data)
 	m_list.SetFocus();
 	m_list.SetItemState( focusItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED );
 	m_list.EnsureVisible( focusItem, FALSE );
+
+	MyUpdateControlStatus();
 }
 
 /**
@@ -1891,13 +1894,25 @@ void CReportView::OnWriteComment()
 		}
 	}
 
-	// 書き込みビューを表示
-	CWriteView* pWriteView = ((CWriteView*)theApp.m_pWriteView);
-	if (m_data.GetAccessType() == ACCESS_MESSAGE) {
-		pWriteView->StartWriteView( WRITEVIEW_TYPE_REPLYMESSAGE, &m_data );
+	// 書き込み種別の取得
+	WRITEVIEW_TYPE writeViewType = ACCESS_INVALID;
+
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData((int)ACCESS_INVALID));
+	if (util::CallMZ3ScriptHookFunctions2("get_write_view_type_by_report_item_access_type", &rvals, 
+			util::MyLuaData(&m_data))) {
+		writeViewType = (WRITEVIEW_TYPE) rvals[0].m_number;
+		MZ3LOGGER_DEBUG(util::FormatString(L"estimated write view type by lua : %d", writeViewType));
 	} else {
-		pWriteView->StartWriteView( WRITEVIEW_TYPE_COMMENT, &m_data );
+		MZ3LOGGER_ERROR(L"Lua 側で処理がないので中止");
+		MessageBox(L"サポートされていない操作です");
+		return;
 	}
+
+	// 書き込みビューを表示
+	CWriteView* pWriteView = theApp.m_pWriteView;
+	pWriteView->StartWriteView( writeViewType, &m_data );
 
 	// 引用する
 	if( quoteType != quote::QUOTETYPE_INVALID && data != NULL ) {
@@ -2133,6 +2148,20 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		flags = util::GetPopupFlagsForSoftKeyMenu2();
 	}
 
+	// MZ3 API : フック関数呼び出し
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(m_data.GetAccessType()));
+	if (util::CallMZ3ScriptHookFunctions2("popup_report_menu", &rvals, 
+			util::MyLuaData(serializeKey), 
+			util::MyLuaData(&m_data), 
+			util::MyLuaData(m_list.GetSelectedItem()),
+			util::MyLuaData(this)))
+	{
+		return;
+	}
+
+	// TODO 下記のビルトインコードをLuaスクリプト化すること
 	CMenu menu;
 	menu.LoadMenu(IDR_REPORT_MENU);
 	CMenu* pcThisMenu = menu.GetSubMenu(0);
@@ -3006,6 +3035,7 @@ void CReportView::OnUpdateLoadFullDiary(CCmdUI *pCmdUI)
 void CReportView::MyUpdateControlStatus(void)
 {
 	if (theApp.m_access) {
+		MZ3LOGGER_DEBUG(L"****** CReportView::MyUpdateControlStatus(1)");
 		theApp.EnableCommandBarButton( ID_BACK_BUTTON, FALSE);
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, TRUE);
 		theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
@@ -3018,6 +3048,7 @@ void CReportView::MyUpdateControlStatus(void)
 		m_infoEdit.ShowWindow(SW_SHOW);
 
 	} else {
+		MZ3LOGGER_DEBUG(L"****** CReportView::MyUpdateControlStatus(0)");
 		theApp.EnableCommandBarButton( ID_STOP_BUTTON, FALSE);
 		theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE);
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
@@ -3029,4 +3060,20 @@ void CReportView::MyUpdateControlStatus(void)
 
 		m_infoEdit.ShowWindow(SW_HIDE);
 	}
+}
+
+/**
+ * MZ3 API で登録されたメニューのイベント
+ */
+void CReportView::OnLuaMenu(UINT nID)
+{
+	UINT idx = nID - ID_LUA_MENU_BASE;
+	if (idx >= theApp.m_luaMenus.size()) {
+		MZ3LOGGER_ERROR(util::FormatString(L"不正なメニューIDです [%d]", nID));
+		return;
+	}
+
+	// Lua関数名取得＆呼び出し
+	const std::string& strFuncName = theApp.m_luaMenus[idx];
+	util::CallMZ3ScriptHookFunction("", "select_menu", strFuncName.c_str(), &m_data);
 }

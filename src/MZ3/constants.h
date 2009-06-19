@@ -118,14 +118,14 @@ enum ACCESS_TYPE {
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 	ACCESS_POST_COMMENT_CONFIRM,		///< コメント投稿（確認画面）
 	ACCESS_POST_COMMENT_REGIST,			///< コメント投稿（書き込み画面）
+	ACCESS_POST_NEWDIARY_CONFIRM,		///< 日記投稿（確認画面）
+	ACCESS_POST_NEWDIARY_REGIST,		///< 日記投稿（書き込み画面）
 	ACCESS_POST_REPLYMESSAGE_ENTRY,		///< メッセージ返信（入力画面）
 	ACCESS_POST_REPLYMESSAGE_CONFIRM,	///< メッセージ返信（確認画面）
 	ACCESS_POST_REPLYMESSAGE_REGIST,	///< メッセージ返信（書き込み画面）
 	ACCESS_POST_NEWMESSAGE_ENTRY,		///< 新規メッセージ（入力画面）
 	ACCESS_POST_NEWMESSAGE_CONFIRM,		///< 新規メッセージ（確認画面）
 	ACCESS_POST_NEWMESSAGE_REGIST,		///< 新規メッセージ（書き込み画面）
-	ACCESS_POST_NEWDIARY_CONFIRM,		///< 日記投稿（確認画面）
-	ACCESS_POST_NEWDIARY_REGIST,		///< 日記投稿（書き込み画面）
 
 	//----------------------------------------------
 	// Twitter
@@ -187,14 +187,14 @@ enum GETPAGE_TYPE
 
 /**
  * WriteView の処理種別
+ *
+ * → Lua 化のために ACCESS_TYPE に統一。Entery/Confirm のアクセス種別を用いる。
  */
-enum WRITEVIEW_TYPE {
-	WRITEVIEW_TYPE_INVALID  = -1,		///< 初期値
-	WRITEVIEW_TYPE_COMMENT  =  0,		///< コメント投稿処理（日記、コミュニティ共用？）
-	WRITEVIEW_TYPE_NEWDIARY =  1,		///< 日記投稿処理
-	WRITEVIEW_TYPE_REPLYMESSAGE  =  2,	///< メッセージ返信処理
-	WRITEVIEW_TYPE_NEWMESSAGE  =  3,	///< 新規メッセージの送信処理
-};
+typedef ACCESS_TYPE WRITEVIEW_TYPE;
+#define WRITEVIEW_TYPE_COMMENT		ACCESS_POST_COMMENT_CONFIRM		///< コメント投稿処理（日記、コミュニティ共用？）
+#define WRITEVIEW_TYPE_NEWDIARY		ACCESS_POST_NEWDIARY_CONFIRM	///< 日記投稿処理
+#define	WRITEVIEW_TYPE_REPLYMESSAGE	ACCESS_POST_REPLYMESSAGE_ENTRY	///< メッセージ返信処理
+#define WRITEVIEW_TYPE_NEWMESSAGE	ACCESS_POST_NEWMESSAGE_ENTRY	///< 新規メッセージの送信処理
 
 /// 送信する Content-Type の種別
 typedef LPCTSTR CONTENT_TYPE;

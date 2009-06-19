@@ -170,6 +170,7 @@ public:
 	afx_msg void OnLoadFullDiary();
 	afx_msg void OnUpdateLoadFullDiary(CCmdUI *pCmdUI);
 	void MyUpdateControlStatus(void);
+	void OnLuaMenu(UINT nID);
 };
 
 

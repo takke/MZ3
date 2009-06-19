@@ -21,8 +21,17 @@ package.path = ".\\?.luac;.\\?.lua;" .. mz3_dir .. "?.luac;" .. mz3_dir .. "?.lu
 -------------------------------------------------
 
 -- mz3_menu.append_menu 用定数
-IDM_CATEGORY_OPEN = 34164 -37000;	-- 最新の一覧を取得
-ID_REPORT_URL_BASE = 36100 -37000;	-- URLを開く
+IDM_CATEGORY_OPEN  = 34164  -37000;		-- 最新の一覧を取得
+ID_REPORT_URL_BASE = 36100  -37000;		-- URLを開く
+
+ID_BACK_MENU       = 32873  -37000;		-- 戻る
+ID_WRITE_COMMENT   = 32802  -37000;		-- 書き込み(返信、など)
+IDM_RELOAD_PAGE    = 32885  -37000;		-- 再読込
+ID_EDIT_COPY       = 0xE122 -37000;		-- コピー
+ID_OPEN_BROWSER    = 32830  -37000;		-- ブラウザで開く（このページ）...
+IDM_LAYOUT_REPORTLIST_MAKE_NARROW = 32964 -37000;	-- リストを狭くする
+IDM_LAYOUT_REPORTLIST_MAKE_WIDE   = 32966 -37000;	-- リストを広くする
+
 
 -- mz3_main_view.set_post_mode 用定数
 MAIN_VIEW_POST_MODE_TWITTER_UPDATE 			= 0;
