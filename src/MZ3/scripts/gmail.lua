@@ -1142,7 +1142,7 @@ mz3.add_event_listener("click_write_view_send_button", "gmail.on_click_write_vie
 
 --- 書き込み画面の書き込み完了イベント
 --
--- @param event_name      'is_enable_write_view_attach_image_mode'
+-- @param event_name      'get_end_write_view'
 -- @param write_view_type 書き込み種別
 -- @param write_item      [MZ3Data] 書き込み画面の要素
 -- @param http_status     HTTP Status Code (200, 404, etc...)
