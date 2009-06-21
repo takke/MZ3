@@ -925,8 +925,7 @@ function on_popup_report_menu(event_name, serialize_key, report_item, sub_item_i
 	
 	menu:append_menu("string", "返信", ID_WRITE_COMMENT);
 
-	-- 「再読込」すると文字化けが発生するので対応しない
---	menu:append_menu("string", "再読込", IDM_RELOAD_PAGE);
+	menu:append_menu("string", "再読込", IDM_RELOAD_PAGE);
 
 	menu_edit:append_menu("string", "コピー", ID_EDIT_COPY);
 	menu:append_submenu("編集", menu_edit);

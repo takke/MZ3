@@ -34,6 +34,7 @@ private:
 											///< （自動接続ONの場合のみ有効）
 public:
 	CString			m_strUserAgent;			///< User-Agent
+	bool			m_bUseDevVerCheck;		///< バージョンチェックに開発版も含める
 
 private:
 	CString			m_proxyServer;			///< プロキシのサーバ
@@ -202,6 +203,7 @@ public:
 #endif
 		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
 		, m_bTwitterReloadTLAfterPost(false)
+		, m_bUseDevVerCheck(false)
 	{
 	}
 

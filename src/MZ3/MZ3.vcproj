@@ -1220,6 +1220,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mz3_revision_in.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MZ3Data.h"
 				>
 			</File>

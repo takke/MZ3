@@ -247,6 +247,9 @@ public:
 	bool MyLuaErrorReport(int status);
 
 	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
+
+	CInetAccess::ENCODING GetInetAccessEncodingByAccessType(ACCESS_TYPE aType);
+
 };
 
 extern CMZ3App theApp;

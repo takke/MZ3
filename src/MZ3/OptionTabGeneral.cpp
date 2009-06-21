@@ -45,6 +45,9 @@ BOOL COptionTabGeneral::OnInitDialog()
 	// 起動時の新着チェック
 	CheckDlgButton( IDC_BOOT_MNC_CHECK, theApp.m_optionMng.IsBootCheckMnC() ? BST_CHECKED : BST_UNCHECKED );
 
+	// バージョンチェックに開発版も含める
+	CheckDlgButton( IDC_USE_DEV_VER_CHECK_CHECK, theApp.m_optionMng.m_bUseDevVerCheck ? BST_CHECKED : BST_UNCHECKED );
+
 	// 引用符号
 	SetDlgItemText( IDC_QUOTE_MARK_EDIT, theApp.m_optionMng.GetQuoteMark() );
 
@@ -68,6 +71,9 @@ void COptionTabGeneral::OnOK()
 	// 起動時の新着チェック
 	theApp.m_optionMng.SetBootCheckMnC(
 		IsDlgButtonChecked( IDC_BOOT_MNC_CHECK ) == BST_CHECKED ? true : false );
+
+	// バージョンチェックに開発版も含める
+	theApp.m_optionMng.m_bUseDevVerCheck = IsDlgButtonChecked( IDC_USE_DEV_VER_CHECK_CHECK ) == BST_CHECKED ? true : false;
 
 	// 引用符号
 	CString mark;

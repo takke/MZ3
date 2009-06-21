@@ -1297,7 +1297,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 			m_data = mixi;
 			m_data.SetBrowseUri(util::CreateMixiUrl(link.url));
 		}
-		theApp.m_inet.Initialize( m_hWnd, NULL );
+		theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 
 		theApp.m_accessType = m_data.GetAccessType();
 		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
@@ -1329,7 +1329,7 @@ void CReportView::OnReloadPage()
 	theApp.m_access = true;
 	m_abort = FALSE;
 
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 
 	theApp.m_accessType = m_data.GetAccessType();
 	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
@@ -1975,7 +1975,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 	theApp.m_access = true;
 	m_abort = FALSE;
 
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 	theApp.m_accessType = m_data.GetAccessType();
 	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
 

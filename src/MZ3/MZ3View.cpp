@@ -2966,21 +2966,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	}
 
 	// encoding 指定
-	switch (theApp.m_accessTypeInfo.getRequestEncoding(data->GetAccessType())) {
-	case AccessTypeInfo::ENCODING_SJIS:
-		encoding = CInetAccess::ENCODING_SJIS;
-		break;
-	case AccessTypeInfo::ENCODING_UTF8:
-		encoding = CInetAccess::ENCODING_UTF8;
-		break;
-	case AccessTypeInfo::ENCODING_NOCONVERSION:
-		encoding = CInetAccess::ENCODING_NOCONVERSION;
-		break;
-	case AccessTypeInfo::ENCODING_EUC:
-	default:
-		encoding = CInetAccess::ENCODING_EUC;
-		break;
-	}
+	encoding = theApp.GetInetAccessEncodingByAccessType(data->GetAccessType());
 
 	// MZ3 API : BASIC認証設定
 	CString strUser = NULL;
@@ -5130,7 +5116,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_twitterPostAccessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		L"", 
@@ -6619,62 +6605,95 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 	}
 
 	// バージョン、URL、タイトルの取得
-	CString strLatestVersion, strUrl, strTitle;
+	const xml2stl::Node* pLatestVerNode = NULL;
 	try {
 #ifdef WINCE
-		const xml2stl::Node& target = root.getNode(L"latest_version").getNode(L"mz3");
+		pLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz3");
 #else
-		const xml2stl::Node& target = root.getNode(L"latest_version").getNode(L"mz4");
+		pLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz4");
 #endif
-		strLatestVersion = target.getProperty(L"version").c_str();
-		strUrl           = target.getProperty(L"url").c_str();
-		strTitle         = target.getProperty(L"title").c_str();
 	} catch (xml2stl::NodeNotFoundException& e) {
 		MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
 		return false;
 	}
 
-	// バージョンチェック
 	MZ3LOGGER_DEBUG(
-		util::FormatString(L"バージョンチェック結果：current[%s], latest_version[%s], url[%s], title[%s]",
+		util::FormatString(L"バージョン取得結果：current[%s], latest_version[%s], url[%s], title[%s]",
 			MZ3_VERSION_TEXT_SHORT,
-			strLatestVersion,
-			strUrl,
-			strTitle));
+			pLatestVerNode->getProperty(L"version").c_str(),
+			pLatestVerNode->getProperty(L"url").c_str(),
+			pLatestVerNode->getProperty(L"title").c_str()));
+
+	const xml2stl::Node* pDevLatestVerNode = NULL;
+	if (theApp.m_optionMng.m_bUseDevVerCheck) {
+		try {
+#ifdef WINCE
+			pDevLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz3_dev");
+#else
+			pDevLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz4_dev");
+#endif
+		} catch (xml2stl::NodeNotFoundException& e) {
+			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
+			return false;
+		}
+		MZ3LOGGER_DEBUG(
+			util::FormatString(L"バージョン取得結果(dev)：current[%s], latest_version[%s], url[%s], title[%s]",
+				MZ3_VERSION_TEXT_SHORT,
+				pDevLatestVerNode->getProperty(L"version").c_str(),
+				pDevLatestVerNode->getProperty(L"url").c_str(),
+				pDevLatestVerNode->getProperty(L"title").c_str()));
+	}
 
 	// バージョン番号の正規化
 	// 0.9.3.7       => 0.9310700
 	CString strCurrentVersionR = theApp.MakeMZ3RegularVersion(MZ3_VERSION_TEXT_SHORT);
-	CString strLatestVersionR  = theApp.MakeMZ3RegularVersion(strLatestVersion);
+	CString strLatestVersionR  = theApp.MakeMZ3RegularVersion(pLatestVerNode->getProperty(L"version").c_str());
+	CString strDevVersionR     = L"0.0000000";
+	if (theApp.m_optionMng.m_bUseDevVerCheck) {
+		strDevVersionR = theApp.MakeMZ3RegularVersion(pDevLatestVerNode->getProperty(L"version").c_str());
+	}
 
 	MZ3LOGGER_DEBUG(util::FormatString(L"正規化バージョン番号：current[%s]", strCurrentVersionR));
 	MZ3LOGGER_DEBUG(util::FormatString(L"正規化バージョン番号：latest [%s]", strLatestVersionR));
+	MZ3LOGGER_DEBUG(util::FormatString(L"正規化バージョン番号：dev    [%s]", strDevVersionR));
 
+	CString strNewURL;
+	CString strNewTitle;
 	if (strLatestVersionR > strCurrentVersionR) {
-		// 新バージョンあり
-		CString msg;
-		msg.Format(L"新しいバージョン(%s)が利用できます。\n今すぐダウンロードしてもよろしいですか？", strTitle);
-		if (MessageBox(msg, NULL, MB_YESNO | MB_ICONQUESTION)==IDYES) {
-			// MZ4はダウンロード
-			static CMixiData s_data;
-			s_data = CMixiData();
-			s_data.SetAccessType(ACCESS_DOWNLOAD);
-
-			// アクセス開始
-			theApp.m_access = true;
-			m_abort = FALSE;
-
-			// コントロール状態の変更
-			MyUpdateControlStatus();
-
-			// ダウンロードファイルパス
-			theApp.m_inet.Initialize( m_hWnd, &s_data );
-			theApp.m_accessType = s_data.GetAccessType();
-			theApp.m_inet.DoGet(strUrl, _T(""), CInetAccess::FILE_BINARY);
-		}
+		// 安定版が最新
+		strNewTitle = pLatestVerNode->getProperty(L"title").c_str();
+		strNewURL   = pLatestVerNode->getProperty(L"url").c_str();
+	} else if (strDevVersionR > strCurrentVersionR) {
+		// 開発版が最新
+		strNewTitle = pDevLatestVerNode->getProperty(L"title").c_str();
+		strNewURL   = pDevLatestVerNode->getProperty(L"url").c_str();
 	} else {
 		// 最新バージョン
 		MessageBox(L"新しいバージョンはありませんでした。", NULL, MB_ICONINFORMATION);
+		return true;
+	}
+
+	// 新バージョンあり
+	CString msg;
+	msg.Format(L"新しいバージョン(%s)が利用できます。\n今すぐダウンロードしてもよろしいですか？", 
+		strNewTitle);
+	if (MessageBox(msg, NULL, MB_YESNO | MB_ICONQUESTION)==IDYES) {
+		// MZ4はダウンロード
+		static CMixiData s_data;
+		s_data = CMixiData();
+		s_data.SetAccessType(ACCESS_DOWNLOAD);
+
+		// アクセス開始
+		theApp.m_access = true;
+		m_abort = FALSE;
+
+		// コントロール状態の変更
+		MyUpdateControlStatus();
+
+		// ダウンロードファイルパス
+		theApp.m_inet.Initialize( m_hWnd, &s_data );
+		theApp.m_accessType = s_data.GetAccessType();
+		theApp.m_inet.DoGet(strNewURL, _T(""), CInetAccess::FILE_BINARY);
 	}
 
 	return true;

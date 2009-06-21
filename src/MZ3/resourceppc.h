@@ -115,6 +115,7 @@
 #define IDC_WRITE_CANCEL_BUTTON         1031
 #define IDC_WRITE_INFO_EDIT             1032
 #define IDC_BOOT_MNC_CHECK              1033
+#define IDC_USE_DEV_VER_CHECK_CHECK     1034
 #define IDC_USE_BGIMAGE_CHECK           1035
 #define IDC_USE_LOG_CHECK               1035
 #define IDC_SAVE_LOG_CHECK              1035

@@ -896,7 +896,7 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 
 	// ’ÊMŠJŽn
 	CString refUrl = L"";
-	theApp.m_inet.Initialize( hwnd, data );
+	theApp.m_inet.Initialize( hwnd, data, theApp.GetInetAccessEncodingByAccessType(theApp.m_accessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		refUrl, 
@@ -1313,7 +1313,7 @@ CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
 	}
 
 	static MyRegex reg2;
-	util::CompileRegex(reg2, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)( (Alpha|Beta)([0-9]+))?$");
+	util::CompileRegex(reg2, L"^([0-9]+)\\.([0-9]+)\\.([0-9]+)(( Alpha| Beta|a|b)([0-9]+))?$");
 	if (reg2.exec(strVersion) && reg2.results.size()>3) {
 		// AA.BB.CC AlphaEE
 		LPCTSTR AA = reg2.results[1].str.c_str();
@@ -1327,10 +1327,10 @@ CString CMZ3App::MakeMZ3RegularVersion(CString strVersion)
 			AlphaBeta = reg2.results[5].str.c_str();
 			EE        = reg2.results[6].str.c_str();
 		}
-		if (AlphaBeta==L"Alpha") {
+		if (AlphaBeta==L" Alpha" || AlphaBeta==L"a") {
 			// Alpha Version
 			strVersionR.Format(L"%s.%02s%02s0%02s%02s", AA, BB, CC, DD, EE);
-		} else if (AlphaBeta==L"Beta") {
+		} else if (AlphaBeta==L" Beta" || AlphaBeta==L"b") {
 			// Beta Version
 			strVersionR.Format(L"%s.%02s%02s1%02s%02s", AA, BB, CC, DD, EE);
 		} else {
@@ -1520,3 +1520,19 @@ void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 		m_loginMng.Write();
 	}
 }
+
+CInetAccess::ENCODING CMZ3App::GetInetAccessEncodingByAccessType(ACCESS_TYPE aType)
+{
+	switch (theApp.m_accessTypeInfo.getRequestEncoding(aType)) {
+	case AccessTypeInfo::ENCODING_SJIS:
+		return CInetAccess::ENCODING_SJIS;
+	case AccessTypeInfo::ENCODING_UTF8:
+		return CInetAccess::ENCODING_UTF8;
+	case AccessTypeInfo::ENCODING_NOCONVERSION:
+		return CInetAccess::ENCODING_NOCONVERSION;
+	case AccessTypeInfo::ENCODING_EUC:
+	default:
+		return CInetAccess::ENCODING_EUC;
+	}
+}
+

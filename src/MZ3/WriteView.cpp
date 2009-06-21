@@ -545,7 +545,7 @@ void CWriteView::StartEntryPost()
 	LPCTSTR refUrl = L"";
 
 	// 通信開始
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(theApp.m_accessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		refUrl, 
@@ -711,7 +711,7 @@ void CWriteView::StartConfirmPost()
 	//LPCTSTR refUrl = m_data->GetURL();
 
 	// 通信開始
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(theApp.m_accessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		refUrl, 
@@ -1056,7 +1056,7 @@ void CWriteView::StartRegistPost()
 	default:							theApp.m_accessType = ACCESS_MAIN;						break;
 	}
 
-	theApp.m_inet.Initialize( m_hWnd, NULL );
+	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(theApp.m_accessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		refUrl, 
