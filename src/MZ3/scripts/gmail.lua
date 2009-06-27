@@ -1093,25 +1093,24 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
 		post:append_post_body('\r\n');
-		post:append_post_body(mz3.url_encode('送信', 'utf8') .. '\r\n');
+		post:append_post_body(mz3.convert_encoding('送信', 'sjis', 'utf8') .. '\r\n');
 		
 		-- redir
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="redir"' .. '\r\n');
 		post:append_post_body('\r\n');
-		post:append_post_body(mz3.url_encode(redir, 'utf8') .. '\r\n');
+		post:append_post_body(mz3.convert_encoding(redir, 'sjis', 'utf8') .. '\r\n');
 
 		-- qrr
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="qrr"' .. '\r\n');
 		post:append_post_body('\r\n');
-		post:append_post_body(mz3.url_encode(qrr, 'utf8') .. '\r\n');
+		post:append_post_body(mz3.convert_encoding(qrr, 'sjis', 'utf8') .. '\r\n');
 		
 		-- subject
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="subject"' .. '\r\n');
 		post:append_post_body('\r\n');
---		post:append_post_body(mz3.url_encode(title, 'utf8') .. '\r\n');
 		post:append_post_body(mz3.convert_encoding(title, 'sjis', 'utf8'));
 		post:append_post_body('\r\n');
 		
@@ -1119,13 +1118,17 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="body"' .. '\r\n');
 		post:append_post_body('\r\n');
---		post:append_post_body(mz3.url_encode(body, 'utf8') .. '\r\n');
 		post:append_post_body(mz3.convert_encoding(body, 'sjis', 'utf8'));
+--		mz3.alert(string.format('%c%c', 0x82, 0xa0));
+--		post:append_post_body(string.format('%c%c%c', 0xEE, 0x95, 0x81));
 		post:append_post_body('\r\n');
+		-- ucs2 0xE541   = 1110 0101 0100 0001
+		-- utf8 0xEE9581 = 1110 1110 1001 0101 1000 0001
+		--                 ~~~~      ~~        ~~
 		
 		-- end of post data
 		post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
-		
+
 		-- 通信開始
 		access_type = mz3.get_access_type_by_key("GMAIL_SEND");
 		referer = write_item:get_text('url');
