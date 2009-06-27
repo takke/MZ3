@@ -629,12 +629,12 @@ CAPTION "一般"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL         "起動時に新着コメント等をチェックする",IDC_BOOT_MNC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,125,10
+    CONTROL         "バージョンチェックに開発版も含める",IDC_USE_DEV_VER_CHECK_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,121,10
     LTEXT           "引用符号",IDC_STATIC,12,50,38,8
     EDITTEXT        IDC_QUOTE_MARK_EDIT,57,47,65,14,ES_AUTOHSCROLL
     GROUPBOX        "返信",IDC_STATIC,7,37,125,27
     CONTROL         "URLを開くときに確認する",IDC_CONFIRM_OPEN_URL_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,81,89,10
     GROUPBOX        "ブラウザ連携",IDC_STATIC,7,70,125,28
-    CONTROL         "バージョンチェックに開発版も含める",IDC_USE_DEV_VER_CHECK_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,121,10
 END
 
 IDD_DEBUG_DIALOG DIALOG  0, 0, 119, 72
@@ -771,9 +771,9 @@ CAPTION "URL の入力"
 FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     EDITTEXT        IDC_URL_EDIT,7,7,105,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_ENCODING_COMBO,7,29,48,58,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,7,46,50,14
     PUSHBUTTON      "キャンセル",IDCANCEL,62,46,50,14
-    COMBOBOX        IDC_ENCODING_COMBO,7,29,48,58,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_OPTIONTAB_MAIN_VIEW DIALOG  0, 0, 139, 148
@@ -848,8 +848,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,3,7
- PRODUCTVERSION 0,9,3,7
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -865,12 +865,12 @@ BEGIN
         BLOCK "041103a4"
         BEGIN
             VALUE "FileDescription", "mixi Browser ""ZERO"""
-            VALUE "FileVersion", "0.9.3.7"
+            VALUE "FileVersion", "1.0.0"
             VALUE "InternalName", "MZ3.exe"
-            VALUE "LegalCopyright", "mako, icchu, takke  All rights reserved."
+            VALUE "LegalCopyright", "takke, icchu, mako  All rights reserved."
             VALUE "OriginalFilename", "MZ3.exe"
             VALUE "ProductName", "MZ3"
-            VALUE "ProductVersion", "0.9.3.7"
+            VALUE "ProductVersion", "1.0.0"
         END
     END
     BLOCK "VarFileInfo"
