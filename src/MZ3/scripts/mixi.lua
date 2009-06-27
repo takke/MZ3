@@ -419,6 +419,159 @@ end
 mz3.add_event_listener("is_enable_write_view_attach_image_mode", "mixi.on_is_enable_write_view_attach_image_mode");
 
 
+--- 更新ボタン押下イベント
+--
+-- @param event_name    'click_update_button'
+-- @param serialize_key Twitter風書き込みモードのシリアライズキー
+--
+function on_click_update_button(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="mixi" then
+		return false;
+	end
+
+	-- 入力文字列を取得
+	text = mz3_main_view.get_edit_text();
+
+	-- 未入力時の処理
+	if text == '' then
+		if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+			-- 未入力はNG => 何もせずに終了
+			return true;
+		elseif serialize_key == 'MIXI_ADD_ECHO' then
+			-- 最新取得
+			mz3_main_view.retrieve_category_item();
+			return true;
+		else
+			-- 上記以外はNG。
+			mz3.alert('未サポートのアクセス種別です');
+			return true;
+		end
+	end
+
+	-- 確認
+	data = mz3_main_view.get_selected_body_item();
+	data = MZ3Data:create(data);
+	if serialize_key == 'MIXI_ADD_ECHO' then
+		msg = 'mixi エコーで発言します。\n'
+		   .. '----\n'
+		   .. text .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+		local username = data:get_text('name');
+		msg = 'mixi エコーで ' .. username .. ' さんに返信します。\n'
+		   .. '---- 発言 ----\n'
+		   .. text .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	end
+
+	-- POST パラメータを設定
+	post = MZ3PostData:create();
+	local post_key = data:get_text('post_key');
+	if post_key=='' then
+		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
+		return true;
+	end
+	if serialize_key == 'MIXI_ADD_ECHO' then
+		post:append_post_body('body=');
+		post:append_post_body(mz3.url_encode(text, 'euc-jp'));
+		post:append_post_body('&x=28&y=20');
+		post:append_post_body('&post_key=');
+		post:append_post_body(post_key);
+		post:append_post_body('&redirect=recent_echo');
+	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
+		local echo_member_id = data:get_integer('author_id');
+		local echo_post_time = data:get_text('echo_post_time');
+		
+		if echo_member_id == -1 then
+			mz3.alert('返信先ユーザが不明です');
+			return true;
+		end
+		if echo_post_time == '' then
+			mz3.alert('返信対象POSTの時刻が不明です');
+			return true;
+		end
+		
+		post:append_post_body('body=');
+		post:append_post_body(mz3.url_encode(text, 'euc-jp'));
+		post:append_post_body('&x=28&y=20');
+ 		post:append_post_body('&parent_member_id=' .. echo_member_id);
+ 		post:append_post_body('&parent_post_time=' .. echo_post_time);
+		post:append_post_body('&redirect=recent_echo');
+		post:append_post_body('&post_key=');
+		post:append_post_body(post_key);
+	end
+	
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
+--	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+--		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+--		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+--	end
+
+	-- POST先URL設定
+	if serialize_key == 'MIXI_ADD_ECHO' then
+		url = 'http://mixi.jp/add_echo.pl';
+	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+		url = 'http://mixi.jp/add_echo.pl';
+	end
+	
+	-- 通信開始
+	access_type = mz3.get_access_type_by_key(serialize_key);
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+
+	return true;
+end
+mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
+
+
+--- POST 完了イベント
+--
+-- @param event_name    'post_end'
+-- @param serialize_key 完了項目のシリアライズキー
+-- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param filename      レスポンスファイル
+-- @param wnd           wnd
+--
+function on_post_end(event_name, serialize_key, http_status, filename)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="mixi" then
+		return false;
+	end
+
+	-- 投稿処理完了
+	
+	if serialize_key == 'MIXI_ADD_ECHO' or 
+	   serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+		if mz3.is_mixi_logout(serialize_key) then
+			mz3.alert('未ログインです。エコー一覧をリロードし、mixiにログインして下さい。');
+			return true;
+		else
+			-- 投稿成功
+			mz3_main_view.set_info_text("エコー書き込み完了");
+
+			-- 入力値を消去
+			mz3_main_view.set_edit_text("");
+
+			return true;
+		end
+	end
+end
+mz3.add_event_listener("post_end", "mixi.on_post_end");
+
+
 ----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------

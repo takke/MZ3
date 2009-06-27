@@ -262,7 +262,7 @@ int lua_mz3_decode_html_entity(lua_State *L)
 --- URL エンコードした文字列を返す
 --
 -- @param text     対象文字列
--- @param encoding "utf8"
+-- @param encoding "utf8", 'euc-jp'
 --
 function mz3.url_encode(text, encoding)
 */
@@ -277,6 +277,8 @@ int lua_mz3_url_encode(lua_State *L)
 	CString url_encoded_text;
 	if (encoding=="utf8") {
 		url_encoded_text = URLEncoder::encode_utf8(text);
+	} else if (encoding=="euc-jp") {
+		url_encoded_text = URLEncoder::encode_euc(text);
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
 		lua_error(L);
@@ -855,6 +857,32 @@ int lua_mz3_change_view(lua_State *L)
 
 	// 戻り値の数を返す
 	return 0;
+}
+
+/*
+--- mixiのログアウト状態判定
+--
+-- @param serialize_key シリアライズキー
+--
+function mz3.is_mixi_logout(serialize_key)
+*/
+int lua_mz3_is_mixi_logout(lua_State *L)
+{
+	const char* func_name = "mz3.is_mixi_logout";
+
+	// 引数取得
+	CStringA serialize_key(lua_tostring(L, 1));
+
+	ACCESS_TYPE aType = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)serialize_key);
+
+	if (theApp.IsMixiLogout(aType)) {
+		lua_pushboolean(L, 1);
+	} else {
+		lua_pushboolean(L, 0);
+	}
+
+	// 戻り値の数を返す
+	return 1;
 }
 
 //-----------------------------------------------
@@ -3243,6 +3271,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
 	{"copy_file",							lua_mz3_copy_file},
 	{"change_view",							lua_mz3_change_view},
+	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

@@ -893,6 +893,11 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	CMixiData* data = (CMixiData*)lParam;
 	ACCESS_TYPE aType = data->GetAccessType();
 
+	if (theApp.m_accessTypeInfo.getInfoType(aType)==AccessTypeInfo::INFO_TYPE_POST) {
+		// POST に対する処理は OnPostEnd に委譲する
+		return OnPostEnd(wParam, lParam);
+	}
+
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
 	if (aType != ACCESS_LOGIN) {
 		// HTML の取得
@@ -4905,11 +4910,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// 未入力時の処理
 	if (strStatus.IsEmpty()) {
 		switch (m_twitterPostAccessType) {
-		case ACCESS_MIXI_ADD_ECHO_REPLY:
-			// 未入力はNG
-			return;
-
-		case ACCESS_MIXI_ADD_ECHO:
 		case ACCESS_WASSR_UPDATE:
 		case ACCESS_GOOHOME_QUOTE_UPDATE:
 		default:
@@ -4921,39 +4921,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// 送信先確認
 	switch (m_twitterPostAccessType) {
-	case ACCESS_MIXI_ADD_ECHO:
-		{
-			CString msg;
-			msg.Format( 
-				L"mixi エコーで発言します。\r\n"
-				L"----\r\n"
-				L"%s\r\n"
-				L"----\r\n"
-				L"よろしいですか？", 
-				strStatus );
-			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
-				return;
-			}
-		}
-		break;
-
-	case ACCESS_MIXI_ADD_ECHO_REPLY:
-		{
-			CMixiData& data = pCategory->GetSelectedBody();
-			CString msg;
-			msg.Format( 
-				L"mixi エコーで %s さんに返信します。\r\n"
-				L"----\r\n"
-				L"%s\r\n"
-				L"----\r\n"
-				L"よろしいですか？", 
-				(LPCTSTR)data.GetName(), strStatus );
-			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
-				return;
-			}
-		}
-		break;
-
 	case ACCESS_WASSR_UPDATE:
 		{
 			CMixiData& data = pCategory->GetSelectedBody();
@@ -5002,45 +4969,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// POST パラメータを設定
 	switch (m_twitterPostAccessType) {
-	case ACCESS_MIXI_ADD_ECHO:
-		{
-			// body=test+from+firefox&x=28&y=20&post_key=74b630af81dfaae59bfb6352728844a7&redirect=recent_echo
-			CString post_key = GetSelectedBodyItem().GetTextValue(L"post_key");
-			if (post_key.IsEmpty()) {
-				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
-				return;
-			}
-			post.AppendPostBody( "body=" );
-			post.AppendPostBody( URLEncoder::encode_euc(strStatus) );
-			post.AppendPostBody( "&x=28&y=20" );
-			post.AppendPostBody( "&post_key=" );
-			post.AppendPostBody( post_key );
-			post.AppendPostBody( "&redirect=recent_echo" );
-		}
-		break;
-
-	case ACCESS_MIXI_ADD_ECHO_REPLY:
-		{
-			// body=test&x=13&y=13&parent_member_id=xxx&parent_post_time=xxx&redirect=list_echo&post_key=xxx
-			CString post_key = GetSelectedBodyItem().GetTextValue(L"post_key");
-			if (post_key.IsEmpty()) {
-				MessageBox(L"送信用のキーが見つかりません。エコー一覧をリロードして下さい。");
-				return;
-			}
-
-			CMixiData& data = pCategory->GetSelectedBody();
-			post.AppendPostBody( "body=" );
-			post.AppendPostBody( URLEncoder::encode_euc(strStatus) );
-			post.AppendPostBody( "&x=28&y=20" );
-			post.AppendPostBody( "&parent_member_id=" );
-			post.AppendPostBody( util::int2str(data.GetAuthorID()) );
-			post.AppendPostBody( "&parent_post_time=" );
-			post.AppendPostBody( data.GetTextValue(L"echo_post_time") );
-			post.AppendPostBody( "&post_key=" );
-			post.AppendPostBody( post_key );
-			post.AppendPostBody( "&redirect=recent_echo" );
-		}
-		break;
 
 	case ACCESS_WASSR_UPDATE:
 		post.AppendPostBody( "status=" );
@@ -5074,14 +5002,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// POST先URL設定
 	CString url;
 	switch (m_twitterPostAccessType) {
-	case ACCESS_MIXI_ADD_ECHO:
-		url = L"http://mixi.jp/add_echo.pl";
-		break;
-
-	case ACCESS_MIXI_ADD_ECHO_REPLY:
-		url = L"http://mixi.jp/add_echo.pl";
-		break;
-
 	case ACCESS_WASSR_UPDATE:
 		url = L"http://api.wassr.jp/statuses/update.json";
 		break;
@@ -5116,7 +5036,12 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// コントロール状態の変更
 	MyUpdateControlStatus();
 
-	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_twitterPostAccessType) );
+	static MZ3Data s_data;
+	MZ3Data data;
+	s_data = data;
+	s_data.SetAccessType(m_twitterPostAccessType);
+
+	theApp.m_inet.Initialize( m_hWnd, &s_data, theApp.GetInetAccessEncodingByAccessType(m_twitterPostAccessType) );
 	theApp.m_inet.DoPost(
 		url, 
 		L"", 
@@ -5202,25 +5127,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 						MZ3LOGGER_ERROR( msg );
 					}
 				} else {
-					// Twitter 以外
-					switch (aType) {
-					case ACCESS_MIXI_ADD_ECHO:
-					case ACCESS_MIXI_ADD_ECHO_REPLY:
-						// ログアウトチェック
-						if (theApp.IsMixiLogout(aType)) {
-							// ログアウト状態になっている
-							MessageBox(L"未ログインです。エコー一覧をリロードし、mixiにログインして下さい。");
-						} else {
-							util::MySetInformationText( m_hWnd, L"エコー書き込み完了" );
-							// 入力値を消去
-							SetDlgItemText( IDC_STATUS_EDIT, L"" );
-						}
-						break;
-
-					default:
-						// アクセス種別不明
-						break;
-					}
+					// Twitter 以外 => 種別不明
 				}
 
 				// 非Luaスクリプト処理ここまで
