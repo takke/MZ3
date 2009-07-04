@@ -1056,8 +1056,12 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 		end
 		
 		-- <b>To:</b> <input type="hidden" name="qrr" value="o"> xxx@xxx.jp</td>
-		local mail_to = reply_form:match('<input type="hidden" name="qrr" value="o"> ?(.-)</');
-		msg = mail_to .. ' にメールを送信します。よろしいですか？' .. "\r\n";
+		-- <input type="radio" id="reply" name="qrr" value="o" checked> </td> <td colspan="2"> <label for="reply"><b>To:</b> NK &lt;xxx@xxx.jp&gt;</label> </td>
+		local mail_to = reply_form:match('<input type="hidden" name="qrr" value="o".-> ?(.-)</');
+		if mail_to==nil then
+			mail_to = reply_form:match('<input type="radio" id="reply" name="qrr" value="o".-<b>To:</b> ?(.-)</');
+		end
+		msg = mz3.decode_html_entity(mail_to) .. ' にメールを送信します。よろしいですか？' .. "\r\n";
 		msg = msg .. '----' .. "\r\n";
 		msg = msg .. title .. "\r\n";
 --		msg = msg .. '----';
@@ -1083,6 +1087,9 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 		local redir = reply_form:match('<input type="hidden" name="redir" value="(.-)"');
 		redir = redir:gsub('&amp;', '&');
 		local qrr   = reply_form:match('<input type="hidden" name="qrr" value="(.-)"');
+		if qrr==nil then
+			qrr = 'o';
+		end
 		
 		
 		-- POSTパラメータ生成
