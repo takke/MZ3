@@ -1644,6 +1644,7 @@ void CWriteView::PopupWriteBodyMenu(void)
 						imageIndex = theApp.AddImageToImageCache(this, image, path);
 					}
 				}
+//				MZ3LOGGER_DEBUG(util::FormatString(L" %4d:%d (%s)", i, imageIndex, path));
 				if (imageIndex>=0) {
 					// メニュー用ビットマップリソースに追加
 					WMMENUBITMAP menuBmp = { idItem, imageIndex };
@@ -1661,13 +1662,16 @@ void CWriteView::PopupWriteBodyMenu(void)
 		if (!menuBitmapArray.empty() ) {
 			menu.PrepareOwnerDraw( &menuBitmapArray[0], menuBitmapArray.size() );
 		}
+
+		// メニュー表示(コンテキストの都合上、ここで呼び出す)
+		pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 	} else {
 		// mixi 以外では非サポート
 		pcThisMenu->DeleteMenu( 1, MF_BYPOSITION );
-	}
 
-	// メニュー表示
-	pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+		// メニュー表示
+		pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
+	}
 }
 
 /**
