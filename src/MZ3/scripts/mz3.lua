@@ -81,5 +81,6 @@ require("scripts\\gmail");		-- GMail
 require("scripts\\wassr");		-- Wassr
 require("scripts\\goohome");	-- goohome
 require("scripts\\RSS");		-- RSS
+require("scripts\\2ch");		-- 2ch
 
 mz3.logger_info('mz3.lua end');

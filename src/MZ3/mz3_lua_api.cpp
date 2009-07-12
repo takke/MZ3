@@ -1598,8 +1598,9 @@ int lua_mz3_data_get_link_list_text(lua_State *L)
 -- @param data MZ3Data オブジェクト
 -- @param url  URL
 -- @param text Text
+-- @param type 'list'(default) or 'page'(ページ変更リンク用)
 --
-function mz3_data.add_link_list(data, url, text)
+function mz3_data.add_link_list(data, url, text, type)
 */
 int lua_mz3_data_add_link_list(lua_State *L)
 {
@@ -1614,8 +1615,13 @@ int lua_mz3_data_add_link_list(lua_State *L)
 	}
 	const char* url = lua_tostring(L, 2);	// 第2引数
 	const char* text = lua_tostring(L, 3);	// 第3引数
+	const char* type = lua_tostring(L, 4);	// 第4引数
 
-	data->m_linkList.push_back(CMixiData::Link(CString(url), CString(text)));
+	if (type!=NULL && strcmp(type, "page")==0) {
+		data->m_linkPage.push_back(CMixiData::Link(CString(url), CString(text)));
+	} else {
+		data->m_linkList.push_back(CMixiData::Link(CString(url), CString(text)));
+	}
 
 	// 戻り値の数を返す
 	return 0;
