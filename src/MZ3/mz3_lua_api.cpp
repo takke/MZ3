@@ -2653,6 +2653,32 @@ int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
 	return 1;
 }
 
+/*
+--- 巡回対象とするかの設定
+--
+-- @param type アクセス種別
+-- @param is_cruise_target 巡回対象とするか
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_cruise_target(type, is_cruise_target)
+*/
+int lua_mz3_access_type_info_set_cruise_target(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_cruise_target";
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+	int is_cruise_target = lua_toboolean(L, 2);
+
+	theApp.m_accessTypeInfo.m_map[access_type].bCruiseTarget = is_cruise_target ? true : false;
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 //-----------------------------------------------
 // MZ3 GroupData API
 //-----------------------------------------------
@@ -3341,6 +3367,7 @@ static const luaL_Reg lua_mz3_access_type_info_lib[] = {
 	{"set_default_url",	lua_mz3_access_type_info_set_default_url},
 	{"set_body_header",	lua_mz3_access_type_info_set_body_header},
 	{"set_body_integrated_line_pattern",	lua_mz3_access_type_info_set_body_integrated_line_pattern},
+	{"set_cruise_target",	lua_mz3_access_type_info_set_cruise_target},
 	{NULL, NULL}
 };
 // group data : tabs

@@ -30,6 +30,7 @@ type:set_body_header(2, 'name', '差出人>>');
 type:set_body_header(3, 'date', '日付>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
 
 -- 送信箱
 type = MZ3AccessTypeInfo.create();
@@ -46,6 +47,7 @@ type:set_body_header(2, 'name', '差出人>>');
 type:set_body_header(3, 'date', '日付>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
 
 -- 公式メッセージ
 type = MZ3AccessTypeInfo.create();
@@ -62,6 +64,7 @@ type:set_body_header(2, 'name', '差出人>>');
 type:set_body_header(3, 'date', '日付>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
 
 
 --------------------------------------------------

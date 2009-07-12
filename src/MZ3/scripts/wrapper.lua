@@ -151,6 +151,7 @@ function MZ3AccessTypeInfo:set_request_encoding(e)		return mz3_access_type_info.
 function MZ3AccessTypeInfo:set_default_url(url)			return mz3_access_type_info.set_default_url(self.type, url);		end
 function MZ3AccessTypeInfo:set_body_header(no, t, n)	return mz3_access_type_info.set_body_header(self.type, no, t, n);	end
 function MZ3AccessTypeInfo:set_body_integrated_line_pattern(l, pat)	return mz3_access_type_info.set_body_integrated_line_pattern(self.type, l, pat);	end
+function MZ3AccessTypeInfo:set_cruise_target(f)			return mz3_access_type_info.set_cruise_target(self.type, f);	end
 
 
 --------------------------------------------------
