@@ -74,6 +74,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3424558B1FCF4DF38FF07483D009F6FA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_363EBB5EAA404A6B8EC1D671717A8DFC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_38AD2F248961401AA3DA83A5B0C0B736"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -536,6 +548,42 @@
             "TargetName" = "8:goohome_quote_quotes_friends_parser.luac"
             "Tag" = "8:"
             "Folder" = "8:_F89F108A4B0A4CC9984492D137F83235"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_3424558B1FCF4DF38FF07483D009F6FA"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\2ch.lua"
+            "TargetName" = "8:2ch.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_363EBB5EAA404A6B8EC1D671717A8DFC"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\2ch.luac"
+            "TargetName" = "8:2ch.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
