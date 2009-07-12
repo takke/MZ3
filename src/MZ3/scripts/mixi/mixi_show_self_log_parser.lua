@@ -28,7 +28,6 @@ type:set_body_header(1, 'title', '名前');
 type:set_body_header(2, 'date', '日付');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
---mz3.logger_debug(type);
 
 --------------------------------------------------
 -- 【逆あしあと一覧】
@@ -71,7 +70,7 @@ function mixi_show_self_log_parser(parent, body, html)
 		-- 項目探索
 		-- <span class="date">02月16日 09:39</span>
 		if line_has_strings(line, "<span", "class", "data") or
-		   line_has_strings(line, "<span", "class", "name") then
+		   line_has_strings(line, "<span", "class", "name")  then
 
 			in_data_region = true;
 
@@ -80,45 +79,80 @@ function mixi_show_self_log_parser(parent, body, html)
 
 			-- 見出し
 			-- <span class="date">02月16日 09:39</span><span class="name"><a href="show_friend.pl?id=xxxxx">user_nickname</a>
-			date, after = line:match(">([^<]+)(<.*)$");
-			-- 日付のセット…
-			data:parse_date_line( date );
+			-- 退会したユーザの場合
+			-- <span class="date">02月16日 09:39</span><span class="name">このユーザーは退会しました</span>
 
-			-- URL 取得
-			url = line:match("href=\"([^\"]+)\"");
-			data:set_text("url", url);
+			-- 退会ユーザチェック
+			-- if line:find( "このユーザーは退会しました", 1, true ) == nil then
+			if line:find( "href=", 1, true ) ~= nil then
 
-			-- id
-			id = get_param_from_url(url, "id");
-			data:set_integer("id", id);
+				date, after = line:match(">([^<]+)(<.*)$");
+				-- 日付のセット…
+				data:parse_date_line( date );
 
-			-- ユーザ名
-			int_start, int_end = after:find( id, 1, true )
-			int_nickname_start = int_end +3;
-			int_nickname_end, dummy = after:find( "</a>", 1, true )
-			nickname = after:sub( int_nickname_start, int_nickname_end -1 );
+				-- URL 取得
+				url = line:match("href=\"([^\"]+)\"");
+				data:set_text("url", url);
 
-			-- マイミクなら名前の後に "(マイミク)" と付与
-			mymixi = "\"マイミクシィ\"";
-			mymixi_mymixi = "\"マイミクシィのマイミクシィ\"";
-			if after:find( "alt=" .. mymixi ) and nickname ~= nil then
-				nickname = nickname .. " (マイミク)";
-			elseif after:find( "alt=" .. mymixi_mymixi ) and nickname ~= nil then
-				nickname = nickname .. " (マイミクのマイミク)";
+				-- id
+				id = get_param_from_url(url, "id");
+				data:set_integer("id", id);
+
+				-- ユーザ名
+				int_start, int_end = after:find( id, 1, true )
+				int_nickname_start = int_end +3;
+				int_nickname_end, dummy = after:find( "</a>", 1, true )
+				nickname = after:sub( int_nickname_start, int_nickname_end -1 );
+
+				-- マイミクなら名前の後に "(マイミク)" と付与
+				mymixi = "\"マイミクシィ\"";
+				mymixi_mymixi = "\"マイミクシィのマイミクシィ\"";
+				if after:find( "alt=" .. mymixi ) and nickname ~= nil then
+					nickname = nickname .. " (マイミク)";
+				elseif after:find( "alt=" .. mymixi_mymixi ) and nickname ~= nil then
+					nickname = nickname .. " (マイミクのマイミク)";
+				end
+
+				nickname = mz3.decode_html_entity(nickname);
+				data:set_text("title", nickname);
+
+				-- URL に応じてアクセス種別を設定
+				type = mz3.estimate_access_type_by_url(url);
+				data:set_access_type(type);
+
+				-- data 追加
+				body:add(data.data);
 			end
 
-			nickname = mz3.decode_html_entity(nickname);
-			data:set_text("title", nickname);
+			-- data 削除
+			data:delete();
 
-			-- URL に応じてアクセス種別を設定
-			type = mz3.estimate_access_type_by_url(url);
-			data:set_access_type(type);
+-- 当月内削除可能残数
+--[[
+		elseif line_has_strings(line, "<div", "class", "logListCenter") then
+
+			i = i +2;
+			line2 = html:get_at(i);
+			in_data_region = true;
+
+			-- data 生成
+			data = MZ3Data:create();
+
+			-- 月内削除可能件数
+			if line2:find( "<strong>", 1, true ) ~= nil then
+				count, after = line2:match("<strong>([^<]+)(<.*)$");
+			else
+				count, after = line2:match("<em>([^<]+)(<.*)$");
+			end
+			data:set_text("title", "当月内削除可能残数 ： " .. count .. "回");
 
 			-- data 追加
 			body:add(data.data);
 
 			-- data 削除
 			data:delete();
+]]
+
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
