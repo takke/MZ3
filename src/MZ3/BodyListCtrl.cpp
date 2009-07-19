@@ -605,7 +605,15 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		LOGFONT lf;
 		GetFont()->GetLogFont( &lf );
 		// px値に正規化
-		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
+//		int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
+//		MZ3LOGGER_DEBUG(util::FormatString(
+//			L"CBodyListCtrl::DrawItem(), %s, lfHeight : %d, lfHeightPx : %d, lfWidth : %d", 
+//			(LPCTSTR)lf.lfFaceName,
+//			(int)lf.lfHeight, (int)lfHeightPx,
+//			(int)lf.lfWidth));
+
+		CSize charSize = pDC->GetTextExtent(CString(L"●"));
+		int lfHeightPx = charSize.cy;
 
 		// 描画
 		rcDraw = rcAllLabels;
@@ -997,14 +1005,24 @@ void CBodyListCtrl::SetSelectItem( const int nItem )
  */
 void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	LOGFONT lf;
-	GetFont()->GetLogFont( &lf );
+//	LOGFONT lf;
+//	GetFont()->GetLogFont( &lf );
 
 //	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d, itemID : %d", 
 //		(int)lf.lfHeight, (int)lpMeasureItemStruct->itemID));
 
 	// px値に変換
-	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
+//	int lfHeightPx = lf.lfHeight < 0 ? -lf.lfHeight : theApp.pt2px(lf.lfHeight);
+	CDC* pDC = GetDC();
+	CFont* pOldFont = pDC->SelectObject(&theApp.m_font);
+	CSize charSize = pDC->GetTextExtent(CString(L"●"));
+	pDC->SelectObject(pOldFont);
+	ReleaseDC(pDC);
+
+	int lfHeightPx = charSize.cy;
+//	MZ3LOGGER_DEBUG(util::FormatString(L"CBodyListCtrl::MeasureItem(), lfHeight : %d, lfHeightPx : %d", 
+//		(int)lf.lfHeight, (int)lfHeightPx));
+
 
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
