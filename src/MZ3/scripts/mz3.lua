@@ -41,6 +41,12 @@ MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY 		= 3;
 MAIN_VIEW_POST_MODE_WASSR_UPDATE			= 4;
 MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 
+-- メイン画面 ViewStyle 定数
+VIEW_STYLE_DEFAULT = 0;	-- 標準スタイル
+VIEW_STYLE_IMAGE   = 1;	-- 標準スタイル+ImageIcon
+VIEW_STYLE_TWITTER = 2;	-- 標準スタイル+ImageIcon+StatusEdit (Twitter)
+
+
 ----------------------------------------------------------------------
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)
 ----------------------------------------------------------------------

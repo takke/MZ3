@@ -243,6 +243,8 @@ function on_body_list_click(serialize_key, event_name, data)
 	-- 標準の処理を続行
 	return false;
 end
+mz3.add_event_listener("dblclk_body_list", "wassr.on_body_list_click");
+mz3.add_event_listener("enter_body_list",  "wassr.on_body_list_click");
 
 
 --- 全文表示メニューまたはダブルクリックイベント
@@ -286,6 +288,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 	end
 end
+mz3.add_event_listener("creating_default_group", "wassr.on_creating_default_group", false);
 
 
 --- ボディリストのポップアップメニュー表示
@@ -331,20 +334,27 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	return true;
 end
-
-
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
-
--- ボディリストのダブルクリック(またはEnter)イベントハンドラ登録
-mz3.add_event_listener("dblclk_body_list", "wassr.on_body_list_click");
-mz3.add_event_listener("enter_body_list",  "wassr.on_body_list_click");
-
--- ボディリストのポップアップメニュー表示イベントハンドラ登録
 mz3.add_event_listener("popup_body_menu",  "wassr.on_popup_body_menu");
 
--- デフォルトのグループリスト生成
-mz3.add_event_listener("creating_default_group", "wassr.on_creating_default_group", false);
+
+--- ViewStyle 変更
+--
+-- @param event_name    'get_view_style'
+-- @param serialize_key カテゴリのシリアライズキー
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] VIEW_STYLE_*
+--
+function on_get_view_style(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Wassr' then
+		return true, VIEW_STYLE_TWITTER;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_view_style", "wassr.on_get_view_style");
+
 
 mz3.logger_debug('wassr.lua end');

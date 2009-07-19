@@ -222,8 +222,9 @@ function the_2ch_subject_parser(parent, body, html)
 			type = mz3.get_access_type_by_key('2CH_THREAD');
 			data:set_access_type(type);
 			
-			data:set_text('name', title);
-			data:set_text('title', parent:get_text('name'));
+			data:set_text('name', '');
+			data:set_text('title', title);
+--			data:set_text('title', parent:get_text('name'));
 
 			-- parent url から test/read.cgi/xxx のURLを生成する
 			parent_url = parent:get_text('url');
@@ -569,5 +570,26 @@ function on_estimate_access_type(event_name, url, data1, data2)
 	return false;
 end
 mz3.add_event_listener("estimate_access_type_by_url", "2ch.on_estimate_access_type");
+
+
+--- ViewStyle 変更
+--
+-- @param event_name    'get_view_style'
+-- @param serialize_key カテゴリのシリアライズキー
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] VIEW_STYLE_*
+--
+function on_get_view_style(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='2ch' then
+		return true, VIEW_STYLE_IMAGE;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_view_style", "2ch.on_get_view_style");
+
 
 mz3.logger_debug('2ch.lua end');

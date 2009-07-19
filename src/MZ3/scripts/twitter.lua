@@ -1340,4 +1340,24 @@ end
 mz3.add_event_listener("creating_default_group", "twitter.on_creating_default_group", false);
 
 
+--- ViewStyle 変更
+--
+-- @param event_name    'get_view_style'
+-- @param serialize_key カテゴリのシリアライズキー
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] VIEW_STYLE_*
+--
+function on_get_view_style(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='Twitter' then
+		return true, VIEW_STYLE_TWITTER;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_view_style", "twitter.on_get_view_style");
+
+
 mz3.logger_debug('twitter.lua end');

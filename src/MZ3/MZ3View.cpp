@@ -4833,35 +4833,29 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 	if (m_selGroup!=NULL) {
 		CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 		if (pCategory!=NULL) {
-			// TODO Luaスクリプト化
-			std::string strServiceType = theApp.m_accessTypeInfo.getServiceType(pCategory->m_mixi.GetAccessType());
-			if (strServiceType == "Twitter") {
-				// Twitter系であれば Twitter スタイル
-				return VIEW_STYLE_TWITTER;
-			} else if (strServiceType == "Wassr") {
-				// Wassr系であれば Twitter スタイル
-				return VIEW_STYLE_TWITTER;
-			} else if (strServiceType == "gooHome") {
-				// gooHome系であれば Twitter スタイル
-				return VIEW_STYLE_TWITTER;
-			} else if (strServiceType == "RSS") {
-				// RSS は「イメージ付き」とする
-				return VIEW_STYLE_IMAGE;
-			} else {
 
-				if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
-					// エコーは Twitter スタイル
-					return VIEW_STYLE_TWITTER;
-				}
+			// MZ3 API : ハンドラ呼び出し
+			util::MyLuaDataList rvals;
+			rvals.push_back(util::MyLuaData(VIEW_STYLE_DEFAULT));
+			if (util::CallMZ3ScriptHookFunctions2("get_view_style", &rvals, 
+					util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(pCategory->m_mixi.GetAccessType()))))
+			{
+				// Lua 側で処理完結。終了。
+				return (VIEW_STYLE)rvals[0].m_number;
+			}
 
-				if (m_bodyList.IsEnableIcon()) {
-					// 画像があれば「イメージ付き」とする
-					CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
-					if (pImageList != NULL &&
-						pImageList->m_hImageList == theApp.m_imageCache.GetImageList16().m_hImageList)
-					{
-						return VIEW_STYLE_IMAGE;
-					}
+			if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
+				// エコーは Twitter スタイル
+				return VIEW_STYLE_TWITTER;
+			}
+
+			if (m_bodyList.IsEnableIcon()) {
+				// 画像があれば「イメージ付き」とする
+				CImageList* pImageList = m_bodyList.GetImageList(LVSIL_SMALL);
+				if (pImageList != NULL &&
+					pImageList->m_hImageList == theApp.m_imageCache.GetImageList16().m_hImageList)
+				{
+					return VIEW_STYLE_IMAGE;
 				}
 			}
 		}

@@ -58,12 +58,27 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 	end
 end
-
-----------------------------------------
--- イベントハンドラの登録
-----------------------------------------
-
--- デフォルトのグループリスト生成
 mz3.add_event_listener("creating_default_group", "RSS.on_creating_default_group", false);
+
+
+--- ViewStyle 変更
+--
+-- @param event_name    'get_view_style'
+-- @param serialize_key カテゴリのシリアライズキー
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] VIEW_STYLE_*
+--
+function on_get_view_style(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='RSS' then
+		return true, VIEW_STYLE_IMAGE;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_view_style", "RSS.on_get_view_style");
+
 
 mz3.logger_debug('RSS.lua end');

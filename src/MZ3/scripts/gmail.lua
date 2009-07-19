@@ -759,9 +759,10 @@ function on_get_end_binary_report_view(event_name, serialize_key, http_status, u
 end
 mz3.add_event_listener("get_end_binary_report_view", "gmail.on_get_end_binary_report_view");
 
+
 --- ボディリストのアイコンのインデックス取得
 --
--- @param event_name    'creating_default_group'
+-- @param event_name    'get_body_list_default_icon_index'
 -- @param serialize_key シリアライズキー(nil)
 -- @param body          body data
 --
@@ -781,6 +782,26 @@ function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 	return false;
 end
 mz3.add_event_listener("get_body_list_default_icon_index", "gmail.on_get_body_list_default_icon_index");
+
+
+--- ViewStyle 変更
+--
+-- @param event_name    'get_view_style'
+-- @param serialize_key カテゴリのシリアライズキー
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] VIEW_STYLE_*
+--
+function on_get_view_style(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type=='gmail' then
+		return true, VIEW_STYLE_IMAGE;
+	end
+
+	return false;
+end
+mz3.add_event_listener("get_view_style", "gmail.on_get_view_style");
 
 
 --- 全文表示メニューまたはダブルクリックイベント
