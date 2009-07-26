@@ -5577,6 +5577,10 @@ void CMZ3View::MyUpdateControlStatus(void)
 	// 中止ボタン
 	theApp.EnableCommandBarButton( ID_STOP_BUTTON, theApp.m_access ? TRUE : FALSE );
 
+	// タブ・カテゴリの無効化
+	m_groupTab.EnableWindow( theApp.m_access ? FALSE : TRUE );
+	m_categoryList.EnableWindow( theApp.m_access ? FALSE : TRUE );
+
 	// プログレスバー
 	if (theApp.m_access) {
 		// 通信中は受信時に自動表示
