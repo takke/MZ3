@@ -1005,7 +1005,6 @@ function on_init_write_view(event_name, write_view_type, write_item)
 	write_item = MZ3Data:create(write_item);
 	
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
-	service_type = mz3.get_service_type(write_view_key);
 	if write_view_key=='GMAIL_SEND' then
 		-- TODO タイトル変更：有効化
 

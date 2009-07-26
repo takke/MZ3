@@ -41,6 +41,7 @@ MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY 		= 3;
 MAIN_VIEW_POST_MODE_WASSR_UPDATE			= 4;
 MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 
+
 -- メイン画面 ViewStyle 定数
 VIEW_STYLE_DEFAULT = 0;	-- 標準スタイル
 VIEW_STYLE_IMAGE   = 1;	-- 標準スタイル+ImageIcon
@@ -75,6 +76,7 @@ function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 end
 mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
 
+
 -------------------------------------------------
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------
@@ -88,5 +90,6 @@ require("scripts\\wassr");		-- Wassr
 require("scripts\\goohome");	-- goohome
 require("scripts\\RSS");		-- RSS
 require("scripts\\2ch");		-- 2ch
+require("scripts\\auone");		-- auone
 
 mz3.logger_info('mz3.lua end');
