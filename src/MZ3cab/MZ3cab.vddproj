@@ -68,6 +68,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_322CC9CEB71E4A448BFE17232C633C30"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_334B1DADD0B94670AEEDD01CA2AD7302"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -338,6 +344,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F1D68EB643424798B5F51FDC185118F0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F7D6B8F66D8741B4AB51D40D9A261B18"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -530,6 +542,24 @@
             "TargetName" = "8:dummy_plugin.lua"
             "Tag" = "8:"
             "Folder" = "8:_C96D8C0A54414528B3B66D574D465CBD"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_322CC9CEB71E4A448BFE17232C633C30"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\auone.luac"
+            "TargetName" = "8:auone.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1304,6 +1334,24 @@
             "TargetName" = "8:mixi_home_parser.lua"
             "Tag" = "8:"
             "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_F1D68EB643424798B5F51FDC185118F0"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\auone.lua"
+            "TargetName" = "8:auone.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
