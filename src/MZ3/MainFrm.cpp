@@ -23,6 +23,10 @@
 #include "url_encoder.h"
 #include "version.h"
 
+#ifdef WINCE
+#include "tpcshell.h"
+#endif
+
 // MZ4 の初回起動時のウィンドウサイズ
 #define MZ4_WINDOW_DEFAULT_SIZE_X	400
 #define MZ4_WINDOW_DEFAULT_SIZE_Y	600
@@ -1208,6 +1212,16 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			}
 		}
 		break;
+	}
+#endif
+
+#ifdef WINCE
+	// WM Standard 端末でESC/BACKキーで前のアプリに戻ってしまうのを防ぐ
+	if (pMsg->message == WM_HOTKEY) {
+		if (HIWORD(pMsg->lParam )== VK_TBACK) {
+			SHSendBackToFocusWindow(WM_HOTKEY, pMsg->wParam, pMsg->lParam);
+			return TRUE;
+		}
 	}
 #endif
 
