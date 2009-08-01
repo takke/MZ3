@@ -5579,7 +5579,7 @@ void CMZ3View::MyUpdateControlStatus(void)
 
 	// タブ・カテゴリの無効化
 	m_groupTab.EnableWindow( theApp.m_access ? FALSE : TRUE );
-	m_categoryList.EnableWindow( theApp.m_access ? FALSE : TRUE );
+//	m_categoryList.EnableWindow( theApp.m_access ? FALSE : TRUE );
 
 	// プログレスバー
 	if (theApp.m_access) {

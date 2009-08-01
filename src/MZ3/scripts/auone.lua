@@ -19,7 +19,7 @@ module("auone", package.seeall)
 --------------------------------------------------
 -- サービスの登録(タブ初期化、ログイン設定用)
 --------------------------------------------------
-mz3.regist_service('auone', true);
+mz3.regist_service('auone', false);
 
 -- ログイン設定画面のプルダウン名、表示名の設定
 mz3_account_provider.set_param('auone', 'id_name', 'au one-ID');
