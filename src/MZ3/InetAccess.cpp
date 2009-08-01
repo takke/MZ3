@@ -511,6 +511,17 @@ static DWORD WINAPI HttpSendRequestWorker(LPVOID pThreadParam)
  */
 int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 {
+	// Twitter モードであれば毎回再接続する(連続通信時の無応答対策)
+	// TODO Twitterモード以外でも利用できるようにすること
+	if (theApp.m_accessTypeInfo.getServiceType(theApp.m_accessType) == "Twitter") {
+		CloseInternetHandles();
+		// Internet ハンドルも閉じる
+		if( m_hInternet != NULL ) {
+			InternetCloseHandle( m_hInternet );
+			m_hInternet = NULL;
+		}
+	}
+
 	// URL 分解
 	ParseURI();
 
