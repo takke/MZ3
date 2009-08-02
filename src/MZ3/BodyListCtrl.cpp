@@ -52,8 +52,11 @@ static const int OTHER_LINE_MARGIN_LEFT = 4+16;	///< 2行目以降、左マージン
 IMPLEMENT_DYNAMIC(CBodyListCtrl, CTouchListCtrl)
 
 CBodyListCtrl::CBodyListCtrl()
-	: m_bStopDraw(false)
 {
+#ifdef WINCE
+	// スクロール時に iPhone 風の再描画を行う
+	m_bBlackScrollMode = true;
+#endif
 }
 
 CBodyListCtrl::~CBodyListCtrl()
@@ -823,7 +826,7 @@ void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2, LPCTSTR col3)
 
 BOOL CBodyListCtrl::OnEraseBkgnd(CDC* pDC)
 {
-	//MZ3_TRACE( L" OnEraseBkgnd()\n");
+	MZ3_TRACE( L"CBodyListCtrl::OnEraseBkgnd()\n");
 
 	pDC->SetBkMode( TRANSPARENT );
 

@@ -19,7 +19,9 @@
 IMPLEMENT_DYNAMIC(CTouchListCtrl, CListCtrl)
 
 CTouchListCtrl::CTouchListCtrl(void)
-	: m_offsetPixelY(0)
+	: m_bStopDraw(false)
+	, m_bBlackScrollMode(false)
+	, m_offsetPixelY(0)
 	, m_bDragging(false)
 	, m_memBMP(NULL)
 	, m_memDC(NULL)
@@ -66,6 +68,7 @@ BEGIN_MESSAGE_MAP(CTouchListCtrl, CListCtrl)
 	ON_NOTIFY_REFLECT(LVN_INSERTITEM, &CTouchListCtrl::OnLvnInsertitem)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_DRAWITEM()
 END_MESSAGE_MAP()
 
 /**
@@ -90,6 +93,10 @@ BOOL CTouchListCtrl::PreTranslateMessage(MSG* pMsg)
 //	case WM_PAINT:
 		// ちらつき防止のため遮断
 //		return TRUE;
+
+	case WM_DRAWITEM:
+//		MZ3_TRACE(L"CTouchListCtrl::PreTranslateMessage(WM_VSCROLL, 0x%04X, 0x%04x)\n", pMsg->wParam, pMsg->lParam);
+		break;
 
 	default:
 //		MZ3_TRACE( L"CTouchListCtrl::PreTranslateMessage(0x%04X, 0x%04X, 0x%04X)\n", pMsg->message, pMsg->wParam, pMsg->lParam);
@@ -228,24 +235,32 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
 			MZ3_TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
 			if( abs(point.y - m_ptDragStart.y) > m_iItemHeight ){
-				// 1行以上ドラッグしていれば慣性スクロール開始
+				// 1行以上ドラッグしているので慣性スクロール開始
+				MZ3_TRACE( L" 1行以上ドラッグしているので慣性スクロール開始\n" );
 				m_dwAutoScrollStartTick = GetTickCount();
 				m_yAutoScrollMax = 0;
 				MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
 			} else {
 				// 1行未満のドラッグならばすぐに止める
-				MyAdjustDrawOffset();
+				MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
 				m_autoScrollInfo.clear();
+
+				// ★強制再描画
+				MZ3_TRACE( L" ★強制再描画#0\n" );
+				m_bDragging = false;
+				m_bScrollDragging = false;
+				DrawDetail(true);
+				UpdateWindow();
 			}
 		} else if( m_bPanDragging ){ 
 			// 横方向にドラッグ
-			switch( m_drPanScrollDirection ){
-				case PAN_SCROLL_DIRECTION_RIGHT:
-					MoveSlideRight();
-					break;
-				case PAN_SCROLL_DIRECTION_LEFT:
-					MoveSlideLeft();
-					break;
+			switch( m_drPanScrollDirection ) {
+			case PAN_SCROLL_DIRECTION_RIGHT:
+				MoveSlideRight();
+				break;
+			case PAN_SCROLL_DIRECTION_LEFT:
+				MoveSlideLeft();
+				break;
 			}
 		}
 		// フラグクリア
@@ -267,13 +282,15 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		return;
 	}
 
-	int dx = point.x - m_ptDragStart.x;
-	int dy = point.y - m_ptDragStart.y;
-
 	if( m_bDragging ) {
+		int dx = point.x - m_ptDragStart.x;
+		int dy = point.y - m_ptDragStart.y;
+
+		MZ3_TRACE(L"CTouchListCtrl::OnMouseMove\n");
+
 		// dx,dyのドラッグ量に応じて、ドラッグ開始かどうかを判定する
 		// m_bPanDragging, m_bScrollDragging, m_drPanScrollDirection が設定される
-		MySetDragFlagWhenMovedPixelOverLimit(dx,dy);
+		MySetDragFlagWhenMovedPixelOverLimit(dx, dy);
 
 		// 縦スクロール中か？
 		if ( m_bScrollDragging ) {
@@ -474,17 +491,99 @@ void CTouchListCtrl::OnDestroy()
  */
 void CTouchListCtrl::DrawToScreen(CDC* pDC)
 {
-	MZ3_TRACE( L"DrawToScreen(0x%X)\n", pDC!=NULL ? pDC->m_hDC : 0);
+	MZ3_TRACE( L"★★DrawToScreen(0x%X)\n", pDC!=NULL ? pDC->m_hDC : 0);
 	if( m_memDC == NULL ){
+		MZ3_TRACE( L" invalid memory DC...\n");
 		return;
 	}
-	// 変更後画面をm_offsetPixelY分ずらして表示する
-	pDC->BitBlt( 
-		0				, m_viewRect.top,
-		m_screenWidth	, m_screenHeight, 
-		m_memDC,
-		0				, m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY,
-		SRCCOPY );
+
+	if (!m_bBlackScrollMode) {
+		int ys = m_drawStartTopOffset + m_viewRect.top - m_offsetPixelY;
+
+		MZ3_TRACE( L" (%d,%d) => (%d,%d) [%d,%d]\n", 
+			0				, ys,
+			0				, m_viewRect.top,
+			m_screenWidth	, m_screenHeight);
+
+		pDC->BitBlt( 
+			0				, m_viewRect.top,
+			m_screenWidth	, m_screenHeight, 
+			m_memDC,
+			0				, ys,
+			SRCCOPY );
+	} else {
+		int ys = 0;
+		// ★スクロールドラッグ中、または慣性スクロール中であれば、描画範囲を計算する
+		int offsetPixelY = 0;
+		if (m_bScrollDragging) {
+			// スクロールドラッグ中 ⇒カーソル座標とドラッグ開始座標から描画範囲を計算
+			offsetPixelY = m_autoScrollInfo.getLastPoint().y - m_ptDragStart.y;
+		} else if (m_bAutoScrolling) {
+			// 慣性スクロール中     ⇒慣性スクロール座標とドラッグ開始位置から描画範囲を計算
+			offsetPixelY = m_autoScrollInfo.getLastPoint().y - m_ptDragStart.y + m_yAutoScrollMax;
+		} else {
+			// m_offsetPixelY 分ずらして表示する
+			offsetPixelY = m_offsetPixelY;
+		}
+		ys = m_drawStartTopOffset + m_viewRect.top - offsetPixelY;
+
+		// 裏画面バッファの転送
+		if (m_bScrollDragging || m_bAutoScrolling) {
+			int h = m_screenHeight;
+			int ydest = m_viewRect.top;
+
+			MZ3_TRACE( L" offsetPixelY : %d\n", offsetPixelY);
+			if (offsetPixelY > 0) {
+				// 上側を塗りつぶす
+				h     = m_screenHeight - offsetPixelY;
+				ydest = m_viewRect.top + offsetPixelY;
+				ys    = m_drawStartTopOffset + m_viewRect.top;
+			} else if (offsetPixelY < 0) {
+				// 下側を塗りつぶす
+				h     = m_screenHeight + offsetPixelY;
+				ydest = m_viewRect.top;
+				ys    = m_drawStartTopOffset + m_viewRect.top - offsetPixelY;
+			}
+
+			// 描画範囲分だけ転送する
+			MZ3_TRACE( L" (%d,%d) => (%d,%d) [%d,%d]\n", 
+				0				, ys,
+				0				, ydest,
+				m_screenWidth	, h);
+			pDC->BitBlt( 
+				0				, ydest,
+				m_screenWidth	, h, 
+				m_memDC,
+				0				, ys,
+				SRCCOPY );
+
+			// 描画範囲外を塗りつぶす
+			if (ydest > m_viewRect.top) {
+				// 上側を塗りつぶす
+				int hFill = offsetPixelY;
+				int yFill = 0;
+				pDC->FillSolidRect(0, m_viewRect.top+yFill, m_screenWidth, hFill, RGB(0,0,0));
+			} else if (h < m_screenHeight) {
+				// 下側を塗りつぶす
+				int hFill = m_screenHeight - h;
+				int yFill = ydest + h;
+				pDC->FillSolidRect(0, m_viewRect.top+yFill, m_screenWidth, hFill, RGB(0,0,0));
+			}
+
+		} else {
+			MZ3_TRACE( L" (%d,%d) => (%d,%d) [%d,%d]\n", 
+				0				, ys,
+				0				, m_viewRect.top,
+				m_screenWidth	, m_screenHeight);
+
+			pDC->BitBlt( 
+				0				, m_viewRect.top,
+				m_screenWidth	, m_screenHeight, 
+				m_memDC,
+				0				, ys,
+				SRCCOPY );
+		}
+	}
 }
 
 /**
@@ -528,7 +627,7 @@ void CTouchListCtrl::DrawToScreen(CDC* pDC, const CRect& rectDest)
  */
 void CTouchListCtrl::DrawItemWithBackSurface(int nItem)
 {
-//	MZ3_TRACE( L"DrawToScreen(%d)\n", nItem);
+	MZ3_TRACE( L"DrawItemWithBackSurface(%d)\n", nItem);
 	if( m_memDC == NULL ){
 		return;
 	}
@@ -549,10 +648,12 @@ void CTouchListCtrl::DrawItemWithBackSurface(int nItem)
 	int w = r.Width();
 	int h = r.Height();
 //	int h = r.Height() + m_iItemHeight*2;
+	
 	MZ3_TRACE( L"DrawToScreen(%d), [%d, %d, %d, %d], [%d,%d,%d,%d], %d, %d\n", 
 		nItem, 
 		rectItem.left, rectItem.top, rectItem.Width(), rectItem.Height(),
 		x, y, w, h, m_drawStartTopOffset, m_offsetPixelY);
+
 	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
 		// 背景画像なしの場合
 		m_memDC->FillSolidRect(x, y, x+w, y+h, RGB(255,255,255));
@@ -678,54 +779,63 @@ int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 	BITMAP bmp;
 	GetObject(m_memBMP->m_hObject, sizeof(BITMAP), &bmp);
 
-	HBITMAP hBgBitmap = GetBgBitmapHandle();
-	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
-		// 背景画像なしの場合
-		m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
-	}else{
-		// 背景ビットマップの描画
-		CRect rectViewClient;
-		this->GetClientRect( &rectViewClient );
-		rectViewClient.OffsetRect( 0 , m_drawStartTopOffset-m_offsetPixelY );
-		int x = rectViewClient.left;
-		int y = rectViewClient.top;
-		int w = rectViewClient.Width();
-		int h = rectViewClient.Height() + m_iItemHeight * 2;
-		int offset = 0;
-		if( IsScrollWithBk() ){
-			offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
-		}
-		util::DrawBitmap( m_memDC->GetSafeHdc(), hBgBitmap, x, y, w, h, 0, 0 + offset );
-	}
+	if (m_bBlackScrollMode && (m_bScrollDragging || m_bAutoScrolling)) {
+		// ★ドラッグ中は背景を再描画しない
+	} else {
 
-	MZ3_TRACE( L"Top=%5d,offset=%5d\n" , GetTopIndex() , m_offsetPixelY );
+		HBITMAP hBgBitmap = GetBgBitmapHandle();
+		if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
+			// 背景画像なしの場合
+			m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
+		}else{
+			// 背景ビットマップの描画
+			CRect rectViewClient;
+			this->GetClientRect( &rectViewClient );
+			rectViewClient.OffsetRect( 0 , m_drawStartTopOffset-m_offsetPixelY );
+			int x = rectViewClient.left;
+			int y = rectViewClient.top;
+			int w = rectViewClient.Width();
+			int h = rectViewClient.Height() + m_iItemHeight * 2;
+			int offset = 0;
+			if( IsScrollWithBk() ){
+				offset = ( m_iItemHeight * GetTopIndex()  - m_offsetPixelY) % bmp.bmHeight;
+			}
+			util::DrawBitmap( m_memDC->GetSafeHdc(), hBgBitmap, x, y, w, h, 0, 0 + offset );
+		}
+
+		MZ3_TRACE( L" Top=%5d,offset=%5d\n" , GetTopIndex() , m_offsetPixelY );
+	}
 
 	// 透過モードに設定
 	m_memDC->SetBkMode(TRANSPARENT);
 
-	// フォントを現在のフォントに置き換え
-	CFont* oldFont = (CFont*)m_memDC->SelectObject( GetFont() );
+	if (m_bBlackScrollMode && (m_bScrollDragging || m_bAutoScrolling)) {
+		// ★ドラッグ中はアイテムを再描画しない
+	} else {
+		// フォントを現在のフォントに置き換え
+		CFont* oldFont = (CFont*)m_memDC->SelectObject( GetFont() );
 
-	// 画面に収まるItemを順番に描画する
-	// オフセットスクロール用に1行余分に描画する。
-	const int N_OVER_OFFSET_LINES = 1;
-	for(int i=-N_OVER_OFFSET_LINES; i <= GetCountPerPage()+N_OVER_OFFSET_LINES ; i++){
-		int nItem = GetTopIndex() + i;
+		// 画面に収まるItemを順番に描画する
+		// オフセットスクロール用に1行余分に描画する。
+		const int N_OVER_OFFSET_LINES = 1;
+		for(int i=-N_OVER_OFFSET_LINES; i <= GetCountPerPage()+N_OVER_OFFSET_LINES ; i++){
+			int nItem = GetTopIndex() + i;
 
-		// 範囲を越えたらスルー
-		if (nItem < 0) {
-			continue;
+			// 範囲を越えたらスルー
+			if (nItem < 0) {
+				continue;
+			}
+			if( GetItemCount() <= nItem ){
+				break;
+			}
+
+			// バックバッファにアイテムを描画する
+			DrawItemToBackSurface(nItem);
 		}
-		if( GetItemCount() <= nItem ){
-			break;
-		}
 
-		// バックバッファにアイテムを描画する
-		DrawItemToBackSurface(nItem);
+		// フォントを元に戻す
+		m_memDC->SelectObject( oldFont );
 	}
-
-	// フォントを元に戻す
-	m_memDC->SelectObject( oldFont );
 
 	// 画面に転送する
 	if (bForceDraw) {
@@ -768,10 +878,11 @@ void CTouchListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 #ifndef WINCE
 	// Win32では独自処理で描画する
-	// WMでは処理が追いつかないので標準処理に任せる
-	DrawDetail();
-	UpdateWindow();
+	// => なぜか背景色塗りつぶしになるので標準処理に任せる(ちらつくが仕方ない)
+//	DrawDetail();
+//	UpdateWindow();
 #else
+	// WMでは処理が追いつかないので標準処理に任せる
 	if( !IsScrollWithBk() ){
 		// WMで、かつ背景同時スクロールでない場合は遅延再描画
 		MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
@@ -877,8 +988,8 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 				int dyByVelocity = (int)(dt * speed);				// 初速による移動	
 				int dyAutoScroll = dyByAccel + dyByVelocity;		// LButtonUp からの移動量
 
-				MZ3_TRACE( L"*************AUTOSCROLL:dyAutoScroll=%d\n", dyAutoScroll );
-				MZ3_TRACE( L"*************AUTOSCROLL:m_yAutoScrollMax=%d\n", m_yAutoScrollMax );
+				MZ3_TRACE( L" *************AUTOSCROLL:dyAutoScroll=%d\n", dyAutoScroll );
+				MZ3_TRACE( L" *************AUTOSCROLL:m_yAutoScrollMax=%d\n", m_yAutoScrollMax );
 
 				// 最大位置より戻った（極点を超えた）、
 				// 加速度がしきい値より小さい、
@@ -891,14 +1002,15 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 				{
 					if( m_offsetPixelY != 0 ){
 						// オフセットのズレを調整
-						MyAdjustDrawOffset();
+						MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
 					} else {
 						// 停止状態で最後の描画
 #ifndef WINCE
 						// Win32では独自処理で描画する
 						// WMでは処理が追いつかないので標準処理に任せる
-						DrawDetail();
-						UpdateWindow();
+//						DrawDetail();
+//						UpdateWindow();
+
 //#else
 //						if( !IsScrollWithBk() ){
 //							// WMで、かつ背景同時スクロールでない場合は再描画
@@ -908,26 +1020,35 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					// 慣性スクロールの停止
-					MZ3_TRACE( L"*************AUTOSCROLL:KillTimer#1\n" );
+					MZ3_TRACE( L" *************AUTOSCROLL:KillTimer#1\n" );
 					MyResetAutoScrollTimer();
 
+					// ★強制再描画
+					MZ3_TRACE( L" ★強制再描画#1\n" );
+					DrawDetail(true);
+					UpdateWindow();
 				} else {
 					// dyAutoScroll 分だけ移動する。
 					CPoint lastPoint = m_autoScrollInfo.getLastPoint();
 
 					int dy = lastPoint.y + dyAutoScroll;
 
-					MZ3_TRACE( L"*************AUTOSCROLL:ScrollByMoveY(%d)\n" , dy );
+					MZ3_TRACE( L" *************AUTOSCROLL:ScrollByMoveY(%d)\n" , dy );
 					if( ScrollByMoveY( dy ) ){
 						// 先頭か最後尾に達した
 						// 慣性スクロールの停止
-						MZ3_TRACE( L"*************AUTOSCROLL:KillTimer#2\n" );
+						MZ3_TRACE( L" *************AUTOSCROLL:KillTimer#2\n" );
 						MyResetAutoScrollTimer();
+
+						// ★強制再描画
+						MZ3_TRACE( L" ★強制再描画#2\n" );
+						DrawDetail(true);
+						UpdateWindow();
 					}
 				}
 
 				m_yAutoScrollMax = dyAutoScroll;
-				MZ3_TRACE( L"*************AUTOSCROLL:m_yAutoScrollMax=%d\n", m_yAutoScrollMax );
+				MZ3_TRACE( L" *************AUTOSCROLL:m_yAutoScrollMax=%d\n", m_yAutoScrollMax );
 #ifdef WINCE
 				if( !IsScrollWithBk() ){
 					// WMで、かつ背景同時スクロールでない場合は遅延再描画
@@ -951,7 +1072,7 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 					// 移動処理
 					m_offsetPixelX += dwDt * m_dPxelX / 10;
 
-					MZ3_TRACE( L"m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
+					MZ3_TRACE( L" m_offsetPixelX = %5d, dwDt = %5d\n"  , m_offsetPixelX , dwDt );
 
 					// 終了判定
 					if( m_dPxelX > 0 ){
@@ -1010,13 +1131,19 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 	// Drag開始点からの移動行数を求める
 	int iScrollLine = (( dy - m_ptDragStart.y ) / m_iItemHeight ) ;
 
+	// ★
+	if (m_bBlackScrollMode) {
+		// PIXEL単位でスクロールさせる
+		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
+	} else {
 #ifndef WINCE
-	// PIXEL単位でスクロールさせる
-	m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
+		// PIXEL単位でスクロールさせる
+		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
 #else
-	// WMではItem単位でスクロールさせる
-	m_offsetPixelY = 0;
+		// WMではItem単位でスクロールさせる
+		m_offsetPixelY = 0;
 #endif
+	}
 
 	// 前回の移動行数からの差分だけスクロールする
 	//  Scroll()メソッドはピクセル数指定だが、ピクセル指定すると
@@ -1025,7 +1152,7 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 	if( abs(iScrollLine - m_iDragLine) > 0 ){
 		CSize szScroll( 0 , -(( iScrollLine - m_iDragLine ) * m_iItemHeight) );
 
-		MZ3_TRACE( L"ScrollByMoveY, Scroll(%5d)\n" , szScroll.cy );
+		MZ3_TRACE( L" ScrollByMoveY, Scroll(%5d)\n" , szScroll.cy );
 
 		// Win32では独自処理で描画する
 		// WMでは処理が追いつかないので標準処理に任せる
@@ -1060,29 +1187,35 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 		bLimitOver = true;
 	}
 
+	bool bDoRedraw = false;
 	if( iTop != iNextTop ) {
 		// Item表示位置が変わった
 		// トータル移動行数を蓄積する
 		m_iDragLine += iTop - iNextTop;
 
-#ifndef WINCE
-		// 再描画
-		MZ3_TRACE( L"ScrollByMoveY, DrawDetail() req1\n" );
-		// Win32では独自処理で描画する
-		// WMでは処理が追いつかないので標準処理に任せる
-		DrawDetail();
-		UpdateWindow();
-#endif
+		MZ3_TRACE( L" ScrollByMoveY, DrawDetail() req1\n" );
+		bDoRedraw = true;
 	} else {
 		// Item表示位置は変わらない
 		if( iOffset != m_offsetPixelY ){
 			// オフセットが変わった
 
+			MZ3_TRACE( L" ScrollByMoveY, DrawDetail() req2\n" );
+			bDoRedraw = true;
+		}
+	}
+
+	if (bDoRedraw) {
+		if (m_bBlackScrollMode) {
+			// 再描画
+			DrawDetail();
+			UpdateWindow();
+		} else {
 #ifndef WINCE
 			// 再描画
-			MZ3_TRACE( L"ScrollByMoveY, DrawDetail() req2\n" );
 			// Win32では独自処理で描画する
 			// WMでは処理が追いつかないので標準処理に任せる
+
 			DrawDetail();
 			UpdateWindow();
 #endif
@@ -1151,8 +1284,9 @@ void CTouchListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
  *  ・移動中なら進行方向に1個進めて止める
  *  ・移動中でなければ近い方に寄せて止める
 */
-bool CTouchListCtrl::MyAdjustDrawOffset()
+bool CTouchListCtrl::MyAdjustDrawOffset(bool bAdjustOnly)
 {
+	MZ3_TRACE(L"MyAdjustDrawOffset()\n");
 	bool bMove = false;
 	if( m_offsetPixelY != 0 ){
 		// オフセットが残っているなら
@@ -1184,15 +1318,17 @@ bool CTouchListCtrl::MyAdjustDrawOffset()
 			}
 		}
 		// スクロール
-		MZ3_TRACE( L"*************AUTOSCROLL:m_iDragLine=%d,m_ptDragStart.y=%d,m_iItemHeight=%d\n" , m_iDragLine , m_ptDragStart.y , m_iItemHeight );
-		MZ3_TRACE( L"*************AUTOSCROLL:ScrollByMoveY(%d)\n" , dy );
-		ScrollByMoveY( dy );
+		MZ3_TRACE( L" *************AUTOSCROLL:m_iDragLine=%d,m_ptDragStart.y=%d,m_iItemHeight=%d\n" , m_iDragLine , m_ptDragStart.y , m_iItemHeight );
+		MZ3_TRACE( L" *************AUTOSCROLL:ScrollByMoveY(%d)\n" , dy );
+		if (!bAdjustOnly) {
+			ScrollByMoveY( dy );
 #ifdef WINCE
-		if( !IsScrollWithBk() ){
-			// WMで、かつ背景同時スクロールでない場合は再描画
-			Invalidate();
-		}
+			if( !IsScrollWithBk() ){
+				// WMで、かつ背景同時スクロールでない場合は再描画
+				Invalidate();
+			}
 #endif
+		}
 	}
 
 	return bMove;
@@ -1355,7 +1491,7 @@ void CTouchListCtrl::StartPanScroll(PAN_SCROLL_DIRECTION direction)
 
 	// パンスクロール開始
 	ResetEvent( m_hPanScrollEvent );
-	MZ3_TRACE( L"ResetEvent(0X%08X)\n" , m_hPanScrollEvent );
+	MZ3_TRACE( L" ResetEvent(0X%08X)\n" , m_hPanScrollEvent );
 	MySetPanScrollTimer( TIMER_INTERVAL_TOUCHLIST_PANSCROLL );
 }
 
@@ -1428,4 +1564,12 @@ void CTouchListCtrl::DrawItemToBackSurface(int nItem)
 	DrawItem( &dis );
 
 	SetDrawBk( true );
+}
+
+void CTouchListCtrl::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+//	MZ3_TRACE(L"CTouchListCtrl::OnDrawItem, %d, %d\n",
+//		nIDCtl, lpDrawItemStruct->itemID);
+
+	CListCtrl::OnDrawItem(nIDCtl, lpDrawItemStruct);
 }

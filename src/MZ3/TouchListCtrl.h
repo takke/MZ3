@@ -29,6 +29,11 @@ class CTouchListCtrl :
 	DECLARE_DYNAMIC(CTouchListCtrl)
 
 public:
+	bool	m_bStopDraw;					///< DrawItem 実行可否フラグ（SetDraw）
+
+	bool	m_bBlackScrollMode;				///< ブラックスクロールモード
+											///< スクロール中、描画範囲外にiPhone風の塗りつぶしを行う。
+											///< WMだとリストの再描画が遅いので。
 	CTouchListCtrl(void);
 	~CTouchListCtrl(void);
 
@@ -119,7 +124,8 @@ public:
 	void	DrawItemWithBackSurface(int nItem);
 private:
 	bool	ScrollByMoveY( const int dy);
-	bool	MyAdjustDrawOffset();
+#define MyAdjustDrawOffset_ADJUST_ONLY	true
+	bool	MyAdjustDrawOffset(bool bAdjustOnly=false);
 	bool	MyMakeBackBuffers(CDC* pdc);
 	void	DrawToScreen(CDC* pDC);
 	void	DrawToScreen(CDC* pDC, const CRect& rectDest);
@@ -182,4 +188,5 @@ public:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	void DrawItemToBackSurface(int nItem);
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 };
