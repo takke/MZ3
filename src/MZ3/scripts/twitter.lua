@@ -1103,7 +1103,7 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 
 	-- リクエストの種別に応じてメッセージを表示
 	if serialize_key == "TWITTER_NEW_DM" then
-		mz3_main_view.set_info_text("メッセージ送信終了");
+		mz3_main_view.set_info_text("メッセージ送信しました");
 	elseif serialize_key == "TWITTER_FAVOURINGS_CREATE" then
 		mz3_main_view.set_info_text("ふぁぼった！");
 	elseif serialize_key == "TWITTER_FAVOURINGS_DESTROY" then
@@ -1116,7 +1116,8 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("twitpic 画像投稿完了");
 	else
 		-- TWITTER_UPDATE
-		mz3_main_view.set_info_text("ステータス送信終了");
+--		mz3_main_view.set_info_text("ステータス送信終了");
+		mz3_main_view.set_info_text("発言しました");
 	end
 
 	-- Wassr への投稿(クロスポスト)
