@@ -575,12 +575,14 @@ mz3.add_event_listener("post_end", "mixi.on_post_end");
 ----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------
--- ★リスト系
 -- コミュニティ最新書込一覧
 require("scripts\\mixi\\mixi_new_bbs_parser");
 
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");
+
+-- 日記詳細
+require("scripts\\mixi\\mixi_view_diary_parser");
 
 -- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
 require("scripts\\mixi\\mixi_new_official_message_parser");
