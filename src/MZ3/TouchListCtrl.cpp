@@ -1286,7 +1286,7 @@ void CTouchListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 */
 bool CTouchListCtrl::MyAdjustDrawOffset(bool bAdjustOnly)
 {
-	MZ3_TRACE(L"MyAdjustDrawOffset()\n");
+//	MZ3_TRACE(L"MyAdjustDrawOffset()\n");
 	bool bMove = false;
 	if( m_offsetPixelY != 0 ){
 		// オフセットが残っているなら

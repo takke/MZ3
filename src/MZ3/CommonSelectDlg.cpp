@@ -90,7 +90,7 @@ BOOL CCommonSelectDlg::OnInitDialog()
 	SetDlgItemText( IDC_SELECT1_BUTTON, m_strButton1 );
 	SetDlgItemText( IDC_SELECT2_BUTTON, m_strButton2 );
 	SetDlgItemText( IDCANCEL,			m_strButtonCancel );
-	SetDlgItemText( IDC_MESSAGE_STATIC, m_strMessage );
+	SetDlgItemText( IDC_MESSAGE_EDIT,   m_strMessage );
 	SetWindowText( m_strTitle );
 
 	return TRUE;  // return TRUE unless you set the focus to a control
