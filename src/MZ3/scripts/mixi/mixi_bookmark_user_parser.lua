@@ -17,33 +17,33 @@ module("mixi", package.seeall)
 -- TODO 本来は Lua 側でやるべき↓
 --[[
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');									-- カテゴリ
-type:set_service_type('mixi');									-- サービス種別
-type:set_serialize_key('FAVORITE');				-- シリアライズキー
-type:set_short_title('お気に入りコミュ');						-- 簡易タイトル
-type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\bookmark_community.html');	-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
-type:set_default_url('http://mixi.jp/list_bookmark.pl?kind=community');
-type:set_body_header(1, 'name', 'コミュニティ');
-type:set_body_header(2, 'title', '説明');
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('FAVORITE');							-- シリアライズキー
+type:set_short_title('お気に入りユーザー');					-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\bookmark_user.html');	-- キャッシュファイル
+type:set_request_encoding('euc-jp');						-- エンコーディング
+type:set_default_url('http://mixi.jp/list_bookmark.pl');
+type:set_body_header(1, 'name', 'ユーザー名');
+type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 ]]
 
 --------------------------------------------------
--- 【お気に入りコミュ一覧】
+-- 【お気に入りユーザー一覧】
 -- [list] bookmark.pl 用パーサ
 --
--- http://mixi.jp/list_bookmark.pl?kind=community
+-- http://mixi.jp/list_bookmark.pl
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
 --   body:   下ペインのオブジェクト群(MZ3DataList*)
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
-function mixi_bookmark_community_parser(parent, body, html)
-	mz3.logger_debug("mixi_bookmark_community_parser start");
+function mixi_bookmark_user_parser(parent, body, html)
+	mz3.logger_debug("mixi_bookmark_user_parser start");
 
 	-- wrapperクラス化
 	body = MZ3DataList:create(body);
@@ -58,8 +58,6 @@ function mixi_bookmark_community_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 
-	local deleted_community = "※このコミュニティはすでに閉鎖しています。不要な場合は削除してください。";
-
 	-- 行数取得
 	local line_count = html:get_count();
 	for i=230, line_count-1 do
@@ -73,8 +71,8 @@ function mixi_bookmark_community_parser(parent, body, html)
 
 		-- 項目探索 以下一行
 		-- <div class="listIcon">
-		--   <a href="view_community.pl?id=3616089">
-		--     <img src="http://community.img.mixi.jp/photo/comm/60/89/3616089_112s.jpg" alt="Windows Home Server" />
+		--   <a href="show_friend.pl?id=xxx">
+		--     <img src="http://community.img.mixi.jp/photo/member/xxx.jpg" alt="ユーザ名" />
 		--   </a>
 		-- </div>
 		if line_has_strings(line, "<div", "class", "listIcon") then
@@ -97,26 +95,28 @@ function mixi_bookmark_community_parser(parent, body, html)
 			url = line:match("href=\"([^\"]+)\"");
 			data:set_text("url", url);
 
-			-- コミュニティ名
+			-- ユーザ名
 			name, after = line:match(">([^<]+)(<.*)$");
 			data:set_text("name", name);
 
-			-- 参加者数
-			users, after = line:match("span>%((.-)%)(<.*)$");
-			data:set_date(users);
-
-			i = i+1;
-			line = html:get_at(i);
-
-			-- 説明
-			description, after = line:match(">([^<]+)(<.*)$");
---			data:set_text("title", description);
-			data:add_body_with_extract(description);
-
-			if description == deleted_community then
-				-- 削除済みコミュは一覧に出さない
+			if name == nil then
+				-- 退会ユーザは表示しない
+				-- data 削除
 				data:delete();
 			else
+				-- 最終ログイン
+				login = line:match("span>(.-)</div");
+				if login~=nil then
+					login = login:match('%((.-)%)');
+					data:set_date(login);
+				end
+
+				i = i+1;
+				line = html:get_at(i);
+
+				-- 説明
+				description, after = line:match(">([^<]+)(<.*)$");
+				data:add_body_with_extract(description);
 
 				-- URL に応じてアクセス種別を設定
 				type = mz3.estimate_access_type_by_url(url);
@@ -151,12 +151,12 @@ function mixi_bookmark_community_parser(parent, body, html)
 	end
 
 	local t2 = mz3.get_tick_count();
-	mz3.logger_debug("mixi_bookmark_community_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+	mz3.logger_debug("mixi_bookmark_user_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 
 
 ----------------------------------------
 -- パーサの登録
 ----------------------------------------
--- お気に入りコミュ
-mz3.set_parser("FAVORITE_COMMUNITY", "mixi.mixi_bookmark_community_parser");
+-- お気に入りユーザー
+mz3.set_parser("FAVORITE", "mixi.mixi_bookmark_user_parser");
