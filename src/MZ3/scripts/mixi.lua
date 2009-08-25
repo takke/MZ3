@@ -593,6 +593,9 @@ require("scripts\\mixi\\mixi_view_message_parser");
 -- 逆あしあと
 require("scripts\\mixi\\mixi_show_self_log_parser");
 
+-- お気に入りコミュ
+require("scripts\\mixi\\mixi_bookmark_community_parser");
+
 -- ニュース関連日記
 require("scripts\\mixi\\mixi_news_quote_diary_parser");
 

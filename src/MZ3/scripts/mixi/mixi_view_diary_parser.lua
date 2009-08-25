@@ -184,7 +184,7 @@ function mixi_view_diary_parser(data, dummy, html)
 			local sub_html = line;
 			for i=i+1, line_count-1 do
 				line = html:get_at(i);
-				if line_has_strings(line, '<!--/viewDiaryBox--></div>') then
+				if line_has_strings(line, '<!--/viewDiaryBox-->') then
 					break;
 				end
 
@@ -199,7 +199,8 @@ function mixi_view_diary_parser(data, dummy, html)
 		i = parseDiaryComment(data, line, i, line_count, html);
 		
 		-- POST URL 解析
-		if line_has_strings(line, '<form action', 'add_comment.pl', 'comment_form') then
+		if line_has_strings(line, '<form', 'comment_form') and
+		   line_has_strings(line, 'add_comment.pl') then
 			-- <form action="add_comment.pl?diary_id=xxx" method="post" name="comment_form">
 			local url = line:match('action="(.-)"');
 			if url~=nil then
@@ -233,8 +234,10 @@ end
 
 -- コメントの取得
 function parseDiaryComment(data, line, i, line_count, html)
-	if line_has_strings(line, 'diaryMainArea02', 'commentList') or
-	   line_has_strings(line, 'diaryMainArea02', 'deleteButton') then
+	if line_has_strings(line, 'diaryMainArea02') and
+	   (line_has_strings(line, 'commentList') or
+	    line_has_strings(line, 'deleteButton'))
+	then
 		
 		-- 2件目以降は子要素として投入する
 		comment_index = 1;
@@ -253,13 +256,21 @@ function parseDiaryComment(data, line, i, line_count, html)
 			end
 			
 			if line_has_strings(line, '</div') then
-				if child:get_text('author')~=nil then
+				if child:get_text('author')~="" then
 					data:add_child(child);
+					child:clear();
+					child:set_text('author', '');
 				end
 			end
 			
 			if line_has_strings(line, 'commentTitleName') then
 				local v = line:match('<a.->(.-)</a>');
+				if v==nil then
+					-- 自分の日記なら2行目にある
+					i = i+1;
+					line = html:get_at(i);
+					v = line:match('<a.->(.-)</a>');
+				end
 				-- 名前
 				child:set_text('author', v);
 				-- コメント番号
