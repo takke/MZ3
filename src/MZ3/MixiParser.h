@@ -827,6 +827,7 @@ public:
  * 【日記詳細】
  * http://mixi.jp/view_diary.pl
  */
+/*
 class ViewDiaryParser : public MixiContentParser
 {
 public:
@@ -1110,9 +1111,7 @@ public:
 	}
 
 private:
-	/**
-	 * コメントの取得
-	 */
+	// コメントの取得
 	static bool parseDiaryComment(CMixiData& data_, const xml2stl::Node& bodyMainArea)
 	{
 		try {
@@ -1222,6 +1221,7 @@ private:
 		return true;
 	}
 };
+*/
 
 
 //■■■コミュニティ■■■
@@ -3990,11 +3990,13 @@ public:
  * 【お気に入り】
  * http://mixi.jp/list_bookmark.pl
  */
+/*
 class ListBookmarkParser : public MixiListParser
 {
 public:
 	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
+*/
 
 /**
  * [list] show_calendar.pl 用パーサ。

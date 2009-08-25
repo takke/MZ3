@@ -50,6 +50,7 @@ bool MixiParserBase::IsLogout( LPCTSTR szHtmlFilename )
 	return false;
 }
 
+/*
 bool ListBookmarkParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"ListBookmarkParser.parse() start." );
@@ -170,5 +171,6 @@ bool ListBookmarkParser::parse( CMixiDataList& out_, const CHtmlArray& html_ )
 	MZ3LOGGER_DEBUG( L"ListBookmarkParser.parse() finished." );
 	return true;
 }
+*/
 
 };

@@ -282,15 +282,15 @@ public:
 	LPCTSTR GetPostAddress()				{ return FindStringMap(L"post_address"); }
 
 	// opening_range : 公開範囲
-	void	SetOpeningRange(LPCTSTR range)	{ m_StringMap[L"opening_range"] = range; }
+//	void	SetOpeningRange(LPCTSTR range)	{ m_StringMap[L"opening_range"] = range; }
 	CString GetOpeningRange()				{ return FindStringMap(L"opening_range"); }
 
 	// next_diary : 次の日記
-	void	SetNextDiary(LPCTSTR url)		{ m_StringMap[L"next_diary"] = url; }
+//	void	SetNextDiary(LPCTSTR url)		{ m_StringMap[L"next_diary"] = url; }
 	CString GetNextDiary()					{ return FindStringMap(L"next_diary"); }
 
 	// prev_diary : 前の日記
-	void	SetPrevDiary(LPCTSTR url)		{ m_StringMap[L"prev_diary"] = url; }
+//	void	SetPrevDiary(LPCTSTR url)		{ m_StringMap[L"prev_diary"] = url; }
 	CString GetPrevDiary()					{ return FindStringMap(L"prev_diary"); }
 
 	// full_diary : 全てを表示

@@ -109,8 +109,8 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 //	case ACCESS_LIST_MESSAGE_IN:				body.clear();	return mixi::ListMessageParser::parse( body, html );
 //	case ACCESS_LIST_MESSAGE_OUT:				body.clear();	return mixi::ListMessageParser::parse( body, html );
 	case ACCESS_LIST_NEWS:						body.clear();	return mixi::ListNewsCategoryParser::parse( body, html );
-	case ACCESS_LIST_FAVORITE_USER:				body.clear();	return mixi::ListBookmarkParser::parse( body, html );
-	case ACCESS_LIST_FAVORITE_COMMUNITY:		body.clear();	return mixi::ListBookmarkParser::parse( body, html );
+//	case ACCESS_LIST_FAVORITE_USER:				body.clear();	return mixi::ListBookmarkParser::parse( body, html );
+//	case ACCESS_LIST_FAVORITE_COMMUNITY:		body.clear();	return mixi::ListBookmarkParser::parse( body, html );
 	case ACCESS_LIST_FRIEND:					body.clear();	return mixi::ListFriendParser::parse( body, html );
 	case ACCESS_LIST_COMMUNITY:					body.clear();	return mixi::ListCommunityParser::parse( body, html );
 	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
@@ -153,8 +153,8 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	}
 
 	switch (aType) {
-	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
-	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
+//	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
+//	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
 	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
 	case ACCESS_EVENT_JOIN:
@@ -162,7 +162,7 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_EVENT_MEMBER:	return mixi::ListEventMemberParser::parse( mixi, html );
 	case ACCESS_BIRTHDAY:
 	case ACCESS_PROFILE:		return mixi::ShowFriendParser::parse( mixi, html );
-	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
+//	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
 //	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
