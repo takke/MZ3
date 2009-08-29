@@ -81,6 +81,15 @@ type:set_short_title('GMail 送信');								-- 簡易タイトル
 type:set_request_method('POST');								-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
+-- スターを付ける
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_ADD_STAR');						-- シリアライズキー
+type:set_short_title('GMail スター');							-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -89,7 +98,7 @@ menu_items = {}
 menu_items.read               = mz3_menu.regist_menu("gmail.on_read_menu_item");
 menu_items.read_by_reportview = mz3_menu.regist_menu("gmail.on_read_by_reportview_menu_item");
 menu_items.open_by_browser    = mz3_menu.regist_menu("gmail.on_open_by_browser_menu_item");
---menu_items.add_star           = mz3_menu.regist_menu("gmail.on_add_star_menu_item");
+menu_items.add_star           = mz3_menu.regist_menu("gmail.on_add_star_menu_item");
 
 
 ----------------------------------------
@@ -248,6 +257,11 @@ function parse_gmail_inbox(parent, body, line)
 	base_url = line:match('<base href="(.-)">');
 --	mz3.alert(base_url);
 
+	-- <form action="?at=xxxxx" name="f" method="POST">
+	post_url = line:match('<form action="(%?[^"].-)" name="f".->');
+	post_url = base_url .. post_url;
+--	mz3.alert(post_url);
+
 	-- 1メールは '<tr ' で始まる
 	pos = line:find('<tr ', 1, true);
 	if pos == nil then
@@ -366,6 +380,9 @@ xxx
 			name = name:gsub('</b>', '');
 			data:set_text("name", mz3.decode_html_entity(name));
 			data:set_text("author", name);
+			
+			-- スター用POST先URL
+			data:set_text('post_url', post_url);
 
 			-- URL に応じてアクセス種別を設定
 			type = mz3.get_access_type_by_key('GMAIL_MAIL');
@@ -826,6 +843,65 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
+--- スターを付ける
+function on_add_star_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_add_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	data = MZ3Data:create(data);
+
+	-- POSTパラメータ生成
+	post = MZ3PostData:create();
+
+	-- tパラメータはメールURLから取得する
+	t = data:get_text('url');
+	t = t:match('th=(.*)$');
+	post_body = 'redir=%3F&tact=st&nvp_tbu_go=%E5%AE%9F%E8%A1%8C&t=' .. t .. '&bact=';
+	post:append_post_body(post_body);
+
+	-- 通信開始
+	url = data:get_text('post_url');
+	access_type = mz3.get_access_type_by_key("GMAIL_ADD_STAR");
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	return true;
+end
+
+
+--- POST 完了イベント
+--
+-- @param event_name    'post_end'
+-- @param serialize_key 完了項目のシリアライズキー
+-- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param filename      レスポンスファイル
+-- @param wnd           wnd
+--
+function on_post_end(event_name, serialize_key, http_status, filename)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="gmail" then
+		return false;
+	end
+
+	-- ステータスコードチェック
+	if http_status~=200 then
+		-- エラーアリなので中断するために true を返す
+		local msg="失敗しました";
+		mz3.logger_error(msg);
+		mz3_main_view.set_info_text(msg);
+		return true;
+	end
+
+	-- リクエストの種別に応じてメッセージを表示
+	if serialize_key == "GMAIL_ADD_STAR" then
+		mz3_main_view.set_info_text("スターつけた！");
+	end
+
+	return true;
+end
+mz3.add_event_listener("post_end", "gmail.on_post_end");
+
+
 --- レポートビューで開く
 read_gmail_mail_first = true;
 function on_read_by_reportview_menu_item(serialize_key, event_name, data)
@@ -903,8 +979,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("string", "本文を読む...", menu_items.read_by_reportview);
 	menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
 
---	menu:append_menu("separator");
---	menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+	menu:append_menu("separator");
+	menu:append_menu("string", "スターを付ける...", menu_items.add_star);
 
 	menu:append_menu("separator");
 	menu:append_menu("string", "メールのプロパティ...", menu_items.read);
