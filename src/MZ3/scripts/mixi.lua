@@ -23,6 +23,160 @@ mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
 
 
 --------------------------------------------------
+-- 【みんなのエコー一覧】
+-- [list] recent_echo.pl 用パーサ
+--
+-- http://mixi.jp/recent_echo.pl
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_recent_echo_parser(parent, body, html)
+	mz3.logger_debug("mixi_recent_echo_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+
+	local t1 = mz3.get_tick_count();
+	local in_data_region = false;
+
+	local line_count = html:get_count();
+	local post_key = '';
+	for i=100, line_count-1 do
+		line = html:get_at(i);
+		
+		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
+		if line_has_strings(line, 'hidden', 'id="post_key"') then
+			post_key = line:match('value="(.-)"');
+		end
+	end
+
+
+	-- 行数取得
+	for i=230, line_count-1 do
+		line = html:get_at(i);
+
+		-- 項目探索 以下一行
+		-- <td class="thumb">
+		if line_has_strings(line, "<td", "class", "thumb") then
+		-- <div class="echo_member_id" style="display: none;">ユーザID</div>
+		-- if line_has_strings(line, "<div", "class", "echo_member_id") then
+
+			in_data_region = true;
+
+			-- data 生成
+			data = MZ3Data:create();
+
+			i = i+2;
+			line = html:get_at(i);
+
+			-- URL 取得
+			url = complement_mixi_url(data:get_text('url'));
+			data:set_text("url", url);
+
+			i = i+2;
+			line = html:get_at(i);
+
+			-- 画像取得
+			image_url, after = line:match("src=\"([^\"]+)\"");
+			data:add_text_array("image", image_url);
+
+			i = i+11;
+			line = html:get_at(i);
+
+			-- ユーザ名
+			-- name = line:match(">([^<]+)(<.*)$");
+			name = line;
+			data:set_text("name", name);
+
+			i = i+9;
+			line = html:get_at(i);
+			if line == "\n" then
+				-- みんなのエコーと自分の一覧で改行数が違うので… 最低
+				i = i+1;
+				line = html:get_at(i);
+			end
+
+			-- 発言
+			if line:find( "href=", 1, true ) ~= nil then
+				post = line:match(">([^<]+)(<.*)$");
+				-- post をリプライ用に修正
+				i = i+4;
+				line = html:get_at(i);
+
+				-- post2 = line:match(">([^<]+)(<.*)$");
+				post = post .. " " .. line;
+			else
+				post = line;
+			end
+
+			data:add_body_with_extract(post);
+
+			i = i+4;
+			line = html:get_at(i);
+
+			if line:find( "<span>", 1, true ) ~= nil then
+				i = i+4;
+				line = html:get_at(i);
+			elseif line:find( "href=", 1, true ) ~= nil then
+				i = i+2;
+				line = html:get_at(i);
+			end
+
+			-- 時間
+			-- date = line:match(">([^<]+)(<.*)$");
+			date = line;
+			data:set_date(date);
+
+			i = i+8;
+			line = html:get_at(i);
+
+			if line == "\n" then
+				i = i+2;
+				line = html:get_at(i);
+			end
+
+			-- id
+			id = line:match(">([^<]+)(<.*)$");
+			data:set_integer("id", id);
+
+			-- URL に応じてアクセス種別を設定
+			type = mz3.estimate_access_type_by_url(url);
+			data:set_access_type(type);
+			
+			data:set_text('post_key', post_key);
+
+			-- data 追加
+			body:add(data.data);
+
+			-- data 削除
+			data:delete();
+
+		end
+
+		if in_data_region and line_has_strings(line, "</ul>") then
+			mz3.logger_debug("★</ul>が見つかったので終了します");
+			break;
+		end
+
+	end
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_recent_echo_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+-- みんなのエコー
+mz3.set_parser("MIXI_RECENT_ECHO", "mixi.mixi_recent_echo_parser");
+mz3.set_parser("MIXI_RES_ECHO"   , "http://mixi.jp/res_echo.pl");
+mz3.set_parser("MIXI_LIST_ECHO"  , "http://mixi.jp/list_echo.pl?id={owner_id}");
+
+
+--------------------------------------------------
 --- 次へ、前への抽出処理
 --------------------------------------------------
 function parse_next_back_link(line, base_url)
