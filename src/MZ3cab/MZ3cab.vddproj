@@ -26,6 +26,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1112F0110B6246869833B6A078B69488"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1487D5D944054D47BCCAB7A146D89E14"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -86,6 +92,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_35961645CF734502B9107D975BD07D2D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_363EBB5EAA404A6B8EC1D671717A8DFC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -140,6 +152,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5D83DE1BAF81487E99A428C1D0478C38"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5ED1D21152934C8B86CB3D8BA86E3DDC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -182,7 +200,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7AD5CA6BA72349E29DE524024E279721"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_81C9804E30354FEFB089876AD772D0A0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8E6EF11A5BD44AEAB0902C123386A4FC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -201,6 +231,12 @@
         "Entry"
         {
         "MsmKey" = "8:_97AD7D3853EA47DD8365D3CF3B3D745F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9A746E8704FA45F0A1F5F2B7AE6EDF4A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -428,6 +464,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_1112F0110B6246869833B6A078B69488"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_diary_parser.lua"
+            "TargetName" = "8:mixi_view_diary_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_1487D5D944054D47BCCAB7A146D89E14"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\wrapper.luac"
@@ -608,6 +662,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_35961645CF734502B9107D975BD07D2D"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_community_parser.lua"
+            "TargetName" = "8:mixi_bookmark_community_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_363EBB5EAA404A6B8EC1D671717A8DFC"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\2ch.luac"
@@ -770,6 +842,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_5D83DE1BAF81487E99A428C1D0478C38"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_diary_parser.luac"
+            "TargetName" = "8:mixi_view_diary_parser.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_5ED1D21152934C8B86CB3D8BA86E3DDC"
             {
             "SourcePath" = "8:skin\\aluminium\\report_.jpg"
@@ -896,12 +986,48 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_7AD5CA6BA72349E29DE524024E279721"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_user_parser.luac"
+            "TargetName" = "8:mixi_bookmark_user_parser.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_81C9804E30354FEFB089876AD772D0A0"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\wassr.luac"
             "TargetName" = "8:wassr.luac"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_8E6EF11A5BD44AEAB0902C123386A4FC"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_user_parser.lua"
+            "TargetName" = "8:mixi_bookmark_user_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -956,6 +1082,24 @@
             "TargetName" = "8:dummy_user_script.lua"
             "Tag" = "8:"
             "Folder" = "8:_FA34FEA1B5DF4E5B99746AF505215046"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_9A746E8704FA45F0A1F5F2B7AE6EDF4A"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_community_parser.luac"
+            "TargetName" = "8:mixi_bookmark_community_parser.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
