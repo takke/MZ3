@@ -1369,6 +1369,7 @@ void CTouchListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 {
 	// 縦ドラッグ開始判断用オフセット値
+/*
 #ifndef WINCE
 	// win32の場合半行以内の移動はドラッグとみなさない
 	int dyMinLimit = theApp.m_optionMng.GetFontHeight() / 2 + 1 ;
@@ -1376,6 +1377,9 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 	// WMの場合一行以内の移動はドラッグとみなさない
 	int dyMinLimit = theApp.m_optionMng.GetFontHeight();
 #endif
+*/
+	// 半行以内の移動はドラッグとみなさない
+	int dyMinLimit = theApp.m_optionMng.GetFontHeight() / 2 + 1 ;
 
 	if (m_bPanDragging) {
 		// 横ドラッグ中

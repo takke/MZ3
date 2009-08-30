@@ -55,7 +55,8 @@ CBodyListCtrl::CBodyListCtrl()
 {
 #ifdef WINCE
 	// スクロール時に iPhone 風の再描画を行う
-	m_bBlackScrollMode = true;
+	// TODO 1画面ではやはり足りない。遅延的に複数画面分確保できるようにしてから復活させること。
+//	m_bBlackScrollMode = true;
 #endif
 }
 
