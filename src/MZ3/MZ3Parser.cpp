@@ -116,7 +116,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
 	case ACCESS_LIST_BBS:						body.clear();	return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:					body.clear();	return mixi::ShowCalendarParser::parse( body, html );
-	case ACCESS_MIXI_RECENT_ECHO:				body.clear();	return mixi::RecentEchoParser::parse( body, html );
+//	case ACCESS_MIXI_RECENT_ECHO:				body.clear();	return mixi::RecentEchoParser::parse( body, html );
 //	case ACCESS_TWITTER_FRIENDS_TIMELINE:		return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
 //	case ACCESS_TWITTER_FAVORITES:				body.clear();	return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// Žb’è
 //	case ACCESS_TWITTER_DIRECT_MESSAGES:		body.clear();	return parser::TwitterDirectMessagesXmlParser::parse( body, html );

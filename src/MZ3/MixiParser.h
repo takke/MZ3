@@ -4165,6 +4165,7 @@ private:
  * - http://mixi.jp/res_echo.pl
  * - http://mixi.jp/list_echo.pl?id={owner_id}
  */
+/*
 class RecentEchoParser : public MixiListParser
 {
 public:
@@ -4332,9 +4333,7 @@ public:
 		}
 	}
 };
-
+*/
 
 
 }//namespace mixi
-
-

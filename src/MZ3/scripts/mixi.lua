@@ -47,6 +47,8 @@ function mixi_recent_echo_parser(parent, body, html)
 	local in_data_region = false;
 
 	local line_count = html:get_count();
+	
+	-- post_key 探索
 	local post_key = '';
 	for i=100, line_count-1 do
 		line = html:get_at(i);
@@ -54,6 +56,7 @@ function mixi_recent_echo_parser(parent, body, html)
 		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
 		if line_has_strings(line, 'hidden', 'id="post_key"') then
 			post_key = line:match('value="(.-)"');
+			break;
 		end
 	end
 
@@ -80,18 +83,16 @@ function mixi_recent_echo_parser(parent, body, html)
 			url = complement_mixi_url(data:get_text('url'));
 			data:set_text("url", url);
 
+			-- 画像取得
 			i = i+2;
 			line = html:get_at(i);
-
-			-- 画像取得
 			image_url, after = line:match("src=\"([^\"]+)\"");
 			data:add_text_array("image", image_url);
 
-			i = i+11;
-			line = html:get_at(i);
-
 			-- ユーザ名
 			-- name = line:match(">([^<]+)(<.*)$");
+			i = i+11;
+			line = html:get_at(i);
 			name = line;
 			data:set_text("name", name);
 
@@ -147,9 +148,11 @@ function mixi_recent_echo_parser(parent, body, html)
 			data:set_integer("id", id);
 
 			-- URL に応じてアクセス種別を設定
-			type = mz3.estimate_access_type_by_url(url);
+			--type = mz3.estimate_access_type_by_url(url);
+			type = mz3.get_access_type_by_key('MIXI_RECENT_ECHO_ITEM');
 			data:set_access_type(type);
 			
+			-- post_key 追加
 			data:set_text('post_key', post_key);
 
 			-- data 追加
