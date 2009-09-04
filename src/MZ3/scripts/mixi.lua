@@ -60,7 +60,6 @@ function mixi_recent_echo_parser(parent, body, html)
 		end
 	end
 
-
 	-- 行数取得
 	for i=230, line_count-1 do
 		line = html:get_at(i);
@@ -71,81 +70,76 @@ function mixi_recent_echo_parser(parent, body, html)
 		-- <div class="echo_member_id" style="display: none;">ユーザID</div>
 		-- if line_has_strings(line, "<div", "class", "echo_member_id") then
 
-			in_data_region = true;
-
 			-- data 生成
 			data = MZ3Data:create();
 
-			i = i+2;
-			line = html:get_at(i);
-
+			in_data_region = true;
+			
+			-- </tr>まで継続, いったんバッファリング
+			sub_html = '';
+			for i=i+2, line_count-1 do
+				line = html:get_at(i);
+				
+				if line_has_strings(line, '</tr>') then
+					break;
+				end
+				sub_html = sub_html .. line;
+				
+			end
+			
+--			mz3.alert(sub_html);
+			
 			-- URL 取得
-			url = complement_mixi_url(data:get_text('url'));
-			data:set_text("url", url);
-
+			url = sub_html:match('<a href="(.-)"');
+			if url ~= nil then
+				url = complement_mixi_url(url);
+				data:set_text("url", url);
+			end
+			
 			-- 画像取得
-			i = i+2;
-			line = html:get_at(i);
-			image_url, after = line:match("src=\"([^\"]+)\"");
-			data:add_text_array("image", image_url);
+			image_url = sub_html:match('<img src="(.-)"');
+			if image_url ~= nil then
+				data:add_text_array("image", image_url);
+--				mz3.alert(image_url);
+			end
 
 			-- ユーザ名
 			-- name = line:match(">([^<]+)(<.*)$");
-			i = i+11;
-			line = html:get_at(i);
-			name = line;
-			data:set_text("name", name);
-
-			i = i+9;
-			line = html:get_at(i);
-			if line == "\n" then
-				-- みんなのエコーと自分の一覧で改行数が違うので… 最低
-				i = i+1;
-				line = html:get_at(i);
+			local s = sub_html:match('<td class="nickname">(.-)</a>');
+			if s ~= nil then
+				s = s:gsub('<.->', '');
+				s = s:gsub("\n", '');
+				s = s:gsub('^ +', '');
+				s = s:gsub(' +$', '');
+				data:set_text("name", s);
 			end
 
 			-- 発言
-			if line:find( "href=", 1, true ) ~= nil then
-				post = line:match(">([^<]+)(<.*)$");
-				-- post をリプライ用に修正
-				i = i+4;
-				line = html:get_at(i);
-
-				-- post2 = line:match(">([^<]+)(<.*)$");
-				post = post .. " " .. line;
-			else
-				post = line;
-			end
-
-			data:add_body_with_extract(post);
-
-			i = i+4;
-			line = html:get_at(i);
-
-			if line:find( "<span>", 1, true ) ~= nil then
-				i = i+4;
-				line = html:get_at(i);
-			elseif line:find( "href=", 1, true ) ~= nil then
-				i = i+2;
-				line = html:get_at(i);
+			local comment = sub_html:match('<td class="comment">(.-)<span>');
+			if comment ~= nil then
+				comment = comment:gsub("\n", '');
+				comment = comment:gsub('<a.->', '');
+				comment = comment:gsub('</a>', ' ');
+				data:add_body_with_extract(comment);
 			end
 
 			-- 時間
-			-- date = line:match(">([^<]+)(<.*)$");
-			date = line;
-			data:set_date(date);
-
-			i = i+8;
-			line = html:get_at(i);
-
-			if line == "\n" then
-				i = i+2;
-				line = html:get_at(i);
+			local date = sub_html:match('<span>.-<a.->(.-)</a>');
+			if date ~= nil then
+				date = date:gsub("\n", '');
+				data:set_date(date);
 			end
 
 			-- id
-			id = line:match(">([^<]+)(<.*)$");
-			data:set_integer("id", id);
+			local author_id = sub_html:match('class="echo_member_id".->(.-)</');
+			if author_id ~= nil then
+				data:set_integer("author_id", author_id);
+				data:set_integer("id", author_id);
+			end
+			local echo_post_time = sub_html:match('class="echo_post_time".->(.-)</');
+			if echo_post_time ~= nil then
+				data:set_text('echo_post_time', echo_post_time);
+			end
 
 			-- URL に応じてアクセス種別を設定
 			--type = mz3.estimate_access_type_by_url(url);
@@ -160,7 +154,6 @@ function mixi_recent_echo_parser(parent, body, html)
 
 			-- data 削除
 			data:delete();
-
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
@@ -175,8 +168,8 @@ function mixi_recent_echo_parser(parent, body, html)
 end
 -- みんなのエコー
 mz3.set_parser("MIXI_RECENT_ECHO", "mixi.mixi_recent_echo_parser");
-mz3.set_parser("MIXI_RES_ECHO"   , "http://mixi.jp/res_echo.pl");
-mz3.set_parser("MIXI_LIST_ECHO"  , "http://mixi.jp/list_echo.pl?id={owner_id}");
+mz3.set_parser("MIXI_RES_ECHO"   , "mixi.mixi_recent_echo_parser");
+mz3.set_parser("MIXI_LIST_ECHO"  , "mixi.mixi_recent_echo_parser");
 
 
 --------------------------------------------------
@@ -408,7 +401,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	return true;
 end
-mz3.add_event_listener("popup_body_menu",  "mixi.on_popup_body_menu");
+mz3.add_event_listener("popup_body_menu", "mixi.on_popup_body_menu");
 
 
 --- デフォルトのグループリスト生成イベントハンドラ
