@@ -4904,7 +4904,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// 未入力時の処理
 	if (strStatus.IsEmpty()) {
 		switch (m_twitterPostAccessType) {
-		case ACCESS_WASSR_UPDATE:
 		case ACCESS_GOOHOME_QUOTE_UPDATE:
 		default:
 			// 未入力なので最新取得
@@ -4915,23 +4914,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// 送信先確認
 	switch (m_twitterPostAccessType) {
-	case ACCESS_WASSR_UPDATE:
-		{
-			CMixiData& data = pCategory->GetSelectedBody();
-			CString msg;
-			msg.Format( 
-				L"Wassrで発言します。\r\n"
-				L"----\r\n"
-				L"%s\r\n"
-				L"----\r\n"
-				L"よろしいですか？", 
-				strStatus );
-			if (IDYES != MessageBox(msg, 0, MB_YESNO)) {
-				return;
-			}
-		}
-		break;
-
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			CString msg;
@@ -4964,18 +4946,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// POST パラメータを設定
 	switch (m_twitterPostAccessType) {
 
-	case ACCESS_WASSR_UPDATE:
-		post.AppendPostBody( "status=" );
-		post.AppendPostBody( URLEncoder::encode_utf8(strStatus) );
-		post.AppendPostBody( "&source=" );
-		post.AppendPostBody( MZ3_APP_NAME );
-		// TODO reply 時の処理
-//		if (0) {
-//			post.AppendPostBody( "&reply_status_rid=" );
-//			post.AppendPostBody( reply_status_rid );
-//		}
-		break;
-
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			// text=***&privacy=***
@@ -4996,10 +4966,6 @@ void CMZ3View::OnBnClickedUpdateButton()
 	// POST先URL設定
 	CString url;
 	switch (m_twitterPostAccessType) {
-	case ACCESS_WASSR_UPDATE:
-		url = L"http://api.wassr.jp/statuses/update.json";
-		break;
-
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		url = L"http://home.goo.ne.jp/api/quote/quotes/post/json";
 		break;
@@ -5094,20 +5060,7 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 			{
 				// イベントハンドラ完了
 			} else {
-				if (theApp.m_accessTypeInfo.getServiceType(aType) == "Wassr") {
-					// HTTPステータスチェックを行う。
-					if (theApp.m_inet.m_dwHttpStatus==200) {
-						// OK
-
-						// 入力値を消去
-						SetDlgItemText( IDC_STATUS_EDIT, L"" );
-					} else {
-						LPCTSTR szStatusErrorMessage = L"?";
-						CString msg = util::FormatString(L"サーバエラー(%d)：%s", theApp.m_inet.m_dwHttpStatus, szStatusErrorMessage);
-						util::MySetInformationText( m_hWnd, msg );
-						MZ3LOGGER_ERROR( msg );
-					}
-				} else if (theApp.m_accessTypeInfo.getServiceType(aType) == "gooHome") {
+				if (theApp.m_accessTypeInfo.getServiceType(aType) == "gooHome") {
 					// HTTPステータスチェックを行う。
 					if (theApp.m_inet.m_dwHttpStatus==200) {
 						// OK
