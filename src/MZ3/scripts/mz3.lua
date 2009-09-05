@@ -77,6 +77,76 @@ end
 mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
 
 
+--- クロスポスト管理データを初期化する
+--
+-- @param from どこから初期ポストしたか。管理データにそのデータを登録しないようにするため。
+--             "twitter", "wassr", "echo" をサポート。
+--
+function mz3.init_cross_post_info(from)
+	mz3.cross_posts = {}
+	if from ~= "twitter" and use_cross_post_to_twitter then
+		table.insert(mz3.cross_posts, "twitter");
+	end
+	if from ~= "wassr" and use_cross_post_to_wassr then
+		table.insert(mz3.cross_posts, "wassr");
+	end
+	if from ~= "echo" and use_cross_post_to_echo then
+		table.insert(mz3.cross_posts, "echo");
+	end
+
+--	mz3.alert(table.concat(mz3.cross_posts, ','));
+
+end
+
+function mz3.do_cross_post()
+
+--	mz3.alert(#mz3.cross_posts);
+
+	if #mz3.cross_posts <= 0 then
+		return false;
+	end
+
+	local target = table.remove(mz3.cross_posts, 1);
+	if target == "twitter" then
+		text = mz3_main_view.get_edit_text();
+		local msg = "Twitter にも投稿しますか？\r\n";
+		msg = msg .. "----\r\n";
+		msg = msg .. text .. "\r\n";
+		msg = msg .. "----\r\n";
+		
+		if mz3.confirm(msg, nil, "yes_no") == "yes" then
+			twitter.do_post_to_twitter(text);
+			return true;
+		end
+	end
+	if target == "wassr" then
+		text = mz3_main_view.get_edit_text();
+		local msg = "Wassr にも投稿しますか？\r\n";
+		msg = msg .. "----\r\n";
+		msg = msg .. text .. "\r\n";
+		msg = msg .. "----\r\n";
+		
+		if mz3.confirm(msg, nil, "yes_no") == "yes" then
+			wassr.do_post_to_wassr(text);
+			return true;
+		end
+	end
+	if target == "echo" then
+		text = mz3_main_view.get_edit_text();
+		local msg = "mixi echo にも投稿しますか？\r\n";
+		msg = msg .. "----\r\n";
+		msg = msg .. text .. "\r\n";
+		msg = msg .. "----\r\n";
+		
+		if mz3.confirm(msg, nil, "yes_no") == "yes" then
+			mixi.do_post_to_echo(text);
+			return true;
+		end
+	end
+
+	return false;
+end
+
 -------------------------------------------------
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------

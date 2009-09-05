@@ -49,13 +49,13 @@ function mixi_recent_echo_parser(parent, body, html)
 	local line_count = html:get_count();
 	
 	-- post_key 探索
-	local post_key = '';
+	mixi.post_key = '';
 	for i=100, line_count-1 do
 		line = html:get_at(i);
 		
 		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
 		if line_has_strings(line, 'hidden', 'id="post_key"') then
-			post_key = line:match('value="(.-)"');
+			mixi.post_key = line:match('value="(.-)"');
 			break;
 		end
 	end
@@ -146,9 +146,6 @@ function mixi_recent_echo_parser(parent, body, html)
 			type = mz3.get_access_type_by_key('MIXI_RECENT_ECHO_ITEM');
 			data:set_access_type(type);
 			
-			-- post_key 追加
-			data:set_text('post_key', post_key);
-
 			-- data 追加
 			body:add(data.data);
 
@@ -624,21 +621,24 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	end
 
+	if serialize_key == 'MIXI_ADD_ECHO' then
+		-- 単純投稿は共通処理で。
+
+		-- クロスポスト管理データ初期化
+		mz3.init_cross_post_info("echo");
+
+		do_post_to_echo(text);
+		return true;
+	end
+	
 	-- POST パラメータを設定
 	post = MZ3PostData:create();
-	local post_key = data:get_text('post_key');
+	local post_key = mixi.post_key;
 	if post_key=='' then
 		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
 		return true;
 	end
-	if serialize_key == 'MIXI_ADD_ECHO' then
-		post:append_post_body('body=');
-		post:append_post_body(mz3.url_encode(text, 'euc-jp'));
-		post:append_post_body('&x=28&y=20');
-		post:append_post_body('&post_key=');
-		post:append_post_body(post_key);
-		post:append_post_body('&redirect=recent_echo');
-	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
 		local echo_member_id = data:get_integer('author_id');
 		local echo_post_time = data:get_text('echo_post_time');
@@ -669,9 +669,7 @@ function on_click_update_button(event_name, serialize_key)
 --	end
 
 	-- POST先URL設定
-	if serialize_key == 'MIXI_ADD_ECHO' then
-		url = 'http://mixi.jp/add_echo.pl';
-	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		url = 'http://mixi.jp/add_echo.pl';
 	end
 	
@@ -684,6 +682,43 @@ function on_click_update_button(event_name, serialize_key)
 	return true;
 end
 mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
+
+
+--- echo に投稿する
+function do_post_to_echo(text)
+
+	serialize_key = 'MIXI_ADD_ECHO'
+
+	post = MZ3PostData:create();
+	local post_key = mixi.post_key;
+	if post_key=='' then
+		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
+		return true;
+	end
+	post:append_post_body('body=');
+	post:append_post_body(mz3.url_encode(text, 'euc-jp'));
+	post:append_post_body('&x=28&y=20');
+	post:append_post_body('&post_key=');
+	post:append_post_body(post_key);
+	post:append_post_body('&redirect=recent_echo');
+
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
+--	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+--		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+--		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+--	end
+
+	-- POST先URL設定
+	url = 'http://mixi.jp/add_echo.pl';
+	
+	-- 通信開始
+	access_type = mz3.get_access_type_by_key(serialize_key);
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+
+	return true;
+end
 
 
 --- POST 完了イベント
@@ -711,6 +746,13 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		else
 			-- 投稿成功
 			mz3_main_view.set_info_text("エコー書き込み完了");
+
+			-- クロスポスト
+			if serialize_key == "MIXI_ADD_ECHO" then
+				if mz3.do_cross_post() then
+					return true;
+				end
+			end
 
 			-- 入力値を消去
 			mz3_main_view.set_edit_text("");

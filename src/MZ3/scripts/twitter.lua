@@ -992,6 +992,10 @@ function on_click_update_button(event_name, serialize_key)
 
 	if serialize_key == 'TWITTER_UPDATE' then
 		-- 通常の投稿は共通化
+		
+		-- クロスポスト管理データ初期化
+		mz3.init_cross_post_info("twitter");
+
 		return do_post_to_twitter(text);
 	end
 
@@ -1120,35 +1124,12 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("発言しました");
 	end
 
-	-- Wassr への投稿(クロスポスト)
---[[
+	-- クロスポスト
 	if serialize_key == "TWITTER_UPDATE" then
-
-		text = mz3_main_view.get_edit_text();
-		msg = "Wassr にも投稿しますか？\r\n";
-		msg = msg .. "----\r\n";
-		msg = msg .. text .. "\r\n";
-		msg = msg .. "----\r\n";
-		
-		if mz3.confirm(msg, nil, "yes_no") == "yes" then
-		
-			-- URL 生成
-			url = "http://api.wassr.jp/statuses/update.json";
-			post = mz3_post_data.create();
-			mz3_post_data.append_post_body(post, "status=");
-			mz3_post_data.append_post_body(post, mz3.url_encode(text, 'utf8'));
-			mz3_post_data.append_post_body(post, "&source=");
-			mz3_post_data.append_post_body(post, mz3.get_app_name());
-			
-			-- 通信開始
-			access_type = mz3.get_access_type_by_key("WASSR_UPDATE");
-			referer = '';
-			user_agent = nil;
-			mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+		if mz3.do_cross_post() then
 			return true;
 		end
 	end
-]]
 
 	-- twitpic の 写真投稿のみを行う場合は下記のコードで POST する
 --[[

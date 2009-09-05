@@ -357,4 +357,130 @@ end
 mz3.add_event_listener("get_view_style", "wassr.on_get_view_style");
 
 
+--- 更新ボタン押下イベント
+--
+-- @param event_name    'click_update_button'
+-- @param serialize_key Twitter風書き込みモードのシリアライズキー
+--
+function on_click_update_button(event_name, serialize_key)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="Wassr" then
+		return false;
+	end
+
+	-- 入力文字列を取得
+	text = mz3_main_view.get_edit_text();
+
+	-- 未入力時の処理
+	if text == '' then
+		-- 最新取得
+		mz3_main_view.retrieve_category_item();
+		return true;
+	end
+
+	-- 確認
+	data = mz3_main_view.get_selected_body_item();
+	data = MZ3Data:create(data);
+	if serialize_key == 'WASSR_UPDATE' then
+		msg = 'Wassrで発言します。\n'
+		   .. '----\n'
+		   .. text .. '\n'
+		   .. '----\n'
+		   .. 'よろしいですか？';
+		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	end
+
+	if serialize_key == 'WASSR_UPDATE' then
+		-- 通常の投稿は共通化
+
+		-- クロスポスト管理データ初期化
+		mz3.init_cross_post_info("wassr");
+
+		return do_post_to_wassr(text);
+	end
+
+	return true;
+end
+mz3.add_event_listener("click_update_button", "wassr.on_click_update_button");
+
+
+--- Wassr に投稿する
+function do_post_to_wassr(text)
+
+	serialize_key = 'WASSR_UPDATE'
+
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+
+	-- POST先URL設定
+	url = "http://api.wassr.jp/statuses/update.json";
+
+	-- POST パラメータを設定
+	post = MZ3PostData:create();
+	post:append_post_body("status=");
+	post:append_post_body(mz3.url_encode(text, 'utf8'));
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
+	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
+		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+	end
+	post:append_post_body("&source=");
+	post:append_post_body(mz3.get_app_name());
+	
+	-- 通信開始
+	access_type = mz3.get_access_type_by_key("WASSR_UPDATE");
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	return true;
+end
+
+
+--- POST 完了イベント
+--
+-- @param event_name    'post_end'
+-- @param serialize_key 完了項目のシリアライズキー
+-- @param http_status   HTTP Status Code (200, 404, etc...)
+-- @param filename      レスポンスファイル
+-- @param wnd           wnd
+--
+function on_post_end(event_name, serialize_key, http_status, filename)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~="Wassr" then
+		return false;
+	end
+
+	-- 投稿処理完了
+	
+	-- ステータスコードチェック
+	if http_status == 200 then
+		-- OK
+		mz3_main_view.set_info_text("Wassrで発言しました");
+	else
+		-- エラーアリなので中断するために true を返す
+		msg = "サーバエラー(" .. http_status .. ")";
+		mz3.logger_error(msg);
+		mz3_main_view.set_info_text(msg);
+		return true;
+	end
+
+	-- クロスポスト
+	if serialize_key == "WASSR_UPDATE" then
+		if mz3.do_cross_post() then
+			return true;
+		end
+	end
+
+	-- 入力値を消去
+	mz3_main_view.set_edit_text("");
+	
+	return true;
+end
+mz3.add_event_listener("post_end", "wassr.on_post_end");
+
+
 mz3.logger_debug('wassr.lua end');
