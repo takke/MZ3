@@ -91,7 +91,102 @@ type:set_request_encoding('utf8');							-- エンコーディング
 twitpic_target_file = nil;
 
 
+--- 1ユーザの追加
+function my_add_new_user(new_list, status)
+--	mz3.logger_debug("my_add_new_user start");
 
+	-- data 生成
+	data = MZ3Data:create();
+	
+	-- id : status/id
+	local id = realid2id(status:match('<id>([^<]*)</id>'));
+	data:set_integer('id', id);
+	type = mz3.get_access_type_by_key('TWITTER_USER');
+	data:set_access_type(type);
+	
+	-- updated : status/created_at
+	local s = status:match('<created_at>([^<]*)</created_at>');
+	data:parse_date_line(s);
+	
+	-- text : status/text
+	text = status:match('<text>([^<]*)</text>');
+	text = text:gsub('&amp;', '&');
+	text = mz3.decode_html_entity(text);
+	data:add_text_array('body', text);
+	
+	-- URL を抽出し、リンクにする
+	for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+		data:add_link_list(url, url);
+--		mz3.logger_debug(url);
+	end
+
+	-- source : status/source
+	s = status:match('<source>([^<]*)</source>');
+	s = mz3.decode_html_entity(s);
+	data:set_text('source', s);
+	
+	-- name : status/user/screen_name
+	user = status:match('<user>.-</user>');
+	s = user:match('<screen_name>([^<]*)</screen_name>');
+	s = s:gsub('&amp;', '&');
+	s = mz3.decode_html_entity(s);
+	data:set_text('name', s);
+	
+	-- author : status/user/name
+	s = user:match('<name>([^<]*)</name>');
+	s = s:gsub('&amp;', '&');
+	s = mz3.decode_html_entity(s);
+	data:set_text('author', s);
+
+	-- description : status/user/description
+	-- title に入れるのは苦肉の策・・・
+	s = user:match('<description>([^<]*)</description>');
+	s = s:gsub('&amp;', '&');
+	s = mz3.decode_html_entity(s);
+	data:set_text('title', s);
+
+	-- owner-id : status/user/id
+	data:set_integer('owner_id', user:match('<id>([^<]*)</id>'));
+
+	-- URL : status/user/url
+	url = user:match('<url>([^<]*)</url>');
+	data:set_text('url', url);
+	data:set_text('browse_uri', url);
+
+	-- Image : status/user/profile_image_url
+	profile_image_url = user:match('<profile_image_url>([^<]*)</profile_image_url>');
+	profile_image_url = mz3.decode_html_entity(profile_image_url);
+--	mz3.logger_debug(profile_image_url);
+
+	-- ファイル名のみをURLエンコード
+--	int idx = strImage.ReverseFind( '/' );
+--	if (idx >= 0) {
+--		CString strFileName = strImage.Mid( idx +1 );
+--		strFileName = URLEncoder::encode_utf8( strFileName );
+--		strImage = strImage.Left(idx + 1);
+--		strImage += strFileName;
+--	}
+	data:add_text_array('image', profile_image_url);
+
+	-- <location>East Tokyo United</location>
+	data:set_text('location', mz3.decode_html_entity(user:match('<location>([^<]*)</location>')));
+	-- <followers_count>555</followers_count>
+	data:set_integer('followers_count', user:match('<followers_count>([^<]*)</followers_count>'));
+	-- <friends_count>596</friends_count>
+	data:set_integer('friends_count', user:match('<friends_count>([^<]*)</friends_count>'));
+	-- <favourites_count>361</favourites_count>
+	data:set_integer('favourites_count', user:match('<favourites_count>([^<]*)</favourites_count>'));
+	-- <statuses_count>7889</statuses_count>
+	data:set_integer('statuses_count', user:match('<statuses_count>([^<]*)</statuses_count>'));
+
+	-- 一時リストに追加
+	new_list:add(data.data);
+	
+	-- data 削除
+	data:delete();
+
+--	mz3.logger_debug("my_add_new_user end");
+end
 --------------------------------------------------
 -- [list] タイムライン用パーサ
 --
@@ -130,117 +225,54 @@ function twitter_friends_timeline_parser(parent, body, html)
 	line = '';
 	local line_count = html:get_count();
 	status = '';
-	for i=0, line_count-1 do
+	local i=0;
+	while i<line_count do
 		line = html:get_at(i);
+--		mz3.logger_debug('line:' .. i);
 		
 		if line_has_strings(line, '<status>') then
 			status = line;
-		elseif line_has_strings(line, '</status>') then
-			status = status .. line;
 			
-			-- id : status/id
-			id = realid2id(status:match('<id>(.-)</id>'));
---			mz3.logger_debug('id : ' .. id);
-			-- 同一IDがあれば追加しない。
-			if id_set[ "" .. id ] then
---				mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
-			else
-				-- data 生成
-				data = MZ3Data:create();
+			-- </status> まで取得する
+			-- ただし、同一IDがあればskipする
+			i = i+1;
+			while i<line_count do
+				line = html:get_at(i);
+				status = status .. line;
 				
-				data:set_integer('id', id);
-				
-				type = mz3.get_access_type_by_key('TWITTER_USER');
-				data:set_access_type(type);
-				
-				-- text : status/text
-				text = status:match('<text>(.-)</text>');
-				text = text:gsub('&amp;', '&');
-				text = mz3.decode_html_entity(text);
-				data:add_text_array('body', text);
-				
-				-- source : status/source
-				s = status:match('<source>(.-)</source>');
-				s = mz3.decode_html_entity(s);
-				data:set_text('source', s);
-				
-				-- name : status/user/screen_name
-				user = status:match('<user>.-</user>');
-				s = user:match('<screen_name>(.-)</screen_name>');
-				s = s:gsub('&amp;', '&');
-				s = mz3.decode_html_entity(s);
-				data:set_text('name', s);
-				
-				-- author : status/user/name
-				s = user:match('<name>(.-)</name>');
-				s = s:gsub('&amp;', '&');
-				s = mz3.decode_html_entity(s);
-				data:set_text('author', s);
+				-- 同一 skip は先にやる
+				if line_has_strings(line, '<id>') then
+					-- id : status/id
+					id = realid2id(line:match('<id>(.-)</id>'));
+					-- 同一IDがあれば追加しない。
+					if id_set[ "" .. id ] then
+						mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
+						i = i+1;
+						while i<line_count do
+							line = html:get_at(i);
+							
+							if line_has_strings(line, '</status>') then
+								break;
+							end
+							i = i+1;
+						end
+--						mz3.logger_debug('new i:' .. i);
 
-				-- description : status/user/description
-				-- title に入れるのは苦肉の策・・・
-				s = user:match('<description>(.-)</description>');
-				s = s:gsub('&amp;', '&');
-				s = mz3.decode_html_entity(s);
-				data:set_text('title', s);
-
-				-- owner-id : status/user/id
-				data:set_integer('owner_id', user:match('<id>(.-)</id>'));
-
-				-- URL : status/user/url
-				url = user:match('<url>(.-)</url>');
-				data:set_text('url', url);
-				data:set_text('browse_uri', url);
-
-				-- Image : status/user/profile_image_url
-				profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
-				profile_image_url = mz3.decode_html_entity(profile_image_url);
---				mz3.logger_debug(profile_image_url);
-
-				-- ファイル名のみをURLエンコード
---				int idx = strImage.ReverseFind( '/' );
---				if (idx >= 0) {
---					CString strFileName = strImage.Mid( idx +1 );
---					strFileName = URLEncoder::encode_utf8( strFileName );
---					strImage = strImage.Left(idx + 1);
---					strImage += strFileName;
---				}
-				data:add_text_array('image', profile_image_url);
-
-				-- <location>East Tokyo United</location>
-				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
-				-- <followers_count>555</followers_count>
-				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
-				-- <friends_count>596</friends_count>
-				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
-				-- <favourites_count>361</favourites_count>
-				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
-				-- <statuses_count>7889</statuses_count>
-				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
-
-				-- updated : status/created_at
-				s = status:match('<created_at>(.-)</created_at>');
-				data:parse_date_line(s);
-				
-				-- URL を抽出し、リンクにする
-				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
-					data:add_link_list(url, url);
---					mz3.logger_debug(url);
+						status = '';
+						break;
+					end
+				elseif line_has_strings(line, '</status>') then
+					-- </status> 発見したのでここまでの status を解析して追加
+					my_add_new_user(new_list, status);
+					break;
 				end
-
-				-- 一時リストに追加
-				new_list:add(data.data);
-				
-				-- data 削除
-				data:delete();
-
+				i = i+1;
 			end
 
 			-- 次の status 取得
 			status = '';
-		elseif status ~= '' then	-- status が空であれば <status> 未発見なので読み飛ばす
-			status = status .. line;
 		end
+		i = i+1;
 	end
 	
 	-- 生成したデータを出力に反映
@@ -432,6 +464,7 @@ mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parse
 ----------------------------------------
 menu_items = {}
 menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
+menu_items.show_user_info        = mz3_menu.regist_menu("twitter.on_show_user_info");
 menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
 
 -- 発言内の @xxx 抽出者のTL(5人まで)
@@ -855,10 +888,28 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. "\r\n";
 	item = item .. "----\r\n";
 	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
-	item = item .. "description : " .. data:get_text('title') .. "\r\n";
+--	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 	item = item .. data:get_date() .. "\r\n";
 	item = item .. "id : " .. id2realid(data:get_integer('id')) .. "\r\n";
---	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+
+	mz3.alert(item, data:get_text('name'));
+
+	return true;
+end
+
+
+--- @userについて
+function on_show_user_info(serialize_key, event_name, data)
+	mz3.logger_debug('on_show_user_info : (' .. serialize_key .. ', ' .. event_name .. ')');
+	data = MZ3Data:create(data);
+--	mz3.logger_debug(data:get_text('name'));
+	
+	item = '';
+	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
+	item = item .. "description : " .. data:get_text('title') .. "\r\n";
+--	item = item .. data:get_date() .. "\r\n";
+--	item = item .. "id : " .. id2realid(data:get_integer('id')) .. "\r\n";
+	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 	if data:get_text('location') ~= '' then
 		item = item .. "location : " .. data:get_text('location') .. "\r\n";
@@ -878,7 +929,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	-- ソース
 	source = data:get_text('source');
 --	item = item .. "source : " .. source .. "\r\n";
-	s_url, s_name = source:match("href=\"(.*)\".*>(.*)<");
+	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
 	if s_url ~= nil then
 		item = item .. "source : " .. s_name .. " (" .. s_url .. ")\r\n";
 	else
@@ -1211,15 +1262,16 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu = MZ3Menu:create_popup_menu();
 	submenu = MZ3Menu:create_popup_menu();
 	
+	name = body:get_text('name');
+
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
 	menu:append_menu("string", "全文を読む...", menu_items.read);
+	menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
 
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "つぶやく", menu_items.update);
 	menu:append_menu("string", "写真を投稿(twitpic)...", menu_items.update_with_twitpic);
-
-	name = body:get_text('name');
 
 	menu:append_menu("string", "@" .. name .. " さんに返信", menu_items.reply);
 	menu:append_menu("string", "@" .. name .. " さんにメッセージ送信", menu_items.new_dm);
