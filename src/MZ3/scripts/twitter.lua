@@ -236,12 +236,13 @@ function twitter_friends_timeline_parser(parent, body, html)
 			-- </status> ‚Ü‚Åæ“¾‚·‚é
 			-- ‚½‚¾‚µA“¯ˆêID‚ª‚ ‚ê‚Îskip‚·‚é
 			i = i+1;
+			i_in_status = 0;
 			while i<line_count do
 				line = html:get_at(i);
 				status = status .. line;
 				
 				-- “¯ˆê skip ‚Íæ‚É‚â‚é
-				if line_has_strings(line, '<id>') then
+				if i_in_status<3 and line_has_strings(line, '<id>') then
 					-- id : status/id
 					id = realid2id(line:match('<id>(.-)</id>'));
 					-- “¯ˆêID‚ª‚ ‚ê‚Î’Ç‰Á‚µ‚È‚¢B
@@ -261,12 +262,13 @@ function twitter_friends_timeline_parser(parent, body, html)
 						status = '';
 						break;
 					end
-				elseif line_has_strings(line, '</status>') then
+				elseif i_in_status>30 and line_has_strings(line, '</status>') then
 					-- </status> ”­Œ©‚µ‚½‚Ì‚Å‚±‚±‚Ü‚Å‚Ì status ‚ğ‰ğÍ‚µ‚Ä’Ç‰Á
 					my_add_new_user(new_list, status);
 					break;
 				end
 				i = i+1;
+				i_in_status = i_in_status+1;
 			end
 
 			-- Ÿ‚Ì status æ“¾
