@@ -1814,7 +1814,7 @@ int lua_mz3_data_list_get_data(lua_State *L)
 --- data_list ‚Ìmerge
 --
 --
-function mz3_data_list.merge(data_list, new_list)
+function mz3_data_list.merge(data_list, new_list, max_size)
 */
 int lua_mz3_data_list_merge(lua_State *L)
 {
@@ -1833,8 +1833,12 @@ int lua_mz3_data_list_merge(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-
-	parser::TwitterParserBase::MergeNewList(*data_list, *new_list);
+	int max_size = lua_tointeger(L, 3);							// ‘æ3ˆø”
+	if (max_size==0) {
+		parser::TwitterParserBase::MergeNewList(*data_list, *new_list);
+	} else {
+		parser::TwitterParserBase::MergeNewList(*data_list, *new_list, max_size);
+	}
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 0;

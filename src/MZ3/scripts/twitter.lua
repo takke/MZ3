@@ -92,14 +92,14 @@ twitpic_target_file = nil;
 
 
 --- 1ユーザの追加
-function my_add_new_user(new_list, status)
+function my_add_new_user(new_list, status, id)
 --	mz3.logger_debug("my_add_new_user start");
 
 	-- data 生成
 	data = MZ3Data:create();
 	
 	-- id : status/id
-	local id = realid2id(status:match('<id>([^<]*)</id>'));
+--	local id = realid2id(status:match('<id>([^<]*)</id>'));
 	data:set_integer('id', id);
 	type = mz3.get_access_type_by_key('TWITTER_USER');
 	data:set_access_type(type);
@@ -226,6 +226,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 	local line_count = html:get_count();
 	status = '';
 	local i=0;
+	local id=0;
 	while i<line_count do
 		line = html:get_at(i);
 --		mz3.logger_debug('line:' .. i);
@@ -262,9 +263,9 @@ function twitter_friends_timeline_parser(parent, body, html)
 						status = '';
 						break;
 					end
-				elseif i_in_status>30 and line_has_strings(line, '</status>') then
+				elseif i_in_status>35 and line_has_strings(line, '</status>') then
 					-- </status> 発見したのでここまでの status を解析して追加
-					my_add_new_user(new_list, status);
+					my_add_new_user(new_list, status, id);
 					break;
 				end
 				i = i+1;
@@ -278,7 +279,11 @@ function twitter_friends_timeline_parser(parent, body, html)
 	end
 	
 	-- 生成したデータを出力に反映
-	body:merge(new_list);
+	if mz3.get_app_name()=="MZ3" then
+		body:merge(new_list, 100);
+	else
+		body:merge(new_list, 1000);
+	end
 
 	-- 新着件数を parent(カテゴリの m_mixi) に設定する
 	parent:set_integer('new_count', new_list:get_count());

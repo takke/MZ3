@@ -96,7 +96,7 @@ function MZ3DataList:insert(index, data)	return mz3_data_list.insert(self.data_l
 function MZ3DataList:get_count()			return mz3_data_list.get_count(self.data_list);				end
 function MZ3DataList:get_data(index)		return mz3_data_list.get_data(self.data_list, index);		end
 function MZ3DataList:delete()				return mz3_data_list.delete(self.data_list);				end
-function MZ3DataList:merge(new_list)		return mz3_data_list.merge(self.data_list, new_list.data_list);	end
+function MZ3DataList:merge(new_list, size)	return mz3_data_list.merge(self.data_list, new_list.data_list, size);	end
 
 
 --------------------------------------------------

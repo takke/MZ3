@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_FONT_SHRINK, &CMainFrame::OnMenuFontShrink)
 	ON_COMMAND(ID_MENU_RELOAD_LUA_SCRIPTS, &CMainFrame::OnMenuReloadLuaScripts)
 	ON_COMMAND(ID_MENU_RELOAD_CATEGORY_LIST_LOG, &CMainFrame::OnMenuReloadCategoryListLog)
+	ON_WM_WININICHANGE()
 END_MESSAGE_MAP()
 
 
@@ -1296,4 +1297,13 @@ void CMainFrame::OnUpdateMenuStop(CCmdUI *pCmdUI)
 void CMainFrame::OnMenuStop()
 {
 	::SendMessage(GetActiveView()->m_hWnd, WM_MZ3_ABORT, NULL, NULL);
+}
+
+void CMainFrame::OnWinIniChange(LPCTSTR lpszSection)
+{
+	CFrameWnd::OnWinIniChange(lpszSection);
+
+	// 縦スクロールバーを消す
+	HWND hwndDlg = m_hWnd;
+	SetWindowLong(hwndDlg, GWL_STYLE, GetWindowLong(hwndDlg,GWL_STYLE) &~WS_VSCROLL);
 }

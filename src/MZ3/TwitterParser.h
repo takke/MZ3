@@ -29,12 +29,10 @@ public:
 	 * new_[in]  : 4, 3
 	 * out_[out] : 4, 3, 2, 1
 	 */
-	static bool MergeNewList( CMixiDataList& out_, CMixiDataList& new_ )
+	static bool MergeNewList( CMixiDataList& out_, CMixiDataList& new_, const size_t LIST_MAX_SIZE = 1000 )
 	{
 		util::StopWatch sw_detect_insert_pos;
 		util::StopWatch sw_move;
-
-		const size_t LIST_MAX_SIZE = 1000;
 
 		if (new_.empty()) {
 			return true;

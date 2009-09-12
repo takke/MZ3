@@ -83,7 +83,8 @@ mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_lis
 --             "twitter", "wassr", "echo" をサポート。
 --
 function mz3.init_cross_post_info(from)
-	mz3.cross_posts = {}
+	mz3.cross_posts = {}	-- どのサービスへクロスポストするか(queue)
+	
 	if from ~= "twitter" and use_cross_post_to_twitter then
 		table.insert(mz3.cross_posts, "twitter");
 	end
