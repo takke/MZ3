@@ -19,6 +19,8 @@ del /Q MZ3_win32\scripts\mixi\*
 copy ..\src\MZ3\scripts\mixi\* MZ3_win32\scripts\mixi
 del /Q MZ3_win32\scripts\goohome\*
 copy ..\src\MZ3\scripts\goohome\* MZ3_win32\scripts\goohome
+del /Q MZ3_win32\user_scripts\*
+copy ..\src\MZ3\user_scripts\* MZ3_win32\user_scripts\
 :copy "..\doc\Help Files\MZ4\MZ4.chm" MZ3_win32\
 copy ..\doc\Readme.txt MZ3_win32\
 copy ..\ChangeLog.txt MZ3_win32\
