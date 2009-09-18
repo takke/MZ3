@@ -41,8 +41,14 @@ function mixi_view_diary_parser(data, dummy, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=10, line_count-1 do
+	i = 10;
+	while i < line_count do
 		line = html:get_at(i);
+
+		-- <form action="add_comment.pl?diary_id=xx" method="post" name="comment_form">
+		if line_has_strings(line, "<form", "add_comment.pl", "comment_form") then
+			break;
+		end
 
 		-- <title> タグからタイトルを取得する
 		if line_has_strings(line, "<title>", "</title>") then
@@ -61,7 +67,8 @@ function mixi_view_diary_parser(data, dummy, html)
 		
 		-- 「最近の日記」の取得
 		if line_has_strings(line, '<ul class="contentsListDiary">') then
-			for i=i+1, line_count-1 do
+			i = i + 1;
+			while i<line_count do
 				line = html:get_at(i);
 				if line_has_strings(line, '</ul') then
 					break;
@@ -71,13 +78,15 @@ function mixi_view_diary_parser(data, dummy, html)
 --					mz3.logger_debug(url .. title);
 					data:add_link_list(url, mz3.decode_html_entity(title), 'page');
 				end
+				i = i+1;
 			end
 		end
 
 		-- 日時の取得
 		-- 公開範囲の取得
 		if line_has_strings(line, '<div', 'listDiaryTitle') then
-			for i=i+1, line_count-1 do
+			i = i+1;
+			while i<line_count do
 				line = html:get_at(i);
 				if line_has_strings(line, '</dl') then
 					break;
@@ -92,6 +101,7 @@ function mixi_view_diary_parser(data, dummy, html)
 				if date~=nil then
 					data:set_date(date);
 				end
+				i = i + 1;
 			end
 		end
 
@@ -116,13 +126,15 @@ function mixi_view_diary_parser(data, dummy, html)
 
 		-- 日記の添付写真
 		if line_has_strings(line, '<div', 'class', 'diaryPhoto') then
-			for i=i+1, line_count-1 do
+			i = i + 1;
+			while i<line_count do
 				line = html:get_at(i);
 				if line_has_strings(line, '</div') then
 					break;
 				end
 
 				data:add_body_with_extract(line);
+				i = i + 1;
 			end
 --			data:add_body_with_extract("<br>");
 		end
@@ -182,13 +194,15 @@ function mixi_view_diary_parser(data, dummy, html)
 		-- 本文取得
 		if line_has_strings(line, '<div', 'id', 'diary_body') then
 			local sub_html = line;
-			for i=i+1, line_count-1 do
+			i = i + 1;
+			while i<line_count do
 				line = html:get_at(i);
-				if line_has_strings(line, '<!--/viewDiaryBox-->') then
+				if line_has_strings(line, '<div class="diaryPaging01">') then
 					break;
 				end
 
 				sub_html = sub_html .. line;
+				i = i + 1;
 			end
 			-- script タグの除去
 			sub_html = sub_html:gsub('<script.-</script>', '');
@@ -209,7 +223,8 @@ function mixi_view_diary_parser(data, dummy, html)
 			end
 
 			-- hidden
-			for i=i+1, line_count-1 do
+			i = i + 1;
+			while i<line_count do
 				line = html:get_at(i);
 				if line_has_strings(line, '</form>') then
 					break;
@@ -222,9 +237,11 @@ function mixi_view_diary_parser(data, dummy, html)
 					break;
 				end
 
+				i = i + 1;
 			end
 		end
-
+		
+		i = i + 1;
 	end
 
 	local t2 = mz3.get_tick_count();
@@ -243,9 +260,11 @@ function parseDiaryComment(data, line, i, line_count, html)
 		comment_index = 1;
 		in_dd = false;
 		child = MZ3Data:create();
-		for i=i+1, line_count-1 do
+
+		i = i + 1;
+		while i<line_count do
 			line = html:get_at(i);
-			if line_has_strings(line, '<!--/diaryMainArea02--></div>') then
+			if line_has_strings(line, '<div class="diaryMainArea02 commentForm">') then
 				break;
 			end
 
@@ -296,6 +315,7 @@ function parseDiaryComment(data, line, i, line_count, html)
 				end
 			end
 			
+			i = i + 1;
 		end
 		child:delete();
 
