@@ -264,7 +264,6 @@ public:
 	afx_msg void OnAcceleratorReload();
 	afx_msg void OnLoadUrl(UINT);
 	afx_msg void OnPaint();
-//	afx_msg void OnMenuTwitterFriendTimelineWithOthers();
 	afx_msg void OnNMRclickGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTabmenuDelete();
 	afx_msg void OnTcnKeydownGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
@@ -380,9 +379,6 @@ public:
 	void MyOpenLocalFile(void);
 	void MyOpenUrl(void);
 	afx_msg void OnAddRssFeedMenu();
-
-	afx_msg void OnMenuMixiEchoAddRefUserEchoList();
-	afx_msg void OnMenuMixiEchoAddUserEchoList();
 
 	void ResetViewContent(void);
 	afx_msg void OnAcceleratorToggleIntegratedMode();

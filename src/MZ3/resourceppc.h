@@ -300,8 +300,6 @@
 #define ID_MENU_PREV_DIARY              34185
 #define ID_MENU_NEXT_DIARY              34186
 #define ID_MENU_PREVDIARY               34187
-#define ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST 34192
-#define ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST 34193
 #define IDM_LOAD_FULL_DIARY             34194
 #define ID_MENU_CHECK_UPDATE            34196
 #define ID_MENU_GOOHOME_READ            34197

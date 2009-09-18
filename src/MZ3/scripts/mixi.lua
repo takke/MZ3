@@ -54,14 +54,14 @@ function mixi_recent_echo_parser(parent, body, html)
 		line = html:get_at(i);
 		
 		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
-		if line_has_strings(line, 'hidden', 'id="post_key"') then
+		if line_has_strings(line, 'hidden', 'name="post_key"') then
 			mixi.post_key = line:match('value="(.-)"');
 			break;
 		end
 	end
 
 	-- 行数取得
-	for i=230, line_count-1 do
+	for i=180, line_count-1 do
 		line = html:get_at(i);
 
 		-- 項目探索 以下一行
@@ -132,6 +132,15 @@ function mixi_recent_echo_parser(parent, body, html)
 
 			-- 発言
 			local comment = sub_html:match('<td class="comment">(.-)<span>');
+			
+			-- 引用ユーザがあれば抽出しておく
+			if line_has_strings(comment, '<a', 'view_echo.pl', '</a>') then
+				local ref_user_id, ref_user_name = comment:match('<a href=".-id=(.-)&.-">&gt;&gt;(.-)</');
+				data:set_integer('ref_user_id', ref_user_id);
+				data:set_text('ref_user_name', ref_user_name);
+			end
+			
+			-- 発言取得
 			if comment ~= nil then
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->', '');
@@ -169,14 +178,16 @@ function mixi_recent_echo_parser(parent, body, html)
 			data:delete();
 		end
 
-		back_data, next_data = parse_next_back_link(line, 'recent_echo.pl', 'title');
-		if back_data ~= nil then
-			back_data:add_body_with_extract(back_data:get_text('title'));
-			body:insert(0, back_data.data);
-		end
-		if next_data ~= nil then
-			next_data:add_body_with_extract(next_data:get_text('title'));
-			body:add(next_data.data);
+		if in_data_region then
+			back_data, next_data = parse_next_back_link(line, 'recent_echo.pl', 'title');
+			if back_data ~= nil then
+				back_data:add_body_with_extract(back_data:get_text('title'));
+				body:insert(0, back_data.data);
+			end
+			if next_data ~= nil then
+				next_data:add_body_with_extract(next_data:get_text('title'));
+				body:add(next_data.data);
+			end
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
@@ -256,6 +267,8 @@ menu_items.mixi_echo_item_read    = mz3_menu.regist_menu("mixi.on_mixi_echo_read
 menu_items.mixi_echo_update       = mz3_menu.regist_menu("mixi.on_mixi_echo_update");
 menu_items.mixi_echo_reply        = mz3_menu.regist_menu("mixi.on_mixi_echo_reply");
 menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show_profile");
+menu_items.mixi_echo_add_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_echo_add_user_echo_list");
+menu_items.mixi_echo_add_ref_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_echo_add_ref_user_echo_list");
 
 ----------------------------------------
 -- イベントハンドラ
@@ -370,6 +383,50 @@ function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 end
 
 
+--- 「xxx のボイス」メニュー用ハンドラ
+function on_mixi_echo_add_user_echo_list(serialize_key, event_name, data)
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	name = body:get_text('name');
+	
+	-- カテゴリ追加
+	title = name .. "さんのボイス";
+	author_id = body:get_integer('author_id');
+	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
+	key = "MIXI_RECENT_ECHO";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- 引用ユーザのボイス追加メニュー用ハンドラ
+function on_mixi_echo_add_ref_user_echo_list(serialize_key, event_name, data)
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	name = body:get_text('ref_user_name');
+	
+	-- カテゴリ追加
+	title = name .. "さんのボイス";
+	author_id = body:get_integer('ref_user_id');
+	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
+	key = "MIXI_RECENT_ECHO";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
 --- ボディリストのポップアップメニュー表示
 --
 -- @param event_name    'popup_body_menu'
@@ -399,14 +456,12 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- TODO 各メニューアイテムのリソース値を定数化(またはLua関数化)
 
 	-- ユーザのエコー一覧
-	ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST = 34192 -37000;
-	menu:append_menu("string", body:get_text('name') .. " さんのエコー", ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST);
+	menu:append_menu("string", body:get_text('name') .. " さんのボイス", menu_items.mixi_echo_add_user_echo_list);
 
 	-- 引用ユーザのエコー一覧
 	ref_user_name = body:get_text('ref_user_name');
 	if ref_user_name ~= "" then
-		ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST = 34193 -37000;
-		menu:append_menu("string", ref_user_name .. " さんのエコー", ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST);
+		menu:append_menu("string", ref_user_name .. " さんのボイス", menu_items.mixi_echo_add_ref_user_echo_list);
 	end
 
 	-- リンク追加

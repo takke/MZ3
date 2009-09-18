@@ -745,7 +745,7 @@ bool AccessTypeInfo::init()
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
 		, "mixi"
-		, L"みんなのエコー"
+		, L"みんなのボイス"
 		, REQUEST_METHOD_GET
 		);
 	// http://mixi.jp/recent_echo.pl
@@ -784,7 +784,7 @@ bool AccessTypeInfo::init()
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
-		, L"mixiエコー発言"
+		, L"mixiボイス発言"
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_RECENT_ECHO_ITEM";

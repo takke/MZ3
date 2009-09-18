@@ -134,9 +134,6 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(IDM_CATEGORY_OPEN, &CMZ3View::OnCategoryOpen)
 	ON_COMMAND(ID_ADD_RSS_FEED_MENU, &CMZ3View::OnAddRssFeedMenu)
 
-	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_REF_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddRefUserEchoList)
-	ON_COMMAND(ID_MENU_MIXI_ECHO_ADD_USER_ECHO_LIST, &CMZ3View::OnMenuMixiEchoAddUserEchoList)
-
 	ON_COMMAND(ID_ACCELERATOR_TOGGLE_INTEGRATED_MODE, &CMZ3View::OnAcceleratorToggleIntegratedMode)
 	ON_COMMAND_RANGE(ID_REPORT_COPY_URL_BASE+1, ID_REPORT_COPY_URL_BASE+50, OnCopyClipboardUrl)
 	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
@@ -5163,99 +5160,6 @@ void CMZ3View::OnPaint()
 		break;
 	}
 }
-
-/**
- * mixiエコー｜引用ユーザのエコー一覧
- */
-void CMZ3View::OnMenuMixiEchoAddRefUserEchoList()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	// タイムライン項目の追加
-	CMixiData& bodyItem = GetSelectedBodyItem();
-	CCategoryItem categoryItem;
-	CString name = bodyItem.GetTextValue(L"ref_user_name");
-	int author_id = _wtoi(bodyItem.GetTextValue(L"ref_user_id"));
-	categoryItem.init( 
-		// 名前
-		util::FormatString( L"%sさんのエコー", name ),
-		util::FormatString( L"http://mixi.jp/list_echo.pl?id=%d", author_id ), 
-		ACCESS_MIXI_RECENT_ECHO, 
-		m_selGroup->categories.size()+1,
-		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_MIXI_RECENT_ECHO),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_MIXI_RECENT_ECHO),
-		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_MIXI_RECENT_ECHO),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
-	AppendCategoryList(categoryItem);
-
-	// 取得開始
-	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
-	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
-}
-
-/**
- * mixiエコー｜ユーザのエコー一覧
- */
-void CMZ3View::OnMenuMixiEchoAddUserEchoList()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	// タイムライン項目の追加
-	CMixiData& bodyItem = GetSelectedBodyItem();
-	CCategoryItem categoryItem;
-	CString name = bodyItem.GetName();
-	int author_id = bodyItem.GetAuthorID();
-	categoryItem.init( 
-		// 名前
-		util::FormatString( L"%sさんのエコー", name ),
-		util::FormatString( L"http://mixi.jp/list_echo.pl?id=%d", author_id ), 
-		ACCESS_MIXI_RECENT_ECHO, 
-		m_selGroup->categories.size()+1,
-		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_MIXI_RECENT_ECHO),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_MIXI_RECENT_ECHO),
-		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_MIXI_RECENT_ECHO),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
-	AppendCategoryList(categoryItem);
-
-	// 取得開始
-	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
-	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
-}
-
-/* Twitter 仕様変更により利用できないためコメントアウト
-void CMZ3View::OnMenuTwitterFriendTimelineWithOthers()
-{
-	if( theApp.m_access ) {
-		// アクセス中は禁止
-		return;
-	}
-
-	// タイムライン項目の追加
-	CMixiData& bodyItem = GetSelectedBodyItem();
-	CCategoryItem categoryItem;
-	categoryItem.init( 
-		// 名前
-		util::FormatString( L"@%sのタイムライン", bodyItem.GetName() ),
-		util::FormatString( L"http://twitter.com/statuses/friends_timeline/%s.xml", (LPCTSTR)bodyItem.GetName() ), 
-		ACCESS_TWITTER_FRIENDS_TIMELINE, 
-		m_selGroup->categories.size()+1,
-		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_TWITTER_FRIENDS_TIMELINE),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
-	AppendCategoryList(categoryItem);
-
-	// 取得開始
-	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
-	AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
-}
-*/
 
 bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 {
