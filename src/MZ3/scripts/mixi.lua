@@ -74,7 +74,15 @@ function mixi_recent_echo_parser(parent, body, html)
 			data = MZ3Data:create();
 
 			in_data_region = true;
-			
+
+			-- 画像取得
+			line = html:get_at(i);
+			image_url = line:match('<img src="(.-)"');
+			if image_url ~= nil then
+				data:add_text_array("image", image_url);
+			--	mz3.alert(image_url);
+			end
+
 			-- </tr>まで継続, いったんバッファリング
 			sub_html = '';
 			for i=i+2, line_count-1 do
@@ -84,7 +92,6 @@ function mixi_recent_echo_parser(parent, body, html)
 					break;
 				end
 				sub_html = sub_html .. line;
-				
 			end
 			
 --			mz3.alert(sub_html);
@@ -95,23 +102,32 @@ function mixi_recent_echo_parser(parent, body, html)
 				url = complement_mixi_url(url);
 				data:set_text("url", url);
 			end
-			
+--[[
 			-- 画像取得
 			image_url = sub_html:match('<img src="(.-)"');
 			if image_url ~= nil then
 				data:add_text_array("image", image_url);
---				mz3.alert(image_url);
+			--	mz3.alert(image_url);
 			end
-
+]]
 			-- ユーザ名
 			-- name = line:match(">([^<]+)(<.*)$");
 			local s = sub_html:match('<td class="nickname">(.-)</a>');
 			if s ~= nil then
-				s = s:gsub('<.->', '');
-				s = s:gsub("\n", '');
-				s = s:gsub('^ +', '');
-				s = s:gsub(' +$', '');
+				if s ~= nil then
+					s = s:gsub('<.->', '');
+					s = s:gsub("\n", '');
+					s = s:gsub('^ +', '');
+					s = s:gsub(' +$', '');
+					data:set_text("name", s);
+				end
+			else
+				i = i +2;
+				line = html:get_at(i);
+				-- s = line:match(">([^<]+)(<.*)$");
+				s = line:match("([^<]+)(<.*)$");
 				data:set_text("name", s);
+				-- mz3.alert(line);
 			end
 
 			-- 発言
@@ -153,6 +169,16 @@ function mixi_recent_echo_parser(parent, body, html)
 			data:delete();
 		end
 
+		back_data, next_data = parse_next_back_link(line, 'recent_echo.pl', 'title');
+		if back_data ~= nil then
+			back_data:add_body_with_extract(back_data:get_text('title'));
+			body:insert(0, back_data.data);
+		end
+		if next_data ~= nil then
+			next_data:add_body_with_extract(next_data:get_text('title'));
+			body:add(next_data.data);
+		end
+
 		if in_data_region and line_has_strings(line, "</ul>") then
 			mz3.logger_debug("★</ul>が見つかったので終了します");
 			break;
@@ -172,10 +198,13 @@ mz3.set_parser("MIXI_LIST_ECHO"  , "mixi.mixi_recent_echo_parser");
 --------------------------------------------------
 --- 次へ、前への抽出処理
 --------------------------------------------------
-function parse_next_back_link(line, base_url)
+function parse_next_back_link(line, base_url, title_set_at)
 
 	local back_data = nil;
 	local next_data = nil;
+	if title_set_at == nil then
+		title_set_at = "title";
+	end
 	
 	-- <ul><li><a href="new_bbs.pl?page=1">前を表示</a></li>
 	-- <li>51件～100件を表示</li>
@@ -186,7 +215,7 @@ function parse_next_back_link(line, base_url)
 		local url, t = line:match([[href="([^"]+)">(前[^<]+)<]]);
 		if url~=nil then
 			back_data = MZ3Data:create();
-			back_data:set_text("title", "<< " .. t .. " >>");
+			back_data:set_text(title_set_at, "<< " .. t .. " >>");
 			back_data:set_text("url", url);
 			type = mz3.estimate_access_type_by_url(url);
 			back_data:set_access_type(type);
@@ -196,7 +225,7 @@ function parse_next_back_link(line, base_url)
 		local url, t = line:match([[href="([^"]+)">(次[^<]+)<]]);
 		if url~=nil then
 			next_data = MZ3Data:create();
-			next_data:set_text("title", "<< " .. t .. " >>");
+			next_data:set_text(title_set_at, "<< " .. t .. " >>");
 			next_data:set_text("url", url);
 			type = mz3.estimate_access_type_by_url(url);
 			next_data:set_access_type(type);
@@ -488,6 +517,11 @@ function on_estimate_access_type(event_name, url, data1, data2)
     -- 関連ニュース
 	if line_has_strings(url, 'http://news.mixi.jp/list_quote_diary.pl?') then
 		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
+	end
+
+    -- エコー
+	if line_has_strings(url, 'recent_echo.pl?') then
+		return true, mz3.get_access_type_by_key('MIXI_RECENT_ECHO');
 	end
 
 	return false;
