@@ -15,7 +15,7 @@
 /// ユーティリティ
 namespace util
 {
-//int GetOpenFileNameEx(OPENFILENAME* pofn);
+int GetOpenFileNameEx(OPENFILENAME* pofn);
 bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int srcx, int srcy );
 bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int tox, int toy, int tow, int toh );
 void MoveDlgItemWindow( CWnd* pParent, int idc, int x, int y, int nWidth, int nHeight );

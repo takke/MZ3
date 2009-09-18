@@ -20,7 +20,6 @@ namespace util
  *
  * 成功時は IDOK が返る
  */
-/*
 int GetOpenFileNameEx(OPENFILENAME* pofn)
 {
 #ifdef WINCE
@@ -38,11 +37,9 @@ int GetOpenFileNameEx(OPENFILENAME* pofn)
 	return GetOpenFileName(pofn);
 #else
 	// for win32
-	// TODO 実装すること
-	return 0;
+	return GetOpenFileName(pofn);
 #endif
 }
-*/
 
 /**
  * 指定されたビットマップ hBitmap を hdc に描画する
