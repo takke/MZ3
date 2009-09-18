@@ -773,6 +773,14 @@ void CMainFrame::OnEnableIntervalCheck()
 
 	// オプションのトグル
 	theApp.m_optionMng.m_bEnableIntervalCheck = !theApp.m_optionMng.m_bEnableIntervalCheck;
+	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		// ON になったのでタイマー開始
+		::KillTimer(theApp.m_pMainView->m_hWnd, TIMERID_INTERVAL_CHECK);
+		::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_INTERVAL_CHECK, 1000, NULL);
+	} else {
+		// OFF になったのでタイマー終了
+		::KillTimer(theApp.m_pMainView->m_hWnd, TIMERID_INTERVAL_CHECK);
+	}
 
 	// タイトル変更
 	MySetTitle();

@@ -19,6 +19,7 @@
 #include "InetAccess.h"
 #include "XcrawlCanceler.h"
 
+#define TIMERID_INTERVAL_CHECK	101
 class CMZ3Doc;
 
 /**

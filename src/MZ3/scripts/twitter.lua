@@ -114,6 +114,12 @@ function my_add_new_user(new_list, status, id)
 	text = mz3.decode_html_entity(text);
 	data:add_text_array('body', text);
 	
+	-- @takke などがあればバイブする
+--	if line_has_strings(text, "@" .. my_twitter_name) then
+--		mz3.set_vib_status(true);
+--		mz3.set_vib_status(false);
+--	end
+	
 	-- URL を抽出し、リンクにする
 	for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 		data:add_link_list(url, url);
@@ -204,6 +210,8 @@ function twitter_friends_timeline_parser(parent, body, html)
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
+
+	my_twitter_name = mz3_account_provider.get_value('Twitter', 'id');
 
 	-- 全消去しない
 --	body:clear();

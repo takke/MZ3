@@ -36,7 +36,6 @@
 #define new DEBUG_NEW
 #endif
 
-#define TIMERID_INTERVAL_CHECK	101
 #define SPLITTER_HEIGHT			10
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
@@ -357,10 +356,6 @@ void CMZ3View::OnInitialUpdate()
 
 	// キャッシュ削除スレッド開始
 	AfxBeginThread( CacheCleanup_Thread, this );
-
-	// インターバルタイマー生成
-	UINT result = SetTimer( TIMERID_INTERVAL_CHECK, 1000, NULL );
-//	DWORD e = ::GetLastError();
 }
 
 /**
@@ -4495,13 +4490,7 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 				ResetIntervalTimer();
 				return;
 			}
-/*
-			if( GetFocus() != &m_categoryList ) {
-				// フォーカスが違うので、タイマーを更新（さらにN秒経つまで待つ）
-				ResetIntervalTimer();
-				return;
-			}
-*/
+
 			// タイマー開始から N 秒経過したか？
 			int nElapsedSec = (GetTickCount() - m_dwIntervalTimerStartMsec)/1000;
 			if( nElapsedSec >= theApp.m_optionMng.m_nIntervalCheckSec ) {

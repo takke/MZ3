@@ -16,6 +16,10 @@
 #include "url_encoder.h"
 #include "version.h"
 #include "PostDataGenerator.h"
+#include "util_gui.h"
+#ifdef WINCE
+#include "Nled.h"
+#endif
 
 //-----------------------------------------------
 // lua support
@@ -817,7 +821,8 @@ int lua_mz3_get_open_file_name(lua_State *L)
 	ofn.lpstrFilter = &szFilter[0];
 	ofn.Flags = flags;
 	ofn.lpstrInitialDir = initial_dir;
-	if (GetOpenFileName(&ofn) == IDOK) {
+//	if (GetOpenFileName(&ofn) == IDOK) {
+	if (util::GetOpenFileNameEx(&ofn) == IDOK) {
 		lua_pushstring(L, CStringA(szFile));
 	} else {
 		lua_pushnil(L);
@@ -883,6 +888,37 @@ int lua_mz3_is_mixi_logout(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+/*
+--- [MZ3 only] バイブをON/OFFする
+--
+-- バイブをON/OFFする。機種依存により動作しない可能性もある。
+--
+-- @param vib_status バイブ状態(true:ON, false:OFF)
+--
+function mz3.set_vib_status(vib_status)
+*/
+int lua_mz3_set_vib_status(lua_State *L)
+{
+	int vib_status = lua_toboolean(L, 1);
+
+#ifdef WINCE
+	struct NLED_SETTINGS_INFO info = { 0 };
+
+	if (vib_status) {
+		info.LedNum = (UINT)1;
+		info.OffOnBlink = (INT)1;
+	} else {
+		info.LedNum = (UINT)1;
+		info.OffOnBlink = (INT)0;
+	}
+
+	NLedSetDevice( NLED_SETTINGS_INFO_ID, (void*)( &info ) );
+#endif
+	
+	// 戻り値の数を返す
+	return 0;
 }
 
 //-----------------------------------------------
@@ -3308,6 +3344,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"copy_file",							lua_mz3_copy_file},
 	{"change_view",							lua_mz3_change_view},
 	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
+	{"set_vib_status",						lua_mz3_set_vib_status},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
