@@ -316,7 +316,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP2"
+				AdditionalOptions="/MP4"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"
@@ -476,7 +476,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP2"
+				AdditionalOptions="/MP4"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="false"

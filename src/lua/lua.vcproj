@@ -281,6 +281,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP4"
 				Optimization="2"
 				PreprocessorDefinitions="NDEBUG;LUA_BUILD_AS_DLL"
 				RuntimeLibrary="0"

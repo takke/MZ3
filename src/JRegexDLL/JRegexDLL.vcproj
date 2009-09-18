@@ -202,6 +202,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP4"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;JREGEXDLL_EXPORTS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
