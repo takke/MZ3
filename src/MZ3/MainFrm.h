@@ -120,7 +120,7 @@ public:
 	afx_msg void OnMenuReloadCategoryListLog();
 	afx_msg void OnUpdateMenuStop(CCmdUI *pCmdUI);
 	afx_msg void OnMenuStop();
-	afx_msg void OnWinIniChange(LPCTSTR lpszSection);
+//	afx_msg void OnWinIniChange(LPCTSTR lpszSection);
 };
 
 
