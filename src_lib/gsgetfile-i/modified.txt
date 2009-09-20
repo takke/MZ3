@@ -2,8 +2,8 @@
 	gsgetfile.dll version 0.05β
 	Copyright(C) 2002-2003 Y.Nagamidori
 -------------------------------------------------------------------
-	Internationalized Version Rev.10
-	Copyright(C) 2002-2006 ホーミン
+	Internationalized Version Rev.14
+	Copyright(C) 2002-2008 ホーミン
 -------------------------------------------------------------------
 
 ・オリジナルからの変更点(機能追加等)
@@ -25,6 +25,19 @@
 
 7.外部からのファイル変更によるファイル一覧更新に対応(PPCのみ)(Rev.10)
 
+8.WindowsMobile6(Std.は除く)にとりあえず対応(Rev.11)
+
+9.初期フォルダ選択アルゴリズムをWin98/Me→Win2000/XP相当に変更(Rev.11)
+
+10.ファイルリストから上下キーでフォーカス移動可能に(Rev.13)
+
+11.96DPI(主にQVGA),192DPI(主にVGA)以外のDPIに対応(Rev.14)
+
+12.フォルダ移動機能追加(Rev.14)
+
+13.OPENFILENAME構造体のnFileOffset、nFileExtensionメンバーをサポート(Rev.14)
+
+14.画像ファイルのプレビュー機能追加(PPCのみ)(Rev.14)
 ※その他、細々と変更してます。
 
 ・バグ対応(Internationalized Ver.固有)
@@ -32,7 +45,9 @@
 2.Rev.5修正でも前面に表示されない場合があったのを修正(Rev.6)
 3.WindowsMobile5以前のポケットPCでツールバーが表示されなくなっていたのを修正(Rev.8)
 4.WindowsMobile5以前のポケットPCで文字化けがおきる場合があったのを修正(Rev.9)
-
+5.WindowsMobile5以降のポケットPCで右メニューが正常に機能していなかったのを修正(Rev.11)
+6.メニューリソース開放漏れを修正(Rev.12)
+7.WM6での余計なFreeLibrary呼び出しを修正(Rev.12)
 
 ・注意事項など
 「gsGetFile.DLL」は、Y.Nagamidori氏作成のソフトです。
