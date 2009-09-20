@@ -45,11 +45,6 @@ function mixi_view_diary_parser(data, dummy, html)
 	while i < line_count do
 		line = html:get_at(i);
 
-		-- <form action="add_comment.pl?diary_id=xx" method="post" name="comment_form">
-		if line_has_strings(line, "<form", "add_comment.pl", "comment_form") then
-			break;
-		end
-
 		-- <title> タグからタイトルを取得する
 		if line_has_strings(line, "<title>", "</title>") then
 			-- 自分の日記なら　　「<title>[mixi] タイトル</title>」
@@ -239,6 +234,9 @@ function mixi_view_diary_parser(data, dummy, html)
 
 				i = i + 1;
 			end
+			
+			-- この投稿フォームがあったら解析終了
+			break;
 		end
 		
 		i = i + 1;

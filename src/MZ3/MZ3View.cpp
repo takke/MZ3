@@ -520,7 +520,8 @@ void CMZ3View::OnSize(UINT nType, int cx, int cy)
 
 void CMZ3View::MySetLayout(int cx, int cy)
 {
-	// 前回の値を保存し、(0,0) の場合はその値を利用する
+//	MZ3LOGGER_DEBUG(util::FormatString(L"MySetLayout(%d,%d)", cx, cy));
+/*	// 前回の値を保存し、(0,0) の場合はその値を利用する
 	static int s_cx = 0;
 	static int s_cy = 0;
 	if (cx==0 && cy==0) {
@@ -530,19 +531,19 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		s_cx = cx;
 		s_cy = cy;
 	}
-/*	{
+*/	{
 		CRect rect;
-		CString msg;
 
-		GetWindowRect( &rect );
-		msg.Format( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
+//		GetWindowRect( &rect );
+//		MZ3LOGGER_DEBUG( util::FormatString( L" wrect-cx,cy : %d, %d", rect.Width(), rect.Height() ) );
 
-		GetWindowRect( &rect );
-		msg.Format( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() );
-		MZ3LOGGER_DEBUG( msg );
+		GetClientRect( &rect );
+//		MZ3LOGGER_DEBUG( util::FormatString( L" crect-cx,cy : %d, %d", rect.Width(), rect.Height() ) );
+
+		cx = rect.Width();
+		cy = rect.Height();
 	}
-*/
+
 	int fontHeight = theApp.m_optionMng.GetFontHeightByPixel(theApp.GetDPI());
 	if( fontHeight == 0 ) {
 		fontHeight = 12;
