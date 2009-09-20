@@ -652,7 +652,11 @@ function on_twitter_reply(serialize_key, event_name, data)
 	if text:find("@" .. name, 1, true)~=nil then
 		return;
 	end
-	text = text .. "@" .. name .. " ";
+	if use_twitter_reply_with_dot then
+		text = text .. ".@" .. name .. " ";
+	else
+		text = text .. "@" .. name .. " ";
+	end
 	
 	mz3_main_view.set_edit_text(text);
 
