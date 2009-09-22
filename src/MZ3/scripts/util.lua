@@ -51,6 +51,26 @@ function line_has_strings(line, ...)
 end
 
 
+------------------------------------------------------------
+-- line に指定された全文字列を順に含むか(targetsはテーブル)
+------------------------------------------------------------
+function line_has_strings_table(line, targets)
+	local args = targets
+	local p = 1;
+	
+	for i=1, #args do
+--		print(args[i]);
+		p = line:find(args[i], p, true);
+		if p==nil then
+			return false;
+		end
+		p = p+1;
+	end
+
+	return true;
+end
+
+
 --------------------------------------------------
 -- URLからパラメータを取得する
 --------------------------------------------------
@@ -175,6 +195,47 @@ function parse_form(line, base_url)
 	end
 
 	return forms;
+end
+
+
+--- html の i 行目から start_region_params ～ end_region_params の間を取得する
+--
+-- start_region_params の全ての要素が1行に現れたら開始行とみなす。
+-- end_region_params   の全ての要素が1行に現れたら終了行とみなす。
+--
+-- @param html MZ3HTMLArray オブジェクト
+-- @param i    行番号(0 origin)
+-- @param start_region_params 開始行認識用文字列テーブル
+-- @param end_region_params   終了行認識用文字列テーブル
+--
+-- @return [1] 開始行～終了行までの文字列(※注意：開始行と終了行は含まない)
+-- @return [2] 終了行が現れた行番号
+--
+function get_sub_html(html, start_line, end_line, start_region_params, end_region_params)
+
+	local sub_html = '';
+	local i = start_line;
+	local in_region = false;
+
+	while i<end_line do
+		line = html:get_at(i);
+
+		if in_region then
+			if line_has_strings_table(line, end_region_params) then
+				break;
+			else
+				sub_html = sub_html .. line;
+			end
+		else
+			if line_has_strings_table(line, start_region_params) then
+				in_region = true;
+			end
+		end
+
+		i = i+1;
+	end
+	
+	return sub_html, i;
 end
 
 

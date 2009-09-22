@@ -2791,6 +2791,7 @@ private:
  * 【プロフィール】
  * http://mixi.jp/show_friend.pl
  */
+/*
 class ShowFriendParser : public MixiContentParser
 {
 public:
@@ -3078,6 +3079,7 @@ public:
 	}
 
 };
+*/
 
 
 //■■■ニュース■■■

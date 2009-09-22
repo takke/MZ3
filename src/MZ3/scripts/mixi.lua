@@ -23,6 +23,154 @@ mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
 
 
 --------------------------------------------------
+-- 【プロフィール】
+-- [content] show_friend.pl 用パーサ
+--
+-- http://mixi.jp/show_friend.pl
+--
+-- 引数:
+--   parent: 上ペインのオブジェクト群(MZ3Data*)
+--   dummy:  NULL
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_show_friend_parser(parent, body, html)
+	mz3.logger_debug("mixi_show_friend_parser start");
+
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	html = MZ3HTMLArray:create(html);
+	
+	parent:clear();
+	
+	parent:set_text('name', '');
+	parent:set_date('');
+
+	local t1 = mz3.get_tick_count();
+	local line_count = html:get_count();
+	
+	-- 名前, 画像
+	local i=100;
+	local sub_html = '';
+	sub_html, i = get_sub_html(html, i, line_count, {"<div id=", '"myProfile"'}, {'<div id=', '"mymixiList"'});
+	
+--	mz3.logger_debug(sub_html);
+	
+	local name = sub_html:match('<h3>(.-)</h3>');
+	if name ~= nil then
+		name = mz3.decode_html_entity(name);
+		parent:set_text('name', name);
+		parent:set_text('title', name);
+		parent:set_text('author', name);
+	end
+	
+	-- ユーザ画像
+	local url = sub_html:match('<img src="(.-)"');
+	if url ~= nil then
+		parent:add_link_list(url, 'ユーザ画像');
+		parent:add_text_array("body", "<_a><<ユーザ画像>></_a>");
+	end
+	
+	-- 最終ログイン
+	-- <p class="loginTime">（最終ログインは3日以上）</p>
+	local last_login = sub_html:match('class="loginTime">(.-)<');
+	if last_login ~= nil then
+		parent:add_body_with_extract(" ");
+		parent:add_body_with_extract(last_login);
+	end
+	
+	-- 友人関係
+	-- <p class="friendPath">たっけ ⇒ <a href="show_friend.pl?id=109835">いっちゅう</a></p>
+	local friend_path = sub_html:match('class="friendPath">(.-)</p>');
+	if friend_path ~= nil then
+		parent:add_body_with_extract("<br>");
+		parent:add_body_with_extract(friend_path);
+	end
+	
+	
+	-- プロフィールを全て取得し、本文に設定する。
+	sub_html, i = get_sub_html(html, i, line_count, {'<div id="profile">'}, {'</ul>'});
+	parent:add_body_with_extract("<br>");
+	for li in sub_html:gmatch("<li>(.-)</li>") do
+--		<li><dl><dt>所属</dt><dd>Webプログラマ</dd></dl></li>
+		local dt = li:match("<dt>(.-)<");
+		local dd = li:match("<dd>(.-)<");
+		if dt ~= nil and dd ~= nil then
+			parent:add_body_with_extract("■ " .. dt);
+			parent:add_body_with_extract("<br>");
+			
+			parent:add_body_with_extract(dd);
+			parent:add_body_with_extract("<br>");
+			parent:add_body_with_extract("<br>");
+		end
+	end
+	
+	-- 最新の日記取得
+	local child_number = 1;
+	sub_html, i = get_sub_html(html, i, line_count, {'<div id="newFriendDiary">'}, {'</dl>'});
+	-- dt/span, dd/a が交互に出現する。
+	-- <dt><span>05月03日</span></dt>
+	-- <dd><a href="view_diary.pl?id=xxx&owner_id=xxx" >WM系の偉い人と飲み会に行って…</a></dd>
+	local child = MZ3Data:create();
+	child:add_body_with_extract("<br>");
+	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
+		local date = dt:match("<span>(.-)<");
+		
+		if date ~= nil then
+			child:add_body_with_extract("■ " .. date .. " : " .. dd);
+			child:add_body_with_extract("<br>");
+		end
+	end
+	child:set_integer("comment_index", child_number);
+	child:set_text('author', "最新の日記");
+	parent:add_child(child);
+	child_number = child_number + 1;
+	child:delete();
+	
+	-- 紹介文取得
+	sub_html, i = get_sub_html(html, i, line_count, {'<div id="intro">'}, {'</ul>'});
+	--[[
+<dl>
+<dt><a href="show_friend.pl?id=xxx"><img src="xxx.jpg" alt="ゆ" onerror="javascript:this.width=76;this.height=76;" /></a>
+<br /><a href="show_friend.pl?id=xxx">ゆ</a></dt>
+<dd>
+<p class="relation">関係：xxx</p>
+<p class="userInput">xxxです。</p>
+</dd>
+</dl>
+]]
+	local child = MZ3Data:create();
+	child:add_body_with_extract("<br>");
+	local has_intro = false;
+	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
+		local name     = dt:match('</a>.-(<a.-</a>)');
+		local relation = dd:match('"relation">(.-)<');
+		local text     = dd:match('"userInput">(.-)</p');
+
+		child:add_body_with_extract("■ " .. name .. "<br>");
+		child:add_body_with_extract(relation);
+		child:add_body_with_extract("<br>");
+		child:add_body_with_extract(text);
+		child:add_body_with_extract("<br>");
+		child:add_body_with_extract("<br>");
+		
+		has_intro = true;
+	end
+	if has_intro then
+		child:set_integer("comment_index", child_number);
+		child:set_text('author', "紹介文");
+		parent:add_child(child);
+		child_number = child_number + 1;
+	end
+	child:delete();
+	
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_show_friend_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("MIXI_PROFILE", "mixi.mixi_show_friend_parser");
+
+
+--------------------------------------------------
 -- 【みんなのエコー一覧】
 -- [list] recent_echo.pl 用パーサ
 --
