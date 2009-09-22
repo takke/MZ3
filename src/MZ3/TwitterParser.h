@@ -50,9 +50,9 @@ public:
 		sw_detect_insert_pos.start();
 		// new_[0].id が out_ の中で最初に大きくなる位置を探索する
 		int insert_pos = old_list_size;	// 初期値：new_[0].id が out_ の中で最小の場合の挿入位置
-		int max_id_on_new = new_[0].GetID();
+		INT64 max_id_on_new = new_[0].GetID();
 		for (size_t i=0; i<old_list_size; i++) {
-			int id = out_[i].GetID();
+			INT64 id = out_[i].GetID();
 			if (max_id_on_new > id) {
 				insert_pos = i;
 				break;
