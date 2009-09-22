@@ -79,6 +79,9 @@ type:set_request_encoding('utf8');							-- エンコーディング
 
 -- ファイル名
 twitpic_target_file = nil;
+-- ダブルクリックとかメニューから @ した場合の status_id
+-- is_twitter_reply_set = false;
+twitter_reply_id = 0;
 
 
 --- 1ユーザの追加
@@ -195,7 +198,10 @@ end
 --------------------------------------------------
 function twitter_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("twitter_friends_timeline_parser start");
-	
+
+	-- 返信 id の初期化
+	twitter_reply_id = 0;
+
 	-- wrapperクラス化
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
@@ -647,7 +653,9 @@ function on_twitter_reply(serialize_key, event_name, data)
 	else
 		text = text .. "@" .. name .. " ";
 	end
-	
+
+	twitter_reply_id = body:get_integer64_as_string('id');
+
 	mz3_main_view.set_edit_text(text);
 
 	-- フォーカス移動
@@ -965,7 +973,16 @@ function do_post_to_twitter(text)
 	-- POST パラメータを設定
 	post:append_post_body('status=');
 	post:append_post_body(mz3.url_encode(text, 'utf8'));
-	
+
+	-- 返信先ステータス
+	if text:sub( 0, 1 ) == '@' then
+		if twitter_reply_id ~= 0 then
+			post:append_post_body('&in_reply_to_status_id=');
+			post:append_post_body(twitter_reply_id);
+		end
+	end
+	twitter_reply_id = 0;
+
 	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
 	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 		if text:find("RT @", 1, false)~=nil then
