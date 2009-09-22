@@ -1375,6 +1375,65 @@ int lua_mz3_data_set_integer(lua_State *L)
 }
 
 /*
+--- 
+--
+--
+function mz3_data.get_integer64_as_string(data, name)
+*/
+int lua_mz3_data_get_integer64_as_string(lua_State *L)
+{
+	const char* func_name = "mz3_data.get_integer64_as_string";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* name = lua_tostring(L, 2);			// 第2引数
+
+	// 値取得
+	INT64 value = data->GetInt64Value(CString(name));
+
+	// 結果をスタックに戻す
+	// 64bit値なので文字列として返す
+	CStringA value_text;
+	value_text.Format("%I64d", value);
+	lua_pushstring(L, value_text);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 
+--
+--
+function mz3_data.set_integer64_from_string(data, name, value)
+*/
+int lua_mz3_data_set_integer64_from_string(lua_State *L)
+{
+	const char* func_name = "mz3_data.set_integer64_from_string";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	const char* name = lua_tostring(L, 2);			// 第2引数
+	const char* value = lua_tostring(L, 3);			// 第3引数
+
+	// 値設定
+	data->SetInt64Value(CString(name), _atoi64(value));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- 各リスト、子要素の削除
 --
 --
@@ -3358,6 +3417,8 @@ static const luaL_Reg lua_mz3_data_lib[] = {
 	{"add_body_with_extract",	lua_mz3_data_add_body_with_extract},
 	{"get_integer",			lua_mz3_data_get_integer},
 	{"set_integer",			lua_mz3_data_set_integer},
+	{"get_integer64_as_string",			lua_mz3_data_get_integer64_as_string},
+	{"set_integer64_from_string",		lua_mz3_data_set_integer64_from_string},
 	{"set_access_type",		lua_mz3_data_set_access_type},
 	{"get_access_type",		lua_mz3_data_get_access_type},
 	{"create",				lua_mz3_data_create},

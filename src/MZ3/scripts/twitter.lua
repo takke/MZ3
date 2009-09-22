@@ -24,16 +24,6 @@ mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
 mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
 
 
---- MZ3内部IDをTwitterIDに変換する
-function id2realid(n)
-	return n+2147483648;
-end
-
---- TwitterIDをMZ3内部IDに変換する
-function realid2id(n)
-	return n-2147483648;
-end
-
 
 ----------------------------------------
 -- アクセス種別の登録
@@ -99,8 +89,8 @@ function my_add_new_user(new_list, status, id)
 	data = MZ3Data:create();
 	
 	-- id : status/id
---	local id = realid2id(status:match('<id>([^<]*)</id>'));
-	data:set_integer('id', id);
+--	local id = status:match('<id>([^<]*)</id>');
+	data:set_integer64_from_string('id', id);
 	type = mz3.get_access_type_by_key('TWITTER_USER');
 	data:set_access_type(type);
 	
@@ -220,7 +210,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
-		id = mz3_data.get_integer(body:get_data(i), 'id');
+		id = mz3_data.get_integer64_as_string(body:get_data(i), 'id');
 --		mz3.logger_debug(id);
 		id_set[ "" .. id ] = true;
 	end
@@ -253,7 +243,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 				-- 同一 skip は先にやる
 				if i_in_status<3 and line_has_strings(line, '<id>') then
 					-- id : status/id
-					id = realid2id(line:match('<id>(.-)</id>'));
+					id = line:match('<id>(.-)</id>');
 					-- 同一IDがあれば追加しない。
 					if id_set[ "" .. id ] then
 						mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
@@ -334,7 +324,7 @@ function twitter_direct_messages_parser(parent, body, html)
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
-		id = mz3_data.get_integer(body:get_data(i), 'id');
+		id = mz3_data.get_integer64_as_string(body:get_data(i), 'id');
 		id_set[ "" .. id ] = true;
 	end
 
@@ -364,7 +354,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				-- data 生成
 				data = MZ3Data:create();
 				
-				data:set_integer('id', id);
+				data:set_integer64_from_string('id', id);
 				
 				type = mz3.get_access_type_by_key('TWITTER_USER');
 				data:set_access_type(type);
@@ -687,7 +677,7 @@ end
 function on_twitter_create_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	id = id2realid(body:get_integer('id'));
+	id = body:get_integer64_as_string('id');
 	url = "http://twitter.com/favourings/create/" .. id .. ".xml";
 
 	-- 通信開始
@@ -704,7 +694,7 @@ end
 function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	id = id2realid(body:get_integer('id'));
+	id = body:get_integer64_as_string('id');
 	url = "http://twitter.com/favourings/destroy/" .. id .. ".xml";
 
 	-- 通信開始
@@ -909,7 +899,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
 --	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 	item = item .. data:get_date() .. "\r\n";
-	item = item .. "id : " .. id2realid(data:get_integer('id')) .. "\r\n";
+	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
 
 	mz3.alert(item, data:get_text('name'));
 
@@ -927,7 +917,7 @@ function on_show_user_info(serialize_key, event_name, data)
 	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
 	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 --	item = item .. data:get_date() .. "\r\n";
---	item = item .. "id : " .. id2realid(data:get_integer('id')) .. "\r\n";
+--	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
 	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 	if data:get_text('location') ~= '' then

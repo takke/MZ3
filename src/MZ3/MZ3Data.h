@@ -87,7 +87,8 @@ public:
 };
 
 typedef std::map<MZ3String, MZ3String>	MZ3StringMap;
-typedef std::map<MZ3String, int>		MZ3IntegerMap;
+typedef std::map<MZ3String, INT32>		MZ3Int32Map;
+typedef std::map<MZ3String, INT64>		MZ3Int64Map;
 
 /**
  * MZ3 のデータ管理クラス
@@ -104,7 +105,8 @@ protected:
 											///< 要素0に list_bbs.pl のデータを持つ。
 
 	MZ3StringMap		m_StringMap;		///< 汎用文字列コンテナ
-	MZ3IntegerMap		m_IntegerMap;		///< 汎用数値コンテナ
+	MZ3Int32Map			m_Int32Map;			///< 汎用32bit数値コンテナ
+	MZ3Int64Map			m_Int64Map;			///< 汎用64bit数値コンテナ
 	MZ3StringArrayMap	m_StringArrayMap;	///< 汎用文字列配列コンテナ
 
 public:
@@ -165,41 +167,60 @@ public:
 	ACCESS_TYPE GetAccessType()	const		{ return m_accessType; }
 
 public:
+	//--- 汎用64bit数値コンテナのアクセッサ
+
+	/// 汎用64bit数値コンテナへのキー指定による数値設定
+	void	SetInt64Value(LPCTSTR key, INT64 value) {
+		m_Int64Map[key] = value;
+	}
+	/// 汎用64bit数値コンテナからのキー指定による数値取得
+	/// 取得失敗時は default_value を返す
+	INT64	GetInt64Value(LPCTSTR key, INT64 default_value=-1) {
+		return FindInt64Map(key, default_value);
+	}
+
 	//--- 汎用数値コンテナのアクセッサ
 
 	/// 汎用数値コンテナへのキー指定による数値設定
 	void	SetIntValue(LPCTSTR key, int value) {
-		m_IntegerMap[key] = value;
+		m_Int32Map[key] = value;
 	}
 	/// 汎用数値コンテナからのキー指定による数値取得
 	/// 取得失敗時は default_value を返す
 	int	GetIntValue(LPCTSTR key, int default_value=-1) {
-		return FindIntegerMap(key, default_value);
+		return FindInt32Map(key, default_value);
 	}
 
 	// author_id : 投稿者のID（オーナーIDに設定される場合もある）
-	void	SetAuthorID(int authorId)	{ m_IntegerMap[L"author_id"] = authorId; }
-	int		GetAuthorID() const			{ return FindIntegerMap(L"author_id", -1); }
+	void	SetAuthorID(int authorId)	{ m_Int32Map[L"author_id"] = authorId; }
+	int		GetAuthorID() const			{ return FindInt32Map(L"author_id", -1); }
 
 	// id : 記事ID
-	void	SetID(int value)			{ m_IntegerMap[L"id"] = value; }
-	int		GetID()	const				{ return FindIntegerMap(L"id", -1); }
+	void	SetID(int value)			{ m_Int32Map[L"id"] = value; }
+	INT64	GetID()	const				{
+		INT64 id = FindInt64Map(L"id", -1);
+		if (id!=-1) {
+			return id;
+		} else {
+			return FindInt32Map(L"id", -1);
+		}
+	}
 
 	// comment_index : コメント番号
-	void	SetCommentIndex(int value)	{ m_IntegerMap[L"comment_index"] = value; }
-	int		GetCommentIndex() const		{ return FindIntegerMap(L"comment_index", -1); }
+	void	SetCommentIndex(int value)	{ m_Int32Map[L"comment_index"] = value; }
+	int		GetCommentIndex() const		{ return FindInt32Map(L"comment_index", -1); }
 
 	// comment_count : コメントの数
-	void	SetCommentCount(int value)	{ m_IntegerMap[L"comment_count"] = value; }
-	int		GetCommentCount() const		{ return FindIntegerMap(L"comment_count", 0); }
+	void	SetCommentCount(int value)	{ m_Int32Map[L"comment_count"] = value; }
+	int		GetCommentCount() const		{ return FindInt32Map(L"comment_count", 0); }
 
 	// owner_id : オーナーID（投稿者IDに設定される場合もある）
-	void	SetOwnerID(int value)		{ m_IntegerMap[L"owner_id"] = value; }
-	int		GetOwnerID() const			{ return FindIntegerMap(L"owner_id", -1); }
+	void	SetOwnerID(int value)		{ m_Int32Map[L"owner_id"] = value; }
+	int		GetOwnerID() const			{ return FindInt32Map(L"owner_id", -1); }
 
 	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
-	void	SetMyMixi(bool bMyMixi)		{ m_IntegerMap[L"my_mixi"] = bMyMixi ? 1 : 0; }
-	bool	IsMyMixi() const			{ return FindIntegerMap(L"my_mixi", 0) ? true : false; }
+	void	SetMyMixi(bool bMyMixi)		{ m_Int32Map[L"my_mixi"] = bMyMixi ? 1 : 0; }
+	bool	IsMyMixi() const			{ return FindInt32Map(L"my_mixi", 0) ? true : false; }
 
 
 	//--- 汎用文字列配列コンテナのアクセッサ
@@ -313,13 +334,26 @@ public:
 
 private:
 	/// 汎用数値コンテナから key 値を取得する。失敗時は default_value を返す。
-	int FindIntegerMap(LPCTSTR key, int default_value) const
+	int FindInt32Map(LPCTSTR key, INT32 default_value) const
 	{
-		if( m_IntegerMap.size() == 0 ){
+		if( m_Int32Map.size() == 0 ){
 			return default_value;
 		}
-		const MZ3IntegerMap::const_iterator& v = m_IntegerMap.find(key);
-		if (v==m_IntegerMap.end()) {
+		const MZ3Int32Map::const_iterator& v = m_Int32Map.find(key);
+		if (v==m_Int32Map.end()) {
+			return default_value;
+		}
+		return v->second;
+	}
+
+	/// 汎用64bit数値コンテナから key 値を取得する。失敗時は default_value を返す。
+	INT64 FindInt64Map(LPCTSTR key, INT64 default_value) const
+	{
+		if( m_Int64Map.size() == 0 ){
+			return default_value;
+		}
+		const MZ3Int64Map::const_iterator& v = m_Int64Map.find(key);
+		if (v==m_Int64Map.end()) {
 			return default_value;
 		}
 		return v->second;

@@ -45,6 +45,8 @@ function MZ3Data:add_text_array(name, value)	return mz3_data.add_text_array(self
 function MZ3Data:add_body_with_extract(value)	return mz3_data.add_body_with_extract(self.data, value);end
 function MZ3Data:get_integer(name)				return mz3_data.get_integer(self.data, name);			end
 function MZ3Data:set_integer(name, value)		return mz3_data.set_integer(self.data, name, value);	end
+function MZ3Data:get_integer64_as_string(name)	return mz3_data.get_integer64_as_string(self.data, name);	end
+function MZ3Data:set_integer64_from_string(name, value)	return mz3_data.set_integer64_from_string(self.data, name, value);	end
 function MZ3Data:parse_date_line(line)			return mz3_data.parse_date_line(self.data, line);		end
 function MZ3Data:get_link_list_size()			return mz3_data.get_link_list_size(self.data);			end
 function MZ3Data:get_link_list_url(idx)			return mz3_data.get_link_list_url(self.data, idx);		end
