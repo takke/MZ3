@@ -978,8 +978,12 @@ function do_post_to_twitter(text)
 	
 	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
 	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
-		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
-		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+		if text:find("RT @", 1, false)~=nil then
+			-- RT‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚Å’Ç‰Á‚µ‚È‚¢
+		else
+			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+		end
 	end
 	post:append_post_body('&source=');
 	post:append_post_body(mz3.get_app_name());
