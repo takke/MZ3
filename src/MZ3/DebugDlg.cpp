@@ -100,7 +100,7 @@ BOOL CDebugDlg::OnInitDialog()
 	idx++;
 
 	m_List.InsertItem( idx, L"‹L–ID" );
-	m_List.SetItemText( idx, 1, util::int2str( data->GetID() ) );
+	m_List.SetItemText( idx, 1, util::FormatString(L"%I64d", data->GetID()) );
 	idx++;
 
 	m_List.InsertItem( idx, L"ƒRƒƒ“ƒg”Ô†" );
