@@ -63,8 +63,6 @@ public:
 private:
 	bool				m_bAccessing;			///< 通信中フラグ
 
-
-
 	FILE_TYPE			m_fileType;				///< 受信ファイル種別
 
 	CString				m_strErrorMsg;			///< エラー時のメッセージ。
@@ -73,6 +71,7 @@ private:
 	CString				m_strUserAgent;			///< リクエストされたユーザエージェント
 
 	int					m_nRedirect;			///< リダイレクト回数
+	bool				m_bIsBlocking;			///< ブロッキングモードかどうか
 
 public:
 	enum ENCODING {
@@ -92,6 +91,7 @@ public:
 		: m_hInternet(NULL)
 		, m_encodingFrom(ENCODING_EUC)
 		, m_dwHttpStatus(0)
+		, m_bIsBlocking(false)
 	{
 		Initialize( NULL, NULL );
 	}

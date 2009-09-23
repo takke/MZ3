@@ -258,6 +258,7 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUse
 	}
 
 	// スレッド開始
+	m_bIsBlocking = false;
 	m_pThreadMain = AfxBeginThread(ExecGet_Thread, this);
 
 	return TRUE;
@@ -285,6 +286,7 @@ BOOL CInetAccess::DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
 	m_nRedirect = 0;
 
 	// スレッド開始
+	m_bIsBlocking = true;
 	ExecGet_Thread(this);
 
 	return TRUE;
@@ -305,7 +307,9 @@ unsigned int CInetAccess::ExecGet_Thread(LPVOID This)
 			inet->m_hInternet = NULL;
 		}
 	}
-	::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
+	if (!inet->m_bIsBlocking) {
+		::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
+	}
 	inet->m_bAccessing = false;
 
 	return 0;
@@ -349,6 +353,7 @@ BOOL CInetAccess::DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* p
 	}
 
 	// スレッド開始
+	m_bIsBlocking = false;
 	m_pThreadMain = AfxBeginThread(ExecPost_Thread, this);
 
 	return TRUE;
@@ -369,7 +374,9 @@ unsigned int CInetAccess::ExecPost_Thread(LPVOID This)
 			inet->m_hInternet = NULL;
 		}
 	}
-	::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
+	if (!inet->m_bIsBlocking) {
+		::PostMessage( inet->m_hwnd, msg, NULL, (LPARAM)inet->m_object );
+	}
 	inet->m_bAccessing = false;
 
 	return 0;
