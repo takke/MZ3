@@ -17,6 +17,7 @@
 #include "version.h"
 #include "PostDataGenerator.h"
 #include "util_gui.h"
+#include "CommonEditDlg.h"
 #ifdef WINCE
 #include "Nled.h"
 #endif
@@ -833,6 +834,38 @@ int lua_mz3_get_open_file_name(lua_State *L)
 }
 
 /*
+--- 共通エディット画面の表示
+--
+-- @param title        キャプション
+-- @param msg          メッセージ
+-- @param initial_text 初期値
+--
+-- @return (string) ユーザ入力値, ユーザキャンセル時は nil
+--
+function mz3.show_common_edit_dlg(caption, msg, initial_text)
+*/
+int lua_mz3_show_common_edit_dlg(lua_State *L)
+{
+	// 引数の取得
+	CString title(lua_tostring(L, 1));
+	CString msg(lua_tostring(L, 2));
+	CString initial_text(lua_tostring(L, 3));
+
+	CCommonEditDlg dlg;
+	dlg.SetTitle( title );
+	dlg.SetMessage( msg );
+	dlg.mc_strEdit = initial_text;
+	if (dlg.DoModal()==IDOK) {
+		lua_pushstring(L, CStringA(dlg.mc_strEdit));
+	} else {
+		lua_pushnil(L);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- ビュー切り替え
 --
 -- @param view_name ビュー名('main_view', 'report_view', 'write_view')
@@ -859,6 +892,28 @@ int lua_mz3_change_view(lua_State *L)
 		return 0;
 	}
 	::SendMessage(hwndTarget, WM_MZ3_CHANGE_VIEW, NULL, NULL);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- 書き込み画面の起動
+--
+-- @param write_view_type 書き込み種別
+-- @param data            MZ3Data(allow nil)
+--
+function mz3.start_write_view(write_view_type, data)
+*/
+int lua_mz3_start_write_view(lua_State *L)
+{
+	const char* func_name = "mz3.start_write_view";
+
+	// 引数取得
+	CStringA write_view_type(lua_tostring(L, 1));
+	MZ3Data* pData = (MZ3Data*)lua_touserdata(L, 2);
+
+	theApp.m_pWriteView->StartWriteView(theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)write_view_type), pData);
 
 	// 戻り値の数を返す
 	return 0;
@@ -3105,6 +3160,26 @@ int lua_mz3_main_view_get_selected_body_item(lua_State *L)
 }
 
 /*
+--- 現在選択中の上ペイン要素取得
+--
+function mz3_main_view.get_selected_category_item();
+*/
+int lua_mz3_main_view_get_selected_category_item(lua_State *L)
+{
+	// 結果をスタックに積む
+	CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
+		lua_pushnil(L);
+	} else {
+		MZ3Data& data = pCategory->m_mixi;
+		lua_pushlightuserdata(L, (void*)&data);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- 現在選択中の上ペイン要素の種別取得
 --
 function mz3_main_view.get_selected_category_access_type();
@@ -3397,12 +3472,14 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
 	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
 	{"get_open_file_name",					lua_mz3_get_open_file_name},
+	{"show_common_edit_dlg",				lua_mz3_show_common_edit_dlg},
 	{"url_encode",							lua_mz3_url_encode},
 	{"convert_encoding",					lua_mz3_convert_encoding},
 	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
 	{"copy_file",							lua_mz3_copy_file},
 	{"change_view",							lua_mz3_change_view},
 	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
+	{"start_write_view",					lua_mz3_start_write_view},
 	{"set_vib_status",						lua_mz3_set_vib_status},
 	{NULL, NULL}
 };
@@ -3497,6 +3574,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"update_control_status",	lua_mz3_main_view_update_control_status},
 	{"set_focus",				lua_mz3_main_view_set_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
+	{"get_selected_category_item",	lua_mz3_main_view_get_selected_category_item},
 	{"get_selected_category_access_type",	lua_mz3_main_view_get_selected_category_access_type},
 	{"append_category",			lua_mz3_main_view_append_category},
 	{"get_wnd",					lua_mz3_main_view_get_wnd},
