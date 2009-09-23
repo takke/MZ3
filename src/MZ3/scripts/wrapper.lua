@@ -161,12 +161,17 @@ function MZ3AccessTypeInfo:set_cruise_target(f)			return mz3_access_type_info.se
 --------------------------------------------------
 MZ3Menu = {};
 
-function MZ3Menu:create_popup_menu()
+function MZ3Menu:create_popup_menu(menu)
 	-- インスタンス用テーブル
 	local object = {}
 	
 	-- メンバー変数の設定
-	object.menu = mz3_menu.create_popup_menu();
+	if menu==nil then
+		object.menu = mz3_menu.create_popup_menu();
+	else
+		object.menu = menu;
+	end
+	
 	
 	-- テーブルに見あたらないキーをクラスから引いてくるように設定
 	setmetatable(object, { __index = MZ3Menu });

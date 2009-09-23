@@ -56,13 +56,7 @@ public:
 
 	/// メインビュー（MZ3View）から起動した書き込み画面かどうかを返す
 	bool IsWriteFromMainView() {
-		switch( m_writeViewType ) {
-		case WRITEVIEW_TYPE_NEWMESSAGE:
-		case WRITEVIEW_TYPE_NEWDIARY:
-			return true;
-		default:
-			return false;
-		}
+		return m_bFromMainView;
 	}
 
 
@@ -149,21 +143,22 @@ private:
 	CPostData* m_postData;
 	CMixiData* m_data;
 
-	CString m_photo1_filepath;	///< 写真１のパス
-	CString m_photo2_filepath;	///< 写真２のパス
-	CString m_photo3_filepath;	///< 写真３のパス
+	CString m_photo1_filepath;		///< 写真１のパス
+	CString m_photo2_filepath;		///< 写真２のパス
+	CString m_photo3_filepath;		///< 写真３のパス
+	bool	m_bFromMainView;		///< メイン画面から起動した場合(TODO 本来はスタックにすべき)
 
 private:
-	bool m_bWriteCompleted;		///< 書き込み完了フラグ(他ビューから本ビューに復帰できるかどうかの判定に利用される)
+	bool	m_bWriteCompleted;		///< 書き込み完了フラグ(他ビューから本ビューに復帰できるかどうかの判定に利用される)
 
 public:
 	// UI 要素
-	CEdit m_infoEdit;			///< 通知エディット
-	CButton m_sendButton;		///< 書き込みボタン
-	CButton m_cancelButton;		///< キャンセルボタン
-	CWriteEdit m_bodyEdit;		///< 本文エディット
-	CEdit m_titleEdit;			///< タイトルエディット
-	CComboBox m_viewlimitCombo;	///< 公開範囲コンボボックス
+	CEdit		m_infoEdit;			///< 通知エディット
+	CButton		m_sendButton;		///< 書き込みボタン
+	CButton		m_cancelButton;		///< キャンセルボタン
+	CWriteEdit	m_bodyEdit;			///< 本文エディット
+	CEdit		m_titleEdit;		///< タイトルエディット
+	CComboBox	m_viewlimitCombo;	///< 公開範囲コンボボックス
 
 private:
 	bool m_abort;		///< 中断フラグ
@@ -191,6 +186,7 @@ public:
 	afx_msg void OnPreviewAttachedPhoto2();
 	afx_msg void OnPreviewAttachedPhoto3();
 	afx_msg void OnInsertEmoji(UINT nID);
+	void OnLuaMenu(UINT nID);
 
 private:
 	bool DumpToTemporaryDraftFile();

@@ -253,8 +253,6 @@ BEGIN
         MENUITEM "ŽÊ^‚ð“Y•t‚·‚é",                     ID_ATTACH_PHOTO
         MENUITEM "‘‚«ž‚Ý",                        ID_WRITE_SEND_MENU
         MENUITEM "’†Ž~",                          ID_WRITE_CANCEL_MENU
-        MENUITEM SEPARATOR
-        MENUITEM "‘O‚Ì‰æ–Ê‚Ö",                       ID_WRITE_BACK_MENU
     END
 END
 

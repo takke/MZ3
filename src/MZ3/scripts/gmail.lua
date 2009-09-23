@@ -36,7 +36,6 @@ type:set_request_method('GET');									-- リクエストメソッド
 type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');	-- キャッシュファイル
 type:set_request_encoding('utf8');								-- エンコーディング
 type:set_default_url('https://mail.google.com/mail/h/');
---type:set_default_url('https://integration.auone.jp/login/CMN2101E01.do');
 type:set_body_header(1, 'title', '件名');
 type:set_body_header(2, 'name', '差出人>>');
 type:set_body_header(3, 'date', '日付>>');
@@ -73,11 +72,32 @@ type:set_request_method('GET');									-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
 -- メール送信
+-- 書き込み画面用アクセス種別として利用する
+-- メール送信時は GMAIL_NEW1 でメール作成画面を取得し、
+-- 成功時に GMAIL_NEW でPOSTする
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('post');										-- カテゴリ
 type:set_service_type('gmail');									-- サービス種別
-type:set_serialize_key('GMAIL_SEND');							-- シリアライズキー
+type:set_serialize_key('GMAIL_NEW');							-- シリアライズキー
 type:set_short_title('GMail 送信');								-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
+-- メール作成画面
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_NEW1');							-- シリアライズキー
+type:set_short_title('GMail 作成画面');							-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
+-- メール返信
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_REPLY');							-- シリアライズキー
+type:set_short_title('GMail 返信');								-- 簡易タイトル
 type:set_request_method('POST');								-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
@@ -95,11 +115,22 @@ type:set_request_encoding('utf8');								-- エンコーディング
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
 menu_items = {}
+
+-- メイン画面下ペイン用
 menu_items.read               = mz3_menu.regist_menu("gmail.on_read_menu_item");
 menu_items.read_by_reportview = mz3_menu.regist_menu("gmail.on_read_by_reportview_menu_item");
 menu_items.open_by_browser    = mz3_menu.regist_menu("gmail.on_open_by_browser_menu_item");
 menu_items.add_star           = mz3_menu.regist_menu("gmail.on_add_star_menu_item");
+menu_items.send_mail          = mz3_menu.regist_menu("gmail.on_send_mail");
 
+-- 書き込み画面用
+menu_items.change_to_address  = mz3_menu.regist_menu("gmail.on_change_to_address");
+
+
+-- 新規メールの情報
+new_mail_info = {}
+--new_mail_info.to = TO アドレス
+--new_mail_info.cc = CC アドレス
 
 ----------------------------------------
 -- メニューへの登録
@@ -261,6 +292,13 @@ function parse_gmail_inbox(parent, body, line)
 	post_url = line:match('<form action="(%?[^"].-)" name="f".->');
 	post_url = base_url .. post_url;
 --	mz3.alert(post_url);
+
+	-- 新規メール作成用URL
+	new_mail_url = line:match('<a href="([^"]+)" accesskey="c"');
+	if new_mail_url ~= nil then
+		new_mail_url = base_url .. new_mail_url;
+		parent:set_text('new_mail_url', new_mail_url);
+	end
 
 	-- 1メールは '<tr ' で始まる
 	pos = line:find('<tr ', 1, true);
@@ -528,7 +566,10 @@ function gmail_mail_parser(data, dummy, html)
 	-- タイトル
 	-- <h2><font size="+1"><b>たいとる</b></font></h2>
 	title = line:match('<h2><font size=.-><b>(.-)</b>');
-	data:set_text('title', mz3.decode_html_entity(title));
+	title = title:gsub('<.->', '');
+	title = title:gsub('^ *', '');
+	title = mz3.decode_html_entity(title);
+	data:set_text('title', title);
 	
 	-- スレッド分離
 	-- 特定のtableと「返信開始タグ」で分離する
@@ -699,7 +740,8 @@ function parse_one_mail(data, line, count)
 				if line_has_strings(img, 'src=') then
 					-- さらに絵文字であれば変換
 					-- <img src="https://mail.google.com/mail/e/ezweb_ne_jp/B60" goomoji="ezweb_ne_jp.B60" ... />
-					emoji_url, goomoji = img:match('src="(https://mail.google.com/mail/e/ezweb_ne_jp/.-)" goomoji="(.-)"');
+					-- <img src="https://mail.google.com/mail/e/docomo_ne_jp/330" goomoji="docomo_ne_jp.330" ... />
+					emoji_url, goomoji = img:match('src="(https://mail.google.com/mail/e/.-)" goomoji="(.-)"');
 					if emoji_url ~= nil and goomoji ~= nil then
 						-- 未ロードの絵文字があればダウンロードする
 						local idx = mz3_image_cache.get_image_index_by_url(emoji_url);
@@ -843,6 +885,44 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
+--- メール送信
+function on_send_mail(serialize_key, event_name, data)
+	mz3.logger_debug('on_send_mail: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	data = MZ3Data:create(data);
+
+	-- 新規メール用の初期化
+	new_mail_info = {}
+	
+	-- 送信先アドレス取得
+	if do_input_to_address() == false then
+		return true;
+	end
+	
+	-- 書き込み画面への遷移
+	mz3.start_write_view('GMAIL_NEW', mz3_main_view.get_selected_category_item());
+
+	return true;
+end
+
+
+function do_input_to_address()
+	while true do
+		local to = mz3.show_common_edit_dlg("送信先設定", "送信先メールアドレスを入力して下さい", new_mail_info.to);
+		if to == nil then
+			return false;
+		end
+		if to:match('^[^@]+@[^@]+$')==nil then
+			mz3.alert("メールアドレスの形式が不正です。再度入力してください。");
+		else
+			new_mail_info.to = to;
+			break;
+		end
+	end
+	return true;
+end
+
+
 --- スターを付ける
 function on_add_star_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_add_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
@@ -981,6 +1061,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 	menu:append_menu("separator");
 	menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+	menu:append_menu("string", "メールを作成...", menu_items.send_mail);
 
 	menu:append_menu("separator");
 	menu:append_menu("string", "メールのプロパティ...", menu_items.read);
@@ -1061,7 +1142,7 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='gmail' then
 		if serialize_key=='GMAIL_MAIL' then
-			return true, mz3.get_access_type_by_key('GMAIL_SEND');
+			return true, mz3.get_access_type_by_key('GMAIL_REPLY');
 		end
 	end
 
@@ -1076,23 +1157,59 @@ mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "gmail.
 -- @param write_view_type 書き込み種別
 -- @param write_item      [MZ3Data] 書き込み画面の要素
 --
+-- @return [1] ok                  true の場合チェーン終了
+-- @return [2] is_from_main_view   1 の場合メイン画面に戻る、0 の場合レポート画面に戻る
+-- @return [3] init_focus          初期フォーカス
+--                                 'body'  : 本文から開始
+--                                 'title' : タイトルから開始
+-- @return [4] enable_combo_box    1 の場合コンボボックス有効
+-- @return [5] enable_title_change 1 の場合タイトル変更有効
+--
 function on_init_write_view(event_name, write_view_type, write_item)
 
 	write_item = MZ3Data:create(write_item);
 	
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
-	if write_view_key=='GMAIL_SEND' then
-		-- TODO タイトル変更：有効化
+	if write_view_key=='GMAIL_REPLY' then
+		-- メール本文｜返信
+		
+		-- タイトル変更：有効化
+		enable_title_change = 1;
 
 		-- タイトルの初期値設定
 		local title = 'Re: ' .. write_item:get_text('title');
 		mz3_write_view.set_text('title_edit', title);
 		
-		-- TODO 公開範囲コンボボックス：無効
+		-- 公開範囲コンボボックス：無効
+		enable_combo_box = 0;
 		
-		-- TODO フォーカス：本文から開始
+		-- フォーカス：本文から開始
+		init_focus = 'body';
+
+		-- キャンセル時、レポート画面に戻る
+		is_from_main_view = 0;
 		
-		return true;
+		return true, is_from_main_view, init_focus, enable_combo_box, enable_title_change;
+	elseif write_view_key=='GMAIL_NEW' then
+		-- メール作成
+		
+		-- タイトル変更：有効化
+		enable_title_change = 1;
+
+		-- タイトルの初期値設定
+		local title = '';
+		mz3_write_view.set_text('title_edit', '');
+		
+		-- 公開範囲コンボボックス：無効
+		enable_combo_box = 0;
+
+		-- フォーカス：タイトルから開始
+		init_focus = 'title';
+
+		-- キャンセル時、-- メイン画面に戻る
+		is_from_main_view = 1;
+		
+		return true, is_from_main_view, init_focus, enable_combo_box, enable_title_change;
 	end
 
 	return false;
@@ -1144,100 +1261,136 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 			mz3.alert('タイトルを入力してください');
 			return true;
 		end
-		
-		local reply_form = write_item:get_text('reply_form');
-		if reply_form==nil then
-			mz3.alert('返信できません');
+		if body=='' then
+			mz3.alert('メール本文を入力して下さい');
 			return true;
 		end
 		
-		-- <b>To:</b> <input type="hidden" name="qrr" value="o"> xxx@xxx.jp</td>
-		-- <input type="radio" id="reply" name="qrr" value="o" checked> </td> <td colspan="2"> <label for="reply"><b>To:</b> NK &lt;xxx@xxx.jp&gt;</label> </td>
-		local mail_to = reply_form:match('<input type="hidden" name="qrr" value="o".-> ?(.-)</');
-		if mail_to==nil then
-			mail_to = reply_form:match('<input type="radio" id="reply" name="qrr" value="o".-<b>To:</b> ?(.-)</');
-		end
-		msg = mz3.decode_html_entity(mail_to) .. ' にメールを送信します。よろしいですか？' .. "\r\n";
-		msg = msg .. '----' .. "\r\n";
-		msg = msg .. title .. "\r\n";
---		msg = msg .. '----';
-		if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
+		if write_view_key=="GMAIL_REPLY" then
+			-- メール返信処理
+			local reply_form = write_item:get_text('reply_form');
+			if reply_form==nil then
+				mz3.alert('返信できません');
+				return true;
+			end
+			
+			-- <b>To:</b> <input type="hidden" name="qrr" value="o"> xxx@xxx.jp</td>
+			-- <input type="radio" id="reply" name="qrr" value="o" checked> </td> <td colspan="2"> <label for="reply"><b>To:</b> NK &lt;xxx@xxx.jp&gt;</label> </td>
+			local mail_to = reply_form:match('<input type="hidden" name="qrr" value="o".-> ?(.-)</');
+			if mail_to==nil then
+				mail_to = reply_form:match('<input type="radio" id="reply" name="qrr" value="o".-<b>To:</b> ?(.-)</');
+			end
+			if mail_to=="" or mail_to==nil then
+				mz3.alert('送信先メールアドレスが取得できませんでした。再度メールを取得して下さい。');
+				return true;
+			end
+			msg = mz3.decode_html_entity(mail_to) .. ' にメールを送信します。よろしいですか？' .. "\r\n";
+			msg = msg .. '----' .. "\r\n";
+			msg = msg .. title .. "\r\n";
+	--		msg = msg .. '----';
+			if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
+				return true;
+			end
+		
+			------------------------------------------
+			-- POST パラメータ生成
+			------------------------------------------
+
+			-- URL 取得
+			-- <form action="?v=b&qrt=n&..." name="qrf" method="POST"> 
+			local url = reply_form:match('<form action="(.-)"');
+			if url==nil then
+				mz3.alert('返信できません(送信先url取得失敗)');
+				return true;
+			end
+			url = write_item:get_text('base_url') .. url;
+			--mz3.alert(url);
+			
+			-- hidden 値の収集
+			local redir = reply_form:match('<input type="hidden" name="redir" value="(.-)"');
+			redir = redir:gsub('&amp;', '&');
+			local qrr   = reply_form:match('<input type="hidden" name="qrr" value="(.-)"');
+			if qrr==nil then
+				qrr = 'o';
+			end
+			
+			
+			-- POSTパラメータ生成
+			post = MZ3PostData:create();
+			post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
+			
+			-- nvp_bu_send
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding('送信', 'sjis', 'utf8') .. '\r\n');
+			
+			-- redir
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="redir"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(redir, 'sjis', 'utf8') .. '\r\n');
+
+			-- qrr
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="qrr"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(qrr, 'sjis', 'utf8') .. '\r\n');
+			
+			-- subject
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="subject"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(title, 'sjis', 'utf8'));
+			post:append_post_body('\r\n');
+			
+			-- body
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="body"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(body, 'sjis', 'utf8'));
+	--		mz3.alert(string.format('%c%c', 0x82, 0xa0));
+	--		post:append_post_body(string.format('%c%c%c', 0xEE, 0x95, 0x81));
+			post:append_post_body('\r\n');
+			-- ucs2 0xE541   = 1110 0101 0100 0001
+			-- utf8 0xEE9581 = 1110 1110 1001 0101 1000 0001
+			--                 ~~~~      ~~        ~~
+			
+			-- end of post data
+			post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
+
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("GMAIL_REPLY");
+			referer = write_item:get_text('url');
+			user_agent = nil;
+			mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
 			return true;
 		end
 		
-		------------------------------------------
-		-- POST パラメータ生成
-		------------------------------------------
-
-		-- URL 取得
-		-- <form action="?v=b&qrt=n&..." name="qrf" method="POST"> 
-		local url = reply_form:match('<form action="(.-)"');
-		if url==nil then
-			mz3.alert('返信できません(送信先url取得失敗)');
+		if write_view_key=="GMAIL_NEW" then
+			-- メール作成
+			msg = new_mail_info.to .. ' にメールを送信します。よろしいですか？' .. "\r\n";
+			msg = msg .. '----' .. "\r\n";
+			msg = msg .. title .. "\r\n";
+			if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
+				return true;
+			end
+			
+			-- まずは新規メール作成画面を取得する
+			local url = write_item:get_text('new_mail_url');
+			if url==nil or url=="" then
+				mz3.alert('メール作成画面のURLが取得できませんでした。再度メール一覧を取得して下さい。');
+				return true;
+			end
+			
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("GMAIL_NEW1");
+			referer = '';
+			user_agent = nil;
+			post = nil;
+			mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 			return true;
 		end
-		url = write_item:get_text('base_url') .. url;
-		--mz3.alert(url);
-		
-		-- hidden 値の収集
-		local redir = reply_form:match('<input type="hidden" name="redir" value="(.-)"');
-		redir = redir:gsub('&amp;', '&');
-		local qrr   = reply_form:match('<input type="hidden" name="qrr" value="(.-)"');
-		if qrr==nil then
-			qrr = 'o';
-		end
-		
-		
-		-- POSTパラメータ生成
-		post = MZ3PostData:create();
-		post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
-		
-		-- nvp_bu_send
-		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
-		post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
-		post:append_post_body('\r\n');
-		post:append_post_body(mz3.convert_encoding('送信', 'sjis', 'utf8') .. '\r\n');
-		
-		-- redir
-		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
-		post:append_post_body('Content-Disposition: form-data; name="redir"' .. '\r\n');
-		post:append_post_body('\r\n');
-		post:append_post_body(mz3.convert_encoding(redir, 'sjis', 'utf8') .. '\r\n');
-
-		-- qrr
-		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
-		post:append_post_body('Content-Disposition: form-data; name="qrr"' .. '\r\n');
-		post:append_post_body('\r\n');
-		post:append_post_body(mz3.convert_encoding(qrr, 'sjis', 'utf8') .. '\r\n');
-		
-		-- subject
-		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
-		post:append_post_body('Content-Disposition: form-data; name="subject"' .. '\r\n');
-		post:append_post_body('\r\n');
-		post:append_post_body(mz3.convert_encoding(title, 'sjis', 'utf8'));
-		post:append_post_body('\r\n');
-		
-		-- body
-		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
-		post:append_post_body('Content-Disposition: form-data; name="body"' .. '\r\n');
-		post:append_post_body('\r\n');
-		post:append_post_body(mz3.convert_encoding(body, 'sjis', 'utf8'));
---		mz3.alert(string.format('%c%c', 0x82, 0xa0));
---		post:append_post_body(string.format('%c%c%c', 0xEE, 0x95, 0x81));
-		post:append_post_body('\r\n');
-		-- ucs2 0xE541   = 1110 0101 0100 0001
-		-- utf8 0xEE9581 = 1110 1110 1001 0101 1000 0001
-		--                 ~~~~      ~~        ~~
-		
-		-- end of post data
-		post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
-
-		-- 通信開始
-		access_type = mz3.get_access_type_by_key("GMAIL_SEND");
-		referer = write_item:get_text('url');
-		user_agent = nil;
-		mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
-		return true;
 	end
 
 	return false;
@@ -1252,47 +1405,226 @@ mz3.add_event_listener("click_write_view_send_button", "gmail.on_click_write_vie
 -- @param write_item      [MZ3Data] 書き込み画面の要素
 -- @param http_status     HTTP Status Code (200, 404, etc...)
 -- @param filename        レスポンスファイル
+-- @param access_type     通信のアクセス種別
 -- 
 --
-function on_get_end_write_view(event_name, write_view_type, write_item, http_status, filename)
-	-- GMail メール送信では投稿後にリダイレクトするため get_end になる。
+function on_get_end_write_view(event_name, write_view_type, write_item, http_status, filename, access_type)
+	-- GMail メール返信では投稿後にリダイレクトするため get_end になる。
 	
 	-- CWriteView::OnPostEnd と同様の処理を行う。
 	
 	write_item = MZ3Data:create(write_item);
 	
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	serialize_key = mz3.get_serialize_key_by_access_type(access_type);
 	service_type = mz3.get_service_type(write_view_key);
 	if service_type~='gmail' then
 		return false;
 	end
 
-	-- 投稿完了チェック
-	if http_status==200 then
-		-- 成功
-		
-		-- メッセージ表示
-		mz3.alert('送信しました');
-		
-		-- 初期化
-		mz3_write_view.set_text('title_edit', '');
-		mz3_write_view.set_text('body_edit', '');
-		
-		-- 前の画面に戻る
-		mz3.change_view('main_view');
-		
-	else
-		-- 失敗
-		mz3.logger_error('失敗:' .. http_status);
-		
-		mz3.alert('投稿に失敗しました。');
-		
-		-- TODO バックアップ
+	-- 返信完了チェック
+	if write_view_key == "GMAIL_REPLY" then
+		if http_status==200 then
+			-- 成功
+			
+			-- メッセージ表示
+			mz3.alert('メールを返信しました');
+			
+			-- 初期化
+			mz3_write_view.set_text('title_edit', '');
+			mz3_write_view.set_text('body_edit', '');
+			
+			-- 前の画面に戻る
+			mz3.change_view('main_view');
+			
+		else
+			-- 失敗
+			mz3.logger_error('失敗:' .. http_status);
+			
+			mz3.alert('投稿に失敗しました。');
+			
+			-- TODO バックアップ
+		end
+		return true;
 	end
+	
+	-- メール送信
+	if serialize_key == "GMAIL_NEW" then
+		if http_status==200 then
+			-- 成功
+			
+			-- メッセージ表示
+			mz3.alert('メールを送信しました');
+			
+			-- 初期化
+			mz3_write_view.set_text('title_edit', '');
+			mz3_write_view.set_text('body_edit', '');
+			
+			-- 前の画面に戻る
+			mz3.change_view('main_view');
+			
+		else
+			-- 失敗
+			mz3.logger_error('失敗:' .. http_status);
+			
+			mz3.alert('投稿に失敗しました。');
+			
+			-- TODO バックアップ
+		end
+		return true;
+	end
+	
+	-- メール作成画面：メール送信開始
+	if serialize_key == "GMAIL_NEW1" then
+		if http_status==200 then
+			-- 成功
+			
+			-- 本文取得
+			local f = io.open(filename, 'r');
+			local file = f:read('*a');
+			f:close();
+			
+			-- 送信用POST値(hidden)を含むformを取得する
+			
+			-- <base href="https://mail.google.com/mail/h/xxx/">
+			base_url = file:match('<base href="(.-)">');
+
+			-- フォーム取得(2つあるフォームをname="f"で識別)
+--[[
+<form action="?v=b&fv=b&cpt=c&at=xxx&pv=tl&cs=c" name="f" enctype="multipart/form-data" method="POST">
+... </form>
+]]
+			send_form = file:match('<form action="[^"]+" name="f".-</form>');
+--			mz3.alert(send_form);
+			
+			-- URL 取得
+			-- <form action="?v=b&fv=b&cpt=c&at=xxx&pv=tl&cs=c" name="f" enctype="multipart/form-data" method="POST">
+			local url = send_form:match('<form action="(.-)"');
+			if url==nil then
+				mz3.alert('メール送信できません(送信先url取得失敗)');
+				return true;
+			end
+			url = base_url .. url;
+--			mz3.alert(url);
+
+			-- ユーザ入力値取得
+			local title = mz3_write_view.get_text('title_edit');
+			local body  = mz3_write_view.get_text('body_edit');
+			
+			-- hidden 値の収集
+			local redir = send_form:match('<input type="hidden" name="redir" value="(.-)"');
+			redir = redir:gsub('&amp;', '&');
+			
+			-- POSTパラメータ生成
+			post = MZ3PostData:create();
+			post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
+			
+			-- nvp_bu_send
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding('送信', 'sjis', 'utf8') .. '\r\n');
+			
+			-- redir
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="redir"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(redir, 'sjis', 'utf8') .. '\r\n');
+
+			-- to
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="to"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(new_mail_info.to, 'sjis', 'utf8') .. '\r\n');
+
+			-- TODO cc
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="cc"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding("", 'sjis', 'utf8') .. '\r\n');
+
+			-- TODO bcc
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="bcc"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding("", 'sjis', 'utf8') .. '\r\n');
+
+			-- TODO file0
+
+			-- subject
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="subject"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(title, 'sjis', 'utf8'));
+			post:append_post_body('\r\n');
+			
+			-- body
+			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
+			post:append_post_body('Content-Disposition: form-data; name="body"' .. '\r\n');
+			post:append_post_body('\r\n');
+			post:append_post_body(mz3.convert_encoding(body, 'sjis', 'utf8'));
+			post:append_post_body('\r\n');
+			
+			-- end of post data
+			post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
+
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("GMAIL_NEW");
+			referer = write_item:get_text('url');
+			user_agent = nil;
+			mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+			return true;
+
+		else
+			-- 失敗
+			mz3.logger_error('失敗:' .. http_status);
+			
+			mz3.alert('メール作成画面の取得に失敗しました。再度リトライしてください。');
+			
+			-- TODO バックアップ
+		end
+		
+		return true;
+	end
+	
+	return false;
+end
+mz3.add_event_listener("get_end_write_view", "gmail.on_get_end_write_view");
+
+
+--- 書き込み画面のポップアップメニュー表示(他画面と違い追加形式となる点に注意)
+--
+-- @param event_name    'popup_write_menu'
+-- @param serialize_key 書き込み種別のシリアライズキー
+-- @param write_item    書き込み画面のデータ
+-- @param menu          メニュー
+--
+function on_popup_write_menu(event_name, serialize_key, write_item, menu)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='gmail' then
+		return false;
+	end
+
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu(menu);
+	
+	menu:append_menu("separator");
+	menu:append_menu("string", "送信先変更 (" .. new_mail_info.to .. ")", menu_items.change_to_address);
 	
 	return true;
 end
-mz3.add_event_listener("get_end_write_view", "gmail.on_get_end_write_view");
+mz3.add_event_listener("popup_write_menu",  "gmail.on_popup_write_menu");
+
+
+--- TO アドレス変更
+function on_change_to_address(serialize_key, event_name, data)
+	mz3.logger_debug('on_change_to_address: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	-- 送信先アドレス取得
+	do_input_to_address();
+	
+	return true;
+end
 
 
 mz3.logger_debug('gmail.lua end');

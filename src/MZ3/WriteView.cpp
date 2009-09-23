@@ -35,6 +35,7 @@ CWriteView::CWriteView()
 	: CFormView(CWriteView::IDD)
 	, m_abort(false)
 	, m_bWriteCompleted(true)
+	, m_bFromMainView(false)
 {
 	m_postData = new CPostData();
 }
@@ -93,6 +94,7 @@ BEGIN_MESSAGE_MAP(CWriteView, CFormView)
 	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO2, &CWriteView::OnPreviewAttachedPhoto2)
 	ON_COMMAND(ID_PREVIEW_ATTACHED_PHOTO3, &CWriteView::OnPreviewAttachedPhoto3)
 	ON_COMMAND_RANGE(IDM_INSERT_EMOJI_BEGIN, IDM_INSERT_EMOJI_BEGIN+1000, &CWriteView::OnInsertEmoji)
+	ON_COMMAND_RANGE(ID_LUA_MENU_BASE, ID_LUA_MENU_BASE+1000, OnLuaMenu)
 END_MESSAGE_MAP()
 
 
@@ -221,11 +223,43 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 	// MZ3 API : フック関数呼び出し
 	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// m_bFromMainView
+	rvals.push_back(util::MyLuaData(""));	// init_focus
+	rvals.push_back(util::MyLuaData(0));	// enable_combo_box
+	rvals.push_back(util::MyLuaData(0));	// enable_title_change
 	if (util::CallMZ3ScriptHookFunctions2("init_write_view", &rvals, 
 			util::MyLuaData(m_writeViewType),
 			util::MyLuaData(m_data)
 			)) {
+
 		// サポートしているので続行
+		if (rvals[0].m_number) {
+			m_bFromMainView = true;
+		} else {
+			m_bFromMainView = false;
+		}
+
+		// 初期フォーカス
+		if (rvals[1].m_strText=="body") {
+			m_bodyEdit.SetFocus();
+		} else if (rvals[1].m_strText=="title") {
+			m_titleEdit.SetFocus();
+		}
+
+		// コンボボックス有効・無効
+		if (rvals[2].m_number) {
+			m_viewlimitCombo.EnableWindow(TRUE);
+		} else {
+			m_viewlimitCombo.EnableWindow(FALSE);
+		}
+
+		// タイトル変更有効・無効
+		if (rvals[3].m_number) {
+			m_titleEdit.SetReadOnly(FALSE);
+		} else {
+			m_titleEdit.SetReadOnly(TRUE);
+		}
+
 	} else {
 		// Lua 側でサポートしていないので従来のコード。
 		switch( writeViewType ) {
@@ -243,6 +277,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 			// フォーカス：本文から開始
 			m_bodyEdit.SetFocus();
+
+			// 戻り先設定
+			m_bFromMainView = false;
 			break;
 
 		case WRITEVIEW_TYPE_NEWMESSAGE:
@@ -254,6 +291,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 			// フォーカス：タイトルから開始
 			m_titleEdit.SetFocus();
+
+			// 戻り先設定
+			m_bFromMainView = true;
 			break;
 
 		case WRITEVIEW_TYPE_COMMENT:
@@ -270,6 +310,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 			// フォーカス：本文から開始
 			m_bodyEdit.SetFocus();
+
+			// 戻り先設定
+			m_bFromMainView = false;
 			break;
 
 		case WRITEVIEW_TYPE_NEWDIARY:
@@ -292,6 +335,9 @@ void CWriteView::StartWriteView(WRITEVIEW_TYPE writeViewType, CMixiData* pMixi)
 
 			// フォーカス：タイトルから開始
 			m_titleEdit.SetFocus();
+
+			// 戻り先設定
+			m_bFromMainView = true;
 			break;
 
 		default:
@@ -1316,19 +1362,20 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	MyUpdateControlStatus();
 
 	// MZ3 API : フック関数呼び出し
+	ACCESS_TYPE access_type = ((CMixiData*)lParam)->GetAccessType();
 	util::MyLuaDataList rvals;
 	if (util::CallMZ3ScriptHookFunctions2("get_end_write_view", &rvals, 
 			util::MyLuaData(m_writeViewType),
 			util::MyLuaData(m_data),
 			util::MyLuaData(theApp.m_inet.m_dwHttpStatus),
-			util::MyLuaData(CStringA(theApp.m_filepath.temphtml))
+			util::MyLuaData(CStringA(theApp.m_filepath.temphtml)),
+			util::MyLuaData(access_type)
 			))
 	{
 		m_bWriteCompleted = true;
 		return TRUE;
 	}
 
-	ACCESS_TYPE access_type = ((CMixiData*)lParam)->GetAccessType();
 	if (theApp.m_accessTypeInfo.getServiceType(access_type)=="mixi") {
 		switch (access_type) {
 		case ACCESS_LOGIN:
@@ -1663,11 +1710,39 @@ void CWriteView::PopupWriteBodyMenu(void)
 			menu.PrepareOwnerDraw( &menuBitmapArray[0], menuBitmapArray.size() );
 		}
 
+		// 追加メニュー
+		util::MyLuaDataList rvals;
+		if (util::CallMZ3ScriptHookFunctions2("popup_write_menu", &rvals, 
+				util::MyLuaData(m_writeViewType),
+				util::MyLuaData(m_data),
+				util::MyLuaData(pcThisMenu)
+				))
+		{
+		}
+
+		// セパレータ、「前の画面へ」
+		pcThisMenu->AppendMenu(MF_SEPARATOR);
+		pcThisMenu->AppendMenu(MF_STRING, ID_WRITE_BACK_MENU, L"前の画面へ");
+
 		// メニュー表示(コンテキストの都合上、ここで呼び出す)
 		pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 	} else {
 		// mixi 以外では非サポート
 		pcThisMenu->DeleteMenu( 1, MF_BYPOSITION );
+
+		// 追加メニュー
+		util::MyLuaDataList rvals;
+		if (util::CallMZ3ScriptHookFunctions2("popup_write_menu", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(m_writeViewType)),
+				util::MyLuaData(m_data),
+				util::MyLuaData(pcThisMenu)
+				))
+		{
+		}
+
+		// セパレータ、「前の画面へ」
+		pcThisMenu->AppendMenu(MF_SEPARATOR);
+		pcThisMenu->AppendMenu(MF_STRING, ID_WRITE_BACK_MENU, L"前の画面へ");
 
 		// メニュー表示
 		pcThisMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
@@ -1705,4 +1780,20 @@ void CWriteView::MyUpdateControlStatus(void)
 
 	// 情報領域：アクセス中は表示
 	m_infoEdit.ShowWindow(theApp.m_access ? SW_SHOW : SW_HIDE);
+}
+
+/**
+ * MZ3 API で登録されたメニューのイベント
+ */
+void CWriteView::OnLuaMenu(UINT nID)
+{
+	UINT idx = nID - ID_LUA_MENU_BASE;
+	if (idx >= theApp.m_luaMenus.size()) {
+		MZ3LOGGER_ERROR(util::FormatString(L"不正なメニューIDです [%d]", nID));
+		return;
+	}
+
+	// Lua関数名取得＆呼び出し
+	const std::string& strFuncName = theApp.m_luaMenus[idx];
+	util::CallMZ3ScriptHookFunction("", "select_menu", strFuncName.c_str(), &m_data);
 }

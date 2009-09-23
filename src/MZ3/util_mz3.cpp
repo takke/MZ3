@@ -313,7 +313,9 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 								const MyLuaData& data1, 
 								const MyLuaData& data2, 
 								const MyLuaData& data3, 
-								const MyLuaData& data4)
+								const MyLuaData& data4,
+								const MyLuaData& data5
+								)
 {
 	CStringA strHookFuncName(szFuncName);
 
@@ -345,7 +347,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 	int n_arg = 1;
 	lua_pushstring(L, szEventName);
 
-	MyLuaDataPtr data_args[] = {&data1, &data2, &data3, &data4, NULL};
+	MyLuaDataPtr data_args[] = {&data1, &data2, &data3, &data4, &data5, NULL};
 	for (int i=0; data_args[i]!=NULL; i++) {
 		MyLuaDataPtr pData = data_args[i];
 		switch (pData->m_type) {
@@ -421,7 +423,9 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 								 const MyLuaData& data1, 
 								 const MyLuaData& data2, 
 								 const MyLuaData& data3, 
-								 const MyLuaData& data4)
+								 const MyLuaData& data4, 
+								 const MyLuaData& data5
+								 )
 {
 	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
 		// フック関数未登録のため終了
@@ -438,7 +442,11 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 //							CString(hookFuncNames[i].c_str()),
 //							CString(szEventName)));
 
-		if (CallMZ3ScriptHookFunction2(szEventName, hookFuncNames[i].c_str(), pRetValList, data1, data2, data3, data4)) {
+		if (CallMZ3ScriptHookFunction2(szEventName, 
+									   hookFuncNames[i].c_str(), 
+									   pRetValList, 
+									   data1, data2, data3, data4, data5))
+		{
 			rval = true;
 			break;
 		}
