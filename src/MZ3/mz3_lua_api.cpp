@@ -3160,6 +3160,73 @@ int lua_mz3_main_view_get_selected_body_item(lua_State *L)
 }
 
 /*
+--- 現在選択中の下ペイン要素のインデックス取得
+--
+function mz3_main_view.get_selected_body_item_idx();
+*/
+int lua_mz3_main_view_get_selected_body_item_idx(lua_State *L)
+{
+	// 結果をスタックに積む
+	CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
+		lua_pushnil(L);
+	} else {
+		int idx = pCategory->selectedBody;
+		lua_pushinteger(L, idx);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 下ペイン要素一覧取得
+--
+function mz3_main_view.get_body_item_list();
+*/
+int lua_mz3_main_view_get_body_item_list(lua_State *L)
+{
+	// 結果をスタックに積む
+	CCategoryItem* pCategory = theApp.m_pMainView->m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
+		lua_pushnil(L);
+	} else {
+		MZ3DataList& list = pCategory->m_body;
+		lua_pushlightuserdata(L, (void*)&list);
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 現在選択中の下ペイン要素を変更する
+--
+-- @param idx 選択要素のインデックス
+--
+function mz3_main_view.select_body_item(idx);
+*/
+int lua_mz3_main_view_select_body_item(lua_State *L)
+{
+	int idx = lua_tointeger(L, 1);
+
+	if (0 <= idx && idx <= theApp.m_pMainView->m_bodyList.GetItemCount()-1) {
+		// 選択変更
+		util::MySetListCtrlItemFocusedAndSelected( theApp.m_pMainView->m_bodyList, idx, true );
+		theApp.m_pMainView->m_bodyList.EnsureVisible(idx, FALSE);
+
+		lua_pushboolean(L, 1);
+	} else {
+		// 範囲外のためfalseを返す
+		lua_pushboolean(L, 0);
+	}
+
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- 現在選択中の上ペイン要素取得
 --
 function mz3_main_view.get_selected_category_item();
@@ -3574,6 +3641,9 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"update_control_status",	lua_mz3_main_view_update_control_status},
 	{"set_focus",				lua_mz3_main_view_set_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
+	{"get_selected_body_item_idx",	lua_mz3_main_view_get_selected_body_item_idx},
+	{"get_body_item_list",		lua_mz3_main_view_get_body_item_list},
+	{"select_body_item",		lua_mz3_main_view_select_body_item},
 	{"get_selected_category_item",	lua_mz3_main_view_get_selected_category_item},
 	{"get_selected_category_access_type",	lua_mz3_main_view_get_selected_category_access_type},
 	{"append_category",			lua_mz3_main_view_append_category},

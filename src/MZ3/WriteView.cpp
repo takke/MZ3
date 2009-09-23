@@ -1713,7 +1713,7 @@ void CWriteView::PopupWriteBodyMenu(void)
 		// 追加メニュー
 		util::MyLuaDataList rvals;
 		if (util::CallMZ3ScriptHookFunctions2("popup_write_menu", &rvals, 
-				util::MyLuaData(m_writeViewType),
+				util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(m_writeViewType)),
 				util::MyLuaData(m_data),
 				util::MyLuaData(pcThisMenu)
 				))
@@ -1733,7 +1733,7 @@ void CWriteView::PopupWriteBodyMenu(void)
 		// 追加メニュー
 		util::MyLuaDataList rvals;
 		if (util::CallMZ3ScriptHookFunctions2("popup_write_menu", &rvals, 
-			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(m_writeViewType)),
+				util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(m_writeViewType)),
 				util::MyLuaData(m_data),
 				util::MyLuaData(pcThisMenu)
 				))
