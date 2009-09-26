@@ -78,6 +78,8 @@ menu_items = {}
 menu_items.read               = mz3_menu.regist_menu("2ch.on_read_menu_item");
 menu_items.read_by_reportview = mz3_menu.regist_menu("2ch.on_read_by_reportview_menu_item");
 menu_items.open_by_browser    = mz3_menu.regist_menu("2ch.on_open_by_browser_menu_item");
+menu_items.search_post_thread = mz3_menu.regist_menu("2ch.on_search_post_thread");
+menu_items.search_post_bbs    = mz3_menu.regist_menu("2ch.on_search_post_bbs");
 
 
 ----------------------------------------
@@ -469,7 +471,8 @@ end
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
-	if serialize_key~="2CH_THREAD" then
+	if serialize_key=="2CH_THREAD" or serialize_key=="2CH_SUBJECT" then
+	else	
 		return false;
 	end
 
@@ -478,13 +481,22 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	-- メニュー生成
 	menu = MZ3Menu:create_popup_menu();
-	
-	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "スレを開く...", menu_items.read_by_reportview);
-	menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
 
-	menu:append_menu("separator");
-	menu:append_menu("string", "プロパティ...", menu_items.read);
+	if serialize_key=="2CH_THREAD" then
+		menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+		menu:append_menu("string", "スレを開く...", menu_items.read_by_reportview);
+		menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
+
+		menu:append_menu("separator");
+		menu:append_menu("string", "プロパティ...", menu_items.read);
+
+		menu:append_menu("separator");
+		-- スレ 検索
+		menu:append_menu("string", "発言検索", menu_items.search_post_thread);
+	else
+		-- 板検索
+		menu:append_menu("string", "板検索", menu_items.search_post_bbs);
+	end
 
 	-- ポップアップ
 	menu:popup(wnd);
@@ -590,6 +602,62 @@ function on_get_view_style(event_name, serialize_key)
 	return false;
 end
 mz3.add_event_listener("get_view_style", "2ch.on_get_view_style");
+
+
+--- スレ検索
+last_searched_index_thread = 0;
+last_searched_key_thread = '';
+function on_search_post_thread(serialize_key, event_name, data)
+
+	local key = mz3.show_common_edit_dlg("スレ検索", "検索したい文字列を入力して下さい", last_searched_key_thread);
+	if key == nil then
+		return false;
+	end
+	last_searched_key_thread = key;
+	key = string.upper( key );
+
+	local list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	for i=0, n-1 do
+		local data = list:get_data(i);
+		s = mz3_data.get_text(data, 'title');
+		s = string.upper( s );
+		if s:find( key, 1, true ) ~= nil then
+			mz3_main_view.select_body_item(i);
+			last_searched_index_thread = i;
+			break;
+		end
+	end
+end
+
+
+--- 板検索
+last_searched_index_bbs = 0;
+last_searched_key_bbs = '';
+function on_search_post_bbs(serialize_key, event_name, data)
+
+	local key = mz3.show_common_edit_dlg("板検索", "検索したい文字列を入力して下さい", last_searched_key_bbs);
+	if key == nil then
+		return false;
+	end
+	last_searched_key_bbs = key;
+	key = string.upper( key );
+
+	local list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	for i=0, n-1 do
+		local data = list:get_data(i);
+		s = mz3_data.get_text(data, 'name');
+		s = string.upper( s );
+		if s:find( key, 1, true ) ~= nil then
+			mz3_main_view.select_body_item(i);
+			last_searched_index_bbs = i;
+			break;
+		end
+	end
+end
 
 
 mz3.logger_debug('2ch.lua end');

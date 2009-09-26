@@ -77,7 +77,7 @@ public:
 		m_bodyColType2 = colType2;
 		m_bodyColType3 = colType3;
 
-		bSaveToGroupFile = saveToGroupFile == SAVE_TO_GROUPFILE_YES ? true : false;
+		bSaveToGroupFile = (saveToGroupFile == SAVE_TO_GROUPFILE_YES) ? true : false;
 	}
 	virtual ~CCategoryItem()				{}
 

@@ -182,7 +182,7 @@ BEGIN
     END
     MENUITEM "dummy",                       ID_DUMMY
     MENUITEM "dummy",                       ID_DUMMY34210
-    MENUITEM "dummy",                       65535
+    MENUITEM "dummy",                       ID_DUMMY34226
 END
 
 IDR_REPORT_MENU MENU 
@@ -293,6 +293,10 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "タブを右に移動\tAlt+Right",          ID_TABMENU_MOVE_TO_RIGHT
             MENUITEM "タブを左に移動\tAlt+Left",           ID_TABMENU_MOVE_TO_LEFT
+            MENUITEM "タブの名称変更...",                  ID_TABMENU_EDIT
+            MENUITEM "タブの削除...",                    ID_TABMENU_DELETE
+            MENUITEM "タブの追加...",                    ID_TABMENU_ADD
+            MENUITEM SEPARATOR
             MENUITEM "↑カテゴリを上に移動\tAlt+Up",          ID_CATEGORYMENU_MOVE_UP
             MENUITEM "↓カテゴリを下に移動\tAlt+Down",        ID_CATEGORYMENU_MOVE_DOWN
         END

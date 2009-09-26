@@ -3303,7 +3303,7 @@ int lua_mz3_main_view_append_category(lua_State *L)
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(access_type),
 		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(access_type),
 		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(access_type),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+		CCategoryItem::SAVE_TO_GROUPFILE_YES );
 	pView->AppendCategoryList(categoryItem);
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
