@@ -939,6 +939,16 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. data:get_date() .. "\r\n";
 	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
 
+	-- ソース
+	source = data:get_text('source');
+--	item = item .. "source : " .. source .. "\r\n";
+	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
+	if s_url ~= nil then
+		item = item .. "source : " .. s_name .. " (" .. s_url .. ")\r\n";
+	else
+		item = item .. "source : " .. source .. "\r\n";
+	end
+
 	mz3.alert(item, data:get_text('name'));
 
 	return true;
@@ -952,11 +962,14 @@ function on_show_user_info(serialize_key, event_name, data)
 --	mz3.logger_debug(data:get_text('name'));
 	
 	item = '';
-	item = item .. "name : " .. data:get_text('name') .. " / " .. data:get_text('author') .. "\r\n";
+	item = item .. "name : " .. data:get_text('name')
+	       .. " / " .. data:get_text('author')
+	       .. " / " .. data:get_integer('owner_id')
+	       .. "\r\n";
 	item = item .. "description : " .. data:get_text('title') .. "\r\n";
 --	item = item .. data:get_date() .. "\r\n";
 --	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
-	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+--	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 	if data:get_text('location') ~= '' then
 		item = item .. "location : " .. data:get_text('location') .. "\r\n";
@@ -973,16 +986,6 @@ function on_show_user_info(serialize_key, event_name, data)
 		            .. "\r\n";
 	end
 	
-	-- ソース
-	source = data:get_text('source');
---	item = item .. "source : " .. source .. "\r\n";
-	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
-	if s_url ~= nil then
-		item = item .. "source : " .. s_name .. " (" .. s_url .. ")\r\n";
-	else
-		item = item .. "source : " .. source .. "\r\n";
-	end
-
 	mz3.alert(item, data:get_text('name'));
 
 	return true;
