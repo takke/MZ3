@@ -77,6 +77,31 @@ type:set_short_title('twitpic投稿');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_UPDATE_DESTROY');			-- シリアライズキー
+type:set_short_title('発言削除');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_USER_BLOCK_CREATE');		-- シリアライズキー
+type:set_short_title('ブロック');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_USER_BLOCK_DESTROY');		-- シリアライズキー
+type:set_short_title('ブロック解除');						-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+
 -- ファイル名
 twitpic_target_file = nil;
 -- ダブルクリックとかメニューから @ した場合の status_id
@@ -500,6 +525,11 @@ menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
 menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
 menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_open_friend_favorites_by_browser");
 menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
+menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
+menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
+menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
+menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
+menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
 
 
 ----------------------------------------
@@ -1199,6 +1229,12 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("フォローやめた！");
 	elseif serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
 		mz3_main_view.set_info_text("twitpic 画像投稿完了");
+	elseif serialize_key == "TWITTER_UPDATE_DESTROY" then
+		mz3_main_view.set_info_text("発言を削除しました");
+	elseif serialize_key == "TWITTER_USER_BLOCK_CREATE" then
+		mz3_main_view.set_info_text("ブロックしました");
+	elseif serialize_key == "TWITTER_USER_BLOCK_DESTROY" then
+		mz3_main_view.set_info_text("ブロックを解除しました");
 	else
 		-- TWITTER_UPDATE
 --		mz3_main_view.set_info_text("ステータス送信終了");
@@ -1322,6 +1358,13 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", "お気に入り削除", menu_items.destroy_favourings);
 	end
 
+	-- post 削除/検索
+	menu:append_menu("separator");
+	if name == mz3_account_provider.get_value('Twitter', 'id') then
+		menu:append_menu("string", "発言削除", menu_items.twitter_update_destroy);
+	end
+	menu:append_menu("string", "発言検索", menu_items.search_post);
+
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
@@ -1345,6 +1388,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	submenu:append_menu("string", "@" .. name .. " をフォローする", menu_items.create_friendships);
 	submenu:append_menu("string", "@" .. name .. " のフォローをやめる", menu_items.destroy_friendships);
+	submenu:append_menu("string", "@" .. name .. " さんをブロック", menu_items.twitter_user_block_create);
+	submenu:append_menu("string", "@" .. name .. " さんのブロック解除", menu_items.twitter_user_block_destroy);
 	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
 	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
 	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
@@ -1365,6 +1410,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 			menu:append_menu("string", "link : " .. body:get_link_list_text(i), id);
 		end
 	end
+
+--	menu:append_menu("string", "debug", menu_items.debug);
 
 	-- ポップアップ
 	menu:popup(wnd);
@@ -1422,6 +1469,124 @@ function on_get_view_style(event_name, serialize_key)
 	return false;
 end
 mz3.add_event_listener("get_view_style", "twitter.on_get_view_style");
+
+
+--- debug
+last_searched_index = 0;
+function on_debug(serialize_key, event_name, data)
+
+	local list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	for i=0, n-1 do
+		local data = list:get_data(i);
+		if (mz3_data.get_text(data, 'name')=='doutor') then
+			mz3_main_view.select_body_item(i);
+			break;
+		end
+	end
+end
+
+
+mz3.logger_debug('twitter.lua end');
+
+
+--- post 検索
+last_searched_index = 0;
+last_searched_key = '';
+function on_search_post(serialize_key, event_name, data)
+
+	local key = mz3.show_common_edit_dlg("発言検索", "検索したい文字列を入力して下さい", last_searched_key);
+	if key == nil then
+		return false;
+	end
+	last_searched_key = key;
+	key = string.upper( key );
+
+	local list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	for i=0, n-1 do
+		local data = list:get_data(i);
+		data = MZ3Data:create(data);
+		s = data:get_text_array_joined_text('body')
+		s = string.upper( s );
+		if s:find( key, 1, true ) ~= nil then
+			mz3_main_view.select_body_item(i);
+			last_searched_index = i;
+			break;
+		end
+	end
+end
+
+
+--- ステータス削除メニュー用ハンドラ
+function on_twitter_update_destroy(serialize_key, event_name, data)
+
+	if mz3.confirm( "選択された発言を削除します。よろしいですか？", nil, "yes_no") == 'yes' then
+		-- URL 生成
+		body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+		id = body:get_integer64_as_string('id');
+		name = body:get_text('name');
+		url = "http://twitter.com/statuses/destroy/" .. id .. ".xml";
+
+		-- 通信開始
+		key = "TWITTER_UPDATE_DESTROY";
+		access_type = mz3.get_access_type_by_key(key);
+		referer = '';
+		user_agent = nil;
+		post = nil;
+		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+	end
+end
+
+
+--- ブロックメニュー用ハンドラ
+function on_twitter_user_block_create(serialize_key, event_name, data)
+
+	-- 確認
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	if mz3.confirm(name .. " さんをブロックします。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	url = "http://twitter.com/blocks/create/" .. name .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_USER_BLOCK_CREATE";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- ブロック解除メニュー用ハンドラ
+function on_twitter_user_block_destroy(serialize_key, event_name, data)
+
+	-- 確認
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	if mz3.confirm(name .. " さんのブロックを解除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	url = "http://twitter.com/blocks/destroy/" .. name .. ".xml";
+
+	-- 通信開始
+	key = "TWITTER_USER_BLOCK_DESTROY";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
 
 
 mz3.logger_debug('twitter.lua end');
