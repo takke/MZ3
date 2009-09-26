@@ -1605,11 +1605,12 @@ function on_popup_write_menu(event_name, serialize_key, write_item, menu)
 		return false;
 	end
 
-	-- メニュー生成
-	menu = MZ3Menu:create_popup_menu(menu);
-	
-	menu:append_menu("separator");
-	menu:append_menu("string", "送信先変更 (" .. new_mail_info.to .. ")", menu_items.change_to_address);
+	if serialize_key == "GMAIL_NEW" then
+		-- メニュー変更
+		menu = MZ3Menu:create_popup_menu(menu);
+		menu:append_menu("separator");
+		menu:append_menu("string", "送信先変更 (" .. new_mail_info.to .. ")", menu_items.change_to_address);
+	end
 	
 	return true;
 end
