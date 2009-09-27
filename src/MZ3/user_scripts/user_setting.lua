@@ -32,4 +32,12 @@ mz3.logger_debug('user_setting.lua start');
 -- 「@xxx こんにちは」のような発言はあなたのフォロワーのTLには表示されません。
 --use_twitter_reply_with_dot = true;
 
+
+------------------------------
+-- 2ch の詳細設定
+------------------------------
+
+-- 2ch スレの最大取得件数
+t2ch_thread_view_limit = 50;
+
 mz3.logger_debug('user_setting.lua end');

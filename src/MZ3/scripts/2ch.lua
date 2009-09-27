@@ -142,7 +142,10 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 	for i=0, line_count-1 do
 		line = html:get_at(i);
 		
-		local group = line:match('^<BR><BR><B>(.-)</');
+		local group = nil;
+		if line_has_strings(line, '<BR><BR>') then
+			group = line:match('^<BR><BR><B>(.-)</');
+		end
 		if group~=nil then
 			current_group = group;
 		end
@@ -154,7 +157,10 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 		if is_start then
 			-- <A HREF=http://headline.2ch.net/bbynamazu/>地震headline</A><br>
 			-- <A HREF=http://www.monazilla.org/ TARGET=_blank>2chツール</A><br>
-			local url, title = line:match('<A HREF=(.-)/>(.-)</A>');
+			local url, title = nil, nil;
+			if line_has_strings(line, '<A') then
+				url, title = line:match('<A HREF=(.-)/>(.-)</A>');
+			end
 			if url~= nil and title~=nil then
 
 				-- data 生成
@@ -240,6 +246,10 @@ function the_2ch_subject_parser(parent, body, html)
 			
 			-- data 削除
 			data:delete();
+			
+			if body:get_count()>=t2ch_thread_view_limit then
+				break;
+			end
 		end
 	end
 
@@ -379,7 +389,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	data = MZ3Data:create(data);
 	
 	item = '';
-	item = item .. "名前 : " .. data:get_text('name') .. "\r\n";
+	item = item .. data:get_text('title') .. "\r\n";
 --	item = item .. "日付 : " .. data:get_date() .. "\r\n";
 	item = item .. "----\r\n";
 
@@ -492,7 +502,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 		menu:append_menu("separator");
 		-- スレ 検索
-		menu:append_menu("string", "発言検索", menu_items.search_post_thread);
+		menu:append_menu("string", "スレ検索", menu_items.search_post_thread);
 	else
 		-- 板検索
 		menu:append_menu("string", "板検索", menu_items.search_post_bbs);
