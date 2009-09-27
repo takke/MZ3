@@ -38,6 +38,6 @@ mz3.logger_debug('user_setting.lua start');
 ------------------------------
 
 -- 2ch ƒXƒŒ‚ÌÅ‘åæ“¾Œ”
-t2ch_thread_view_limit = 50;
+t2ch_thread_view_limit = 200;
 
 mz3.logger_debug('user_setting.lua end');

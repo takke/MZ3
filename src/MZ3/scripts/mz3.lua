@@ -48,6 +48,11 @@ VIEW_STYLE_IMAGE   = 1;	-- 標準スタイル+ImageIcon
 VIEW_STYLE_TWITTER = 2;	-- 標準スタイル+ImageIcon+StatusEdit (Twitter)
 
 
+-- メイン画面 カテゴリ取得時のハンドラ用定数
+RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE = 1;	-- ローカルストレージ経由で取得
+RETRIEVE_CATEGORY_ITEM_RVAL_INETACCESS = 0;		-- インターネットにアクセス
+RETRIEVE_CATEGORY_ITEM_RVAL_DONE = 2;			-- ハンドラ側で処理完了、何もしない
+
 ----------------------------------------------------------------------
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)
 ----------------------------------------------------------------------

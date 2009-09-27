@@ -4534,18 +4534,34 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	if (item==NULL) {
 		return false;
 	}
-	switch (item->m_mixi.GetAccessType()) {
-	case ACCESS_LIST_BOOKMARK:
-		// ブックマーク：アクセスなし（ローカルストレージ）
-		SetBodyList( item->GetBodyList() );
-		break;
 
-	default:
-		// インターネットにアクセス
-		m_hotList = &m_bodyList;
-		AccessProc( &item->m_mixi, util::CreateMixiUrl(item->m_mixi.GetURL()));
-		break;
+	// MZ3 API : ハンドラ呼び出し
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));
+	if (util::CallMZ3ScriptHookFunctions2("retrieve_category_item", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(item->m_mixi.GetAccessType()))))
+	{
+		// Lua 側で処理完結
+		switch (rvals[0].m_number) {
+		case 2:
+			// 処理完了
+			return true;
+
+		case 1:
+			// ブックマーク同様にローカルストレージ経由で取得
+			SetBodyList( item->GetBodyList() );
+			return true;
+
+		case 0:
+		default:
+			// インターネットにアクセス(続行)
+			break;
+		}
 	}
+
+	// インターネットにアクセス
+	m_hotList = &m_bodyList;
+	AccessProc( &item->m_mixi, util::CreateMixiUrl(item->m_mixi.GetURL()));
 
 	return true;
 }

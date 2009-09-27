@@ -439,7 +439,7 @@ mz3.add_event_listener("reset_twitter_style_post_mode", "mixi.on_reset_twitter_s
 --- Twitterスタイルのボタン名称の更新
 function on_update_twitter_update_button(event_name, serialize_key)
 	if serialize_key == 'MIXI_ADD_ECHO' then
-		return true, 'echo';
+		return true, 'voice';
 	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		return true, '返信';
 	end
@@ -999,6 +999,22 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	end
 end
 mz3.add_event_listener("post_end", "mixi.on_post_end");
+
+
+--- カテゴリ取得時のハンドラ
+--
+-- @param event_name    'retrieve_category_item'
+-- @param serialize_key カテゴリアイテムのシリアライズキー
+--
+function on_retrieve_category_item(event_name, serialize_key, body, wnd)
+	if serialize_key~="BOOKMARK" then
+		return false;
+	end
+	
+	-- ブックマークはローカルストレージ
+	return true, RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE;
+end
+mz3.add_event_listener("retrieve_category_item", "mixi.on_retrieve_category_item");
 
 
 ----------------------------------------

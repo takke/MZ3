@@ -69,6 +69,7 @@ public:
 	{
 		m_name = name;
 
+		m_mixi.SetName( name );
 		m_mixi.SetURL( url );
 		m_mixi.SetAccessType( accessType );
 
