@@ -187,8 +187,8 @@ bool Mz3GroupDataReader::load( AccessTypeInfo& accessTypeInfo, Mz3GroupData& tar
 		CGroupItem group;
 		group.init( util::my_mbstowcs(group_name).c_str(), util::my_mbstowcs(url).c_str(), group_type );
 
-		// "CategoryXX" の値を取得し、処理する。XX は [01,20] とする。
-		for( int j=0; j<20; j++ ) {
+		// "CategoryXX" の値を取得し、処理する。XX は [01,30] とする。
+		for( int j=0; j<30; j++ ) {
 			CStringA key;
 			key.Format( "Category%02d", j+1 );
 			
