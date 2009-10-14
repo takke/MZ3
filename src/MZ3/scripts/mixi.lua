@@ -701,7 +701,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("足あと", "FOOTSTEP");
 		tab:append_category("カレンダー", "CALENDAR", "show_calendar.pl");
 		tab:append_category("ブックマーク", "BOOKMARK");
-		tab:append_category("お気に入りユーザー", "FAVORITE", "list_bookmark.pl");
+		tab:append_category("お気に入りユーザー", "FAVORITE", "view_mylist.pl");
 		tab:append_category("お気に入りコミュ", "FAVORITE_COMMUNITY", "list_bookmark.pl?kind=community");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
@@ -720,6 +720,14 @@ function on_estimate_access_type(event_name, url, data1, data2)
     -- 関連ニュース
 	if line_has_strings(url, 'http://news.mixi.jp/list_quote_diary.pl?') then
 		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
+	end
+
+    -- お気に入りユーザ・コミュニティ
+	if line_has_strings(url, 'view_mylist.pl') then
+		return true, mz3.get_access_type_by_key('FAVORITE');
+	end
+	if line_has_strings(url, 'http://mixi.jp/list_bookmark.pl', 'kind=community') then
+		return true, mz3.get_access_type_by_key('FAVORITE_COMMUNITY');
 	end
 
     -- エコー

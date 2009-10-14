@@ -152,7 +152,7 @@ bool AccessTypeInfo::init()
 	m_map[type].defaultCategoryURL = L"list_bookmark.pl";
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"最終ログイン>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"自己紹介>>");
+	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"追加日>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1\t(%2)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%3";
 

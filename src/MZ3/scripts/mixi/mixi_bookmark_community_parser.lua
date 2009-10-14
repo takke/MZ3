@@ -62,21 +62,19 @@ function mixi_bookmark_community_parser(parent, body, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=230, line_count-1 do
+	for i=180, line_count-1 do
 		line = html:get_at(i);
 
 		-- 次へ、前への抽出処理
 		-- 項目発見前にのみ存在する
 		if not in_data_region and back_data==nil and next_data==nil then
-			back_data, next_data = parse_next_back_link(line, "list_bookmark.pl");
+			if line_has_strings( line, "list_bookmark.pl" ) then
+				back_data, next_data = parse_next_back_link(line, "list_bookmark.pl", "name");
+			end
 		end
 
 		-- 項目探索 以下一行
 		-- <div class="listIcon">
-		--   <a href="view_community.pl?id=3616089">
-		--     <img src="http://community.img.mixi.jp/photo/comm/60/89/3616089_112s.jpg" alt="Windows Home Server" />
-		--   </a>
-		-- </div>
 		if line_has_strings(line, "<div", "class", "listIcon") then
 
 			in_data_region = true;
@@ -84,50 +82,59 @@ function mixi_bookmark_community_parser(parent, body, html)
 			-- data 生成
 			data = MZ3Data:create();
 
-			-- 画像取得
-			image_url, after = line:match("src=\"([^\"]+)\"");
-			-- image_md5 = mz3.make_image_logfile_path_from_url_md5( image_url );
-			-- hoge = mz3_image_cache.get_image_index_by_url( image_url );
-			data:add_text_array("image", image_url);
-
-			i = i+2;
+			i = i+1;
 			line = html:get_at(i);
 
 			-- URL 取得
 			url = line:match("href=\"([^\"]+)\"");
-			data:set_text("url", url);
-
-			-- コミュニティ名
-			name, after = line:match(">([^<]+)(<.*)$");
-			data:set_text("name", name);
-
-			-- 参加者数
-			users, after = line:match("span>%((.-)%)(<.*)$");
-			data:set_date(users);
+			if url ~= nil then
+				url = complement_mixi_url(url);
+				data:set_text("url", url);
+			end
 
 			i = i+1;
 			line = html:get_at(i);
 
-			-- 説明
-			description, after = line:match(">([^<]+)(<.*)$");
---			data:set_text("title", description);
-			data:add_body_with_extract(description);
+			-- 画像取得
+			image_url = line:match("src=\"([^\"]+)\"");
+			data:add_text_array("image", image_url);
 
-			if description == deleted_community then
-				-- 削除済みコミュは一覧に出さない
-				data:delete();
-			else
+			i = i+5;
+			line = html:get_at(i);
 
-				-- URL に応じてアクセス種別を設定
-				type = mz3.estimate_access_type_by_url(url);
-				data:set_access_type(type);
+			-- コミュニティ名
+			name = line:match(">([^<]+)(<.*)$");
 
-				-- data 追加
-				body:add(data.data);
+			if name ~= "" and name ~= nil then
+				add_name = line:match(">([^<]+)(&nbsp;.*)$");
+				data:set_text("name", add_name);
 
-				-- data 削除
-				data:delete();
+				-- 参加者数
+				users = name:match("([0-9]+.人)");
+				data:set_date(users);
+
+				i = i+8;
+				line = html:get_at(i);
+
+				-- 説明
+				-- description, after = line:match(">([^<]+)(<.*)$");
+				description = line:gsub( "\t", "" );
+				data:add_body_with_extract(description);
+
+				if description == '' or description == deleted_community then
+					-- 削除済みコミュは一覧に出さない
+				else
+
+					-- URL に応じてアクセス種別を設定
+					type = mz3.estimate_access_type_by_url(url);
+					data:set_access_type(type);
+
+					-- data 追加
+					body:add(data.data);
+				end
 			end
+			-- data 削除
+			data:delete();
 
 		end
 

@@ -24,7 +24,7 @@ type:set_short_title('お気に入りユーザー');					-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('mixi\\bookmark_user.html');	-- キャッシュファイル
 type:set_request_encoding('euc-jp');						-- エンコーディング
-type:set_default_url('http://mixi.jp/list_bookmark.pl');
+type:set_default_url('http://mixi.jp/view_mylist.pl');
 type:set_body_header(1, 'name', 'ユーザー名');
 type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -60,75 +60,83 @@ function mixi_bookmark_user_parser(parent, body, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=230, line_count-1 do
+	for i=200, line_count-1 do
 		line = html:get_at(i);
 
 		-- 次へ、前への抽出処理
 		-- 項目発見前にのみ存在する
 		if not in_data_region and back_data==nil and next_data==nil then
-			back_data, next_data = parse_next_back_link(line, "list_bookmark.pl");
+			back_data, next_data = parse_next_back_link(line, "view_mylist.pl", "name");
 		end
 
 		-- 項目探索 以下一行
-		-- <div class="listIcon">
-		--   <a href="show_friend.pl?id=xxx">
-		--     <img src="http://community.img.mixi.jp/photo/member/xxx.jpg" alt="ユーザ名" />
-		--   </a>
-		-- </div>
-		if line_has_strings(line, "<div", "class", "listIcon") then
+		-- <td class="thumb">
+		if line_has_strings(line, "<td", "class", "thumb") then
 
 			in_data_region = true;
 
 			-- data 生成
 			data = MZ3Data:create();
 
-			-- 画像取得
-			image_url, after = line:match("src=\"([^\"]+)\"");
-			-- image_md5 = mz3.make_image_logfile_path_from_url_md5( image_url );
-			-- hoge = mz3_image_cache.get_image_index_by_url( image_url );
-			data:add_text_array("image", image_url);
-
-			i = i+2;
+			i = i+1;
 			line = html:get_at(i);
 
 			-- URL 取得
 			url = line:match("href=\"([^\"]+)\"");
-			data:set_text("url", url);
-
-			-- ユーザ名
-			name, after = line:match(">([^<]+)(<.*)$");
-			data:set_text("name", name);
-
-			if name == nil then
-				-- 退会ユーザは表示しない
-				-- data 削除
-				data:delete();
-			else
-				-- 最終ログイン
-				login = line:match("span>(.-)</div");
-				if login~=nil then
-					login = login:match('%((.-)%)');
-					data:set_date(login);
-				end
+			if url ~= nil and url ~= "" then
+				url = complement_mixi_url(url);
+				data:set_text("url", url);
 
 				i = i+1;
 				line = html:get_at(i);
 
-				-- 説明
-				description, after = line:match(">([^<]+)(<.*)$");
-				data:add_body_with_extract(description);
+				-- 画像取得
+				image_url = line:match("src=\"([^\"]+)\"");
+				data:add_text_array("image", image_url);
 
-				-- URL に応じてアクセス種別を設定
-				type = mz3.estimate_access_type_by_url(url);
-				data:set_access_type(type);
+				i = i+4;
+				line = html:get_at(i);
 
-				-- data 追加
-				body:add(data.data);
+				-- ユーザ名
+				name = line:match(">([^<]+)(<.*)$");
+				data:set_text("name", name);
 
-				-- data 削除
-				data:delete();
+				if name ~= nil and name ~= "" then
+					-- 退会ユーザは表示しない
+
+					i = i+1;
+					line = html:get_at(i);
+
+					-- 最終ログイン
+					login = line:match(">([^<]+)(<.*)$");
+					if login~=nil then
+						login = login:match('%((.-)%)');
+						data:set_date(login);
+					end
+
+					for i=i+2, line_count-1 do
+						line = html:get_at(i);
+						if line_has_strings(line, 'date') then
+							break;
+						end
+					end
+
+					-- 追加日
+					add_date = line:match(">([^<]+)(<.*)$");
+					data:add_body_with_extract(add_date);
+
+					-- URL に応じてアクセス種別を設定
+					type = mz3.estimate_access_type_by_url(url);
+					data:set_access_type(type);
+
+					-- data 追加
+					body:add(data.data);
+
+				end
 			end
 
+			-- data 削除
+			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
