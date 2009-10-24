@@ -1,8 +1,7 @@
 --[[
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version
- 2 of the License, or (at your option) any later version.
+ * Copyright (c) MZ3 Project Team All rights reserved.
+ * Code licensed under the BSD License:
+ * http://www.mz3.jp/license.txt
 ]]
 --------------------------------------------------
 -- MZ3 Script : mixi
