@@ -516,8 +516,8 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC_1,7,7,20,20,SS_REALSIZEIMAGE
     LTEXT           "MZ3 Version 0.0.0.0",IDC_STATIC_2,27,7,112,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2006-{YEAR}",IDC_STATIC_COPYRIGHT1,27,18,102,8
-    LTEXT           "Takke, Icchu and many contributors...",IDC_STATIC_7,30,29,108,8
-    LTEXT           "(GNU General Public License)",IDC_STATIC_8,30,40,88,8
+    LTEXT           "MZ3 Project Team",IDC_STATIC_7,30,29,55,8
+    LTEXT           "(BSD License)",IDC_STATIC_8,30,40,43,8
     LTEXT           "based on :",IDC_STATIC_11,27,52,31,8
     LTEXT           "MZ3 Version 0.3.3.1",IDC_STATIC_4,30,63,70,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2006 Mako",IDC_STATIC_3,30,74,86,8
@@ -543,11 +543,11 @@ BEGIN
     LTEXT           "Copyright (C) 2006 Mako",IDC_STATIC_3,63,63,86,8
     LTEXT           "MZ3 Version 0.3.3.1",IDC_STATIC_4,63,52,70,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2006-{YEAR}",IDC_STATIC_COPYRIGHT1,30,18,112,8
-    LTEXT           "(GNU General Public License)",IDC_STATIC_8,33,40,88,8
+    LTEXT           "(BSD License)",IDC_STATIC_8,33,40,43,8
     LTEXT           "includes :",IDC_STATIC_9,30,75,28,8
     LTEXT           "Copyright (C) 2003 (‘S—ª)",IDC_STATIC_6,103,75,77,8
     LTEXT           "JRegex lib.",IDC_STATIC_10,63,75,34,8
-    LTEXT           "Takke, Icchu and many contributors...",IDC_STATIC_7,33,29,108,8
+    LTEXT           "MZ3 Project Team",IDC_STATIC_7,33,29,55,8
     LTEXT           "based on :",IDC_STATIC_11,30,52,31,8
     LTEXT           "FDQ Library",IDC_STATIC_FDQ_TEXT,63,86,36,8
     LTEXT           "Copyright (C) 2002 Qta",IDC_STATIC_FDQ_COPYRIGHT,103,86,69,8
