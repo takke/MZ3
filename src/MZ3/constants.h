@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) MZ3 Project Team All rights reserved.
+ * Code licensed under the BSD License:
+ * http://www.mz3.jp/license.txt
+ */
 /**
  * 各種定数
  */
@@ -10,7 +15,7 @@
 #define	MZ3_APP_NAME				L"MZ4"
 #endif
 
-// CHM ヘルプファイルパス
+// ヘルプファイルパス
 #ifndef WINCE
 # define MZ4_MANUAL_URL				L"http://mz3.jp/manual_mz4/"
 #endif

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) MZ3 Project Team All rights reserved.
+ * Code licensed under the BSD License:
+ * http://www.mz3.jp/license.txt
+ */
 #if !defined(AFX_RAN2IMAGE_H__185C28F5_417B_4C7B_8F56_3015E3F45646__INCLUDED_)
 #define AFX_RAN2IMAGE_H__185C28F5_417B_4C7B_8F56_3015E3F45646__INCLUDED_
 
