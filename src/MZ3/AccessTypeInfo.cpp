@@ -277,42 +277,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"時刻");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-/*
-	type = ACCESS_LIST_MESSAGE_IN;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"メッセージ(受信箱)"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].cacheFilePattern = L"list_message_in.html";
-	m_map[type].serializeKey = "MESSAGE_IN";
-	m_map[type].bCruiseTarget = true;
-	m_map[type].defaultCategoryURL = L"list_message.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"差出人>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-*/
-/*
-	type = ACCESS_LIST_MESSAGE_OUT;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"メッセージ(送信箱)"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].cacheFilePattern = L"list_message_out.html";
-	m_map[type].serializeKey = "MESSAGE_OUT";
-	m_map[type].bCruiseTarget = true;
-	m_map[type].defaultCategoryURL = L"list_message.pl?box=outbox";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"件名");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"宛先>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-*/
+
 	type = ACCESS_LIST_BOOKMARK;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
