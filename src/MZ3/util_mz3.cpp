@@ -51,7 +51,7 @@ inline CString LogfileRuleToText( const CMixiData& data, const CString& strRule 
 			targetURL = targetURL.Left( defaultPathIdx );		// ':' 以前
 		}
 
-		// URL から param パラメータを取得し、その文字列を返す。
+		// URL から取得し、その文字列を返す。
 		CString after;
 		if (util::GetAfterSubString( data.GetURL(), targetURL, after )<0) {
 			return defaultPath;
