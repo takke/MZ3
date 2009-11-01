@@ -27,13 +27,6 @@ mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
---[[
-type = mz3.get_access_type_by_key('TWITTER_FRIENDS_TIMELINE');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '<small>%2 \t(%3)</small>');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '%1');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 1, '%1');
-mz3_access_type_info.set_body_integrated_line_pattern(type, 2, '<small>%2 \t(%3)</small>');
-]]
 
 -- POST用アクセス種別登録
 type = MZ3AccessTypeInfo:create();
@@ -188,9 +181,13 @@ function my_add_new_user(new_list, status, id)
 	-- description : status/user/description
 	-- title に入れるのは苦肉の策・・・
 	s = user:match('<description>([^<]*)</description>');
-	s = s:gsub('&amp;', '&');
-	s = mz3.decode_html_entity(s);
-	data:set_text('title', s);
+	if s~=nil then
+		s = s:gsub('&amp;', '&');
+		s = mz3.decode_html_entity(s);
+		data:set_text('title', s);
+	else
+		data:set_text('title', '');
+	end
 
 	-- owner-id : status/user/id
 	data:set_integer('owner_id', user:match('<id>([^<]*)</id>'));

@@ -621,7 +621,7 @@ bool AccessTypeInfo::init()
 	// http://twitter.com/statuses/user_timeline.xml
 	// http://twitter.com/statuses/user_timeline/takke.xml
 	// => twitter/user_timeline_takke.xml
-	m_map[type].cacheFilePattern = L"twitter\\{urlafter:statuses/:friends_timeline.xml}";
+	m_map[type].cacheFilePattern = L"twitter\\{urlafter:/:friends_timeline.xml}";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
 	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
