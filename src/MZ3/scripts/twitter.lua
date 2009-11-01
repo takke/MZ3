@@ -100,6 +100,30 @@ type:set_short_title('ブロック解除');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+-- Lists用アクセス種別登録
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_LISTS');					-- シリアライズキー
+type:set_short_title('リスト一覧');							-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_cache_file_pattern('twitter\\{urlafter:/}');	-- キャッシュファイル
+type:set_request_encoding('utf8');							-- エンコーディング
+type:set_default_url('http://twitter.com/{twitter:id}/lists.xml');	-- dummy
+type:set_body_header(1, 'title', 'リスト名');
+type:set_body_header(2, 'name', 'members>>');	-- MZ3の制限のため
+type:set_body_header(3, 'date', 'Followers>>');	-- MZ3の制限のため
+type:set_body_integrated_line_pattern(1, '%1 (%2)');
+type:set_body_integrated_line_pattern(2, '  Followers:%3');
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_LISTS_ITEM');				-- シリアライズキー
+type:set_short_title('Twitterリスト');						-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
 
 -- ファイル名
 twitpic_target_file = nil;
@@ -210,6 +234,8 @@ function my_add_new_user(new_list, status, id)
 
 --	mz3.logger_debug("my_add_new_user end");
 end
+
+
 --------------------------------------------------
 -- [list] タイムライン用パーサ
 --
@@ -323,6 +349,101 @@ function twitter_friends_timeline_parser(parent, body, html)
 end
 mz3.set_parser("TWITTER_FRIENDS_TIMELINE", "twitter.twitter_friends_timeline_parser");
 mz3.set_parser("TWITTER_FAVORITES", "twitter.twitter_friends_timeline_parser");
+
+
+--------------------------------------------------
+-- [list] Lists用パーサ
+--
+-- http://twitter.com/{twitter:id}/lists.xml
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function twitter_lists_parser(parent, body, html)
+	mz3.logger_debug("twitter_lists_parser start");
+
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+	
+	local t1 = mz3.get_tick_count();
+	
+	local i=0;
+	local line = '';
+	local line_count = html:get_count();
+	while i<line_count do
+		line = html:get_at(i);
+--		mz3.logger_debug('line:' .. i);
+		
+		if line_has_strings(line, '<list>') then
+			local list = '';
+			list, i = get_sub_html(html, i, line_count, {'<list>'}, {'</list>'});
+			if list ~= '' then
+--				mz3.logger_debug(' list:' .. list);
+				-- data 生成
+				data = MZ3Data:create();
+				
+				local full_name    = list:match('<full_name>(.-)</');
+				local slug         = list:match('<slug>(.-)</slug>');
+				local member_count = list:match('<member_count>(.-)</member_count>');
+				local subscriber_count = list:match('<subscriber_count>(.-)</subscriber_count>');
+				local uri              = list:match('<uri>(.-)</uri>');
+
+				local user_name    = list:match('<screen_name>(.-)</screen_name>');
+				
+				data:set_text('title', full_name);
+				data:set_text('name', member_count);
+				data:set_text('list_slug', slug);
+				data:set_text('user', user_name);
+				data:set_date(subscriber_count);
+				data:set_text('uri', uri);
+
+				type = mz3.get_access_type_by_key('TWITTER_LISTS_ITEM');
+				data:set_access_type(type);
+
+				-- リストに追加
+				body:add(data.data);
+				
+				-- data 削除
+				data:delete();
+			end
+		end
+		i = i+1;
+	end
+
+	-- リストがなければメッセージを表示
+	if body:get_count()==0 then
+		mz3.alert("リストがありませんでした。\r\n\r\n"
+			   .. "Twitter のWeb版からリストを作成してください。\r\n"
+			   .. "MZ3/4ではTwitter側の制限のため、「フォローしているリスト」を取得できません。");
+
+--[[
+		-- data 生成
+		data = MZ3Data:create();
+		
+		-- 0件の表示
+		data:set_text('name', '');
+		data:set_date('');
+		data:set_text('title', 'リストがありません。Twitter でリストを作成してください。');
+
+		-- リストに追加
+		body:add(data.data);
+		
+		-- data 削除
+		data:delete();
+]]
+	end
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("twitter_lists_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("TWITTER_LISTS", "twitter.twitter_lists_parser");
 
 
 --------------------------------------------------
@@ -912,6 +1033,24 @@ function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="TWITTER_USER" then
 		-- 全文表示
 		return on_read_menu_item(serialize_key, event_name, data);
+	elseif serialize_key=="TWITTER_LISTS_ITEM" then
+		-- リストのカテゴリ追加
+		local data = MZ3Data:create(data);
+		
+		local title = data:get_text('title');
+		local user = data:get_text('user');
+		local list_slug = data:get_text('list_slug');
+		local url = 'http://twitter.com/' .. user .. '/lists/' .. list_slug .. '/statuses.xml';
+		local key = "TWITTER_FRIENDS_TIMELINE";
+		mz3_main_view.append_category(title, url, key);
+		
+		-- 追加したカテゴリの取得開始
+		access_type = mz3.get_access_type_by_key(key);
+		referer = '';
+		user_agent = nil;
+		post = nil;
+		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+		return true;
 	end
 	
 	-- 標準の処理を続行
@@ -1443,6 +1582,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		local tab = MZ3GroupItem:create("Twitter");
 		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
+		tab:append_category("リスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
 		tab:append_category("お気に入り", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
 		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
 		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
