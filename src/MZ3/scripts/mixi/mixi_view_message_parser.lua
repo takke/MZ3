@@ -38,7 +38,7 @@ function mixi_view_message_parser(data, dummy, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=140, line_count-1 do
+	for i=250, line_count-1 do
 		line = html:get_at(i);
 
 		-- 日付抽出
@@ -73,18 +73,27 @@ function mixi_view_message_parser(data, dummy, html)
 				mz3.logger_debug("★</div>が見つかったので終了します(1)");
 				break;
 			end
-			for j=i+1, line_count-(i+1)-1 do
+
+			if line:find( "FANCYURL_EMBED", 1, true )==nil then
+				-- 公式メッセージ
+				j = i+2;
 				line = html:get_at(j);
-				
-				-- 整形して追加
 				data:add_body_with_extract(line);
-				
-				if line_has_strings(line, "</div") then
-					mz3.logger_debug("★</div>が見つかったので終了します(2)");
-					break;
+			else
+				-- 普通のメッセージ
+				for j=i+1, line_count-(i+1)-1 do
+					line = html:get_at(j);
+
+					-- 整形して追加
+					data:add_body_with_extract(line);
+					
+					if line_has_strings(line, "</div") then
+						mz3.logger_debug("★</div>が見つかったので終了します(2)");
+						break;
+					end
 				end
 			end
-			
+
 			break;
 		end
 		
