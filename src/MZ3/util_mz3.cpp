@@ -492,4 +492,52 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	return ACCESS_INVALID;
 }
 
+/**
+ * CMixiData に対応する画像ファイルのパスを生成する
+ *
+ * パスは "local_image_filepath" としてキャッシュする。
+ */
+CString MakeImageLogfilePath( CMixiData& data )
+{
+	// アクセス種別に応じてパスを生成する
+	bool bShowImage = false;
+	switch( data.GetAccessType() ) {
+	case ACCESS_PROFILE:
+	case ACCESS_COMMUNITY:
+	case ACCESS_TWITTER_USER:
+	case ACCESS_WASSR_USER:
+	case ACCESS_GOOHOME_USER:
+	case ACCESS_MIXI_ECHO_USER:
+		// これらのアクセス種別では強制的に表示
+		bShowImage = true;
+		break;
+	default:
+		// 通常のアクセス種別では「show_image」が1であれば表示する
+		if (data.GetIntValue(L"show_image", 0)) {
+			bShowImage = true;
+		}
+		break;
+	}
+
+	if (bShowImage) {
+		if (data.GetImageCount()>0) {
+			const CString& image_url = data.GetImage(0);
+			if (image_url.IsEmpty()) {
+				return L"";
+			}
+			CString path = data.GetTextValue(L"local_image_filepath");
+			if (path.IsEmpty()) {
+				path = MakeImageLogfilePathFromUrlMD5( image_url );
+				if (!path.IsEmpty()) {
+					data.SetTextValue(L"local_image_filepath", path);
+				}
+			}
+			if (!path.IsEmpty()) {
+				return path;
+			}
+		}
+	}
+	return L"";
+}
+
 }

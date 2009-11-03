@@ -70,6 +70,7 @@ typedef const MyLuaData* MyLuaDataPtr;
 typedef std::vector<MyLuaData> MyLuaDataList;
 
 CString MakeLogfilePath( const CMixiData& data );
+CString MakeImageLogfilePath( CMixiData& data );
 
 /// URL から画像ファイルのパスを生成する
 CString MakeImageLogfilePathFromUrl( const CString& url );
@@ -154,44 +155,6 @@ inline CString ExtractFilenameFromUrl( const CString& url, const CString& strDef
 		return url.Mid( idx+1 );
 	}
 	return strDefault;
-}
-
-/**
- * CMixiData に対応する画像ファイルのパスを生成する
- *
- * パスは "local_image_filepath" としてキャッシュする。
- */
-inline CString MakeImageLogfilePath( CMixiData& data )
-{
-	// アクセス種別に応じてパスを生成する
-	switch( data.GetAccessType() ) {
-	case ACCESS_PROFILE:
-	case ACCESS_COMMUNITY:
-	case ACCESS_TWITTER_USER:
-	case ACCESS_WASSR_USER:
-	case ACCESS_GOOHOME_USER:
-	case ACCESS_MIXI_ECHO_USER:
-		if (data.GetImageCount()>0) {
-			const CString& image_url = data.GetImage(0);
-			if (image_url.IsEmpty()) {
-				return L"";
-			}
-			CString path = data.GetTextValue(L"local_image_filepath");
-			if (path.IsEmpty()) {
-				path = MakeImageLogfilePathFromUrlMD5( image_url );
-				if (!path.IsEmpty()) {
-					data.SetTextValue(L"local_image_filepath", path);
-				}
-			}
-			if (!path.IsEmpty()) {
-				return path;
-			}
-		}
-		break;
-	default:
-		break;
-	}
-	return L"";
 }
 
 /**
