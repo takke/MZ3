@@ -99,6 +99,12 @@ menu_items.search_post_bbs    = mz3_menu.regist_menu("2ch.on_search_post_bbs");
 menu_items.add_bookmark       = mz3_menu.regist_menu("2ch.on_add_bookmark");
 menu_items.remove_bookmark    = mz3_menu.regist_menu("2ch.on_remove_bookmark");
 
+-- 板選択用のメニュー
+menu_items.select_bbs = {}
+THE_BBS_DIV = 6;		-- グループ化する個数。この個数まで on_select_bbs_n を用意すること
+for i=0, THE_BBS_DIV-1 do
+	menu_items.select_bbs[i]     = mz3_menu.regist_menu("2ch.on_select_bbs_" .. i);
+end
 
 ----------------------------------------
 -- 2ch プラグイン共通定数
@@ -160,6 +166,15 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 	
 	local t1 = mz3.get_tick_count();
 	
+	-- data 生成
+	data = MZ3Data:create();
+	type = mz3.get_access_type_by_key('2CH_SUBJECT');
+	data:set_access_type(type);
+	
+	-- 方針：
+	-- '<BR><BR><B>...</B>' で表現される「グループ」単位で項目を作る。
+	-- かつ、THE_BBS_DIV 個ごとに別項目を作る。
+	
 	line = '';
 	local line_count = html:get_count();
 	local is_start = false;
@@ -172,6 +187,28 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 			group = line:match('^<BR><BR><B>(.-)</');
 		end
 		if group~=nil then
+			-- 新グループ発見
+			-- 2件目以降であればここまでの分をリストに追加
+			if current_group ~= nil then
+				-- ここまでの分をはき出す
+--				mz3.logger_debug(group);
+
+				-- タイトルの後ろに付ける
+				link_no = data:get_link_list_size();
+				if link_no > 0 then
+--					local title = data:get_text('title');
+--					data:set_text('title', title .. ' (' .. link_no .. ')');
+
+					-- リストに追加
+					body:add(data.data);
+				end
+			end
+
+			-- 初期化
+			data:clear();
+			data:set_text('name', '');
+			data:set_text('title', group);
+			
 			current_group = group;
 		end
 		
@@ -187,31 +224,55 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 				url, title = line:match('<A HREF=(.-)/>(.-)</A>');
 			end
 			if url~= nil and title~=nil then
+				
+				-- 既に THE_BBS_DIV 個以上あればはき出す
+				link_no = data:get_link_list_size();
+				if link_no >= THE_BBS_DIV then
+--					local title = data:get_text('title');
+--					data:set_text('title', title .. ' (' .. link_no .. ')');
 
-				-- data 生成
-				data = MZ3Data:create();
+					-- リストに追加
+					body:add(data.data);
+					
+					-- 初期化
+					data:clear();
+					data:set_text('name', '');
+					data:set_text('title', '');
+					
+				end
 				
-				type = mz3.get_access_type_by_key('2CH_SUBJECT');
-				data:set_access_type(type);
-				
-				data:set_text('name', title);
-				data:set_text('title', current_group);
+				-- 構築
+				name = data:get_text('name');
+--				if name:len() < 30 then
+					if name == '' then
+						name = title;
+					else
+						name = name .. ', ' .. title;
+					end
+					data:set_text('name', name);
+--				end
 
 				url = url .. '/subject.txt';
-				data:set_text('url', url);
-				data:set_text('browse_uri', url);
 
-				-- リストに追加
-				body:add(data.data);
-				
-				-- data 削除
-				data:delete();
-				
-				-- 2つ目以降の同一カテゴリはカテゴリを登録しない。見づらいので。
-				current_group = '';
+				data:add_link_list(url, title);
 			end
 		end
 	end
+
+	if current_group ~= nil then
+		-- タイトルの後ろに付ける
+		link_no = data:get_link_list_size();
+		if link_no > 0 then
+--			local title = data:get_text('title');
+--			data:set_text('title', title .. ' (' .. link_no .. ')');
+
+			-- リストに追加
+			body:add(data.data);
+		end
+	end
+
+	-- data 削除
+	data:delete();
 
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("the_2ch_bbsmenu_parser end; elapsed : " .. (t2-t1) .. "[msec]");
@@ -451,6 +512,9 @@ end
 function on_body_list_click(serialize_key, event_name, data)
 
 	if serialize_key=="2CH_SUBJECT" then
+		-- メニュー表示
+		return on_popup_body_menu(event_name, serialize_key, mz3_main_view.get_selected_body_item(), mz3_main_view.get_wnd());
+--[[
 		-- カテゴリ追加
 		body = mz3_main_view.get_selected_body_item();
 		body = MZ3Data:create(body);
@@ -470,8 +534,8 @@ function on_body_list_click(serialize_key, event_name, data)
 		user_agent = nil;
 		post = nil;
 		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
-
 		return true;
+]]
 	end
 	
 	if serialize_key=="2CH_THREAD" then
@@ -487,6 +551,52 @@ function on_body_list_click(serialize_key, event_name, data)
 end
 mz3.add_event_listener("dblclk_body_list", "2ch.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "2ch.on_body_list_click");
+
+
+--- 板選択用のメニューイベント
+function on_select_bbs_n(serialize_key, event_name, data)
+
+	-- イベントのIDを取得し、どの項目が選択されたかを判定する
+	local id = mz3_selected_menu_id;
+	local base_id = menu_items.select_bbs[0];
+	local index = id - base_id;
+
+	-- リンク一覧から URL, TEXT を取得し、カテゴリを追加する
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	n = body:get_link_list_size();
+	if index < n then
+		
+		-- リンク一覧から取得する
+		name = body:get_link_list_text(index);
+		url  = body:get_link_list_url(index);
+
+		-- カテゴリ追加
+		title = "└" .. name;
+		key = "2CH_SUBJECT";
+		mz3_main_view.append_category(title, url, key);
+		
+		-- 追加したカテゴリの取得開始
+		access_type = mz3.get_access_type_by_key(key);
+		referer = '';
+		user_agent = nil;
+		post = nil;
+		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+	end
+	
+	return true;
+	
+end
+on_select_bbs_0 = on_select_bbs_n;
+on_select_bbs_1 = on_select_bbs_n;
+on_select_bbs_2 = on_select_bbs_n;
+on_select_bbs_3 = on_select_bbs_n;
+on_select_bbs_4 = on_select_bbs_n;
+on_select_bbs_5 = on_select_bbs_n;
+on_select_bbs_6 = on_select_bbs_n;
+on_select_bbs_7 = on_select_bbs_n;
+on_select_bbs_8 = on_select_bbs_n;
+on_select_bbs_9 = on_select_bbs_n;
 
 
 --- 「ブラウザで開く」メニュー用ハンドラ
@@ -539,6 +649,16 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		-- スレ 検索
 		menu:append_menu("string", "スレ検索", menu_items.search_post_thread);
 	elseif serialize_key=="2CH_SUBJECT" then
+		-- 配下の板一覧を表示
+		n = body:get_link_list_size();
+		if n > 0 then
+			for i=0, n-1 do
+				id = menu_items.select_bbs[i];		-- 本来はインデックス検査すべき
+				menu:append_menu("string", "" .. body:get_link_list_text(i), id);
+			end
+			menu:append_menu("separator");
+		end
+		
 		-- 板検索
 		menu:append_menu("string", "板検索", menu_items.search_post_bbs);
 	end
@@ -678,7 +798,6 @@ end
 
 
 --- 板検索
-last_searched_index_bbs = 0;
 last_searched_key_bbs = '';
 function on_search_post_bbs(serialize_key, event_name, data)
 
@@ -698,7 +817,6 @@ function on_search_post_bbs(serialize_key, event_name, data)
 		s = string.upper( s );
 		if s:find( key, 1, true ) ~= nil then
 			mz3_main_view.select_body_item(i);
-			last_searched_index_bbs = i;
 			break;
 		end
 	end

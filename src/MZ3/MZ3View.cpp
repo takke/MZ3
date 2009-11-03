@@ -5877,7 +5877,10 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
 				MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");
 				// Twitter タイムライン、ページ変更(複数ページ取得)処理
-				{
+				if (theApp.m_access) {
+					// 画像取得中の可能性あり。キャンセル
+					break;
+				} else {
 					CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
 					int page = pCategoryItem->m_mixi.GetIntValue(L"request_page", 1);
 					MZ3_TRACE(L"　★page=%d\n", page);
@@ -6243,6 +6246,10 @@ void CMZ3View::OnLuaMenu(UINT nID)
 		MZ3LOGGER_ERROR(util::FormatString(L"不正なメニューIDです [%d]", nID));
 		return;
 	}
+
+	// ID の通知
+	lua_pushinteger(theApp.m_luaState, idx);
+	lua_setglobal(theApp.m_luaState, "mz3_selected_menu_id");
 
 	// Lua関数名取得＆呼び出し
 	const std::string& strFuncName = theApp.m_luaMenus[idx];
