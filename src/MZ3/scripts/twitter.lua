@@ -201,15 +201,6 @@ function my_add_new_user(new_list, status, id)
 	profile_image_url = user:match('<profile_image_url>([^<]*)</profile_image_url>');
 	profile_image_url = mz3.decode_html_entity(profile_image_url);
 --	mz3.logger_debug(profile_image_url);
-
-	-- ファイル名のみをURLエンコード
---	int idx = strImage.ReverseFind( '/' );
---	if (idx >= 0) {
---		CString strFileName = strImage.Mid( idx +1 );
---		strFileName = URLEncoder::encode_utf8( strFileName );
---		strImage = strImage.Left(idx + 1);
---		strImage += strFileName;
---	}
 	data:add_text_array('image', profile_image_url);
 
 	-- <location>East Tokyo United</location>
@@ -386,6 +377,7 @@ function twitter_lists_parser(parent, body, html)
 				-- data 生成
 				data = MZ3Data:create();
 				
+				-- 各種データ取得、設定
 				local full_name    = list:match('<full_name>(.-)</');
 				local slug         = list:match('<slug>(.-)</slug>');
 				local member_count = list:match('<member_count>(.-)</member_count>');
@@ -401,6 +393,16 @@ function twitter_lists_parser(parent, body, html)
 				data:set_date(subscriber_count);
 				data:set_text('uri', uri);
 
+				-- Image : list/user/profile_image_url
+				profile_image_url = list:match('<profile_image_url>([^<]*)</profile_image_url>');
+				profile_image_url = mz3.decode_html_entity(profile_image_url);
+				mz3.logger_debug(profile_image_url);
+				data:add_text_array('image', profile_image_url);
+
+				-- 画像表示フラグを立てる
+				data:set_integer('show_image', 1);
+
+				-- アクセス種別設定
 				type = mz3.get_access_type_by_key('TWITTER_LISTS_ITEM');
 				data:set_access_type(type);
 
@@ -559,16 +561,6 @@ function twitter_direct_messages_parser(parent, body, html)
 				-- Image : direct_message/user/profile_image_url
 				profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
 				profile_image_url = mz3.decode_html_entity(profile_image_url);
---				mz3.logger_debug(profile_image_url);
-
-				-- ファイル名のみをURLエンコード
---				int idx = strImage.ReverseFind( '/' );
---				if (idx >= 0) {
---					CString strFileName = strImage.Mid( idx +1 );
---					strFileName = URLEncoder::encode_utf8( strFileName );
---					strImage = strImage.Left(idx + 1);
---					strImage += strFileName;
---				}
 				data:add_text_array('image', profile_image_url);
 
 				-- <location>East Tokyo United</location>
@@ -1580,11 +1572,13 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
 		tab:append_category("リスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
+		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists/memberships.xml");
 		tab:append_category("お気に入り", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
 		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
 		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
+
 	end
 end
 mz3.add_event_listener("creating_default_group", "twitter.on_creating_default_group", false);
