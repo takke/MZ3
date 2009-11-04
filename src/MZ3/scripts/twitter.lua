@@ -117,7 +117,6 @@ type:set_short_title('Twitterリスト');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
-
 -- ファイル名
 twitpic_target_file = nil;
 -- ダブルクリックとかメニューから @ した場合の status_id
@@ -636,10 +635,20 @@ menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_o
 menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
 menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
 menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
+menu_items.search_hash           = mz3_menu.regist_menu("twitter.on_search_hash_list");
 menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
 menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
 menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
+menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
 
+-- 発言内のハッシュタグ #xxx 抽出リスト
+menu_items.search_hash_list = {}
+menu_items.search_hash_list[1]   = mz3_menu.regist_menu("twitter.on_search_hash_list_1");
+menu_items.search_hash_list[2]   = mz3_menu.regist_menu("twitter.on_search_hash_list_2");
+menu_items.search_hash_list[3]   = mz3_menu.regist_menu("twitter.on_search_hash_list_3");
+menu_items.search_hash_list[4]   = mz3_menu.regist_menu("twitter.on_search_hash_list_4");
+menu_items.search_hash_list[5]   = mz3_menu.regist_menu("twitter.on_search_hash_list_5");
+hash_list = {}
 
 ----------------------------------------
 -- サービス用関数
@@ -1197,6 +1206,20 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	end
 
+--[[
+	-- 文字長チェック
+	len = string.len( text );
+	if len > 140 then
+		msg = '140バイトを超過しています。投稿に失敗する可能性がありますが続行しますか？\n'
+			.. '※ バイト数であり、文字数ではありません。\n'
+			.. '----\n'
+			.. text;
+		if mz3.confirm(msg, 'バイト数：' .. len, 'yes_no') ~= 'yes' then
+			return true;
+		end
+	end
+]]
+
 	-- 確認
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
@@ -1365,6 +1388,8 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("ブロックしました");
 	elseif serialize_key == "TWITTER_USER_BLOCK_DESTROY" then
 		mz3_main_view.set_info_text("ブロックを解除しました");
+	elseif serialize_key == "TWITTER_USER_SPAM_REPORTS_CREATE" then
+		mz3_main_view.set_info_text("スパム通報しました");
 	else
 		-- TWITTER_UPDATE
 --		mz3_main_view.set_info_text("ステータス送信終了");
@@ -1457,6 +1482,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- メニュー生成
 	menu = MZ3Menu:create_popup_menu();
 	submenu = MZ3Menu:create_popup_menu();
+	submenu_hash = MZ3Menu:create_popup_menu();
 	
 	name = body:get_text('name');
 
@@ -1495,6 +1521,26 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 	menu:append_menu("string", "発言検索", menu_items.search_post);
 
+	-- 発言内のハッシュタグ #XXX を抽出し、メニュー化
+	body_text = body:get_text_array_joined_text('body');
+	i = 1;
+	for hash in body_text:gmatch("#([0-9a-zA-Z_]+)") do
+		mz3.logger_debug(hash);
+		hash_list[i] = hash;
+		submenu_hash:append_menu("string", "#" .. hash .. " の検索", menu_items.search_hash_list[i]);
+		i = i+1;
+		--[[
+		-- 最大5つまでサポート
+		if i>5 then
+			break;
+		end
+		]]
+	end
+
+	if i > 1 then
+		menu:append_submenu("ハッシュタグ", submenu_hash);
+	end
+
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
@@ -1520,6 +1566,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	submenu:append_menu("string", "@" .. name .. " のフォローをやめる", menu_items.destroy_friendships);
 	submenu:append_menu("string", "@" .. name .. " さんをブロック", menu_items.twitter_user_block_create);
 	submenu:append_menu("string", "@" .. name .. " さんのブロック解除", menu_items.twitter_user_block_destroy);
+	submenu:append_menu("string", "@" .. name .. " さんをスパム通報する", menu_items.twitter_user_spam_reports);
 	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
 	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
 	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
@@ -1549,6 +1596,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- メニューリソース削除
 	menu:delete();
 	submenu:delete();
+	submenu_hash:delete();
 	
 	return true;
 end
@@ -1714,6 +1762,47 @@ function on_twitter_user_block_destroy(serialize_key, event_name, data)
 
 	-- 通信開始
 	key = "TWITTER_USER_BLOCK_DESTROY";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- 「#xxx の検索」メニュー用ハンドラ
+function on_search_hash_list_1(serialize_key, event_name, data)	search_hash_list(1) end
+function on_search_hash_list_2(serialize_key, event_name, data)	search_hash_list(2) end
+function on_search_hash_list_3(serialize_key, event_name, data)	search_hash_list(3) end
+function on_search_hash_list_4(serialize_key, event_name, data)	search_hash_list(4) end
+function on_search_hash_list_5(serialize_key, event_name, data)	search_hash_list(5) end
+
+function search_hash_list(num)
+	-- 発言内の num 番目のハッシュタグ #xxx を検索する
+	hash = hash_list[num];
+	-- カテゴリ追加
+	title = "#" .. hash .. " を検索";
+	url = "https://twitter.com/search?q=%23" .. hash;
+	mz3.open_url_by_browser_with_confirm(url);
+end
+
+
+--- スパム通報メニュー用ハンドラ
+function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
+
+	-- 確認
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	if mz3.confirm(name .. " さんをスパムとして通報します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	url = "http://twitter.com/report_spam.xml?screen_name=" .. name;
+
+	-- 通信開始
+	key = "TWITTER_USER_SPAM_REPORTS_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
