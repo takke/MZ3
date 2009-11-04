@@ -117,6 +117,57 @@ type:set_short_title('Twitterリスト');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+
+----------------------------------------
+-- メニュー項目登録(静的に用意すること)
+----------------------------------------
+menu_items = {}
+menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
+menu_items.show_user_info        = mz3_menu.regist_menu("twitter.on_show_user_info");
+menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
+
+menu_items.get_prev_page         = mz3_menu.regist_menu("twitter.on_get_prev_page");
+
+-- 発言内の @xxx 抽出者のTL(5人まで)
+menu_items.show_follower_tl = {}
+menu_items.show_follower_tl[1]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_1");
+menu_items.show_follower_tl[2]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_2");
+menu_items.show_follower_tl[3]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_3");
+menu_items.show_follower_tl[4]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_4");
+menu_items.show_follower_tl[5]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_5");
+follower_names = {}
+
+menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
+menu_items.update_with_twitpic   = mz3_menu.regist_menu("twitter.on_twitter_update_with_twitpic");
+menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
+menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
+menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_create_favourings");
+menu_items.destroy_favourings    = mz3_menu.regist_menu("twitter.on_twitter_destroy_favourings");
+menu_items.create_friendships    = mz3_menu.regist_menu("twitter.on_twitter_create_friendships");
+menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_destroy_friendships");
+menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
+menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
+menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
+menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_open_friend_favorites_by_browser");
+menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
+menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
+menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
+menu_items.search_hash           = mz3_menu.regist_menu("twitter.on_search_hash_list");
+menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
+menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
+menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
+menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
+
+-- 発言内のハッシュタグ #xxx 抽出リスト
+menu_items.search_hash_list = {}
+menu_items.search_hash_list[1]   = mz3_menu.regist_menu("twitter.on_search_hash_list_1");
+menu_items.search_hash_list[2]   = mz3_menu.regist_menu("twitter.on_search_hash_list_2");
+menu_items.search_hash_list[3]   = mz3_menu.regist_menu("twitter.on_search_hash_list_3");
+menu_items.search_hash_list[4]   = mz3_menu.regist_menu("twitter.on_search_hash_list_4");
+menu_items.search_hash_list[5]   = mz3_menu.regist_menu("twitter.on_search_hash_list_5");
+hash_list = {}
+
+
 -- ファイル名
 twitpic_target_file = nil;
 -- ダブルクリックとかメニューから @ した場合の status_id
@@ -604,53 +655,6 @@ mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parse
 
 
 ----------------------------------------
--- メニュー項目登録(静的に用意すること)
-----------------------------------------
-menu_items = {}
-menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
-menu_items.show_user_info        = mz3_menu.regist_menu("twitter.on_show_user_info");
-menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
-
--- 発言内の @xxx 抽出者のTL(5人まで)
-menu_items.show_follower_tl = {}
-menu_items.show_follower_tl[1]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_1");
-menu_items.show_follower_tl[2]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_2");
-menu_items.show_follower_tl[3]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_3");
-menu_items.show_follower_tl[4]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_4");
-menu_items.show_follower_tl[5]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_5");
-follower_names = {}
-
-menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
-menu_items.update_with_twitpic   = mz3_menu.regist_menu("twitter.on_twitter_update_with_twitpic");
-menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
-menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
-menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_create_favourings");
-menu_items.destroy_favourings    = mz3_menu.regist_menu("twitter.on_twitter_destroy_favourings");
-menu_items.create_friendships    = mz3_menu.regist_menu("twitter.on_twitter_create_friendships");
-menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_destroy_friendships");
-menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
-menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
-menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
-menu_items.open_friend_favorites_by_browser = mz3_menu.regist_menu("twitter.on_open_friend_favorites_by_browser");
-menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_site");
-menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
-menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
-menu_items.search_hash           = mz3_menu.regist_menu("twitter.on_search_hash_list");
-menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
-menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
-menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
-menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
-
--- 発言内のハッシュタグ #xxx 抽出リスト
-menu_items.search_hash_list = {}
-menu_items.search_hash_list[1]   = mz3_menu.regist_menu("twitter.on_search_hash_list_1");
-menu_items.search_hash_list[2]   = mz3_menu.regist_menu("twitter.on_search_hash_list_2");
-menu_items.search_hash_list[3]   = mz3_menu.regist_menu("twitter.on_search_hash_list_3");
-menu_items.search_hash_list[4]   = mz3_menu.regist_menu("twitter.on_search_hash_list_4");
-menu_items.search_hash_list[5]   = mz3_menu.regist_menu("twitter.on_search_hash_list_5");
-hash_list = {}
-
-----------------------------------------
 -- サービス用関数
 ----------------------------------------
 
@@ -1019,6 +1023,62 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 	
 	-- 追加したカテゴリの取得開始
 	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- body_item_list から最大のIDを取得する
+-- 
+-- ただし、ログから取得した項目は含まない
+--
+-- 未発見時は nil を返す
+--
+function get_max_id_from_body_list()
+	local max_id = nil;
+	list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	for i=0, n-1 do
+		local data = list:get_data(i);
+		data = MZ3Data:create(data);
+		local id = data:get_integer64_as_string('id');
+		local from_log_flag = data:get_integer('from_log_flag');
+		mz3.logger_debug(' ' .. i .. ' : ' .. from_log_flag .. ' : ' .. id);
+		if from_log_flag ~= 1 then
+			max_id = id;
+		end
+	end
+	return max_id;
+end
+
+
+--- 「前のページを取得」メニュー用ハンドラ
+function on_get_prev_page(serialize_key, event_name, data)
+
+	-- max_id の探索(log は含まない)
+	local max_id = get_max_id_from_body_list();
+	if max_id == nil then
+		-- 未取得
+		max_id = 0;
+	end
+
+	-- カテゴリのURL取得
+	local category = MZ3Data:create(mz3_main_view.get_selected_category_item());
+	local category_url = category:get_text('url');
+	url = category_url;
+	if url:find("?", 1, false)~=nil then
+		-- ? を含む
+		url = url .. '&max_id=' .. max_id;
+	else
+		-- ? を含まない
+		url = url .. '?max_id=' .. max_id;
+	end
+
+	-- カテゴリの取得開始
+	access_type = category:get_access_type();
 	referer = '';
 	user_agent = nil;
 	post = nil;
@@ -1487,6 +1547,15 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	name = body:get_text('name');
 
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	
+	-- N 件未満であれば「前のページを取得」を表示
+	list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	if n < 100 then
+		menu:append_menu("string", "前のページを取得", menu_items.get_prev_page);
+	end
+
 	menu:append_menu("string", "全文を読む...", menu_items.read);
 	menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
 
@@ -1515,7 +1584,6 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 
 	-- post 削除/検索
-	menu:append_menu("separator");
 	if name == mz3_account_provider.get_value('Twitter', 'id') then
 		menu:append_menu("string", "発言削除", menu_items.twitter_update_destroy);
 	end
@@ -1529,12 +1597,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		hash_list[i] = hash;
 		submenu_hash:append_menu("string", "#" .. hash .. " の検索", menu_items.search_hash_list[i]);
 		i = i+1;
-		--[[
 		-- 最大5つまでサポート
 		if i>5 then
 			break;
 		end
-		]]
 	end
 
 	if i > 1 then
