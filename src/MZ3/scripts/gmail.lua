@@ -109,7 +109,23 @@ type:set_short_title('GMail スター');							-- 簡易タイトル
 type:set_request_method('POST');								-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
+-- スターをはずす
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_REMOVE_STAR');					-- シリアライズキー
+type:set_short_title('GMail スター');							-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
 
+-- アーカイブする
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('gmail');									-- サービス種別
+type:set_serialize_key('GMAIL_ARCHIVE');						-- シリアライズキー
+type:set_short_title('GMail アーカイブ');						-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
@@ -120,6 +136,8 @@ menu_items.read               = mz3_menu.regist_menu("gmail.on_read_menu_item");
 menu_items.read_by_reportview = mz3_menu.regist_menu("gmail.on_read_by_reportview_menu_item");
 menu_items.open_by_browser    = mz3_menu.regist_menu("gmail.on_open_by_browser_menu_item");
 menu_items.add_star           = mz3_menu.regist_menu("gmail.on_add_star_menu_item");
+menu_items.rmv_star           = mz3_menu.regist_menu("gmail.on_remove_star_menu_item");
+menu_items.archive            = mz3_menu.regist_menu("gmail.on_archive_menu_item");
 menu_items.send_mail          = mz3_menu.regist_menu("gmail.on_send_mail");
 
 -- 書き込み画面用
@@ -946,6 +964,53 @@ function on_add_star_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
+--- スターをはずす
+function on_remove_star_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_remove_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	data = MZ3Data:create(data);
+
+	-- POSTパラメータ生成
+	post = MZ3PostData:create();
+
+	-- tパラメータはメールURLから取得する
+	t = data:get_text('url');
+	t = t:match('th=(.*)$');
+	post_body = 'redir=%3F&tact=xst&nvp_tbu_go=%E5%AE%9F%E8%A1%8C&t=' .. t .. '&bact=';
+	post:append_post_body(post_body);
+
+	-- 通信開始
+	url = data:get_text('post_url');
+	access_type = mz3.get_access_type_by_key("GMAIL_REMOVE_STAR");
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	return true;
+end
+
+--- アーカイブする
+function on_archive_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_archive_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	data = MZ3Data:create(data);
+
+	-- POSTパラメータ生成
+	post = MZ3PostData:create();
+
+	-- tパラメータはメールURLから取得する
+	t = data:get_text('url');
+	t = t:match('th=(.*)$');
+	post_body = 'redir=%3F&nvp_a_arch=%83A%81%5b%83J%83C%83u&t=' .. t .. '&bact=';
+	post:append_post_body(post_body);
+
+	-- 通信開始
+	url = data:get_text('post_url');
+	access_type = mz3.get_access_type_by_key("GMAIL_ARCHIVE");
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	return true;
+end
 
 --- POST 完了イベント
 --
@@ -974,6 +1039,12 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	-- リクエストの種別に応じてメッセージを表示
 	if serialize_key == "GMAIL_ADD_STAR" then
 		mz3_main_view.set_info_text("スターつけた！");
+	end
+	if serialize_key == "GMAIL_REMOVE_STAR" then
+		mz3_main_view.set_info_text("スターとったどー！");
+	end
+	if serialize_key == "GMAIL_ARCHIVE" then
+		mz3_main_view.set_info_text("アーカイブしたー！");
 	end
 
 	return true;
@@ -1060,6 +1131,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 	menu:append_menu("separator");
 	menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+	menu:append_menu("string", "スターをはずす...", menu_items.rmv_star);
+	menu:append_menu("string", "アーカイブ...", menu_items.archive);
 	menu:append_menu("string", "メールを作成...", menu_items.send_mail);
 
 	menu:append_menu("separator");
