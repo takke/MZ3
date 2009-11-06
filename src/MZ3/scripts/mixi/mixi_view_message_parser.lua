@@ -74,23 +74,16 @@ function mixi_view_message_parser(data, dummy, html)
 				break;
 			end
 
-			if line:find( "FANCYURL_EMBED", 1, true )==nil then
-				-- 公式メッセージ
-				j = i+2;
+			-- 普通のメッセージ
+			for j=i+1, line_count-1 do
 				line = html:get_at(j);
-				data:add_body_with_extract(line);
-			else
-				-- 普通のメッセージ
-				for j=i+1, line_count-(i+1)-1 do
-					line = html:get_at(j);
 
-					-- 整形して追加
-					data:add_body_with_extract(line);
-					
-					if line_has_strings(line, "</div") then
-						mz3.logger_debug("★</div>が見つかったので終了します(2)");
-						break;
-					end
+				-- 整形して追加
+				data:add_body_with_extract(line);
+				
+				if line_has_strings(line, "</div") then
+					mz3.logger_debug("★</div>が見つかったので終了します(2)");
+					break;
 				end
 			end
 
