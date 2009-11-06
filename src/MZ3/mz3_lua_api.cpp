@@ -975,6 +975,30 @@ int lua_mz3_set_vib_status(lua_State *L)
 	return 0;
 }
 
+/*
+--- •¶š—ñ‚Ì’·‚³æ“¾
+--
+-- @param text ‘ÎÛ•¶š—ñ
+--
+-- @return integer ’·‚³
+--
+function mz3.get_text_length(text)
+*/
+int lua_mz3_get_text_length(lua_State *L)
+{
+	const char* func_name = "mz3.get_text_length";
+
+	// ˆø”æ“¾
+	CString text(lua_tostring(L, 1));
+
+	int length = text.GetLength();
+
+	lua_pushinteger(L, length);
+
+	// –ß‚è’l‚Ì”‚ğ•Ô‚·
+	return 1;
+}
+
 //-----------------------------------------------
 // MZ3 Account Provider API
 //-----------------------------------------------
@@ -3547,6 +3571,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
 	{"start_write_view",					lua_mz3_start_write_view},
 	{"set_vib_status",						lua_mz3_set_vib_status},
+	{"get_text_length",						lua_mz3_get_text_length},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

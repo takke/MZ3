@@ -1266,19 +1266,17 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	end
 
---[[
 	-- 文字長チェック
-	len = string.len( text );
+	local len = mz3.get_text_length(text);
 	if len > 140 then
-		msg = '140バイトを超過しています。投稿に失敗する可能性がありますが続行しますか？\n'
-			.. '※ バイト数であり、文字数ではありません。\n'
+		msg = '140文字を超過しています(' .. len .. '文字)\n'
+			.. '投稿に失敗する可能性がありますが続行しますか？\n'
 			.. '----\n'
 			.. text;
-		if mz3.confirm(msg, 'バイト数：' .. len, 'yes_no') ~= 'yes' then
+		if mz3.confirm(msg, '文字数：' .. len, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	end
-]]
 
 	-- 確認
 	data = mz3_main_view.get_selected_body_item();
