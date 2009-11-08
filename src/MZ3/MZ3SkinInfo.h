@@ -32,6 +32,16 @@ public:
 	COLORREF clrMainBodyListEmphasis2;			///< メイン画面、ボディコントロールの強調２(デフォルト：赤)
 	COLORREF clrMainBodyListEmphasis3;			///< メイン画面、ボディコントロールの強調３(デフォルト：緑)
 
+	COLORREF clrMainStatusBG;					///< メイン画面、ステータスバーの背景色
+	COLORREF clrMainStatusText;					///< メイン画面、ステータスバーの文字色
+	COLORREF clrMainEditBG;						///< メイン画面、エディットコントロールの背景色
+	COLORREF clrMainEditText;					///< メイン画面、エディットコントロールの文字色
+
+	bool	 bMainCategoryListBorder;			///< メイン画面、カテゴリコントロールの枠線有無
+	bool	 bMainBodyListBorder;				///< メイン画面、ボディコントロールの枠線有無
+	bool	 bMainStatusBorder;					///< メイン画面、ステータスバーの枠線有無
+	bool	 bMainEditBorder;					///< メイン画面、エディットコントロールの枠線有無
+
 	CMZ3SkinInfo()
 	{
 		strSkinName = L"default";
@@ -46,5 +56,6 @@ public:
 
 private:
 	COLORREF loadColorFromInifile( inifile::IniFile& inifile, COLORREF defaultColor, LPCSTR key, LPCSTR section );
+	bool loadBoolVar(inifile::IniFile& inifile, bool defaultVar, LPCSTR key, LPCSTR section );
 };
 

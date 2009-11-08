@@ -987,6 +987,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 	// スキン情報の更新
 	theApp.LoadSkinSetting();
 
+	// スキンの反映
+	theApp.ReflectSkinSetting();
+
 	// スキンファイルチェック
 	if (!theApp.m_bgImageMainBodyCtrl.isValidSkinfile(szSkinName) ||
 		!theApp.m_bgImageMainCategoryCtrl.isValidSkinfile(szSkinName) ||
@@ -999,6 +1002,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 		
 		// スキン情報の更新
 		theApp.LoadSkinSetting();
+
+		// スキンの反映
+		theApp.ReflectSkinSetting();
 
 		if (pWnd) {
 			util::MySetInformationText( pWnd->GetSafeHwnd(), L"スキン画像ファイルが見つかりません" );

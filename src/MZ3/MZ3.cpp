@@ -486,6 +486,9 @@ BOOL CMZ3App::InitInstance()
 	// フォーカスをメインビューに変更する
 	m_pMainView->SetFocus();
 
+	// スキンの設定を画面に反映する
+	ReflectSkinSetting();
+
 /*
 #ifndef WINCE
 	MZ3Hook_SetMainWindow(m_pMainView->m_hWnd);
@@ -1190,7 +1193,52 @@ bool CMZ3App::LoadSkinSetting()
 	theApp.m_bgImageMainCategoryCtrl.setImageFileName( m_skininfo.strMainCategoryCtrlImageFileName );
 	theApp.m_bgImageReportListCtrl.setImageFileName( m_skininfo.strReportListCtrlImageFileName );
 
+	// ブラシの初期化
+	theApp.m_brushMainStatusBar.CreateSolidBrush( m_skininfo.clrMainStatusBG );
+	theApp.m_brushMainEdit.CreateSolidBrush( m_skininfo.clrMainEditBG );
+
 	return true;
+}
+
+void CMZ3App::ReflectSkinSetting()
+{
+	int nFlags = SWP_FRAMECHANGED;
+
+	CWnd* pCategoryList = m_pMainView->GetDlgItem(IDC_HEADER_LIST);
+	if (pCategoryList) {
+		if (theApp.m_skininfo.bMainCategoryListBorder) {
+			pCategoryList->ModifyStyle(0, WS_BORDER, nFlags);
+		} else {
+			pCategoryList->ModifyStyle(WS_BORDER, 0, nFlags);
+		}
+	}
+
+	CWnd* pBodyList = m_pMainView->GetDlgItem(IDC_BODY_LIST);
+	if (pBodyList) {
+		if (theApp.m_skininfo.bMainBodyListBorder) {
+			pBodyList->ModifyStyle(0, WS_BORDER, nFlags);
+		} else {
+			pBodyList->ModifyStyle(WS_BORDER, 0, nFlags);
+		}
+	}
+
+	CWnd* pStatusBar = m_pMainView->GetDlgItem(IDC_INFO_EDIT);
+	if (pBodyList) {
+		if (theApp.m_skininfo.bMainBodyListBorder) {
+			pBodyList->ModifyStyle(0, WS_BORDER, nFlags);
+		} else {
+			pBodyList->ModifyStyle(WS_BORDER, 0, nFlags);
+		}
+	}
+
+	CWnd* pEditBar = m_pMainView->GetDlgItem(IDC_STATUS_EDIT);
+	if (pEditBar) {
+		if (theApp.m_skininfo.bMainEditBorder) {
+			pEditBar->ModifyStyle(0, WS_BORDER, nFlags);
+		} else {
+			pEditBar->ModifyStyle(WS_BORDER, 0, nFlags);
+		}
+	}
 }
 
 /**

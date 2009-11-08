@@ -140,6 +140,7 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_TABMENU_MOVE_TO_LEFT, &CMZ3View::OnTabmenuMoveToLeft)
 	ON_COMMAND(ID_CATEGORYMENU_MOVE_UP, &CMZ3View::OnCategorymenuMoveUp)
 	ON_COMMAND(ID_CATEGORYMENU_MOVE_DOWN, &CMZ3View::OnCategorymenuMoveDown)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -6626,4 +6627,27 @@ void CMZ3View::MoveCategoryItem(int oldCategoryIndex, int newCategoryIndex)
 
 	// グループ定義ファイルの保存
 	theApp.SaveGroupData();
+}
+
+HBRUSH CMZ3View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	int idc = pWnd->GetDlgCtrlID();
+	switch (idc) {
+	case IDC_INFO_EDIT:
+		pDC->SetBkMode(TRANSPARENT);
+		pDC->SetTextColor(theApp.m_skininfo.clrMainStatusText);
+		return (HBRUSH)theApp.m_brushMainStatusBar;
+
+	case IDC_STATUS_EDIT:
+		pDC->SetBkMode(TRANSPARENT);
+		pDC->SetTextColor(theApp.m_skininfo.clrMainEditText);
+		return (HBRUSH)theApp.m_brushMainEdit;
+
+	default:
+		break;
+	}
+
+	return hbr;
 }

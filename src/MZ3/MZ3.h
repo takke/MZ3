@@ -150,6 +150,9 @@ public:
 	CMZ3BackgroundImage	m_bgImageMainBodyCtrl;		///< メインビュー、ボディコントロールの背景用ビットマップ
 	CMZ3BackgroundImage	m_bgImageReportListCtrl;	///< レポートビュー、リストコントロールの背景用ビットマップ
 
+	CBrush				m_brushMainStatusBar;		///< メインビュー、ステータスバーの背景色ブラシ
+	CBrush				m_brushMainEdit;			///< メインビュー、エディットコントロールの背景色ブラシ
+
 	FilePath			m_filepath;				///< MZ3 で利用しているファイルパス群
 
 	option::Option		m_optionMng;			///< オプションデータ
@@ -229,6 +232,8 @@ public:
 	int GetTabHeight( int fontHeight );
 
 	bool LoadSkinSetting();
+	void ReflectSkinSetting();
+
 	void InitPlatformFlags();
 	void InitResolutionFlags();
 	bool SaveGroupData(void);

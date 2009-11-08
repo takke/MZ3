@@ -111,6 +111,34 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		// メイン画面、ボディコントロールの強調２
 		clrMainBodyListEmphasis3			= loadColorFromInifile( inifile, clrMainBodyListEmphasis3, 
 																	"MainBodyListEmphasis3", SECTION_NAME );
+
+		// メイン画面、ステータスバーの背景色
+		clrMainStatusBG						= loadColorFromInifile( inifile, clrMainStatusBG, 
+																	"MainStatusBG", SECTION_NAME);
+
+		// メイン画面、ステータスバーの文字色
+		clrMainStatusText					= loadColorFromInifile( inifile, clrMainStatusText, 
+																	"MainStatusText", SECTION_NAME);
+
+		// メイン画面、エディットコントロールの背景色
+		clrMainEditBG						= loadColorFromInifile( inifile, clrMainEditBG, 
+																	"MainEditBG", SECTION_NAME);
+
+		// メイン画面、エディットコントロールの文字色
+		clrMainEditText						= loadColorFromInifile( inifile, clrMainEditText, 
+																	"MainEditText", SECTION_NAME);
+
+		// メイン画面、カテゴリコントロールの枠線有無
+		bMainCategoryListBorder = loadBoolVar(inifile, bMainCategoryListBorder, "MainCategoryListBorder", SECTION_NAME);
+
+		// メイン画面、ボディコントロールの枠線有無
+		bMainBodyListBorder		= loadBoolVar(inifile, bMainBodyListBorder, "MainBodyListBorder", SECTION_NAME);
+
+		// メイン画面、ステータスバーの枠線有無
+		bMainStatusBorder		= loadBoolVar(inifile, bMainStatusBorder, "MainStatusBorder", SECTION_NAME);
+
+		// メイン画面、エディットコントロールの枠線有無
+		bMainEditBorder			= loadBoolVar(inifile, bMainEditBorder, "MainEditBorder", SECTION_NAME);
 	}
 
 	return true;
@@ -138,6 +166,16 @@ bool CMZ3SkinInfo::setDefaultInfo()
 	clrMainBodyListDayBreakLine			= RGB(0xC0, 0xC0, 0xFF);	// メイン画面、ボディコントロールの日付区切り線
 	clrMainBodyListEmphasis2			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの強調２(デフォルト：赤)
 	clrMainBodyListEmphasis3			= RGB(0x00, 0xA0, 0x00);	// メイン画面、ボディコントロールの強調３(デフォルト：緑)
+
+	clrMainStatusBG						= RGB(0xEE, 0xEE, 0xEE);	// メイン画面、ステータスバーの背景色
+	clrMainStatusText					= RGB(0x00, 0x00, 0x00);	// メイン画面、ステータスバーの文字色
+	clrMainEditBG						= RGB(0xFF, 0xFF, 0xFF);	// メイン画面、エディットコントロールの背景色
+	clrMainEditText						= RGB(0x00, 0x00, 0x00);	// メイン画面、エディットコントロールの文字色
+
+	bMainCategoryListBorder = true;			// メイン画面、カテゴリコントロールの枠線有無
+	bMainBodyListBorder		= true;			// メイン画面、ボディコントロールの枠線有無
+	bMainStatusBorder		= true;			// メイン画面、ステータスバーの枠線有無
+	bMainEditBorder			= false;		// メイン画面、エディットコントロールの枠線有無
 
 	return true;
 }
@@ -179,3 +217,21 @@ COLORREF CMZ3SkinInfo::loadColorFromInifile( inifile::IniFile& inifile, COLORREF
 		return defaultColor;
 	}
 }
+
+bool CMZ3SkinInfo::loadBoolVar(inifile::IniFile& inifile, bool defaultVar, LPCSTR key, LPCSTR section )
+{
+	std::string s = inifile.GetValue(key, section);
+	if (!s.empty()) {
+		// 値が存在するのでその値を使う
+		int n = atoi(s.c_str());
+		if (n) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		// 値が存在しないのでデフォルト値を返す
+		return defaultVar;
+	}
+}
+
