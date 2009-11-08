@@ -5287,6 +5287,9 @@ bool CMZ3View::PopupTabMenu(POINT pt_, int flags_)
 	return true;
 }
 
+/**
+ * カテゴリの追加
+ */
 void CMZ3View::OnAppendCategoryMenu(UINT nID)
 {
 	int idx = nID - ID_APPEND_MENU_BEGIN;
@@ -5327,13 +5330,46 @@ void CMZ3View::OnRemoveCategoryItem()
 {
 	CCategoryItem* pCategoryItem = m_selGroup->getFocusedCategory();
 
-	if (pCategoryItem->bSaveToGroupFile) {
+/*	if (pCategoryItem->bSaveToGroupFile) {
 		pCategoryItem->bSaveToGroupFile = false;
 
 		MessageBox( util::FormatString( L"[%s] は次回起動時に削除されます", (LPCTSTR)pCategoryItem->m_name ) );
 	} else {
 		pCategoryItem->bSaveToGroupFile = true;
 	}
+*/
+
+	// 1件以下なら削除不可
+	if (m_selGroup->categories.size()<=1) {
+		MessageBox(L"このタブのカテゴリが1件なので削除できません");
+		return;
+	}
+
+	// 該当項目を削除する
+	m_selGroup->categories.erase(m_selGroup->categories.begin() + m_selGroup->focusedCategory);
+
+	// 末尾を削除した場合は選択を1つ前にする
+	// 例)
+	// 元のサイズ            :5
+	// 削除後のサイズ        :4
+	// 選択項目のインデックス:4
+	if (m_selGroup->focusedCategory==m_selGroup->categories.size()) {
+		// 1つ前を表示する
+		m_selGroup->focusedCategory --;
+		m_selGroup->selectedCategory = m_selGroup->focusedCategory;
+		theApp.m_optionMng.m_lastTopPageCategoryIndex = m_selGroup->focusedCategory;
+	}
+
+	// カテゴリーリストを初期化する
+	MyUpdateCategoryListByGroupItem();
+
+	// インデックスへの反映(再構築)
+	for (size_t i=0; i<m_selGroup->categories.size(); i++) {
+		m_selGroup->categories[i].SetIndexOnList(i);
+	}
+
+	// カテゴリリスト中の「現在選択されている項目」を更新
+	OnMySelchangedCategoryList();
 
 	// グループ定義ファイルの保存
 	theApp.SaveGroupData();
