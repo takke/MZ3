@@ -561,6 +561,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	CWnd* pStatusEdit   = GetDlgItem( IDC_STATUS_EDIT );
 	CWnd* pUpdateButton = GetDlgItem( IDC_UPDATE_BUTTON );
 	CRect rectUpdateButton;
+
 	switch (m_viewStyle) {
 	case VIEW_STYLE_DEFAULT:
 		if (m_infoEdit.m_hWnd!=NULL) {
@@ -573,6 +574,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 			pUpdateButton->ShowWindow(SW_HIDE);
 		}
 		break;
+
 	case VIEW_STYLE_IMAGE:
 		if (m_infoEdit.m_hWnd!=NULL) {
 			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
@@ -589,6 +591,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		hInfo = (int)(hInfoBase * (1+0.5*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #endif
 		break;
+
 	case VIEW_STYLE_TWITTER:
 		if (m_infoEdit.m_hWnd!=NULL) {
 			m_infoEdit.ModifyStyle( 0, ES_MULTILINE );
@@ -607,6 +610,14 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		hInfo = (int)(hInfoBase * (1+0.5*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #endif
 		break;
+	}
+
+	// ボーダーなしスキンの場合は hInfo をNピクセル減らす
+	if (!theApp.m_skininfo.bMainStatusBorder) {
+		hInfo -= 3;
+	}
+	if (!theApp.m_skininfo.bMainCategoryListBorder) {
+		hGroup -= 3;
 	}
 
 	// カテゴリ、ボディリストの領域を % で指定

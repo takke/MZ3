@@ -1223,11 +1223,11 @@ void CMZ3App::ReflectSkinSetting()
 	}
 
 	CWnd* pStatusBar = m_pMainView->GetDlgItem(IDC_INFO_EDIT);
-	if (pBodyList) {
-		if (theApp.m_skininfo.bMainBodyListBorder) {
-			pBodyList->ModifyStyle(0, WS_BORDER, nFlags);
+	if (pStatusBar) {
+		if (theApp.m_skininfo.bMainStatusBorder) {
+			pStatusBar->ModifyStyle(0, WS_BORDER, nFlags);
 		} else {
-			pBodyList->ModifyStyle(WS_BORDER, 0, nFlags);
+			pStatusBar->ModifyStyle(WS_BORDER, 0, nFlags);
 		}
 	}
 
