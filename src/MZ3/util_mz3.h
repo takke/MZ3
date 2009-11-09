@@ -328,4 +328,34 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 								const MyLuaData& pData4=MyLuaData(),
 								const MyLuaData& pData5=MyLuaData()
 								);
+
+// 引用ユーザリストがなければ作成する
+inline void SetTwitterQuoteUsersWhenNotGenerated(MZ3Data* pSelectedData)
+{
+	if (pSelectedData->GetIntValue(L"quote_users_gened", 0)==0) {
+
+		// 引用ユーザリストの作成
+		CString target = pSelectedData->GetBody();
+		if (target.Find(L"@")!=-1) {
+			// 正規表現のコンパイル（一回のみ）
+			static MyRegex reg;
+			util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
+
+			for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
+				std::vector<MyRegex::Result>* pResults = NULL;
+				if (reg.exec(target) == false || reg.results.size() != 2) {
+					// 未発見
+					break;
+				}
+
+				pSelectedData->AddTextArray(L"quote_users", reg.results[1].str.c_str());
+
+				// ターゲットを更新。
+				target.Delete(0, reg.results[0].end);
+			}
+		}
+		pSelectedData->SetIntValue(L"quote_users_gened", 1);
+	}
+}
+
 }

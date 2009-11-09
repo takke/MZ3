@@ -1623,19 +1623,24 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 				redrawItems.insert( s_lastSelected );
 			}
 
-			const CMixiData& sel_data      = pCategory->m_body[selected];
-			const CMixiData& last_sel_data = pCategory->m_body[s_lastSelected];
+			CMixiData& sel_data      = pCategory->m_body[selected];
+			CMixiData& last_sel_data = pCategory->m_body[s_lastSelected];
 
 			// selected, s_lastSelected と同一IDの項目は再描画
+			// (但し、selected, s_lastSelected のIDが異なる場合)
 			int idxStart = m_bodyList.GetTopIndex();
 			int idxEnd   = idxStart + m_bodyList.GetCountPerPage();
-			for (int idx=idxStart; idx<=idxEnd; idx++) {
-				if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
-					int id = pCategory->m_body[idx].GetOwnerID();
-					if (id == sel_data.GetOwnerID()) {
-						redrawItems.insert(idx);
-					} else if (selected!=s_lastSelected && id == last_sel_data.GetOwnerID()) {
-						redrawItems.insert(idx);
+			if (sel_data.GetOwnerID() == last_sel_data.GetOwnerID()) {
+				// 同一IDの項目は描画状態に変化がないので再描画しない
+			} else {
+				for (int idx=idxStart; idx<=idxEnd; idx++) {
+					if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+						int id = pCategory->m_body[idx].GetOwnerID();
+						if (id == sel_data.GetOwnerID()) {
+							redrawItems.insert(idx);
+						} else if (selected!=s_lastSelected && id == last_sel_data.GetOwnerID()) {
+							redrawItems.insert(idx);
+						}
 					}
 				}
 			}
@@ -1644,25 +1649,22 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			static MyRegex reg;
 			util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
 			for (int i=0; i<2; i++) {
-				CString target = (i==0) ? sel_data.GetBody() : last_sel_data.GetBody();
-				if (target.Find(L"@")!=-1) {
-					for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
-						std::vector<MyRegex::Result>* pResults = NULL;
-						if (reg.exec(target) == false || reg.results.size() != 2) {
-							break;
-						}
+				MZ3Data* pSelectedData = (i==0) ? &sel_data : &last_sel_data;
+				// 選択項目内の引用ユーザリストを取得する。なければここで作る。
+				util::SetTwitterQuoteUsersWhenNotGenerated(pSelectedData);
 
-						// 一致すれば強調表示
-						for (int idx=idxStart; idx<=idxEnd; idx++) {
-							if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
-								if (pCategory->m_body[idx].GetName()==reg.results[1].str.c_str()) {
-									redrawItems.insert(idx);
-								}
+				// いずれかと一致すれば強調表示
+				int n = pSelectedData->GetTextArraySize(L"quote_users");
+				for (int i=0; i<n; i++) {
+					LPCTSTR szQuoteUser = pSelectedData->GetTextArrayValue(L"quote_users", i);
+					
+					// 一致すれば強調表示
+					for (int idx=idxStart; idx<=idxEnd; idx++) {
+						if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+							if (pCategory->m_body[idx].GetName()==szQuoteUser) {
+								redrawItems.insert(idx);
 							}
 						}
-
-						// ターゲットを更新。
-						target.Delete(0, reg.results[0].end);
 					}
 				}
 			}
