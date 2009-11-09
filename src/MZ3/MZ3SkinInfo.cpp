@@ -108,7 +108,7 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		clrMainBodyListEmphasis2			= loadColorFromInifile( inifile, clrMainBodyListEmphasis2, 
 																	"MainBodyListEmphasis2", SECTION_NAME );
 
-		// メイン画面、ボディコントロールの強調２
+		// メイン画面、ボディコントロールの強調３
 		clrMainBodyListEmphasis3			= loadColorFromInifile( inifile, clrMainBodyListEmphasis3, 
 																	"MainBodyListEmphasis3", SECTION_NAME );
 
