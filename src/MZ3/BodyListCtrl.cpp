@@ -154,7 +154,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 選択要素
 	int selectedIdx = util::MyGetListCtrlSelectedItemIndex(*this);
-	const CMixiData* pSelectedData = NULL;
+	CMixiData* pSelectedData = NULL;
 	if (pCategory!=NULL && 0 <= selectedIdx && selectedIdx < (int)pCategory->m_body.size()) {
 		pSelectedData = &pCategory->m_body[ selectedIdx ];
 	}
@@ -429,27 +429,42 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
 						} else {
 							// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
-							CString target = pSelectedData->GetBody();
-							if (target.Find(L"@")!=-1) {
-								// 正規表現のコンパイル（一回のみ）
-								static MyRegex reg;
-								util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
 
-								for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
-									std::vector<MyRegex::Result>* pResults = NULL;
-									if (reg.exec(target) == false || reg.results.size() != 2) {
-										// 未発見
-										break;
+							// 選択項目内の引用ユーザリストを取得する。なければここで作る。
+							if (pSelectedData->GetIntValue(L"quote_users_gened", 0)==0) {
+
+								// 引用ユーザリストの作成
+								CString target = pSelectedData->GetBody();
+								if (target.Find(L"@")!=-1) {
+									// 正規表現のコンパイル（一回のみ）
+									static MyRegex reg;
+									util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
+
+									for (int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++) {
+										std::vector<MyRegex::Result>* pResults = NULL;
+										if (reg.exec(target) == false || reg.results.size() != 2) {
+											// 未発見
+											break;
+										}
+
+										pSelectedData->AddTextArray(L"quote_users", reg.results[1].str.c_str());
+
+										// ターゲットを更新。
+										target.Delete(0, reg.results[0].end);
 									}
+								}
+								pSelectedData->SetIntValue(L"quote_users_gened", 1);
+							}
 
-									// 一致すれば強調表示
-									if (pData->GetName()==reg.results[1].str.c_str()) {
-										clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
-										break;
-									}
-
-									// ターゲットを更新。
-									target.Delete(0, reg.results[0].end);
+							// いずれかと一致すれば強調表示
+							int n = pSelectedData->GetTextArraySize(L"quote_users");
+							for (int i=0; i<n; i++) {
+								LPCTSTR szQuoteUser = pSelectedData->GetTextArrayValue(L"quote_users", i);
+								
+								// 一致すれば強調表示
+								if (pData->GetName()==szQuoteUser) {
+									clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
+									break;
 								}
 							}
 						}
