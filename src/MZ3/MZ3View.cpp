@@ -1604,21 +1604,19 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	m_infoEdit.SetWindowText( strInfo );
 
-	// 画像位置変更
-	MoveMiniImageDlg();
-
 	// Twitter であれば再表示(同一IDや引用者の色変更を伴うため)
 	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
 		static int s_lastSelected = 0;
 		int selected = pCategory->selectedBody;
 
 		if (!m_bodyList.m_bStopDraw) {
-			std::set<int> redrawItems;
+			static std::set<int> redrawItems;
+			redrawItems.clear();
 
 			// selected, s_lastSelected は再描画
-			if (selected < m_bodyList.GetItemCount()) {
-				redrawItems.insert( selected );
-			}
+//			if (selected < m_bodyList.GetItemCount()) {
+//				redrawItems.insert( selected );
+//			}
 			if (s_lastSelected < m_bodyList.GetItemCount()) {
 				redrawItems.insert( s_lastSelected );
 			}
@@ -1633,12 +1631,21 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			if (sel_data.GetOwnerID() == last_sel_data.GetOwnerID()) {
 				// 同一IDの項目は描画状態に変化がないので再描画しない
 			} else {
+				// 再描画対象となるユーザID
+				static std::set<int> redrawTargetUsers;
+				redrawTargetUsers.clear();
+
+				redrawTargetUsers.insert(sel_data.GetOwnerID());
+				redrawTargetUsers.insert(last_sel_data.GetOwnerID());
+
 				for (int idx=idxStart; idx<=idxEnd; idx++) {
+					if (idx == selected || idx == s_lastSelected) {
+						continue;
+					}
+
 					if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
 						int id = pCategory->m_body[idx].GetOwnerID();
-						if (id == sel_data.GetOwnerID()) {
-							redrawItems.insert(idx);
-						} else if (selected!=s_lastSelected && id == last_sel_data.GetOwnerID()) {
+						if (redrawTargetUsers.count(id) > 0) {
 							redrawItems.insert(idx);
 						}
 					}
@@ -1646,25 +1653,27 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 			// selected, s_lastSelected の言及ユーザは再描画
-			static MyRegex reg;
-			util::CompileRegex(reg, L"@([0-9a-zA-Z_]+)");
+			static std::set<CString> redrawTargetUsers;
+			redrawTargetUsers.clear();
 			for (int i=0; i<2; i++) {
 				MZ3Data* pSelectedData = (i==0) ? &sel_data : &last_sel_data;
 				// 選択項目内の引用ユーザリストを取得する。なければここで作る。
 				util::SetTwitterQuoteUsersWhenNotGenerated(pSelectedData);
 
-				// いずれかと一致すれば強調表示
 				int n = pSelectedData->GetTextArraySize(L"quote_users");
 				for (int i=0; i<n; i++) {
-					LPCTSTR szQuoteUser = pSelectedData->GetTextArrayValue(L"quote_users", i);
-					
-					// 一致すれば強調表示
-					for (int idx=idxStart; idx<=idxEnd; idx++) {
-						if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
-							if (pCategory->m_body[idx].GetName()==szQuoteUser) {
-								redrawItems.insert(idx);
-							}
-						}
+					redrawTargetUsers.insert(pSelectedData->GetTextArrayValue(L"quote_users", i));
+				}
+			}
+
+			for (int idx=idxStart; idx<=idxEnd; idx++) {
+				if (idx == selected || idx == s_lastSelected) {
+					continue;
+				}
+
+				if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
+					if (redrawTargetUsers.count(pCategory->m_body[idx].GetName()) > 0) {
+						redrawItems.insert(idx);
 					}
 				}
 			}
@@ -1677,6 +1686,9 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 		s_lastSelected = selected;
 	} 
+
+	// 画像位置変更
+	MoveMiniImageDlg();
 
 	// アイコン再描画
 	InvalidateRect( m_rectIcon, FALSE );
