@@ -6155,7 +6155,7 @@ void CMZ3View::OnCategoryOpen()
 		return;
 	}
 
-	int iItem = util::MyGetListCtrlSelectedItemIndex( m_categoryList );
+	int iItem = m_selGroup->selectedCategory;
 	m_hotList = &m_categoryList;
 
 	if (iItem<0) {
@@ -6164,8 +6164,7 @@ void CMZ3View::OnCategoryOpen()
 
 	// カレントデータを取得
 	int idx = (int)m_categoryList.GetItemData(iItem);
-	m_selGroup->selectedCategory = idx;
-	m_selGroup->focusedCategory  = idx;
+	m_selGroup->focusedCategory = idx;
 	if (m_preCategory != iItem) {
 		m_categoryList.SetActiveItem(iItem);
 		m_categoryList.Update(m_preCategory);
