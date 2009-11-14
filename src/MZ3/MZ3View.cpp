@@ -5247,6 +5247,9 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	m_bodyList.DrawDetail();
 	m_bodyList.UpdateWindow();
 
+	// グループ定義ファイルの保存
+	theApp.SaveGroupData();
+
 	return true;
 }
 
@@ -5339,8 +5342,6 @@ void CMZ3View::OnAppendCategoryMenu(UINT nID)
 				m_selGroup->selectedCategory = m_selGroup->categories.size()-1;
 				OnMySelchangedCategoryList();
 
-				// グループ定義ファイルの保存
-				theApp.SaveGroupData();
 				return;
 			}
 
@@ -6361,9 +6362,6 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 			theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 		AppendCategoryList(categoryItem);
 
-		// グループ定義ファイルの保存
-		theApp.SaveGroupData();
-
 		nAppendedFeed = 1;
 	} else {
 		MZ3LOGGER_INFO( L"RSS じゃないので、RSS AutoDiscovery してみるよ" );
@@ -6387,9 +6385,6 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 					theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_RSS_READER_FEED));
 				AppendCategoryList(categoryItem);
 			}
-
-			// グループ定義ファイルの保存
-			theApp.SaveGroupData();
 
 			nAppendedFeed = items.size();
 		}
