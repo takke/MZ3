@@ -776,7 +776,14 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	} else {
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 	}
-	m_infoEdit.SetWindowText(_T(""));
+
+	// 第1カラムに表示している内容を表示する。
+	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false);
+	// 絵文字を文字列に変換する
+	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+	}
+	m_infoEdit.SetWindowText( strInfo );
 
 	*pResult = 0;
 }
@@ -2060,7 +2067,7 @@ BOOL CMZ3View::CommandSetFocusCategoryList()
 {
 	m_categoryList.SetFocus();
 	m_hotList = &m_categoryList;
-	m_infoEdit.SetWindowText( _T("") );
+//	m_infoEdit.SetWindowText( _T("") );
 
 	m_categoryList.EnsureVisible( m_selGroup->focusedCategory, FALSE);
 
@@ -3186,6 +3193,14 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 		// ボディリストに設定
 		SetBodyList( pCategory->GetBodyList() );
 	}
+
+	// 第1カラムに表示している内容を表示する。
+	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
+	// 絵文字を文字列に変換する
+	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+	}
+	m_infoEdit.SetWindowText( strInfo );
 }
 
 /**
@@ -6660,7 +6675,7 @@ HBRUSH CMZ3View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		return (HBRUSH)theApp.m_brushMainStatusBar;
 
 	case IDC_STATUS_EDIT:
-		pDC->SetBkMode(TRANSPARENT);
+		pDC->SetBkColor(theApp.m_skininfo.clrMainEditBG);
 		pDC->SetTextColor(theApp.m_skininfo.clrMainEditText);
 		return (HBRUSH)theApp.m_brushMainEdit;
 
