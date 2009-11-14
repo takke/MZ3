@@ -419,31 +419,46 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 					// 自分宛の発言を強調表示する
 					const CString& bodyText = pData->GetBody();
-					if (bodyText.Find(util::FormatString(L"@%s", theApp.m_loginMng.GetTwitterId()))!=-1) {
+					LPCTSTR szMyTwitterID = theApp.m_loginMng.GetTwitterId();
+					if (bodyText.Find(util::FormatString(L"@%s", szMyTwitterID))!=-1) {
 						// 強調２
 						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
-					} else if (pSelectedData!=NULL) {
-						// 選択項目と同じオーナーIDの項目を強調表示する。
-						if (pSelectedData->GetOwnerID()==pData->GetOwnerID()) {
-							// 同じオーナーID：強調表示
-							clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
-						} else {
-							// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
+						break;
+					}
 
-							// 選択項目内の引用ユーザリストを取得する。なければここで作る。
-							util::SetTwitterQuoteUsersWhenNotGenerated(pSelectedData);
+					if (pSelectedData==NULL) {
+						break;
+					}
 
-							// いずれかと一致すれば強調表示
-							int n = pSelectedData->GetTextArraySize(L"quote_users");
-							for (int i=0; i<n; i++) {
-								LPCTSTR szQuoteUser = pSelectedData->GetTextArrayValue(L"quote_users", i);
-								
-								// 一致すれば強調表示
-								if (pData->GetName()==szQuoteUser) {
-									clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
-									break;
-								}
-							}
+					// 自分の発言を強調表示する
+					const CString& pTargetName = pData->GetName();
+					if (pTargetName==szMyTwitterID) {
+						// 同じオーナーID：強調表示
+						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis4;
+						break;
+					}
+
+					// 選択項目と同じオーナーIDの項目を強調表示する。
+					if (pSelectedData->GetOwnerID()==pData->GetOwnerID()) {
+						// 同じオーナーID：強調表示
+						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						break;
+					}
+
+					// 選択項目内の引用ユーザ "@xxx @yyy" のいずれかと同じユーザであれば強調表示する
+
+					// 選択項目内の引用ユーザリストを取得する。なければここで作る。
+					util::SetTwitterQuoteUsersWhenNotGenerated(pSelectedData);
+
+					// いずれかと一致すれば強調表示
+					int n = pSelectedData->GetTextArraySize(L"quote_users");
+					for (int i=0; i<n; i++) {
+						LPCTSTR szQuoteUser = pSelectedData->GetTextArrayValue(L"quote_users", i);
+						
+						// 一致すれば強調表示
+						if (pTargetName==szQuoteUser) {
+							clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
+							break;
 						}
 					}
 				}

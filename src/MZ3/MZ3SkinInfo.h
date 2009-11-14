@@ -31,6 +31,7 @@ public:
 	COLORREF clrMainBodyListDayBreakLine;		///< メイン画面、ボディコントロールの日付区切り線
 	COLORREF clrMainBodyListEmphasis2;			///< メイン画面、ボディコントロールの強調２(デフォルト：赤)
 	COLORREF clrMainBodyListEmphasis3;			///< メイン画面、ボディコントロールの強調３(デフォルト：緑)
+	COLORREF clrMainBodyListEmphasis4;			///< メイン画面、ボディコントロールの強調４(デフォルト：ピンク)
 
 	COLORREF clrMainStatusBG;					///< メイン画面、ステータスバーの背景色
 	COLORREF clrMainStatusText;					///< メイン画面、ステータスバーの文字色

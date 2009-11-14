@@ -112,6 +112,10 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		clrMainBodyListEmphasis3			= loadColorFromInifile( inifile, clrMainBodyListEmphasis3, 
 																	"MainBodyListEmphasis3", SECTION_NAME );
 
+		// メイン画面、ボディコントロールの強調４
+		clrMainBodyListEmphasis4			= loadColorFromInifile( inifile, clrMainBodyListEmphasis4, 
+																	"MainBodyListEmphasis4", SECTION_NAME );
+
 		// メイン画面、ステータスバーの背景色
 		clrMainStatusBG						= loadColorFromInifile( inifile, clrMainStatusBG, 
 																	"MainStatusBG", SECTION_NAME);
@@ -166,6 +170,7 @@ bool CMZ3SkinInfo::setDefaultInfo()
 	clrMainBodyListDayBreakLine			= RGB(0xC0, 0xC0, 0xFF);	// メイン画面、ボディコントロールの日付区切り線
 	clrMainBodyListEmphasis2			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの強調２(デフォルト：赤)
 	clrMainBodyListEmphasis3			= RGB(0x00, 0xA0, 0x00);	// メイン画面、ボディコントロールの強調３(デフォルト：緑)
+	clrMainBodyListEmphasis4			= RGB(0xCC, 0x00, 0xCC);	// メイン画面、ボディコントロールの強調４(デフォルト：ピンク)
 
 	clrMainStatusBG						= RGB(0xEE, 0xEE, 0xEE);	// メイン画面、ステータスバーの背景色
 	clrMainStatusText					= RGB(0x00, 0x00, 0x00);	// メイン画面、ステータスバーの文字色
