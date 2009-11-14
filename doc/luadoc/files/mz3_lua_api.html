@@ -63,16 +63,6 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#*mz3_data.get_serialize_key">*mz3_data.get_serialize_key</a>&nbsp;(data)</td>
-	<td class="summary">ƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB  </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#*mz3_inifile.set_value">*mz3_inifile.set_value</a>&nbsp;(name, section, value)</td>
-	<td class="summary"> </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#event_listener1">event_listener1</a>&nbsp;(serialize_key, event_name, data)</td>
 	<td class="summary">ƒtƒbƒNŠÖ”(ƒ^ƒCƒv1)  </td>
 	</tr>
@@ -83,13 +73,33 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#mz3.add_event_listener">mz3.add_event_listener</a>&nbsp;(event, event_handler)</td>
-	<td class="summary">ŠeíƒCƒxƒ“ƒg‚É‘Î‚·‚éƒtƒbƒNŠÖ”‚ğ’Ç‰Á‚·‚éB  “¯ˆêƒCƒxƒ“ƒg‚É‘Î‚µ‚Ä•¡”‚ÌƒtƒbƒNŠÖ”‚ª“o˜^‚³‚ê‚Ä‚¢‚éê‡AÅŒã‚É“o˜^‚³‚ê‚½ŠÖ”‚©‚ç‡‚ÉŒÄ‚Ño‚·B  </td>
+	<td class="name" nowrap><a href="#mz3.add_event_listener">mz3.add_event_listener</a>&nbsp;(event, event_handler, call_first)</td>
+	<td class="summary">ŠeíƒCƒxƒ“ƒg‚É‘Î‚·‚éƒtƒbƒNŠÖ”‚ğ’Ç‰Á‚·‚éB  call_first ‚ª true ‚Ìê‡A “¯ˆêƒCƒxƒ“ƒg‚É‘Î‚µ‚Ä•¡”‚ÌƒtƒbƒNŠÖ”‚ª“o˜^‚³‚ê‚Ä‚¢‚éê‡AÅŒã‚É“o˜^‚³‚ê‚½ŠÖ”‚©‚ç‡‚ÉŒÄ‚Ño‚·B false ‚Ìê‡‚Í‹t‡‚ÉŒÄ‚Ño‚·B  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3.alert">mz3.alert</a>&nbsp;(msg, title)</td>
 	<td class="summary">Win32 API ‚Ì MessageBox() ‚ğŒÄ‚Ño‚·B  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.change_view">mz3.change_view</a>&nbsp;(view_name)</td>
+	<td class="summary">ƒrƒ…[Ø‚è‘Ö‚¦  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.confirm">mz3.confirm</a>&nbsp;(msg, title, type)</td>
+	<td class="summary">Šm”F‰æ–Ê  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.convert_encoding">mz3.convert_encoding</a>&nbsp;(text, in_encoding, out_encoding)</td>
+	<td class="summary">•¶šƒR[ƒh•ÏŠ·  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.copy_file">mz3.copy_file</a>&nbsp;(from_path, to_path)</td>
+	<td class="summary">ƒtƒ@ƒCƒ‹ƒRƒs[  </td>
 	</tr>
 
 	<tr>
@@ -108,13 +118,48 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.get_app_name">mz3.get_app_name</a>&nbsp;()</td>
+	<td class="summary">ƒAƒvƒŠƒP[ƒVƒ‡ƒ“–¼("MZ3", "MZ4")‚ğ•Ô‚·  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_app_version">mz3.get_app_version</a>&nbsp;()</td>
+	<td class="summary">ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ìƒo[ƒWƒ‡ƒ“("1.0.0 Beta13")‚ğ•Ô‚·  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_open_file_name">mz3.get_open_file_name</a>&nbsp;(wnd, caption, title, flags, initial_dir, initial_file, filter)</td>
+	<td class="summary">ƒtƒ@ƒCƒ‹‘I‘ğ‰æ–Ê‚Ì•\¦  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.get_serialize_key_by_access_type">mz3.get_serialize_key_by_access_type</a>&nbsp;(type)</td>
 	<td class="summary">ƒAƒNƒZƒXí•Ê‚©‚çƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB  </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.get_service_type">mz3.get_service_type</a>&nbsp;(key)</td>
+	<td class="summary">ƒVƒŠƒAƒ‰ƒCƒYƒL[‚©‚çƒT[ƒrƒXí•Ê‚ğæ“¾‚·‚éB  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_text_length">mz3.get_text_length</a>&nbsp;(text)</td>
+	<td class="summary">•¶š—ñ‚Ì’·‚³æ“¾  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.get_tick_count">mz3.get_tick_count</a>&nbsp;()</td>
 	<td class="summary">Win32 API ‚Ì GetTickCount() ‚ğŒÄ‚Ño‚·B  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.is_mixi_logout">mz3.is_mixi_logout</a>&nbsp;(serialize_key)</td>
+	<td class="summary">mixi‚ÌƒƒOƒAƒEƒgó‘Ô”»’è  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.keybd_event">mz3.keybd_event</a>&nbsp;(key, state)</td>
+	<td class="summary">ƒL[ƒ{[ƒh‘€ì  </td>
 	</tr>
 
 	<tr>
@@ -133,13 +178,58 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.make_image_logfile_path_from_url_md5">mz3.make_image_logfile_path_from_url_md5</a>&nbsp;(url)</td>
+	<td class="summary">‰æ‘œƒtƒ@ƒCƒ‹ƒpƒX¶¬(MD5Œ^)  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.open_url">mz3.open_url</a>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, file_type)</td>
+	<td class="summary">URL ‚ğŠJ‚­  MZ3 ‚Ì’ÊMˆ—‚ğŠJn‚·‚é  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.open_url_by_browser">mz3.open_url_by_browser</a>&nbsp;(url)</td>
+	<td class="summary">URL ‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.open_url_by_browser_with_confirm">mz3.open_url_by_browser_with_confirm</a>&nbsp;(url)</td>
+	<td class="summary">URL ‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­(Šm”F•t‚«)  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.regist_service">mz3.regist_service</a>&nbsp;(service_name, default_selected)</td>
+	<td class="summary">ƒT[ƒrƒX“o˜^(ƒ^ƒu‚Ì‰Šú‰»—p)  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.set_parser">mz3.set_parser</a>&nbsp;(key, parser)</td>
 	<td class="summary">ƒp[ƒT‚ğw’è‚·‚éB  </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.set_vib_status">mz3.set_vib_status</a>&nbsp;(vib_status)</td>
+	<td class="summary">[MZ3 only] ƒoƒCƒu‚ğON/OFF‚·‚é  ƒoƒCƒu‚ğON/OFF‚·‚éB‹@íˆË‘¶‚É‚æ‚è“®ì‚µ‚È‚¢‰Â”\«‚à‚ ‚éB  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.show_common_edit_dlg">mz3.show_common_edit_dlg</a>&nbsp;(caption, msg, initial_text, title)</td>
+	<td class="summary">‹¤’ÊƒGƒfƒBƒbƒg‰æ–Ê‚Ì•\¦  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.start_write_view">mz3.start_write_view</a>&nbsp;(write_view_type, data)</td>
+	<td class="summary">‘‚«‚İ‰æ–Ê‚Ì‹N“®  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.trace">mz3.trace</a>&nbsp;(msg)</td>
 	<td class="summary">TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.url_encode">mz3.url_encode</a>&nbsp;(text, encoding)</td>
+	<td class="summary">URL ƒGƒ“ƒR[ƒh‚µ‚½•¶š—ñ‚ğ•Ô‚·  </td>
 	</tr>
 
 	<tr>
@@ -160,6 +250,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_cache_file_pattern">mz3_access_type_info.set_cache_file_pattern</a>&nbsp;(type, file_pattern)</td>
 	<td class="summary">ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹‚Ìƒpƒ^[ƒ“İ’è  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_access_type_info.set_cruise_target">mz3_access_type_info.set_cruise_target</a>&nbsp;(type, is_cruise_target)</td>
+	<td class="summary">„‰ñ‘ÎÛ‚Æ‚·‚é‚©‚Ìİ’è  </td>
 	</tr>
 
 	<tr>
@@ -198,13 +293,38 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_account_provider.get_value">mz3_account_provider.get_value</a>&nbsp;(service_name, param_name)</td>
+	<td class="summary">ƒAƒJƒEƒ“ƒgî•ñ‚Ìæ“¾(ƒ†[ƒUİ’è’l‚Ìæ“¾)  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_account_provider.set_param">mz3_account_provider.set_param</a>&nbsp;(service_name, param_name, param_value)</td>
+	<td class="summary">ƒAƒJƒEƒ“ƒgî•ñ“o˜^(Šeƒvƒ‰ƒOƒCƒ“‚Å‚Ç‚Ì‚æ‚¤‚Èî•ñ‚ª•K—v‚©)  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_data.add_body_with_extract">mz3_data.add_body_with_extract</a>&nbsp;(data, value)</td>
 	<td class="summary">value ‚©‚çƒŠƒ“ƒN“™‚ğ’ŠoA®Œ`‚µAHTML ‚Ì®Œ`‚ğ‚µ‚ÄAbody ”z—ñ‚É’Ç‰Á‚·‚é   </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_data.add_child">mz3_data.add_child</a>&nbsp;(data, child)</td>
+	<td class="summary">q—v‘f‚Ì’Ç‰Á   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.add_link_list">mz3_data.add_link_list</a>&nbsp;(data, url, text, type)</td>
+	<td class="summary">link_list ‚É’Ç‰Á‚·‚é  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_data.add_text_array">mz3_data.add_text_array</a>&nbsp;(data, name, value)</td>
 	<td class="summary">name ‚Æ‚¢‚¤–¼‘O‚Ì”z—ñ‚É value ‚ğ’Ç‰Á‚·‚éB   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.clear">mz3_data.clear</a>&nbsp;(data)</td>
+	<td class="summary">ŠeƒŠƒXƒgAq—v‘f‚Ìíœ   </td>
 	</tr>
 
 	<tr>
@@ -230,6 +350,31 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3_data.get_integer">mz3_data.get_integer</a>&nbsp;(data, name)</td>
 	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_integer64_as_string">mz3_data.get_integer64_as_string</a>&nbsp;(data, name)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_link_list_size">mz3_data.get_link_list_size</a>&nbsp;(data)</td>
+	<td class="summary">link_list ‚ÌŒÂ”‚ğæ“¾‚·‚é   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_link_list_text">mz3_data.get_link_list_text</a>&nbsp;(data, idx)</td>
+	<td class="summary">link_list ‚©‚ç TEXT(ƒLƒƒƒvƒVƒ‡ƒ“) ‚ğæ“¾‚·‚é  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_link_list_url">mz3_data.get_link_list_url</a>&nbsp;(data, idx)</td>
+	<td class="summary">link_list ‚©‚ç URL ‚ğæ“¾‚·‚é  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data.get_serialize_key*">mz3_data.get_serialize_key*</a>&nbsp;(data)</td>
+	<td class="summary">ƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB  </td>
 	</tr>
 
 	<tr>
@@ -268,6 +413,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_data.set_integer64_from_string">mz3_data.set_integer64_from_string</a>&nbsp;(data, name, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_data.set_text">mz3_data.set_text</a>&nbsp;(data, name, value)</td>
 	<td class="summary"> </td>
 	</tr>
@@ -283,8 +433,38 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.create">mz3_data_list.create</a>&nbsp;()</td>
+	<td class="summary">data_list ‚Ì¶¬   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.delete">mz3_data_list.delete</a>&nbsp;(data_list)</td>
+	<td class="summary">data_list ‚ÌÁ‹   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.get_count">mz3_data_list.get_count</a>&nbsp;(data_list)</td>
+	<td class="summary">data_list ‚ÌŒÂ”æ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.get_data">mz3_data_list.get_data</a>&nbsp;(data_list, idx)</td>
+	<td class="summary">data_list ‚Ì—v‘fæ“¾  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_data_list.insert">mz3_data_list.insert</a>&nbsp;(data_list, index, data)</td>
 	<td class="summary">data_list ‚Ì index ‚É data ‚ğ‘}“ü‚·‚éB   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_data_list.merge">mz3_data_list.merge</a>&nbsp;(data_list, new_list, max_size)</td>
+	<td class="summary">data_list ‚Ìmerge   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_group_data.append_tab">mz3_group_data.append_tab</a>&nbsp;(group, tab)</td>
+	<td class="summary">ƒ^ƒu‚ğƒOƒ‹[ƒv‚É’Ç‰Á‚·‚é  </td>
 	</tr>
 
 	<tr>
@@ -303,6 +483,16 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_group_item.create">mz3_group_item.create</a>&nbsp;(title)</td>
+	<td class="summary">ƒ^ƒu‚ğì¬‚·‚é  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_group_item.delete">mz3_group_item.delete</a>&nbsp;(tab)</td>
+	<td class="summary">MZ3GroupItem ƒIƒuƒWƒFƒNƒg‚Ìíœ  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_htmlarray.get_at">mz3_htmlarray.get_at</a>&nbsp;(htmlarray, index)</td>
 	<td class="summary">index ‚Ì—v‘f‚ğæ“¾‚·‚éB   </td>
 	</tr>
@@ -313,18 +503,178 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_image_cache.get_image_index_by_url">mz3_image_cache.get_image_index_by_url</a>&nbsp;(url)</td>
+	<td class="summary">URL‚É‘Š“–‚·‚éƒLƒƒƒbƒVƒ…ƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚é  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_inifile.get_value">mz3_inifile.get_value</a>&nbsp;(name, section)</td>
 	<td class="summary">ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é  </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_inifile.set_value*">mz3_inifile.set_value*</a>&nbsp;(name, section, value)</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.append_category">mz3_main_view.append_category</a>&nbsp;(title, url, key)</td>
+	<td class="summary">ƒJƒeƒSƒŠ‚Ì’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_body_item_list">mz3_main_view.get_body_item_list</a>&nbsp;()</td>
+	<td class="summary">‰ºƒyƒCƒ“—v‘fˆê——æ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_edit_text">mz3_main_view.get_edit_text</a>&nbsp;()</td>
+	<td class="summary">edit ƒGƒŠƒA‚Ì•¶š—ñæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_selected_body_item">mz3_main_view.get_selected_body_item</a>&nbsp;()</td>
+	<td class="summary">Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘fæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_selected_body_item_idx">mz3_main_view.get_selected_body_item_idx</a>&nbsp;()</td>
+	<td class="summary">Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘f‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_selected_category_access_type">mz3_main_view.get_selected_category_access_type</a>&nbsp;()</td>
+	<td class="summary">Œ»İ‘I‘ğ’†‚ÌãƒyƒCƒ“—v‘f‚Ìí•Êæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_selected_category_item">mz3_main_view.get_selected_category_item</a>&nbsp;()</td>
+	<td class="summary">Œ»İ‘I‘ğ’†‚ÌãƒyƒCƒ“—v‘fæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_wnd">mz3_main_view.get_wnd</a>&nbsp;()</td>
+	<td class="summary">ƒƒCƒ“ƒrƒ…[‚Ìæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.redraw_body_images">mz3_main_view.redraw_body_images</a>&nbsp;()</td>
+	<td class="summary">‰ºƒyƒCƒ“ƒAƒCƒRƒ“‚ÌÄ•`‰æ  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.retrieve_category_item">mz3_main_view.retrieve_category_item</a>&nbsp;()</td>
+	<td class="summary">ƒJƒeƒSƒŠ‚ÌÄ“Ç‚İ‚İ  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.select_body_item">mz3_main_view.select_body_item</a>&nbsp;(idx)</td>
+	<td class="summary">Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘f‚ğ•ÏX‚·‚é  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.set_edit_text">mz3_main_view.set_edit_text</a>&nbsp;(text)</td>
+	<td class="summary">edit ƒGƒŠƒA‚Ö‚Ì•¶š—ñİ’è  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.set_focus">mz3_main_view.set_focus</a>&nbsp;(focus_control)</td>
+	<td class="summary">ƒtƒH[ƒJƒXˆÚ“®  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.set_info_text">mz3_main_view.set_info_text</a>&nbsp;(text)</td>
+	<td class="summary">info ƒGƒŠƒA‚Ö‚Ì•¶š—ñİ’è  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.set_post_mode">mz3_main_view.set_post_mode</a>&nbsp;(mode)</td>
+	<td class="summary">Twitter •—‘‚«‚İ—pƒ‚[ƒh‚Ì•ÏX(‘‚«‚İæURL/API¯•Ê—p) : ‚¢‚í‚ä‚éƒAƒNƒZƒXí•Ê‚Æ“¯‚¶’l  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.update_control_status">mz3_main_view.update_control_status</a>&nbsp;(mode)</td>
+	<td class="summary">ƒRƒ“ƒgƒ[ƒ‹‚ÌÄ”z’u  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.append_menu">mz3_menu.append_menu</a>&nbsp;(menu, type, title, item_id)</td>
+	<td class="summary">ƒƒjƒ…[‚Ì’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.append_submenu">mz3_menu.append_submenu</a>&nbsp;(menu, title, submenu)</td>
+	<td class="summary">ƒTƒuƒƒjƒ…[‚Ì’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.create_popup_menu">mz3_menu.create_popup_menu</a>&nbsp;()</td>
+	<td class="summary">ƒƒjƒ…[ì¬  ì¬‚µ‚½ƒƒjƒ…[(•Ô‚è’l)‚Í•K‚¸ mz3_menu.delete() ‚Åíœ‚·‚é‚±‚Æ  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.delete">mz3_menu.delete</a>&nbsp;(menu)</td>
+	<td class="summary">ƒƒjƒ…[‚Ì”jŠü  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_menu.insert_menu">mz3_menu.insert_menu</a>&nbsp;(menu, index, title, item_id)</td>
-	<td class="summary">ƒƒjƒ…[‚Ì“o˜^B  2009/02/10 Œ»İAƒƒCƒ“‰æ–Ê‚Ì‚İƒTƒ|[ƒgB  </td>
+	<td class="summary">ƒƒjƒ…[‚Ì‘}“ü  2009/02/10 Œ»İAƒƒCƒ“‰æ–Ê‚Ì‚İƒTƒ|[ƒgB  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_menu.popup">mz3_menu.popup</a>&nbsp;(menu, wnd)</td>
+	<td class="summary">ƒƒjƒ…[‚Ìƒ|ƒbƒvƒAƒbƒv  </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#mz3_menu.regist_menu">mz3_menu.regist_menu</a>&nbsp;(hook_function_name)</td>
-	<td class="summary">ƒƒjƒ…[—pƒtƒbƒNŠÖ”‚Ì“o˜^B  “o˜^‚µ‚½ŠÖ”‚Í insert_menu ‚Å—˜—p‰Â”\B  </td>
+	<td class="summary">ƒƒjƒ…[—pƒtƒbƒNŠÖ”‚Ì“o˜^B  “o˜^‚µ‚½ŠÖ”‚Í insert_menu, append_menu ‚Å—˜—p‰Â”\B  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.append_additional_header">mz3_post_data.append_additional_header</a>&nbsp;(post, text)</td>
+	<td class="summary">POST ‚·‚éƒwƒbƒ_[‚Ì’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.append_file">mz3_post_data.append_file</a>&nbsp;(post, filename)</td>
+	<td class="summary">ƒtƒ@ƒCƒ‹(ƒoƒCƒiƒŠƒtƒ@ƒCƒ‹)‚ğ’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.append_post_body">mz3_post_data.append_post_body</a>&nbsp;(post, text)</td>
+	<td class="summary">POST ‚·‚é•¶š—ñ‚Ì’Ç‰Á  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.create">mz3_post_data.create</a>&nbsp;()</td>
+	<td class="summary">PostData ‚Ì¶¬  ƒXƒŒƒbƒhƒZ[ƒt‚Å‚Í‚È‚¢“_‚É’ˆÓI   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.set_content_type">mz3_post_data.set_content_type</a>&nbsp;(post, content_type)</td>
+	<td class="summary">Content-Type ‚Ìİ’è  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_report_view.get_wnd">mz3_report_view.get_wnd</a>&nbsp;()</td>
+	<td class="summary">ƒŒƒ|[ƒgƒrƒ…[‚Ìæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_write_view.get_text">mz3_write_view.get_text</a>&nbsp;(name)</td>
+	<td class="summary">‘‚«‚İ‰æ–Ê‚Ì—v‘f‚Ìæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_write_view.get_wnd">mz3_write_view.get_wnd</a>&nbsp;()</td>
+	<td class="summary">‘‚«‚İ‰æ–Ê‚Ìæ“¾  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_write_view.set_text">mz3_write_view.set_text</a>&nbsp;(name, text, value)</td>
+	<td class="summary">‘‚«‚İ‰æ–Ê‚Ì—v‘f‚Ìİ’è  </td>
 	</tr>
 
 </table>
@@ -342,69 +692,6 @@
 
 <h2><a name="functions"></a>Functions</h2>
 <dl class="function">
-
-
-
-<dt><a name="*mz3_data.get_serialize_key"></a><strong>*mz3_data.get_serialize_key</strong>&nbsp;(data)</dt>
-<dd>
-ƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB 
-
-
-<h3>Parameters</h3>
-<ul>
-	
-	<li>
-	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-[string]ƒVƒŠƒAƒ‰ƒCƒYƒL[ 
-
-
-
-</dd>
-
-
-
-
-<dt><a name="*mz3_inifile.set_value"></a><strong>*mz3_inifile.set_value</strong>&nbsp;(name, section, value)</dt>
-<dd>
-
-
-
-<h3>Parameters</h3>
-<ul>
-	
-	<li>
-	  name: 
-	</li>
-	
-	<li>
-	  section: 
-	</li>
-	
-	<li>
-	  value: 
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-</dd>
-
 
 
 
@@ -482,9 +769,9 @@
 
 
 
-<dt><a name="mz3.add_event_listener"></a><strong>mz3.add_event_listener</strong>&nbsp;(event, event_handler)</dt>
+<dt><a name="mz3.add_event_listener"></a><strong>mz3.add_event_listener</strong>&nbsp;(event, event_handler, call_first)</dt>
 <dd>
-ŠeíƒCƒxƒ“ƒg‚É‘Î‚·‚éƒtƒbƒNŠÖ”‚ğ’Ç‰Á‚·‚éB  “¯ˆêƒCƒxƒ“ƒg‚É‘Î‚µ‚Ä•¡”‚ÌƒtƒbƒNŠÖ”‚ª“o˜^‚³‚ê‚Ä‚¢‚éê‡AÅŒã‚É“o˜^‚³‚ê‚½ŠÖ”‚©‚ç‡‚ÉŒÄ‚Ño‚·B 
+ŠeíƒCƒxƒ“ƒg‚É‘Î‚·‚éƒtƒbƒNŠÖ”‚ğ’Ç‰Á‚·‚éB  call_first ‚ª true ‚Ìê‡A “¯ˆêƒCƒxƒ“ƒg‚É‘Î‚µ‚Ä•¡”‚ÌƒtƒbƒNŠÖ”‚ª“o˜^‚³‚ê‚Ä‚¢‚éê‡AÅŒã‚É“o˜^‚³‚ê‚½ŠÖ”‚©‚ç‡‚ÉŒÄ‚Ño‚·B false ‚Ìê‡‚Í‹t‡‚ÉŒÄ‚Ño‚·B 
 
 
 <h3>Parameters</h3>
@@ -496,6 +783,10 @@
 	
 	<li>
 	  event_handler: ƒtƒbƒNŠÖ”–¼({ƒe[ƒuƒ‹}.{ŠÖ”–¼})
+	</li>
+	
+	<li>
+	  call_first: ƒR[ƒ‹‡˜(–¢w’è‚Ítrue‚Æ‚İ‚È‚·) 
 	</li>
 	
 </ul>
@@ -510,8 +801,12 @@
 <h3>See also:</h3>
 <ul>
 	
+	<li><a href="../files/mz3_lua_api.html#event_listener1">
+		event_listener1
+	</a>
+	
 	<li><a href="">
-		event_listener
+		event_listener2 
 	</a>
 	
 </ul>
@@ -535,6 +830,133 @@ Win32 API ‚Ì MessageBox() ‚ğŒÄ‚Ño‚·B
 	
 	<li>
 	  title: ƒ^ƒCƒgƒ‹ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.change_view"></a><strong>mz3.change_view</strong>&nbsp;(view_name)</dt>
+<dd>
+ƒrƒ…[Ø‚è‘Ö‚¦ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  view_name: ƒrƒ…[–¼('main_view', 'report_view', 'write_view') 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.confirm"></a><strong>mz3.confirm</strong>&nbsp;(msg, title, type)</dt>
+<dd>
+Šm”F‰æ–Ê 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: ƒƒbƒZ[ƒW
+	</li>
+	
+	<li>
+	  title: ƒ^ƒCƒgƒ‹
+	</li>
+	
+	<li>
+	  type: "yes_no", "yes_no_cancel"
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+"yes", "no", "cancel" 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.convert_encoding"></a><strong>mz3.convert_encoding</strong>&nbsp;(text, in_encoding, out_encoding)</dt>
+<dd>
+•¶šƒR[ƒh•ÏŠ· 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: ‘ÎÛ•¶š—ñ
+	</li>
+	
+	<li>
+	  in_encoding: "utf8", "sjis"
+	</li>
+	
+	<li>
+	  out_encoding: "utf8", "sjis" 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.copy_file"></a><strong>mz3.copy_file</strong>&nbsp;(from_path, to_path)</dt>
+<dd>
+ƒtƒ@ƒCƒ‹ƒRƒs[ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  from_path: ƒRƒs[Œ³ƒpƒX
+	</li>
+	
+	<li>
+	  to_path: ƒRƒs[æƒpƒX 
 	</li>
 	
 </ul>
@@ -635,6 +1057,99 @@ URL‚©‚ç—Ş„‚³‚ê‚éƒAƒNƒZƒXí•Ê‚ğæ“¾‚·‚éB
 
 
 
+<dt><a name="mz3.get_app_name"></a><strong>mz3.get_app_name</strong>&nbsp;()</dt>
+<dd>
+ƒAƒvƒŠƒP[ƒVƒ‡ƒ“–¼("MZ3", "MZ4")‚ğ•Ô‚· 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] ƒAƒvƒŠƒP[ƒVƒ‡ƒ“–¼ 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_app_version"></a><strong>mz3.get_app_version</strong>&nbsp;()</dt>
+<dd>
+ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ìƒo[ƒWƒ‡ƒ“("1.0.0 Beta13")‚ğ•Ô‚· 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] ƒo[ƒWƒ‡ƒ“•¶š—ñ 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_open_file_name"></a><strong>mz3.get_open_file_name</strong>&nbsp;(wnd, caption, title, flags, initial_dir, initial_file, filter)</dt>
+<dd>
+ƒtƒ@ƒCƒ‹‘I‘ğ‰æ–Ê‚Ì•\¦ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  wnd: ƒEƒBƒ“ƒhƒE(mz3_main_view.get_wnd() “™‚Åæ“¾‚µ‚½’l)
+	</li>
+	
+	<li>
+	  caption: 
+	</li>
+	
+	<li>
+	  title: ƒLƒƒƒvƒVƒ‡ƒ“
+	</li>
+	
+	<li>
+	  flags: ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“ƒtƒ‰ƒO(OPENFILENAME:Flags ‚Ì’l)
+	</li>
+	
+	<li>
+	  initial_dir: ‰ŠúƒfƒBƒŒƒNƒgƒŠ
+	</li>
+	
+	<li>
+	  initial_file: ‰Šúƒtƒ@ƒCƒ‹ 
+	</li>
+	
+	<li>
+	  filter: ƒtƒ@ƒCƒ‹ƒtƒBƒ‹ƒ^("JPEGÌ§²Ù (*.jpg)%0*.jpg;*.jpeg%0‚·‚×‚Ä‚ÌÌ§²Ù (*.*)%0*.*%0%0"‚È‚Ç) "\0" ‚Íˆø‚«“n‚µ‚É–³‹‚³‚ê‚é‚½‚ß "%0" ‚Åw’è‚·‚é‚±‚ÆB
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+(string) ‘I‘ğƒtƒ@ƒCƒ‹ƒpƒX, ƒ†[ƒUƒLƒƒƒ“ƒZƒ‹‚Í nil 
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.get_serialize_key_by_access_type"></a><strong>mz3.get_serialize_key_by_access_type</strong>&nbsp;(type)</dt>
 <dd>
 ƒAƒNƒZƒXí•Ê‚©‚çƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB 
@@ -664,6 +1179,64 @@ URL‚©‚ç—Ş„‚³‚ê‚éƒAƒNƒZƒXí•Ê‚ğæ“¾‚·‚éB
 
 
 
+<dt><a name="mz3.get_service_type"></a><strong>mz3.get_service_type</strong>&nbsp;(key)</dt>
+<dd>
+ƒVƒŠƒAƒ‰ƒCƒYƒL[‚©‚çƒT[ƒrƒXí•Ê‚ğæ“¾‚·‚éB 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  key: ƒVƒŠƒAƒ‰ƒCƒYƒL[
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] ƒT[ƒrƒXí•Ê 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_text_length"></a><strong>mz3.get_text_length</strong>&nbsp;(text)</dt>
+<dd>
+•¶š—ñ‚Ì’·‚³æ“¾ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: ‘ÎÛ•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+integer ’·‚³ 
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.get_tick_count"></a><strong>mz3.get_tick_count</strong>&nbsp;()</dt>
 <dd>
 Win32 API ‚Ì GetTickCount() ‚ğŒÄ‚Ño‚·B 
@@ -676,6 +1249,62 @@ Win32 API ‚Ì GetTickCount() ‚ğŒÄ‚Ño‚·B
 
 <h3>Return value:</h3>
 [integer] OS‹N“®‚©‚ç‚ÌŒo‰ßŠÔ(ms) 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.is_mixi_logout"></a><strong>mz3.is_mixi_logout</strong>&nbsp;(serialize_key)</dt>
+<dd>
+mixi‚ÌƒƒOƒAƒEƒgó‘Ô”»’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  serialize_key: ƒVƒŠƒAƒ‰ƒCƒYƒL[ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.keybd_event"></a><strong>mz3.keybd_event</strong>&nbsp;(key, state)</dt>
+<dd>
+ƒL[ƒ{[ƒh‘€ì 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  key: ƒL[’l
+	</li>
+	
+	<li>
+	  state: "keydown" or "keyup" 
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -765,6 +1394,174 @@ mz3.logger_error('text')
 
 
 
+<dt><a name="mz3.make_image_logfile_path_from_url_md5"></a><strong>mz3.make_image_logfile_path_from_url_md5</strong>&nbsp;(url)</dt>
+<dd>
+‰æ‘œƒtƒ@ƒCƒ‹ƒpƒX¶¬(MD5Œ^) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  url: url
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+ƒpƒX 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.open_url"></a><strong>mz3.open_url</strong>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, file_type)</dt>
+<dd>
+URL ‚ğŠJ‚­  MZ3 ‚Ì’ÊMˆ—‚ğŠJn‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  wnd: ƒEƒBƒ“ƒhƒE(mz3_main_view.get_wnd() “™‚Åæ“¾‚µ‚½’l)
+	</li>
+	
+	<li>
+	  access_type: ƒAƒNƒZƒXí•Ê(ƒAƒNƒZƒXí•Ê‚É‰‚¶‚Äæ“¾ƒƒ\ƒbƒh[GET/POST]‚ª©“®İ’è‚³‚ê‚é)
+	</li>
+	
+	<li>
+	  url: URL
+	</li>
+	
+	<li>
+	  referer: ƒŠƒtƒ@ƒ‰[URL
+	</li>
+	
+	<li>
+	  type: 
+	</li>
+	
+	<li>
+	  user_agent: ƒ†[ƒUƒG[ƒWƒFƒ“ƒg(nil ‚Ìê‡ "MZ3" or "MZ4" ‚ª©“®İ’è‚³‚ê‚é)
+	</li>
+	
+	<li>
+	  post: POST —pƒIƒuƒWƒFƒNƒg(–¢ƒTƒ|[ƒg) 
+	</li>
+	
+	<li>
+	  file_type: ƒtƒ@ƒCƒ‹í•Ê("text", "binary")
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+‚È‚µ 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.open_url_by_browser"></a><strong>mz3.open_url_by_browser</strong>&nbsp;(url)</dt>
+<dd>
+URL ‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  url: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.open_url_by_browser_with_confirm"></a><strong>mz3.open_url_by_browser_with_confirm</strong>&nbsp;(url)</dt>
+<dd>
+URL ‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­(Šm”F•t‚«) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  url: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.regist_service"></a><strong>mz3.regist_service</strong>&nbsp;(service_name, default_selected)</dt>
+<dd>
+ƒT[ƒrƒX“o˜^(ƒ^ƒu‚Ì‰Šú‰»—p) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  service_name: ƒT[ƒrƒX–¼
+	</li>
+	
+	<li>
+	  default_selected: ƒfƒtƒHƒ‹ƒgó‘Ô‚Å‘I‘ğÏ‚İ‚É‚·‚é‚©‚Ç‚¤‚© 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.set_parser"></a><strong>mz3.set_parser</strong>&nbsp;(key, parser)</dt>
 <dd>
 ƒp[ƒT‚ğw’è‚·‚éB 
@@ -798,6 +1595,103 @@ mz3.logger_error('text')
 
 
 
+<dt><a name="mz3.set_vib_status"></a><strong>mz3.set_vib_status</strong>&nbsp;(vib_status)</dt>
+<dd>
+[MZ3 only] ƒoƒCƒu‚ğON/OFF‚·‚é  ƒoƒCƒu‚ğON/OFF‚·‚éB‹@íˆË‘¶‚É‚æ‚è“®ì‚µ‚È‚¢‰Â”\«‚à‚ ‚éB 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  vib_status: ƒoƒCƒuó‘Ô(true:ON, false:OFF) 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.show_common_edit_dlg"></a><strong>mz3.show_common_edit_dlg</strong>&nbsp;(caption, msg, initial_text, title)</dt>
+<dd>
+‹¤’ÊƒGƒfƒBƒbƒg‰æ–Ê‚Ì•\¦ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  caption: 
+	</li>
+	
+	<li>
+	  msg: ƒƒbƒZ[ƒW
+	</li>
+	
+	<li>
+	  initial_text: ‰Šú’l 
+	</li>
+	
+	<li>
+	  title: ƒLƒƒƒvƒVƒ‡ƒ“
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+(string) ƒ†[ƒU“ü—Í’l, ƒ†[ƒUƒLƒƒƒ“ƒZƒ‹‚Í nil 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.start_write_view"></a><strong>mz3.start_write_view</strong>&nbsp;(write_view_type, data)</dt>
+<dd>
+‘‚«‚İ‰æ–Ê‚Ì‹N“® 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  write_view_type: ‘‚«‚İí•Ê
+	</li>
+	
+	<li>
+	  data: MZ3Data(allow nil) 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.trace"></a><strong>mz3.trace</strong>&nbsp;(msg)</dt>
 <dd>
 TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B 
@@ -808,6 +1702,36 @@ TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B
 	
 	<li>
 	  msg: o—Í‚·‚é•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.url_encode"></a><strong>mz3.url_encode</strong>&nbsp;(text, encoding)</dt>
+<dd>
+URL ƒGƒ“ƒR[ƒh‚µ‚½•¶š—ñ‚ğ•Ô‚· 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: ‘ÎÛ•¶š—ñ
+	</li>
+	
+	<li>
+	  encoding: "utf8", 'euc-jp' 
 	</li>
 	
 </ul>
@@ -955,6 +1879,39 @@ TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B
 
 
 
+<dt><a name="mz3_access_type_info.set_cruise_target"></a><strong>mz3_access_type_info.set_cruise_target</strong>&nbsp;(type, is_cruise_target)</dt>
+<dd>
+„‰ñ‘ÎÛ‚Æ‚·‚é‚©‚Ìİ’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: ƒAƒNƒZƒXí•Ê
+	</li>
+	
+	<li>
+	  is_cruise_target: „‰ñ‘ÎÛ‚Æ‚·‚é‚©
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[bool] ¬Œ÷‚Í trueA¸”s‚Í false 
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_access_type_info.set_default_url"></a><strong>mz3_access_type_info.set_default_url</strong>&nbsp;(type, url)</dt>
 <dd>
 ƒfƒtƒHƒ‹ƒgURL‚Ìİ’è 
@@ -1001,7 +1958,7 @@ TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B
 	</li>
 	
 	<li>
-	  info_type: ƒAƒNƒZƒXí•Ê‚Ìí•Ê(‚Æ‚è‚ ‚¦‚¸'category'‚Ì‚İƒTƒ|[ƒg)
+	  info_type: ƒAƒNƒZƒXí•Ê‚Ìí•Ê('category', 'body', 'post', 'other')
 	</li>
 	
 </ul>
@@ -1186,6 +2143,70 @@ TRACEo—Í‚ğs‚¤BMZ3‚ÌƒRƒ“ƒ\[ƒ‹•t‚«ƒo[ƒWƒ‡ƒ“‚Ì‚İ‚Å•\¦‰Â”\B
 
 
 
+<dt><a name="mz3_account_provider.get_value"></a><strong>mz3_account_provider.get_value</strong>&nbsp;(service_name, param_name)</dt>
+<dd>
+ƒAƒJƒEƒ“ƒgî•ñ‚Ìæ“¾(ƒ†[ƒUİ’è’l‚Ìæ“¾) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  service_name: ƒT[ƒrƒX–¼
+	</li>
+	
+	<li>
+	  param_name: ƒpƒ‰ƒ[ƒ^–¼('id', 'password') 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_account_provider.set_param"></a><strong>mz3_account_provider.set_param</strong>&nbsp;(service_name, param_name, param_value)</dt>
+<dd>
+ƒAƒJƒEƒ“ƒgî•ñ“o˜^(Šeƒvƒ‰ƒOƒCƒ“‚Å‚Ç‚Ì‚æ‚¤‚Èî•ñ‚ª•K—v‚©) 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  service_name: ƒT[ƒrƒX–¼
+	</li>
+	
+	<li>
+	  param_name: ƒpƒ‰ƒ[ƒ^–¼('id_name', 'password_name')
+	</li>
+	
+	<li>
+	  param_value: ƒpƒ‰ƒ[ƒ^’l 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_data.add_body_with_extract"></a><strong>mz3_data.add_body_with_extract</strong>&nbsp;(data, value)</dt>
 <dd>
 value ‚©‚çƒŠƒ“ƒN“™‚ğ’ŠoA®Œ`‚µAHTML ‚Ì®Œ`‚ğ‚µ‚ÄAbody ”z—ñ‚É’Ç‰Á‚·‚é  
@@ -1200,6 +2221,74 @@ value ‚©‚çƒŠƒ“ƒN“™‚ğ’ŠoA®Œ`‚µAHTML ‚Ì®Œ`‚ğ‚µ‚ÄAbody ”z—ñ‚É’Ç‰Á‚·‚é
 	
 	<li>
 	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.add_child"></a><strong>mz3_data.add_child</strong>&nbsp;(data, child)</dt>
+<dd>
+q—v‘f‚Ì’Ç‰Á  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  child: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.add_link_list"></a><strong>mz3_data.add_link_list</strong>&nbsp;(data, url, text, type)</dt>
+<dd>
+link_list ‚É’Ç‰Á‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  url: URL
+	</li>
+	
+	<li>
+	  text: Text
+	</li>
+	
+	<li>
+	  type: 'list'(default) or 'page'(ƒy[ƒW•ÏXƒŠƒ“ƒN—p) 
 	</li>
 	
 </ul>
@@ -1234,6 +2323,32 @@ name ‚Æ‚¢‚¤–¼‘O‚Ì”z—ñ‚É value ‚ğ’Ç‰Á‚·‚éB
 	
 	<li>
 	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.clear"></a><strong>mz3_data.clear</strong>&nbsp;(data)</dt>
+<dd>
+ŠeƒŠƒXƒgAq—v‘f‚Ìíœ  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
 	</li>
 	
 </ul>
@@ -1376,6 +2491,157 @@ MZ3Data ƒIƒuƒWƒFƒNƒg‚Ì”jŠü  ’ˆÓFLua “à‚Å create ‚µ‚½ MZ3Data ƒIƒuƒWƒFƒNƒg‚Í•K‚
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_integer64_as_string"></a><strong>mz3_data.get_integer64_as_string</strong>&nbsp;(data, name)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_link_list_size"></a><strong>mz3_data.get_link_list_size</strong>&nbsp;(data)</dt>
+<dd>
+link_list ‚ÌŒÂ”‚ğæ“¾‚·‚é  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_link_list_text"></a><strong>mz3_data.get_link_list_text</strong>&nbsp;(data, idx)</dt>
+<dd>
+link_list ‚©‚ç TEXT(ƒLƒƒƒvƒVƒ‡ƒ“) ‚ğæ“¾‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  idx: ƒCƒ“ƒfƒbƒNƒX 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+idx ‚ª•s³‚Èê‡‚Í nilA‚»‚êˆÈŠO‚Í URL •¶š—ñ‚ğ•Ô‚· 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_link_list_url"></a><strong>mz3_data.get_link_list_url</strong>&nbsp;(data, idx)</dt>
+<dd>
+link_list ‚©‚ç URL ‚ğæ“¾‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  idx: ƒCƒ“ƒfƒbƒNƒX 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+idx ‚ª•s³‚Èê‡‚Í nilA‚»‚êˆÈŠO‚Í URL •¶š—ñ‚ğ•Ô‚· 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data.get_serialize_key*"></a><strong>mz3_data.get_serialize_key*</strong>&nbsp;(data)</dt>
+<dd>
+ƒVƒŠƒAƒ‰ƒCƒYƒL[‚ğæ“¾‚·‚éB 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: MZ3Data ƒIƒuƒWƒFƒNƒg
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string]ƒVƒŠƒAƒ‰ƒCƒYƒL[ 
 
 
 
@@ -1608,6 +2874,40 @@ MZ3Data ƒIƒuƒWƒFƒNƒg‚Ì”jŠü  ’ˆÓFLua “à‚Å create ‚µ‚½ MZ3Data ƒIƒuƒWƒFƒNƒg‚Í•K‚
 
 
 
+<dt><a name="mz3_data.set_integer64_from_string"></a><strong>mz3_data.set_integer64_from_string</strong>&nbsp;(data, name, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data: 
+	</li>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_data.set_text"></a><strong>mz3_data.set_text</strong>&nbsp;(data, name, value)</dt>
 <dd>
 
@@ -1702,6 +3002,105 @@ data_list ‚Ì—v‘f‚ğ‚·‚×‚ÄÁ‹‚·‚éB
 
 
 
+<dt><a name="mz3_data_list.create"></a><strong>mz3_data_list.create</strong>&nbsp;()</dt>
+<dd>
+data_list ‚Ì¶¬  
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.delete"></a><strong>mz3_data_list.delete</strong>&nbsp;(data_list)</dt>
+<dd>
+data_list ‚ÌÁ‹  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.get_count"></a><strong>mz3_data_list.get_count</strong>&nbsp;(data_list)</dt>
+<dd>
+data_list ‚ÌŒÂ”æ“¾ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.get_data"></a><strong>mz3_data_list.get_data</strong>&nbsp;(data_list, idx)</dt>
+<dd>
+data_list ‚Ì—v‘fæ“¾ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+	<li>
+	  idx: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_data_list.insert"></a><strong>mz3_data_list.insert</strong>&nbsp;(data_list, index, data)</dt>
 <dd>
 data_list ‚Ì index ‚É data ‚ğ‘}“ü‚·‚éB  
@@ -1720,6 +3119,70 @@ data_list ‚Ì index ‚É data ‚ğ‘}“ü‚·‚éB
 	
 	<li>
 	  data: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_data_list.merge"></a><strong>mz3_data_list.merge</strong>&nbsp;(data_list, new_list, max_size)</dt>
+<dd>
+data_list ‚Ìmerge  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  data_list: 
+	</li>
+	
+	<li>
+	  new_list: 
+	</li>
+	
+	<li>
+	  max_size: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_data.append_tab"></a><strong>mz3_group_data.append_tab</strong>&nbsp;(group, tab)</dt>
+<dd>
+ƒ^ƒu‚ğƒOƒ‹[ƒv‚É’Ç‰Á‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  group: MZ3GroupData
+	</li>
+	
+	<li>
+	  tab: MZ3GroupItem 
 	</li>
 	
 </ul>
@@ -1789,7 +3252,7 @@ MZ3GroupItem
 
 
 <h3>Return value:</h3>
-ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚ÌƒXƒy[ƒX‹æØ‚è•¶š—ñ 
+ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚ÌƒXƒy[ƒX‹æØ‚è•¶š—ñBƒT[ƒrƒXí•Ê‚Í mz3.regist_service() ‚Å“o˜^‚µ‚½•¶š—ñB 
 
 
 
@@ -1831,6 +3294,61 @@ MZ3GroupItem
 
 <h3>Return value:</h3>
 ¬Œ÷‚Í trueA¸”s‚Í false 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_item.create"></a><strong>mz3_group_item.create</strong>&nbsp;(title)</dt>
+<dd>
+ƒ^ƒu‚ğì¬‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  title: ƒ^ƒu‚Ì–¼Ì 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[MZ3GroupItem] tab 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_group_item.delete"></a><strong>mz3_group_item.delete</strong>&nbsp;(tab)</dt>
+<dd>
+MZ3GroupItem ƒIƒuƒWƒFƒNƒg‚Ìíœ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  tab: [MZ3GroupItem] ƒ^ƒu 
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -1895,6 +3413,32 @@ index ‚Ì—v‘f‚ğæ“¾‚·‚éB
 
 
 
+<dt><a name="mz3_image_cache.get_image_index_by_url"></a><strong>mz3_image_cache.get_image_index_by_url</strong>&nbsp;(url)</dt>
+<dd>
+URL‚É‘Š“–‚·‚éƒLƒƒƒbƒVƒ…ƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  url: ‰æ‘œURL 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_inifile.get_value"></a><strong>mz3_inifile.get_value</strong>&nbsp;(name, section)</dt>
 <dd>
 ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é 
@@ -1931,9 +3475,501 @@ ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é
 
 
 
+<dt><a name="mz3_inifile.set_value*"></a><strong>mz3_inifile.set_value*</strong>&nbsp;(name, section, value)</dt>
+<dd>
+
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: 
+	</li>
+	
+	<li>
+	  section: 
+	</li>
+	
+	<li>
+	  value: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.append_category"></a><strong>mz3_main_view.append_category</strong>&nbsp;(title, url, key)</dt>
+<dd>
+ƒJƒeƒSƒŠ‚Ì’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  title: ƒ^ƒCƒgƒ‹
+	</li>
+	
+	<li>
+	  url: URL
+	</li>
+	
+	<li>
+	  key: ƒVƒŠƒAƒ‰ƒCƒYƒL[ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_body_item_list"></a><strong>mz3_main_view.get_body_item_list</strong>&nbsp;()</dt>
+<dd>
+‰ºƒyƒCƒ“—v‘fˆê——æ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_edit_text"></a><strong>mz3_main_view.get_edit_text</strong>&nbsp;()</dt>
+<dd>
+edit ƒGƒŠƒA‚Ì•¶š—ñæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_selected_body_item"></a><strong>mz3_main_view.get_selected_body_item</strong>&nbsp;()</dt>
+<dd>
+Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘fæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_selected_body_item_idx"></a><strong>mz3_main_view.get_selected_body_item_idx</strong>&nbsp;()</dt>
+<dd>
+Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘f‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_selected_category_access_type"></a><strong>mz3_main_view.get_selected_category_access_type</strong>&nbsp;()</dt>
+<dd>
+Œ»İ‘I‘ğ’†‚ÌãƒyƒCƒ“—v‘f‚Ìí•Êæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_selected_category_item"></a><strong>mz3_main_view.get_selected_category_item</strong>&nbsp;()</dt>
+<dd>
+Œ»İ‘I‘ğ’†‚ÌãƒyƒCƒ“—v‘fæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_wnd"></a><strong>mz3_main_view.get_wnd</strong>&nbsp;()</dt>
+<dd>
+ƒƒCƒ“ƒrƒ…[‚Ìæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.redraw_body_images"></a><strong>mz3_main_view.redraw_body_images</strong>&nbsp;()</dt>
+<dd>
+‰ºƒyƒCƒ“ƒAƒCƒRƒ“‚ÌÄ•`‰æ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.retrieve_category_item"></a><strong>mz3_main_view.retrieve_category_item</strong>&nbsp;()</dt>
+<dd>
+ƒJƒeƒSƒŠ‚ÌÄ“Ç‚İ‚İ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.select_body_item"></a><strong>mz3_main_view.select_body_item</strong>&nbsp;(idx)</dt>
+<dd>
+Œ»İ‘I‘ğ’†‚Ì‰ºƒyƒCƒ“—v‘f‚ğ•ÏX‚·‚é 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  idx: ‘I‘ğ—v‘f‚ÌƒCƒ“ƒfƒbƒNƒX 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.set_edit_text"></a><strong>mz3_main_view.set_edit_text</strong>&nbsp;(text)</dt>
+<dd>
+edit ƒGƒŠƒA‚Ö‚Ì•¶š—ñİ’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: İ’è‚·‚é•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.set_focus"></a><strong>mz3_main_view.set_focus</strong>&nbsp;(focus_control)</dt>
+<dd>
+ƒtƒH[ƒJƒXˆÚ“® 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  focus_control: ƒtƒH[ƒJƒXˆÚ“®æƒRƒ“ƒgƒ[ƒ‹("edit", "category_list", "body_list") 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.set_info_text"></a><strong>mz3_main_view.set_info_text</strong>&nbsp;(text)</dt>
+<dd>
+info ƒGƒŠƒA‚Ö‚Ì•¶š—ñİ’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: İ’è‚·‚é•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.set_post_mode"></a><strong>mz3_main_view.set_post_mode</strong>&nbsp;(mode)</dt>
+<dd>
+Twitter •—‘‚«‚İ—pƒ‚[ƒh‚Ì•ÏX(‘‚«‚İæURL/API¯•Ê—p) : ‚¢‚í‚ä‚éƒAƒNƒZƒXí•Ê‚Æ“¯‚¶’l 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  mode: ƒ‚[ƒh’l 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.update_control_status"></a><strong>mz3_main_view.update_control_status</strong>&nbsp;(mode)</dt>
+<dd>
+ƒRƒ“ƒgƒ[ƒ‹‚ÌÄ”z’u 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  mode: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.append_menu"></a><strong>mz3_menu.append_menu</strong>&nbsp;(menu, type, title, item_id)</dt>
+<dd>
+ƒƒjƒ…[‚Ì’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  menu: ƒƒjƒ…[—pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  type: ƒƒjƒ…[í•Ê("string", "separator")
+	</li>
+	
+	<li>
+	  title: ƒ^ƒCƒgƒ‹
+	</li>
+	
+	<li>
+	  item_id: regist_menu ‚Ì•Ô‚è’l 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.append_submenu"></a><strong>mz3_menu.append_submenu</strong>&nbsp;(menu, title, submenu)</dt>
+<dd>
+ƒTƒuƒƒjƒ…[‚Ì’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  menu: ƒƒjƒ…[—pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  title: ƒ^ƒCƒgƒ‹
+	</li>
+	
+	<li>
+	  submenu: ƒTƒuƒƒjƒ…[—pƒIƒuƒWƒFƒNƒg 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.create_popup_menu"></a><strong>mz3_menu.create_popup_menu</strong>&nbsp;()</dt>
+<dd>
+ƒƒjƒ…[ì¬  ì¬‚µ‚½ƒƒjƒ…[(•Ô‚è’l)‚Í•K‚¸ mz3_menu.delete() ‚Åíœ‚·‚é‚±‚Æ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.delete"></a><strong>mz3_menu.delete</strong>&nbsp;(menu)</dt>
+<dd>
+ƒƒjƒ…[‚Ì”jŠü 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  menu: ƒƒjƒ…[—pƒIƒuƒWƒFƒNƒg 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_menu.insert_menu"></a><strong>mz3_menu.insert_menu</strong>&nbsp;(menu, index, title, item_id)</dt>
 <dd>
-ƒƒjƒ…[‚Ì“o˜^B  2009/02/10 Œ»İAƒƒCƒ“‰æ–Ê‚Ì‚İƒTƒ|[ƒgB 
+ƒƒjƒ…[‚Ì‘}“ü  2009/02/10 Œ»İAƒƒCƒ“‰æ–Ê‚Ì‚İƒTƒ|[ƒgB 
 
 
 <h3>Parameters</h3>
@@ -1952,7 +3988,37 @@ ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é
 	</li>
 	
 	<li>
-	  item_id: insert_menu ‚Ì•Ô‚è’l 
+	  item_id: regist_menu ‚Ì•Ô‚è’l 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_menu.popup"></a><strong>mz3_menu.popup</strong>&nbsp;(menu, wnd)</dt>
+<dd>
+ƒƒjƒ…[‚Ìƒ|ƒbƒvƒAƒbƒv 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  menu: ƒƒjƒ…[—pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  wnd: eƒEƒBƒ“ƒhƒE 
 	</li>
 	
 </ul>
@@ -1971,7 +4037,7 @@ ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é
 
 <dt><a name="mz3_menu.regist_menu"></a><strong>mz3_menu.regist_menu</strong>&nbsp;(hook_function_name)</dt>
 <dd>
-ƒƒjƒ…[—pƒtƒbƒNŠÖ”‚Ì“o˜^B  “o˜^‚µ‚½ŠÖ”‚Í insert_menu ‚Å—˜—p‰Â”\B 
+ƒƒjƒ…[—pƒtƒbƒNŠÖ”‚Ì“o˜^B  “o˜^‚µ‚½ŠÖ”‚Í insert_menu, append_menu ‚Å—˜—p‰Â”\B 
 
 
 <h3>Parameters</h3>
@@ -1979,6 +4045,237 @@ ini ƒtƒ@ƒCƒ‹‚©‚ç’l‚ğæ“¾‚·‚é
 	
 	<li>
 	  hook_function_name: ƒƒjƒ…[‰Ÿ‰º‚ÌƒtƒbƒNŠÖ”–¼ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.append_additional_header"></a><strong>mz3_post_data.append_additional_header</strong>&nbsp;(post, text)</dt>
+<dd>
+POST ‚·‚éƒwƒbƒ_[‚Ì’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST —pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  text: ’Ç‰Á‚·‚é•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.append_file"></a><strong>mz3_post_data.append_file</strong>&nbsp;(post, filename)</dt>
+<dd>
+ƒtƒ@ƒCƒ‹(ƒoƒCƒiƒŠƒtƒ@ƒCƒ‹)‚ğ’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST —pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  filename: ƒtƒ@ƒCƒ‹–¼ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.append_post_body"></a><strong>mz3_post_data.append_post_body</strong>&nbsp;(post, text)</dt>
+<dd>
+POST ‚·‚é•¶š—ñ‚Ì’Ç‰Á 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST —pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  text: ’Ç‰Á‚·‚é•¶š—ñ 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.create"></a><strong>mz3_post_data.create</strong>&nbsp;()</dt>
+<dd>
+PostData ‚Ì¶¬  ƒXƒŒƒbƒhƒZ[ƒt‚Å‚Í‚È‚¢“_‚É’ˆÓI  
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.set_content_type"></a><strong>mz3_post_data.set_content_type</strong>&nbsp;(post, content_type)</dt>
+<dd>
+Content-Type ‚Ìİ’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST —pƒIƒuƒWƒFƒNƒg
+	</li>
+	
+	<li>
+	  content_type: Content-Type ’l 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_report_view.get_wnd"></a><strong>mz3_report_view.get_wnd</strong>&nbsp;()</dt>
+<dd>
+ƒŒƒ|[ƒgƒrƒ…[‚Ìæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_write_view.get_text"></a><strong>mz3_write_view.get_text</strong>&nbsp;(name)</dt>
+<dd>
+‘‚«‚İ‰æ–Ê‚Ì—v‘f‚Ìæ“¾ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: æ“¾‚µ‚½‚¢—v‘f–¼('title_edit', 'body_edit') 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_write_view.get_wnd"></a><strong>mz3_write_view.get_wnd</strong>&nbsp;()</dt>
+<dd>
+‘‚«‚İ‰æ–Ê‚Ìæ“¾ 
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_write_view.set_text"></a><strong>mz3_write_view.set_text</strong>&nbsp;(name, text, value)</dt>
+<dd>
+‘‚«‚İ‰æ–Ê‚Ì—v‘f‚Ìİ’è 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: İ’è‚µ‚½‚¢—v‘f–¼('title_edit', 'body_edit')
+	</li>
+	
+	<li>
+	  text: 
+	</li>
+	
+	<li>
+	  value: İ’è‚µ‚½‚¢•¶š—ñ 
 	</li>
 	
 </ul>
