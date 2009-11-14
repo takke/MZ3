@@ -145,6 +145,7 @@ menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_crea
 menu_items.destroy_favourings    = mz3_menu.regist_menu("twitter.on_twitter_destroy_favourings");
 menu_items.create_friendships    = mz3_menu.regist_menu("twitter.on_twitter_create_friendships");
 menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_destroy_friendships");
+menu_items.show_status_url       = mz3_menu.regist_menu("twitter.on_show_status_url");
 menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
 menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
 menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
@@ -183,17 +184,16 @@ function my_add_new_user(new_list, status, id)
 	data = MZ3Data:create();
 	
 	-- id : status/id
---	local id = status:match('<id>([^<]*)</id>');
 	data:set_integer64_from_string('id', id);
 	type = mz3.get_access_type_by_key('TWITTER_USER');
 	data:set_access_type(type);
 	
 	-- updated : status/created_at
-	local s = status:match('<created_at>([^<]*)</created_at>');
+	local s = status:match('<created_at>([^<]*)<');
 	data:parse_date_line(s);
 	
 	-- text : status/text
-	text = status:match('<text>([^<]*)</text>');
+	text = status:match('<text>([^<]*)<');
 	text = text:gsub('&amp;', '&');
 	text = mz3.decode_html_entity(text);
 	data:add_text_array('body', text);
@@ -205,32 +205,34 @@ function my_add_new_user(new_list, status, id)
 --	end
 	
 	-- URL を抽出し、リンクにする
-	for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
-		data:add_link_list(url, url);
---		mz3.logger_debug(url);
+	if line_has_strings(text, 'ttp') then
+		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+			data:add_link_list(url, url);
+			mz3.logger_debug('抽出URL: ' .. url);
+		end
 	end
 
 	-- source : status/source
-	s = status:match('<source>([^<]*)</source>');
+	s = status:match('<source>([^<]*)<');
 	s = mz3.decode_html_entity(s);
 	data:set_text('source', s);
 	
 	-- name : status/user/screen_name
 	user = status:match('<user>.-</user>');
-	s = user:match('<screen_name>([^<]*)</screen_name>');
+	s = user:match('<screen_name>([^<]*)<');
 	s = s:gsub('&amp;', '&');
 	s = mz3.decode_html_entity(s);
 	data:set_text('name', s);
 	
 	-- author : status/user/name
-	s = user:match('<name>([^<]*)</name>');
+	s = user:match('<name>([^<]*)<');
 	s = s:gsub('&amp;', '&');
 	s = mz3.decode_html_entity(s);
 	data:set_text('author', s);
 
 	-- description : status/user/description
 	-- title に入れるのは苦肉の策・・・
-	s = user:match('<description>([^<]*)</description>');
+	s = user:match('<description>([^<]*)<');
 	if s~=nil then
 		s = s:gsub('&amp;', '&');
 		s = mz3.decode_html_entity(s);
@@ -240,29 +242,31 @@ function my_add_new_user(new_list, status, id)
 	end
 
 	-- owner-id : status/user/id
-	data:set_integer('owner_id', user:match('<id>([^<]*)</id>'));
+	data:set_integer('owner_id', user:match('<id>([^<]*)<'));
+	
+	-- in_reply_to_status_id : status/in_reply_to_status_id
+--	data:set_integer('in_reply_to_status_id', status:match('<in_reply_to_status_id>([^<]*)</'));
 
 	-- URL : status/user/url
-	url = user:match('<url>([^<]*)</url>');
+	url = user:match('<url>([^<]*)<');
 	data:set_text('url', url);
 	data:set_text('browse_uri', url);
 
 	-- Image : status/user/profile_image_url
-	profile_image_url = user:match('<profile_image_url>([^<]*)</profile_image_url>');
+	profile_image_url = user:match('<profile_image_url>([^<]*)<');
 	profile_image_url = mz3.decode_html_entity(profile_image_url);
---	mz3.logger_debug(profile_image_url);
 	data:add_text_array('image', profile_image_url);
 
 	-- <location>East Tokyo United</location>
-	data:set_text('location', mz3.decode_html_entity(user:match('<location>([^<]*)</location>')));
+	data:set_text('location', mz3.decode_html_entity(user:match('<location>([^<]*)<')));
 	-- <followers_count>555</followers_count>
-	data:set_integer('followers_count', user:match('<followers_count>([^<]*)</followers_count>'));
+	data:set_integer('followers_count', user:match('<followers_count>([^<]*)<'));
 	-- <friends_count>596</friends_count>
-	data:set_integer('friends_count', user:match('<friends_count>([^<]*)</friends_count>'));
+	data:set_integer('friends_count', user:match('<friends_count>([^<]*)<'));
 	-- <favourites_count>361</favourites_count>
-	data:set_integer('favourites_count', user:match('<favourites_count>([^<]*)</favourites_count>'));
+	data:set_integer('favourites_count', user:match('<favourites_count>([^<]*)<'));
 	-- <statuses_count>7889</statuses_count>
-	data:set_integer('statuses_count', user:match('<statuses_count>([^<]*)</statuses_count>'));
+	data:set_integer('statuses_count', user:match('<statuses_count>([^<]*)<'));
 
 	-- 一時リストに追加
 	new_list:add(data.data);
@@ -912,6 +916,15 @@ function on_twitter_destroy_friendships(serialize_key, event_name, data)
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- 「ステータスページを開く」メニュー用ハンドラ
+function on_show_status_url(serialize_key, event_name, data)
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	local url = "http://twitter.com/" .. body:get_text('name') .. "/statuses/" .. body:get_integer64_as_string('id');
+	mz3.open_url_by_browser_with_confirm(url);
 end
 
 
@@ -1607,6 +1620,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 	menu:append_menu("separator");
 
+	menu:append_menu("string", "ステータスページを開く", menu_items.show_status_url);
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
 	
 	-- 発言内の @XXX を抽出し、メニュー化
