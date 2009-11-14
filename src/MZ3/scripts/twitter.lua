@@ -208,7 +208,7 @@ function my_add_new_user(new_list, status, id)
 	if line_has_strings(text, 'ttp') then
 		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 			data:add_link_list(url, url);
-			mz3.logger_debug('’ŠoURL: ' .. url);
+--			mz3.logger_debug('’ŠoURL: ' .. url);
 		end
 	end
 

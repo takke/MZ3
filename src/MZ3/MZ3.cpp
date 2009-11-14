@@ -1200,45 +1200,36 @@ bool CMZ3App::LoadSkinSetting()
 	return true;
 }
 
-void CMZ3App::ReflectSkinSetting()
+inline void MySetBorder(CWnd* pTargetWnd, bool bShowBorder)
 {
 	int nFlags = SWP_FRAMECHANGED;
 
-	CWnd* pCategoryList = m_pMainView->GetDlgItem(IDC_HEADER_LIST);
-	if (pCategoryList) {
-		if (theApp.m_skininfo.bMainCategoryListBorder) {
-			pCategoryList->ModifyStyle(0, WS_BORDER, nFlags);
+	if (pTargetWnd) {
+		if (bShowBorder) {
+#ifdef WINCE
+			pTargetWnd->ModifyStyle(0, WS_BORDER, nFlags);
+#else
+			pTargetWnd->ModifyStyleEx(0, WS_EX_CLIENTEDGE, nFlags);
+#endif
 		} else {
-			pCategoryList->ModifyStyle(WS_BORDER, 0, nFlags);
+#ifdef WINCE
+			pTargetWnd->ModifyStyle(WS_BORDER, 0, nFlags);
+#else
+			pTargetWnd->ModifyStyleEx(WS_EX_CLIENTEDGE, 0, nFlags);
+#endif
 		}
+		pTargetWnd->Invalidate();
 	}
+}
 
-	CWnd* pBodyList = m_pMainView->GetDlgItem(IDC_BODY_LIST);
-	if (pBodyList) {
-		if (theApp.m_skininfo.bMainBodyListBorder) {
-			pBodyList->ModifyStyle(0, WS_BORDER, nFlags);
-		} else {
-			pBodyList->ModifyStyle(WS_BORDER, 0, nFlags);
-		}
-	}
+void CMZ3App::ReflectSkinSetting()
+{
+	MZ3LOGGER_DEBUG(L"CMZ3App::ReflectSkinSetting");
 
-	CWnd* pStatusBar = m_pMainView->GetDlgItem(IDC_INFO_EDIT);
-	if (pStatusBar) {
-		if (theApp.m_skininfo.bMainStatusBorder) {
-			pStatusBar->ModifyStyle(0, WS_BORDER, nFlags);
-		} else {
-			pStatusBar->ModifyStyle(WS_BORDER, 0, nFlags);
-		}
-	}
-
-	CWnd* pEditBar = m_pMainView->GetDlgItem(IDC_STATUS_EDIT);
-	if (pEditBar) {
-		if (theApp.m_skininfo.bMainEditBorder) {
-			pEditBar->ModifyStyle(0, WS_BORDER, nFlags);
-		} else {
-			pEditBar->ModifyStyle(WS_BORDER, 0, nFlags);
-		}
-	}
+	MySetBorder(m_pMainView->GetDlgItem(IDC_HEADER_LIST), theApp.m_skininfo.bMainCategoryListBorder);
+	MySetBorder(m_pMainView->GetDlgItem(IDC_BODY_LIST),   theApp.m_skininfo.bMainBodyListBorder);
+	MySetBorder(m_pMainView->GetDlgItem(IDC_INFO_EDIT),   theApp.m_skininfo.bMainStatusBorder);
+	MySetBorder(m_pMainView->GetDlgItem(IDC_STATUS_EDIT), theApp.m_skininfo.bMainEditBorder);
 }
 
 /**
