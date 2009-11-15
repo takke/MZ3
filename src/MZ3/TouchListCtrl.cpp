@@ -1007,8 +1007,10 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 #ifndef WINCE
 						// Win32では独自処理で描画する
 						// WMでは処理が追いつかないので標準処理に任せる
-//						DrawDetail();
-//						UpdateWindow();
+
+						// ⇒やっぱりWMでも描画する
+						DrawDetail();
+						UpdateWindow();
 
 //#else
 //						if( !IsScrollWithBk() ){
@@ -1140,7 +1142,10 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
 #else
 		// WMではItem単位でスクロールさせる
-		m_offsetPixelY = 0;
+//		m_offsetPixelY = 0;
+
+		// ⇒やっぱりPIXEL単位でスクロールさせる
+		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
 #endif
 	}
 
@@ -1210,14 +1215,16 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 			DrawDetail();
 			UpdateWindow();
 		} else {
-#ifndef WINCE
+//#ifndef WINCE
 			// 再描画
 			// Win32では独自処理で描画する
 			// WMでは処理が追いつかないので標準処理に任せる
 
+			// ⇒やっぱりWMでも独自処理で描画する
+
 			DrawDetail();
 			UpdateWindow();
-#endif
+//#endif
 		}
 	}
 
