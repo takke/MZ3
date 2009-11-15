@@ -5255,7 +5255,7 @@ void CMZ3View::OnPaint()
 
 			if (!bDrawFinished) {
 				// “h‚è‚Â‚Ô‚·
-				dc.FillSolidRect( m_rectIcon, RGB(255,255,255) );
+				dc.FillSolidRect( m_rectIcon, theApp.m_skininfo.clrMainStatusBG );
 			}
 		}
 		break;
