@@ -397,6 +397,7 @@ public:
 	afx_msg void OnCategorymenuMoveDown();
 	void MoveCategoryItem(int oldCategoryIndex, int newCategoryIndex);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	bool MySetInfoEditFromBodySelectedData(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

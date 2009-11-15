@@ -116,6 +116,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
+//	util::StopWatch sw_draw1, sw_draw2, sw_draw4, sw_draw3;
+
+//sw_draw1.start();
+
 	// 再描画するItemの座標を取得
 	CRect rcItem( lpDrawItemStruct->rcItem );
 
@@ -192,6 +196,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		(bFocus || (GetStyle() & LVS_SHOWSELALWAYS))
 		&& lvi.state & LVIS_SELECTED;
 	bSelected = bSelected || (lvi.state & LVIS_DROPHILITED);
+
+//sw_draw1.stop();
+//sw_draw2.start();
 
 	// アイテムの表示されている幅を取得
 	CRect rcAllLabels;
@@ -298,6 +305,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 	}
 
+//sw_draw2.stop();
+//sw_draw3.start();
+
 	// アイテムのラベルを描きます。
 	CRect rcSubItem;
 	this->GetItemRect(nItem, rcSubItem, LVIR_LABEL);
@@ -318,6 +328,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		clrBkSave = pDC->SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
 	} else {
 		// 非選択状態なので、状態に応じて色を変更する
+//		util::StopWatch sw_coloring;
+
+//		sw_coloring.start();
 		if (pData!=NULL) {
 
 			COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
@@ -474,9 +487,18 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			// 色の設定
 			clrTextSave = pDC->SetTextColor(clrTextFg);
 		}
+//		sw_coloring.stop();
+
+//		MZ3LOGGER_DEBUG(
+//			util::FormatString(L" *** coloring detect[%dms]",
+//				sw_coloring.getElapsedMilliSecUntilStoped()));
 	}
 
+//sw_draw3.stop();
+
+
 	// 各カラム(各行)の描画
+//sw_draw4.start();
 
 	// 絵文字を文字列に変換する
 	if( LINE_HAS_EMOJI_LINK(strTarget1) ) {
@@ -795,6 +817,20 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if ((lvi.state & LVIS_FOCUSED) == LVIS_FOCUSED && bFocus == TRUE) {
 		pDC->DrawFocusRect(rcAllLabels);
 	}
+
+//sw_draw4.stop();
+
+	// ベンチマーク結果出力
+	/*
+	MZ3LOGGER_DEBUG(
+		util::FormatString(L"DrawItem[%02d] draw[%dms][%dms][%dms][%dms]",
+			nItem,
+			sw_draw1.getElapsedMilliSecUntilStoped(),
+			sw_draw2.getElapsedMilliSecUntilStoped(),
+			sw_draw3.getElapsedMilliSecUntilStoped(),
+			sw_draw4.getElapsedMilliSecUntilStoped()
+			));
+	*/
 }
 
 /**

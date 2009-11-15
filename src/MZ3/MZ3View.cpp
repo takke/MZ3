@@ -646,9 +646,21 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		break;
 	case VIEW_STYLE_IMAGE:
 	case VIEW_STYLE_TWITTER:
-		m_rectIcon.SetRect( 0, y, hInfo, y+hInfo );
-		util::MoveDlgItemWindow( this, IDC_INFO_EDIT, hInfo, y, cx-hInfo, hInfo     );
-		y += hInfo;
+		{
+			// アイコンの幅は16, 32, 48pxとする
+			int iconWidth = 16;
+			if (hInfo>=48) {
+				iconWidth = 48;
+			} else if (hInfo>=32) {
+				iconWidth = 32;
+			} else {
+				iconWidth = 16;
+			}
+			// 高さは hInfo 固定
+			m_rectIcon.SetRect( 0, y, iconWidth, y+hInfo );
+			util::MoveDlgItemWindow( this, IDC_INFO_EDIT, iconWidth, y, cx-iconWidth, hInfo     );
+			y += hInfo;
+		}
 		break;
 	}
 
@@ -777,13 +789,8 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 	}
 
-	// 第1カラムに表示している内容を表示する。
-	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false);
-	// 絵文字を文字列に変換する
-	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
-		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
-	}
-	m_infoEdit.SetWindowText( strInfo );
+	// 第1カラムに表示している内容を表示する
+	MySetInfoEditFromBodySelectedData();
 
 	*pResult = 0;
 }
@@ -1503,15 +1510,8 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 		// アイテムが0件
 		util::MySetInformationText( m_hWnd, L"完了" );
 	} else {
-		// 第1カラムに表示している内容を表示する。
-		if (pCategory!=NULL) {
-			CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
-			// 絵文字を文字列に変換する
-			if( LINE_HAS_EMOJI_LINK(strInfo) ) {
-				mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
-			}
-			m_infoEdit.SetWindowText( strInfo );
-		}
+		// 第1カラムに表示している内容を表示する
+		MySetInfoEditFromBodySelectedData();
 	}
 }
 
@@ -1603,13 +1603,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	pCategory->selectedBody = pNMLV->iItem;
 
 	// 第1カラムに表示している内容を表示する。
-	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
-	// 絵文字を文字列に変換する
-	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
-		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
-	}
-
-	m_infoEdit.SetWindowText( strInfo );
+	MySetInfoEditFromBodySelectedData();
 
 	// Twitter であれば再表示(同一IDや引用者の色変更を伴うため)
 	if (util::IsTwitterAccessType(pCategory->m_mixi.GetAccessType())) {
@@ -1617,6 +1611,9 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		int selected = pCategory->selectedBody;
 
 		if (!m_bodyList.m_bStopDraw) {
+//			util::StopWatch sw_detect, sw_draw;
+//			sw_detect.start();
+
 			static std::set<int> redrawItems;
 			redrawItems.clear();
 
@@ -1684,21 +1681,46 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 					}
 				}
 			}
+//			sw_detect.stop();
 
+			
+			// 再描画
+//			sw_draw.start();
 			for (std::set<int>::iterator it=redrawItems.begin(); it!=redrawItems.end(); it++) {
 				int idx = (*it);
 				m_bodyList.DrawItemWithBackSurface(idx);
 			}
+//			sw_draw.stop();
+
+
+			// ベンチマーク結果出力
+//			MZ3LOGGER_DEBUG(
+//				util::FormatString(L"*** Twitter Detect/Draw n[%d] detect[%dms] draw[%dms]",
+//					redrawItems.size(),
+//					sw_detect.getElapsedMilliSecUntilStoped(),
+//					sw_draw.getElapsedMilliSecUntilStoped()));
 		}
 
 		s_lastSelected = selected;
 	} 
 
 	// 画像位置変更
+//	util::StopWatch sw_draw1, sw_draw2;
+//	sw_draw1.start();
 	MoveMiniImageDlg();
+//	sw_draw1.stop();
 
 	// アイコン再描画
+//	sw_draw2.start();
 	InvalidateRect( m_rectIcon, FALSE );
+//	sw_draw2.stop();
+
+	// ベンチマーク結果出力
+//	MZ3LOGGER_DEBUG(
+//		util::FormatString(L"*** IconRedraw draw[%dms][%dms]",
+//			sw_draw1.getElapsedMilliSecUntilStoped(),
+//			sw_draw2.getElapsedMilliSecUntilStoped()
+//			));
 
 	*pResult = 0;
 }
@@ -2094,13 +2116,8 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 		m_bodyList.SetFocus();
 		m_hotList = &m_bodyList;
 
-		// 第1カラムに表示している内容を表示する。
-		CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), m_selGroup->getSelectedCategory()->m_bodyColType1, false);
-		// 絵文字を文字列に変換する
-		if( LINE_HAS_EMOJI_LINK(strInfo) ) {
-			mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
-		}
-		m_infoEdit.SetWindowText( strInfo );
+		// 第1カラムに表示している内容を表示する
+		MySetInfoEditFromBodySelectedData();
 
 		// 選択状態を更新
 		int idx = m_selGroup->getSelectedCategory()->selectedBody;
@@ -3194,13 +3211,8 @@ void CMZ3View::OnMySelchangedCategoryList(void)
 		SetBodyList( pCategory->GetBodyList() );
 	}
 
-	// 第1カラムに表示している内容を表示する。
-	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategory->m_bodyColType1, false);
-	// 絵文字を文字列に変換する
-	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
-		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
-	}
-	m_infoEdit.SetWindowText( strInfo );
+	// 第1カラムに表示している内容を表示する
+	MySetInfoEditFromBodySelectedData();
 }
 
 /**
@@ -5185,17 +5197,59 @@ void CMZ3View::OnPaint()
 				// 情報領域の左側に描画する。
 				const CRect& rectIcon = m_rectIcon;
 
-				CMZ3BackgroundImage image(L"");
-				image.load( path );
-				if (image.isEnableImage()) {
-					// リサイズする。
-					CMZ3BackgroundImage resizedImage(L"");
-					util::MakeResizedImage( this, resizedImage, image, rectIcon.Width(), rectIcon.Height() );
+				// アイコンがあればそちらで描画する
+				int iconIndex = theApp.m_imageCache.GetImageIndex( path );
+				if (iconIndex >= 0) {
 
-					util::DrawBitmap( dc.GetSafeHdc(), resizedImage.getHandle(), 
-						rectIcon.left, rectIcon.top, rectIcon.Width(), rectIcon.Height(), 0, 0 );
+					CImageList* pImageList = NULL;
+					int h = rectIcon.Height();
+					int iconHeight = h;
+					if (h>=48) {
+						pImageList = &theApp.m_imageCache.GetImageList48();
+						iconHeight = 48;
+					} else if (h>=32) {
+						pImageList = &theApp.m_imageCache.GetImageList32();
+						iconHeight = 32;
+					} else {
+						pImageList = &theApp.m_imageCache.GetImageList16();
+						iconHeight = 16;
+					}
+					ImageList_DrawEx(
+						pImageList->m_hImageList, iconIndex,
+						dc.GetSafeHdc(),
+						rectIcon.left, rectIcon.top, 0, 0,
+						CLR_DEFAULT, CLR_DEFAULT,
+						ILD_IMAGE);
+
+					// 残り部分を塗りつぶす
+					if (rectIcon.Height() > iconHeight) {
+						CRect rect(m_rectIcon.left, m_rectIcon.top + iconHeight, m_rectIcon.right, m_rectIcon.bottom);
+						dc.FillSolidRect(rect, theApp.m_skininfo.clrMainStatusBG);
+					}
 
 					bDrawFinished = true;
+				} else {
+					// アイコンがないので自前で描画する
+					CMZ3BackgroundImage image(L"");
+					image.load( path );
+					if (image.isEnableImage()) {
+						// リサイズする
+
+						// 幅のスクエアとする
+						CMZ3BackgroundImage resizedImage(L"");
+						util::MakeResizedImage( this, resizedImage, image, rectIcon.Width(), rectIcon.Width() );
+
+						util::DrawBitmap( dc.GetSafeHdc(), resizedImage.getHandle(), 
+							rectIcon.left, rectIcon.top, rectIcon.Width(), rectIcon.Width(), 0, 0 );
+
+						// 残り部分を塗りつぶす
+						if (rectIcon.Height() > rectIcon.Width()) {
+							CRect rect(m_rectIcon.left, m_rectIcon.top + rectIcon.Width(), m_rectIcon.right, m_rectIcon.bottom);
+							dc.FillSolidRect(rect, theApp.m_skininfo.clrMainStatusBG);
+						}
+
+						bDrawFinished = true;
+					}
 				}
 			}
 
@@ -6684,4 +6738,31 @@ HBRUSH CMZ3View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	}
 
 	return hbr;
+}
+
+/**
+ * 第1カラムに表示している内容をステータスバーに表示する
+ */
+bool CMZ3View::MySetInfoEditFromBodySelectedData(void)
+{
+	if (m_selGroup == NULL) {
+		return false;
+	}
+
+	CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
+	if (pCategoryItem == NULL) {
+		return false;
+	}
+
+	// 第1カラムに表示している内容を表示する
+	CString strInfo = util::MyGetItemByBodyColType(&GetSelectedBodyItem(), pCategoryItem->m_bodyColType1, false);
+
+	// 絵文字を文字列に変換する
+	if( LINE_HAS_EMOJI_LINK(strInfo) ) {
+		mixi::ParserUtil::ReplaceEmojiImageToText( strInfo );
+	}
+
+	m_infoEdit.SetWindowText( strInfo );
+
+	return true;
 }
