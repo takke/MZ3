@@ -655,7 +655,10 @@ void CTouchListCtrl::DrawItemWithBackSurface(int nItem)
 
 	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
 		// 背景画像なしの場合
-		m_memDC->FillSolidRect(x, y, x+w, y+h, RGB(255,255,255));
+//		m_memDC->FillSolidRect(x, y, x+w, y+h, RGB(255,255,255));
+		// 暫定的にステータスバーの背景色を利用する
+		m_memDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+		m_memDC->FillSolidRect(x, y, x+w, y+h, theApp.m_skininfo.clrMainStatusBG);
 	}else{
 		// 背景ビットマップの描画
 		int offset = 0;
@@ -742,7 +745,10 @@ void CTouchListCtrl::PanDrawToScreen(CDC* pDC)
 	HBITMAP hBgBitmap = GetBgBitmapHandle();
 	if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
 		// 背景画像なしの場合
-		pDC->FillSolidRect( dx, m_viewRect.top, wid, m_screenHeight, RGB(255,255,255) );
+//		pDC->FillSolidRect( dx, m_viewRect.top, wid, m_screenHeight, RGB(255,255,255) );
+		// 暫定的にステータスバーの背景色を利用する
+		pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+		pDC->FillSolidRect( dx, m_viewRect.top, wid, m_screenHeight, theApp.m_skininfo.clrMainStatusBG);
 	}else{
 		// 背景ビットマップの描画
 		CRect rectViewClient;
@@ -785,7 +791,10 @@ int	CTouchListCtrl::DrawDetail( bool bForceDraw )
 		HBITMAP hBgBitmap = GetBgBitmapHandle();
 		if( !theApp.m_optionMng.IsUseBgImage() || hBgBitmap == NULL ) {
 			// 背景画像なしの場合
-			m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
+//			m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, RGB(255,255,255) );
+			// 暫定的にステータスバーの背景色を利用する
+			m_memDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+			m_memDC->FillSolidRect( 0, 0, bmp.bmWidth, bmp.bmHeight, theApp.m_skininfo.clrMainStatusBG );
 		}else{
 			// 背景ビットマップの描画
 			CRect rectViewClient;

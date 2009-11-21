@@ -122,7 +122,10 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 背景の塗りつぶし（背景画像なしの場合）
 	if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageReportListCtrl.isEnableImage() ) {
-		pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
+//		pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
+		// 暫定的にステータスバーの背景色を利用する
+		pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+		pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
 	}
 
 	// 選択されている場合は、
@@ -289,10 +292,9 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 	pDC->SetBkMode( TRANSPARENT );
 
 	// ビットマップの初期化と描画
+	CRect rectClient;
+	this->GetClientRect( &rectClient );
 	if( theApp.m_optionMng.IsUseBgImage() ) {
-		CRect rectClient;
-		this->GetClientRect( &rectClient );
-
 		theApp.m_bgImageReportListCtrl.load();
 
 		if (theApp.m_bgImageReportListCtrl.isEnableImage()) {
@@ -313,7 +315,10 @@ BOOL CReportListCtrl::OnEraseBkgnd(CDC* pDC)
 		}
 	}
 
-	return CListCtrl::OnEraseBkgnd(pDC);
+	// ステータスバーの背景色で描画
+	pDC->FillRect(rectClient, &theApp.m_brushMainStatusBar);
+	return TRUE;
+//	return CListCtrl::OnEraseBkgnd(pDC);
 }
 
 BOOL CReportListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)

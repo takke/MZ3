@@ -961,9 +961,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
 	CWnd* pWnd = GetActiveView();
 
 	// スキンの有効・無効チェック
-	if (!theApp.m_optionMng.IsUseBgImage()) {
-		return;
-	}
+//	if (!theApp.m_optionMng.IsUseBgImage()) {
+//		return;
+//	}
 
 	int n = nID - ID_SKIN_BASE;
 
