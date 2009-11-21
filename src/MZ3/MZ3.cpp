@@ -1285,18 +1285,20 @@ int CMZ3App::pt2px(int pt)
 int CMZ3App::AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& image, const CString& strImagePath)
 {
 	// 16x16, 32x32, 48x48 にリサイズする。
-	CMZ3BackgroundImage image16(L""), image32(L""), image48(L"");
+	CMZ3BackgroundImage image16(L""), image32(L""), image48(L""), image64(L"");
 	util::MakeResizedImage( pWnd, image16, image, 16, 16 );
 	util::MakeResizedImage( pWnd, image32, image, 32, 32 );
 	util::MakeResizedImage( pWnd, image48, image, 48, 48 );
+	util::MakeResizedImage( pWnd, image64, image, 64, 64 );
 
 	// ビットマップの追加
-	CBitmap bm16, bm32, bm48;
+	CBitmap bm16, bm32, bm48, bm64;
 	bm16.Attach( image16.getHandle() );
 	bm32.Attach( image32.getHandle() );
 	bm48.Attach( image48.getHandle() );
+	bm64.Attach( image64.getHandle() );
 
-	return theApp.m_imageCache.Add( &bm16, &bm32, &bm48, (CBitmap*)NULL, strImagePath );
+	return theApp.m_imageCache.Add( &bm16, &bm32, &bm48, &bm64, (CBitmap*)NULL, strImagePath );
 }
 
 

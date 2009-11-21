@@ -208,6 +208,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	int nIconSize = 16;
 	switch (m_iconMode) {
+	case ICON_MODE_64:	nIconSize = 64;	break;
 	case ICON_MODE_48:	nIconSize = 48;	break;
 	case ICON_MODE_32:	nIconSize = 32;	break;
 	default:			nIconSize = 16;	break;

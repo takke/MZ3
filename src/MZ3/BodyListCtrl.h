@@ -24,6 +24,7 @@ public:
 		ICON_MODE_16 = 16,		///< 16x16 アイコン
 		ICON_MODE_32 = 32,		///< 32x32 アイコン
 		ICON_MODE_48 = 48,		///< 48x48 アイコン
+		ICON_MODE_64 = 64,		///< 64x64 アイコン
 	};
 
 private:

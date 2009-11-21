@@ -18,7 +18,8 @@
 #include "InetAccess.h"
 #include "XcrawlCanceler.h"
 
-#define TIMERID_INTERVAL_CHECK	101
+#define TIMERID_INTERVAL_CHECK		101
+#define TIMERID_RESTORE_STATUSBAR	102
 class CMZ3Doc;
 
 /**
@@ -290,6 +291,7 @@ public:
 	BOOL OnKeyUp(MSG* pMsg);
 
 	bool MyLoadCategoryLogfile(CCategoryItem& category);
+	void OnMySelchangedCategoryList(void);
 
 private:
 	void InsertInitialData();
@@ -300,7 +302,6 @@ private:
 	void SetBodyImageList( CMixiDataList& body );
 
 	void OnUpdateWriteButton(CCmdUI*);
-	void OnMySelchangedCategoryList(void);
 
 	static unsigned int Initialize_Thread( LPVOID This );
 	static unsigned int CacheCleanup_Thread( LPVOID This );

@@ -324,7 +324,7 @@ void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ3Backgr
 	HWND hwnd = pWnd->GetSafeHwnd();
 
 	HDC hdcDisp = ::GetDC( hwnd );
-	resizedImage.create( hdcDisp, w, h, 32 );
+	resizedImage.create( hdcDisp, w, h, 24 );
 	::ReleaseDC( hwnd, hdcDisp );
 
 	// ƒƒ‚ƒŠDC‚Ì¶¬

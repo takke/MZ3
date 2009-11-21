@@ -647,9 +647,11 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	case VIEW_STYLE_IMAGE:
 	case VIEW_STYLE_TWITTER:
 		{
-			// アイコンの幅は16, 32, 48pxとする
+			// アイコンの幅は16, 32, 48, 64pxとする
 			int iconWidth = 16;
-			if (hInfo>=48) {
+			if (hInfo>=64) {
+				iconWidth = 64;
+			} else if (hInfo>=48) {
 				iconWidth = 48;
 			} else if (hInfo>=32) {
 				iconWidth = 32;
@@ -832,6 +834,9 @@ LRESULT CMZ3View::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 
 			// 再描画
 			MyRedrawBodyImages();
+
+			// 「アイコンの作成完了」をN秒後に戻す
+			::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_RESTORE_STATUSBAR, 1000L, NULL);
 		}
 		break;
 
@@ -1374,7 +1379,10 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			MEASUREITEMSTRUCT measureItemStruct;
 			m_bodyList.MeasureItem(&measureItemStruct);
 			MZ3_TRACE(L"アイテムの高さ : %d\n", measureItemStruct.itemHeight);
-			if (measureItemStruct.itemHeight>=48) {
+			if (measureItemStruct.itemHeight>=64) {
+				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList64(), LVSIL_SMALL);
+				iconMode = CBodyListCtrl::ICON_MODE_64;
+			} else if (measureItemStruct.itemHeight>=48) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList48(), LVSIL_SMALL);
 				iconMode = CBodyListCtrl::ICON_MODE_48;
 			} else if (measureItemStruct.itemHeight>=32) {
@@ -4560,6 +4568,15 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 		return;
 	}
 
+	if (nIDEvent == TIMERID_RESTORE_STATUSBAR) {
+		KillTimer(nIDEvent);
+
+		// ステータスバーの復帰
+		MySetInfoEditFromBodySelectedData();
+
+		return;
+	}
+
 	CFormView::OnTimer(nIDEvent);
 }
 
@@ -5204,7 +5221,10 @@ void CMZ3View::OnPaint()
 					CImageList* pImageList = NULL;
 					int h = rectIcon.Height();
 					int iconHeight = h;
-					if (h>=48) {
+					if (h>=64) {
+						pImageList = &theApp.m_imageCache.GetImageList64();
+						iconHeight = 64;
+					} else if (h>=48) {
 						pImageList = &theApp.m_imageCache.GetImageList48();
 						iconHeight = 48;
 					} else if (h>=32) {
