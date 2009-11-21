@@ -317,6 +317,9 @@ void Option::Sync(bool bSave)
 	// ダブルクリックでの項目移動
 	SyncIniValue(inifile, bSave, m_bUseRan2DoubleClickMove, "UseRan2DoubleClickMove", "UI" );
 
+	// MZ3(WM)でピクセル単位スクロールを実行するか？
+	SyncIniValue(inifile, bSave, m_bListScrollByPixelOnMZ3, "ListScrollByPixelOnMZ3", "UI");
+
 	// スキン名
 	SyncIniValue(inifile, bSave, m_strSkinname, "SkinName", "UI" );
 

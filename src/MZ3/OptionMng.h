@@ -103,12 +103,16 @@ public:
 		REPORT_SCROLL_TYPE_LINE = 0,	///< 行単位
 		REPORT_SCROLL_TYPE_PAGE = 1,	///< ページ単位
 	};
-	REPORT_SCROLL_TYPE	m_reportScrollType;			///< レポート画面のスクロールタイプ
-	int				m_reportScrollLine;				///< レポート画面のスクロール行数
+	REPORT_SCROLL_TYPE	m_reportScrollType;				///< レポート画面のスクロールタイプ
+	int				m_reportScrollLine;					///< レポート画面のスクロール行数
 	
-	bool			m_bUseRan2PanScrollAnimation;	///< らんらんビューのパンスクロールアニメーション
-	bool			m_bUseRan2HorizontalDragMove;	///< 横ドラッグでの項目移動
-	bool			m_bUseRan2DoubleClickMove;		///< ダブルクリックでの項目移動
+	bool			m_bUseRan2PanScrollAnimation;		///< らんらんビューのパンスクロールアニメーション
+	bool			m_bUseRan2HorizontalDragMove;		///< 横ドラッグでの項目移動
+	bool			m_bUseRan2DoubleClickMove;			///< ダブルクリックでの項目移動
+
+	bool			m_bListScrollByPixelOnMZ3;			///< MZ3(WM)でピクセル単位スクロールを実行するか？
+														///< T-01A(おそらくWM6.5も)ではスクロールがもたつくので
+														///< デフォルトオフとする
 
 	//--- メイン画面
 	bool			m_bShowMainViewIcon;				///< トピック等にアイコンを表示する？
@@ -188,6 +192,7 @@ public:
 		, m_bUseRan2DoubleClickMove( true )
 #endif
 		, m_bAutoLoadMiniImage( true )
+		, m_bListScrollByPixelOnMZ3( false )
 		, m_bBodyListIntegratedColumnMode( true )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )

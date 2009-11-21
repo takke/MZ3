@@ -1004,20 +1004,20 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 						MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
 					} else {
 						// 停止状態で最後の描画
-#ifndef WINCE
+//#ifndef WINCE
 						// Win32では独自処理で描画する
 						// WMでは処理が追いつかないので標準処理に任せる
 
 						// ⇒やっぱりWMでも描画する
-						DrawDetail();
-						UpdateWindow();
+//						DrawDetail();
+//						UpdateWindow();
 
 //#else
 //						if( !IsScrollWithBk() ){
 //							// WMで、かつ背景同時スクロールでない場合は再描画
 //							Invalidate();
 //						}
-#endif
+//#endif
 					}
 
 					// 慣性スクロールの停止
@@ -1141,11 +1141,13 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 		// PIXEL単位でスクロールさせる
 		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
 #else
-		// WMではItem単位でスクロールさせる
-//		m_offsetPixelY = 0;
-
-		// ⇒やっぱりPIXEL単位でスクロールさせる
-		m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
+		if (theApp.m_optionMng.m_bListScrollByPixelOnMZ3) {
+			// PIXEL単位でスクロールさせる
+			m_offsetPixelY = (( dy - m_ptDragStart.y ) % m_iItemHeight );
+		} else {
+			// Item単位でスクロールさせる(WMデフォルト)
+			m_offsetPixelY = 0;
+		}
 #endif
 	}
 
@@ -1215,16 +1217,18 @@ bool CTouchListCtrl::ScrollByMoveY(const int dy)
 			DrawDetail();
 			UpdateWindow();
 		} else {
-//#ifndef WINCE
+#ifndef WINCE
 			// 再描画
 			// Win32では独自処理で描画する
-			// WMでは処理が追いつかないので標準処理に任せる
-
-			// ⇒やっぱりWMでも独自処理で描画する
-
 			DrawDetail();
 			UpdateWindow();
-//#endif
+#else
+			if (theApp.m_optionMng.m_bListScrollByPixelOnMZ3) {
+				// ピクセル単位スクロールの場合はWMでも独自処理で描画する
+				DrawDetail();
+				UpdateWindow();
+			}
+#endif
 		}
 	}
 
