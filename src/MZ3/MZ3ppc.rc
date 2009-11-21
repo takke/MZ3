@@ -87,78 +87,7 @@ IDI_RSS_ICON            ICON                    "res\\RSS.ico"
 
 IDR_MAINFRAME MENU 
 BEGIN
-    POPUP "メニュー"
-    BEGIN
-        MENUITEM "中止",                          ID_MENU_STOP
-        POPUP "画面"
-        BEGIN
-            MENUITEM "戻る",                          ID_MENU_BACK
-            MENUITEM "進む",                          ID_MENU_NEXT
-            MENUITEM SEPARATOR
-            MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
-            MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
-            MENUITEM SEPARATOR
-            MENUITEM "ダウンロードマネージャ",                 ID_DOWNLOAD_MANAGER_VIEW
-        END
-        POPUP "設定"
-        BEGIN
-            MENUITEM "一般...",                       ID_SETTING_GENERAL
-            MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
-            MENUITEM "定期取得",                        ID_ENABLE_INTERVAL_CHECK
-            POPUP "記事取得"
-            BEGIN
-                MENUITEM "全件取得",                        IDM_GETPAGE_ALL
-                MENUITEM "最新２０件取得",                     IDM_GETPAGE_LATEST10
-            END
-            POPUP "文字サイズ"
-            BEGIN
-                MENUITEM "大きくする",                       ID_MENU_FONT_MAGNIFY
-                MENUITEM "小さくする",                       ID_MENU_FONT_SHRINK
-                MENUITEM SEPARATOR
-                MENUITEM "大",                           ID_CHANGE_FONT_BIG
-                MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
-                MENUITEM "小",                           ID_CHANGE_FONT_SMALL
-            END
-            MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
-        END
-        POPUP "編集"
-        BEGIN
-            MENUITEM "切り取り",                        ID_EDIT_CUT
-            MENUITEM "コピー",                         ID_EDIT_COPY
-            MENUITEM "貼り付け",                        ID_EDIT_PASTE
-            MENUITEM "全て選択",                        ID_SELECT_ALL
-        END
-        POPUP "ブックマーク"
-        BEGIN
-            MENUITEM "ブックマークに追加",                   ID_ADD_BOOKMARK
-            MENUITEM "ブックマークから削除",                  ID_DEL_BOOKMARK
-        END
-        POPUP "その他"
-        BEGIN
-            MENUITEM "新着チェック",                      IDM_CHECK_NEW
-            MENUITEM "全てを巡回",                       IDM_START_CRUISE
-            MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
-        END
-        POPUP "ヘルプ"
-        BEGIN
-            MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
-            MENUITEM "改版履歴",                        ID_HISTORY_MENU
-            MENUITEM SEPARATOR
-            MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
-            MENUITEM "バージョン情報...",                  ID_APP_ABOUT
-            MENUITEM SEPARATOR
-            POPUP "デバッグツール"
-            BEGIN
-                MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
-                MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
-                MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
-                MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
-                MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
-            END
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "終了",                          ID_MENU_CLOSE
-    END
+    MENUITEM "メニュー",                        ID_MENU_OPEN_MENU
     MENUITEM "アクション",                       ID_MENU_ACTION
 END
 
@@ -446,6 +375,81 @@ BEGIN
         MENUITEM "開く...",                       ID_RAN2_URL_LINK_OPEN
         MENUITEM SEPARATOR
         MENUITEM "リンクをコピー",                     ID_RAN2_URL_LINK_COPY
+    END
+END
+
+IDR_MAINFRAME_CE MENU 
+BEGIN
+    POPUP "メニュー"
+    BEGIN
+        MENUITEM "中止",                          ID_MENU_STOP
+        POPUP "画面"
+        BEGIN
+            MENUITEM "戻る",                          ID_MENU_BACK
+            MENUITEM "進む",                          ID_MENU_NEXT
+            MENUITEM SEPARATOR
+            MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
+            MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
+            MENUITEM SEPARATOR
+            MENUITEM "ダウンロードマネージャ",                 ID_DOWNLOAD_MANAGER_VIEW
+        END
+        POPUP "カテゴリ"
+        BEGIN
+            MENUITEM "dummy",                       ID_DUMMY
+        END
+        POPUP "設定"
+        BEGIN
+            MENUITEM "一般...",                       ID_SETTING_GENERAL
+            MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
+            MENUITEM "定期取得",                        ID_ENABLE_INTERVAL_CHECK
+            POPUP "mixi記事取得"
+            BEGIN
+                MENUITEM "全件取得",                        IDM_GETPAGE_ALL
+                MENUITEM "最新２０件取得",                     IDM_GETPAGE_LATEST10
+            END
+            POPUP "文字サイズ"
+            BEGIN
+                MENUITEM "大きくする",                       ID_MENU_FONT_MAGNIFY
+                MENUITEM "小さくする",                       ID_MENU_FONT_SHRINK
+                MENUITEM SEPARATOR
+                MENUITEM "大",                           ID_CHANGE_FONT_BIG
+                MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
+                MENUITEM "小",                           ID_CHANGE_FONT_SMALL
+            END
+            MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
+        END
+        POPUP "編集"
+        BEGIN
+            MENUITEM "切り取り",                        ID_EDIT_CUT
+            MENUITEM "コピー",                         ID_EDIT_COPY
+            MENUITEM "貼り付け",                        ID_EDIT_PASTE
+            MENUITEM "全て選択",                        ID_SELECT_ALL
+        END
+        POPUP "その他"
+        BEGIN
+            MENUITEM "mixi新着チェック",                  IDM_CHECK_NEW
+            MENUITEM "全てを巡回",                       IDM_START_CRUISE
+            MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
+        END
+        POPUP "ヘルプ"
+        BEGIN
+            MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
+            MENUITEM "改版履歴",                        ID_HISTORY_MENU
+            MENUITEM SEPARATOR
+            MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
+            MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+            MENUITEM SEPARATOR
+            POPUP "デバッグツール"
+            BEGIN
+                MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
+                MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
+                MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
+                MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
+                MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
+            END
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "終了",                          ID_MENU_CLOSE
     END
 END
 

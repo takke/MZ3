@@ -43,6 +43,7 @@
 #define IDD_COMMON_EDIT_DIALOG          167
 #define IDR_RSS_MENU                    167
 #define IDC_ARROW_LEFT_CURSOR           168
+#define IDR_MAINFRAME_CE                168
 #define IDC_ARROW_RIGHT_CURSOR          169
 #define IDB_SLIDE_LEFT_BITMAP           170
 #define IDB_SLIDE_RIGHT_BITMAP          172
@@ -314,6 +315,7 @@
 #define ID_CATEGORYMENU_MOVE_DOWN       34219
 #define ID_CATEGORYMENU_MOVE_UP         34221
 #define ID_DUMMY34226                   34226
+#define ID_MENU_OPEN_MENU               34231
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
 #define ID_REPORT_PAGE_LINK_BASE        36200
@@ -322,6 +324,7 @@
 #define ID_REPORT_COPY_URL_BASE         36500
 #define ID_REPORT_COPY_IMAGE            36600
 #define ID_REPORT_COPY_MOVIE            36700
+#define ID_SELECT_CATEGORY_BASE         36800
 #define ID_LUA_MENU_BASE                37000
 
 // Next default values for new objects
@@ -329,7 +332,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
-#define _APS_NEXT_COMMAND_VALUE         34227
+#define _APS_NEXT_COMMAND_VALUE         34233
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118
 #endif

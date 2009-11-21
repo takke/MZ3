@@ -188,6 +188,41 @@ CString MakeImageLogfilePathFromUrlMD5( const CString& url )
 	}
 }
 
+POINT GetPopupPosForSoftKeyMenu1()
+{
+	POINT pt;
+
+#ifdef WINCE
+	// MZ3 : 画面の右下でポップアップする
+	// ただし、メニューの高さ分だけ上に表示する
+
+	CRect rectMenuBar;
+	CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+	GetWindowRect(pMainFrame->m_hwndMenuBar, &rectMenuBar);
+
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	pt.x = rect.left;
+	pt.y = rect.bottom - rectMenuBar.Height();
+	return pt;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	return GetPopupPos();
+#endif
+}
+
+int GetPopupFlagsForSoftKeyMenu1()
+{
+#ifdef WINCE
+	// MZ3 : 画面の右下でポップアップする
+	return TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+#else
+	// MZ4 : マウスの位置でポップアップする
+	// マウス位置を左上にして表示、右ボタンを有効にする
+	return GetPopupFlags();
+#endif
+}
+
 POINT GetPopupPosForSoftKeyMenu2()
 {
 	POINT pt;

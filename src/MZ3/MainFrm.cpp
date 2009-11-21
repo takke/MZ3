@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_ENABLE_INTERVAL_CHECK, &CMainFrame::OnEnableIntervalCheck)
 	ON_COMMAND(ID_MENU_CHECK_UPDATE, &CMainFrame::OnCheckUpdate)
 	ON_COMMAND_RANGE(ID_SKIN_BASE, ID_SKIN_BASE+99, &CMainFrame::OnSkinMenuItem)
+	ON_COMMAND_RANGE(ID_SELECT_CATEGORY_BASE, ID_SELECT_CATEGORY_BASE+99, &CMainFrame::OnSelectCategory)
 	ON_COMMAND(ID_MENU_STOP, &CMainFrame::OnMenuStop)
     ON_UPDATE_COMMAND_UI(ID_BACK_BUTTON, OnUpdateBackButton)
     ON_UPDATE_COMMAND_UI(ID_FORWARD_BUTTON, OnUpdateForwardButton)
@@ -92,6 +93,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_RELOAD_LUA_SCRIPTS, &CMainFrame::OnMenuReloadLuaScripts)
 	ON_COMMAND(ID_MENU_RELOAD_CATEGORY_LIST_LOG, &CMainFrame::OnMenuReloadCategoryListLog)
 //	ON_WM_WININICHANGE()
+	ON_COMMAND(ID_MENU_OPEN_MENU, &CMainFrame::OnMenuOpenMenu)
 END_MESSAGE_MAP()
 
 
@@ -1322,3 +1324,93 @@ void CMainFrame::OnWinIniChange(LPCTSTR lpszSection)
 	SetWindowLong(hwndDlg, GWL_STYLE, GetWindowLong(hwndDlg,GWL_STYLE) &~WS_VSCROLL);
 }
 */
+
+/**
+ * メニュー押下(メインメニュー表示)
+ */
+void CMainFrame::OnMenuOpenMenu()
+{
+	POINT pt    = util::GetPopupPosForSoftKeyMenu1();
+	int   flags = util::GetPopupFlagsForSoftKeyMenu1();
+
+	CMenu menu;
+	menu.LoadMenu(IDR_MAINFRAME_CE);
+	CMenu* pSubMenu = menu.GetSubMenu(0);
+
+	CView* pActiveView = GetActiveView();
+
+	// カテゴリ差し替え
+	const int IDX_CATEGOGY_MENU = 2;
+	if (pActiveView == theApp.m_pMainView) {
+		// メインビュー
+		CMenu* pCategoryMenu = pSubMenu->GetSubMenu(IDX_CATEGOGY_MENU);
+		if (pCategoryMenu != NULL) {
+			// ダミー削除
+			pCategoryMenu->DeleteMenu(ID_DUMMY, MF_BYCOMMAND);
+
+			// カテゴリ選択メニュー追加
+			const CCategoryItemList& categories = theApp.m_pMainView->m_selGroup->categories;
+			for (size_t i=0; i<categories.size(); i++) {
+				int mflag = MF_STRING;
+
+				if (i == theApp.m_pMainView->m_selGroup->selectedCategory) {
+					mflag |= MF_CHECKED;
+				}
+				pCategoryMenu->AppendMenuW(mflag, ID_SELECT_CATEGORY_BASE + i, categories[i].m_name);
+			}
+		}
+	} else {
+		// メインビュー以外：非表示
+		pSubMenu->DeleteMenu(IDX_CATEGOGY_MENU, MF_BYPOSITION);
+	}
+
+	// メニュー表示
+	pSubMenu->TrackPopupMenu(flags, pt.x, pt.y, this);
+}
+
+/**
+ * カテゴリ切り替え
+ */
+void CMainFrame::OnSelectCategory(UINT nID)
+{
+	CWnd* pWnd = GetActiveView();
+
+	int idx = nID - ID_SELECT_CATEGORY_BASE;
+	CMZ3View* v = theApp.m_pMainView;
+
+	const CCategoryItemList& categories = v->m_selGroup->categories;
+
+	// 入力チェック
+	if (idx < 0 || idx >= (int)categories.size()) {
+		return;
+	}
+
+	// 本来は CMZ3View 側でやるべき
+	{
+		// 非選択項目なので、取得時刻とボディの変更。
+		// 非取得で、ログがあるならログから取得。
+
+		// アクセス中は選択不可
+		if (theApp.m_access) {
+			return;
+		}
+
+		// 選択状態変更
+		util::MySetListCtrlItemFocusedAndSelected( v->m_categoryList, v->m_selGroup->focusedCategory, false );
+
+		v->m_selGroup->selectedCategory = idx;
+		v->m_selGroup->focusedCategory = idx;
+
+		util::MySetListCtrlItemFocusedAndSelected( v->m_categoryList, v->m_selGroup->focusedCategory, true );
+
+		// 変更反映
+		v->OnMySelchangedCategoryList();
+
+		// 再取得
+		v->RetrieveCategoryItem();
+
+		// フォーカスはボディリストとする
+		v->CommandSetFocusBodyList();
+
+	}
+}

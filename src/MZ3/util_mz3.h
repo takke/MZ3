@@ -79,6 +79,9 @@ CString MakeImageLogfilePathFromUrl( const CString& url );
 /// URL から画像ファイルのパスをMD5で生成する
 CString MakeImageLogfilePathFromUrlMD5( const CString& url );
 
+POINT GetPopupPosForSoftKeyMenu1();
+int GetPopupFlagsForSoftKeyMenu1();
+
 POINT GetPopupPosForSoftKeyMenu2();
 int GetPopupFlagsForSoftKeyMenu2();
 

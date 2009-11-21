@@ -98,6 +98,7 @@ public:
 
 	void GetSkinFolderNameList(std::vector<std::wstring>& skinfileList);
 	void OnSkinMenuItem(UINT nID);
+	void OnSelectCategory(UINT nID);
 	afx_msg void OnMenuAction();
 	afx_msg void OnDestroy();
 	afx_msg void OnEnableIntervalCheck();
@@ -120,6 +121,7 @@ public:
 	afx_msg void OnUpdateMenuStop(CCmdUI *pCmdUI);
 	afx_msg void OnMenuStop();
 //	afx_msg void OnWinIniChange(LPCTSTR lpszSection);
+	afx_msg void OnMenuOpenMenu();
 };
 
 
