@@ -90,6 +90,12 @@ void Option::Sync(bool bSave)
 {
 	inifile::IniFile inifile;
 
+	// ProMode
+	if (theApp.m_bProMode) {
+		// スキンのデフォルト値を変更
+		m_strSkinname = L"ブラックパネル";
+	}
+
 	//--- 初期処理
 	if (bSave) {
 		// 保存時の初期処理

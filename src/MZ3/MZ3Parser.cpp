@@ -207,7 +207,7 @@ inline void MyExtractLinks(const CString& s, MZ3Data& data)
 	if (s.Find( L"ttp://" ) != -1) {
 		// ƒŠƒ“ƒN’Šo
 		static MyRegex reg4;
-		if( !util::CompileRegex( reg4, L"(h?)(ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+		if( !util::CompileRegex( reg4, L"(https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
 			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
 			return;
 		}
@@ -220,13 +220,9 @@ inline void MyExtractLinks(const CString& s, MZ3Data& data)
 
 			// URL
 			if (target.Find( L"ttp://" ) != -1) {
-				if( reg4.exec(target) && reg4.results.size() == 3 ) {
-					if (reg4.results[1].str!=L"h") {
-						// 2ch URL ‚ğ³‹K‰»
-						url = L"h";
-					}
+				if( reg4.exec(target) && reg4.results.size() == 2 ) {
 					offsetend = reg4.results[0].end;
-					url += reg4.results[2].str.c_str();
+					url += reg4.results[1].str.c_str();
 				}
 			}
 			if (offsetend < 0) {
