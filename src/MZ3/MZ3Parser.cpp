@@ -193,12 +193,54 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 // Twitter 用パーサ
 //
 
-inline CString& MyGetMatchString(const CString& target, const CString& left, const CString& right, CString& buf)
+inline bool MyGetMatchString(const CString& target, const CString& left, const CString& right, CString& buf)
 {
 	if (util::GetBetweenSubString(target, left, right, buf)<0) {
-		buf = L"";
+		return false;
+	} else {
+		return true;
 	}
-	return buf;
+}
+
+inline void MyExtractLinks(const CString& s, MZ3Data& data)
+{
+	if (s.Find( L"ttp://" ) != -1) {
+		// リンク抽出
+		static MyRegex reg4;
+		if( !util::CompileRegex( reg4, L"(h?)(ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
+			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
+			return;
+		}
+
+		CString target = s;
+		for( int i=0; i<MZ3_INFINITE_LOOP_MAX_COUNT; i++ ) {	// MZ3_INFINITE_LOOP_MAX_COUNT は無限ループ防止
+
+			int offsetend = -1;
+			CString url;
+
+			// URL
+			if (target.Find( L"ttp://" ) != -1) {
+				if( reg4.exec(target) && reg4.results.size() == 3 ) {
+					if (reg4.results[1].str!=L"h") {
+						// 2ch URL を正規化
+						url = L"h";
+					}
+					offsetend = reg4.results[0].end;
+					url += reg4.results[2].str.c_str();
+				}
+			}
+			if (offsetend < 0) {
+				// 未発見。
+				// 残りの文字列を代入して終了。
+				break;
+			}
+
+			data.m_linkList.push_back( CMixiData::Link(url, url) );
+
+			// ターゲットを更新。
+			target = target.Mid( offsetend );
+		}
+	}
 }
 
 bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& body_, const CHtmlArray& html_ )
@@ -222,8 +264,6 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 
 	// 一時リスト
 	CMixiDataList new_list;
-	// data 生成
-	MZ3Data data;
 
 	for (int i=0; i<count; i++) {
 		const CString& line = html_.GetAt(i);
@@ -232,22 +272,30 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 			// 但し、同一IDがあればskipする
 			i++;
 
+			// data 生成
+			MZ3Data data;
+			data.SetAccessType(ACCESS_TWITTER_USER);
+
 			int i_in_status = 0;
-			CString status = line;
+			bool bInUser = false;	// /status      : false
+									// /status/user : true
+			CString user_tag;
 
 			while (i<count) {
 				const CString& line = html_.GetAt(i);
-				status += line;
 
-				if (i_in_status<3 && util::LineHasStringsNoCase(line, L"<id>")) {
-					CString s;
-					if (util::GetBetweenSubString(line, L"<id>", L"</id>", s) < 0) {
+				CString tagName;
+				MyGetMatchString(line, L"<", L">", tagName);
+				CString s;
+				
+				if (i_in_status<3 && tagName == L"id") {
+					if (util::GetBetweenSubString(line, L">", L"<", s) < 0) {
 						continue;
 					}
 					INT64 id = _wtoi64(s);
 					if (id_set.count(id) > 0) {
 						MZ3LOGGER_DEBUG(util::FormatString(L"id[%d]は既に存在するのでskipする", id));
-						i++;
+						i += 30;
 						while (i<count) {
 							const CString& line = html_.GetAt(i);
 							if (util::LineHasStringsNoCase(line, L"</status>")) {
@@ -258,85 +306,99 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 						break;				
 					}
 
-					// 初期化
-					data = MZ3Data();
 					data.SetInt64Value(L"id", id);
-					data.SetAccessType(ACCESS_TWITTER_USER);
 				}
-				if (i_in_status>35 && util::LineHasStringsNoCase(line, L"</status>")) {
-					CString s;
+
+				if (!bInUser) {
+					// /status
+					if (i_in_status > 7 && tagName==L"user") {
+						bInUser = true;
+
+					} else if (tagName == L"created_at" && MyGetMatchString(line, L">", L"<", s)) {
+						// updated : status/created_at
+						mixi::ParserUtil::ParseDate(s, data);
+
+					} else if (tagName == L"text") {
+						// 複数行対応
+						if (!MyGetMatchString(line, L">", L"<", s)) {
+							util::GetAfterSubString(line, L">", s);
+							i++;
+
+							while(i<count) {
+								const CString& line = html_.GetAt(i);
+								int idx = line.Find(L"<");
+								if (idx >= 0) {
+									s += line.Left(idx);
+									break;
+								} else {
+									s += line;
+								}
+							}
+						}
+
+						// text : status/text
+						s.Replace(L"&amp;", L"&");
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.AddBody(s);
+						
+						// URL を抽出し、リンクにする
+						MyExtractLinks(s, data);
+
+					} else if (tagName == L"source" && MyGetMatchString(line, L">", L"<", s)) {
+						// source : status/source
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.SetTextValue(L"source", s);
+
+					} else if (tagName == L"in_reply_to_status_id" && MyGetMatchString(line, L">", L"<", s)) {
+						// in_reply_to_status_id : status/in_reply_to_status_id
+						data.SetIntValue(L"in_reply_to_status_id", _wtol(s));
+					}
+
+				} else {
+					// /status/user
+
+					user_tag += line;
+
+					if (tagName == L"screen_name" && MyGetMatchString(line, L">", L"<", s)) {
+						// name : status/user/screen_name
+						s.Replace(L"&amp;", L"&");
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.SetTextValue(L"name", s);
 					
-					// updated : status/created_at
-					mixi::ParserUtil::ParseDate(MyGetMatchString(status, L"<created_at>", L"<", s), data);
-					
-					// text : status/text
-					s = MyGetMatchString(status, L"<text>", L"<", s);
-					s.Replace(L"&amp;", L"&");
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.AddBody(s);
-					
-					// URL を抽出し、リンクにする
-					mixi::ParserUtil::ExtractURI(s, data.m_linkList);
+					} else if (tagName == L"name" && MyGetMatchString(line, L">", L"<", s)) {
+						// author : status/user/name
+						s.Replace(L"&amp;", L"&");
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.SetTextValue(L"author", s);
 
-					// source : status/source
-					s = MyGetMatchString(status, L"<source>", L"<", s);
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.SetTextValue(L"source", s);
-					
-					// name : status/user/screen_name
-					CString user;
-					util::GetAfterSubString(status, L"<user>", user);
-					s = MyGetMatchString(user, L"<screen_name>", L"<", s);
-					s.Replace(L"&amp;", L"&");
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.SetTextValue(L"name", s);
-					
-					// author : status/user/name
-					s = MyGetMatchString(user, L"<name>", L"<", s);
-					s.Replace(L"&amp;", L"&");
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.SetTextValue(L"author", s);
+					} else if (tagName == L"description" && MyGetMatchString(line, L">", L"<", s)) {
+						// description : status/user/description
 
-					// description : status/user/description
-					// title に入れるのは苦肉の策・・・
-					s = MyGetMatchString(user, L"<description>", L"<", s);
-					s.Replace(L"&amp;", L"&");
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.SetTextValue(L"title", s);
+						// title に入れるのは苦肉の策・・・
+						s.Replace(L"&amp;", L"&");
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.SetTextValue(L"title", s);
 
-					// owner-id : status/user/id
-					s = MyGetMatchString(user, L"<id>", L"<", s);
-					data.SetIntValue(L"owner_id", _wtol(s));
-					
-					// in_reply_to_status_id : status/in_reply_to_status_id
-					s = MyGetMatchString(user, L"<in_reply_to_status_id>", L"<", s);
-					data.SetIntValue(L"in_reply_to_status_id", _wtol(s));
+					} else if (tagName == L"id" && MyGetMatchString(line, L">", L"<", s)) {
+						// owner-id : status/user/id
+						data.SetIntValue(L"owner_id", _wtol(s));
+						
+					} else if (tagName == L"url" && MyGetMatchString(line, L">", L"<", s)) {
+						// URL : status/user/url
+						data.SetTextValue(L"url", s);
+						data.SetTextValue(L"browse_uri", s);
 
-					// URL : status/user/url
-					s = MyGetMatchString(user, L"<url>", L"<", s);
-					data.SetTextValue(L"url", s);
-					data.SetTextValue(L"browse_uri", s);
+					} else if (tagName == L"profile_image_url" && MyGetMatchString(line, L">", L"<", s)) {
+						// Image : status/user/profile_image_url
+						s.Replace(L"&amp;", L"&");
+						mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+						data.AddImage(s);
+					}
+				}
 
-					// Image : status/user/profile_image_url
-					s = MyGetMatchString(user, L"<profile_image_url>", L"<", s);
-					s.Replace(L"&amp;", L"&");
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.AddImage(s);
-
-					// <location>East Tokyo United</location>
-					s = MyGetMatchString(user, L"<location>", L"<", s);
-					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
-					data.SetTextValue(L"location", s);
-					// <followers_count>555</followers_count>
-					data.SetIntValue(L"followers_count", _wtoi(MyGetMatchString(user, L"<followers_count>", L"<", s)));
-					// <friends_count>596</friends_count>
-					data.SetIntValue(L"friends_count", _wtoi(MyGetMatchString(user, L"<friends_count>", L"<", s)));
-					// <favourites_count>361</favourites_count>
-					data.SetIntValue(L"favourites_count", _wtoi(MyGetMatchString(user, L"<favourites_count>", L"<", s)));
-					// <statuses_count>7889</statuses_count>
-					data.SetIntValue(L"statuses_count", _wtoi(MyGetMatchString(user, L"<statuses_count>", L"<", s)));
-
+				if (i_in_status>35 && line.Find(L"</status>") >= 0) {
 					// 一時リストに追加
+					data.SetTextValue(L"user_tag", user_tag);
 					new_list.push_back(data);
 					break;
 				}

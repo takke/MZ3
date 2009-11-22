@@ -22,7 +22,7 @@ namespace mixi {
 	bool ParserUtil::ParseDate(LPCTSTR line, CMixiData& mixi)
 	{
 		// 汎用 形式
-		{
+		if (wcsstr(line, L"時") != NULL) {
 			// 正規表現のコンパイル
 			static MyRegex reg;
 			if( !util::CompileRegex( reg, L"([0-9]{2,4})?年?([0-9]{1,2}?)月([0-9]{1,2})日[^0-9]*([0-9]{1,2})?:?時?([0-9]{2})?" ) ) {

@@ -257,16 +257,7 @@ function my_add_new_user(new_list, status, id)
 	profile_image_url = mz3.decode_html_entity(profile_image_url);
 	data:add_text_array('image', profile_image_url);
 
-	-- <location>East Tokyo United</location>
-	data:set_text('location', mz3.decode_html_entity(user:match('<location>([^<]*)<')));
-	-- <followers_count>555</followers_count>
-	data:set_integer('followers_count', user:match('<followers_count>([^<]*)<'));
-	-- <friends_count>596</friends_count>
-	data:set_integer('friends_count', user:match('<friends_count>([^<]*)<'));
-	-- <favourites_count>361</favourites_count>
-	data:set_integer('favourites_count', user:match('<favourites_count>([^<]*)<'));
-	-- <statuses_count>7889</statuses_count>
-	data:set_integer('statuses_count', user:match('<statuses_count>([^<]*)<'));
+	data:set_text('user_tag', user);
 
 	-- 一時リストに追加
 	new_list:add(data.data);
@@ -622,16 +613,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				profile_image_url = mz3.decode_html_entity(profile_image_url);
 				data:add_text_array('image', profile_image_url);
 
-				-- <location>East Tokyo United</location>
-				data:set_text('location', mz3.decode_html_entity(user:match('<location>(.-)</location>')));
-				-- <followers_count>555</followers_count>
-				data:set_integer('followers_count', user:match('<followers_count>(.-)</followers_count>'));
-				-- <friends_count>596</friends_count>
-				data:set_integer('friends_count', user:match('<friends_count>(.-)</friends_count>'));
-				-- <favourites_count>361</favourites_count>
-				data:set_integer('favourites_count', user:match('<favourites_count>(.-)</favourites_count>'));
-				-- <statuses_count>7889</statuses_count>
-				data:set_integer('statuses_count', user:match('<statuses_count>(.-)</statuses_count>'));
+				data:set_text('user_tag', user);
 
 				-- 一時リストに追加
 				new_list:add(data.data);
@@ -1185,18 +1167,33 @@ function on_show_user_info(serialize_key, event_name, data)
 --	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
 --	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
-	if data:get_text('location') ~= '' then
-		item = item .. "location : " .. data:get_text('location') .. "\r\n";
+
+	-- location 等はここでパースする
+	user = data:get_text('user_tag');
+
+	-- <location>East Tokyo United</location>
+	location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
+	-- <followers_count>555</followers_count>
+	followers_count = user:match('<followers_count>([^<]*)<');
+	-- <friends_count>596</friends_count>
+	friends_count = user:match('<friends_count>([^<]*)<');
+	-- <favourites_count>361</favourites_count>
+	favourites_count = user:match('<favourites_count>([^<]*)<');
+	-- <statuses_count>7889</statuses_count>
+	statuses_count = user:match('<statuses_count>([^<]*)<');
+
+	if location ~= nil then
+		item = item .. "location : " .. location .. "\r\n";
 	end
 	
-	if data:get_integer('friends_count') ~= -1 then
-		item = item .. "followings : " .. data:get_integer('friends_count')
+	if friends_count ~= nil then
+		item = item .. "followings : " .. friends_count
 		            .. ", "
-		            .. "followers : " .. data:get_integer('followers_count')
+		            .. "followers : " .. followers_count
 		            .. ", "
-		            .. "fav : " .. data:get_integer('favourites_count')
+		            .. "fav : " .. favourites_count
 		            .. ", "
-		            .. "発言 : " .. data:get_integer('statuses_count')
+		            .. "発言 : " .. statuses_count
 		            .. "\r\n";
 	end
 	

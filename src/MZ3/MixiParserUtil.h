@@ -260,19 +260,22 @@ public:
 		// </p> → 改行
 		while( line.Replace(_T("</p>"), _T("\r\n\r\n")) ) ;
 
-		// &quot; などの定義済み実体参照の文字化
-		ReplaceDefinedEntityReferenceToCharacter( line );
+		// 実体参照の文字化
+		ReplaceEntityReferenceToCharacter(line);
 
-		// &#xxxx; の実体参照の文字化
-		// 例）&#3642; → char(3642)
-		ReplaceNumberEntityReferenceToCharacter( line );
 	}
 
 	static void ReplaceEntityReferenceToCharacter( CString& str )
 	{
+		// &quot; などの定義済み実体参照の文字化
 		ReplaceDefinedEntityReferenceToCharacter( str );
-		ReplaceNumberEntityReferenceToCharacter( str );
-		ReplaceNumberEntityReferenceToCharacter2( str );
+
+		// &#xxxx; の実体参照の文字化
+		// 例）&#3642; → char(3642)
+		if (str.Find(L"&#") >= 0) {
+			ReplaceNumberEntityReferenceToCharacter( str );
+			ReplaceNumberEntityReferenceToCharacter2( str );
+		}
 	}
 
 	/**
@@ -280,11 +283,11 @@ public:
 	 */
 	static void ReplaceDefinedEntityReferenceToCharacter( CString& str )
 	{
-		while( str.Replace(_T("&quot;"), _T("\"")) ) ;
-		while( str.Replace(_T("&gt;"),   _T(">")) ) ;
-		while( str.Replace(_T("&lt;"),   _T("<")) ) ;
-		while( str.Replace(_T("&nbsp;"), _T(" ")) ) ;
-		while( str.Replace(_T("&amp;"),  _T("&")) ) ;
+		str.Replace(_T("&quot;"), _T("\""));
+		str.Replace(_T("&gt;"),   _T(">"));
+		str.Replace(_T("&lt;"),   _T("<"));
+		str.Replace(_T("&nbsp;"), _T(" "));
+		str.Replace(_T("&amp;"),  _T("&"));
 	}
 
 	/**
