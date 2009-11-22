@@ -139,6 +139,7 @@ follower_names = {}
 
 menu_items.update                = mz3_menu.regist_menu("twitter.on_twitter_update");
 menu_items.update_with_twitpic   = mz3_menu.regist_menu("twitter.on_twitter_update_with_twitpic");
+menu_items.update_with_twitpic_now = mz3_menu.regist_menu("twitter.on_twitter_update_with_twitpic_now");
 menu_items.reply                 = mz3_menu.regist_menu("twitter.on_twitter_reply");
 menu_items.new_dm                = mz3_menu.regist_menu("twitter.on_twitter_new_dm");
 menu_items.create_favourings     = mz3_menu.regist_menu("twitter.on_twitter_create_favourings");
@@ -758,6 +759,28 @@ function on_twitter_update_with_twitpic(serialize_key, event_name, data)
 												 filter,
 												 flags,
 												 "");
+--	mz3.alert(twitpic_target_file);
+	if twitpic_target_file == nil then
+		-- 中止
+		return;
+	end
+
+	-- モード変更
+	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE_WITH_TWITPIC'));
+
+	-- モード変更反映(ボタン名称変更)
+	mz3_main_view.update_control_status();
+
+	-- フォーカス移動
+	mz3_main_view.set_focus('edit');
+end
+
+
+--- 「写真を投稿」メニュー用ハンドラ
+function on_twitter_update_with_twitpic_now(serialize_key, event_name, data)
+
+	-- 撮影画面
+	twitpic_target_file = mz3.camera_capture(mz3_main_view.get_wnd());
 --	mz3.alert(twitpic_target_file);
 	if twitpic_target_file == nil then
 		-- 中止
@@ -1556,6 +1579,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu = MZ3Menu:create_popup_menu();
 	submenu = MZ3Menu:create_popup_menu();
 	submenu_hash = MZ3Menu:create_popup_menu();
+	submenu_twitpic = MZ3Menu:create_popup_menu();
 	
 	name = body:get_text('name');
 
@@ -1575,7 +1599,15 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "つぶやく", menu_items.update);
-	menu:append_menu("string", "写真を投稿(twitpic)...", menu_items.update_with_twitpic);
+	
+	if mz3_pro_mode and mz3.get_app_name()=="MZ3" then
+		-- Pro & MZ3 only
+		submenu_twitpic:append_menu("string", "ファイルを選択...", menu_items.update_with_twitpic);
+		submenu_twitpic:append_menu("string", "カメラで撮影...", menu_items.update_with_twitpic_now);
+		menu:append_submenu("写真を投稿(twitpic)", submenu_twitpic);
+	else
+		menu:append_menu("string", "写真を投稿(twitpic)...", menu_items.update_with_twitpic);
+	end
 
 	menu:append_menu("string", "@" .. name .. " さんに返信", menu_items.reply);
 	menu:append_menu("string", "@" .. name .. " さんにメッセージ送信", menu_items.new_dm);

@@ -833,6 +833,46 @@ int lua_mz3_get_open_file_name(lua_State *L)
 }
 
 /*
+--- カメラ撮影(撮影結果のファイル名を返す)
+--
+-- ※MZ3 & Pro Mode Only
+--
+-- @param wnd		   ウィンドウ(mz3_main_view.get_wnd() 等で取得した値)
+--
+-- @return (string) 選択ファイルパス, ユーザキャンセル時は nil
+--
+function mz3.camera_capture()
+*/
+int lua_mz3_camera_capture(lua_State *L)
+{
+#ifdef WINCE
+	if (theApp.m_bProMode) {
+		CWnd* wnd = (CWnd*)lua_touserdata(L, 1);
+
+		SHCAMERACAPTURE shcc = {0};
+		shcc.cbSize = sizeof(shcc);
+		shcc.hwndOwner = wnd->m_hWnd;
+
+		if (SHCameraCapture(&shcc) == S_OK) {
+			LPCTSTR szFile = shcc.szFile;
+			lua_pushstring(L, CStringA(szFile));
+		} else {
+			lua_pushnil(L);
+		}
+	} else {
+		// 非 Pro モードでは常に nil
+		lua_pushnil(L);
+	}
+#else
+	// MZ4 では常に nil
+	lua_pushnil(L);
+#endif
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- 共通エディット画面の表示
 --
 -- @param title        キャプション
@@ -3562,6 +3602,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
 	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
 	{"get_open_file_name",					lua_mz3_get_open_file_name},
+	{"camera_capture",						lua_mz3_camera_capture},
 	{"show_common_edit_dlg",				lua_mz3_show_common_edit_dlg},
 	{"url_encode",							lua_mz3_url_encode},
 	{"convert_encoding",					lua_mz3_convert_encoding},
