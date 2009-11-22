@@ -1403,6 +1403,8 @@ void CMainFrame::OnSelectCategory(UINT nID)
 
 		util::MySetListCtrlItemFocusedAndSelected( v->m_categoryList, v->m_selGroup->focusedCategory, true );
 
+		v->m_categoryList.EnsureVisible(v->m_selGroup->focusedCategory, FALSE);
+
 		// •ÏX”½‰f
 		v->OnMySelchangedCategoryList();
 
