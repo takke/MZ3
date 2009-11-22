@@ -407,8 +407,9 @@ unsigned int CMZ3View::CacheCleanup_Thread( LPVOID This )
  */
 bool CMZ3View::DoInitialize()
 {
-	// 初期データ設定
 	util::MySetInformationText( m_hWnd, L"画面を作成しています..." );
+
+	// 初期データ設定
 	InsertInitialData();
 
 	m_hotList = &m_categoryList;
@@ -481,8 +482,11 @@ void CMZ3View::InsertInitialData()
 
 	// カテゴリの選択状態を復帰
 	int nCategory = m_selGroup->categories.size();
-	if (0 <= theApp.m_optionMng.m_lastTopPageCategoryIndex && theApp.m_optionMng.m_lastTopPageCategoryIndex < nCategory) {
-		m_selGroup->focusedCategory = m_selGroup->selectedCategory = theApp.m_optionMng.m_lastTopPageCategoryIndex;
+	int lastIdx = theApp.m_optionMng.m_lastTopPageCategoryIndex;
+	if (0 <= lastIdx && lastIdx < nCategory) {
+		m_selGroup->focusedCategory = m_selGroup->selectedCategory = lastIdx;
+
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, lastIdx, true );
 	}
 
 	// カテゴリーリストを初期化する

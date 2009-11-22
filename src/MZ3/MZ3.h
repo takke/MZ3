@@ -129,6 +129,8 @@ public:
 	BOOL				m_bWinMo2003;
 	BOOL				m_bWinMo2003_SE;
 
+	bool				m_bProMode;				///< ProMode
+
 public:
 	//--- ロガー
 	CSimpleLogger		m_logger;				///< ログ出力オブジェクト

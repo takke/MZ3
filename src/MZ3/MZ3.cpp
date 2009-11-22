@@ -71,6 +71,7 @@ CMZ3App::CMZ3App()
 	, m_luaState(NULL)
 	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
 	, m_access(false)
+	, m_bProMode(false)
 {
 }
 
@@ -129,6 +130,17 @@ BOOL CMZ3App::InitInstance()
 	MZ3Hook_StartHook();
 #endif
 */
+	// ProMode 判定
+	HINSTANCE hProDll = LoadLibrary (_T("mz3plus.dll"));
+	if (hProDll == NULL) {
+		m_bProMode = false;
+	} else {
+		m_bProMode = true;
+		FreeLibrary(hProDll);
+	}
+#ifndef WINCE
+	m_bProMode = true;
+#endif
 
 	// ファイルパス群を初期化
 	m_filepath.init();
@@ -174,124 +186,6 @@ BOOL CMZ3App::InitInstance()
 
 	// スキン関連の初期化
 	LoadSkinSetting();
-
-	/*
-	// MSXML 利用のためのコード、せっかくだから残しておくお
-	{
-		CMixiData rss_data;
-		rss_data.SetAccessType(ACCESS_RSS_READER_FEED);
-		rss_data.SetURL(L"http://b.hatena.ne.jp/hotentry?mode=rss");
-#ifdef WINCE
-		CString rss_data_path = L"\\hatena.rss.utf8";
-#else
-		CString rss_data_path = L"M:\\hatena.rss.utf8";
-#endif
-		MZ3_TRACE( L"rss_file_path : /%s/\n", rss_data_path );
-
-		util::StopWatch sw;
-		{
-			CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
-			CComPtr<IXMLDOMDocument> iXMLDoc;
-			CComPtr<IXMLDOMNodeList> iXMLList;
-
-			VARIANT_BOOL bSuccess=false;
-
-			if(S_OK == iXMLDoc.CoCreateInstance( __uuidof(DOMDocument) ) ){
-
-				sw.start();
-
-				for (int loop=0; loop<10; loop++) {
-					// 同期読込
-					iXMLDoc->put_async(VARIANT_FALSE);
-
-					// load XML
-					CComVariant         varFile = rss_data_path;
-					iXMLDoc->load(varFile, &bSuccess);
-					if (bSuccess) {
-						iXMLDoc->selectNodes(_bstr_t("rdf:RDF/item/title"), &iXMLList);
-
-						if (iXMLList != NULL) {
-
-							_bstr_t _bstGet;
-							for (int i=0;; i++) {
-								CComPtr<IXMLDOMElement> iXMLInfo;
-
-								iXMLList->get_item(i, (IXMLDOMNode**)&iXMLInfo);
-
-								if (NULL != iXMLInfo) {
-									iXMLInfo->get_text( &_bstGet.GetBSTR() );
-
-									MZ3_TRACE( L" %d : /%s/\n", i, _bstGet.GetBSTR() );
-								} else {
-									break;
-								}
-							}
-
-						}
-					} else {
-						MessageBox( NULL, L"load failed", L"", MB_OK );
-					}
-				}
-
-				CString msg;
-				msg.Format( L"elapsed time : %.2f [sec]\n", sw.stop() / 1000.0 );
-				MessageBox(NULL, msg, L"", MB_OK);
-
-			} else {
-				MessageBox( NULL, L"object generate failed", L"", MB_OK );
-			}
-		}
-
-		{
-			CString rss_data_path = util::MakeLogfilePath(rss_data);
-
-			sw.start();
-
-			CHtmlArray html_;
-			html_.Load( rss_data_path );
-
-			// html_ の文字列化
-			std::vector<TCHAR> text;
-			html_.TranslateToVectorBuffer( text );
-
-			for (int loop=0; loop<10; loop++) {
-
-				// XML 解析
-				xml2stl::Container root;
-				if (!xml2stl::SimpleXmlParser::loadFromText( root, text )) {
-					MZ3LOGGER_ERROR( L"XML 解析失敗" );
-				} else {
-					// rdf:RDF/item に対する処理
-					try {
-						const xml2stl::Node& rdf = root.getNode(L"rdf:RDF");
-						
-						int counter = 0;
-						for (unsigned int i=0; i<rdf.getChildrenCount(); i++) {
-							const xml2stl::Node& item = rdf.getNode(i);
-							if (item.getName() != L"item") {
-								continue;
-							}
-
-							// description, title の取得
-							CString title = item.getNode(L"title").getTextAll().c_str();
-
-							MZ3_TRACE( L" %d : /%s/\n", counter, title );
-							counter++;
-						}
-
-					} catch (xml2stl::NodeNotFoundException& e) {
-						MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
-					}
-				}
-			}
-
-			CString msg;
-			msg.Format( L"elapsed time : %.2f [sec]\n", sw.stop() / 1000.0 );
-			MessageBox(NULL, msg, L"", MB_OK);
-		}
-	}
-	*/
 
 	// 詳細画面のクラス登録
 	Ran2View::RegisterWndClass(AfxGetInstanceHandle());
@@ -449,6 +343,9 @@ BOOL CMZ3App::InitInstance()
 	// メイン ウィンドウが初期化されたので、表示と更新を行う
 	m_pMainWnd->ShowWindow( SW_SHOW );
 	m_pMainWnd->UpdateWindow();
+
+	// タイトル切り替え
+	((CMainFrame*)m_pMainWnd)->MySetTitle();
 
 #ifdef WINCE
 	if( m_bSmartphone ) {
@@ -1474,6 +1371,10 @@ bool CMZ3App::MyLuaInit(void)
 	lua_setglobal(L, "mz3_plugin_dir");
 	lua_pushstring(L, CStringA(user_script_dir)+"\\");
 	lua_setglobal(L, "mz3_user_script_dir");
+
+	// Proモード識別を渡す
+	lua_pushboolean(L, m_bProMode ? 1 : 0);
+	lua_setglobal(L, "mz3_pro_mode");
 
 	// Lua スクリプトのロード＆実行
 	// "mz3.luac" がなければ "mz3.lua" をロードする

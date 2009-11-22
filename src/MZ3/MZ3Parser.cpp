@@ -64,16 +64,17 @@ static bool CallMZ3ScriptParser(const char* szServiceType, const char* szParserF
 	int n_ret = 1;
 	int status = lua_pcall(L, n_arg, n_ret, 0);
 
+	int result = 0;
 	if (status != 0) {
 		// TODO エラー処理
 		theApp.MyLuaErrorReport(status);
 		return false;
 	} else {
 		// 返り値取得
-		int result = lua_toboolean(L, -1);
+		result = lua_toboolean(L, -1);
 	}
 	lua_settop(L, top);
-	return true;
+	return result != 0;
 }
 
 /// リスト系HTMLの解析
@@ -81,6 +82,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 {
 	// MZ3 Script 用パーサがあれば利用する
 	const char* szSerializeKey = theApp.m_accessTypeInfo.getSerializeKey(aType);
+	bool bRunLuaParser = false;
 	if (theApp.m_luaParsers.count(szSerializeKey)!=0) {
 		CStringA strParserName = theApp.m_luaParsers[szSerializeKey].c_str();
 
@@ -90,10 +92,24 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 			CStringA strTable = strParserName.Left(idx);
 			CStringA strFuncName = strParserName.Mid(idx+1);
 //			printf("parser : [%s], [%s]\n", strTable, strFuncName);
-			return CallMZ3ScriptParser(strTable, strFuncName, &parent, &body, html);
+			CallMZ3ScriptParser(strTable, strFuncName, &parent, &body, html);
+
+			// ProMode 用の処理後に終了する
+			bRunLuaParser = true;
 		}
 	}
 
+	if (theApp.m_bProMode) {
+		switch (aType) {
+		case ACCESS_TWITTER_FRIENDS_TIMELINE:
+		case ACCESS_TWITTER_FAVORITES:
+			return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
+		}
+	}
+
+	if (bRunLuaParser) {
+		return true;
+	}
 
 	switch (aType) {
 //	case ACCESS_MAIN:							body.clear();	return mixi::HomeParser::parse( parent, html );
@@ -115,22 +131,16 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
 	case ACCESS_LIST_BBS:						body.clear();	return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:					body.clear();	return mixi::ShowCalendarParser::parse( body, html );
-//	case ACCESS_MIXI_RECENT_ECHO:				body.clear();	return mixi::RecentEchoParser::parse( body, html );
-//	case ACCESS_TWITTER_FRIENDS_TIMELINE:		return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );
-//	case ACCESS_TWITTER_FAVORITES:				body.clear();	return parser::TwitterFriendsTimelineXmlParser::parse( parent, body, html );	// 暫定
-//	case ACCESS_TWITTER_DIRECT_MESSAGES:		body.clear();	return parser::TwitterDirectMessagesXmlParser::parse( body, html );
-//	case ACCESS_WASSR_FRIENDS_TIMELINE:			return parser::WassrFriendsTimelineXmlParser::parse( body, html );
 	case ACCESS_RSS_READER_FEED:				body.clear();	return parser::RssFeedParser::parse( body, html );
-//	case ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS:	body.clear();	return parser::GoohomeQuoteQuotesFriendsParser::parse( body, html );
 	default:
-		{
-			CString msg;
-			msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
-			MZ3LOGGER_ERROR(msg);
-			MessageBox(NULL, msg, NULL, MB_OK);
-		}
-		return false;
+		break;
 	}
+
+	CString msg;
+	msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
+	MZ3LOGGER_ERROR(msg);
+	MessageBox(NULL, msg, NULL, MB_OK);
+	return false;
 }
 
 /// View系HTMLの解析
@@ -178,6 +188,186 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 		return false;
 	}
 }
+
+//
+// Twitter 用パーサ
+//
+
+inline CString& MyGetMatchString(const CString& target, const CString& left, const CString& right, CString& buf)
+{
+	if (util::GetBetweenSubString(target, left, right, buf)<0) {
+		buf = L"";
+	}
+	return buf;
+}
+
+bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& body_, const CHtmlArray& html_ )
+{
+	MZ3LOGGER_DEBUG( L"TwitterFriendsTimelineXmlParser.parse() start." );
+
+	INT_PTR count = html_.GetCount();
+
+	// 全消去しない
+
+	// 重複防止用の id 一覧を生成
+	std::set<INT64> id_set;
+	int n = body_.size();
+	for (int i=0; i<n; i++) {
+		INT64 id = body_[i].GetID();
+		id_set.insert(id);
+	}
+
+	util::StopWatch sw;
+	sw.start();
+
+	// 一時リスト
+	CMixiDataList new_list;
+	// data 生成
+	MZ3Data data;
+
+	for (int i=0; i<count; i++) {
+		const CString& line = html_.GetAt(i);
+		if (util::LineHasStringsNoCase(line, L"<status>")) {
+			// </status> まで取得する
+			// 但し、同一IDがあればskipする
+			i++;
+
+			int i_in_status = 0;
+			CString status = line;
+
+			while (i<count) {
+				const CString& line = html_.GetAt(i);
+				status += line;
+
+				if (i_in_status<3 && util::LineHasStringsNoCase(line, L"<id>")) {
+					CString s;
+					if (util::GetBetweenSubString(line, L"<id>", L"</id>", s) < 0) {
+						continue;
+					}
+					INT64 id = _wtoi64(s);
+					if (id_set.count(id) > 0) {
+						MZ3LOGGER_DEBUG(util::FormatString(L"id[%d]は既に存在するのでskipする", id));
+						i++;
+						while (i<count) {
+							const CString& line = html_.GetAt(i);
+							if (util::LineHasStringsNoCase(line, L"</status>")) {
+								break;
+							}
+							i++;
+						}
+						break;				
+					}
+
+					// 初期化
+					data = MZ3Data();
+					data.SetInt64Value(L"id", id);
+					data.SetAccessType(ACCESS_TWITTER_USER);
+				}
+				if (i_in_status>35 && util::LineHasStringsNoCase(line, L"</status>")) {
+					CString s;
+					
+					// updated : status/created_at
+					mixi::ParserUtil::ParseDate(MyGetMatchString(status, L"<created_at>", L"<", s), data);
+					
+					// text : status/text
+					s = MyGetMatchString(status, L"<text>", L"<", s);
+					s.Replace(L"&amp;", L"&");
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.AddBody(s);
+					
+					// URL を抽出し、リンクにする
+					mixi::ParserUtil::ExtractURI(s, data.m_linkList);
+
+					// source : status/source
+					s = MyGetMatchString(status, L"<source>", L"<", s);
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.SetTextValue(L"source", s);
+					
+					// name : status/user/screen_name
+					CString user;
+					util::GetAfterSubString(status, L"<user>", user);
+					s = MyGetMatchString(user, L"<screen_name>", L"<", s);
+					s.Replace(L"&amp;", L"&");
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.SetTextValue(L"name", s);
+					
+					// author : status/user/name
+					s = MyGetMatchString(user, L"<name>", L"<", s);
+					s.Replace(L"&amp;", L"&");
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.SetTextValue(L"author", s);
+
+					// description : status/user/description
+					// title に入れるのは苦肉の策・・・
+					s = MyGetMatchString(user, L"<description>", L"<", s);
+					s.Replace(L"&amp;", L"&");
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.SetTextValue(L"title", s);
+
+					// owner-id : status/user/id
+					s = MyGetMatchString(user, L"<id>", L"<", s);
+					data.SetIntValue(L"owner_id", _wtol(s));
+					
+					// in_reply_to_status_id : status/in_reply_to_status_id
+					s = MyGetMatchString(user, L"<in_reply_to_status_id>", L"<", s);
+					data.SetIntValue(L"in_reply_to_status_id", _wtol(s));
+
+					// URL : status/user/url
+					s = MyGetMatchString(user, L"<url>", L"<", s);
+					data.SetTextValue(L"url", s);
+					data.SetTextValue(L"browse_uri", s);
+
+					// Image : status/user/profile_image_url
+					s = MyGetMatchString(user, L"<profile_image_url>", L"<", s);
+					s.Replace(L"&amp;", L"&");
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.AddImage(s);
+
+					// <location>East Tokyo United</location>
+					s = MyGetMatchString(user, L"<location>", L"<", s);
+					mixi::ParserUtil::ReplaceEntityReferenceToCharacter(s);
+					data.SetTextValue(L"location", s);
+					// <followers_count>555</followers_count>
+					data.SetIntValue(L"followers_count", _wtoi(MyGetMatchString(user, L"<followers_count>", L"<", s)));
+					// <friends_count>596</friends_count>
+					data.SetIntValue(L"friends_count", _wtoi(MyGetMatchString(user, L"<friends_count>", L"<", s)));
+					// <favourites_count>361</favourites_count>
+					data.SetIntValue(L"favourites_count", _wtoi(MyGetMatchString(user, L"<favourites_count>", L"<", s)));
+					// <statuses_count>7889</statuses_count>
+					data.SetIntValue(L"statuses_count", _wtoi(MyGetMatchString(user, L"<statuses_count>", L"<", s)));
+
+					// 一時リストに追加
+					new_list.push_back(data);
+					break;
+				}
+
+				i_in_status++;
+				i++;
+			}
+		}
+	}
+
+	// 生成したデータを出力に反映
+#ifdef WINCE
+	TwitterParserBase::MergeNewList(body_, new_list, 100);
+#else
+	TwitterParserBase::MergeNewList(body_, new_list, 1000);
+#endif
+
+	// 新着件数を parent(カテゴリの m_mixi) に設定する
+	parent.SetIntValue(L"new_count", new_list.size());
+	
+	sw.stop();
+
+	MZ3LOGGER_DEBUG(
+		util::FormatString(L"TwitterFriendsTimelineXmlParser.parse() end; elapsed : %d [msec]",
+			sw.getElapsedMilliSecUntilStoped()));
+	return true;
+}
+
+//
+// RSS 用パーサ
+//
 
 bool RssFeedParser::parse( CMixiDataList& out_, const std::vector<TCHAR>& text_, CString* pStrTitle )
 {
@@ -476,6 +666,10 @@ bool MZ3ParserBase::ExtractLinks(CMixiData &data_)
 	return true;
 }
 
+//
+// help 用パーサ
+//
+
 bool HelpParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"HelpParser.parse() start." );
@@ -593,14 +787,16 @@ bool HelpParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 	return true;
 }
 
+//
+// エラーログ 用パーサ
+//
+
 bool ErrorlogParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 {
 	MZ3LOGGER_DEBUG( L"ErrorlogParser.parse() start." );
 
 	mixi.ClearAllList();
 	INT_PTR count = html_.GetCount();
-
-	int iLine = 0;
 
 	int status = 0;		// 0 : start, 1 : 最初の項目, 2 : 2番目以降の項目解析中
 	CMixiData child;
@@ -623,7 +819,14 @@ bool ErrorlogParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 	// ずっと本文△[.\MZ3View.cpp:947]
 	// ---
 	// という形式。
-	for( int iLine=0; iLine<count; iLine++ ) {
+
+	// 末尾のN行のみ対象とする
+	int iLine = 0;
+	const int LINE_LIMIT = 200;
+	if (count > LINE_LIMIT) {
+		iLine = count-LINE_LIMIT;
+	}
+	for(; iLine<count; iLine++ ) {
 		CString target = html_.GetAt(iLine);
 		target.Replace(_T("\n"), _T("\r\n"));	// 改行コード変換
 
@@ -688,6 +891,10 @@ bool ErrorlogParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 	MZ3LOGGER_DEBUG( L"ErrorlogParser.parse() finished." );
 	return true;
 }
+
+//
+// テキスト用パーサ
+//
 
 bool PlainTextParser::parse( CMixiData& mixi, const CHtmlArray& html_ )
 {

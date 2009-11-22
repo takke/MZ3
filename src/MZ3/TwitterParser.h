@@ -121,51 +121,12 @@ public:
 */
 };
 
-/*
 class TwitterFriendsTimelineXmlParser : public parser::TwitterParserBase
 {
 public:
 	static bool parse( CMixiData& parent, CMixiDataList& out_, const CHtmlArray& html_ );
-};
-*/
+	static bool add_new_user(CMixiDataList& new_list_, const CString& status_);
 
-/*
-class TwitterDirectMessagesXmlParser : public parser::TwitterParserBase
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
 };
-*/
-
-/*
-class WassrFriendsTimelineXmlParser : public parser::TwitterParserBase
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
-};
-*/
-
-/*
-class GoohomeQuoteQuotesFriendsParser : public parser::TwitterParserBase
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ );
-
-	// “n‚³‚ê‚½s(line)‚Éw’è‚³‚ê‚½ƒL[‚Ì—v‘f‚ª‚ ‚ê‚Îæ“¾‚·‚é
-	static bool GetJsonValue(LPCTSTR line, LPCTSTR json_key, CString& result)
-	{
-		CString key;
-		key.Format(L"\"%s\":", json_key);
-		if (util::LineHasStringsNoCase(line, key) &&
-			util::GetAfterSubString(line, L":", result)>0 &&
-			util::GetBetweenSubString(result, L"\"", L"\"", result)>0)
-		{
-			return true;
-		} else {
-			return false;
-		}
-	}
-};
-*/
 
 }//namespace parser

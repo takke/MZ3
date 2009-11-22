@@ -294,6 +294,11 @@ function twitter_friends_timeline_parser(parent, body, html)
 	-- 返信 id の初期化
 	twitter_reply_id = 0;
 
+	if mz3_pro_mode then
+		-- Pro モードならホスト側に任せる
+		return false;
+	end
+
 	-- wrapperクラス化
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);

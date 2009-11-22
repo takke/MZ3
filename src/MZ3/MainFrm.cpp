@@ -1165,6 +1165,9 @@ void CMainFrame::MySetTitle(void)
 #ifdef WINCE
 	// タイトル変更
 	CString title = MZ3_APP_NAME;
+	if (theApp.m_bProMode) {
+		title += L"+";
+	}
 
 	// 定期取得状態
 	if( theApp.m_optionMng.m_bEnableIntervalCheck ) {
