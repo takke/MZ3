@@ -55,6 +55,9 @@ BOOL COptionTabMainView::OnInitDialog()
 	// 下ペインのリストを１行で表示する
 	CheckDlgButton( IDC_NO_INTEGRATED_MODE_CHECK, theApp.m_optionMng.m_bBodyListIntegratedColumnMode ? BST_UNCHECKED : BST_CHECKED);
 
+	// 上ペインのリストクリック時に取得する
+	CheckDlgButton( IDC_ONE_CLICK_CATEGORY_FETCH_MODE_CHECK, theApp.m_optionMng.m_bOneClickCategoryFetchMode ? BST_CHECKED : BST_UNCHECKED);
+
 	UpdateControlItemStatus();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -66,14 +69,17 @@ void COptionTabMainView::OnOK()
 	// ユーザやコミュニティの画像
 	theApp.m_optionMng.m_bShowMainViewMiniImage = IsDlgButtonChecked( IDC_SHOW_MINI_IMAGE_CHECK ) == BST_CHECKED;
 
+	// 画像の自動取得
+	theApp.m_optionMng.m_bAutoLoadMiniImage = IsDlgButtonChecked( IDC_AUTO_LOAD_MINI_IMAGE_CHECK ) == BST_CHECKED;
+
 	// トピック等のアイコン表示
 	theApp.m_optionMng.m_bShowMainViewIcon = IsDlgButtonChecked( IDC_SHOW_ICON_CHECK ) == BST_CHECKED;
 
 	// 下ペインのリストを１行で表示する
 	theApp.m_optionMng.m_bBodyListIntegratedColumnMode = IsDlgButtonChecked( IDC_NO_INTEGRATED_MODE_CHECK ) != BST_CHECKED;
 
-	// 画像の自動取得
-	theApp.m_optionMng.m_bAutoLoadMiniImage = IsDlgButtonChecked( IDC_AUTO_LOAD_MINI_IMAGE_CHECK ) == BST_CHECKED;
+	// 上ペインのリストクリック時に取得する
+	theApp.m_optionMng.m_bOneClickCategoryFetchMode = IsDlgButtonChecked( IDC_ONE_CLICK_CATEGORY_FETCH_MODE_CHECK ) == BST_CHECKED;
 
 	CPropertyPage::OnOK();
 }

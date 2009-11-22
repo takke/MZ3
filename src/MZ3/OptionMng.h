@@ -120,6 +120,7 @@ public:
 	bool			m_bAutoLoadMiniImage;				///< 画像の自動取得
 
 	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
+	bool			m_bOneClickCategoryFetchMode;		///< 上ペインのリストクリック時に取得する
 
 private:
 	int				m_recvBufSize;					///< 受信バッファサイズ
@@ -194,6 +195,7 @@ public:
 		, m_bAutoLoadMiniImage( true )
 		, m_bListScrollByPixelOnMZ3( false )
 		, m_bBodyListIntegratedColumnMode( true )
+		, m_bOneClickCategoryFetchMode( true )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )
 		, m_nTwitterStatusLineCount(3)

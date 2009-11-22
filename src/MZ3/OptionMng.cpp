@@ -380,6 +380,9 @@ void Option::Sync(bool bSave)
 	// ボディリストのカラムの統合モード
 	SyncIniValue(inifile, bSave, m_bBodyListIntegratedColumnMode, "MainViewBodyListIntegratedColumnMode", "MainView");
 
+	// 上ペインのリストクリック時に取得する
+	SyncIniValue(inifile, bSave, m_bOneClickCategoryFetchMode, "MainViewOneClickCategoryFetchMode", "MainView");
+
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
 	SyncIniValue(inifile, bSave, m_strTwitterPostFotterText, "PostFotterText", "Twitter" );

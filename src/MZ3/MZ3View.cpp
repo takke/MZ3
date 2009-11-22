@@ -732,6 +732,13 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	OnMySelchangedCategoryList();
 
+	if (theApp.m_optionMng.m_bOneClickCategoryFetchMode) {
+		// 上ペインのリストクリックで取得する
+
+		// 再取得
+		RetrieveCategoryItem();
+	}
+
 	*pResult = 0;
 }
 
@@ -2244,34 +2251,50 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		// グループタブの選択変更
 		return CommandSelectGroupTabBeforeItem();
 
-
-		// グループタブに移動
-//		return CommandSetFocusGroupTab();
 	case VK_RIGHT:
 		if (theApp.m_access) return TRUE;	// アクセス中は無視
 
 		// グループタブの選択変更
 		return CommandSelectGroupTabNextItem();
 
-		// ボディリストに移動
-//		return CommandSetFocusBodyList();
 	case VK_RETURN:
-		if (m_selGroup->selectedCategory == m_selGroup->focusedCategory) {
-			RetrieveCategoryItem();
-		}
-		else {
-			// 非選択項目なので、取得時刻とボディの変更。
-			// 非取得で、ログがあるならログから取得。
+		if (theApp.m_optionMng.m_bOneClickCategoryFetchMode) {
+			// 上ペインのリストクリックで取得する
+			if (m_selGroup->selectedCategory != m_selGroup->focusedCategory) {
+				// 非選択項目なので、取得時刻とボディの変更。
+				// 非取得で、ログがあるならログから取得。
 
-			// アクセス中は選択不可
-			if (theApp.m_access) {
-				return TRUE;
+				// アクセス中は選択不可
+				if (theApp.m_access) {
+					return TRUE;
+				}
+				m_selGroup->selectedCategory = m_selGroup->focusedCategory;
+
+				OnMySelchangedCategoryList();
 			}
-			m_selGroup->selectedCategory = m_selGroup->focusedCategory;
 
-			OnMySelchangedCategoryList();
+			// 再取得
+			RetrieveCategoryItem();
+
+		} else {
+			// 選択項目のクリックで再取得、非選択項目なら項目変更まで。
+			if (m_selGroup->selectedCategory == m_selGroup->focusedCategory) {
+				RetrieveCategoryItem();
+			} else {
+				// 非選択項目なので、取得時刻とボディの変更。
+				// 非取得で、ログがあるならログから取得。
+
+				// アクセス中は選択不可
+				if (theApp.m_access) {
+					return TRUE;
+				}
+				m_selGroup->selectedCategory = m_selGroup->focusedCategory;
+
+				OnMySelchangedCategoryList();
+			}
 		}
 		return TRUE;
+
 	case VK_BACK:
 #ifndef WINCE
 	case VK_ESCAPE:
@@ -4589,8 +4612,8 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	if (m_selGroup==NULL) {
 		return false;
 	}
-	CCategoryItem* item = m_selGroup->getSelectedCategory();
-	if (item==NULL) {
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory==NULL) {
 		return false;
 	}
 
@@ -4598,7 +4621,7 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	util::MyLuaDataList rvals;
 	rvals.push_back(util::MyLuaData(0));
 	if (util::CallMZ3ScriptHookFunctions2("retrieve_category_item", &rvals, 
-			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(item->m_mixi.GetAccessType()))))
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(pCategory->m_mixi.GetAccessType()))))
 	{
 		// Lua 側で処理完結
 		switch (rvals[0].m_number) {
@@ -4608,7 +4631,7 @@ bool CMZ3View::RetrieveCategoryItem(void)
 
 		case 1:
 			// ブックマーク同様にローカルストレージ経由で取得
-			SetBodyList( item->GetBodyList() );
+			SetBodyList( pCategory->GetBodyList() );
 			return true;
 
 		case 0:
@@ -4620,7 +4643,7 @@ bool CMZ3View::RetrieveCategoryItem(void)
 
 	// インターネットにアクセス
 	m_hotList = &m_bodyList;
-	AccessProc( &item->m_mixi, util::CreateMixiUrl(item->m_mixi.GetURL()));
+	AccessProc( &pCategory->m_mixi, util::CreateMixiUrl(pCategory->m_mixi.GetURL()));
 
 	return true;
 }
@@ -5165,7 +5188,13 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 		case ACCESS_TWITTER_UPDATE:
 			// 投稿後にタイムラインを取得する
 			if (theApp.m_optionMng.m_bTwitterReloadTLAfterPost) {
-				RetrieveCategoryItem();
+				// http://twitter.com/statuses/friends_timeline.xml であれば再取得する。
+				// http://twitter.com/statuses/replies.xml や
+				// http://twitter.com/statuses/user_timeline/takke.xml であれば再取得しない。
+				CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+				if (pCategory!=NULL && wcsstr(pCategory->m_mixi.GetURL(), L"friends_timeline.xml")!=NULL) {
+					RetrieveCategoryItem();
+				}
 			}
 			break;
 		}

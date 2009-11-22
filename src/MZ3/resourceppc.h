@@ -130,6 +130,7 @@
 #define IDC_DEBUG_MODE_CHECK            1036
 #define IDC_SERVICE_TYPE_TWITTER_CHECK  1036
 #define IDC_CONFIRM_OPEN_URL_CHECK      1036
+#define IDC_ONE_CLICK_CATEGORY_FETCH_MODE_CHECK 1036
 #define IDC_USE_XCRAWL_CANCELER_CHECK   1037
 #define IDC_SERVICE_TYPE_WASSR_CHECK    1037
 #define IDC_DEBUG_LIST                  1038
@@ -315,6 +316,7 @@
 #define ID_CATEGORYMENU_MOVE_DOWN       34219
 #define ID_CATEGORYMENU_MOVE_UP         34221
 #define ID_DUMMY34226                   34226
+#define ID_MENU_MENU                    34230
 #define ID_MENU_OPEN_MENU               34231
 #define ID_REPORT_IMAGE                 36000
 #define ID_REPORT_URL_BASE              36100
@@ -332,7 +334,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
-#define _APS_NEXT_COMMAND_VALUE         34233
+#define _APS_NEXT_COMMAND_VALUE         34235
 #define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
