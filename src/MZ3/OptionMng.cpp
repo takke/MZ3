@@ -93,7 +93,7 @@ void Option::Sync(bool bSave)
 	// ProMode
 	if (theApp.m_bProMode) {
 		// スキンのデフォルト値を変更
-		m_strSkinname = L"ブラックパネル";
+		m_strSkinname = L"dark";
 	}
 
 	//--- 初期処理

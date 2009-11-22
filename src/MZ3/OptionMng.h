@@ -155,10 +155,10 @@ public:
 		, m_bUseXcrawlExtension( false )
 		, m_bUseRunConfirmDlg( true )
 		, m_quoteMark( L"> " )
-		, m_nMainViewCategoryListHeightRatio( 30 )	// カテゴリリストは 30%
-		, m_nMainViewBodyListHeightRatio( 70 )		// ボディリストは 70%
-		, m_nReportViewListHeightRatio( 40 )		// リストは 40%
-		, m_nReportViewBodyHeightRatio( 60 )		// ボディは 60%
+		, m_nMainViewCategoryListHeightRatio( 20 )	// カテゴリリストは 20%
+		, m_nMainViewBodyListHeightRatio( 80 )		// ボディリストは 80%
+		, m_nReportViewListHeightRatio( 30 )		// リストは 30%
+		, m_nReportViewBodyHeightRatio( 70 )		// ボディは 70%
 		, m_nReportViewListCol1Ratio( 7 )			// カラム１は 7/N
 		, m_nReportViewListCol2Ratio( 17 )			// カラム２は 17/N
 		, m_nReportViewListCol3Ratio( 21 )			// カラム３は 21/N

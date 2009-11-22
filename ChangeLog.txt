@@ -40,8 +40,8 @@ $Id$
 
 ** MZ3 Plus (Pro Mode)
 - Twitterでカメラ撮影して投稿できる
-- Twitterの表示が少し高速
-- スキンのデフォルトがブラックパネル
+- Twitterの表示を少し高速化
+- スキンのデフォルトをブラックパネルに変更
 
 
 * MZ3.i/MZ4 Ver.1.0 series

@@ -26,6 +26,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MZ3Plus", "src\MZ3Plus\MZ3Plus.vcproj", "{371F202E-9F5C-4DD3-9C33-3A1BC2E614E5}"
 EndProject
 Project("{B900F1C2-3D47-4FEC-85B3-04AAF18C3634}") = "MZ3CabPlus", "src\MZ3Cab\MZ3CabPlus.vddproj", "{788C35E6-1869-4C38-817B-9DA345B3F5D6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{371F202E-9F5C-4DD3-9C33-3A1BC2E614E5} = {371F202E-9F5C-4DD3-9C33-3A1BC2E614E5}
+		{2D15C884-CA53-4B00-9854-A51ED9FF9FB2} = {2D15C884-CA53-4B00-9854-A51ED9FF9FB2}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

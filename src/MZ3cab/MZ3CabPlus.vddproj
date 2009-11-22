@@ -326,6 +326,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D104BC41DF024EE7A85853EE2BD4E98F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D88021CE7DE442D8BABB8096080B93F9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1802,6 +1808,32 @@
             "OutputConfiguration" = "8:Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{761EECB0-554B-4906-ACC2-CF846B3A630A}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{605BE39E-5046-48BD-AEC0-63C3A46626D5}:_D104BC41DF024EE7A85853EE2BD4E98F"
+            {
+            "SourcePath" = "8:..\\MZ3Plus\\Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\\Release\\mz3plus.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:0"
+            "OutputConfiguration" = "8:Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{371F202E-9F5C-4DD3-9C33-3A1BC2E614E5}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
