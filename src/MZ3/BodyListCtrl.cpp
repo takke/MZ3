@@ -57,6 +57,9 @@ CBodyListCtrl::CBodyListCtrl()
 	// TODO 1画面ではやはり足りない。遅延的に複数画面分確保できるようにしてから復活させること。
 //	m_bBlackScrollMode = true;
 #endif
+	// 横スライドによる移動をオンにする
+	// （コンストラクタで設定し、以降変更しないこと）
+	SetCanSlide(true);
 }
 
 CBodyListCtrl::~CBodyListCtrl()
@@ -1135,4 +1138,26 @@ void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 		}
 	}
+}
+
+/**
+ * virtual MoveSlideRight()
+ *
+ * 右へスライド
+ */
+void CBodyListCtrl::MoveSlideRight()
+{
+	// 現在の項目を表示
+	theApp.m_pMainView->OnKeydownBodyList(VK_RETURN);
+}
+
+/**
+ * virtual MoveSlideLeft()
+ *
+ * 左へスライド
+ */
+void CBodyListCtrl::MoveSlideLeft()
+{
+	// フォーカスを上ペインへ
+	theApp.m_pMainView->CommandSetFocusCategoryList();
 }

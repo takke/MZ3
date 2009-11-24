@@ -91,9 +91,11 @@ void Option::Sync(bool bSave)
 	inifile::IniFile inifile;
 
 	// ProMode
-	if (theApp.m_bProMode) {
+	if (theApp.m_bProMode && !bSave) {
 		// スキンのデフォルト値を変更
+#ifdef WINCE
 		m_strSkinname = L"dark";
+#endif
 	}
 
 	//--- 初期処理

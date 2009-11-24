@@ -329,6 +329,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 								} else {
 									s += line;
 								}
+								i++;
 							}
 						}
 

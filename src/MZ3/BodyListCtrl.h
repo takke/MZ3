@@ -62,6 +62,7 @@ public:
 	virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	afx_msg LRESULT OnSetFont(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+
+	virtual void MoveSlideRight();
+	virtual void MoveSlideLeft();
 };
-
-

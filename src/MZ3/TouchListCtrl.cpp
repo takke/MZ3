@@ -241,7 +241,8 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
 			} else {
 				// 1行未満のドラッグならばすぐに止める
-				MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
+//				MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
+				MyAdjustDrawOffset();
 				m_autoScrollInfo.clear();
 
 				// ★強制再描画
@@ -1010,7 +1011,8 @@ void CTouchListCtrl::OnTimer(UINT_PTR nIDEvent)
 				{
 					if( m_offsetPixelY != 0 ){
 						// オフセットのズレを調整
-						MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
+//						MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
+						MyAdjustDrawOffset();
 					} else {
 						// 停止状態で最後の描画
 //#ifndef WINCE
