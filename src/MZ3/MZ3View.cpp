@@ -170,7 +170,11 @@ CMZ3View::CMZ3View()
 	, m_hotList(NULL)
 	, m_bModifyingBodyList(false)
 	, m_abort(FALSE)
+#ifdef WINCE
+	, m_magnifyMode(MAGNIFY_MODE_CATEGORY)
+#else
 	, m_magnifyMode(MAGNIFY_MODE_DEFAULT)
+#endif
 {
 }
 

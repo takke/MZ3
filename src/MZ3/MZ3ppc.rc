@@ -305,6 +305,10 @@ BEGIN
         MENUITEM "戻る(&P)",                      ID_MENU_BACK
         MENUITEM "進む(&N)",                      ID_MENU_NEXT
         MENUITEM SEPARATOR
+        MENUITEM "上ペイン最大化",                     IDM_LAYOUT_MAGNIFY_CATEGORY_LIST
+        MENUITEM "下ペイン最大化",                     IDM_LAYOUT_MAGNIFY_BODY_LIST
+        MENUITEM "上下ペインの最大化を戻す",                IDM_LAYOUT_MAGNIFY_DEFAULT
+        MENUITEM SEPARATOR
         MENUITEM "前の日記へ(&B)",                   ID_MENU_PREV_DIARY
         MENUITEM "次の日記へ(&F)",                   ID_MENU_NEXT_DIARY
         MENUITEM SEPARATOR
@@ -391,6 +395,10 @@ BEGIN
         BEGIN
             MENUITEM "戻る",                          ID_MENU_BACK
             MENUITEM "進む",                          ID_MENU_NEXT
+            MENUITEM SEPARATOR
+            MENUITEM "上ペイン最大化",                     IDM_LAYOUT_MAGNIFY_CATEGORY_LIST
+            MENUITEM "下ペイン最大化",                     IDM_LAYOUT_MAGNIFY_BODY_LIST
+            MENUITEM "上下ペインの最大化を戻す",                IDM_LAYOUT_MAGNIFY_DEFAULT
             MENUITEM SEPARATOR
             MENUITEM "前の日記へ",                       ID_MENU_PREV_DIARY
             MENUITEM "次の日記へ",                       ID_MENU_NEXT_DIARY
