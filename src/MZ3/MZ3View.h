@@ -50,8 +50,16 @@ public:
 	};
 	VIEW_STYLE			m_viewStyle;			///< 表示スタイル
 
-	ACCESS_TYPE			m_twitterPostAccessType;///< Twitter 風送信アクセス種別
+	/// 拡大表示モード
+	enum MAGNIFY_MODE {
+		MAGNIFY_MODE_DEFAULT	= 0,			///< 標準モード
+		MAGNIFY_MODE_CATEGORY	= 1,			///< カテゴリリスト表示
+		MAGNIFY_MODE_BODY		= 2,			///< ボディリスト表示
+	};
+	MAGNIFY_MODE		m_magnifyMode;			///< 拡大表示モード
 
+
+	ACCESS_TYPE			m_twitterPostAccessType;///< Twitter 風送信アクセス種別
 
 	CRect				m_rectIcon;				///< アイコン表示領域のRECT
 
@@ -399,6 +407,10 @@ public:
 	void MoveCategoryItem(int oldCategoryIndex, int newCategoryIndex);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	bool MySetInfoEditFromBodySelectedData(void);
+	void MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo);
+	afx_msg void OnLayoutMagnifyBodyList();
+	afx_msg void OnLayoutMagnifyCategoryList();
+	afx_msg void OnLayoutMagnifyDefault();
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

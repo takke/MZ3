@@ -141,6 +141,9 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
 	ON_COMMAND(ID_CATEGORYMENU_MOVE_UP, &CMZ3View::OnCategorymenuMoveUp)
 	ON_COMMAND(ID_CATEGORYMENU_MOVE_DOWN, &CMZ3View::OnCategorymenuMoveDown)
 	ON_WM_CTLCOLOR()
+	ON_COMMAND(IDM_LAYOUT_MAGNIFY_BODY_LIST, &CMZ3View::OnLayoutMagnifyBodyList)
+	ON_COMMAND(IDM_LAYOUT_MAGNIFY_CATEGORY_LIST, &CMZ3View::OnLayoutMagnifyCategoryList)
+	ON_COMMAND(IDM_LAYOUT_MAGNIFY_DEFAULT, &CMZ3View::OnLayoutMagnifyDefault)
 END_MESSAGE_MAP()
 
 // CMZ3View コンストラクション/デストラクション
@@ -167,6 +170,7 @@ CMZ3View::CMZ3View()
 	, m_hotList(NULL)
 	, m_bModifyingBodyList(false)
 	, m_abort(FALSE)
+	, m_magnifyMode(MAGNIFY_MODE_DEFAULT)
 {
 }
 
@@ -443,6 +447,7 @@ bool CMZ3View::DoInitialize()
 	if (newStyle!=m_viewStyle) {
 		m_viewStyle = newStyle;
 		MySetLayout(0,0);
+		InvalidateRect( m_rectIcon, FALSE );
 	}
 
 	// Twitterスタイルであればカテゴリに応じて送信タイプを初期化
@@ -629,8 +634,36 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	const int h1 = theApp.m_optionMng.m_nMainViewCategoryListHeightRatio;
 	const int h2 = theApp.m_optionMng.m_nMainViewBodyListHeightRatio;
 
-	int hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
-	int hBody     = (cy * h2 / (h1+h2)) - (hInfo + hPost -1);
+	// cy = hGroup + hCategory + hBody + hInfo + hPost
+
+	int hCategory = 0;
+	int hBody     = 0;
+
+	switch (m_magnifyMode) {
+	case MAGNIFY_MODE_DEFAULT:
+		hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
+		hBody     = (cy * h2 / (h1+h2)) - (hInfo + hPost -1);
+		break;
+
+	case MAGNIFY_MODE_CATEGORY:
+		{
+			CRect rectItem0;
+			m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
+			hCategory = cy - (hInfo + hPost +hGroup -1) - rectItem0.Height();
+			hBody     = rectItem0.Height();
+		}
+		break;
+
+	case MAGNIFY_MODE_BODY:
+	default:
+		{
+			CRect rectItem0;
+			m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
+			hCategory = rectItem0.Height()+3;
+			hBody     = cy - (hInfo + hPost +hGroup -1) - (rectItem0.Height()+3);
+		}
+		break;
+	}
 
 	int y = 0;
 	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
@@ -734,6 +767,12 @@ void CMZ3View::OnNMClickCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 
 //	m_categoryList.Update( m_selGroup->getSelectedCategory()->selectedBody );
 
+	// カテゴリリスト表示であればボディリスト表示に変更
+	if (m_magnifyMode != MAGNIFY_MODE_DEFAULT) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
+	}
+
+	// 再取得
 	OnMySelchangedCategoryList();
 
 	if (theApp.m_optionMng.m_bOneClickCategoryFetchMode) {
@@ -1449,6 +1488,7 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 	if (newStyle!=m_viewStyle) {
 		m_viewStyle = newStyle;
 		MySetLayout(0,0);
+		InvalidateRect( m_rectIcon, FALSE );
 	}
 
 	util::MySetInformationText( m_hWnd, L"アイコンの作成完了" );
@@ -1539,9 +1579,58 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
  */
 void CMZ3View::OnEnSetfocusInfoEdit()
 {
+	/*
 	// この行にはフォーカスを移さない
 	// カテゴリリストにフォーカスを移す
 	m_categoryList.SetFocus();
+	*/
+
+	// 3ステート
+
+	// 標準:カテゴリ＆ボディリストがそのままの比率
+	// カテゴリリスト表示:カテゴリリストをほぼ全画面表示、ボディリストを最下部に1行表示
+	// ボディリスト表示  :ボディリストをほぼ全画面表示、カテゴリリストを最上部に1行表示
+
+	switch (m_magnifyMode) {
+	case MAGNIFY_MODE_DEFAULT:
+		m_magnifyMode = MAGNIFY_MODE_CATEGORY;
+		break;
+
+	case MAGNIFY_MODE_CATEGORY:
+		m_magnifyMode = MAGNIFY_MODE_BODY;
+		break;
+
+	case MAGNIFY_MODE_BODY:
+	default:
+		m_magnifyMode = MAGNIFY_MODE_DEFAULT;
+		break;
+	}
+
+	// レイアウト変更反映
+	MySetLayout(0, 0);
+	InvalidateRect( m_rectIcon, FALSE );
+
+	// 変更後のモードに応じてフォーカス変更
+	switch (m_magnifyMode) {
+	case MAGNIFY_MODE_DEFAULT:
+		m_bodyList.SetFocus();
+		m_infoEdit.SetWindowText( L"標準モード" );
+		break;
+
+	case MAGNIFY_MODE_CATEGORY:
+		m_categoryList.SetFocus();
+		m_infoEdit.SetWindowText( L"上ペイン最大表示:ステータスバー押下で戻ります" );
+		break;
+
+	case MAGNIFY_MODE_BODY:
+	default:
+		m_infoEdit.SetWindowText( L"下ペイン最大表示:ステータスバー押下で戻ります" );
+		m_bodyList.SetFocus();
+		break;
+	}
+
+	// N秒後にステータスバーを戻す
+	::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_RESTORE_STATUSBAR, 2000L, NULL);
 }
 
 /**
@@ -2112,6 +2201,11 @@ BOOL CMZ3View::CommandSetFocusCategoryList()
 
 	m_categoryList.EnsureVisible( m_selGroup->focusedCategory, FALSE);
 
+	// ボディリスト最大表示であればカテゴリリスト表示に変更
+	if (m_magnifyMode != MAGNIFY_MODE_DEFAULT) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+	}
+
 	return TRUE;
 }
 
@@ -2131,6 +2225,18 @@ BOOL CMZ3View::CommandSetFocusGroupTab()
  */
 BOOL CMZ3View::CommandSetFocusBodyList()
 {
+	// カテゴリリスト表示であればボディリスト表示に変更
+	if (m_magnifyMode == MAGNIFY_MODE_CATEGORY) {
+		m_magnifyMode = MAGNIFY_MODE_BODY;
+
+		// レイアウト変更反映
+		MySetLayout(0, 0);
+		InvalidateRect( m_rectIcon, FALSE );
+
+		// カテゴリの選択項目のみを表示
+		m_categoryList.EnsureVisible(m_selGroup->selectedCategory, FALSE);
+	}
+
 	if (m_bodyList.GetItemCount() != 0) {
 		m_bodyList.SetFocus();
 		m_hotList = &m_bodyList;
@@ -2143,6 +2249,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
 		m_bodyList.EnsureVisible( idx, FALSE);
 	}
+
 	return TRUE;
 }
 
@@ -2262,6 +2369,12 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 		return CommandSelectGroupTabNextItem();
 
 	case VK_RETURN:
+
+		// カテゴリリスト表示であればボディリスト表示に変更
+		if (m_magnifyMode != MAGNIFY_MODE_DEFAULT) {
+			MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
+		}
+
 		if (theApp.m_optionMng.m_bOneClickCategoryFetchMode) {
 			// 上ペインのリストクリックで取得する
 			if (m_selGroup->selectedCategory != m_selGroup->focusedCategory) {
@@ -4478,6 +4591,27 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 	}
 
+	// 画面レイアウト
+	const int CATEGORY_MENU_LAYOUT_SUB_MENU_IDX = 6;
+	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_LAYOUT_SUB_MENU_IDX) {
+		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
+	} else {
+		CMenu* pLayoutMenu = pSubMenu->GetSubMenu(CATEGORY_MENU_LAYOUT_SUB_MENU_IDX);
+		if (pLayoutMenu) {
+			// カテゴリリスト表示
+			pLayoutMenu->CheckMenuItem(IDM_LAYOUT_MAGNIFY_CATEGORY_LIST,
+				(m_magnifyMode==MAGNIFY_MODE_CATEGORY ? MF_CHECKED : MF_UNCHECKED) | MF_BYCOMMAND);
+
+			// ボディリスト表示
+			pLayoutMenu->CheckMenuItem(IDM_LAYOUT_MAGNIFY_BODY_LIST,
+				(m_magnifyMode==MAGNIFY_MODE_BODY ? MF_CHECKED : MF_UNCHECKED) | MF_BYCOMMAND);
+
+			// 上下ペインを元に戻す
+			pLayoutMenu->EnableMenuItem(IDM_LAYOUT_MAGNIFY_DEFAULT,
+				(m_magnifyMode==MAGNIFY_MODE_DEFAULT ? MF_GRAYED : MF_ENABLED) | MF_BYCOMMAND);
+		}
+	}
+
 	// 項目を追加
 	const int CATEGORY_MENU_APPEND_SUB_MENU_IDX = 7;
 	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_APPEND_SUB_MENU_IDX) {
@@ -5869,7 +6003,7 @@ void CMZ3View::OnMouseMove(UINT nFlags, CPoint point)
 			// ちょっとだけディレイさせる
 			static DWORD s_dwLastMove = GetTickCount();
 			DWORD dwNow = GetTickCount();
-			if (dwNow > s_dwLastMove +20) {
+			if (dwNow > s_dwLastMove +10) {
 				s_dwLastMove = dwNow;
 
 				// スプリッター変更
@@ -6145,12 +6279,13 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
  */
 void CMZ3View::MyUpdateFocus(void)
 {
+	CWnd* pFocus = GetFocus();
+
 	switch (m_viewStyle) {
 	case VIEW_STYLE_TWITTER:
 		{
 			// Twitter関連のPOSTが完了したので、フォーカスを入力領域に移動する。
 			// 但し、フォーカスがリストにある場合は移動しない。
-			CWnd* pFocus = GetFocus();
 			if (pFocus == NULL ||
 				(pFocus->m_hWnd != m_categoryList.m_hWnd &&
 				 pFocus->m_hWnd != m_bodyList.m_hWnd))
@@ -6818,4 +6953,66 @@ bool CMZ3View::MySetInfoEditFromBodySelectedData(void)
 	m_infoEdit.SetWindowText( strInfo );
 
 	return true;
+}
+
+void CMZ3View::MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo)
+{
+	switch (magnifyModeTo) {
+	case MAGNIFY_MODE_BODY:
+		// ボディリスト表示に変更
+		m_magnifyMode = MAGNIFY_MODE_BODY;
+
+		// レイアウト変更反映
+		MySetLayout(0, 0);
+		InvalidateRect( m_rectIcon, FALSE );
+
+		// カテゴリの選択項目のみを表示
+		m_categoryList.EnsureVisible(m_selGroup->focusedCategory, FALSE);
+
+		// フォーカス移動
+		if (m_bodyList.GetItemCount() > 0) {
+			m_bodyList.SetFocus();
+		}
+		break;
+
+	case MAGNIFY_MODE_CATEGORY:
+		// カテゴリ最大表示に変更
+		m_magnifyMode = MAGNIFY_MODE_CATEGORY;
+
+		// レイアウト変更反映
+		MySetLayout(0, 0);
+		InvalidateRect( m_rectIcon, FALSE );
+
+		// 選択項目にフォーカス移動
+		m_categoryList.EnsureVisible(m_selGroup->selectedCategory, FALSE);
+		m_selGroup->focusedCategory = m_selGroup->selectedCategory;
+		util::MySetListCtrlItemFocusedAndSelected( m_categoryList, m_selGroup->focusedCategory, true );
+		break;
+
+	default:
+		m_magnifyMode = MAGNIFY_MODE_DEFAULT;
+
+		// レイアウト変更反映
+		MySetLayout(0, 0);
+		InvalidateRect( m_rectIcon, FALSE );
+		break;
+	}
+}
+
+/// 下ペイン最大化
+void CMZ3View::OnLayoutMagnifyBodyList()
+{
+	MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
+}
+
+/// 上ペイン最大化
+void CMZ3View::OnLayoutMagnifyCategoryList()
+{
+	MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+}
+
+/// 上下ペインの最大化を元に戻す
+void CMZ3View::OnLayoutMagnifyDefault()
+{
+	MySetMagnifyModeTo(MAGNIFY_MODE_DEFAULT);
 }

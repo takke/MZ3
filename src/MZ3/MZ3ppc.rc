@@ -217,6 +217,10 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "画面レイアウト"
         BEGIN
+            MENUITEM "上ペイン最大化",                     IDM_LAYOUT_MAGNIFY_CATEGORY_LIST
+            MENUITEM "下ペイン最大化",                     IDM_LAYOUT_MAGNIFY_BODY_LIST
+            MENUITEM "上下ペインの最大化を戻す",                IDM_LAYOUT_MAGNIFY_DEFAULT
+            MENUITEM SEPARATOR
             MENUITEM "↑カテゴリリストを狭くする",               IDM_LAYOUT_CATEGORY_MAKE_NARROW
             MENUITEM "↓カテゴリリストを広くする",               IDM_LAYOUT_CATEGORY_MAKE_WIDE
             MENUITEM SEPARATOR
