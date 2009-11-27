@@ -6,6 +6,7 @@
 // Ran2View.cpp : 実装ファイル
 //
 #include "stdafx.h"
+#include "MZ3.h"
 #include "Ran2View.h"
 #include "resourceppc.h"
 #include "util_gui.h"
@@ -451,7 +452,8 @@ bool Ran2View::MyMakeBackBuffers(CPaintDC& cdc)
 	// パンスクロール用バッファの確保
 	// 画面の大きさ分だけ確保する
 	if (m_memPanBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE) {
-		MessageBox(TEXT("CreateCompatibelBitmap error!"));
+		MZ3LOGGER_FATAL(TEXT("CreateCompatibleBitmap error!"));
+//		MessageBox(TEXT("CreateCompatibleBitmap error!"));
 		return false;
 	}
 

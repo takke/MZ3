@@ -450,7 +450,7 @@ bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 	// 裏画面バッファの確保
 	// 画面の高さを2倍して余裕をもたせてみた
 	if (m_memBMP->CreateCompatibleBitmap( pdc , m_screenWidth , m_screenHeight*2 ) != TRUE) {
-		MessageBox(TEXT("CreateCompatibelBitmap error!"));
+		MZ3LOGGER_FATAL(TEXT("CreateCompatibleBitmap error!"));
 		return false;
 	}
 	// 実際に描画する領域の先頭オフセット
