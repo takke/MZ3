@@ -439,8 +439,11 @@ bool Ran2View::MyMakeBackBuffers(CPaintDC& cdc)
 	//--- バッファ生成
 	// バックバッファの確保
 	// 画面の高さをn倍して余裕をもたせてみた
-	if (m_memBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight*2) != TRUE) {
-		MessageBox(TEXT("CreateCompatibelBitmap error!"));
+	if (m_memBMP->CreateCompatibleBitmap(&cdc, screenWidth, screenHeight*2) != TRUE) {
+		CString msg;
+		msg.Format(TEXT("CreateCompatibleBitmap error! w[%d], h[%d]"), screenWidth, screenHeight*2);
+		MZ3LOGGER_FATAL(msg);
+//		MessageBox(TEXT("CreateCompatibleBitmap error!"));
 		return false;
 	}
 	m_drawStartTopOffset = screenHeight/2;
@@ -451,8 +454,10 @@ bool Ran2View::MyMakeBackBuffers(CPaintDC& cdc)
 
 	// パンスクロール用バッファの確保
 	// 画面の大きさ分だけ確保する
-	if (m_memPanBMP->CreateCompatibleBitmap(&cdc,screenWidth,screenHeight) != TRUE) {
-		MZ3LOGGER_FATAL(TEXT("CreateCompatibleBitmap error!"));
+	if (m_memPanBMP->CreateCompatibleBitmap(&cdc, screenWidth, screenHeight) != TRUE) {
+		CString msg;
+		msg.Format(TEXT("CreateCompatibleBitmap error! w[%d], h[%d]"), screenWidth, screenHeight);
+		MZ3LOGGER_FATAL(msg);
 //		MessageBox(TEXT("CreateCompatibleBitmap error!"));
 		return false;
 	}

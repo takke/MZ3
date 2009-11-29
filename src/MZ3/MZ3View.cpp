@@ -651,23 +651,35 @@ void CMZ3View::MySetLayout(int cx, int cy)
 
 	case MAGNIFY_MODE_CATEGORY:
 		{
-			CRect rectItem0;
-			m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
-			hCategory = cy - (hInfo + hPost +hGroup -1) - rectItem0.Height();
-			hBody     = rectItem0.Height();
+			int hItem0 = 0;
+			if (m_bodyList.GetItemCount() > 0) {
+				CRect rectItem0;
+				m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
+				hItem0 = rectItem0.Height();
+			}
+			hCategory = cy - (hInfo + hPost +hGroup -1) - hItem0;
+			hBody     = hItem0;
 		}
 		break;
 
 	case MAGNIFY_MODE_BODY:
 	default:
 		{
-			CRect rectItem0;
-			m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
-			hCategory = rectItem0.Height()+3;
-			hBody     = cy - (hInfo + hPost +hGroup -1) - (rectItem0.Height()+3);
+			int hItem0 = 0;
+			if (m_categoryList.GetItemCount() > 0) {
+				CRect rectItem0;
+				m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
+				hItem0 = rectItem0.Height();
+			}
+			hCategory = hItem0 +3;
+			hBody     = cy - (hInfo + hPost +hGroup -1) - (hItem0+3);
 		}
 		break;
 	}
+
+//	MZ3LOGGER_INFO(util::FormatString(L"cx[%d] cy[%d] group[%d] category[%d] body[%d]", 
+//		cx, cy,
+//		hGroup, hCategory, hBody));
 
 	int y = 0;
 	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );

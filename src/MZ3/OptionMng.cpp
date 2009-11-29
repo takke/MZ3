@@ -375,6 +375,9 @@ void Option::Sync(bool bSave)
 	// User-Agent
 	SyncIniValue(inifile, bSave, m_strUserAgent, "UserAgent", "Net" );
 
+	// 通信中のプログレスバー表示
+	SyncIniValue(inifile, bSave, m_bShowNetProgressBar, "ShowNetProgressBar", "Net");
+
 	//--- メイン画面
 	// トピック等にアイコンを表示する？
 	SyncIniValue(inifile, bSave, m_bShowMainViewIcon, "ShowMainViewIcon", "MainView");

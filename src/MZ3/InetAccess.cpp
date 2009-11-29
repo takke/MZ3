@@ -47,6 +47,10 @@
  */
 inline void MySetTrafficInfo( HWND hWnd, LONG dwLoaded, LONG dwContentLen, DWORD dwElapsedMsec, bool bCancelable=true )
 {
+	if (!theApp.m_optionMng.m_bShowNetProgressBar) {
+		return;
+	}
+
 	// メッセージ生成
 	CString msg;
 	DWORD dwLength = 0;

@@ -27,12 +27,7 @@ public:
 
 private:
 	bool			m_bDebugMode;			///< デバッグモード
-	bool			m_bUseAutoConnection;	///< 自動接続を使う？
-	bool			m_bUseProxy;			///< プロキシを使う？
-	bool			m_bUseGlobalProxy;		///< グローバルプロキシを使う？
-											///< （自動接続ONの場合のみ有効）
 public:
-	CString			m_strUserAgent;			///< User-Agent
 	bool			m_bUseDevVerCheck;		///< バージョンチェックに開発版も含める
 
 private:
@@ -122,9 +117,16 @@ public:
 	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
 	bool			m_bOneClickCategoryFetchMode;		///< 上ペインのリストクリック時に取得する
 
-private:
+	//--- 通信
 	int				m_recvBufSize;					///< 受信バッファサイズ
+	bool			m_bUseAutoConnection;			///< 自動接続を使う？
+	CString			m_strUserAgent;					///< User-Agent
 
+	bool			m_bShowNetProgressBar;			///< 通信中のプログレスバー表示
+
+	bool			m_bUseProxy;					///< プロキシを使う？
+	bool			m_bUseGlobalProxy;				///< グローバルプロキシを使う？
+													///< （自動接続ONの場合のみ有効）
 public:
 	//--- Twitter
 	bool			m_bAddSourceTextOnTwitterPost;	///< 文末に *MZ3* マークをつける
@@ -210,6 +212,7 @@ public:
 		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
 		, m_bTwitterReloadTLAfterPost(false)
 		, m_bUseDevVerCheck(false)
+		, m_bShowNetProgressBar(false)
 	{
 	}
 

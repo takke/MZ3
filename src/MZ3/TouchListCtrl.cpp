@@ -39,6 +39,8 @@ CTouchListCtrl::CTouchListCtrl(void)
 	, m_bCanPanScroll(false)
 	, m_hPanScrollEvent(NULL)
 	, m_bStopDragging(false)
+	, m_screenHeight(10)
+	, m_screenWidth(10)
 {
 	// イベントオブジェクト作成
 	m_hPanScrollEvent = CreateEvent( NULL , TRUE , TRUE , NULL );
@@ -383,6 +385,12 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 {
 	CListCtrl::OnSize(nType, cx, cy);
 
+	if (cx <= 0 || cx >= 4096 ||
+		cy <= 0 || cy >= 4096)
+	{
+		return;
+	}
+
 	CRect rctItem;								// 0番目のアイテムの領域
 	CRect rctHeader;							// ヘッダ領域
 
@@ -393,6 +401,20 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 
 	// 描画領域のtopをヘッダの高さ分縮める
 	ScreenToClient( &rctHeader );
+
+	/*
+	MZ3LOGGER_INFO(util::FormatString(L" id[%d] cx[%d] cy[%d] rctHeader[%d][%d][%d][%d](%d,%d)", 
+		GetDlgCtrlID(),
+		cx, cy,
+		rctHeader.left, rctHeader.top, rctHeader.right, rctHeader.bottom,
+		rctHeader.Width(), rctHeader.Height()));
+	*/
+	if (rctHeader.Height() < 0 || rctHeader.Height() > 4096 ||
+		rctHeader.Width() < 0 || rctHeader.Width() > 4096)
+	{
+		return;
+	}
+
 	m_viewRect.top = rctHeader.bottom ;
 
 	// アイテム1個の高さを取得する
@@ -406,6 +428,10 @@ void CTouchListCtrl::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// 描画領域の幅と高さをメンバ変数に設定する
+	if (cy - rctHeader.Height() < 0) {
+		return;
+	}
+
 	m_screenWidth = cx;
 	m_screenHeight = cy - rctHeader.Height();
 
@@ -450,7 +476,9 @@ bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 	// 裏画面バッファの確保
 	// 画面の高さを2倍して余裕をもたせてみた
 	if (m_memBMP->CreateCompatibleBitmap( pdc , m_screenWidth , m_screenHeight*2 ) != TRUE) {
-		MZ3LOGGER_FATAL(TEXT("CreateCompatibleBitmap error!"));
+		CString msg;
+		msg.Format(TEXT("CreateCompatibleBitmap error! w[%d], h[%d]"), m_screenWidth, m_screenHeight*2);
+		MZ3LOGGER_FATAL(msg);
 		return false;
 	}
 	// 実際に描画する領域の先頭オフセット
