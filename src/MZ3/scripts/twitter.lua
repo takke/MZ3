@@ -72,6 +72,14 @@ type:set_request_encoding('utf8');							-- エンコーディング
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('post');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_UPDATE_RETWEET');			-- シリアライズキー
+type:set_short_title('ReTweet');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');									-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
 type:set_serialize_key('TWITTER_UPDATE_DESTROY');			-- シリアライズキー
 type:set_short_title('発言削除');							-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
@@ -986,21 +994,52 @@ end
 
 --- 「ReTweet」メニュー用ハンドラ
 function on_retweet_menu_item(serialize_key, event_name, data)
-	-- モード変更
-	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
 
-	-- モード変更反映(ボタン名称変更)
-	mz3_main_view.update_control_status();
+	msg = 'この発言をReTweetしますか？\r\n'
+	   .. '\r\n'
+	   .. '「はい」：すぐにReTweetします(公式RT)\r\n'
+	   .. '「いいえ」：コメントを追加できます';
+	if mz3.confirm(msg, nil, 'yes_no') == 'yes' then
+		-- 公式RT
+		serialize_key = 'TWITTER_UPDATE_RETWEET';
 
-	-- エディットコントロールに文字列設定
-	data = mz3_main_view.get_selected_body_item();
-	data = MZ3Data:create(data);
-	text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
-	text = text:gsub("\r\n", "");
-	mz3_main_view.set_edit_text(text);
+		-- ヘッダーの設定
+		post = MZ3PostData:create();
+		post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+		post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+		post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
 
-	-- フォーカス移動
-	mz3_main_view.set_focus('edit');
+		-- POST パラメータを設定
+		data = mz3_main_view.get_selected_body_item();
+		data = MZ3Data:create(data);
+		local id = data:get_integer64_as_string('id');
+		post:append_post_body('id=' .. id);
+
+		-- POST先URL設定
+		url = 'http://twitter.com/statuses/retweet/' .. id .. '.xml';
+
+		-- 通信開始
+		access_type = mz3.get_access_type_by_key(serialize_key);
+		referer = '';
+		user_agent = nil;
+		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	else
+		-- モード変更
+		mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
+
+		-- モード変更反映(ボタン名称変更)
+		mz3_main_view.update_control_status();
+
+		-- エディットコントロールに文字列設定
+		data = mz3_main_view.get_selected_body_item();
+		data = MZ3Data:create(data);
+		text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
+		text = text:gsub("\r\n", "");
+		mz3_main_view.set_edit_text(text);
+
+		-- フォーカス移動
+		mz3_main_view.set_focus('edit');
+	end
 end
 
 
@@ -1486,6 +1525,8 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("ブロックを解除しました");
 	elseif serialize_key == "TWITTER_USER_SPAM_REPORTS_CREATE" then
 		mz3_main_view.set_info_text("スパム通報しました");
+	elseif serialize_key == "TWITTER_UPDATE_RETWEET" then
+		mz3_main_view.set_info_text("RTしました！");
 	else
 		-- TWITTER_UPDATE
 --		mz3_main_view.set_info_text("ステータス送信終了");
