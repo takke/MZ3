@@ -6,9 +6,9 @@
 --------------------------------------------------
 -- MZ3 Script : auone
 --
--- auone ƒ[ƒ‹—pƒvƒ‰ƒOƒCƒ“
+-- auone ãƒ¡ãƒ¼ãƒ«ç”¨ãƒ—ãƒ©ã‚°ã‚¤ãƒ³
 --
--- ƒƒOƒCƒ“ˆÈŠO‚Ìˆ—‚Í gmail.lua ‚ÉˆË‘¶‚µ‚Ä‚¢‚éB
+-- ãƒ­ã‚°ã‚¤ãƒ³ä»¥å¤–ã®å‡¦ç†ã¯ gmail.lua ã«ä¾å­˜ã—ã¦ã„ã‚‹ã€‚
 --
 -- $Id: auone.lua 1306 2009-06-21 14:37:54Z takke $
 --------------------------------------------------
@@ -16,69 +16,69 @@ mz3.logger_debug('auone.lua start');
 module("auone", package.seeall)
 
 --------------------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»AƒƒOƒCƒ“İ’è—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ã€ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”¨)
 --------------------------------------------------
 mz3.regist_service('auone', false);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
 mz3_account_provider.set_param('auone', 'id_name', 'au one-ID');
-mz3_account_provider.set_param('auone', 'password_name', 'ƒpƒXƒ[ƒh');
+mz3_account_provider.set_param('auone', 'password_name', 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰');
 
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 
--- óMƒgƒŒƒC
+-- å—ä¿¡ãƒˆãƒ¬ã‚¤
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('AUONE_INBOX');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('auone óMƒgƒŒƒC');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('auone\\inbox_{urlparam:s}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('AUONE_INBOX');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('auone å—ä¿¡ãƒˆãƒ¬ã‚¤');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('auone\\inbox_{urlparam:s}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('https://mail.google.com/a/auone.jp/h/');
-type:set_body_header(1, 'title', 'Œ–¼');
-type:set_body_header(2, 'name', '·ol>>');
-type:set_body_header(3, 'date', '“ú•t>>');
+type:set_body_header(1, 'title', 'ä»¶å');
+type:set_body_header(2, 'name', 'å·®å‡ºäºº>>');
+type:set_body_header(3, 'date', 'æ—¥ä»˜>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 
--- ƒƒOƒCƒ“—p
+-- ãƒ­ã‚°ã‚¤ãƒ³ç”¨
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('AUONE_LOGIN');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('auone ƒƒOƒCƒ“');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('auone\\login.html');				-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('AUONE_LOGIN');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('auone ãƒ­ã‚°ã‚¤ãƒ³');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('auone\\login.html');				-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 
 ----------------------------------------
--- ƒƒjƒ…[‚Ö‚Ì“o˜^
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸ã®ç™»éŒ²
 ----------------------------------------
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' auone', 1, true) ~= nil then
-		-- óMƒgƒŒƒC
+		-- å—ä¿¡ãƒˆãƒ¬ã‚¤
 		local tab = MZ3GroupItem:create("auone");
 
-		tab:append_category("óMƒgƒŒƒC", "AUONE_INBOX");
-		tab:append_category("EZ‘—Mƒ{ƒbƒNƒX", "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=l&l=EZ%E9%80%81%E4%BF%A1%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9');
-		tab:append_category("‘—MÏ‚İ",   "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=s');
-		tab:append_category("ƒXƒ^[•t‚«", "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=r');
-		tab:append_category("‚·‚×‚Ä",     "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=a');
+		tab:append_category("å—ä¿¡ãƒˆãƒ¬ã‚¤", "AUONE_INBOX");
+		tab:append_category("EZé€ä¿¡ãƒœãƒƒã‚¯ã‚¹", "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=l&l=EZ%E9%80%81%E4%BF%A1%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9');
+		tab:append_category("é€ä¿¡æ¸ˆã¿",   "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=s');
+		tab:append_category("ã‚¹ã‚¿ãƒ¼ä»˜ã", "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=r');
+		tab:append_category("ã™ã¹ã¦",     "AUONE_INBOX", 'https://mail.google.com/a/auone.jp/h/?s=a');
 
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
@@ -89,38 +89,38 @@ mz3.add_event_listener("creating_default_group", "auone.on_creating_default_grou
 
 
 ----------------------------------------
--- ƒp[ƒT
+-- ãƒ‘ãƒ¼ã‚µ
 ----------------------------------------
 
 --------------------------------------------------
--- yóMƒgƒŒƒCz
+-- ã€å—ä¿¡ãƒˆãƒ¬ã‚¤ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function auone_inbox_parser(parent, body, html, is_from_login_parser)
 	mz3.logger_debug("auone_inbox_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
 	
-	-- ƒƒOƒCƒ“”»’è
+	-- ãƒ­ã‚°ã‚¤ãƒ³åˆ¤å®š
 	is_logged_in = false;
 	local line_count = html:get_count();
 	for i=0, line_count-1 do
 		line = html:get_at(i);
 		
-		-- <input id="sbb" type="submit" name="nvp_site_mail" value="Ò°Ù‚ğŒŸõ" />
-		-- ã‹L‚ª‚ ‚ê‚ÎƒƒOƒCƒ“Ï = Šù‚ÉóM” 
+		-- <input id="sbb" type="submit" name="nvp_site_mail" value="ãƒ¡ãƒ¼ãƒ«ã‚’æ¤œç´¢" />
+		-- ä¸Šè¨˜ãŒã‚ã‚Œã°ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆ = æ—¢ã«å—ä¿¡ç®±
 		if line_has_strings(line, '<input', '"nvp_site_mail"') then
 			is_logged_in = true;
 			break;
@@ -128,28 +128,28 @@ function auone_inbox_parser(parent, body, html, is_from_login_parser)
 	end
 	
 	if is_logged_in then
---		mz3.alert('ƒƒOƒCƒ“Ï');
+--		mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆ');
 		
-		-- •¡”s‚É•ª‚©‚ê‚Ä‚¢‚é‚Ì‚Å1s‚ÉŒ‹‡
+		-- è¤‡æ•°è¡Œã«åˆ†ã‹ã‚Œã¦ã„ã‚‹ã®ã§1è¡Œã«çµåˆ
 		line = '';
 		for i=0, line_count-1 do
 			line = line .. html:get_at(i);
 		end
 
-		-- ƒƒOƒCƒ“Ï‚İ‚ÌóMƒgƒŒƒC‚Ìƒp[ƒX
+		-- ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆã¿ã®å—ä¿¡ãƒˆãƒ¬ã‚¤ã®ãƒ‘ãƒ¼ã‚¹
 		gmail.parse_gmail_inbox(parent, body, line);
 	else
-		-- ƒƒOƒCƒ“ˆ—
+		-- ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†
 
 		mail_address  = mz3_account_provider.get_value('auone', 'id');
 		mail_password = mz3_account_provider.get_value('auone', 'password');
 		
 		if (mail_address == "" or mail_password == "") then
-			mz3.alert("ƒ[ƒ‹ƒAƒhƒŒƒX‚ÆƒpƒXƒ[ƒh‚ğƒƒOƒCƒ“İ’è‰æ–Ê‚Åİ’è‚µ‚Ä‰º‚³‚¢");
+			mz3.alert("ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã§è¨­å®šã—ã¦ä¸‹ã•ã„");
 			return;
 		end
 
-		-- ƒtƒH[ƒ€‰ğÍ
+		-- ãƒ•ã‚©ãƒ¼ãƒ è§£æ
 		line = '';
 		for i=0, line_count-1 do
 			line = line .. html:get_at(i);
@@ -160,25 +160,25 @@ function auone_inbox_parser(parent, body, html, is_from_login_parser)
 		
 		form = nil;
 		for k, v in pairs(forms) do
-			if v.name=="CMN2101E01Dto" or	-- –¢ƒƒOƒCƒ“‚Í‚±‚¿‚çB
-			   v.name=="acsForm"			-- "CMN2101E01Dto" ‚Ì‚ ‚Æ‚Í‚±‚¿‚çB
+			if v.name=="CMN2101E01Dto" or	-- æœªãƒ­ã‚°ã‚¤ãƒ³æ™‚ã¯ã“ã¡ã‚‰ã€‚
+			   v.name=="acsForm"			-- "CMN2101E01Dto" ã®ã‚ã¨ã¯ã“ã¡ã‚‰ã€‚
 			then
 				form = v;
 				break;
 			end
 		end
 		if form==nil then
-			mz3.alert("ƒƒOƒCƒ“‚É¸”s‚µ‚Ü‚µ‚½Bƒ[ƒ‹ƒAƒhƒŒƒXEƒpƒXƒ[ƒh‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢B(form not found)");
+			mz3.alert("ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚(form not found)");
 			return;
 		end
 		if is_from_login_parser and form.name=="CMN2101E01Dto" then
-			-- auone_login_parser ‚©‚çŒÄ‚Ño‚³‚ê‚Ä‚¢‚é‚Ì‚É–¢‚¾‚É "CMN2101E01Dto" ‚Ìƒy[ƒW‚ª
-			-- æ“¾‚³‚ê‚é‚Æ‚¢‚¤‚±‚Æ‚ÍƒƒOƒCƒ“‚É¸”s‚µ‚Ä‚¢‚é‚Æ‚¢‚¤‚±‚ÆB
-			mz3.alert("ƒƒOƒCƒ“‚É¸”s‚µ‚Ü‚µ‚½Bƒ[ƒ‹ƒAƒhƒŒƒXEƒpƒXƒ[ƒh‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢B(loop)");
+			-- auone_login_parser ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã¦ã„ã‚‹ã®ã«æœªã ã« "CMN2101E01Dto" ã®ãƒšãƒ¼ã‚¸ãŒ
+			-- å–å¾—ã•ã‚Œã‚‹ã¨ã„ã†ã“ã¨ã¯ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¦ã„ã‚‹ã¨ã„ã†ã“ã¨ã€‚
+			mz3.alert("ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚(loop)");
 			return;
 		end
 		
-		-- URL ¶¬
+		-- URL ç”Ÿæˆ
 		url = form.action;
 		post = mz3_post_data.create();
 		mz3_post_data.append_post_body(post, "auoneid=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
@@ -194,7 +194,7 @@ function auone_inbox_parser(parent, body, html, is_from_login_parser)
 			first_in_for = false;
 		end
 		
-		-- ’ÊMŠJn
+		-- é€šä¿¡é–‹å§‹
 		access_type = mz3.get_access_type_by_key("AUONE_LOGIN");
 		referer = '';
 		user_agent = nil;
@@ -208,20 +208,20 @@ mz3.set_parser("AUONE_INBOX", "auone.auone_inbox_parser");
 
 
 --------------------------------------------------
--- yƒƒOƒCƒ“z
+-- ã€ãƒ­ã‚°ã‚¤ãƒ³ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function auone_login_parser(parent, body, html)
 	mz3.logger_debug("auone_login_parser start");
 	local t1 = mz3.get_tick_count();
 	
-	-- óMƒgƒŒƒCƒp[ƒT‚ğ—˜—p‚·‚éB
-	-- ƒAƒNƒZƒXí•Ê‚ğ•Ê“r—pˆÓ‚µ‚Ä‚¢‚é‚Ì‚ÍƒAƒNƒZƒXƒƒ\ƒbƒh(GET/POST)‚ª
-	-- óMƒgƒŒƒC‚ÆƒƒOƒCƒ“ˆ—‚Æ‚ÅˆÙ‚È‚é‚½‚ßB
+	-- å—ä¿¡ãƒˆãƒ¬ã‚¤ãƒ‘ãƒ¼ã‚µã‚’åˆ©ç”¨ã™ã‚‹ã€‚
+	-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’åˆ¥é€”ç”¨æ„ã—ã¦ã„ã‚‹ã®ã¯ã‚¢ã‚¯ã‚»ã‚¹ãƒ¡ã‚½ãƒƒãƒ‰(GET/POST)ãŒ
+	-- å—ä¿¡ãƒˆãƒ¬ã‚¤ã¨ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†ã¨ã§ç•°ãªã‚‹ãŸã‚ã€‚
 --	mz3.alert("auone_login_parser");
 	auone_inbox_parser(parent, body, html, true);
 
@@ -232,9 +232,9 @@ mz3.set_parser("AUONE_LOGIN", "auone.auone_login_parser");
 
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- => gmail.lua QÆ
+-- => gmail.lua å‚ç…§
 --
 ----------------------------------------
 

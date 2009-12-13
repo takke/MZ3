@@ -4,35 +4,35 @@
  * http://www.mz3.jp/license.txt
 ]]
 --------------------------------------------------
--- MZ3 Script : ƒrƒ‹ƒgƒCƒ“ƒXƒNƒŠƒvƒg
+-- MZ3 Script : ãƒ“ãƒ«ãƒˆã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆ
 --
 -- $Id$
 --------------------------------------------------
 mz3.logger_info('mz3.lua start');
 
--- ƒpƒbƒP[ƒWƒ[ƒhƒpƒX‚Ì•ÏX
+-- ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ãƒ­ãƒ¼ãƒ‰ãƒ‘ã‚¹ã®å¤‰æ›´
 --print(package.path);
 package.path = ".\\?.luac;.\\?.lua;" .. mz3_dir .. "?.luac;" .. mz3_dir .. "?.lua;"
 --print(package.path);
 
 -------------------------------------------------
--- MZ3 —p’è”İ’è
+-- MZ3 ç”¨å®šæ•°è¨­å®š
 -------------------------------------------------
 
--- mz3_menu.append_menu —p’è”
-IDM_CATEGORY_OPEN  = 34164  -37000;		-- ÅV‚Ìˆê——‚ğæ“¾
-ID_REPORT_URL_BASE = 36100  -37000;		-- URL‚ğŠJ‚­
+-- mz3_menu.append_menu ç”¨å®šæ•°
+IDM_CATEGORY_OPEN  = 34164  -37000;		-- æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—
+ID_REPORT_URL_BASE = 36100  -37000;		-- URLã‚’é–‹ã
 
-ID_BACK_MENU       = 32873  -37000;		-- –ß‚é
-ID_WRITE_COMMENT   = 32802  -37000;		-- ‘‚«‚İ(•ÔMA‚È‚Ç)
-IDM_RELOAD_PAGE    = 32885  -37000;		-- Ä“Ç
-ID_EDIT_COPY       = 0xE122 -37000;		-- ƒRƒs[
-ID_OPEN_BROWSER    = 32830  -37000;		-- ƒuƒ‰ƒEƒU‚ÅŠJ‚­i‚±‚Ìƒy[ƒWj...
-IDM_LAYOUT_REPORTLIST_MAKE_NARROW = 32964 -37000;	-- ƒŠƒXƒg‚ğ‹·‚­‚·‚é
-IDM_LAYOUT_REPORTLIST_MAKE_WIDE   = 32966 -37000;	-- ƒŠƒXƒg‚ğL‚­‚·‚é
+ID_BACK_MENU       = 32873  -37000;		-- æˆ»ã‚‹
+ID_WRITE_COMMENT   = 32802  -37000;		-- æ›¸ãè¾¼ã¿(è¿”ä¿¡ã€ãªã©)
+IDM_RELOAD_PAGE    = 32885  -37000;		-- å†èª­è¾¼
+ID_EDIT_COPY       = 0xE122 -37000;		-- ã‚³ãƒ”ãƒ¼
+ID_OPEN_BROWSER    = 32830  -37000;		-- ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ãï¼ˆã“ã®ãƒšãƒ¼ã‚¸ï¼‰...
+IDM_LAYOUT_REPORTLIST_MAKE_NARROW = 32964 -37000;	-- ãƒªã‚¹ãƒˆã‚’ç‹­ãã™ã‚‹
+IDM_LAYOUT_REPORTLIST_MAKE_WIDE   = 32966 -37000;	-- ãƒªã‚¹ãƒˆã‚’åºƒãã™ã‚‹
 
 
--- mz3_main_view.set_post_mode —p’è”
+-- mz3_main_view.set_post_mode ç”¨å®šæ•°
 MAIN_VIEW_POST_MODE_TWITTER_UPDATE 			= 0;
 MAIN_VIEW_POST_MODE_TWITTER_DM 				= 1;
 MAIN_VIEW_POST_MODE_MIXI_ECHO 				= 2;
@@ -41,29 +41,29 @@ MAIN_VIEW_POST_MODE_WASSR_UPDATE			= 4;
 MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE	= 5;
 
 
--- ƒƒCƒ“‰æ–Ê ViewStyle ’è”
-VIEW_STYLE_DEFAULT = 0;	-- •W€ƒXƒ^ƒCƒ‹
-VIEW_STYLE_IMAGE   = 1;	-- •W€ƒXƒ^ƒCƒ‹+ImageIcon
-VIEW_STYLE_TWITTER = 2;	-- •W€ƒXƒ^ƒCƒ‹+ImageIcon+StatusEdit (Twitter)
+-- ãƒ¡ã‚¤ãƒ³ç”»é¢ ViewStyle å®šæ•°
+VIEW_STYLE_DEFAULT = 0;	-- æ¨™æº–ã‚¹ã‚¿ã‚¤ãƒ«
+VIEW_STYLE_IMAGE   = 1;	-- æ¨™æº–ã‚¹ã‚¿ã‚¤ãƒ«+ImageIcon
+VIEW_STYLE_TWITTER = 2;	-- æ¨™æº–ã‚¹ã‚¿ã‚¤ãƒ«+ImageIcon+StatusEdit (Twitter)
 
 
--- ƒƒCƒ“‰æ–Ê ƒJƒeƒSƒŠæ“¾‚Ìƒnƒ“ƒhƒ‰—p’è”
-RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE = 1;	-- ƒ[ƒJƒ‹ƒXƒgƒŒ[ƒWŒo—R‚Åæ“¾
-RETRIEVE_CATEGORY_ITEM_RVAL_INETACCESS = 0;		-- ƒCƒ“ƒ^[ƒlƒbƒg‚ÉƒAƒNƒZƒX
-RETRIEVE_CATEGORY_ITEM_RVAL_DONE = 2;			-- ƒnƒ“ƒhƒ‰‘¤‚Åˆ—Š®—¹A‰½‚à‚µ‚È‚¢
+-- ãƒ¡ã‚¤ãƒ³ç”»é¢ ã‚«ãƒ†ã‚´ãƒªå–å¾—æ™‚ã®ãƒãƒ³ãƒ‰ãƒ©ç”¨å®šæ•°
+RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE = 1;	-- ãƒ­ãƒ¼ã‚«ãƒ«ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸çµŒç”±ã§å–å¾—
+RETRIEVE_CATEGORY_ITEM_RVAL_INETACCESS = 0;		-- ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã«ã‚¢ã‚¯ã‚»ã‚¹
+RETRIEVE_CATEGORY_ITEM_RVAL_DONE = 2;			-- ãƒãƒ³ãƒ‰ãƒ©å´ã§å‡¦ç†å®Œäº†ã€ä½•ã‚‚ã—ãªã„
 
 ----------------------------------------------------------------------
--- MZ3 ‹¤’Êƒnƒ“ƒhƒ‰(ŠeƒT[ƒrƒX–ˆ‚É‘‚­‚Æ’x‚­‚È‚é‚æ‚¤‚Èƒnƒ“ƒhƒ‰)
+-- MZ3 å…±é€šãƒãƒ³ãƒ‰ãƒ©(å„ã‚µãƒ¼ãƒ“ã‚¹æ¯ã«æ›¸ãã¨é…ããªã‚‹ã‚ˆã†ãªãƒãƒ³ãƒ‰ãƒ©)
 ----------------------------------------------------------------------
 
---- ƒ{ƒfƒBƒŠƒXƒg‚ÌƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 --
 -- @param event_name    'creating_default_group'
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param body          body data
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
--- @return (2) [int] ƒAƒCƒRƒ“ƒCƒ“ƒfƒbƒNƒX
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
+-- @return (2) [int] ã‚¢ã‚¤ã‚³ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 --
 function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 
@@ -81,13 +81,13 @@ end
 mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
 
 
---- ƒNƒƒXƒ|ƒXƒgŠÇ—ƒf[ƒ^‚ğ‰Šú‰»‚·‚é
+--- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆç®¡ç†ãƒ‡ãƒ¼ã‚¿ã‚’åˆæœŸåŒ–ã™ã‚‹
 --
--- @param from ‚Ç‚±‚©‚ç‰Šúƒ|ƒXƒg‚µ‚½‚©BŠÇ—ƒf[ƒ^‚É‚»‚Ìƒf[ƒ^‚ğ“o˜^‚µ‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ßB
---             "twitter", "wassr", "echo" ‚ğƒTƒ|[ƒgB
+-- @param from ã©ã“ã‹ã‚‰åˆæœŸãƒã‚¹ãƒˆã—ãŸã‹ã€‚ç®¡ç†ãƒ‡ãƒ¼ã‚¿ã«ãã®ãƒ‡ãƒ¼ã‚¿ã‚’ç™»éŒ²ã—ãªã„ã‚ˆã†ã«ã™ã‚‹ãŸã‚ã€‚
+--             "twitter", "wassr", "echo" ã‚’ã‚µãƒãƒ¼ãƒˆã€‚
 --
 function mz3.init_cross_post_info(from)
-	mz3.cross_posts = {}	-- ‚Ç‚ÌƒT[ƒrƒX‚ÖƒNƒƒXƒ|ƒXƒg‚·‚é‚©(queue)
+	mz3.cross_posts = {}	-- ã©ã®ã‚µãƒ¼ãƒ“ã‚¹ã¸ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆã™ã‚‹ã‹(queue)
 	
 	if from ~= "twitter" and use_cross_post_to_twitter then
 		table.insert(mz3.cross_posts, "twitter");
@@ -114,7 +114,7 @@ function mz3.do_cross_post()
 	local target = table.remove(mz3.cross_posts, 1);
 	if target == "twitter" then
 		text = mz3_main_view.get_edit_text();
-		local msg = "Twitter ‚É‚à“Še‚µ‚Ü‚·‚©H\r\n";
+		local msg = "Twitter ã«ã‚‚æŠ•ç¨¿ã—ã¾ã™ã‹ï¼Ÿ\r\n";
 		msg = msg .. "----\r\n";
 		msg = msg .. text .. "\r\n";
 		msg = msg .. "----\r\n";
@@ -126,7 +126,7 @@ function mz3.do_cross_post()
 	end
 	if target == "wassr" then
 		text = mz3_main_view.get_edit_text();
-		local msg = "Wassr ‚É‚à“Še‚µ‚Ü‚·‚©H\r\n";
+		local msg = "Wassr ã«ã‚‚æŠ•ç¨¿ã—ã¾ã™ã‹ï¼Ÿ\r\n";
 		msg = msg .. "----\r\n";
 		msg = msg .. text .. "\r\n";
 		msg = msg .. "----\r\n";
@@ -138,7 +138,7 @@ function mz3.do_cross_post()
 	end
 	if target == "echo" then
 		text = mz3_main_view.get_edit_text();
-		local msg = "mixi echo ‚É‚à“Še‚µ‚Ü‚·‚©H\r\n";
+		local msg = "mixi echo ã«ã‚‚æŠ•ç¨¿ã—ã¾ã™ã‹ï¼Ÿ\r\n";
 		msg = msg .. "----\r\n";
 		msg = msg .. text .. "\r\n";
 		msg = msg .. "----\r\n";
@@ -153,11 +153,11 @@ function mz3.do_cross_post()
 end
 
 -------------------------------------------------
--- Šeíƒrƒ‹ƒgƒCƒ“ƒXƒNƒŠƒvƒgƒ[ƒh
+-- å„ç¨®ãƒ“ãƒ«ãƒˆã‚¤ãƒ³ã‚¹ã‚¯ãƒªãƒ—ãƒˆãƒ­ãƒ¼ãƒ‰
 -------------------------------------------------
-require("scripts\\util");		-- ƒ†[ƒeƒBƒŠƒeƒB
-require("scripts\\wrapper");	-- APIƒ‰ƒbƒp[ƒNƒ‰ƒX
--- ŠeƒT[ƒrƒX—pƒXƒNƒŠƒvƒgƒ[ƒh
+require("scripts\\util");		-- ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
+require("scripts\\wrapper");	-- APIãƒ©ãƒƒãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹
+-- å„ã‚µãƒ¼ãƒ“ã‚¹ç”¨ã‚¹ã‚¯ãƒªãƒ—ãƒˆãƒ­ãƒ¼ãƒ‰
 require("scripts\\mixi");		-- mixi
 require("scripts\\twitter");	-- Twitter
 require("scripts\\gmail");		-- GMail

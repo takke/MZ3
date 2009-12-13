@@ -11,22 +11,22 @@
 module("mixi", package.seeall)
 
 --------------------------------------------------
--- ymixiƒgƒbƒvƒy[ƒWz
--- [content] home.pl ƒƒOƒCƒ“Œã‚ÌƒƒCƒ“‰æ–Ê—pƒp[ƒT
+-- ã€mixiãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸ã€‘
+-- [content] home.pl ãƒ­ã‚°ã‚¤ãƒ³å¾Œã®ãƒ¡ã‚¤ãƒ³ç”»é¢ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/home.pl
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --
--- parent ‚Ì‰º‹L‚Ì•Ï”‚Éî•ñ‚ğŠi”[‚·‚éB
+-- parent ã®ä¸‹è¨˜ã®å¤‰æ•°ã«æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹ã€‚
 -- <ul>
---  <li>[string] "owner_id"       => ©•ª‚ÌID
---  <li>[int] "new_message_count" => V’…ƒƒbƒZ[ƒW”
---  <li>[int] "new_comment_count" => V’…ƒRƒƒ“ƒg”
---  <li>[int] "new_apply_count"   => ³”F‘Ò‚¿”
+--  <li>[string] "owner_id"       => è‡ªåˆ†ã®ID
+--  <li>[int] "new_message_count" => æ–°ç€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ•°
+--  <li>[int] "new_comment_count" => æ–°ç€ã‚³ãƒ¡ãƒ³ãƒˆæ•°
+--  <li>[int] "new_apply_count"   => æ‰¿èªå¾…ã¡æ•°
 -- </ul>
 --------------------------------------------------
 function mixi_home_parser(parent, body, html)
@@ -34,17 +34,17 @@ function mixi_home_parser(parent, body, html)
 
 	local t1 = mz3.get_tick_count();
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	html = MZ3HTMLArray:create(html);
 
-	-- Œ‹‰Ê‚Ì‰Šú‰»
+	-- çµæœã®åˆæœŸåŒ–
 	parent:set_integer("new_message_count", 0);
 	parent:set_integer("new_comment_count", 0);
 	parent:set_integer("new_apply_count", 0);
 	mz3.logger_debug("original owner_id : [" .. parent:get_text("owner_id") .. "]");
 	
-	-- V’…ƒƒbƒZ[ƒWAƒRƒƒ“ƒgA³”F‘Ò‚¿Œ”‚Ìæ“¾
+	-- æ–°ç€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€ã‚³ãƒ¡ãƒ³ãƒˆã€æ‰¿èªå¾…ã¡ä»¶æ•°ã®å–å¾—
 	local line_count = html:get_count();
 	local in_mixi_info_div = false;
 	for i=350, line_count-1 do
@@ -53,12 +53,12 @@ function mixi_home_parser(parent, body, html)
 		-- ...
 		-- <ul>
 		-- ...
-		-- <li class="redTxt"><a href="list_request.pl"><b>ƒ}ƒCƒ~ƒNƒVƒB’Ç‰ÁƒŠƒNƒGƒXƒg‚ª2Œ‚ ‚è‚Ü‚·I</b></a></li>
-		-- <li class="redTxt"><a href="list_message.pl">V’…ƒƒbƒZ[ƒW‚ª2Œ‚ ‚è‚Ü‚·I</a></li>
-		-- <li class="redTxt"><a href="view_diary.pl?id=xxx&owner_id=xxx">1Œ‚Ì“ú‹L‚É‘Î‚µ‚ÄV’…ƒRƒƒ“ƒg‚ª‚ ‚è‚Ü‚·I</a></li>
+		-- <li class="redTxt"><a href="list_request.pl"><b>ãƒã‚¤ãƒŸã‚¯ã‚·ã‚£è¿½åŠ ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒ2ä»¶ã‚ã‚Šã¾ã™ï¼</b></a></li>
+		-- <li class="redTxt"><a href="list_message.pl">æ–°ç€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒ2ä»¶ã‚ã‚Šã¾ã™ï¼</a></li>
+		-- <li class="redTxt"><a href="view_diary.pl?id=xxx&owner_id=xxx">1ä»¶ã®æ—¥è¨˜ã«å¯¾ã—ã¦æ–°ç€ã‚³ãƒ¡ãƒ³ãƒˆãŒã‚ã‚Šã¾ã™ï¼</a></li>
 		-- ...
 		-- </ul>
-		-- ‚ğŒŸõ‘ÎÛ‚Æ‚·‚é
+		-- ã‚’æ¤œç´¢å¯¾è±¡ã¨ã™ã‚‹
 
 		if not in_mixi_info_div then
 			if line_has_strings(line, '<div', 'id=', 'mixiInfo') then
@@ -68,25 +68,25 @@ function mixi_home_parser(parent, body, html)
 			if line_has_strings(line, '</ul>') then
 				break;
 			else
-				-- li ƒ^ƒO‚Ì’†‚ğŒŸõ‚·‚é
+				-- li ã‚¿ã‚°ã®ä¸­ã‚’æ¤œç´¢ã™ã‚‹
 				local li_text = line:match('<li[^>]*>(.*)</li>');
 				if li_text ~= nil then
 --					mz3.logger_debug(li_text);
 
 					local n = 0;
-					n = li_text:match('ƒ}ƒCƒ~ƒNƒVƒB’Ç‰ÁƒŠƒNƒGƒXƒg‚ª(.*)Œ‚ ‚è‚Ü‚·I');
+					n = li_text:match('ãƒã‚¤ãƒŸã‚¯ã‚·ã‚£è¿½åŠ ãƒªã‚¯ã‚¨ã‚¹ãƒˆãŒ(.*)ä»¶ã‚ã‚Šã¾ã™ï¼');
 --					mz3.logger_debug(n);
 					if n ~= nil then
 						parent:set_integer('new_apply_count', n);
 					end
 					
-					n = li_text:match('[ƒW]‚ª(.*)Œ‚ ‚è‚Ü‚·I');
+					n = li_text:match('[ã‚¸]ãŒ(.*)ä»¶ã‚ã‚Šã¾ã™ï¼');
 --					mz3.logger_debug(n);
 					if n ~= nil then
 						parent:set_integer('new_message_count', n);
 					end
 					
-					n = li_text:match('([0-9]*)Œ‚Ì“ú‹L‚É‘Î‚µ‚ÄV’…ƒRƒƒ“ƒg‚ª‚ ‚è‚Ü‚·I');
+					n = li_text:match('([0-9]*)ä»¶ã®æ—¥è¨˜ã«å¯¾ã—ã¦æ–°ç€ã‚³ãƒ¡ãƒ³ãƒˆãŒã‚ã‚Šã¾ã™ï¼');
 --					mz3.logger_debug(n);
 					if n ~= nil then
 						parent:set_integer('new_comment_count', n);
@@ -97,10 +97,10 @@ function mixi_home_parser(parent, body, html)
 	end
 	
 	
-	-- owner_id ‚Ìæ“¾
---	parent:set_text('owner_id', '');	-- ƒfƒoƒbƒO—p
+	-- owner_id ã®å–å¾—
+--	parent:set_text('owner_id', '');	-- ãƒ‡ãƒãƒƒã‚°ç”¨
 	if parent:get_text('owner_id')=="" then
-		mz3.logger_debug('owner_id ‚ª–¢æ“¾‚È‚Ì‚Å‰ğÍ‚µ‚Ü‚·');
+		mz3.logger_debug('owner_id ãŒæœªå–å¾—ãªã®ã§è§£æã—ã¾ã™');
 		
 		for i=0, line_count-1 do
 			line = html:get_at(i);
@@ -110,7 +110,7 @@ function mixi_home_parser(parent, body, html)
 --				mz3.logger_debug("[" .. url .. "]");
 				local id = get_param_from_url(url, 'id');
 				if id=="" then
-					mz3.logger_error("add_diary.pl ‚Ìˆø”‚É id ƒpƒ‰ƒ[ƒ^‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBline[" .. line .. "]");
+					mz3.logger_error("add_diary.pl ã®å¼•æ•°ã« id ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚line[" .. line .. "]");
 				else
 					mz3.logger_debug("owner_id[" .. id .. "]");
 					parent:set_text('owner_id', id);
@@ -120,7 +120,7 @@ function mixi_home_parser(parent, body, html)
 		end
 		
 		if parent:get_text('owner_id')=="" then
-			mz3.logger_error('owner_id ‚ğæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½');
+			mz3.logger_error('owner_id ã‚’å–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸ');
 		end
 	end
 	

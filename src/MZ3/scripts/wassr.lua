@@ -12,22 +12,22 @@ mz3.logger_debug('wassr.lua start');
 module("wassr", package.seeall)
 
 ----------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ç”¨)
 ----------------------------------------
 mz3.regist_service('Wassr', false);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
 mz3_account_provider.set_param('Wassr', 'id_name', 'ID');
-mz3_account_provider.set_param('Wassr', 'password_name', 'ƒpƒXƒ[ƒh');
+mz3_account_provider.set_param('Wassr', 'password_name', 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰');
 
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 -- TODO
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 menu_items.read                  = mz3_menu.regist_menu("wassr.on_read_menu_item");
@@ -35,36 +35,36 @@ menu_items.update                = mz3_menu.regist_menu("wassr.on_wassr_update")
 
 
 ----------------------------------------
--- ƒT[ƒrƒX—pŠÖ”
+-- ã‚µãƒ¼ãƒ“ã‚¹ç”¨é–¢æ•°
 ----------------------------------------
 
 
 ----------------------------------------
--- ƒp[ƒT
+-- ãƒ‘ãƒ¼ã‚µ
 ----------------------------------------
 
 --------------------------------------------------
--- [list] ƒ^ƒCƒ€ƒ‰ƒCƒ“—pƒp[ƒT
+-- [list] ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://api.wassr.jp/statuses/friends_timeline.xml
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function wassr_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("wassr_friends_timeline_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹‚µ‚È‚¢
+	-- å…¨æ¶ˆå»ã—ãªã„
 --	body:clear();
 	
-	-- d•¡–h~—p‚Ì id ˆê——‚ğ¶¬B
+	-- é‡è¤‡é˜²æ­¢ç”¨ã® id ä¸€è¦§ã‚’ç”Ÿæˆã€‚
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
@@ -75,7 +75,7 @@ function wassr_friends_timeline_parser(parent, body, html)
 
 	local t1 = mz3.get_tick_count();
 	
-	-- ˆêƒŠƒXƒg
+	-- ä¸€æ™‚ãƒªã‚¹ãƒˆ
 	new_list = MZ3DataList:create();
 	
 	line = '';
@@ -94,11 +94,11 @@ function wassr_friends_timeline_parser(parent, body, html)
 		-- id : status/id
 		id = status:match('<id>(.-)</id>');
 		
-		-- “¯ˆêID‚ª‚ ‚ê‚Î’Ç‰Á‚µ‚È‚¢B
+		-- åŒä¸€IDãŒã‚ã‚Œã°è¿½åŠ ã—ãªã„ã€‚
 		if id_set[ id ] then
---			mz3.logger_debug('id[' .. id .. '] ‚ÍŠù‚É‘¶İ‚·‚é‚Ì‚Åskip‚·‚é');
+--			mz3.logger_debug('id[' .. id .. '] ã¯æ—¢ã«å­˜åœ¨ã™ã‚‹ã®ã§skipã™ã‚‹');
 		else
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 			
 			data:set_integer('id', id);
@@ -132,7 +132,7 @@ function wassr_friends_timeline_parser(parent, body, html)
 			profile_image_url = mz3.decode_html_entity(profile_image_url);
 --			mz3.logger_debug(profile_image_url);
 
-			-- ƒtƒ@ƒCƒ‹–¼‚Ì‚İ‚ğURLƒGƒ“ƒR[ƒh
+			-- ãƒ•ã‚¡ã‚¤ãƒ«åã®ã¿ã‚’URLã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
 --			int idx = strImage.ReverseFind( '/' );
 --			if (idx >= 0) {
 --				CString strFileName = strImage.Mid( idx +1 );
@@ -146,20 +146,20 @@ function wassr_friends_timeline_parser(parent, body, html)
 			s = status:match('<epoch>(.-)</epoch>');
 			data:parse_date_line(s);
 			
-			-- URL ‚ğ’Šo‚µAƒŠƒ“ƒN‚É‚·‚é
+			-- URL ã‚’æŠ½å‡ºã—ã€ãƒªãƒ³ã‚¯ã«ã™ã‚‹
 			for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 				data:add_link_list(url, url);
 			end
 
-			-- ˆêƒŠƒXƒg‚É’Ç‰Á
+			-- ä¸€æ™‚ãƒªã‚¹ãƒˆã«è¿½åŠ 
 			new_list:add(data.data);
 			
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 	end
 	
-	-- ¶¬‚µ‚½ƒf[ƒ^‚ğo—Í‚É”½‰f
+	-- ç”Ÿæˆã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ã«åæ˜ 
 	body:merge(new_list);
 
 	new_list:delete();
@@ -171,11 +171,11 @@ mz3.set_parser("WASSR_FRIENDS_TIMELINE", "wassr.wassr_friends_timeline_parser");
 
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
 
---- BASIC ”FØİ’è
+--- BASIC èªè¨¼è¨­å®š
 function on_set_basic_auth_account(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Wassr' then
@@ -183,7 +183,7 @@ function on_set_basic_auth_account(event_name, serialize_key)
 		password = mz3_account_provider.get_value('Wassr', 'password');
 		
 		if id=='' or password=='' then
-			mz3.alert('ƒƒOƒCƒ“İ’è‰æ–Ê‚Åƒ†[ƒUID‚ÆƒpƒXƒ[ƒh‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢');
+			mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã§ãƒ¦ãƒ¼ã‚¶IDã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’è¨­å®šã—ã¦ãã ã•ã„');
 			return true, 1;
 		end
 		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
@@ -194,11 +194,11 @@ end
 mz3.add_event_listener("set_basic_auth_account", "wassr.on_set_basic_auth_account");
 
 
---- Twitter•—‘‚«‚İƒ‚[ƒh‚Ì‰Šú‰»
+--- Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®åˆæœŸåŒ–
 function on_reset_twitter_style_post_mode(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Wassr' then
-		-- ƒ‚[ƒh•ÏX
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('WASSR_UPDATE'));
 		
 		return true;
@@ -208,7 +208,7 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "wassr.on_reset_twitter_style_post_mode");
 
 
---- TwitterƒXƒ^ƒCƒ‹‚Ìƒ{ƒ^ƒ“–¼Ì‚ÌXV
+--- Twitterã‚¹ã‚¿ã‚¤ãƒ«ã®ãƒœã‚¿ãƒ³åç§°ã®æ›´æ–°
 function on_update_twitter_update_button(event_name, serialize_key)
 	if serialize_key == 'WASSR_UPDATE' then
 		return true, 'Wassr';
@@ -219,39 +219,39 @@ end
 mz3.add_event_listener("update_twitter_update_button", "wassr.on_update_twitter_update_button");
 
 
--- u‚Â‚Ô‚â‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+-- ã€Œã¤ã¶ã‚„ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_wassr_update(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_WASSR_UPDATE);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="WASSR_USER" then
-		-- ‘S•¶•\¦
+		-- å…¨æ–‡è¡¨ç¤º
 		return on_read_menu_item(serialize_key, event_name, data);
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "wassr.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "wassr.on_body_list_click");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
 
-	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
+	-- æœ¬æ–‡ã‚’1è¡Œã«å¤‰æ›ã—ã¦è¡¨ç¤º
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 
@@ -267,22 +267,22 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' Wassr', 1, true) ~= nil then
 
-		-- Wassrƒ^ƒu’Ç‰Á
+		-- Wassrã‚¿ãƒ–è¿½åŠ 
 		local tab = MZ3GroupItem:create("Wassr");
-		tab:append_category("ƒ^ƒCƒ€ƒ‰ƒCƒ“", "WASSR_FRIENDS_TIMELINE");
-		tab:append_category("•ÔMˆê——", "WASSR_FRIENDS_TIMELINE", "http://api.wassr.jp/statuses/replies.xml");
+		tab:append_category("ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³", "WASSR_FRIENDS_TIMELINE");
+		tab:append_category("è¿”ä¿¡ä¸€è¦§", "WASSR_FRIENDS_TIMELINE", "http://api.wassr.jp/statuses/replies.xml");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 	end
@@ -290,10 +290,10 @@ end
 mz3.add_event_listener("creating_default_group", "wassr.on_creating_default_group", false);
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -302,20 +302,20 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "‘S•¶‚ğ“Ç‚Ş...", menu_items.read);
+	menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "å…¨æ–‡ã‚’èª­ã‚€...", menu_items.read);
 
 	menu:append_menu("separator");
 
-	menu:append_menu("string", "‚Â‚Ô‚â‚­", menu_items.update);
+	menu:append_menu("string", "ã¤ã¶ã‚„ã", menu_items.update);
 
-	-- ƒŠƒ“ƒN’Ç‰Á
+	-- ãƒªãƒ³ã‚¯è¿½åŠ 
 	n = body:get_link_list_size();
 	if n > 0 then
 		menu:append_menu("separator");
@@ -325,10 +325,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 	end
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	
 	return true;
@@ -336,12 +336,12 @@ end
 mz3.add_event_listener("popup_body_menu",  "wassr.on_popup_body_menu");
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
@@ -356,10 +356,10 @@ end
 mz3.add_event_listener("get_view_style", "wassr.on_get_view_style");
 
 
---- XVƒ{ƒ^ƒ“‰Ÿ‰ºƒCƒxƒ“ƒg
+--- æ›´æ–°ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'click_update_button'
--- @param serialize_key Twitter•—‘‚«‚İƒ‚[ƒh‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
 function on_click_update_button(event_name, serialize_key)
 
@@ -368,34 +368,34 @@ function on_click_update_button(event_name, serialize_key)
 		return false;
 	end
 
-	-- “ü—Í•¶š—ñ‚ğæ“¾
+	-- å…¥åŠ›æ–‡å­—åˆ—ã‚’å–å¾—
 	text = mz3_main_view.get_edit_text();
 
-	-- –¢“ü—Í‚Ìˆ—
+	-- æœªå…¥åŠ›æ™‚ã®å‡¦ç†
 	if text == '' then
-		-- ÅVæ“¾
+		-- æœ€æ–°å–å¾—
 		mz3_main_view.retrieve_category_item();
 		return true;
 	end
 
-	-- Šm”F
+	-- ç¢ºèª
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'WASSR_UPDATE' then
-		msg = 'Wassr‚Å”­Œ¾‚µ‚Ü‚·B\n'
+		msg = 'Wassrã§ç™ºè¨€ã—ã¾ã™ã€‚\n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	end
 
 	if serialize_key == 'WASSR_UPDATE' then
-		-- ’Êí‚Ì“Še‚Í‹¤’Ê‰»
+		-- é€šå¸¸ã®æŠ•ç¨¿ã¯å…±é€šåŒ–
 
-		-- ƒNƒƒXƒ|ƒXƒgŠÇ—ƒf[ƒ^‰Šú‰»
+		-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆç®¡ç†ãƒ‡ãƒ¼ã‚¿åˆæœŸåŒ–
 		mz3.init_cross_post_info("wassr");
 
 		return do_post_to_wassr(text);
@@ -406,22 +406,22 @@ end
 mz3.add_event_listener("click_update_button", "wassr.on_click_update_button");
 
 
---- Wassr ‚É“Še‚·‚é
+--- Wassr ã«æŠ•ç¨¿ã™ã‚‹
 function do_post_to_wassr(text)
 
 	serialize_key = 'WASSR_UPDATE'
 
-	-- ƒwƒbƒ_[‚Ìİ’è
+	-- ãƒ˜ãƒƒãƒ€ãƒ¼ã®è¨­å®š
 	post = MZ3PostData:create();
 
-	-- POSTæURLİ’è
+	-- POSTå…ˆURLè¨­å®š
 	url = "http://api.wassr.jp/statuses/update.json";
 
-	-- POST ƒpƒ‰ƒ[ƒ^‚ğİ’è
+	-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 	post = MZ3PostData:create();
 	post:append_post_body("status=");
 	post:append_post_body(mz3.url_encode(text, 'utf8'));
-	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ã®ç¢ºèª
 	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
@@ -429,7 +429,7 @@ function do_post_to_wassr(text)
 	post:append_post_body("&source=");
 	post:append_post_body(mz3.get_app_name());
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key("WASSR_UPDATE");
 	referer = '';
 	user_agent = nil;
@@ -438,12 +438,12 @@ function do_post_to_wassr(text)
 end
 
 
---- POST Š®—¹ƒCƒxƒ“ƒg
+--- POST å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'post_end'
--- @param serialize_key Š®—¹€–Ú‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key å®Œäº†é …ç›®ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param http_status   HTTP Status Code (200, 404, etc...)
--- @param filename      ƒŒƒXƒ|ƒ“ƒXƒtƒ@ƒCƒ‹
+-- @param filename      ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
 -- @param wnd           wnd
 --
 function on_post_end(event_name, serialize_key, http_status, filename)
@@ -453,28 +453,28 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		return false;
 	end
 
-	-- “Šeˆ—Š®—¹
+	-- æŠ•ç¨¿å‡¦ç†å®Œäº†
 	
-	-- ƒXƒe[ƒ^ƒXƒR[ƒhƒ`ƒFƒbƒN
+	-- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 	if http_status == 200 then
 		-- OK
-		mz3_main_view.set_info_text("Wassr‚Å”­Œ¾‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("Wassrã§ç™ºè¨€ã—ã¾ã—ãŸ");
 	else
-		-- ƒGƒ‰[ƒAƒŠ‚È‚Ì‚Å’†’f‚·‚é‚½‚ß‚É true ‚ğ•Ô‚·
-		msg = "ƒT[ƒoƒGƒ‰[(" .. http_status .. ")";
+		-- ã‚¨ãƒ©ãƒ¼ã‚¢ãƒªãªã®ã§ä¸­æ–­ã™ã‚‹ãŸã‚ã« true ã‚’è¿”ã™
+		msg = "ã‚µãƒ¼ãƒã‚¨ãƒ©ãƒ¼(" .. http_status .. ")";
 		mz3.logger_error(msg);
 		mz3_main_view.set_info_text(msg);
 		return true;
 	end
 
-	-- ƒNƒƒXƒ|ƒXƒg
+	-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆ
 	if serialize_key == "WASSR_UPDATE" then
 		if mz3.do_cross_post() then
 			return true;
 		end
 	end
 
-	-- “ü—Í’l‚ğÁ‹
+	-- å…¥åŠ›å€¤ã‚’æ¶ˆå»
 	mz3_main_view.set_edit_text("");
 	
 	return true;

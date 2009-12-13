@@ -12,17 +12,17 @@ mz3.logger_debug('goohome.lua start');
 module("goohome", package.seeall)
 
 ----------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ç”¨)
 ----------------------------------------
 mz3.regist_service('goohome', false);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
-mz3_account_provider.set_param('gooƒz[ƒ€', 'id_name', 'gooID');
-mz3_account_provider.set_param('gooƒz[ƒ€', 'password_name', 'gooƒz[ƒ€ ‚Ğ‚Æ‚±‚Æƒ[ƒ‹“ŠeƒAƒhƒŒƒX');
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
+mz3_account_provider.set_param('gooãƒ›ãƒ¼ãƒ ', 'id_name', 'gooID');
+mz3_account_provider.set_param('gooãƒ›ãƒ¼ãƒ ', 'password_name', 'gooãƒ›ãƒ¼ãƒ  ã²ã¨ã“ã¨ãƒ¡ãƒ¼ãƒ«æŠ•ç¨¿ã‚¢ãƒ‰ãƒ¬ã‚¹');
 
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 menu_items.read          = mz3_menu.regist_menu("goohome.on_read_menu_item");
@@ -30,7 +30,7 @@ menu_items.read_comments = mz3_menu.regist_menu("goohome.on_read_comments_menu_i
 menu_items.update        = mz3_menu.regist_menu("goohome.on_goohome_update");
 
 
--- ‚Ğ‚Æ‚±‚Æ“ŠeƒAƒhƒŒƒX‚©‚çAPI KEY‚ğæ“¾‚·‚é
+-- ã²ã¨ã“ã¨æŠ•ç¨¿ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰API KEYã‚’å–å¾—ã™ã‚‹
 function get_api_key_from_quote_mail_address(address)
 	key = address:match('^quote%-([0-9a-zA-Z-_]*)@home%.goo%.ne%.jp$');
 	if key==nil or string.len(key)~=12 then
@@ -40,27 +40,27 @@ function get_api_key_from_quote_mail_address(address)
 	return key;
 end
 
--- "quote-XXXXXXXXXXXX@home.goo.ne.jp" ‚ÌŒ`®‚Å‚ ‚é‚±‚Æ‚ğŠm”F‚·‚é
+-- "quote-XXXXXXXXXXXX@home.goo.ne.jp" ã®å½¢å¼ã§ã‚ã‚‹ã“ã¨ã‚’ç¢ºèªã™ã‚‹
 function is_valid_quote_mail_address(password)
 	return get_api_key_from_quote_mail_address(password)~='';
 end
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
 
---- ƒ†[ƒU“ü—ÍƒAƒJƒEƒ“ƒgƒ`ƒFƒbƒN
+--- ãƒ¦ãƒ¼ã‚¶å…¥åŠ›ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãƒã‚§ãƒƒã‚¯
 function on_check_account(event_name, service_name, id, password)
 --	mz3.alert(service_name);
-	if service_name == 'gooƒz[ƒ€' then
+	if service_name == 'gooãƒ›ãƒ¼ãƒ ' then
 		if password ~= '' and is_valid_quote_mail_address(password)==false then
-			msg = "gooƒz[ƒ€‚Ğ‚Æ‚±‚Æ“ŠeƒAƒhƒŒƒX‚Í‰º‹L‚ÌŒ`®‚Å‚·B\n"
+			msg = "gooãƒ›ãƒ¼ãƒ ã²ã¨ã“ã¨æŠ•ç¨¿ã‚¢ãƒ‰ãƒ¬ã‚¹ã¯ä¸‹è¨˜ã®å½¢å¼ã§ã™ã€‚\n"
 			    .." quote-XXXXXXXXXXXX@home.goo.ne.jp\n"
-			    .."“ü—Í‚³‚ê‚½ƒAƒhƒŒƒXF\n"
+			    .."å…¥åŠ›ã•ã‚ŒãŸã‚¢ãƒ‰ãƒ¬ã‚¹ï¼š\n"
 			    .." " .. password
 			    .."\n"
-			    .."Šm”F‚·‚éURL‚ğŠJ‚«‚Ü‚·‚©H";
+			    .."ç¢ºèªã™ã‚‹URLã‚’é–‹ãã¾ã™ã‹ï¼Ÿ";
 			if (mz3.confirm(msg, nil, 'yes_no')=='yes') then
 				url = "http://home.goo.ne.jp/config/quote";
 				mz3.open_url_by_browser(url);
@@ -74,17 +74,17 @@ end
 mz3.add_event_listener("check_account", "goohome.on_check_account");
 
 
---- BASIC ”FØİ’è
+--- BASIC èªè¨¼è¨­å®š
 function on_set_basic_auth_account(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='gooHome' then
-		id       = mz3_account_provider.get_value('gooƒz[ƒ€', 'id');
-		password = mz3_account_provider.get_value('gooƒz[ƒ€', 'password');
+		id       = mz3_account_provider.get_value('gooãƒ›ãƒ¼ãƒ ', 'id');
+		password = mz3_account_provider.get_value('gooãƒ›ãƒ¼ãƒ ', 'password');
 		
 		password = get_api_key_from_quote_mail_address(password);
 		
 		if id=='' or password=='' then
-			mz3.alert('ƒƒOƒCƒ“İ’è‰æ–Ê‚ÅgooID‚Æ‚Ğ‚Æ‚±‚Æ“ŠeƒAƒhƒŒƒX‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢');
+			mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã§gooIDã¨ã²ã¨ã“ã¨æŠ•ç¨¿ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’è¨­å®šã—ã¦ãã ã•ã„');
 			return true, 1;
 		end
 		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
@@ -95,11 +95,11 @@ end
 mz3.add_event_listener("set_basic_auth_account", "goohome.on_set_basic_auth_account");
 
 
---- Twitter•—‘‚«‚İƒ‚[ƒh‚Ì‰Šú‰»
+--- Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®åˆæœŸåŒ–
 function on_reset_twitter_style_post_mode(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='gooHome' then
-		-- ƒ‚[ƒh•ÏX
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('GOOHOME_QUOTE_UPDATE'));
 		
 		return true;
@@ -109,10 +109,10 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "goohome.on_reset_twitter_style_post_mode");
 
 
---- TwitterƒXƒ^ƒCƒ‹‚Ìƒ{ƒ^ƒ“–¼Ì‚ÌXV
+--- Twitterã‚¹ã‚¿ã‚¤ãƒ«ã®ãƒœã‚¿ãƒ³åç§°ã®æ›´æ–°
 function on_update_twitter_update_button(event_name, serialize_key)
 	if serialize_key == 'GOOHOME_QUOTE_UPDATE' then
-		return true, '‚Ğ‚Æ‚±‚Æ';
+		return true, 'ã²ã¨ã“ã¨';
 	end
 	
 	return false;
@@ -120,13 +120,13 @@ end
 mz3.add_event_listener("update_twitter_update_button", "goohome.on_update_twitter_update_button");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 	
-	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
+	-- æœ¬æ–‡ã‚’1è¡Œã«å¤‰æ›ã—ã¦è¡¨ç¤º
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 	
@@ -141,7 +141,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒRƒƒ“ƒg‚ğ“Ç‚Ş ƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã‚³ãƒ¡ãƒ³ãƒˆã‚’èª­ã‚€ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_read_comments_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_comments_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
@@ -152,49 +152,49 @@ function on_read_comments_menu_item(serialize_key, event_name, data)
 end
 
 
--- u‚Â‚Ô‚â‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+-- ã€Œã¤ã¶ã‚„ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_goohome_update(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_GOOHOME_QUOTE_UPDATE);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="GOOHOME_USER" then
-		-- ‘S•¶•\¦
+		-- å…¨æ–‡è¡¨ç¤º
 		return on_read_menu_item(serialize_key, event_name, data);
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "goohome.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "goohome.on_body_list_click");
 
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' goohome', 1, true) ~= nil then
 
-		-- Wassrƒ^ƒu’Ç‰Á
-		local tab = MZ3GroupItem:create("gooƒz[ƒ€");
-		tab:append_category("—F’BE’–Ú‚Ìl", "GOOHOME_QUOTE_QUOTES_FRIENDS");
-		tab:append_category("©•ª‚Ì‚Ğ‚Æ‚±‚Æˆê——", "GOOHOME_QUOTE_QUOTES_FRIENDS", "http://home.goo.ne.jp/api/quote/quotes/myself/json");
+		-- Wassrã‚¿ãƒ–è¿½åŠ 
+		local tab = MZ3GroupItem:create("gooãƒ›ãƒ¼ãƒ ");
+		tab:append_category("å‹é”ãƒ»æ³¨ç›®ã®äºº", "GOOHOME_QUOTE_QUOTES_FRIENDS");
+		tab:append_category("è‡ªåˆ†ã®ã²ã¨ã“ã¨ä¸€è¦§", "GOOHOME_QUOTE_QUOTES_FRIENDS", "http://home.goo.ne.jp/api/quote/quotes/myself/json");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 	end
@@ -202,10 +202,10 @@ end
 mz3.add_event_listener("creating_default_group", "goohome.on_creating_default_group", false);
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -214,21 +214,21 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "‘S•¶‚ğ“Ç‚Ş...", menu_items.read);
+	menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "å…¨æ–‡ã‚’èª­ã‚€...", menu_items.read);
 
 	menu:append_menu("separator");
 
-	menu:append_menu("string", "ƒRƒƒ“ƒg‚ğ“Ç‚Ş...", menu_items.read_comments);
-	menu:append_menu("string", "‚Â‚Ô‚â‚­", menu_items.update);
+	menu:append_menu("string", "ã‚³ãƒ¡ãƒ³ãƒˆã‚’èª­ã‚€...", menu_items.read_comments);
+	menu:append_menu("string", "ã¤ã¶ã‚„ã", menu_items.update);
 
-	-- ƒŠƒ“ƒN’Ç‰Á
+	-- ãƒªãƒ³ã‚¯è¿½åŠ 
 	n = body:get_link_list_size();
 	if n > 0 then
 		menu:append_menu("separator");
@@ -238,10 +238,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 	end
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	
 	return true;
@@ -249,12 +249,12 @@ end
 mz3.add_event_listener("popup_body_menu",  "goohome.on_popup_body_menu");
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
@@ -270,9 +270,9 @@ mz3.add_event_listener("get_view_style", "goohome.on_get_view_style");
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ìƒ[ƒh•“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ãƒ­ãƒ¼ãƒ‰ï¼†ç™»éŒ²
 ----------------------------------------
--- gooƒz[ƒ€ —F’BE’–Ú‚Ìl‚Ì‚Ğ‚Æ‚±‚Æˆê——
+-- gooãƒ›ãƒ¼ãƒ  å‹é”ãƒ»æ³¨ç›®ã®äººã®ã²ã¨ã“ã¨ä¸€è¦§
 require("scripts\\goohome\\goohome_quote_quotes_friends_parser");
 mz3.set_parser("GOOHOME_QUOTE_QUOTES_FRIENDS", "goohome.quote_quotes_friends_parser");
 

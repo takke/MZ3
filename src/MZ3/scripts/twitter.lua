@@ -11,123 +11,123 @@
 mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
-ID_REPORT_URL_BASE = 36100 -37000;	-- URL‚ğŠJ‚­
+ID_REPORT_URL_BASE = 36100 -37000;	-- URLã‚’é–‹ã
 
 ----------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ç”¨)
 ----------------------------------------
 mz3.regist_service('Twitter', true);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
 mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
-mz3_account_provider.set_param('Twitter', 'password_name', 'ƒpƒXƒ[ƒh');
+mz3_account_provider.set_param('Twitter', 'password_name', 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰');
 
 
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 
--- POST—pƒAƒNƒZƒXí•Ê“o˜^
+-- POSTç”¨ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ç™»éŒ²
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_FAVOURINGS_CREATE');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('‚¨‹C‚É“ü‚è“o˜^');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_FAVOURINGS_CREATE');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãŠæ°—ã«å…¥ã‚Šç™»éŒ²');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_FAVOURINGS_DESTROY');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('‚¨‹C‚É“ü‚èíœ');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_FAVOURINGS_DESTROY');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãŠæ°—ã«å…¥ã‚Šå‰Šé™¤');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_FRIENDSHIPS_CREATE');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒtƒHƒ[“o˜^');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_FRIENDSHIPS_CREATE');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ•ã‚©ãƒ­ãƒ¼ç™»éŒ²');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_FRIENDSHIPS_DESTROY');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒtƒHƒ[‰ğœ');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_FRIENDSHIPS_DESTROY');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ•ã‚©ãƒ­ãƒ¼è§£é™¤');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_UPDATE_WITH_TWITPIC');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('twitpic“Še');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_UPDATE_WITH_TWITPIC');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('twitpicæŠ•ç¨¿');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_UPDATE_RETWEET');			-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ReTweet');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_UPDATE_RETWEET');			-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ReTweet');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_UPDATE_DESTROY');			-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('”­Œ¾íœ');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_UPDATE_DESTROY');			-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ç™ºè¨€å‰Šé™¤');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_USER_BLOCK_CREATE');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒuƒƒbƒN');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_USER_BLOCK_CREATE');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ–ãƒ­ãƒƒã‚¯');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');									-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_USER_BLOCK_DESTROY');		-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒuƒƒbƒN‰ğœ');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');							-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_USER_BLOCK_DESTROY');		-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ–ãƒ­ãƒƒã‚¯è§£é™¤');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');							-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- Lists—pƒAƒNƒZƒXí•Ê“o˜^
+-- Listsç”¨ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ç™»éŒ²
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_LISTS');					-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒŠƒXƒgˆê——');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('twitter\\{urlafter:/}');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');								-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_LISTS');					-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒªã‚¹ãƒˆä¸€è¦§');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('twitter\\{urlafter:/}');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://twitter.com/{twitter:id}/lists.xml');	-- dummy
-type:set_body_header(1, 'title', 'ƒŠƒXƒg–¼');
-type:set_body_header(2, 'name', 'members>>');	-- MZ3‚Ì§ŒÀ‚Ì‚½‚ß
-type:set_body_header(3, 'date', 'Followers>>');	-- MZ3‚Ì§ŒÀ‚Ì‚½‚ß
+type:set_body_header(1, 'title', 'ãƒªã‚¹ãƒˆå');
+type:set_body_header(2, 'name', 'members>>');	-- MZ3ã®åˆ¶é™ã®ãŸã‚
+type:set_body_header(3, 'date', 'Followers>>');	-- MZ3ã®åˆ¶é™ã®ãŸã‚
 type:set_body_integrated_line_pattern(1, '%1 (%2)');
 type:set_body_integrated_line_pattern(2, '  Followers:%3');
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('other');								-- ƒJƒeƒSƒŠ
-type:set_service_type('Twitter');							-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('TWITTER_LISTS_ITEM');				-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('TwitterƒŠƒXƒg');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('other');								-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('Twitter');							-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('TWITTER_LISTS_ITEM');				-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('Twitterãƒªã‚¹ãƒˆ');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
@@ -136,7 +136,7 @@ menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu
 
 menu_items.get_prev_page         = mz3_menu.regist_menu("twitter.on_get_prev_page");
 
--- ”­Œ¾“à‚Ì @xxx ’ŠoÒ‚ÌTL(5l‚Ü‚Å)
+-- ç™ºè¨€å†…ã® @xxx æŠ½å‡ºè€…ã®TL(5äººã¾ã§)
 menu_items.show_follower_tl = {}
 menu_items.show_follower_tl[1]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_1");
 menu_items.show_follower_tl[2]   = mz3_menu.regist_menu("twitter.on_show_follower_tl_2");
@@ -168,7 +168,7 @@ menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitt
 menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
 menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
 
--- ”­Œ¾“à‚ÌƒnƒbƒVƒ…ƒ^ƒO #xxx ’ŠoƒŠƒXƒg
+-- ç™ºè¨€å†…ã®ãƒãƒƒã‚·ãƒ¥ã‚¿ã‚° #xxx æŠ½å‡ºãƒªã‚¹ãƒˆ
 menu_items.search_hash_list = {}
 menu_items.search_hash_list[1]   = mz3_menu.regist_menu("twitter.on_search_hash_list_1");
 menu_items.search_hash_list[2]   = mz3_menu.regist_menu("twitter.on_search_hash_list_2");
@@ -178,18 +178,18 @@ menu_items.search_hash_list[5]   = mz3_menu.regist_menu("twitter.on_search_hash_
 hash_list = {}
 
 
--- ƒtƒ@ƒCƒ‹–¼
+-- ãƒ•ã‚¡ã‚¤ãƒ«å
 twitpic_target_file = nil;
--- ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Æ‚©ƒƒjƒ…[‚©‚ç @ ‚µ‚½ê‡‚Ì status_id
+-- ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã¨ã‹ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‹ã‚‰ @ ã—ãŸå ´åˆã® status_id
 -- is_twitter_reply_set = false;
 twitter_reply_id = 0;
 
 
---- 1ƒ†[ƒU‚Ì’Ç‰Á
+--- 1ãƒ¦ãƒ¼ã‚¶ã®è¿½åŠ 
 function my_add_new_user(new_list, status, id)
 --	mz3.logger_debug("my_add_new_user start");
 
-	-- data ¶¬
+	-- data ç”Ÿæˆ
 	data = MZ3Data:create();
 	
 	-- id : status/id
@@ -207,17 +207,17 @@ function my_add_new_user(new_list, status, id)
 	text = mz3.decode_html_entity(text);
 	data:add_text_array('body', text);
 	
-	-- @takke ‚È‚Ç‚ª‚ ‚ê‚ÎƒoƒCƒu‚·‚é
+	-- @takke ãªã©ãŒã‚ã‚Œã°ãƒã‚¤ãƒ–ã™ã‚‹
 --	if line_has_strings(text, "@" .. my_twitter_name) then
 --		mz3.set_vib_status(true);
 --		mz3.set_vib_status(false);
 --	end
 	
-	-- URL ‚ğ’Šo‚µAƒŠƒ“ƒN‚É‚·‚é
+	-- URL ã‚’æŠ½å‡ºã—ã€ãƒªãƒ³ã‚¯ã«ã™ã‚‹
 	if line_has_strings(text, 'ttp') then
 		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 			data:add_link_list(url, url);
---			mz3.logger_debug('’ŠoURL: ' .. url);
+--			mz3.logger_debug('æŠ½å‡ºURL: ' .. url);
 		end
 	end
 
@@ -240,7 +240,7 @@ function my_add_new_user(new_list, status, id)
 	data:set_text('author', s);
 
 	-- description : status/user/description
-	-- title ‚É“ü‚ê‚é‚Ì‚Í‹ê“÷‚ÌôEEE
+	-- title ã«å…¥ã‚Œã‚‹ã®ã¯è‹¦è‚‰ã®ç­–ãƒ»ãƒ»ãƒ»
 	s = user:match('<description>([^<]*)<');
 	if s~=nil then
 		s = s:gsub('&amp;', '&');
@@ -268,10 +268,10 @@ function my_add_new_user(new_list, status, id)
 
 	data:set_text('user_tag', user);
 
-	-- ˆêƒŠƒXƒg‚É’Ç‰Á
+	-- ä¸€æ™‚ãƒªã‚¹ãƒˆã«è¿½åŠ 
 	new_list:add(data.data);
 	
-	-- data íœ
+	-- data å‰Šé™¤
 	data:delete();
 
 --	mz3.logger_debug("my_add_new_user end");
@@ -279,37 +279,37 @@ end
 
 
 --------------------------------------------------
--- [list] ƒ^ƒCƒ€ƒ‰ƒCƒ“—pƒp[ƒT
+-- [list] ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://twitter.com/statuses/friends_timeline.xml
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function twitter_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("twitter_friends_timeline_parser start");
 
-	-- •ÔM id ‚Ì‰Šú‰»
+	-- è¿”ä¿¡ id ã®åˆæœŸåŒ–
 	twitter_reply_id = 0;
 
 	if mz3_pro_mode then
-		-- Pro ƒ‚[ƒh‚È‚çƒzƒXƒg‘¤‚É”C‚¹‚é
+		-- Pro ãƒ¢ãƒ¼ãƒ‰ãªã‚‰ãƒ›ã‚¹ãƒˆå´ã«ä»»ã›ã‚‹
 		return false;
 	end
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
 	my_twitter_name = mz3_account_provider.get_value('Twitter', 'id');
 
-	-- ‘SÁ‹‚µ‚È‚¢
+	-- å…¨æ¶ˆå»ã—ãªã„
 --	body:clear();
 	
-	-- d•¡–h~—p‚Ì id ˆê——‚ğ¶¬B
+	-- é‡è¤‡é˜²æ­¢ç”¨ã® id ä¸€è¦§ã‚’ç”Ÿæˆã€‚
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
@@ -320,7 +320,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 
 	local t1 = mz3.get_tick_count();
 	
-	-- ˆêƒŠƒXƒg
+	-- ä¸€æ™‚ãƒªã‚¹ãƒˆ
 	new_list = MZ3DataList:create();
 	
 	line = '';
@@ -335,21 +335,21 @@ function twitter_friends_timeline_parser(parent, body, html)
 		if line_has_strings(line, '<status>') then
 			status = line;
 			
-			-- </status> ‚Ü‚Åæ“¾‚·‚é
-			-- ‚½‚¾‚µA“¯ˆêID‚ª‚ ‚ê‚Îskip‚·‚é
+			-- </status> ã¾ã§å–å¾—ã™ã‚‹
+			-- ãŸã ã—ã€åŒä¸€IDãŒã‚ã‚Œã°skipã™ã‚‹
 			i = i+1;
 			i_in_status = 0;
 			while i<line_count do
 				line = html:get_at(i);
 				status = status .. line;
 				
-				-- “¯ˆê skip ‚Íæ‚É‚â‚é
+				-- åŒä¸€ skip ã¯å…ˆã«ã‚„ã‚‹
 				if i_in_status<3 and line_has_strings(line, '<id>') then
 					-- id : status/id
 					id = line:match('<id>(.-)</id>');
-					-- “¯ˆêID‚ª‚ ‚ê‚Î’Ç‰Á‚µ‚È‚¢B
+					-- åŒä¸€IDãŒã‚ã‚Œã°è¿½åŠ ã—ãªã„ã€‚
 					if id_set[ "" .. id ] then
-						mz3.logger_debug('id[' .. id .. '] ‚ÍŠù‚É‘¶İ‚·‚é‚Ì‚Åskip‚·‚é');
+						mz3.logger_debug('id[' .. id .. '] ã¯æ—¢ã«å­˜åœ¨ã™ã‚‹ã®ã§skipã™ã‚‹');
 						i = i+1;
 						while i<line_count do
 							line = html:get_at(i);
@@ -365,7 +365,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 						break;
 					end
 				elseif i_in_status>35 and line_has_strings(line, '</status>') then
-					-- </status> ”­Œ©‚µ‚½‚Ì‚Å‚±‚±‚Ü‚Å‚Ì status ‚ğ‰ğÍ‚µ‚Ä’Ç‰Á
+					-- </status> ç™ºè¦‹ã—ãŸã®ã§ã“ã“ã¾ã§ã® status ã‚’è§£æã—ã¦è¿½åŠ 
 					my_add_new_user(new_list, status, id);
 					break;
 				end
@@ -373,20 +373,20 @@ function twitter_friends_timeline_parser(parent, body, html)
 				i_in_status = i_in_status+1;
 			end
 
-			-- Ÿ‚Ì status æ“¾
+			-- æ¬¡ã® status å–å¾—
 			status = '';
 		end
 		i = i+1;
 	end
 	
-	-- ¶¬‚µ‚½ƒf[ƒ^‚ğo—Í‚É”½‰f
+	-- ç”Ÿæˆã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ã«åæ˜ 
 	if mz3.get_app_name()=="MZ3" then
 		body:merge(new_list, 100);
 	else
 		body:merge(new_list, 1000);
 	end
 
-	-- V’…Œ”‚ğ parent(ƒJƒeƒSƒŠ‚Ì m_mixi) ‚Éİ’è‚·‚é
+	-- æ–°ç€ä»¶æ•°ã‚’ parent(ã‚«ãƒ†ã‚´ãƒªã® m_mixi) ã«è¨­å®šã™ã‚‹
 	parent:set_integer('new_count', new_list:get_count());
 	
 	new_list:delete();
@@ -399,24 +399,24 @@ mz3.set_parser("TWITTER_FAVORITES", "twitter.twitter_friends_timeline_parser");
 
 
 --------------------------------------------------
--- [list] Lists—pƒp[ƒT
+-- [list] Listsç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://twitter.com/{twitter:id}/lists.xml
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function twitter_lists_parser(parent, body, html)
 	mz3.logger_debug("twitter_lists_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -433,10 +433,10 @@ function twitter_lists_parser(parent, body, html)
 			list, i = get_sub_html(html, i, line_count, {'<list>'}, {'</list>'});
 			if list ~= '' then
 --				mz3.logger_debug(' list:' .. list);
-				-- data ¶¬
+				-- data ç”Ÿæˆ
 				data = MZ3Data:create();
 				
-				-- Šeíƒf[ƒ^æ“¾Aİ’è
+				-- å„ç¨®ãƒ‡ãƒ¼ã‚¿å–å¾—ã€è¨­å®š
 				local full_name    = list:match('<full_name>(.-)</');
 				local slug         = list:match('<slug>(.-)</slug>');
 				local member_count = list:match('<member_count>(.-)</member_count>');
@@ -458,42 +458,42 @@ function twitter_lists_parser(parent, body, html)
 				mz3.logger_debug(profile_image_url);
 				data:add_text_array('image', profile_image_url);
 
-				-- ‰æ‘œ•\¦ƒtƒ‰ƒO‚ğ—§‚Ä‚é
+				-- ç”»åƒè¡¨ç¤ºãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 				data:set_integer('show_image', 1);
 
-				-- ƒAƒNƒZƒXí•Êİ’è
+				-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥è¨­å®š
 				type = mz3.get_access_type_by_key('TWITTER_LISTS_ITEM');
 				data:set_access_type(type);
 
-				-- ƒŠƒXƒg‚É’Ç‰Á
+				-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 				body:add(data.data);
 				
-				-- data íœ
+				-- data å‰Šé™¤
 				data:delete();
 			end
 		end
 		i = i+1;
 	end
 
-	-- ƒŠƒXƒg‚ª‚È‚¯‚ê‚ÎƒƒbƒZ[ƒW‚ğ•\¦
+	-- ãƒªã‚¹ãƒˆãŒãªã‘ã‚Œã°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤º
 	if body:get_count()==0 then
-		mz3.alert("ƒŠƒXƒg‚ª‚ ‚è‚Ü‚¹‚ñ‚Å‚µ‚½B\r\n\r\n"
-			   .. "Twitter ‚ÌWeb”Å‚©‚çƒŠƒXƒg‚ğì¬‚µ‚Ä‚­‚¾‚³‚¢B\r\n"
-			   .. "MZ3/4‚Å‚ÍTwitter‘¤‚Ì§ŒÀ‚Ì‚½‚ßAuƒtƒHƒ[‚µ‚Ä‚¢‚éƒŠƒXƒgv‚ğæ“¾‚Å‚«‚Ü‚¹‚ñB");
+		mz3.alert("ãƒªã‚¹ãƒˆãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚\r\n\r\n"
+			   .. "Twitter ã®Webç‰ˆã‹ã‚‰ãƒªã‚¹ãƒˆã‚’ä½œæˆã—ã¦ãã ã•ã„ã€‚\r\n"
+			   .. "MZ3/4ã§ã¯Twitterå´ã®åˆ¶é™ã®ãŸã‚ã€ã€Œãƒ•ã‚©ãƒ­ãƒ¼ã—ã¦ã„ã‚‹ãƒªã‚¹ãƒˆã€ã‚’å–å¾—ã§ãã¾ã›ã‚“ã€‚");
 
 --[[
-		-- data ¶¬
+		-- data ç”Ÿæˆ
 		data = MZ3Data:create();
 		
-		-- 0Œ‚Ì•\¦
+		-- 0ä»¶ã®è¡¨ç¤º
 		data:set_text('name', '');
 		data:set_date('');
-		data:set_text('title', 'ƒŠƒXƒg‚ª‚ ‚è‚Ü‚¹‚ñBTwitter ‚ÅƒŠƒXƒg‚ğì¬‚µ‚Ä‚­‚¾‚³‚¢B');
+		data:set_text('title', 'ãƒªã‚¹ãƒˆãŒã‚ã‚Šã¾ã›ã‚“ã€‚Twitter ã§ãƒªã‚¹ãƒˆã‚’ä½œæˆã—ã¦ãã ã•ã„ã€‚');
 
-		-- ƒŠƒXƒg‚É’Ç‰Á
+		-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 		body:add(data.data);
 		
-		-- data íœ
+		-- data å‰Šé™¤
 		data:delete();
 ]]
 	end
@@ -505,31 +505,31 @@ mz3.set_parser("TWITTER_LISTS", "twitter.twitter_lists_parser");
 
 
 --------------------------------------------------
--- [list] DM—pƒp[ƒT
+-- [list] DMç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://twitter.com/direct_messages.xml
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function twitter_direct_messages_parser(parent, body, html)
 	mz3.logger_debug("twitter_direct_messages_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- 'sent.xml' ‚ª‚ ‚ê‚Îu‘—MƒƒbƒZ[ƒWv
+	-- 'sent.xml' ãŒã‚ã‚Œã°ã€Œé€ä¿¡ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€
 	category_url = parent:get_text('url');
 	is_sent = line_has_strings(category_url, 'sent.xml');
 
-	-- ‘SÁ‹‚µ‚È‚¢
+	-- å…¨æ¶ˆå»ã—ãªã„
 --	body:clear();
 	
-	-- d•¡–h~—p‚Ì id ˆê——‚ğ¶¬B
+	-- é‡è¤‡é˜²æ­¢ç”¨ã® id ä¸€è¦§ã‚’ç”Ÿæˆã€‚
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
@@ -539,7 +539,7 @@ function twitter_direct_messages_parser(parent, body, html)
 
 	local t1 = mz3.get_tick_count();
 	
-	-- ˆêƒŠƒXƒg
+	-- ä¸€æ™‚ãƒªã‚¹ãƒˆ
 	new_list = MZ3DataList:create();
 	
 	line = '';
@@ -556,11 +556,11 @@ function twitter_direct_messages_parser(parent, body, html)
 			-- id : direct_message/id
 			id = direct_message:match('<id>(.-)</id>');
 			
-			-- “¯ˆêID‚ª‚ ‚ê‚Î’Ç‰Á‚µ‚È‚¢B
+			-- åŒä¸€IDãŒã‚ã‚Œã°è¿½åŠ ã—ãªã„ã€‚
 			if id_set[ id ] then
---				mz3.logger_debug('id[' .. id .. '] ‚ÍŠù‚É‘¶İ‚·‚é‚Ì‚Åskip‚·‚é');
+--				mz3.logger_debug('id[' .. id .. '] ã¯æ—¢ã«å­˜åœ¨ã™ã‚‹ã®ã§skipã™ã‚‹');
 			else
-				-- data ¶¬
+				-- data ç”Ÿæˆ
 				data = MZ3Data:create();
 				
 				data:set_integer64_from_string('id', id);
@@ -578,7 +578,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				s = direct_message:match('<created_at>(.-)</created_at>');
 				data:parse_date_line(s);
 				
-				-- URL ‚ğ’Šo‚µAƒŠƒ“ƒN‚É‚·‚é
+				-- URL ã‚’æŠ½å‡ºã—ã€ãƒªãƒ³ã‚¯ã«ã™ã‚‹
 				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
 					data:add_link_list(url, url);
 --					mz3.logger_debug(url);
@@ -603,7 +603,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				data:set_text('author', s);
 
 				-- description : direct_message/user/description
-				-- title ‚É“ü‚ê‚é‚Ì‚Í‹ê“÷‚ÌôEEE
+				-- title ã«å…¥ã‚Œã‚‹ã®ã¯è‹¦è‚‰ã®ç­–ãƒ»ãƒ»ãƒ»
 				s = user:match('<description>(.-)</description>');
 				s = s:gsub('&amp;', '&');
 				s = mz3.decode_html_entity(s);
@@ -624,28 +624,28 @@ function twitter_direct_messages_parser(parent, body, html)
 
 				data:set_text('user_tag', user);
 
-				-- ˆêƒŠƒXƒg‚É’Ç‰Á
+				-- ä¸€æ™‚ãƒªã‚¹ãƒˆã«è¿½åŠ 
 				new_list:add(data.data);
 				
-				-- data íœ
+				-- data å‰Šé™¤
 				data:delete();
 
 			end
 
-			-- Ÿ‚Ì direct_message æ“¾
+			-- æ¬¡ã® direct_message å–å¾—
 			direct_message = '';
-		elseif direct_message ~= '' then	-- direct_message ‚ª‹ó‚Å‚ ‚ê‚Î <direct_message> –¢”­Œ©‚È‚Ì‚Å“Ç‚İ”ò‚Î‚·
+		elseif direct_message ~= '' then	-- direct_message ãŒç©ºã§ã‚ã‚Œã° <direct_message> æœªç™ºè¦‹ãªã®ã§èª­ã¿é£›ã°ã™
 			direct_message = direct_message .. line;
 		end
 	end
 	
-	-- ¶¬‚µ‚½ƒf[ƒ^‚ğo—Í‚É”½‰f
+	-- ç”Ÿæˆã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ã«åæ˜ 
 	body:merge(new_list);
 	--TwitterParserBase::MergeNewList(out_, new_list);
 
 	new_list:delete();
 	
-	-- V’…Œ”‚ğ parent(ƒJƒeƒSƒŠ‚Ì m_mixi) ‚Éİ’è‚·‚é
+	-- æ–°ç€ä»¶æ•°ã‚’ parent(ã‚«ãƒ†ã‚´ãƒªã® m_mixi) ã«è¨­å®šã™ã‚‹
 	parent:set_integer('new_count', new_count);
 	
 	local t2 = mz3.get_tick_count();
@@ -655,30 +655,30 @@ mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parse
 
 
 ----------------------------------------
--- ƒT[ƒrƒX—pŠÖ”
+-- ã‚µãƒ¼ãƒ“ã‚¹ç”¨é–¢æ•°
 ----------------------------------------
 
---- ƒXƒe[ƒ^ƒXƒR[ƒh‰ğÍ
+--- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ¼ãƒ‰è§£æ
 function get_http_status_error_status(http_status)
 
 	if http_status==200 or http_status==304 then
-		-- 200 OK: ¬Œ÷
-		-- 304 Not Modified: V‚µ‚¢î•ñ‚Í‚È‚¢
+		-- 200 OK: æˆåŠŸ
+		-- 304 Not Modified: æ–°ã—ã„æƒ…å ±ã¯ãªã„
 		return nil;
 	elseif http_status==400 then		-- Bad Request:
-		return "API ‚ÌÀs‰ñ”§ŒÀ‚Éˆø‚ÁŠ|‚©‚Á‚½A‚È‚Ç‚Ì——R‚ÅƒŠƒNƒGƒXƒg‚ğ‹p‰º‚µ‚½";
+		return "API ã®å®Ÿè¡Œå›æ•°åˆ¶é™ã«å¼•ã£æ›ã‹ã£ãŸã€ãªã©ã®ç†ç”±ã§ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’å´ä¸‹ã—ãŸ";
 	elseif http_status==401 then		-- Not Authorized:
-		return "”FØ¸”s";
+		return "èªè¨¼å¤±æ•—";
 	elseif http_status==403 then		-- Forbidden:
-		return "Œ ŒÀ‚ª‚È‚¢API ‚ğÀs‚µ‚æ‚¤‚Æ‚µ‚½";
+		return "æ¨©é™ãŒãªã„API ã‚’å®Ÿè¡Œã—ã‚ˆã†ã¨ã—ãŸ";
 	elseif http_status==404 then		-- Not Found:
-		return "‘¶İ‚µ‚È‚¢ API ‚ğÀs‚µ‚æ‚¤‚Æ‚µ‚½A‘¶İ‚µ‚È‚¢ƒ†[ƒU‚ğˆø”‚Åw’è‚µ‚Ä API ‚ğÀs‚µ‚æ‚¤‚Æ‚µ‚½";
+		return "å­˜åœ¨ã—ãªã„ API ã‚’å®Ÿè¡Œã—ã‚ˆã†ã¨ã—ãŸã€å­˜åœ¨ã—ãªã„ãƒ¦ãƒ¼ã‚¶ã‚’å¼•æ•°ã§æŒ‡å®šã—ã¦ API ã‚’å®Ÿè¡Œã—ã‚ˆã†ã¨ã—ãŸ";
 	elseif http_status==500 then		-- Internal Server Error:
-		return "Twitter ‘¤‚Å‰½‚ç‚©‚Ì–â‘è‚ª”­¶‚µ‚Ä‚¢‚Ü‚·";
+		return "Twitter å´ã§ä½•ã‚‰ã‹ã®å•é¡ŒãŒç™ºç”Ÿã—ã¦ã„ã¾ã™";
 	elseif http_status==502 then		-- Bad Gateway:
-		return "Twitter ‚ÌƒT[ƒo‚ª~‚Ü‚Á‚Ä‚¢‚Ü‚·iƒƒ“ƒe’†‚©‚à‚µ‚ê‚Ü‚¹‚ñj";
+		return "Twitter ã®ã‚µãƒ¼ãƒãŒæ­¢ã¾ã£ã¦ã„ã¾ã™ï¼ˆãƒ¡ãƒ³ãƒ†ä¸­ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ï¼‰";
 	elseif http_status==503 then		-- Service Unavailable:
-		return "Twitter ‚ÌƒT[ƒo‚Ì•‰‰×‚ª‚‚·‚¬‚ÄAƒŠƒNƒGƒXƒg‚ğÙ‚«Ø‚ê‚È‚¢ó‘Ô‚É‚È‚Á‚Ä‚¢‚Ü‚·";
+		return "Twitter ã®ã‚µãƒ¼ãƒã®è² è·ãŒé«˜ã™ãã¦ã€ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’è£ãåˆ‡ã‚Œãªã„çŠ¶æ…‹ã«ãªã£ã¦ã„ã¾ã™";
 	end
 
 	return nil;
@@ -686,22 +686,22 @@ end
 
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
---- BASIC ”FØİ’è
+--- BASIC èªè¨¼è¨­å®š
 function on_set_basic_auth_account(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Twitter' then
 		if serialize_key=='TWITTER_UPDATE_WITH_TWITPIC' then
-			-- twitpic ‚Í BASIC ”FØ•s—v
+			-- twitpic ã¯ BASIC èªè¨¼ä¸è¦
 			return true, 0, '', '';
 		end
 		id       = mz3_account_provider.get_value('Twitter', 'id');
 		password = mz3_account_provider.get_value('Twitter', 'password');
 		
 		if id=='' or password=='' then
-			mz3.alert('ƒƒOƒCƒ“İ’è‰æ–Ê‚Åƒ†[ƒUID‚ÆƒpƒXƒ[ƒh‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢');
+			mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã§ãƒ¦ãƒ¼ã‚¶IDã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’è¨­å®šã—ã¦ãã ã•ã„');
 			return true, 1;
 		end
 		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
@@ -712,11 +712,11 @@ end
 mz3.add_event_listener("set_basic_auth_account", "twitter.on_set_basic_auth_account");
 
 
---- Twitter•—‘‚«‚İƒ‚[ƒh‚Ì‰Šú‰»
+--- Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®åˆæœŸåŒ–
 function on_reset_twitter_style_post_mode(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Twitter' then
-		-- ƒ‚[ƒh•ÏX
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE'));
 		
 		return true;
@@ -726,12 +726,12 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "twitter.on_reset_twitter_style_post_mode");
 
 
---- TwitterƒXƒ^ƒCƒ‹‚Ìƒ{ƒ^ƒ“–¼Ì‚ÌXV
+--- Twitterã‚¹ã‚¿ã‚¤ãƒ«ã®ãƒœã‚¿ãƒ³åç§°ã®æ›´æ–°
 function on_update_twitter_update_button(event_name, serialize_key)
 	if serialize_key == 'TWITTER_NEW_DM' then
 		return true, 'DM';
 	elseif serialize_key == 'TWITTER_UPDATE' then
-		return true, 'XV';
+		return true, 'æ›´æ–°';
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
 		return true, 'TwitPic';
 	end
@@ -741,84 +741,84 @@ end
 mz3.add_event_listener("update_twitter_update_button", "twitter.on_update_twitter_update_button");
 
 
---- u‚Â‚Ô‚â‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œã¤ã¶ã‚„ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_update(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE'));
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
---- uÊ^‚ğ“Ševƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå†™çœŸã‚’æŠ•ç¨¿ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_update_with_twitpic(serialize_key, event_name, data)
 
-	-- ƒtƒ@ƒCƒ‹‘I‘ğ‰æ–Ê
+	-- ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠç”»é¢
 	OFN_EXPLORER = 0x00080000;
 	OFN_FILEMUSTEXIST = 0x00001000;
 	flags = OFN_EXPLORER + OFN_FILEMUSTEXIST;
-	filter = "JPEGÌ§²Ù (*.jpg)%0*.jpg;*.jpeg%0%0";
---	filter = "JPEGÌ§²Ù (*.jpg)%0*.jpg;*.jpeg%0‚·‚×‚Ä‚ÌÌ§²Ù (*.*)%0*.*%0%0";
+	filter = "JPEGãƒ•ã‚¡ã‚¤ãƒ« (*.jpg)%0*.jpg;*.jpeg%0%0";
+--	filter = "JPEGãƒ•ã‚¡ã‚¤ãƒ« (*.jpg)%0*.jpg;*.jpeg%0ã™ã¹ã¦ã®ãƒ•ã‚¡ã‚¤ãƒ« (*.*)%0*.*%0%0";
 	twitpic_target_file = mz3.get_open_file_name(mz3_main_view.get_wnd(),
-												 "JPEGÌ§²Ù‚ğŠJ‚­...", 
+												 "JPEGãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã...", 
 												 filter,
 												 flags,
 												 "");
 --	mz3.alert(twitpic_target_file);
 	if twitpic_target_file == nil then
-		-- ’†~
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE_WITH_TWITPIC'));
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
 
---- uÊ^‚ğ“Ševƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå†™çœŸã‚’æŠ•ç¨¿ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_update_with_twitpic_now(serialize_key, event_name, data)
 
-	-- B‰e‰æ–Ê
+	-- æ’®å½±ç”»é¢
 	twitpic_target_file = mz3.camera_capture(mz3_main_view.get_wnd());
 --	mz3.alert(twitpic_target_file);
 	if twitpic_target_file == nil then
-		-- ’†~
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(mz3.get_access_type_by_key('TWITTER_UPDATE_WITH_TWITPIC'));
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
 
---- u•ÔMvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œè¿”ä¿¡ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_reply(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- “ü—Í—Ìˆæ‚Éƒ†[ƒU‚ÌƒXƒNƒŠ[ƒ“–¼‚ğ’Ç‰Á
+	-- å…¥åŠ›é ˜åŸŸã«ãƒ¦ãƒ¼ã‚¶ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åã‚’è¿½åŠ 
 	text = mz3_main_view.get_edit_text();
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	-- ‚·‚Å‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚ê‚Î’Ç‰Á‚µ‚È‚¢
+	-- ã™ã§ã«å«ã¾ã‚Œã¦ã„ã‚Œã°è¿½åŠ ã—ãªã„
 	if text:find("@" .. name, 1, true)~=nil then
 		return;
 	end
@@ -832,37 +832,37 @@ function on_twitter_reply(serialize_key, event_name, data)
 
 	mz3_main_view.set_edit_text(text);
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 
-	-- ––”ö‚ÖˆÚ“®
+	-- æœ«å°¾ã¸ç§»å‹•
 	VK_END = 0x23;
 	mz3.keybd_event(VK_END, "keydown");
 	mz3.keybd_event(VK_END, "keyup");
 end
 
 
---- uƒƒbƒZ[ƒW‘—Mvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é€ä¿¡ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_new_dm(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_DM);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
 
---- u‚¨‹C‚É“ü‚è“o˜^vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€ŒãŠæ°—ã«å…¥ã‚Šç™»éŒ²ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_create_favourings(serialize_key, event_name, data)
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
 	url = "http://twitter.com/favourings/create/" .. id .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_FAVOURINGS_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -872,14 +872,14 @@ function on_twitter_create_favourings(serialize_key, event_name, data)
 end
 
 
---- u‚¨‹C‚É“ü‚èíœvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€ŒãŠæ°—ã«å…¥ã‚Šå‰Šé™¤ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_destroy_favourings(serialize_key, event_name, data)
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
 	url = "http://twitter.com/favourings/destroy/" .. id .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_FAVOURINGS_DESTROY";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -889,21 +889,21 @@ function on_twitter_destroy_favourings(serialize_key, event_name, data)
 end
 
 
---- uƒtƒHƒ[‚·‚évƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ•ã‚©ãƒ­ãƒ¼ã™ã‚‹ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_create_friendships(serialize_key, event_name, data)
 
-	-- Šm”F
+	-- ç¢ºèª
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	if mz3.confirm(name .. " ‚³‚ñ‚ğƒtƒHƒ[‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") ~= 'yes' then
-		-- ’†~
+	if mz3.confirm(name .. " ã•ã‚“ã‚’ãƒ•ã‚©ãƒ­ãƒ¼ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") ~= 'yes' then
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	url = "http://twitter.com/friendships/create/" .. name .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_FRIENDSHIPS_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -913,21 +913,21 @@ function on_twitter_create_friendships(serialize_key, event_name, data)
 end
 
 
---- uƒtƒHƒ[‚â‚ß‚évƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ•ã‚©ãƒ­ãƒ¼ã‚„ã‚ã‚‹ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_destroy_friendships(serialize_key, event_name, data)
 
-	-- Šm”F
+	-- ç¢ºèª
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	if mz3.confirm(name .. " ‚³‚ñ‚ÌƒtƒHƒ[‚ğ‰ğœ‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") ~= 'yes' then
-		-- ’†~
+	if mz3.confirm(name .. " ã•ã‚“ã®ãƒ•ã‚©ãƒ­ãƒ¼ã‚’è§£é™¤ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") ~= 'yes' then
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	url = "http://twitter.com/friendships/destroy/" .. name .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_FRIENDSHIPS_DESTROY";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -937,7 +937,7 @@ function on_twitter_destroy_friendships(serialize_key, event_name, data)
 end
 
 
---- uƒXƒe[ƒ^ƒXƒy[ƒW‚ğŠJ‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒšãƒ¼ã‚¸ã‚’é–‹ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_show_status_url(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
@@ -946,19 +946,19 @@ function on_show_status_url(serialize_key, event_name, data)
 end
 
 
---- u@xxx ‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œ@xxx ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_show_friend_timeline(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('name');
 	
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = "@" .. name .. "‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = "@" .. name .. "ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³";
 	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
-	-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -967,23 +967,23 @@ function on_show_friend_timeline(serialize_key, event_name, data)
 end
 
 
---- u@xxx ‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“v(ƒtƒHƒƒ[)ƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œ@xxx ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ã€(ãƒ•ã‚©ãƒ­ãƒ¯ãƒ¼)ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_show_follower_tl_1(serialize_key, event_name, data)	show_follower_tl(1) end
 function on_show_follower_tl_2(serialize_key, event_name, data)	show_follower_tl(2) end
 function on_show_follower_tl_3(serialize_key, event_name, data)	show_follower_tl(3) end
 function on_show_follower_tl_4(serialize_key, event_name, data)	show_follower_tl(4) end
 function on_show_follower_tl_5(serialize_key, event_name, data)	show_follower_tl(5) end
 function show_follower_tl(num)
-	-- ”­Œ¾“à‚Ì num ”Ô–Ú‚Ì @xxx ƒ†[ƒU‚Ì TL ‚ğ•\¦‚·‚é
+	-- ç™ºè¨€å†…ã® num ç•ªç›®ã® @xxx ãƒ¦ãƒ¼ã‚¶ã® TL ã‚’è¡¨ç¤ºã™ã‚‹
 	name = follower_names[num];
 	
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = "@" .. name .. "‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = "@" .. name .. "ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³";
 	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
-	-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -992,58 +992,58 @@ function show_follower_tl(num)
 end
 
 
---- uReTweetvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€ŒReTweetã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_retweet_menu_item(serialize_key, event_name, data)
 
-	msg = '‚±‚Ì”­Œ¾‚ğReTweet‚µ‚Ü‚·‚©H\r\n'
+	msg = 'ã“ã®ç™ºè¨€ã‚’ReTweetã—ã¾ã™ã‹ï¼Ÿ\r\n'
 	   .. '\r\n'
-	   .. 'u‚Í‚¢vF‚·‚®‚ÉReTweet‚µ‚Ü‚·(Œö®RT)\r\n'
-	   .. 'u‚¢‚¢‚¦vFƒRƒƒ“ƒg‚ğ’Ç‰Á‚Å‚«‚Ü‚·';
+	   .. 'ã€Œã¯ã„ã€ï¼šã™ãã«ReTweetã—ã¾ã™(å…¬å¼RT)\r\n'
+	   .. 'ã€Œã„ã„ãˆã€ï¼šã‚³ãƒ¡ãƒ³ãƒˆã‚’è¿½åŠ ã§ãã¾ã™';
 	if mz3.confirm(msg, nil, 'yes_no') == 'yes' then
-		-- Œö®RT
+		-- å…¬å¼RT
 		serialize_key = 'TWITTER_UPDATE_RETWEET';
 
-		-- ƒwƒbƒ_[‚Ìİ’è
+		-- ãƒ˜ãƒƒãƒ€ãƒ¼ã®è¨­å®š
 		post = MZ3PostData:create();
 		post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
 		post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
 		post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
 
-		-- POST ƒpƒ‰ƒ[ƒ^‚ğİ’è
+		-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 		data = mz3_main_view.get_selected_body_item();
 		data = MZ3Data:create(data);
 		local id = data:get_integer64_as_string('id');
 		post:append_post_body('id=' .. id);
 
-		-- POSTæURLİ’è
+		-- POSTå…ˆURLè¨­å®š
 		url = 'http://twitter.com/statuses/retweet/' .. id .. '.xml';
 
-		-- ’ÊMŠJn
+		-- é€šä¿¡é–‹å§‹
 		access_type = mz3.get_access_type_by_key(serialize_key);
 		referer = '';
 		user_agent = nil;
 		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
 	else
-		-- ƒ‚[ƒh•ÏX
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 		mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
 
-		-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 		mz3_main_view.update_control_status();
 
-		-- ƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚É•¶š—ñİ’è
+		-- ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã«æ–‡å­—åˆ—è¨­å®š
 		data = mz3_main_view.get_selected_body_item();
 		data = MZ3Data:create(data);
 		text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
 		text = text:gsub("\r\n", "");
 		mz3_main_view.set_edit_text(text);
 
-		-- ƒtƒH[ƒJƒXˆÚ“®
+		-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 		mz3_main_view.set_focus('edit');
 	end
 end
 
 
---- uƒz[ƒ€vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ›ãƒ¼ãƒ ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_home(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -1052,7 +1052,7 @@ function on_open_home(serialize_key, event_name, data)
 end
 
 
---- u—F’B‚Ì‚¨‹C‚É“ü‚èvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå‹é”ã®ãŠæ°—ã«å…¥ã‚Šã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -1061,7 +1061,7 @@ function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
 end
 
 
---- u—F’B‚ÌƒTƒCƒgvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå‹é”ã®ã‚µã‚¤ãƒˆã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_friend_site(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -1070,20 +1070,20 @@ function on_open_friend_site(serialize_key, event_name, data)
 end
 
 
---- u—F’B‚Ì‚¨‹C‚É“ü‚èvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå‹é”ã®ãŠæ°—ã«å…¥ã‚Šã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_friend_favorites(serialize_key, event_name, data)
 
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('name');
 	
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = "@" .. name .. "‚Ì‚¨‹C‚É“ü‚è";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = "@" .. name .. "ã®ãŠæ°—ã«å…¥ã‚Š";
 	url = "http://twitter.com/favorites/" .. name .. ".xml";
 	key = "TWITTER_FAVORITES";
 	mz3_main_view.append_category(title, url, key);
 	
-	-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -1092,11 +1092,11 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 end
 
 
---- body_item_list ‚©‚çÅ‘å‚ÌID‚ğæ“¾‚·‚é
+--- body_item_list ã‹ã‚‰æœ€å¤§ã®IDã‚’å–å¾—ã™ã‚‹
 -- 
--- ‚½‚¾‚µAƒƒO‚©‚çæ“¾‚µ‚½€–Ú‚ÍŠÜ‚Ü‚È‚¢
+-- ãŸã ã—ã€ãƒ­ã‚°ã‹ã‚‰å–å¾—ã—ãŸé …ç›®ã¯å«ã¾ãªã„
 --
--- –¢”­Œ©‚Í nil ‚ğ•Ô‚·
+-- æœªç™ºè¦‹æ™‚ã¯ nil ã‚’è¿”ã™
 --
 function get_max_id_from_body_list()
 	local max_id = nil;
@@ -1117,29 +1117,29 @@ function get_max_id_from_body_list()
 end
 
 
---- u‘O‚Ìƒy[ƒW‚ğæ“¾vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œå‰ã®ãƒšãƒ¼ã‚¸ã‚’å–å¾—ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_get_prev_page(serialize_key, event_name, data)
 
-	-- max_id ‚Ì’Tõ(log ‚ÍŠÜ‚Ü‚È‚¢)
+	-- max_id ã®æ¢ç´¢(log ã¯å«ã¾ãªã„)
 	local max_id = get_max_id_from_body_list();
 	if max_id == nil then
-		-- –¢æ“¾
+		-- æœªå–å¾—
 		max_id = 0;
 	end
 
-	-- ƒJƒeƒSƒŠ‚ÌURLæ“¾
+	-- ã‚«ãƒ†ã‚´ãƒªã®URLå–å¾—
 	local category = MZ3Data:create(mz3_main_view.get_selected_category_item());
 	local category_url = category:get_text('url');
 	url = category_url;
 	if url:find("?", 1, false)~=nil then
-		-- ? ‚ğŠÜ‚Ş
+		-- ? ã‚’å«ã‚€
 		url = url .. '&max_id=' .. max_id;
 	else
-		-- ? ‚ğŠÜ‚Ü‚È‚¢
+		-- ? ã‚’å«ã¾ãªã„
 		url = url .. '?max_id=' .. max_id;
 	end
 
-	-- ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- ã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = category:get_access_type();
 	referer = '';
 	user_agent = nil;
@@ -1148,13 +1148,13 @@ function on_get_prev_page(serialize_key, event_name, data)
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="TWITTER_USER" then
-		-- ‘S•¶•\¦
+		-- å…¨æ–‡è¡¨ç¤º
 		return on_read_menu_item(serialize_key, event_name, data);
 	elseif serialize_key=="TWITTER_LISTS_ITEM" then
-		-- ƒŠƒXƒg‚ÌƒJƒeƒSƒŠ’Ç‰Á
+		-- ãƒªã‚¹ãƒˆã®ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
 		local data = MZ3Data:create(data);
 		
 		local title = data:get_text('title');
@@ -1164,7 +1164,7 @@ function on_body_list_click(serialize_key, event_name, data)
 		local key = "TWITTER_FRIENDS_TIMELINE";
 		mz3_main_view.append_category(title, url, key);
 		
-		-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+		-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 		access_type = mz3.get_access_type_by_key(key);
 		referer = '';
 		user_agent = nil;
@@ -1173,20 +1173,20 @@ function on_body_list_click(serialize_key, event_name, data)
 		return true;
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "twitter.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "twitter.on_body_list_click");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
-	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
+	-- æœ¬æ–‡ã‚’1è¡Œã«å¤‰æ›ã—ã¦è¡¨ç¤º
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 	
@@ -1197,7 +1197,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	item = item .. data:get_date() .. "\r\n";
 	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
 
-	-- ƒ\[ƒX
+	-- ã‚½ãƒ¼ã‚¹
 	source = data:get_text('source');
 --	item = item .. "source : " .. source .. "\r\n";
 	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
@@ -1213,7 +1213,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
---- @user‚É‚Â‚¢‚Ä
+--- @userã«ã¤ã„ã¦
 function on_show_user_info(serialize_key, event_name, data)
 	mz3.logger_debug('on_show_user_info : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
@@ -1230,7 +1230,7 @@ function on_show_user_info(serialize_key, event_name, data)
 --	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 
-	-- location “™‚Í‚±‚±‚Åƒp[ƒX‚·‚é
+	-- location ç­‰ã¯ã“ã“ã§ãƒ‘ãƒ¼ã‚¹ã™ã‚‹
 	user = data:get_text('user_tag');
 
 	-- <location>East Tokyo United</location>
@@ -1255,7 +1255,7 @@ function on_show_user_info(serialize_key, event_name, data)
 		            .. ", "
 		            .. "fav : " .. favourites_count
 		            .. ", "
-		            .. "”­Œ¾ : " .. statuses_count
+		            .. "ç™ºè¨€ : " .. statuses_count
 		            .. "\r\n";
 	end
 	
@@ -1265,22 +1265,22 @@ function on_show_user_info(serialize_key, event_name, data)
 end
 
 
---- Twitter ‚É“Še‚·‚é
+--- Twitter ã«æŠ•ç¨¿ã™ã‚‹
 function do_post_to_twitter(text)
 
 	serialize_key = 'TWITTER_UPDATE'
 
-	-- ƒwƒbƒ_[‚Ìİ’è
+	-- ãƒ˜ãƒƒãƒ€ãƒ¼ã®è¨­å®š
 	post = MZ3PostData:create();
 	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
 	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
 	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
 
-	-- POST ƒpƒ‰ƒ[ƒ^‚ğİ’è
+	-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 	post:append_post_body('status=');
 	post:append_post_body(mz3.url_encode(text, 'utf8'));
 
-	-- •ÔMæƒXƒe[ƒ^ƒX
+	-- è¿”ä¿¡å…ˆã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹
 	if text:sub( 0, 1 ) == '@' then
 		if twitter_reply_id ~= 0 then
 			post:append_post_body('&in_reply_to_status_id=');
@@ -1289,10 +1289,10 @@ function do_post_to_twitter(text)
 	end
 	twitter_reply_id = 0;
 
-	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ã®ç¢ºèª
 	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 		if text:find("RT @", 1, false)~=nil then
-			-- RT‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚Å’Ç‰Á‚µ‚È‚¢
+			-- RTãŒå«ã¾ã‚Œã¦ã„ã‚‹ã®ã§è¿½åŠ ã—ãªã„
 		else
 			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
@@ -1301,10 +1301,10 @@ function do_post_to_twitter(text)
 	post:append_post_body('&source=');
 	post:append_post_body(mz3.get_app_name());
 
-	-- POSTæURLİ’è
+	-- POSTå…ˆURLè¨­å®š
 	url = 'http://twitter.com/statuses/update.xml';
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key(serialize_key);
 	referer = '';
 	user_agent = nil;
@@ -1314,10 +1314,10 @@ function do_post_to_twitter(text)
 end
 
 
---- XVƒ{ƒ^ƒ“‰Ÿ‰ºƒCƒxƒ“ƒg
+--- æ›´æ–°ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'click_update_button'
--- @param serialize_key Twitter•—‘‚«‚İƒ‚[ƒh‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
 function on_click_update_button(event_name, serialize_key)
 
@@ -1326,85 +1326,85 @@ function on_click_update_button(event_name, serialize_key)
 		return false;
 	end
 
-	-- “ü—Í•¶š—ñ‚ğæ“¾
+	-- å…¥åŠ›æ–‡å­—åˆ—ã‚’å–å¾—
 	text = mz3_main_view.get_edit_text();
 
-	-- –¢“ü—Í‚Ìˆ—
+	-- æœªå…¥åŠ›æ™‚ã®å‡¦ç†
 	if text == '' then
 		if serialize_key == 'TWITTER_NEW_DM' then
-			-- –¢“ü—Í‚ÍNG => ‰½‚à‚¹‚¸‚ÉI—¹
+			-- æœªå…¥åŠ›ã¯NG => ä½•ã‚‚ã›ãšã«çµ‚äº†
 			return true;
 		elseif serialize_key == 'TWITTER_UPDATE' then
-			-- ÅVæ“¾
+			-- æœ€æ–°å–å¾—
 			mz3_main_view.retrieve_category_item();
 			return true;
 		elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
-			-- –¢“ü—Í‚àOK => ‘±s
+			-- æœªå…¥åŠ›ã‚‚OK => ç¶šè¡Œ
 		end
 	end
 
-	-- •¶š’·ƒ`ƒFƒbƒN
+	-- æ–‡å­—é•·ãƒã‚§ãƒƒã‚¯
 	local len = mz3.get_text_length(text);
 	if len > 140 then
-		msg = '140•¶š‚ğ’´‰ß‚µ‚Ä‚¢‚Ü‚·(' .. len .. '•¶š)\n'
-			.. '“Še‚É¸”s‚·‚é‰Â”\«‚ª‚ ‚è‚Ü‚·‚ª‘±s‚µ‚Ü‚·‚©H\n'
+		msg = '140æ–‡å­—ã‚’è¶…éã—ã¦ã„ã¾ã™(' .. len .. 'æ–‡å­—)\n'
+			.. 'æŠ•ç¨¿ã«å¤±æ•—ã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ãŒç¶šè¡Œã—ã¾ã™ã‹ï¼Ÿ\n'
 			.. '----\n'
 			.. text;
-		if mz3.confirm(msg, '•¶š”F' .. len, 'yes_no') ~= 'yes' then
+		if mz3.confirm(msg, 'æ–‡å­—æ•°ï¼š' .. len, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	end
 
-	-- Šm”F
+	-- ç¢ºèª
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'TWITTER_NEW_DM' then
-		msg = data:get_text('name') .. ' ‚³‚ñ‚ÉˆÈ‰º‚ÌƒƒbƒZ[ƒW‚ğ‘—M‚µ‚Ü‚·B\n'
+		msg = data:get_text('name') .. ' ã•ã‚“ã«ä»¥ä¸‹ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡ã—ã¾ã™ã€‚\n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	elseif serialize_key == 'TWITTER_UPDATE' then
-		msg = 'Twitter‚Å”­Œ¾‚µ‚Ü‚·B\n'
+		msg = 'Twitterã§ç™ºè¨€ã—ã¾ã™ã€‚\n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
-		msg = 'twitpic‚Å“Še‚µ‚Ü‚·B\n'
-		   .. '---- ”­Œ¾ ----\n'
+		msg = 'twitpicã§æŠ•ç¨¿ã—ã¾ã™ã€‚\n'
+		   .. '---- ç™ºè¨€ ----\n'
 		   .. text .. '\n'
-		   .. '---- ƒtƒ@ƒCƒ‹ ----\n'
+		   .. '---- ãƒ•ã‚¡ã‚¤ãƒ« ----\n'
 		   .. twitpic_target_file .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	end
 
 	if serialize_key == 'TWITTER_UPDATE' then
-		-- ’Êí‚Ì“Še‚Í‹¤’Ê‰»
+		-- é€šå¸¸ã®æŠ•ç¨¿ã¯å…±é€šåŒ–
 		
-		-- ƒNƒƒXƒ|ƒXƒgŠÇ—ƒf[ƒ^‰Šú‰»
+		-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆç®¡ç†ãƒ‡ãƒ¼ã‚¿åˆæœŸåŒ–
 		mz3.init_cross_post_info("twitter");
 
 		return do_post_to_twitter(text);
 	end
 
-	-- ƒwƒbƒ_[‚Ìİ’è
+	-- ãƒ˜ãƒƒãƒ€ãƒ¼ã®è¨­å®š
 	post = MZ3PostData:create();
 	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
 	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
 	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
 
-	-- POST ƒpƒ‰ƒ[ƒ^‚ğİ’è
+	-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 	if serialize_key == 'TWITTER_NEW_DM' then
 		post:append_post_body('text=');
 		post:append_post_body(mz3.url_encode(text, 'utf8'));
@@ -1428,13 +1428,13 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body('\r\n');
 		post:append_post_body(mz3.url_encode(password, 'utf8') .. '\r\n');
 		
-		-- ƒƒbƒZ[ƒW‚ÍUTF8‚Å–„‚ß‚Ş
+		-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯UTF8ã§åŸ‹ã‚è¾¼ã‚€
 		-- message
 		post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 		post:append_post_body('Content-Disposition: form-data; name="message"' .. '\r\n');
 		post:append_post_body('\r\n');
 		post:append_post_body(mz3.convert_encoding(text, 'sjis', 'utf8'));
-		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
+		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ã®ç¢ºèª
 		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 			post:append_post_body(mz3.convert_encoding(footer_text, 'sjis', 'utf8'));
@@ -1448,7 +1448,7 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body('\r\n');
 		
 		if post:append_file(twitpic_target_file) == false then
-			mz3.alert('‰æ‘œƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+			mz3.alert('ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸ');
 			return true;
 		end
 
@@ -1459,7 +1459,7 @@ function on_click_update_button(event_name, serialize_key)
 
 	end
 
-	-- POSTæURLİ’è
+	-- POSTå…ˆURLè¨­å®š
 	url = '';
 	if serialize_key == 'TWITTER_NEW_DM' then
 		url = 'http://twitter.com/direct_messages/new.xml';
@@ -1467,7 +1467,7 @@ function on_click_update_button(event_name, serialize_key)
 		url = 'http://twitpic.com/api/uploadAndPost';
 	end
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key(serialize_key);
 	referer = '';
 	user_agent = nil;
@@ -1478,12 +1478,12 @@ end
 mz3.add_event_listener("click_update_button", "twitter.on_click_update_button");
 
 
---- POST Š®—¹ƒCƒxƒ“ƒg
+--- POST å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'post_end'
--- @param serialize_key Š®—¹€–Ú‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key å®Œäº†é …ç›®ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param http_status   HTTP Status Code (200, 404, etc...)
--- @param filename      ƒŒƒXƒ|ƒ“ƒXƒtƒ@ƒCƒ‹
+-- @param filename      ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
 -- @param wnd           wnd
 --
 function on_post_end(event_name, serialize_key, http_status, filename)
@@ -1493,69 +1493,69 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		return false;
 	end
 
-	-- Twitter“Šeˆ—Š®—¹
+	-- TwitteræŠ•ç¨¿å‡¦ç†å®Œäº†
 	
-	-- ƒXƒe[ƒ^ƒXƒR[ƒhƒ`ƒFƒbƒN
+	-- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 	msg = get_http_status_error_status(http_status);
 	if msg ~= nil then
-		-- ƒGƒ‰[ƒAƒŠ‚È‚Ì‚Å’†’f‚·‚é‚½‚ß‚É true ‚ğ•Ô‚·
+		-- ã‚¨ãƒ©ãƒ¼ã‚¢ãƒªãªã®ã§ä¸­æ–­ã™ã‚‹ãŸã‚ã« true ã‚’è¿”ã™
 		mz3.logger_error(msg);
 		mz3_main_view.set_info_text(msg);
 		return true;
 	end
 
-	-- ƒŠƒNƒGƒXƒg‚Ìí•Ê‚É‰‚¶‚ÄƒƒbƒZ[ƒW‚ğ•\¦
+	-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆã®ç¨®åˆ¥ã«å¿œã˜ã¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤º
 	if serialize_key == "TWITTER_NEW_DM" then
-		mz3_main_view.set_info_text("ƒƒbƒZ[ƒW‘—M‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é€ä¿¡ã—ã¾ã—ãŸ");
 	elseif serialize_key == "TWITTER_FAVOURINGS_CREATE" then
-		mz3_main_view.set_info_text("‚Ó‚Ÿ‚Ú‚Á‚½I");
+		mz3_main_view.set_info_text("ãµãã¼ã£ãŸï¼");
 	elseif serialize_key == "TWITTER_FAVOURINGS_DESTROY" then
-		mz3_main_view.set_info_text("‚Ó‚Ÿ‚Ú‚é‚Ì‚â‚ß‚½I");
+		mz3_main_view.set_info_text("ãµãã¼ã‚‹ã®ã‚„ã‚ãŸï¼");
 	elseif serialize_key == "TWITTER_FRIENDSHIPS_CREATE" then
-		mz3_main_view.set_info_text("ƒtƒHƒ[‚µ‚½I");
+		mz3_main_view.set_info_text("ãƒ•ã‚©ãƒ­ãƒ¼ã—ãŸï¼");
 	elseif serialize_key == "TWITTER_FRIENDSHIPS_DESTROY" then
-		mz3_main_view.set_info_text("ƒtƒHƒ[‚â‚ß‚½I");
+		mz3_main_view.set_info_text("ãƒ•ã‚©ãƒ­ãƒ¼ã‚„ã‚ãŸï¼");
 	elseif serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
-		mz3_main_view.set_info_text("twitpic ‰æ‘œ“ŠeŠ®—¹");
+		mz3_main_view.set_info_text("twitpic ç”»åƒæŠ•ç¨¿å®Œäº†");
 	elseif serialize_key == "TWITTER_UPDATE_DESTROY" then
-		mz3_main_view.set_info_text("”­Œ¾‚ğíœ‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("ç™ºè¨€ã‚’å‰Šé™¤ã—ã¾ã—ãŸ");
 	elseif serialize_key == "TWITTER_USER_BLOCK_CREATE" then
-		mz3_main_view.set_info_text("ƒuƒƒbƒN‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("ãƒ–ãƒ­ãƒƒã‚¯ã—ã¾ã—ãŸ");
 	elseif serialize_key == "TWITTER_USER_BLOCK_DESTROY" then
-		mz3_main_view.set_info_text("ƒuƒƒbƒN‚ğ‰ğœ‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("ãƒ–ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã¾ã—ãŸ");
 	elseif serialize_key == "TWITTER_USER_SPAM_REPORTS_CREATE" then
-		mz3_main_view.set_info_text("ƒXƒpƒ€’Ê•ñ‚µ‚Ü‚µ‚½");
+		mz3_main_view.set_info_text("ã‚¹ãƒ‘ãƒ é€šå ±ã—ã¾ã—ãŸ");
 	elseif serialize_key == "TWITTER_UPDATE_RETWEET" then
-		mz3_main_view.set_info_text("RT‚µ‚Ü‚µ‚½I");
+		mz3_main_view.set_info_text("RTã—ã¾ã—ãŸï¼");
 	else
 		-- TWITTER_UPDATE
---		mz3_main_view.set_info_text("ƒXƒe[ƒ^ƒX‘—MI—¹");
-		mz3_main_view.set_info_text("”­Œ¾‚µ‚Ü‚µ‚½");
+--		mz3_main_view.set_info_text("ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é€ä¿¡çµ‚äº†");
+		mz3_main_view.set_info_text("ç™ºè¨€ã—ã¾ã—ãŸ");
 	end
 
-	-- ƒNƒƒXƒ|ƒXƒg
+	-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆ
 	if serialize_key == "TWITTER_UPDATE" then
 		if mz3.do_cross_post() then
 			return true;
 		end
 	end
 
-	-- twitpic ‚Ì Ê^“Še‚Ì‚İ‚ğs‚¤ê‡‚Í‰º‹L‚ÌƒR[ƒh‚Å POST ‚·‚é
+	-- twitpic ã® å†™çœŸæŠ•ç¨¿ã®ã¿ã‚’è¡Œã†å ´åˆã¯ä¸‹è¨˜ã®ã‚³ãƒ¼ãƒ‰ã§ POST ã™ã‚‹
 --[[
 	if serialize_key == "TWITTER_UPDATE_WITH_TWITPIC" then
 		f = io.open(filename, 'r');
 		file = f:read('*a');
 		f:close();
 		
-		-- “Še‚µ‚½ƒtƒ@ƒCƒ‹‚ÌURLæ“¾
+		-- æŠ•ç¨¿ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã®URLå–å¾—
 		twitpic_url = file:match('<mediaurl>(.-)<');
 		if twitpic_url == '' then
-			mz3.alert('“Še‚É¸”s‚µ‚½‰Â”\«‚ª‚ ‚è‚Ü‚·BÄ“x“Še‚µ‚Ä‚­‚¾‚³‚¢B');
+			mz3.alert('æŠ•ç¨¿ã«å¤±æ•—ã—ãŸå¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚å†åº¦æŠ•ç¨¿ã—ã¦ãã ã•ã„ã€‚');
 			return true;
 		end
 --		mz3.alert(twitpic_url);
 		
-		-- Ä“xPOST‚·‚é
+		-- å†åº¦POSTã™ã‚‹
 		text = mz3_main_view.get_edit_text();
 		do_post_to_twitter(twitpic_url .. ' - ' .. text);
 		
@@ -1563,7 +1563,7 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	end
 ]]
 
-	-- “ü—Í’l‚ğÁ‹
+	-- å…¥åŠ›å€¤ã‚’æ¶ˆå»
 	mz3_main_view.set_edit_text("");
 	
 	return true;
@@ -1571,10 +1571,10 @@ end
 mz3.add_event_listener("post_end", "twitter.on_post_end");
 
 
---- GET Š®—¹ƒCƒxƒ“ƒg
+--- GET å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'get_end'
--- @param serialize_key Š®—¹€–Ú‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key å®Œäº†é …ç›®ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param http_status   HTTP Status Code (200, 404, etc...)
 -- @param wnd           wnd
 --
@@ -1585,26 +1585,26 @@ function on_get_end(event_name, serialize_key, http_status)
 		return false;
 	end
 
-	-- ƒXƒe[ƒ^ƒXƒR[ƒhƒ`ƒFƒbƒN‚Ì‚İs‚¤
+	-- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯ã®ã¿è¡Œã†
 	msg = get_http_status_error_status(http_status);
 	if msg ~= nil then
-		-- ƒGƒ‰[ƒAƒŠ‚È‚Ì‚Å’†’f‚·‚é‚½‚ß‚É true ‚ğ•Ô‚·
+		-- ã‚¨ãƒ©ãƒ¼ã‚¢ãƒªãªã®ã§ä¸­æ–­ã™ã‚‹ãŸã‚ã« true ã‚’è¿”ã™
 		mz3.logger_error(msg);
 		mz3_main_view.set_info_text(msg);
-		mz3.alert("ƒT[ƒoƒGƒ‰[(" .. http_status .. ") : " .. msg);
+		mz3.alert("ã‚µãƒ¼ãƒã‚¨ãƒ©ãƒ¼(" .. http_status .. ") : " .. msg);
 		return true;
 	end
-	-- ƒGƒ‰[‚È‚µ‚È‚Ì‚Å‘±s‚·‚é(Œã‘±‚Ì‰ğÍˆ—“™‚ğŒp‘±)
+	-- ã‚¨ãƒ©ãƒ¼ãªã—ãªã®ã§ç¶šè¡Œã™ã‚‹(å¾Œç¶šã®è§£æå‡¦ç†ç­‰ã‚’ç¶™ç¶š)
 
 	return false;
 end
 mz3.add_event_listener("get_end",  "twitter.on_get_end");
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -1613,10 +1613,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	submenu = MZ3Menu:create_popup_menu();
 	submenu_hash = MZ3Menu:create_popup_menu();
@@ -1624,89 +1624,89 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	name = body:get_text('name');
 
-	menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
 	
-	-- N Œ–¢–‚Å‚ ‚ê‚Îu‘O‚Ìƒy[ƒW‚ğæ“¾v‚ğ•\¦
+	-- N ä»¶æœªæº€ã§ã‚ã‚Œã°ã€Œå‰ã®ãƒšãƒ¼ã‚¸ã‚’å–å¾—ã€ã‚’è¡¨ç¤º
 	list = mz3_main_view.get_body_item_list();
 	list = MZ3DataList:create(list);
 	local n = list:get_count();
 	if n < 100 then
-		menu:append_menu("string", "‘O‚Ìƒy[ƒW‚ğæ“¾", menu_items.get_prev_page);
+		menu:append_menu("string", "å‰ã®ãƒšãƒ¼ã‚¸ã‚’å–å¾—", menu_items.get_prev_page);
 	end
 
-	menu:append_menu("string", "‘S•¶‚ğ“Ç‚Ş...", menu_items.read);
-	menu:append_menu("string", "@" .. name .. " ‚³‚ñ‚É‚Â‚¢‚Ä...", menu_items.show_user_info);
+	menu:append_menu("string", "å…¨æ–‡ã‚’èª­ã‚€...", menu_items.read);
+	menu:append_menu("string", "@" .. name .. " ã•ã‚“ã«ã¤ã„ã¦...", menu_items.show_user_info);
 
 	menu:append_menu("separator");
 
-	menu:append_menu("string", "‚Â‚Ô‚â‚­", menu_items.update);
+	menu:append_menu("string", "ã¤ã¶ã‚„ã", menu_items.update);
 	
 	if mz3_pro_mode and mz3.get_app_name()=="MZ3" then
 		-- Pro & MZ3 only
-		submenu_twitpic:append_menu("string", "ƒtƒ@ƒCƒ‹‚ğ‘I‘ğ...", menu_items.update_with_twitpic);
-		submenu_twitpic:append_menu("string", "ƒJƒƒ‰‚ÅB‰e...", menu_items.update_with_twitpic_now);
-		menu:append_submenu("Ê^‚ğ“Še(twitpic)", submenu_twitpic);
+		submenu_twitpic:append_menu("string", "ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠ...", menu_items.update_with_twitpic);
+		submenu_twitpic:append_menu("string", "ã‚«ãƒ¡ãƒ©ã§æ’®å½±...", menu_items.update_with_twitpic_now);
+		menu:append_submenu("å†™çœŸã‚’æŠ•ç¨¿(twitpic)", submenu_twitpic);
 	else
-		menu:append_menu("string", "Ê^‚ğ“Še(twitpic)...", menu_items.update_with_twitpic);
+		menu:append_menu("string", "å†™çœŸã‚’æŠ•ç¨¿(twitpic)...", menu_items.update_with_twitpic);
 	end
 
-	menu:append_menu("string", "@" .. name .. " ‚³‚ñ‚É•ÔM", menu_items.reply);
-	menu:append_menu("string", "@" .. name .. " ‚³‚ñ‚ÉƒƒbƒZ[ƒW‘—M", menu_items.new_dm);
+	menu:append_menu("string", "@" .. name .. " ã•ã‚“ã«è¿”ä¿¡", menu_items.reply);
+	menu:append_menu("string", "@" .. name .. " ã•ã‚“ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é€ä¿¡", menu_items.new_dm);
 
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "ReTweet...", menu_items.retweet);
 	
-	-- ƒJƒeƒSƒŠ‚ªutimelinev‚Ì‚İA‚¨‹C‚É“ü‚è“o˜^‚ğ•\¦
+	-- ã‚«ãƒ†ã‚´ãƒªãŒã€Œtimelineã€ã®ã¿ã€ãŠæ°—ã«å…¥ã‚Šç™»éŒ²ã‚’è¡¨ç¤º
 	category_access_type = mz3_main_view.get_selected_category_access_type();
 	category_key = mz3.get_serialize_key_by_access_type(category_access_type);
 	if category_key == "TWITTER_FRIENDS_TIMELINE" then
-		menu:append_menu("string", "‚¨‹C‚É“ü‚è“o˜^i‚Ó‚Ÿ‚Ú‚éj", menu_items.create_favourings);
+		menu:append_menu("string", "ãŠæ°—ã«å…¥ã‚Šç™»éŒ²ï¼ˆãµãã¼ã‚‹ï¼‰", menu_items.create_favourings);
 	end
 	
-	-- ƒJƒeƒSƒŠ‚ªu‚¨‹C‚É“ü‚èv‚Ì‚İA‚¨‹C‚É“ü‚èíœ‚ğ•\¦
+	-- ã‚«ãƒ†ã‚´ãƒªãŒã€ŒãŠæ°—ã«å…¥ã‚Šã€ã®ã¿ã€ãŠæ°—ã«å…¥ã‚Šå‰Šé™¤ã‚’è¡¨ç¤º
 	if category_key == "TWITTER_FAVORITES" then
-		menu:append_menu("string", "‚¨‹C‚É“ü‚èíœ", menu_items.destroy_favourings);
+		menu:append_menu("string", "ãŠæ°—ã«å…¥ã‚Šå‰Šé™¤", menu_items.destroy_favourings);
 	end
 
-	-- post íœ/ŒŸõ
+	-- post å‰Šé™¤/æ¤œç´¢
 	if name == mz3_account_provider.get_value('Twitter', 'id') then
-		menu:append_menu("string", "”­Œ¾íœ", menu_items.twitter_update_destroy);
+		menu:append_menu("string", "ç™ºè¨€å‰Šé™¤", menu_items.twitter_update_destroy);
 	end
-	menu:append_menu("string", "”­Œ¾ŒŸõ", menu_items.search_post);
+	menu:append_menu("string", "ç™ºè¨€æ¤œç´¢", menu_items.search_post);
 
-	-- ”­Œ¾“à‚ÌƒnƒbƒVƒ…ƒ^ƒO #XXX ‚ğ’Šo‚µAƒƒjƒ…[‰»
+	-- ç™ºè¨€å†…ã®ãƒãƒƒã‚·ãƒ¥ã‚¿ã‚° #XXX ã‚’æŠ½å‡ºã—ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼åŒ–
 	body_text = body:get_text_array_joined_text('body');
 	i = 1;
 	for hash in body_text:gmatch("#([0-9a-zA-Z_]+)") do
 		mz3.logger_debug(hash);
 		hash_list[i] = hash;
-		submenu_hash:append_menu("string", "#" .. hash .. " ‚ÌŒŸõ", menu_items.search_hash_list[i]);
+		submenu_hash:append_menu("string", "#" .. hash .. " ã®æ¤œç´¢", menu_items.search_hash_list[i]);
 		i = i+1;
-		-- Å‘å5‚Â‚Ü‚ÅƒTƒ|[ƒg
+		-- æœ€å¤§5ã¤ã¾ã§ã‚µãƒãƒ¼ãƒˆ
 		if i>5 then
 			break;
 		end
 	end
 
 	if i > 1 then
-		menu:append_submenu("ƒnƒbƒVƒ…ƒ^ƒO", submenu_hash);
+		menu:append_submenu("ãƒãƒƒã‚·ãƒ¥ã‚¿ã‚°", submenu_hash);
 	end
 
 	menu:append_menu("separator");
 
-	menu:append_menu("string", "ƒXƒe[ƒ^ƒXƒy[ƒW‚ğŠJ‚­", menu_items.show_status_url);
-	menu:append_menu("string", "@" .. name .. " ‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“", menu_items.show_friend_timeline);
+	menu:append_menu("string", "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ãƒšãƒ¼ã‚¸ã‚’é–‹ã", menu_items.show_status_url);
+	menu:append_menu("string", "@" .. name .. " ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³", menu_items.show_friend_timeline);
 	
-	-- ”­Œ¾“à‚Ì @XXX ‚ğ’Šo‚µAƒƒjƒ…[‰»
+	-- ç™ºè¨€å†…ã® @XXX ã‚’æŠ½å‡ºã—ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼åŒ–
 	body_text = body:get_text_array_joined_text('body');
 	i = 1;
 	for f_name in body_text:gmatch("@([0-9a-zA-Z_]+)") do
 		mz3.logger_debug(f_name);
-		-- Lua •Ï”‚É–¼‘O‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+		-- Lua å¤‰æ•°ã«åå‰ã‚’ä¿å­˜ã—ã¦ãŠã
 		follower_names[i] = f_name;
-		menu:append_menu("string", "@" .. f_name .. " ‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“", menu_items.show_follower_tl[i]);
-		-- Å‘å5l‚Ü‚ÅƒTƒ|[ƒg
+		menu:append_menu("string", "@" .. f_name .. " ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³", menu_items.show_follower_tl[i]);
+		-- æœ€å¤§5äººã¾ã§ã‚µãƒãƒ¼ãƒˆ
 		i = i+1;
 		if i>5 then
 			break;
@@ -1715,23 +1715,23 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 --	menu:append_menu("separator");
 	
-	submenu:append_menu("string", "@" .. name .. " ‚ğƒtƒHƒ[‚·‚é", menu_items.create_friendships);
-	submenu:append_menu("string", "@" .. name .. " ‚ÌƒtƒHƒ[‚ğ‚â‚ß‚é", menu_items.destroy_friendships);
-	submenu:append_menu("string", "@" .. name .. " ‚³‚ñ‚ğƒuƒƒbƒN", menu_items.twitter_user_block_create);
-	submenu:append_menu("string", "@" .. name .. " ‚³‚ñ‚ÌƒuƒƒbƒN‰ğœ", menu_items.twitter_user_block_destroy);
-	submenu:append_menu("string", "@" .. name .. " ‚³‚ñ‚ğƒXƒpƒ€’Ê•ñ‚·‚é", menu_items.twitter_user_spam_reports);
-	submenu:append_menu("string", "@" .. name .. " ‚Ìƒz[ƒ€‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­", menu_items.open_home);
-	submenu:append_menu("string", "@" .. name .. " ‚Ì‚¨‹C‚É“ü‚è‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­", menu_items.open_friend_favorites_by_browser);
-	submenu:append_menu("string", "@" .. name .. " ‚Ì‚¨‹C‚É“ü‚è", menu_items.open_friend_favorites);
-	menu:append_submenu("‚»‚Ì‘¼", submenu);
+	submenu:append_menu("string", "@" .. name .. " ã‚’ãƒ•ã‚©ãƒ­ãƒ¼ã™ã‚‹", menu_items.create_friendships);
+	submenu:append_menu("string", "@" .. name .. " ã®ãƒ•ã‚©ãƒ­ãƒ¼ã‚’ã‚„ã‚ã‚‹", menu_items.destroy_friendships);
+	submenu:append_menu("string", "@" .. name .. " ã•ã‚“ã‚’ãƒ–ãƒ­ãƒƒã‚¯", menu_items.twitter_user_block_create);
+	submenu:append_menu("string", "@" .. name .. " ã•ã‚“ã®ãƒ–ãƒ­ãƒƒã‚¯è§£é™¤", menu_items.twitter_user_block_destroy);
+	submenu:append_menu("string", "@" .. name .. " ã•ã‚“ã‚’ã‚¹ãƒ‘ãƒ é€šå ±ã™ã‚‹", menu_items.twitter_user_spam_reports);
+	submenu:append_menu("string", "@" .. name .. " ã®ãƒ›ãƒ¼ãƒ ã‚’ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ã", menu_items.open_home);
+	submenu:append_menu("string", "@" .. name .. " ã®ãŠæ°—ã«å…¥ã‚Šã‚’ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ã", menu_items.open_friend_favorites_by_browser);
+	submenu:append_menu("string", "@" .. name .. " ã®ãŠæ°—ã«å…¥ã‚Š", menu_items.open_friend_favorites);
+	menu:append_submenu("ãã®ä»–", submenu);
 
-	-- URL ‚ª‹ó‚Å‚È‚¯‚ê‚ÎuƒTƒCƒgv‚ğ’Ç‰Á
+	-- URL ãŒç©ºã§ãªã‘ã‚Œã°ã€Œã‚µã‚¤ãƒˆã€ã‚’è¿½åŠ 
 	url = body:get_text('url');
 	if url~=nil and url:len()>0 then
-		submenu:append_menu("string", "@" .. name .. " ‚ÌƒTƒCƒg‚ğƒuƒ‰ƒEƒU‚ÅŠJ‚­", menu_items.open_friend_site);
+		submenu:append_menu("string", "@" .. name .. " ã®ã‚µã‚¤ãƒˆã‚’ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ã", menu_items.open_friend_site);
 	end
 
-	-- ƒŠƒ“ƒN’Ç‰Á
+	-- ãƒªãƒ³ã‚¯è¿½åŠ 
 	n = body:get_link_list_size();
 	if n > 0 then
 		menu:append_menu("separator");
@@ -1743,10 +1743,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 
 --	menu:append_menu("string", "debug", menu_items.debug);
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	submenu:delete();
 	submenu_hash:delete();
@@ -1756,27 +1756,27 @@ end
 mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
 
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' Twitter', 1, true) ~= nil then
 
-		-- Twitterƒ^ƒu’Ç‰Á
+		-- Twitterã‚¿ãƒ–è¿½åŠ 
 		local tab = MZ3GroupItem:create("Twitter");
-		tab:append_category("ƒ^ƒCƒ€ƒ‰ƒCƒ“", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
-		tab:append_category("•ÔMˆê——", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
-		tab:append_category("ƒŠƒXƒgˆê——", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
-		tab:append_category("“o˜^‚³‚ê‚Ä‚¢‚éƒŠƒXƒgˆê——", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists/memberships.xml");
-		tab:append_category("‚¨‹C‚É“ü‚è", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
-		tab:append_category("óMƒƒbƒZ[ƒW", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
-		tab:append_category("‘—MƒƒbƒZ[ƒW", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
+		tab:append_category("ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
+		tab:append_category("è¿”ä¿¡ä¸€è¦§", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
+		tab:append_category("ãƒªã‚¹ãƒˆä¸€è¦§", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
+		tab:append_category("ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ãƒªã‚¹ãƒˆä¸€è¦§", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists/memberships.xml");
+		tab:append_category("ãŠæ°—ã«å…¥ã‚Š", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
+		tab:append_category("å—ä¿¡ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
+		tab:append_category("é€ä¿¡ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
@@ -1785,12 +1785,12 @@ end
 mz3.add_event_listener("creating_default_group", "twitter.on_creating_default_group", false);
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
@@ -1825,12 +1825,12 @@ end
 mz3.logger_debug('twitter.lua end');
 
 
---- post ŒŸõ
+--- post æ¤œç´¢
 last_searched_index = 0;
 last_searched_key = '';
 function on_search_post(serialize_key, event_name, data)
 
-	local key = mz3.show_common_edit_dlg("”­Œ¾ŒŸõ", "ŒŸõ‚µ‚½‚¢•¶š—ñ‚ğ“ü—Í‚µ‚Ä‰º‚³‚¢", last_searched_key);
+	local key = mz3.show_common_edit_dlg("ç™ºè¨€æ¤œç´¢", "æ¤œç´¢ã—ãŸã„æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„", last_searched_key);
 	if key == nil then
 		return false;
 	end
@@ -1854,17 +1854,17 @@ function on_search_post(serialize_key, event_name, data)
 end
 
 
---- ƒXƒe[ƒ^ƒXíœƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å‰Šé™¤ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_update_destroy(serialize_key, event_name, data)
 
-	if mz3.confirm( "‘I‘ğ‚³‚ê‚½”­Œ¾‚ğíœ‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") == 'yes' then
-		-- URL ¶¬
+	if mz3.confirm( "é¸æŠã•ã‚ŒãŸç™ºè¨€ã‚’å‰Šé™¤ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") == 'yes' then
+		-- URL ç”Ÿæˆ
 		body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 		id = body:get_integer64_as_string('id');
 		name = body:get_text('name');
 		url = "http://twitter.com/statuses/destroy/" .. id .. ".xml";
 
-		-- ’ÊMŠJn
+		-- é€šä¿¡é–‹å§‹
 		key = "TWITTER_UPDATE_DESTROY";
 		access_type = mz3.get_access_type_by_key(key);
 		referer = '';
@@ -1875,21 +1875,21 @@ function on_twitter_update_destroy(serialize_key, event_name, data)
 end
 
 
---- ƒuƒƒbƒNƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ãƒ–ãƒ­ãƒƒã‚¯ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_user_block_create(serialize_key, event_name, data)
 
-	-- Šm”F
+	-- ç¢ºèª
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	if mz3.confirm(name .. " ‚³‚ñ‚ğƒuƒƒbƒN‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") ~= 'yes' then
-		-- ’†~
+	if mz3.confirm(name .. " ã•ã‚“ã‚’ãƒ–ãƒ­ãƒƒã‚¯ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") ~= 'yes' then
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	url = "http://twitter.com/blocks/create/" .. name .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_USER_BLOCK_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -1899,21 +1899,21 @@ function on_twitter_user_block_create(serialize_key, event_name, data)
 end
 
 
---- ƒuƒƒbƒN‰ğœƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ãƒ–ãƒ­ãƒƒã‚¯è§£é™¤ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_user_block_destroy(serialize_key, event_name, data)
 
-	-- Šm”F
+	-- ç¢ºèª
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	if mz3.confirm(name .. " ‚³‚ñ‚ÌƒuƒƒbƒN‚ğ‰ğœ‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") ~= 'yes' then
-		-- ’†~
+	if mz3.confirm(name .. " ã•ã‚“ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’è§£é™¤ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") ~= 'yes' then
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	url = "http://twitter.com/blocks/destroy/" .. name .. ".xml";
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_USER_BLOCK_DESTROY";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
@@ -1923,7 +1923,7 @@ function on_twitter_user_block_destroy(serialize_key, event_name, data)
 end
 
 
---- u#xxx ‚ÌŒŸõvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œ#xxx ã®æ¤œç´¢ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_search_hash_list_1(serialize_key, event_name, data)	search_hash_list(1) end
 function on_search_hash_list_2(serialize_key, event_name, data)	search_hash_list(2) end
 function on_search_hash_list_3(serialize_key, event_name, data)	search_hash_list(3) end
@@ -1931,30 +1931,30 @@ function on_search_hash_list_4(serialize_key, event_name, data)	search_hash_list
 function on_search_hash_list_5(serialize_key, event_name, data)	search_hash_list(5) end
 
 function search_hash_list(num)
-	-- ”­Œ¾“à‚Ì num ”Ô–Ú‚ÌƒnƒbƒVƒ…ƒ^ƒO #xxx ‚ğŒŸõ‚·‚é
+	-- ç™ºè¨€å†…ã® num ç•ªç›®ã®ãƒãƒƒã‚·ãƒ¥ã‚¿ã‚° #xxx ã‚’æ¤œç´¢ã™ã‚‹
 	hash = hash_list[num];
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = "#" .. hash .. " ‚ğŒŸõ";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = "#" .. hash .. " ã‚’æ¤œç´¢";
 	url = "https://twitter.com/search?q=%23" .. hash;
 	mz3.open_url_by_browser_with_confirm(url);
 end
 
 
---- ƒXƒpƒ€’Ê•ñƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã‚¹ãƒ‘ãƒ é€šå ±ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 
-	-- Šm”F
+	-- ç¢ºèª
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
-	if mz3.confirm(name .. " ‚³‚ñ‚ğƒXƒpƒ€‚Æ‚µ‚Ä’Ê•ñ‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H", nil, "yes_no") ~= 'yes' then
-		-- ’†~
+	if mz3.confirm(name .. " ã•ã‚“ã‚’ã‚¹ãƒ‘ãƒ ã¨ã—ã¦é€šå ±ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ", nil, "yes_no") ~= 'yes' then
+		-- ä¸­æ­¢
 		return;
 	end
 
-	-- URL ¶¬
+	-- URL ç”Ÿæˆ
 	url = "http://twitter.com/report_spam.xml?screen_name=" .. name;
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	key = "TWITTER_USER_SPAM_REPORTS_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';

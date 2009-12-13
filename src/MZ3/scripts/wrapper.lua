@@ -4,7 +4,7 @@
  * http://www.mz3.jp/license.txt
 ]]
 --------------------------------------------------
--- MZ3 Script : APIƒ‰ƒbƒp[ƒNƒ‰ƒX
+-- MZ3 Script : APIãƒ©ãƒƒãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹
 --
 -- $Id$
 --------------------------------------------------
@@ -15,18 +15,18 @@
 MZ3Data = {};
 
 function MZ3Data:create(data)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	if data==nil then
 		object.data = mz3_data.create();
 	else
 		object.data = data;
 	end
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
-	-- ƒƒ‚Fƒƒ^ƒe[ƒuƒ‹‚ÍƒtƒbƒN‚Ì‚æ‚¤‚È‚à‚Ì
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
+	-- ãƒ¡ãƒ¢ï¼šãƒ¡ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã¯ãƒ•ãƒƒã‚¯ã®ã‚ˆã†ãªã‚‚ã®
 	setmetatable(object, { __index = MZ3Data });
 	return object;
 end
@@ -54,7 +54,7 @@ function MZ3Data:add_link_list(url, text, t)	return mz3_data.add_link_list(self.
 function MZ3Data:clear()						return mz3_data.clear(self.data);						end
 function MZ3Data:add_child(child)				return mz3_data.add_child(self.data, child.data);		end
 
--- text_array ‚ğ‘S‚Ä˜AŒ‹‚µ‚½•¶š—ñ‚ğ•Ô‚·ƒwƒ‹ƒp[
+-- text_array ã‚’å…¨ã¦é€£çµã—ãŸæ–‡å­—åˆ—ã‚’è¿”ã™ãƒ˜ãƒ«ãƒ‘ãƒ¼
 function MZ3Data:get_text_array_joined_text(name)
 	item = '';
 	n = mz3_data.get_text_array_size(self.data, name);
@@ -65,7 +65,7 @@ function MZ3Data:get_text_array_joined_text(name)
 	return item;
 end
 
--- ƒVƒŠƒAƒ‰ƒCƒYƒL[‚Ìæ“¾
+-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼ã®å–å¾—
 function MZ3Data:get_serialize_key()
 	return mz3.get_serialize_key_by_access_type(self:get_access_type());
 end
@@ -76,17 +76,17 @@ end
 MZ3DataList = {};
 
 function MZ3DataList:create(data_list)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	if data_list==nil then
 		object.data_list = mz3_data_list.create();
 	else
 		object.data_list = data_list;
 	end
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3DataList });
 	return object;
 end
@@ -106,13 +106,13 @@ function MZ3DataList:merge(new_list, size)	return mz3_data_list.merge(self.data_
 MZ3HTMLArray = {};
 
 function MZ3HTMLArray:create(htmlarray)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	object.htmlarray = htmlarray;
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3HTMLArray });
 	return object;
 end
@@ -127,17 +127,17 @@ function MZ3HTMLArray:get_at(index)		return mz3_htmlarray.get_at(self.htmlarray,
 MZ3AccessTypeInfo = {};
 
 function MZ3AccessTypeInfo:create(type)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	if type==nil then
 		object.type = mz3_access_type_info.new_access_type();
 	else
 		object.type = type;
 	end
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3AccessTypeInfo });
 	return object;
 end
@@ -161,10 +161,10 @@ function MZ3AccessTypeInfo:set_cruise_target(f)			return mz3_access_type_info.se
 MZ3Menu = {};
 
 function MZ3Menu:create_popup_menu(menu)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	if menu==nil then
 		object.menu = mz3_menu.create_popup_menu();
 	else
@@ -172,7 +172,7 @@ function MZ3Menu:create_popup_menu(menu)
 	end
 	
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3Menu });
 	return object;
 end
@@ -189,13 +189,13 @@ function MZ3Menu:delete()							return mz3_menu.delete(self.menu);	end
 MZ3GroupItem = {};
 
 function MZ3GroupItem:create(name)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	object.item = mz3_group_item.create(name);
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3GroupItem });
 	return object;
 end
@@ -210,17 +210,17 @@ function MZ3GroupItem:delete()							return mz3_group_item.delete(self.item);	en
 MZ3PostData = {};
 
 function MZ3PostData:create(post_data)
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX—pƒe[ƒuƒ‹
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”¨ãƒ†ãƒ¼ãƒ–ãƒ«
 	local object = {}
 	
-	-- ƒƒ“ƒo[•Ï”‚Ìİ’è
+	-- ãƒ¡ãƒ³ãƒãƒ¼å¤‰æ•°ã®è¨­å®š
 	if post_data == nil then
 		object.post_data = mz3_post_data.create();
 	else
 		object.post_data = post_data;
 	end
 	
-	-- ƒe[ƒuƒ‹‚ÉŒ©‚ ‚½‚ç‚È‚¢ƒL[‚ğƒNƒ‰ƒX‚©‚çˆø‚¢‚Ä‚­‚é‚æ‚¤‚Éİ’è
+	-- ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¦‹ã‚ãŸã‚‰ãªã„ã‚­ãƒ¼ã‚’ã‚¯ãƒ©ã‚¹ã‹ã‚‰å¼•ã„ã¦ãã‚‹ã‚ˆã†ã«è¨­å®š
 	setmetatable(object, { __index = MZ3PostData });
 	return object;
 end

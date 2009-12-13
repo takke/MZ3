@@ -11,82 +11,82 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 
--- óM” 
+-- å—ä¿¡ç®±
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('MESSAGE_IN');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒƒbƒZ[ƒW(óM” )');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('mixi\\list_message_inbox.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('MESSAGE_IN');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(å—ä¿¡ç®±)');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('mixi\\list_message_inbox.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://mixi.jp/list_message.pl');
-type:set_body_header(1, 'title', 'Œ–¼');
-type:set_body_header(2, 'name', '·ol>>');
-type:set_body_header(3, 'date', '“ú•t>>');
+type:set_body_header(1, 'title', 'ä»¶å');
+type:set_body_header(2, 'name', 'å·®å‡ºäºº>>');
+type:set_body_header(3, 'date', 'æ—¥ä»˜>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
--- ‘—M” 
+-- é€ä¿¡ç®±
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('MESSAGE_OUT');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒƒbƒZ[ƒW(‘—M” )');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('mixi\\list_message_outbox.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('MESSAGE_OUT');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(é€ä¿¡ç®±)');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('mixi\\list_message_outbox.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://mixi.jp/list_message.pl?box=outbox');
-type:set_body_header(1, 'title', 'Œ–¼');
-type:set_body_header(2, 'name', '·ol>>');
-type:set_body_header(3, 'date', '“ú•t>>');
+type:set_body_header(1, 'title', 'ä»¶å');
+type:set_body_header(2, 'name', 'å·®å‡ºäºº>>');
+type:set_body_header(3, 'date', 'æ—¥ä»˜>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
--- Œö®ƒƒbƒZ[ƒW
+-- å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');										-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');										-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('MIXI_LIST_MESSAGE_OFFICIAL');				-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('Œö®ƒƒbƒZ[ƒW');								-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');										-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('mixi\\list_message_official.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');										-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('MIXI_LIST_MESSAGE_OFFICIAL');				-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸');								-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');										-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('mixi\\list_message_official.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://mixi.jp/list_message.pl?box=noticebox');
-type:set_body_header(1, 'title', 'Œ–¼');
-type:set_body_header(2, 'name', '·ol>>');
-type:set_body_header(3, 'date', '“ú•t>>');
+type:set_body_header(1, 'title', 'ä»¶å');
+type:set_body_header(2, 'name', 'å·®å‡ºäºº>>');
+type:set_body_header(3, 'date', 'æ—¥ä»˜>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
 
 --------------------------------------------------
--- ymixi ƒƒbƒZ[ƒW(óM” ), (‘—M” )z
--- [list] list_message.pl —pƒp[ƒT
--- [list] list_message.pl?box=outbox —pƒp[ƒT
+-- ã€mixi ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(å—ä¿¡ç®±), (é€ä¿¡ç®±)ã€‘
+-- [list] list_message.pl ç”¨ãƒ‘ãƒ¼ã‚µ
+-- [list] list_message.pl?box=outbox ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/list_message.pl
--- [list] list_message.pl?box=outbox —pƒp[ƒT
+-- [list] list_message.pl?box=outbox ç”¨ãƒ‘ãƒ¼ã‚µ
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_list_message_parser(parent, body, html)
 	mz3.logger_debug("mixi_list_message_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -95,62 +95,62 @@ function mixi_list_message_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=140, line_count-1 do
 		line = html:get_at(i);
 		
 --		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
-		-- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
-		-- €–Ú”­Œ©‘O‚É‚Ì‚İ‘¶İ‚·‚é
+		-- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
+		-- é …ç›®ç™ºè¦‹å‰ã«ã®ã¿å­˜åœ¨ã™ã‚‹
 		if not in_data_region and back_data==nil and next_data==nil then
 			back_data, next_data = parse_next_back_link(line, "list_message.pl");
 		end
 
-		-- €–Ú’Tõ
+		-- é …ç›®æ¢ç´¢
 		if line_has_strings(line, "td", "class", "subject") then
 
 			in_data_region = true;
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
-			--	Œ–¼
+			--	ä»¶å
 			--	<td class="subject">
 			--		<a href="view_message.pl?id=*****&box=inbox&page=1">
-			--			Œ–¼
+			--			ä»¶å
 			--		</a>
 			--	</td>
-			-- Œ–¼
+			-- ä»¶å
 			title, after = line:match(">([^<]+)(<.*)$");
 			title = mz3.decode_html_entity(title);
 			data:set_text("title", title);
 
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line:match("href=\"([^\"]+)\"");
 			data:set_text("url", url);
 
-			-- 1s–ß‚é
+			-- 1è¡Œæˆ»ã‚‹
 			i = i -1;
 			line2 = html:get_at(i);
 
-			-- –¼‘O
+			-- åå‰
 			name, after = line2:match(">([^<]+)(<.*)$");
 			name = mz3.decode_html_entity(name);
 			data:set_text("name", name);
 			data:set_text("author", name);
 
-			-- 2si‚Ş
+			-- 2è¡Œé€²ã‚€
 			i = i +2;
 			line3 = html:get_at(i);
 
-			-- “ú•tæ“¾
-			-- <td class="date">03Œ10“ú<a id=
+			-- æ—¥ä»˜å–å¾—
+			-- <td class="date">03æœˆ10æ—¥<a id=
 			date, after = line3:match(">([^<]+)(<.*)$");
 			data:set_date( date );
 
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line:match("href=\"([^\"]+)\"");
 			data:set_text("url", url);
 
@@ -158,32 +158,32 @@ function mixi_list_message_parser(parent, body, html)
 			id = get_param_from_url(url, "id");
 			data:set_integer("id", id);
 
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			type = mz3.estimate_access_type_by_url(url);
 			data:set_access_type(type);
 
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			body:add(data.data);
 
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
 	end
 
-	-- ‘OAŸ‚ÖƒŠƒ“ƒN‚Ì’Ç‰Á
+	-- å‰ã€æ¬¡ã¸ãƒªãƒ³ã‚¯ã®è¿½åŠ 
 	if back_data~=nil then
-		-- æ“ª‚É‘}“ü
+		-- å…ˆé ­ã«æŒ¿å…¥
 		body:insert(0, back_data.data);
 		back_data:delete();
 	end
 	if next_data~=nil then
-		-- ––”ö‚É’Ç‰Á
+		-- æœ«å°¾ã«è¿½åŠ 
 		body:add(next_data.data);
 		next_data:delete();
 	end
@@ -194,24 +194,24 @@ end
 
 
 --------------------------------------------------
--- yŒö®‚©‚ç‚ÌƒƒbƒZ[ƒWˆê——z
--- [list] list_message.pl?box=noticebox —pƒp[ƒT
+-- ã€å…¬å¼ã‹ã‚‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ä¸€è¦§ã€‘
+-- [list] list_message.pl?box=noticebox ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/list_message.pl?box=noticebox
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_new_official_message_parser(parent, body, html)
 	mz3.logger_debug("mixi_new_official_message_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -220,49 +220,49 @@ function mixi_new_official_message_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=140, line_count-1 do
 		line = html:get_at(i);
 		
 --		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
-		-- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
-		-- €–Ú”­Œ©‘O‚É‚Ì‚İ‘¶İ‚·‚é
+		-- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
+		-- é …ç›®ç™ºè¦‹å‰ã«ã®ã¿å­˜åœ¨ã™ã‚‹
 		if not in_data_region and back_data==nil and next_data==nil then
 --			back_data, next_data = parse_next_back_link(line, "list_message.pl?box=noticebox");
 			back_data, next_data = parse_next_back_link(line, "view_message.pl");
 		end
 
-		-- €–Ú’Tõ
+		-- é …ç›®æ¢ç´¢
 		if line_has_strings(line, "<td", "class", "sender")  then
 
 			in_data_region = true;
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
-			-- “ú•t‚Ìƒp[ƒX
-			-- sender, subject, date ‚Æ‰ñ‚èCdate ‚É“ú•t‚ª‚ ‚é‚Ì‚Å +2 c
+			-- æ—¥ä»˜ã®ãƒ‘ãƒ¼ã‚¹
+			-- sender, subject, date ã¨å›ã‚Šï¼Œdate ã«æ—¥ä»˜ãŒã‚ã‚‹ã®ã§ +2 â€¦
 			line3 = html:get_at(i +2);
 			date = line3:match(">([^<]+)(<.*)$");
 			date = mz3.decode_html_entity(date);
 			data:set_date(date);
 			
-			-- Ÿsæ“¾
+			-- æ¬¡è¡Œå–å¾—
 			i = i+1;
 			line2 = html:get_at(i);
 --			mz3.trace(i .. " : " .. line2);
 			
-			-- Œ©o‚µ
+			-- è¦‹å‡ºã—
 			-- <dd><a href="view_bbs.pl?id=20728968&comment_count=3&comm_id=1198460">
-			-- yƒ`ƒƒƒbƒgzW‚¦Ixxx</a> (MZ3 -Mixi for ZERO3-)</dd>
+			-- ã€ãƒãƒ£ãƒƒãƒˆã€‘é›†ãˆï¼xxx</a> (MZ3 -Mixi for ZERO3-)</dd>
 			title, after = line2:match(">([^<]+)(<.*)$");
 			title = mz3.decode_html_entity(title);
 
 			data:set_text("title", title);
 			
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line2:match("href=\"([^\"]+)\"");
 			data:set_text("url", url);
 
@@ -270,42 +270,42 @@ function mixi_new_official_message_parser(parent, body, html)
 			id = get_param_from_url(url, "id");
 			data:set_integer("id", id);
 	
-			-- ‘—MÒ–¼
+			-- é€ä¿¡è€…å
 			sender = line:match(">([^<]+)(<.*)$");
 --			sender = mz3.decode_html_entity(sender);
 			data:set_text("name", sender);
 			data:set_text("author", sender);
 			
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			type = mz3.estimate_access_type_by_url(url);
 			data:set_access_type(type);
 
-			-- Ÿsæ“¾
+			-- æ¬¡è¡Œå–å¾—
 			i = i+1;
 			line = html:get_at(i);
 			
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			body:add(data.data);
 
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
 	end
 
-	-- ‘OAŸ‚ÖƒŠƒ“ƒN‚Ì’Ç‰Á
+	-- å‰ã€æ¬¡ã¸ãƒªãƒ³ã‚¯ã®è¿½åŠ 
 	if back_data~=nil then
-		-- æ“ª‚É‘}“ü
+		-- å…ˆé ­ã«æŒ¿å…¥
 		body:insert(0, back_data.data);
 		back_data:delete();
 	end
 	if next_data~=nil then
-		-- ––”ö‚É’Ç‰Á
+		-- æœ«å°¾ã«è¿½åŠ 
 		body:add(next_data.data);
 		next_data:delete();
 	end
@@ -316,74 +316,74 @@ end
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
--- óM” , ‘—M” 
+-- å—ä¿¡ç®±, é€ä¿¡ç®±
 mz3.set_parser("MESSAGE_IN", "mixi.mixi_list_message_parser");
 mz3.set_parser("MESSAGE_OUT", "mixi.mixi_list_message_parser");
--- Œö®ƒƒbƒZ[ƒW
+-- å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 mz3.set_parser("MIXI_LIST_MESSAGE_OFFICIAL", "mixi.mixi_new_official_message_parser");
 
 
 ----------------------------------------
--- ƒƒjƒ…[‚Ö‚Ì“o˜^
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸ã®ç™»éŒ²
 ----------------------------------------
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group_for_mixi_list_message(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' mixi', 1, true) ~= nil then
-		-- óM” 
-		local tab = mz3_group_data.get_group_item_by_name(group, 'ƒƒbƒZ[ƒW');
-		mz3_group_item.append_category(tab, "ƒƒbƒZ[ƒW(óM” )", "MESSAGE_IN", "http://mixi.jp/list_message.pl");
+		-- å—ä¿¡ç®±
+		local tab = mz3_group_data.get_group_item_by_name(group, 'ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸');
+		mz3_group_item.append_category(tab, "ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(å—ä¿¡ç®±)", "MESSAGE_IN", "http://mixi.jp/list_message.pl");
 
-		-- ‘—M” 
-		local tab = mz3_group_data.get_group_item_by_name(group, 'ƒƒbƒZ[ƒW');
-		mz3_group_item.append_category(tab, "ƒƒbƒZ[ƒW(‘—M” )", "MESSAGE_OUT", "http://mixi.jp/list_message.pl?box=outbox");
+		-- é€ä¿¡ç®±
+		local tab = mz3_group_data.get_group_item_by_name(group, 'ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸');
+		mz3_group_item.append_category(tab, "ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(é€ä¿¡ç®±)", "MESSAGE_OUT", "http://mixi.jp/list_message.pl?box=outbox");
 
-		-- Œö®ƒƒbƒZ[ƒW
-		local tab = mz3_group_data.get_group_item_by_name(group, 'ƒƒbƒZ[ƒW');
-		mz3_group_item.append_category(tab, "Œö®ƒƒbƒZ[ƒW", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
+		-- å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+		local tab = mz3_group_data.get_group_item_by_name(group, 'ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸');
+		mz3_group_item.append_category(tab, "å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸", "MIXI_LIST_MESSAGE_OFFICIAL", "http://mixi.jp/list_message.pl?box=noticebox");
 	end
 end
--- ƒCƒxƒ“ƒgƒtƒbƒNŠÖ”‚Ì“o˜^
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒ•ãƒƒã‚¯é–¢æ•°ã®ç™»éŒ²
 mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group_for_mixi_list_message");
 
 
 ----------------------------------------
--- estimate ‘ÎÛ‚É’Ç‰Á
+-- estimate å¯¾è±¡ã«è¿½åŠ 
 ----------------------------------------
 
---- estimate ‘ÎÛ”»•ÊƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- estimate å¯¾è±¡åˆ¤åˆ¥ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
 -- @param event_name 'estimate_access_type_by_url'
--- @param url        ‰ğÍ‘ÎÛURL
+-- @param url        è§£æå¯¾è±¡URL
 --
 function on_estimate_access_type_by_url_for_mixi_list_message(event_name, url, data1, data2)
 
-    -- óM” 
+    -- å—ä¿¡ç®±
 	if line_has_strings(url, 'list_message.pl', 'box=inbox') then
 		return true, mz3.get_access_type_by_key('MESSAGE_IN');
 	end
 	
-    -- ‘—M” 
+    -- é€ä¿¡ç®±
 	if line_has_strings(url, 'list_message.pl', 'box=outbox') then
 		return true, mz3.get_access_type_by_key('MESSAGE_OUT');
 	end
 	
-    -- Œö®ƒƒbƒZ[ƒW
+    -- å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 	if line_has_strings(url, 'list_message.pl', 'box=noticebox') then
 		return true, mz3.get_access_type_by_key('MIXI_LIST_MESSAGE_OFFICIAL');
 	end
 
 	return false;
 end
--- ƒCƒxƒ“ƒgƒtƒbƒNŠÖ”‚Ì“o˜^
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒ•ãƒƒã‚¯é–¢æ•°ã®ç™»éŒ²
 mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type_by_url_for_mixi_list_message");

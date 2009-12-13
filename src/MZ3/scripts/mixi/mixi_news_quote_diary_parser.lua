@@ -9,41 +9,41 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('body');									-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');								-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('MIXI_NEWS_QUOTE_DIARY');				-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('ƒjƒ…[ƒXŠÖ˜A“ú‹L');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('news\\list_quote_diary_{urlparam:id}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');						-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('body');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');								-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('MIXI_NEWS_QUOTE_DIARY');				-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãƒ‹ãƒ¥ãƒ¼ã‚¹é–¢é€£æ—¥è¨˜');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('news\\list_quote_diary_{urlparam:id}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');						-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 -- url(1) : http://news.mixi.jp/list_quote_diary.pl?id=839733
 
 
 --------------------------------------------------
--- ymixi ƒjƒ…[ƒXŠÖ˜A“ú‹Lz
--- [content] http://news.mixi.jp/list_quote_diary.pl —pƒp[ƒT
+-- ã€mixi ãƒ‹ãƒ¥ãƒ¼ã‚¹é–¢é€£æ—¥è¨˜ã€‘
+-- [content] http://news.mixi.jp/list_quote_diary.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/view_message.pl
 --
--- ˆø”:
---   data:  ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   data:  ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy: NULL
---   html:  HTMLƒf[ƒ^(CHtmlArray*)
+--   html:  HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_news_quote_diary_parser(data, dummy, html)
 	mz3.logger_debug("mixi_news_quote_diary_parser start");
 	local t1 = mz3.get_tick_count();
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 
 	data:clear();
 
-	-- ƒ^ƒCƒgƒ‹æ“¾
+	-- ã‚¿ã‚¤ãƒˆãƒ«å–å¾—
 	local line_count = html:get_count();
 	for i=5, line_count-1 do
 		line = html:get_at(i);
@@ -59,7 +59,7 @@ function mixi_news_quote_diary_parser(data, dummy, html)
 		end
 	end
 
-	-- ŠT—væ“¾
+	-- æ¦‚è¦å–å¾—
 	in_description = false;
 	desc_end_line = 200;
 	for i=200, line_count-1 do
@@ -67,26 +67,26 @@ function mixi_news_quote_diary_parser(data, dummy, html)
 		
 		--<div class="relationNewsDescription">
 		--<div class="heading02">
-		--<h2>ƒjƒ…[ƒXŠT—v</h2>
+		--<h2>ãƒ‹ãƒ¥ãƒ¼ã‚¹æ¦‚è¦</h2>
 		
 		if line_has_strings(line, '<div', 'class="relationNewsDescription"') then
 			in_description = true;
 		end
 		if in_description then
-			--<p class="newsTitle"><a href="view_news.pl?id=840519&media_id=42">misono‚ªƒZƒ~ƒk[ƒh‚É‰’§í</a></p>
+			--<p class="newsTitle"><a href="view_news.pl?id=840519&media_id=42">misonoãŒã‚»ãƒŸãƒŒãƒ¼ãƒ‰ã«åˆæŒ‘æˆ¦</a></p>
 			if line_has_strings(line, '<p class="newsTitle">') then
 				data:add_text_array("body", "\r\n");
 				
-				-- URL‚ğƒtƒ‹ƒpƒX‚É•ÏŠ·
+				-- URLã‚’ãƒ•ãƒ«ãƒ‘ã‚¹ã«å¤‰æ›
 				line = line:gsub('view_news\.pl', 'http://news.mixi.jp/%1', 1);
 				data:add_body_with_extract(line:match('>(.*)<'));
 				
 				data:add_text_array("body", "\r\n");
 				data:add_text_array("body", "\r\n");
 			end
-			--<p class="media">iƒTƒ“ƒPƒCƒXƒ|[ƒc - 05Œ19“ú 08:03j</p>
+			--<p class="media">ï¼ˆã‚µãƒ³ã‚±ã‚¤ã‚¹ãƒãƒ¼ãƒ„ - 05æœˆ19æ—¥ 08:03ï¼‰</p>
 			if line_has_strings(line, '<p class="media">') then
-				author, date = line:match("i([^ ]*) \- (.*)j");
+				author, date = line:match("ï¼ˆ([^ ]*) \- (.*)ï¼‰");
 				data:set_text('author', author);
 				data:parse_date_line(date);
 			end
@@ -105,24 +105,24 @@ function mixi_news_quote_diary_parser(data, dummy, html)
 		--<div class="diaryContents clearfix">
 		--<div class="thumb">
 		--<a href="http://mixi.jp/show_friend.pl?id=xxx"><img src="http://profile.img.mixi.jp/photo/member/xx/xx/xx.jpg" alt="" /></a>
-		--<a href="http://mixi.jp/show_friend.pl?id=xxx">‚È‚Ü‚¦</a>
+		--<a href="http://mixi.jp/show_friend.pl?id=xxx">ãªã¾ãˆ</a>
 		--
 		--</div>
 		--<div class="diaryList01">
 		--<div class="heading clearfix">
-		--<span class="title"><a href="http://mixi.jp/view_diary.pl?owner_id=xxx&id=xxx">‚½‚¢‚Æ‚é</a></span>
-		--<span class="date">05Œ19“ú 15:26</span>
+		--<span class="title"><a href="http://mixi.jp/view_diary.pl?owner_id=xxx&id=xxx">ãŸã„ã¨ã‚‹</a></span>
+		--<span class="date">05æœˆ19æ—¥ 15:26</span>
 		--</div>
-		--<p>‚Î‚Á‚·‚¢‚µ‚½‚É‚Á‚«‚Ì‚È‚¢‚æ‚¤</p>
-		--<p class="readMore"><a href="http://mixi.jp/view_diary.pl?owner_id=xxx&id=xxx">‘±‚«‚ğ“Ç‚Ş</a></p>
+		--<p>ã°ã£ã™ã„ã—ãŸã«ã£ãã®ãªã„ã‚ˆã†</p>
+		--<p class="readMore"><a href="http://mixi.jp/view_diary.pl?owner_id=xxx&id=xxx">ç¶šãã‚’èª­ã‚€</a></p>
 		--</div>
 		--</div>
 		
 		if line_has_strings(line, '<div', 'diaryContents') then
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			diary = MZ3Data:create();
 			
-			-- ƒjƒbƒNƒl[ƒ€‚ÆURL
+			-- ãƒ‹ãƒƒã‚¯ãƒãƒ¼ãƒ ã¨URL
 			i = i+3;
 			line = html:get_at(i);
 			profile_url, name = line:match('href="([^\"]*)">(.*)<');
@@ -155,14 +155,14 @@ function mixi_news_quote_diary_parser(data, dummy, html)
 				end
 			end
 
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			type = mz3.estimate_access_type_by_url(url);
 			diary:set_access_type(type);
 
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			data:add_child(diary);
 
-			-- data íœ
+			-- data å‰Šé™¤
 			diary:delete();
 		end
 	end
@@ -173,7 +173,7 @@ end
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
--- óM” 
+-- å—ä¿¡ç®±
 mz3.set_parser("MIXI_NEWS_QUOTE_DIARY", "mixi.mixi_news_quote_diary_parser");

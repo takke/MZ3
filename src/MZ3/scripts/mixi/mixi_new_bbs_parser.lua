@@ -11,24 +11,24 @@
 module("mixi", package.seeall)
 
 --------------------------------------------------
--- yƒRƒ~ƒ…ƒjƒeƒBÅV‘‚«‚İˆê——z
--- [list] new_bbs.pl —pƒp[ƒT
+-- ã€ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£æœ€æ–°æ›¸ãè¾¼ã¿ä¸€è¦§ã€‘
+-- [list] new_bbs.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/new_bbs.pl
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function new_bbs_parser(parent, body, html)
 	mz3.logger_debug("new_bbs_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -37,97 +37,97 @@ function new_bbs_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 	
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=140, line_count-1 do
 		line = html:get_at(i);
 		
 --		mz3.logger_debug(i .. " : " .. html:get_at(i));
 
-		-- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
-		-- €–Ú”­Œ©‘O‚É‚Ì‚İ‘¶İ‚·‚é
+		-- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
+		-- é …ç›®ç™ºè¦‹å‰ã«ã®ã¿å­˜åœ¨ã™ã‚‹
 		if not in_data_region and back_data==nil and next_data==nil then
 			back_data, next_data = parse_next_back_link(line, "new_bbs.pl");
 		end
 
-		-- €–Ú’Tõ
-		-- <dt class="iconTopic">2007”N10Œ01“ú&nbsp;22:14</dt>
+		-- é …ç›®æ¢ç´¢
+		-- <dt class="iconTopic">2007å¹´10æœˆ01æ—¥&nbsp;22:14</dt>
 		if line_has_strings(line, "<dt", "class", "iconTopic") or 
 		   line_has_strings(line, "<dt", "class", "iconEvent") or 
 		   line_has_strings(line, "<dt", "class", "iconEnquete") then
 
 			in_data_region = true;
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
-			-- “ú•t‚Ìƒp[ƒX
+			-- æ—¥ä»˜ã®ãƒ‘ãƒ¼ã‚¹
 			data:parse_date_line(line);
 			
-			-- Ÿsæ“¾
+			-- æ¬¡è¡Œå–å¾—
 			i = i+1;
 			line2 = html:get_at(i);
 --			mz3.trace(i .. " : " .. line2);
 			
-			-- Œ©o‚µ
+			-- è¦‹å‡ºã—
 			-- <dd><a href="view_bbs.pl?id=20728968&comment_count=3&comm_id=1198460">
-			-- yƒ`ƒƒƒbƒgzW‚¦Ixxx</a> (MZ3 -Mixi for ZERO3-)</dd>
+			-- ã€ãƒãƒ£ãƒƒãƒˆã€‘é›†ãˆï¼xxx</a> (MZ3 -Mixi for ZERO3-)</dd>
 			title, after = line2:match(">([^<]+)(<.*)$");
 			title = mz3.decode_html_entity(title);
 --			mz3.logger_debug(after);
 
-			-- ƒAƒ“ƒP[ƒgAƒCƒxƒ“ƒg‚Ìê‡‚Íƒ^ƒCƒgƒ‹‚Ì‘O‚Éƒ}[ƒN‚ğ•t‚¯‚é
+			-- ã‚¢ãƒ³ã‚±ãƒ¼ãƒˆã€ã‚¤ãƒ™ãƒ³ãƒˆã®å ´åˆã¯ã‚¿ã‚¤ãƒˆãƒ«ã®å‰ã«ãƒãƒ¼ã‚¯ã‚’ä»˜ã‘ã‚‹
 			if line_has_strings(line, "iconEvent") then
-				title = "y™z" .. title;
+				title = "ã€â˜†ã€‘" .. title;
 			elseif line_has_strings(line, "iconEnquete") then
-				title = "y—z" .. title;
+				title = "ã€ï¼ ã€‘" .. title;
 			end
 --			mz3.logger_debug(title);
 			data:set_text("title", title);
 			
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line2:match("href=\"([^\"]+)\"");
 --			mz3.logger_debug(url);
 			data:set_text("url", url);
 			
-			-- ƒRƒƒ“ƒg”
+			-- ã‚³ãƒ¡ãƒ³ãƒˆæ•°
 			data:set_integer("comment_count", get_param_from_url(url, "comment_count"));
 			
 			-- id
 			id = get_param_from_url(url, "id");
 			data:set_integer("id", id);
 
-			-- ƒRƒ~ƒ…ƒjƒeƒB–¼
+			-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£å
 			name = after:match("</a>[^(]*[(](.*)[)]</dd>");
 			name = mz3.decode_html_entity(name);
 			data:set_text("name", name);
 			
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			type = mz3.estimate_access_type_by_url(url);
 			data:set_access_type(type);
 			
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			body:add(data.data);
 			
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
 	end
 	
-	-- ‘OAŸ‚ÖƒŠƒ“ƒN‚Ì’Ç‰Á
+	-- å‰ã€æ¬¡ã¸ãƒªãƒ³ã‚¯ã®è¿½åŠ 
 	if back_data~=nil then
-		-- æ“ª‚É‘}“ü
+		-- å…ˆé ­ã«æŒ¿å…¥
 		body:insert(0, back_data.data);
 		back_data:delete();
 	end
 	if next_data~=nil then
-		-- ––”ö‚É’Ç‰Á
+		-- æœ«å°¾ã«è¿½åŠ 
 		body:add(next_data.data);
 		next_data:delete();
 	end
@@ -136,7 +136,7 @@ function new_bbs_parser(parent, body, html)
 	mz3.logger_debug("new_bbs_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 
--- ƒRƒ~ƒ…ƒjƒeƒBÅV‘ˆê——
+-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£æœ€æ–°æ›¸è¾¼ä¸€è¦§
 mz3.set_parser("BBS",             "mixi.new_bbs_parser");
--- ƒRƒ~ƒ…ƒjƒeƒBƒRƒƒ“ƒg‹L“ü—š—ğ : ÅV‘ˆê——‚Æ“¯ˆê
+-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£ã‚³ãƒ¡ãƒ³ãƒˆè¨˜å…¥å±¥æ­´ : æœ€æ–°æ›¸è¾¼ä¸€è¦§ã¨åŒä¸€
 mz3.set_parser("NEW_BBS_COMMENT", "mixi.new_bbs_parser");

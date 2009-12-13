@@ -12,30 +12,30 @@ mz3.logger_debug('mixi.lua start');
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ç”¨)
 ----------------------------------------
 mz3.regist_service('mixi', true);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
-mz3_account_provider.set_param('mixi', 'id_name', 'ƒ[ƒ‹ƒAƒhƒŒƒX');
-mz3_account_provider.set_param('mixi', 'password_name', 'ƒpƒXƒ[ƒh');
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
+mz3_account_provider.set_param('mixi', 'id_name', 'ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹');
+mz3_account_provider.set_param('mixi', 'password_name', 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰');
 
 
 --------------------------------------------------
--- yƒvƒƒtƒB[ƒ‹z
--- [content] show_friend.pl —pƒp[ƒT
+-- ã€ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã€‘
+-- [content] show_friend.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/show_friend.pl
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy:  NULL
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_show_friend_parser(parent, body, html)
 	mz3.logger_debug("mixi_show_friend_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	html = MZ3HTMLArray:create(html);
 	
@@ -47,7 +47,7 @@ function mixi_show_friend_parser(parent, body, html)
 	local t1 = mz3.get_tick_count();
 	local line_count = html:get_count();
 	
-	-- –¼‘O, ‰æ‘œ
+	-- åå‰, ç”»åƒ
 	local i=100;
 	local sub_html = '';
 	sub_html, i = get_sub_html(html, i, line_count, {"<div id=", '"myProfile"'}, {'<div id=', '"mymixiList"'});
@@ -62,23 +62,23 @@ function mixi_show_friend_parser(parent, body, html)
 		parent:set_text('author', name);
 	end
 	
-	-- ƒ†[ƒU‰æ‘œ
+	-- ãƒ¦ãƒ¼ã‚¶ç”»åƒ
 	local url = sub_html:match('<img src="(.-)"');
 	if url ~= nil then
-		parent:add_link_list(url, 'ƒ†[ƒU‰æ‘œ');
-		parent:add_text_array("body", "<_a><<ƒ†[ƒU‰æ‘œ>></_a>");
+		parent:add_link_list(url, 'ãƒ¦ãƒ¼ã‚¶ç”»åƒ');
+		parent:add_text_array("body", "<_a><<ãƒ¦ãƒ¼ã‚¶ç”»åƒ>></_a>");
 	end
 	
-	-- ÅIƒƒOƒCƒ“
-	-- <p class="loginTime">iÅIƒƒOƒCƒ“‚Í3“úˆÈãj</p>
+	-- æœ€çµ‚ãƒ­ã‚°ã‚¤ãƒ³
+	-- <p class="loginTime">ï¼ˆæœ€çµ‚ãƒ­ã‚°ã‚¤ãƒ³ã¯3æ—¥ä»¥ä¸Šï¼‰</p>
 	local last_login = sub_html:match('class="loginTime">(.-)<');
 	if last_login ~= nil then
 		parent:add_body_with_extract(" ");
 		parent:add_body_with_extract(last_login);
 	end
 	
-	-- —FlŠÖŒW
-	-- <p class="friendPath">‚½‚Á‚¯ Ë <a href="show_friend.pl?id=109835">‚¢‚Á‚¿‚ã‚¤</a></p>
+	-- å‹äººé–¢ä¿‚
+	-- <p class="friendPath">ãŸã£ã‘ â‡’ <a href="show_friend.pl?id=109835">ã„ã£ã¡ã‚…ã†</a></p>
 	local friend_path = sub_html:match('class="friendPath">(.-)</p>');
 	if friend_path ~= nil then
 		parent:add_body_with_extract("<br>");
@@ -86,15 +86,15 @@ function mixi_show_friend_parser(parent, body, html)
 	end
 	
 	
-	-- ƒvƒƒtƒB[ƒ‹‚ğ‘S‚Äæ“¾‚µA–{•¶‚Éİ’è‚·‚éB
+	-- ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã‚’å…¨ã¦å–å¾—ã—ã€æœ¬æ–‡ã«è¨­å®šã™ã‚‹ã€‚
 	sub_html, i = get_sub_html(html, i, line_count, {'<div id="profile">'}, {'</ul>'});
 	parent:add_body_with_extract("<br>");
 	for li in sub_html:gmatch("<li>(.-)</li>") do
---		<li><dl><dt>Š‘®</dt><dd>WebƒvƒƒOƒ‰ƒ}</dd></dl></li>
+--		<li><dl><dt>æ‰€å±</dt><dd>Webãƒ—ãƒ­ã‚°ãƒ©ãƒ</dd></dl></li>
 		local dt = li:match("<dt>(.-)<");
 		local dd = li:match("<dd>(.-)<");
 		if dt ~= nil and dd ~= nil then
-			parent:add_body_with_extract("¡ " .. dt);
+			parent:add_body_with_extract("â–  " .. dt);
 			parent:add_body_with_extract("<br>");
 			
 			parent:add_body_with_extract(dd);
@@ -103,37 +103,37 @@ function mixi_show_friend_parser(parent, body, html)
 		end
 	end
 	
-	-- ÅV‚Ì“ú‹Læ“¾
+	-- æœ€æ–°ã®æ—¥è¨˜å–å¾—
 	local child_number = 1;
 	sub_html, i = get_sub_html(html, i, line_count, {'<div id="newFriendDiary">'}, {'</dl>'});
-	-- dt/span, dd/a ‚ªŒğŒİ‚ÉoŒ»‚·‚éB
-	-- <dt><span>05Œ03“ú</span></dt>
-	-- <dd><a href="view_diary.pl?id=xxx&owner_id=xxx" >WMŒn‚ÌˆÌ‚¢l‚Æˆù‚İ‰ï‚És‚Á‚Äc</a></dd>
+	-- dt/span, dd/a ãŒäº¤äº’ã«å‡ºç¾ã™ã‚‹ã€‚
+	-- <dt><span>05æœˆ03æ—¥</span></dt>
+	-- <dd><a href="view_diary.pl?id=xxx&owner_id=xxx" >WMç³»ã®å‰ã„äººã¨é£²ã¿ä¼šã«è¡Œã£ã¦â€¦</a></dd>
 	local child = MZ3Data:create();
 	child:add_body_with_extract("<br>");
 	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
 		local date = dt:match("<span>(.-)<");
 		
 		if date ~= nil then
-			child:add_body_with_extract("¡ " .. date .. " : " .. dd);
+			child:add_body_with_extract("â–  " .. date .. " : " .. dd);
 			child:add_body_with_extract("<br>");
 		end
 	end
 	child:set_integer("comment_index", child_number);
-	child:set_text('author', "ÅV‚Ì“ú‹L");
+	child:set_text('author', "æœ€æ–°ã®æ—¥è¨˜");
 	parent:add_child(child);
 	child_number = child_number + 1;
 	child:delete();
 	
-	-- Ğ‰î•¶æ“¾
+	-- ç´¹ä»‹æ–‡å–å¾—
 	sub_html, i = get_sub_html(html, i, line_count, {'<div id="intro">'}, {'</ul>'});
 	--[[
 <dl>
-<dt><a href="show_friend.pl?id=xxx"><img src="xxx.jpg" alt="‚ä" onerror="javascript:this.width=76;this.height=76;" /></a>
-<br /><a href="show_friend.pl?id=xxx">‚ä</a></dt>
+<dt><a href="show_friend.pl?id=xxx"><img src="xxx.jpg" alt="ã‚†" onerror="javascript:this.width=76;this.height=76;" /></a>
+<br /><a href="show_friend.pl?id=xxx">ã‚†</a></dt>
 <dd>
-<p class="relation">ŠÖŒWFxxx</p>
-<p class="userInput">xxx‚Å‚·B</p>
+<p class="relation">é–¢ä¿‚ï¼šxxx</p>
+<p class="userInput">xxxã§ã™ã€‚</p>
 </dd>
 </dl>
 ]]
@@ -145,7 +145,7 @@ function mixi_show_friend_parser(parent, body, html)
 		local relation = dd:match('"relation">(.-)<');
 		local text     = dd:match('"userInput">(.-)</p');
 
-		child:add_body_with_extract("¡ " .. name .. "<br>");
+		child:add_body_with_extract("â–  " .. name .. "<br>");
 		child:add_body_with_extract(relation);
 		child:add_body_with_extract("<br>");
 		child:add_body_with_extract(text);
@@ -156,7 +156,7 @@ function mixi_show_friend_parser(parent, body, html)
 	end
 	if has_intro then
 		child:set_integer("comment_index", child_number);
-		child:set_text('author', "Ğ‰î•¶");
+		child:set_text('author', "ç´¹ä»‹æ–‡");
 		parent:add_child(child);
 		child_number = child_number + 1;
 	end
@@ -170,24 +170,24 @@ mz3.set_parser("MIXI_PROFILE", "mixi.mixi_show_friend_parser");
 
 
 --------------------------------------------------
--- y‚İ‚ñ‚È‚ÌƒGƒR[ˆê——z
--- [list] recent_echo.pl —pƒp[ƒT
+-- ã€ã¿ã‚“ãªã®ã‚¨ã‚³ãƒ¼ä¸€è¦§ã€‘
+-- [list] recent_echo.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/recent_echo.pl
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_recent_echo_parser(parent, body, html)
 	mz3.logger_debug("mixi_recent_echo_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 
 	local t1 = mz3.get_tick_count();
@@ -195,7 +195,7 @@ function mixi_recent_echo_parser(parent, body, html)
 
 	local line_count = html:get_count();
 	
-	-- post_key ’Tõ
+	-- post_key æ¢ç´¢
 	mixi.post_key = '';
 	for i=100, line_count-1 do
 		line = html:get_at(i);
@@ -207,22 +207,22 @@ function mixi_recent_echo_parser(parent, body, html)
 		end
 	end
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	for i=180, line_count-1 do
 		line = html:get_at(i);
 
-		-- €–Ú’Tõ ˆÈ‰ºˆês
+		-- é …ç›®æ¢ç´¢ ä»¥ä¸‹ä¸€è¡Œ
 		-- <td class="thumb">
 		if line_has_strings(line, "<td", "class", "thumb") then
-		-- <div class="echo_member_id" style="display: none;">ƒ†[ƒUID</div>
+		-- <div class="echo_member_id" style="display: none;">ãƒ¦ãƒ¼ã‚¶ID</div>
 		-- if line_has_strings(line, "<div", "class", "echo_member_id") then
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
 			in_data_region = true;
 
-			-- ‰æ‘œæ“¾
+			-- ç”»åƒå–å¾—
 			line = html:get_at(i);
 			image_url = line:match('<img src="(.-)"');
 			if image_url ~= nil then
@@ -230,7 +230,7 @@ function mixi_recent_echo_parser(parent, body, html)
 			--	mz3.alert(image_url);
 			end
 
-			-- </tr>‚Ü‚ÅŒp‘±, ‚¢‚Á‚½‚ñƒoƒbƒtƒ@ƒŠƒ“ƒO
+			-- </tr>ã¾ã§ç¶™ç¶š, ã„ã£ãŸã‚“ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°
 			sub_html = '';
 			for i=i+2, line_count-1 do
 				line = html:get_at(i);
@@ -243,21 +243,21 @@ function mixi_recent_echo_parser(parent, body, html)
 			
 --			mz3.alert(sub_html);
 			
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = sub_html:match('<a href="(.-)"');
 			if url ~= nil then
 				url = complement_mixi_url(url);
 				data:set_text("url", url);
 			end
 --[[
-			-- ‰æ‘œæ“¾
+			-- ç”»åƒå–å¾—
 			image_url = sub_html:match('<img src="(.-)"');
 			if image_url ~= nil then
 				data:add_text_array("image", image_url);
 			--	mz3.alert(image_url);
 			end
 ]]
-			-- ƒ†[ƒU–¼
+			-- ãƒ¦ãƒ¼ã‚¶å
 			-- name = line:match(">([^<]+)(<.*)$");
 			local s = sub_html:match('<td class="nickname">(.-)</a>');
 			if s ~= nil then
@@ -277,17 +277,17 @@ function mixi_recent_echo_parser(parent, body, html)
 				-- mz3.alert(line);
 			end
 
-			-- ”­Œ¾
+			-- ç™ºè¨€
 			local comment = sub_html:match('<td class="comment">(.-)<span>');
 			
-			-- ˆø—pƒ†[ƒU‚ª‚ ‚ê‚Î’Šo‚µ‚Ä‚¨‚­
+			-- å¼•ç”¨ãƒ¦ãƒ¼ã‚¶ãŒã‚ã‚Œã°æŠ½å‡ºã—ã¦ãŠã
 			if line_has_strings(comment, '<a', 'view_echo.pl', '</a>') then
 				local ref_user_id, ref_user_name = comment:match('<a href=".-id=(.-)&.-">&gt;&gt;(.-)</');
 				data:set_integer('ref_user_id', ref_user_id);
 				data:set_text('ref_user_name', ref_user_name);
 			end
 			
-			-- ”­Œ¾æ“¾
+			-- ç™ºè¨€å–å¾—
 			if comment ~= nil then
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->', '');
@@ -295,7 +295,7 @@ function mixi_recent_echo_parser(parent, body, html)
 				data:add_body_with_extract(comment);
 			end
 
-			-- ŠÔ
+			-- æ™‚é–“
 			local date = sub_html:match('<span>.-<a.->(.-)</a>');
 			if date ~= nil then
 				date = date:gsub("\n", '');
@@ -313,15 +313,15 @@ function mixi_recent_echo_parser(parent, body, html)
 				data:set_text('echo_post_time', echo_post_time);
 			end
 
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			--type = mz3.estimate_access_type_by_url(url);
 			type = mz3.get_access_type_by_key('MIXI_RECENT_ECHO_ITEM');
 			data:set_access_type(type);
 			
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			body:add(data.data);
 
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 
@@ -338,7 +338,7 @@ function mixi_recent_echo_parser(parent, body, html)
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
@@ -347,14 +347,14 @@ function mixi_recent_echo_parser(parent, body, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_recent_echo_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
--- ‚İ‚ñ‚È‚ÌƒGƒR[
+-- ã¿ã‚“ãªã®ã‚¨ã‚³ãƒ¼
 mz3.set_parser("MIXI_RECENT_ECHO", "mixi.mixi_recent_echo_parser");
 mz3.set_parser("MIXI_RES_ECHO"   , "mixi.mixi_recent_echo_parser");
 mz3.set_parser("MIXI_LIST_ECHO"  , "mixi.mixi_recent_echo_parser");
 
 
 --------------------------------------------------
---- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
+--- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
 --------------------------------------------------
 function parse_next_back_link(line, base_url, title_set_at)
 
@@ -364,13 +364,13 @@ function parse_next_back_link(line, base_url, title_set_at)
 		title_set_at = "title";
 	end
 	
-	-- <ul><li><a href="new_bbs.pl?page=1">‘O‚ğ•\¦</a></li>
-	-- <li>51Œ`100Œ‚ğ•\¦</li>
-	-- <li><a href="new_bbs.pl?page=3">Ÿ‚ğ•\¦</a></li></ul>
+	-- <ul><li><a href="new_bbs.pl?page=1">å‰ã‚’è¡¨ç¤º</a></li>
+	-- <li>51ä»¶ã€œ100ä»¶ã‚’è¡¨ç¤º</li>
+	-- <li><a href="new_bbs.pl?page=3">æ¬¡ã‚’è¡¨ç¤º</a></li></ul>
 	if line_has_strings(line, base_url) then
 		
-		-- ‘O
-		local url, t = line:match([[href="([^"]+)">(‘O[^<]+)<]]);
+		-- å‰
+		local url, t = line:match([[href="([^"]+)">(å‰[^<]+)<]]);
 		if url~=nil then
 			back_data = MZ3Data:create();
 			back_data:set_text(title_set_at, "<< " .. t .. " >>");
@@ -379,8 +379,8 @@ function parse_next_back_link(line, base_url, title_set_at)
 			back_data:set_access_type(type);
 		end
 		
-		-- Ÿ
-		local url, t = line:match([[href="([^"]+)">(Ÿ[^<]+)<]]);
+		-- æ¬¡
+		local url, t = line:match([[href="([^"]+)">(æ¬¡[^<]+)<]]);
 		if url~=nil then
 			next_data = MZ3Data:create();
 			next_data:set_text(title_set_at, "<< " .. t .. " >>");
@@ -394,7 +394,7 @@ function parse_next_back_link(line, base_url, title_set_at)
 end
 
 --------------------------------------------------
---- mixi —pURL•âŠ®
+--- mixi ç”¨URLè£œå®Œ
 --------------------------------------------------
 function complement_mixi_url(url)
 	if (url:find("mixi.jp", 1, true) == nil and
@@ -407,7 +407,7 @@ end
 
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 menu_items.mixi_echo_item_read    = mz3_menu.regist_menu("mixi.on_mixi_echo_read_menu_item");
@@ -418,14 +418,14 @@ menu_items.mixi_echo_add_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_ech
 menu_items.mixi_echo_add_ref_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_echo_add_ref_user_echo_list");
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
---- Twitter•—‘‚«‚İƒ‚[ƒh‚Ì‰Šú‰»
+--- Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®åˆæœŸåŒ–
 function on_reset_twitter_style_post_mode(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='mixi' then
-		-- ƒ‚[ƒh•ÏX
+		-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('MIXI_ADD_ECHO'));
 		
 		return true;
@@ -435,12 +435,12 @@ end
 mz3.add_event_listener("reset_twitter_style_post_mode", "mixi.on_reset_twitter_style_post_mode");
 
 
---- TwitterƒXƒ^ƒCƒ‹‚Ìƒ{ƒ^ƒ“–¼Ì‚ÌXV
+--- Twitterã‚¹ã‚¿ã‚¤ãƒ«ã®ãƒœã‚¿ãƒ³åç§°ã®æ›´æ–°
 function on_update_twitter_update_button(event_name, serialize_key)
 	if serialize_key == 'MIXI_ADD_ECHO' then
 		return true, 'voice';
 	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
-		return true, '•ÔM';
+		return true, 'è¿”ä¿¡';
 	end
 	
 	return false;
@@ -448,74 +448,74 @@ end
 mz3.add_event_listener("update_twitter_update_button", "mixi.on_update_twitter_update_button");
 
 
---- u‚Â‚Ô‚â‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œã¤ã¶ã‚„ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_mixi_echo_update(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
---- u•ÔMvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œè¿”ä¿¡ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_mixi_echo_reply(serialize_key, event_name, data)
-	-- ƒ‚[ƒh•ÏX
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY);
 
-	-- ƒ‚[ƒh•ÏX”½‰f(ƒ{ƒ^ƒ“–¼Ì•ÏX)
+	-- ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´åæ˜ (ãƒœã‚¿ãƒ³åç§°å¤‰æ›´)
 	mz3_main_view.update_control_status();
 
-	-- ƒtƒH[ƒJƒXˆÚ“®
+	-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ç§»å‹•
 	mz3_main_view.set_focus('edit');
 end
 
---- uƒvƒƒtƒB[ƒ‹vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_mixi_echo_show_profile(serialize_key, event_name, data)
 
-	-- ‘I‘ğ’†‚Ì—v‘fæ“¾
+	-- é¸æŠä¸­ã®è¦ç´ å–å¾—
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	
-	-- URL æ“¾
+	-- URL å–å¾—
 	url = complement_mixi_url(data:get_text('url'));
 --	mz3.alert(url);
 	
-	-- ƒvƒƒtƒB[ƒ‹æ“¾ƒAƒNƒZƒXŠJn
+	-- ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«å–å¾—ã‚¢ã‚¯ã‚»ã‚¹é–‹å§‹
 	access_type = mz3.get_access_type_by_key("MIXI_PROFILE");
 	referer = "";
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 
-	-- •\¦ó‘ÔXV
+	-- è¡¨ç¤ºçŠ¶æ…‹æ›´æ–°
 	mz3_main_view.update_control_status();
 
 end
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 	if serialize_key=="MIXI_RECENT_ECHO_ITEM" then
-		-- ‘S•¶•\¦
+		-- å…¨æ–‡è¡¨ç¤º
 		return on_mixi_echo_read_menu_item(serialize_key, event_name, data);
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "mixi.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_mixi_echo_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
-	-- –{•¶‚ğ1s‚É•ÏŠ·‚µ‚Ä•\¦
+	-- æœ¬æ–‡ã‚’1è¡Œã«å¤‰æ›ã—ã¦è¡¨ç¤º
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 	
@@ -530,20 +530,20 @@ function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 end
 
 
---- uxxx ‚Ìƒ{ƒCƒXvƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œxxx ã®ãƒœã‚¤ã‚¹ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_mixi_echo_add_user_echo_list(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('name');
 	
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = name .. "‚³‚ñ‚Ìƒ{ƒCƒX";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = name .. "ã•ã‚“ã®ãƒœã‚¤ã‚¹";
 	author_id = body:get_integer('author_id');
 	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
 	key = "MIXI_RECENT_ECHO";
 	mz3_main_view.append_category(title, url, key);
 	
-	-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -552,20 +552,20 @@ function on_mixi_echo_add_user_echo_list(serialize_key, event_name, data)
 end
 
 
---- ˆø—pƒ†[ƒU‚Ìƒ{ƒCƒX’Ç‰Áƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- å¼•ç”¨ãƒ¦ãƒ¼ã‚¶ã®ãƒœã‚¤ã‚¹è¿½åŠ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_mixi_echo_add_ref_user_echo_list(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('ref_user_name');
 	
-	-- ƒJƒeƒSƒŠ’Ç‰Á
-	title = name .. "‚³‚ñ‚Ìƒ{ƒCƒX";
+	-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+	title = name .. "ã•ã‚“ã®ãƒœã‚¤ã‚¹";
 	author_id = body:get_integer('ref_user_id');
 	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
 	key = "MIXI_RECENT_ECHO";
 	mz3_main_view.append_category(title, url, key);
 	
-	-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+	-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -574,10 +574,10 @@ function on_mixi_echo_add_ref_user_echo_list(serialize_key, event_name, data)
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -586,32 +586,32 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 	
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "‘S•¶‚ğ“Ç‚Ş...", menu_items.mixi_echo_item_read);
+	menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "å…¨æ–‡ã‚’èª­ã‚€...", menu_items.mixi_echo_item_read);
 	menu:append_menu("separator");
-	menu:append_menu("string", "‚Â‚Ô‚â‚­", menu_items.mixi_echo_update);
-	menu:append_menu("string", "•ÔM", menu_items.mixi_echo_reply);
-	menu:append_menu("string", body:get_text('name') .. " ‚³‚ñ‚ÌƒvƒƒtƒB[ƒ‹", menu_items.mixi_echo_show_profile);
+	menu:append_menu("string", "ã¤ã¶ã‚„ã", menu_items.mixi_echo_update);
+	menu:append_menu("string", "è¿”ä¿¡", menu_items.mixi_echo_reply);
+	menu:append_menu("string", body:get_text('name') .. " ã•ã‚“ã®ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«", menu_items.mixi_echo_show_profile);
 	menu:append_menu("separator");
 
-	-- TODO Šeƒƒjƒ…[ƒAƒCƒeƒ€‚ÌƒŠƒ\[ƒX’l‚ğ’è”‰»(‚Ü‚½‚ÍLuaŠÖ”‰»)
+	-- TODO å„ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒªã‚½ãƒ¼ã‚¹å€¤ã‚’å®šæ•°åŒ–(ã¾ãŸã¯Luaé–¢æ•°åŒ–)
 
-	-- ƒ†[ƒU‚ÌƒGƒR[ˆê——
-	menu:append_menu("string", body:get_text('name') .. " ‚³‚ñ‚Ìƒ{ƒCƒX", menu_items.mixi_echo_add_user_echo_list);
+	-- ãƒ¦ãƒ¼ã‚¶ã®ã‚¨ã‚³ãƒ¼ä¸€è¦§
+	menu:append_menu("string", body:get_text('name') .. " ã•ã‚“ã®ãƒœã‚¤ã‚¹", menu_items.mixi_echo_add_user_echo_list);
 
-	-- ˆø—pƒ†[ƒU‚ÌƒGƒR[ˆê——
+	-- å¼•ç”¨ãƒ¦ãƒ¼ã‚¶ã®ã‚¨ã‚³ãƒ¼ä¸€è¦§
 	ref_user_name = body:get_text('ref_user_name');
 	if ref_user_name ~= "" then
-		menu:append_menu("string", ref_user_name .. " ‚³‚ñ‚Ìƒ{ƒCƒX", menu_items.mixi_echo_add_ref_user_echo_list);
+		menu:append_menu("string", ref_user_name .. " ã•ã‚“ã®ãƒœã‚¤ã‚¹", menu_items.mixi_echo_add_ref_user_echo_list);
 	end
 
-	-- ƒŠƒ“ƒN’Ç‰Á
+	-- ãƒªãƒ³ã‚¯è¿½åŠ 
 	n = body:get_link_list_size();
 	if n > 0 then
 		menu:append_menu("separator");
@@ -621,10 +621,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 	end
 	
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	
 	return true;
@@ -632,76 +632,76 @@ end
 mz3.add_event_listener("popup_body_menu", "mixi.on_popup_body_menu");
 
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' mixi', 1, true) ~= nil then
 
-		-- Šeíƒ^ƒu’Ç‰Á
+		-- å„ç¨®ã‚¿ãƒ–è¿½åŠ 
 
-		-- “ú‹L
-		local tab = MZ3GroupItem:create("“ú‹L");
-		tab:append_category("Å‹ß‚Ì“ú‹L", "MYDIARY");
-		tab:append_category("Å‹ß‚ÌƒRƒƒ“ƒg", "COMMENT");
-		tab:append_category("ƒ}ƒCƒ~ƒNÅV“ú‹L", "DIARY");
-		tab:append_category("“ú‹LƒRƒƒ“ƒg‹L“ü—š—ğ", "NEW_COMMENT");
+		-- æ—¥è¨˜
+		local tab = MZ3GroupItem:create("æ—¥è¨˜");
+		tab:append_category("æœ€è¿‘ã®æ—¥è¨˜", "MYDIARY");
+		tab:append_category("æœ€è¿‘ã®ã‚³ãƒ¡ãƒ³ãƒˆ", "COMMENT");
+		tab:append_category("ãƒã‚¤ãƒŸã‚¯æœ€æ–°æ—¥è¨˜", "DIARY");
+		tab:append_category("æ—¥è¨˜ã‚³ãƒ¡ãƒ³ãƒˆè¨˜å…¥å±¥æ­´", "NEW_COMMENT");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
-		-- ƒRƒ~ƒ…ƒjƒeƒB
-		local tab = MZ3GroupItem:create("ƒRƒ~ƒ…ƒjƒeƒB");
-		tab:append_category("ÅV‘‚«‚İˆê——", "BBS");
-		tab:append_category("ƒRƒ~ƒ…ƒRƒƒ“ƒg—š—ğ", "NEW_BBS_COMMENT");
-		tab:append_category("ƒRƒ~ƒ…ƒjƒeƒBˆê——", "COMMUNITY");
+		-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£
+		local tab = MZ3GroupItem:create("ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£");
+		tab:append_category("æœ€æ–°æ›¸ãè¾¼ã¿ä¸€è¦§", "BBS");
+		tab:append_category("ã‚³ãƒŸãƒ¥ã‚³ãƒ¡ãƒ³ãƒˆå±¥æ­´", "NEW_BBS_COMMENT");
+		tab:append_category("ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£ä¸€è¦§", "COMMUNITY");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
-		-- ƒjƒ…[ƒX
-		local tab = MZ3GroupItem:create("ƒjƒ…[ƒX");
-		tab:append_category("’–Ú‚ÌƒsƒbƒNƒAƒbƒv",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn");
-		tab:append_category("‘“à",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1");
-		tab:append_category("­¡",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1");
-		tab:append_category("ŒoÏ",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1");
-		tab:append_category("’nˆæ",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1");
-		tab:append_category("ŠCŠO",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1");
-		tab:append_category("ƒXƒ|[ƒc",			  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1");
-		tab:append_category("ƒGƒ“ƒ^[ƒeƒCƒ“ƒƒ“ƒg",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1");
+		-- ãƒ‹ãƒ¥ãƒ¼ã‚¹
+		local tab = MZ3GroupItem:create("ãƒ‹ãƒ¥ãƒ¼ã‚¹");
+		tab:append_category("æ³¨ç›®ã®ãƒ”ãƒƒã‚¯ã‚¢ãƒƒãƒ—",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn");
+		tab:append_category("å›½å†…",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1");
+		tab:append_category("æ”¿æ²»",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=2&type=bn&sort=1");
+		tab:append_category("çµŒæ¸ˆ",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=3&type=bn&sort=1");
+		tab:append_category("åœ°åŸŸ",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=4&type=bn&sort=1");
+		tab:append_category("æµ·å¤–",				  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=5&type=bn&sort=1");
+		tab:append_category("ã‚¹ãƒãƒ¼ãƒ„",			  	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=6&type=bn&sort=1");
+		tab:append_category("ã‚¨ãƒ³ã‚¿ãƒ¼ãƒ†ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆ",	"NEWS", "http://news.mixi.jp/list_news_category.pl?id=7&type=bn&sort=1");
 		tab:append_category("IT",					"NEWS", "http://news.mixi.jp/list_news_category.pl?id=8&type=bn&sort=1");
-		tab:append_category("ƒQ[ƒ€EƒAƒjƒ",		"NEWS", "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1");
-		tab:append_category("ƒRƒ‰ƒ€",				"NEWS", "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1");
+		tab:append_category("ã‚²ãƒ¼ãƒ ãƒ»ã‚¢ãƒ‹ãƒ¡",		"NEWS", "http://news.mixi.jp/list_news_category.pl?id=9&type=bn&sort=1");
+		tab:append_category("ã‚³ãƒ©ãƒ ",				"NEWS", "http://news.mixi.jp/list_news_category.pl?id=10&type=bn&sort=1");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
-		-- ƒƒbƒZ[ƒW
-		local tab = MZ3GroupItem:create("ƒƒbƒZ[ƒW");
-		-- ƒJƒeƒSƒŠ‚ÍŠeƒp[ƒT‚ª’Ç‰Á‚·‚é
+		-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+		local tab = MZ3GroupItem:create("ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸");
+		-- ã‚«ãƒ†ã‚´ãƒªã¯å„ãƒ‘ãƒ¼ã‚µãŒè¿½åŠ ã™ã‚‹
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
 		-- echo
-		local tab = MZ3GroupItem:create("ƒGƒR[");
-		tab:append_category("‚İ‚ñ‚È‚ÌƒGƒR[", "MIXI_RECENT_ECHO");
-		tab:append_category("©•ª‚Ö‚Ì•ÔMˆê——", "MIXI_RECENT_ECHO", "http://mixi.jp/res_echo.pl");
-		tab:append_category("©•ª‚Ìˆê——", "MIXI_RECENT_ECHO", "http://mixi.jp/list_echo.pl?id={owner_id}");
+		local tab = MZ3GroupItem:create("ã‚¨ã‚³ãƒ¼");
+		tab:append_category("ã¿ã‚“ãªã®ã‚¨ã‚³ãƒ¼", "MIXI_RECENT_ECHO");
+		tab:append_category("è‡ªåˆ†ã¸ã®è¿”ä¿¡ä¸€è¦§", "MIXI_RECENT_ECHO", "http://mixi.jp/res_echo.pl");
+		tab:append_category("è‡ªåˆ†ã®ä¸€è¦§", "MIXI_RECENT_ECHO", "http://mixi.jp/list_echo.pl?id={owner_id}");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
-		-- ‚»‚Ì‘¼
-		local tab = MZ3GroupItem:create("‚»‚Ì‘¼");
-		tab:append_category("ƒ}ƒCƒ~ƒNˆê——", "FRIEND");
-		tab:append_category("Ğ‰î•¶", "INTRO");
-		tab:append_category("‘«‚ ‚Æ", "FOOTSTEP");
-		tab:append_category("ƒJƒŒƒ“ƒ_[", "CALENDAR", "show_calendar.pl");
-		tab:append_category("ƒuƒbƒNƒ}[ƒN", "BOOKMARK");
-		tab:append_category("‚¨‹C‚É“ü‚èƒ†[ƒU[", "FAVORITE", "view_mylist.pl");
-		tab:append_category("‚¨‹C‚É“ü‚èƒRƒ~ƒ…", "FAVORITE_COMMUNITY", "list_bookmark.pl?kind=community");
+		-- ãã®ä»–
+		local tab = MZ3GroupItem:create("ãã®ä»–");
+		tab:append_category("ãƒã‚¤ãƒŸã‚¯ä¸€è¦§", "FRIEND");
+		tab:append_category("ç´¹ä»‹æ–‡", "INTRO");
+		tab:append_category("è¶³ã‚ã¨", "FOOTSTEP");
+		tab:append_category("ã‚«ãƒ¬ãƒ³ãƒ€ãƒ¼", "CALENDAR", "show_calendar.pl");
+		tab:append_category("ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯", "BOOKMARK");
+		tab:append_category("ãŠæ°—ã«å…¥ã‚Šãƒ¦ãƒ¼ã‚¶ãƒ¼", "FAVORITE", "view_mylist.pl");
+		tab:append_category("ãŠæ°—ã«å…¥ã‚Šã‚³ãƒŸãƒ¥", "FAVORITE_COMMUNITY", "list_bookmark.pl?kind=community");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 	end
@@ -709,19 +709,19 @@ end
 mz3.add_event_listener("creating_default_group", "mixi.on_creating_default_group", false);
 
 
---- estimate ‘ÎÛ”»•ÊƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- estimate å¯¾è±¡åˆ¤åˆ¥ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
 -- @param event_name 'estimate_access_type_by_url'
--- @param url        ‰ğÍ‘ÎÛURL
+-- @param url        è§£æå¯¾è±¡URL
 --
 function on_estimate_access_type(event_name, url, data1, data2)
 
-    -- ŠÖ˜Aƒjƒ…[ƒX
+    -- é–¢é€£ãƒ‹ãƒ¥ãƒ¼ã‚¹
 	if line_has_strings(url, 'http://news.mixi.jp/list_quote_diary.pl?') then
 		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
 	end
 
-    -- ‚¨‹C‚É“ü‚èƒ†[ƒUEƒRƒ~ƒ…ƒjƒeƒB
+    -- ãŠæ°—ã«å…¥ã‚Šãƒ¦ãƒ¼ã‚¶ãƒ»ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£
 	if line_has_strings(url, 'view_mylist.pl') then
 		return true, mz3.get_access_type_by_key('FAVORITE');
 	end
@@ -729,7 +729,7 @@ function on_estimate_access_type(event_name, url, data1, data2)
 		return true, mz3.get_access_type_by_key('FAVORITE_COMMUNITY');
 	end
 
-    -- ƒGƒR[
+    -- ã‚¨ã‚³ãƒ¼
 	if line_has_strings(url, 'recent_echo.pl?') then
 		return true, mz3.get_access_type_by_key('MIXI_RECENT_ECHO');
 	end
@@ -739,10 +739,10 @@ end
 mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type");
 
 
---- ƒŒƒ|[ƒg‰æ–Ê‚©‚ç‚Ì‘‚«‚İí•Ê‚Ì”»’è
+--- ãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã‹ã‚‰ã®æ›¸ãè¾¼ã¿ç¨®åˆ¥ã®åˆ¤å®š
 --
 -- @param event_name  'get_write_view_type_by_report_item_access_type'
--- @param report_item [MZ3Data] ƒŒƒ|[ƒg‰æ–Ê‚Ì—v‘f
+-- @param report_item [MZ3Data] ãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã®è¦ç´ 
 --
 function on_get_write_view_type_by_report_item_access_type(event_name, report_item)
 
@@ -752,10 +752,10 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='mixi' then
 		if serialize_key=='MIXI_MESSAGE' then
-			-- ƒƒbƒZ[ƒW•ÔM‚Ì‘‚«‚İí•Ê
+			-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¿”ä¿¡ã®æ›¸ãè¾¼ã¿ç¨®åˆ¥
 			return true, mz3.get_access_type_by_key('MIXI_POST_REPLYMESSAGE_ENTRY');
 		else
-			-- ƒRƒƒ“ƒg•ÔM‚Ì‘‚«‚İí•Ê
+			-- ã‚³ãƒ¡ãƒ³ãƒˆè¿”ä¿¡ã®æ›¸ãè¾¼ã¿ç¨®åˆ¥
 			return true, mz3.get_access_type_by_key('MIXI_POST_COMMENT_CONFIRM');
 		end
 	end
@@ -765,11 +765,11 @@ end
 mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "mixi.on_get_write_view_type_by_report_item_access_type");
 
 
---- ‘‚«‚İ‰æ–Ê‚Åu‰æ‘œ‚ª“Y•t‰Â”\‚Èƒ‚[ƒh‚©v‚Ì”»’è
+--- æ›¸ãè¾¼ã¿ç”»é¢ã§ã€Œç”»åƒãŒæ·»ä»˜å¯èƒ½ãªãƒ¢ãƒ¼ãƒ‰ã‹ã€ã®åˆ¤å®š
 --
 -- @param event_name      'is_enable_write_view_attach_image_mode'
--- @param write_view_type ‘‚«‚İí•Ê
--- @param write_item      [MZ3Data] ‘‚«‚İ‰æ–Ê‚Ì—v‘f
+-- @param write_view_type æ›¸ãè¾¼ã¿ç¨®åˆ¥
+-- @param write_item      [MZ3Data] æ›¸ãè¾¼ã¿ç”»é¢ã®è¦ç´ 
 --
 function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, write_item)
 
@@ -780,7 +780,7 @@ function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, 
 	if service_type=='mixi' then
 		if write_view_key=="MIXI_POST_REPLYMESSAGE_ENTRY" or
 		   write_view_key=="MIXI_POST_NEWMESSAGE_ENTRY" then
-			-- ƒƒbƒZ[ƒWAƒƒbƒZ[ƒW•ÔM‚Í“Y•t•s‰Â
+			-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¿”ä¿¡ã¯æ·»ä»˜ä¸å¯
 			return true, 0;
 		end
 		
@@ -789,16 +789,16 @@ function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, 
 			if serialize_key=="MIXI_BBS" or
 			   serialize_key=="MIXI_EVENT" or
 			   serialize_key=="MIXI_EVENT_JOIN" then
-				-- ƒRƒƒ“ƒg‚Ì BBS, EVENT ‚Å‚ ‚ê‚Î“Y•t‰Â
+				-- ã‚³ãƒ¡ãƒ³ãƒˆã® BBS, EVENT ã§ã‚ã‚Œã°æ·»ä»˜å¯
 				return true, 1;
 			else
-				-- ã‹LˆÈŠO(“ú‹LƒRƒƒ“ƒgAƒAƒ“ƒP[ƒgƒRƒƒ“ƒg“™)‚Í“Y•t•s‰Â
+				-- ä¸Šè¨˜ä»¥å¤–(æ—¥è¨˜ã‚³ãƒ¡ãƒ³ãƒˆã€ã‚¢ãƒ³ã‚±ãƒ¼ãƒˆã‚³ãƒ¡ãƒ³ãƒˆç­‰)ã¯æ·»ä»˜ä¸å¯
 				return true, 0;
 			end
 		end
 		
 		if write_view_key=="MIXI_POST_NEWDIARY_CONFIRM" then
-			-- “ú‹L‚Í“Y•t‰Â
+			-- æ—¥è¨˜ã¯æ·»ä»˜å¯
 			return true, 1;
 		end
 		
@@ -810,10 +810,10 @@ end
 mz3.add_event_listener("is_enable_write_view_attach_image_mode", "mixi.on_is_enable_write_view_attach_image_mode");
 
 
---- XVƒ{ƒ^ƒ“‰Ÿ‰ºƒCƒxƒ“ƒg
+--- æ›´æ–°ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'click_update_button'
--- @param serialize_key Twitter•—‘‚«‚İƒ‚[ƒh‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key Twitteré¢¨æ›¸ãè¾¼ã¿ãƒ¢ãƒ¼ãƒ‰ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
 function on_click_update_button(event_name, serialize_key)
 
@@ -822,64 +822,64 @@ function on_click_update_button(event_name, serialize_key)
 		return false;
 	end
 
-	-- “ü—Í•¶š—ñ‚ğæ“¾
+	-- å…¥åŠ›æ–‡å­—åˆ—ã‚’å–å¾—
 	text = mz3_main_view.get_edit_text();
 
-	-- –¢“ü—Í‚Ìˆ—
+	-- æœªå…¥åŠ›æ™‚ã®å‡¦ç†
 	if text == '' then
 		if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
-			-- –¢“ü—Í‚ÍNG => ‰½‚à‚¹‚¸‚ÉI—¹
+			-- æœªå…¥åŠ›ã¯NG => ä½•ã‚‚ã›ãšã«çµ‚äº†
 			return true;
 		elseif serialize_key == 'MIXI_ADD_ECHO' then
-			-- ÅVæ“¾
+			-- æœ€æ–°å–å¾—
 			mz3_main_view.retrieve_category_item();
 			return true;
 		else
-			-- ã‹LˆÈŠO‚ÍNGB
-			mz3.alert('–¢ƒTƒ|[ƒg‚ÌƒAƒNƒZƒXí•Ê‚Å‚·');
+			-- ä¸Šè¨˜ä»¥å¤–ã¯NGã€‚
+			mz3.alert('æœªã‚µãƒãƒ¼ãƒˆã®ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã§ã™');
 			return true;
 		end
 	end
 
-	-- Šm”F
+	-- ç¢ºèª
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'MIXI_ADD_ECHO' then
-		msg = 'mixi ƒGƒR[‚Å”­Œ¾‚µ‚Ü‚·B\n'
+		msg = 'mixi ã‚¨ã‚³ãƒ¼ã§ç™ºè¨€ã—ã¾ã™ã€‚\n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		local username = data:get_text('name');
-		msg = 'mixi ƒGƒR[‚Å ' .. username .. ' ‚³‚ñ‚É•ÔM‚µ‚Ü‚·B\n'
-		   .. '---- ”­Œ¾ ----\n'
+		msg = 'mixi ã‚¨ã‚³ãƒ¼ã§ ' .. username .. ' ã•ã‚“ã«è¿”ä¿¡ã—ã¾ã™ã€‚\n'
+		   .. '---- ç™ºè¨€ ----\n'
 		   .. text .. '\n'
 		   .. '----\n'
-		   .. '‚æ‚ë‚µ‚¢‚Å‚·‚©H';
+		   .. 'ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
 	end
 
 	if serialize_key == 'MIXI_ADD_ECHO' then
-		-- ’Pƒ“Še‚Í‹¤’Êˆ—‚ÅB
+		-- å˜ç´”æŠ•ç¨¿ã¯å…±é€šå‡¦ç†ã§ã€‚
 
-		-- ƒNƒƒXƒ|ƒXƒgŠÇ—ƒf[ƒ^‰Šú‰»
+		-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆç®¡ç†ãƒ‡ãƒ¼ã‚¿åˆæœŸåŒ–
 		mz3.init_cross_post_info("echo");
 
 		do_post_to_echo(text);
 		return true;
 	end
 	
-	-- POST ƒpƒ‰ƒ[ƒ^‚ğİ’è
+	-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®š
 	post = MZ3PostData:create();
 	local post_key = mixi.post_key;
 	if post_key=='' then
-		mz3.alert('‘—M—p‚ÌƒL[‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒGƒR[ˆê——‚ğƒŠƒ[ƒh‚µ‚Ä‰º‚³‚¢B');
+		mz3.alert('é€ä¿¡ç”¨ã®ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã‚¨ã‚³ãƒ¼ä¸€è¦§ã‚’ãƒªãƒ­ãƒ¼ãƒ‰ã—ã¦ä¸‹ã•ã„ã€‚');
 		return true;
 	end
 	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
@@ -888,11 +888,11 @@ function on_click_update_button(event_name, serialize_key)
 		local echo_post_time = data:get_text('echo_post_time');
 		
 		if echo_member_id == -1 then
-			mz3.alert('•ÔMæƒ†[ƒU‚ª•s–¾‚Å‚·');
+			mz3.alert('è¿”ä¿¡å…ˆãƒ¦ãƒ¼ã‚¶ãŒä¸æ˜ã§ã™');
 			return true;
 		end
 		if echo_post_time == '' then
-			mz3.alert('•ÔM‘ÎÛPOST‚Ì‚ª•s–¾‚Å‚·');
+			mz3.alert('è¿”ä¿¡å¯¾è±¡POSTã®æ™‚åˆ»ãŒä¸æ˜ã§ã™');
 			return true;
 		end
 		
@@ -906,18 +906,18 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body(post_key);
 	end
 	
-	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ã®ç¢ºèª
 --	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 --		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 --		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
 --	end
 
-	-- POSTæURLİ’è
+	-- POSTå…ˆURLè¨­å®š
 	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		url = 'http://mixi.jp/add_echo.pl';
 	end
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key(serialize_key);
 	referer = '';
 	user_agent = nil;
@@ -928,7 +928,7 @@ end
 mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
 
 
---- echo ‚É“Še‚·‚é
+--- echo ã«æŠ•ç¨¿ã™ã‚‹
 function do_post_to_echo(text)
 
 	serialize_key = 'MIXI_ADD_ECHO'
@@ -936,7 +936,7 @@ function do_post_to_echo(text)
 	post = MZ3PostData:create();
 	local post_key = mixi.post_key;
 	if post_key=='' then
-		mz3.alert('‘—M—p‚ÌƒL[‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒGƒR[ˆê——‚ğƒŠƒ[ƒh‚µ‚Ä‰º‚³‚¢B');
+		mz3.alert('é€ä¿¡ç”¨ã®ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã‚¨ã‚³ãƒ¼ä¸€è¦§ã‚’ãƒªãƒ­ãƒ¼ãƒ‰ã—ã¦ä¸‹ã•ã„ã€‚');
 		return true;
 	end
 	post:append_post_body('body=');
@@ -946,16 +946,16 @@ function do_post_to_echo(text)
 	post:append_post_body(post_key);
 	post:append_post_body('&redirect=recent_echo');
 
-	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ‚ÌŠm”F
+	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost ã®ç¢ºèª
 --	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
 --		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 --		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
 --	end
 
-	-- POSTæURLİ’è
+	-- POSTå…ˆURLè¨­å®š
 	url = 'http://mixi.jp/add_echo.pl';
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key(serialize_key);
 	referer = '';
 	user_agent = nil;
@@ -965,12 +965,12 @@ function do_post_to_echo(text)
 end
 
 
---- POST Š®—¹ƒCƒxƒ“ƒg
+--- POST å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'post_end'
--- @param serialize_key Š®—¹€–Ú‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key å®Œäº†é …ç›®ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param http_status   HTTP Status Code (200, 404, etc...)
--- @param filename      ƒŒƒXƒ|ƒ“ƒXƒtƒ@ƒCƒ‹
+-- @param filename      ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
 -- @param wnd           wnd
 --
 function on_post_end(event_name, serialize_key, http_status, filename)
@@ -980,25 +980,25 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		return false;
 	end
 
-	-- “Šeˆ—Š®—¹
+	-- æŠ•ç¨¿å‡¦ç†å®Œäº†
 	
 	if serialize_key == 'MIXI_ADD_ECHO' or 
 	   serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		if mz3.is_mixi_logout(serialize_key) then
-			mz3.alert('–¢ƒƒOƒCƒ“‚Å‚·BƒGƒR[ˆê——‚ğƒŠƒ[ƒh‚µAmixi‚ÉƒƒOƒCƒ“‚µ‚Ä‰º‚³‚¢B');
+			mz3.alert('æœªãƒ­ã‚°ã‚¤ãƒ³ã§ã™ã€‚ã‚¨ã‚³ãƒ¼ä¸€è¦§ã‚’ãƒªãƒ­ãƒ¼ãƒ‰ã—ã€mixiã«ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ä¸‹ã•ã„ã€‚');
 			return true;
 		else
-			-- “Še¬Œ÷
-			mz3_main_view.set_info_text("ƒGƒR[‘‚«‚İŠ®—¹");
+			-- æŠ•ç¨¿æˆåŠŸ
+			mz3_main_view.set_info_text("ã‚¨ã‚³ãƒ¼æ›¸ãè¾¼ã¿å®Œäº†");
 
-			-- ƒNƒƒXƒ|ƒXƒg
+			-- ã‚¯ãƒ­ã‚¹ãƒã‚¹ãƒˆ
 			if serialize_key == "MIXI_ADD_ECHO" then
 				if mz3.do_cross_post() then
 					return true;
 				end
 			end
 
-			-- “ü—Í’l‚ğÁ‹
+			-- å…¥åŠ›å€¤ã‚’æ¶ˆå»
 			mz3_main_view.set_edit_text("");
 
 			return true;
@@ -1008,48 +1008,48 @@ end
 mz3.add_event_listener("post_end", "mixi.on_post_end");
 
 
---- ƒJƒeƒSƒŠæ“¾‚Ìƒnƒ“ƒhƒ‰
+--- ã‚«ãƒ†ã‚´ãƒªå–å¾—æ™‚ã®ãƒãƒ³ãƒ‰ãƒ©
 --
 -- @param event_name    'retrieve_category_item'
--- @param serialize_key ƒJƒeƒSƒŠƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
 function on_retrieve_category_item(event_name, serialize_key, body, wnd)
 	if serialize_key~="BOOKMARK" then
 		return false;
 	end
 	
-	-- ƒuƒbƒNƒ}[ƒN‚Íƒ[ƒJƒ‹ƒXƒgƒŒ[ƒW
+	-- ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã¯ãƒ­ãƒ¼ã‚«ãƒ«ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸
 	return true, RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE;
 end
 mz3.add_event_listener("retrieve_category_item", "mixi.on_retrieve_category_item");
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ìƒ[ƒh•“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ãƒ­ãƒ¼ãƒ‰ï¼†ç™»éŒ²
 ----------------------------------------
--- ƒRƒ~ƒ…ƒjƒeƒBÅV‘ˆê——
+-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£æœ€æ–°æ›¸è¾¼ä¸€è¦§
 require("scripts\\mixi\\mixi_new_bbs_parser");
 
--- ƒgƒbƒvƒy[ƒW
+-- ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸
 require("scripts\\mixi\\mixi_home_parser");
 
--- “ú‹LÚ×
+-- æ—¥è¨˜è©³ç´°
 require("scripts\\mixi\\mixi_view_diary_parser");
 
--- ƒƒbƒZ[ƒW(óM” , ‘—M” ), Œö®ƒƒbƒZ[ƒW, ƒƒbƒZ[ƒWÚ×
+-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(å—ä¿¡ç®±, é€ä¿¡ç®±), å…¬å¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸, ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è©³ç´°
 require("scripts\\mixi\\mixi_new_official_message_parser");
 require("scripts\\mixi\\mixi_message_outbox_parser");
 require("scripts\\mixi\\mixi_message_inbox_parser");
 require("scripts\\mixi\\mixi_view_message_parser");
 
--- ‹t‚ ‚µ‚ ‚Æ
+-- é€†ã‚ã—ã‚ã¨
 require("scripts\\mixi\\mixi_show_self_log_parser");
 
--- ‚¨‹C‚É“ü‚èƒRƒ~ƒ…Aƒ†[ƒU
+-- ãŠæ°—ã«å…¥ã‚Šã‚³ãƒŸãƒ¥ã€ãƒ¦ãƒ¼ã‚¶
 require("scripts\\mixi\\mixi_bookmark_community_parser");
 require("scripts\\mixi\\mixi_bookmark_user_parser");
 
--- ƒjƒ…[ƒXŠÖ˜A“ú‹L
+-- ãƒ‹ãƒ¥ãƒ¼ã‚¹é–¢é€£æ—¥è¨˜
 require("scripts\\mixi\\mixi_news_quote_diary_parser");
 
 mz3.logger_debug('mixi.lua end');

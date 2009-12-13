@@ -11,44 +11,44 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
--- TODO –{—ˆ‚Í Lua ‘¤‚Å‚â‚é‚×‚««
+-- TODO æœ¬æ¥ã¯ Lua å´ã§ã‚„ã‚‹ã¹ãâ†“
 --[[
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');								-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('FAVORITE');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('‚¨‹C‚É“ü‚èƒ†[ƒU[');					-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('mixi\\bookmark_user.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');						-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');								-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');								-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('FAVORITE');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãŠæ°—ã«å…¥ã‚Šãƒ¦ãƒ¼ã‚¶ãƒ¼');					-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('mixi\\bookmark_user.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');						-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://mixi.jp/view_mylist.pl');
-type:set_body_header(1, 'name', 'ƒ†[ƒU[–¼');
-type:set_body_header(2, 'title', '©ŒÈĞ‰î');
+type:set_body_header(1, 'name', 'ãƒ¦ãƒ¼ã‚¶ãƒ¼å');
+type:set_body_header(2, 'title', 'è‡ªå·±ç´¹ä»‹');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 ]]
 
 --------------------------------------------------
--- y‚¨‹C‚É“ü‚èƒ†[ƒU[ˆê——z
--- [list] bookmark.pl —pƒp[ƒT
+-- ã€ãŠæ°—ã«å…¥ã‚Šãƒ¦ãƒ¼ã‚¶ãƒ¼ä¸€è¦§ã€‘
+-- [list] bookmark.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/list_bookmark.pl
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_bookmark_user_parser(parent, body, html)
 	mz3.logger_debug("mixi_bookmark_user_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 
 	local t1 = mz3.get_tick_count();
@@ -57,30 +57,30 @@ function mixi_bookmark_user_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=200, line_count-1 do
 		line = html:get_at(i);
 
-		-- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
-		-- €–Ú”­Œ©‘O‚É‚Ì‚İ‘¶İ‚·‚é
+		-- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
+		-- é …ç›®ç™ºè¦‹å‰ã«ã®ã¿å­˜åœ¨ã™ã‚‹
 		if not in_data_region and back_data==nil and next_data==nil then
 			back_data, next_data = parse_next_back_link(line, "view_mylist.pl", "name");
 		end
 
-		-- €–Ú’Tõ ˆÈ‰ºˆês
+		-- é …ç›®æ¢ç´¢ ä»¥ä¸‹ä¸€è¡Œ
 		-- <td class="thumb">
 		if line_has_strings(line, "<td", "class", "thumb") then
 
 			in_data_region = true;
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
 			i = i+1;
 			line = html:get_at(i);
 
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line:match("href=\"([^\"]+)\"");
 			if url ~= nil and url ~= "" then
 				url = complement_mixi_url(url);
@@ -89,24 +89,24 @@ function mixi_bookmark_user_parser(parent, body, html)
 				i = i+1;
 				line = html:get_at(i);
 
-				-- ‰æ‘œæ“¾
+				-- ç”»åƒå–å¾—
 				image_url = line:match("src=\"([^\"]+)\"");
 				data:add_text_array("image", image_url);
 
 				i = i+4;
 				line = html:get_at(i);
 
-				-- ƒ†[ƒU–¼
+				-- ãƒ¦ãƒ¼ã‚¶å
 				name = line:match(">([^<]+)(<.*)$");
 				data:set_text("name", name);
 
 				if name ~= nil and name ~= "" then
-					-- ‘Ş‰ïƒ†[ƒU‚Í•\¦‚µ‚È‚¢
+					-- é€€ä¼šãƒ¦ãƒ¼ã‚¶ã¯è¡¨ç¤ºã—ãªã„
 
 					i = i+1;
 					line = html:get_at(i);
 
-					-- ÅIƒƒOƒCƒ“
+					-- æœ€çµ‚ãƒ­ã‚°ã‚¤ãƒ³
 					login = line:match(">([^<]+)(<.*)$");
 					if login~=nil then
 						login = login:match('%((.-)%)');
@@ -120,39 +120,39 @@ function mixi_bookmark_user_parser(parent, body, html)
 						end
 					end
 
-					-- ’Ç‰Á“ú
+					-- è¿½åŠ æ—¥
 					add_date = line:match(">([^<]+)(<.*)$");
 					data:add_body_with_extract(add_date);
 
-					-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+					-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 					type = mz3.estimate_access_type_by_url(url);
 					data:set_access_type(type);
 
-					-- data ’Ç‰Á
+					-- data è¿½åŠ 
 					body:add(data.data);
 
 				end
 			end
 
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
 	end
 
-	-- ‘OAŸ‚ÖƒŠƒ“ƒN‚Ì’Ç‰Á
+	-- å‰ã€æ¬¡ã¸ãƒªãƒ³ã‚¯ã®è¿½åŠ 
 	if back_data~=nil then
-		-- æ“ª‚É‘}“ü
+		-- å…ˆé ­ã«æŒ¿å…¥
 		body:insert(0, back_data.data);
 		back_data:delete();
 	end
 	if next_data~=nil then
-		-- ––”ö‚É’Ç‰Á
+		-- æœ«å°¾ã«è¿½åŠ 
 		body:add(next_data.data);
 		next_data:delete();
 	end
@@ -163,7 +163,7 @@ end
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
--- ‚¨‹C‚É“ü‚èƒ†[ƒU[
+-- ãŠæ°—ã«å…¥ã‚Šãƒ¦ãƒ¼ã‚¶ãƒ¼
 mz3.set_parser("FAVORITE", "mixi.mixi_bookmark_user_parser");

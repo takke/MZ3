@@ -11,44 +11,44 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
--- TODO –{—ˆ‚Í Lua ‘¤‚Å‚â‚é‚×‚««
+-- TODO æœ¬æ¥ã¯ Lua å´ã§ã‚„ã‚‹ã¹ãâ†“
 --[[
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('mixi');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('FAVORITE');				-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('‚¨‹C‚É“ü‚èƒRƒ~ƒ…');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('mixi\\bookmark_community.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('euc-jp');							-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('mixi');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('FAVORITE');				-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãŠæ°—ã«å…¥ã‚Šã‚³ãƒŸãƒ¥');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('mixi\\bookmark_community.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('euc-jp');							-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://mixi.jp/list_bookmark.pl?kind=community');
-type:set_body_header(1, 'name', 'ƒRƒ~ƒ…ƒjƒeƒB');
-type:set_body_header(2, 'title', 'à–¾');
+type:set_body_header(1, 'name', 'ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£');
+type:set_body_header(2, 'title', 'èª¬æ˜');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 ]]
 
 --------------------------------------------------
--- y‚¨‹C‚É“ü‚èƒRƒ~ƒ…ˆê——z
--- [list] bookmark.pl —pƒp[ƒT
+-- ã€ãŠæ°—ã«å…¥ã‚Šã‚³ãƒŸãƒ¥ä¸€è¦§ã€‘
+-- [list] bookmark.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/list_bookmark.pl?kind=community
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_bookmark_community_parser(parent, body, html)
 	mz3.logger_debug("mixi_bookmark_community_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 
 	local t1 = mz3.get_tick_count();
@@ -57,34 +57,34 @@ function mixi_bookmark_community_parser(parent, body, html)
 	local back_data = nil;
 	local next_data = nil;
 
-	local deleted_community = "¦‚±‚ÌƒRƒ~ƒ…ƒjƒeƒB‚Í‚·‚Å‚É•Â½‚µ‚Ä‚¢‚Ü‚·B•s—v‚Èê‡‚Ííœ‚µ‚Ä‚­‚¾‚³‚¢B";
+	local deleted_community = "â€»ã“ã®ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£ã¯ã™ã§ã«é–‰é–ã—ã¦ã„ã¾ã™ã€‚ä¸è¦ãªå ´åˆã¯å‰Šé™¤ã—ã¦ãã ã•ã„ã€‚";
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=180, line_count-1 do
 		line = html:get_at(i);
 
-		-- Ÿ‚ÖA‘O‚Ö‚Ì’Šoˆ—
-		-- €–Ú”­Œ©‘O‚É‚Ì‚İ‘¶İ‚·‚é
+		-- æ¬¡ã¸ã€å‰ã¸ã®æŠ½å‡ºå‡¦ç†
+		-- é …ç›®ç™ºè¦‹å‰ã«ã®ã¿å­˜åœ¨ã™ã‚‹
 		if not in_data_region and back_data==nil and next_data==nil then
 			if line_has_strings( line, "list_bookmark.pl" ) then
 				back_data, next_data = parse_next_back_link(line, "list_bookmark.pl", "name");
 			end
 		end
 
-		-- €–Ú’Tõ ˆÈ‰ºˆês
+		-- é …ç›®æ¢ç´¢ ä»¥ä¸‹ä¸€è¡Œ
 		-- <div class="listIcon">
 		if line_has_strings(line, "<div", "class", "listIcon") then
 
 			in_data_region = true;
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 
 			i = i+1;
 			line = html:get_at(i);
 
-			-- URL æ“¾
+			-- URL å–å¾—
 			url = line:match("href=\"([^\"]+)\"");
 			if url ~= nil then
 				url = complement_mixi_url(url);
@@ -94,64 +94,64 @@ function mixi_bookmark_community_parser(parent, body, html)
 			i = i+1;
 			line = html:get_at(i);
 
-			-- ‰æ‘œæ“¾
+			-- ç”»åƒå–å¾—
 			image_url = line:match("src=\"([^\"]+)\"");
 			data:add_text_array("image", image_url);
 
 			i = i+5;
 			line = html:get_at(i);
 
-			-- ƒRƒ~ƒ…ƒjƒeƒB–¼
+			-- ã‚³ãƒŸãƒ¥ãƒ‹ãƒ†ã‚£å
 			name = line:match(">([^<]+)(<.*)$");
 
 			if name ~= "" and name ~= nil then
 				add_name = line:match(">([^<]+)(&nbsp;.*)$");
 				data:set_text("name", add_name);
 
-				-- Q‰ÁÒ”
-				users = name:match("([0-9]+.l)");
+				-- å‚åŠ è€…æ•°
+				users = name:match("([0-9]+.äºº)");
 				data:set_date(users);
 
 				i = i+8;
 				line = html:get_at(i);
 
-				-- à–¾
+				-- èª¬æ˜
 				-- description, after = line:match(">([^<]+)(<.*)$");
 				description = line:gsub( "\t", "" );
 				data:add_body_with_extract(description);
 
 				if description == '' or description == deleted_community then
-					-- íœÏ‚İƒRƒ~ƒ…‚Íˆê——‚Éo‚³‚È‚¢
+					-- å‰Šé™¤æ¸ˆã¿ã‚³ãƒŸãƒ¥ã¯ä¸€è¦§ã«å‡ºã•ãªã„
 				else
 
-					-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+					-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 					type = mz3.estimate_access_type_by_url(url);
 					data:set_access_type(type);
 
-					-- data ’Ç‰Á
+					-- data è¿½åŠ 
 					body:add(data.data);
 				end
 			end
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 
 		end
 
 		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("š</ul>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·");
+			mz3.logger_debug("â˜…</ul>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™");
 			break;
 		end
 
 	end
 
-	-- ‘OAŸ‚ÖƒŠƒ“ƒN‚Ì’Ç‰Á
+	-- å‰ã€æ¬¡ã¸ãƒªãƒ³ã‚¯ã®è¿½åŠ 
 	if back_data~=nil then
-		-- æ“ª‚É‘}“ü
+		-- å…ˆé ­ã«æŒ¿å…¥
 		body:insert(0, back_data.data);
 		back_data:delete();
 	end
 	if next_data~=nil then
-		-- ––”ö‚É’Ç‰Á
+		-- æœ«å°¾ã«è¿½åŠ 
 		body:add(next_data.data);
 		next_data:delete();
 	end
@@ -162,7 +162,7 @@ end
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
--- ‚¨‹C‚É“ü‚èƒRƒ~ƒ…
+-- ãŠæ°—ã«å…¥ã‚Šã‚³ãƒŸãƒ¥
 mz3.set_parser("FAVORITE_COMMUNITY", "mixi.mixi_bookmark_community_parser");

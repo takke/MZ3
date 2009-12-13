@@ -12,126 +12,126 @@ mz3.logger_debug('gmail.lua start');
 module("gmail", package.seeall)
 
 --------------------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»AƒƒOƒCƒ“İ’è—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ã€ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”¨)
 --------------------------------------------------
 mz3.regist_service('gmail', true);
 
--- ƒƒOƒCƒ“İ’è‰æ–Ê‚Ìƒvƒ‹ƒ_ƒEƒ“–¼A•\¦–¼‚Ìİ’è
-mz3_account_provider.set_param('GMail', 'id_name', 'ƒ[ƒ‹ƒAƒhƒŒƒX');
-mz3_account_provider.set_param('GMail', 'password_name', 'ƒpƒXƒ[ƒh');
+-- ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã®ãƒ—ãƒ«ãƒ€ã‚¦ãƒ³åã€è¡¨ç¤ºåã®è¨­å®š
+mz3_account_provider.set_param('GMail', 'id_name', 'ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹');
+mz3_account_provider.set_param('GMail', 'password_name', 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰');
 
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 
--- óMƒgƒŒƒC
+-- å—ä¿¡ãƒˆãƒ¬ã‚¤
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_INBOX');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail óMƒgƒŒƒC');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_INBOX');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail å—ä¿¡ãƒˆãƒ¬ã‚¤');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('gmail\\inbox_{urlparam:s}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('https://mail.google.com/mail/h/');
-type:set_body_header(1, 'title', 'Œ–¼');
-type:set_body_header(2, 'name', '·ol>>');
-type:set_body_header(3, 'date', '“ú•t>>');
+type:set_body_header(1, 'title', 'ä»¶å');
+type:set_body_header(2, 'name', 'å·®å‡ºäºº>>');
+type:set_body_header(3, 'date', 'æ—¥ä»˜>>');
 type:set_body_integrated_line_pattern(1, '%2 %3');
 type:set_body_integrated_line_pattern(2, '%1');
 
--- ƒƒOƒCƒ“—p
+-- ãƒ­ã‚°ã‚¤ãƒ³ç”¨
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_LOGIN');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ƒƒOƒCƒ“');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('gmail\\login.html');				-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('sjis');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_LOGIN');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ãƒ­ã‚°ã‚¤ãƒ³');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('gmail\\login.html');				-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('sjis');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒ[ƒ‹–{•¶
+-- ãƒ¡ãƒ¼ãƒ«æœ¬æ–‡
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('body');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_MAIL');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ƒ[ƒ‹');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('gmail\\mail.html');				-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('body');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_MAIL');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ãƒ¡ãƒ¼ãƒ«');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('gmail\\mail.html');				-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ŠG•¶š
+-- çµµæ–‡å­—
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');									-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_EMOJI');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ŠG•¶š');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('other');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_EMOJI');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail çµµæ–‡å­—');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒ[ƒ‹‘—M
--- ‘‚«‚İ‰æ–Ê—pƒAƒNƒZƒXí•Ê‚Æ‚µ‚Ä—˜—p‚·‚é
--- ƒ[ƒ‹‘—M‚Í GMAIL_NEW1 ‚Åƒ[ƒ‹ì¬‰æ–Ê‚ğæ“¾‚µA
--- ¬Œ÷‚É GMAIL_NEW ‚ÅPOST‚·‚é
+-- ãƒ¡ãƒ¼ãƒ«é€ä¿¡
+-- æ›¸ãè¾¼ã¿ç”»é¢ç”¨ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã¨ã—ã¦åˆ©ç”¨ã™ã‚‹
+-- ãƒ¡ãƒ¼ãƒ«é€ä¿¡æ™‚ã¯ GMAIL_NEW1 ã§ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢ã‚’å–å¾—ã—ã€
+-- æˆåŠŸæ™‚ã« GMAIL_NEW ã§POSTã™ã‚‹
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_NEW');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ‘—M');								-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_NEW');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail é€ä¿¡');								-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒ[ƒ‹ì¬‰æ–Ê
+-- ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_NEW1');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ì¬‰æ–Ê');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_NEW1');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ä½œæˆç”»é¢');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒ[ƒ‹•ÔM
+-- ãƒ¡ãƒ¼ãƒ«è¿”ä¿¡
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_REPLY');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail •ÔM');								-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_REPLY');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail è¿”ä¿¡');								-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒXƒ^[‚ğ•t‚¯‚é
+-- ã‚¹ã‚¿ãƒ¼ã‚’ä»˜ã‘ã‚‹
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_ADD_STAR');						-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ƒXƒ^[');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_ADD_STAR');						-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ã‚¹ã‚¿ãƒ¼');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒXƒ^[‚ğ‚Í‚¸‚·
+-- ã‚¹ã‚¿ãƒ¼ã‚’ã¯ãšã™
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_REMOVE_STAR');					-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ƒXƒ^[');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_REMOVE_STAR');					-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ã‚¹ã‚¿ãƒ¼');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
--- ƒA[ƒJƒCƒu‚·‚é
+-- ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–ã™ã‚‹
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');										-- ƒJƒeƒSƒŠ
-type:set_service_type('gmail');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('GMAIL_ARCHIVE');						-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('GMail ƒA[ƒJƒCƒu');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('POST');								-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_request_encoding('utf8');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('post');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('gmail');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('GMAIL_ARCHIVE');						-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('GMail ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('POST');								-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_request_encoding('utf8');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 
--- ƒƒCƒ“‰æ–Ê‰ºƒyƒCƒ“—p
+-- ãƒ¡ã‚¤ãƒ³ç”»é¢ä¸‹ãƒšã‚¤ãƒ³ç”¨
 menu_items.read               = mz3_menu.regist_menu("gmail.on_read_menu_item");
 menu_items.read_by_reportview = mz3_menu.regist_menu("gmail.on_read_by_reportview_menu_item");
 menu_items.open_by_browser    = mz3_menu.regist_menu("gmail.on_open_by_browser_menu_item");
@@ -140,37 +140,37 @@ menu_items.rmv_star           = mz3_menu.regist_menu("gmail.on_remove_star_menu_
 menu_items.archive            = mz3_menu.regist_menu("gmail.on_archive_menu_item");
 menu_items.send_mail          = mz3_menu.regist_menu("gmail.on_send_mail");
 
--- ‘‚«‚İ‰æ–Ê—p
+-- æ›¸ãè¾¼ã¿ç”»é¢ç”¨
 menu_items.change_to_address  = mz3_menu.regist_menu("gmail.on_change_to_address");
 
 
--- V‹Kƒ[ƒ‹‚Ìî•ñ
+-- æ–°è¦ãƒ¡ãƒ¼ãƒ«ã®æƒ…å ±
 new_mail_info = {}
---new_mail_info.to = TO ƒAƒhƒŒƒX
---new_mail_info.cc = CC ƒAƒhƒŒƒX
+--new_mail_info.to = TO ã‚¢ãƒ‰ãƒ¬ã‚¹
+--new_mail_info.cc = CC ã‚¢ãƒ‰ãƒ¬ã‚¹
 
 ----------------------------------------
--- ƒƒjƒ…[‚Ö‚Ì“o˜^
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸ã®ç™»éŒ²
 ----------------------------------------
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' gmail', 1, true) ~= nil then
-		-- óMƒgƒŒƒC
+		-- å—ä¿¡ãƒˆãƒ¬ã‚¤
 		local tab = MZ3GroupItem:create("GMail");
 
-		tab:append_category("óMƒgƒŒƒC", "GMAIL_INBOX");
-		tab:append_category("ƒXƒ^[•t‚«", "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=r');
-		tab:append_category("‘—MÏ‚İ",   "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=s');
-		tab:append_category("‚·‚×‚Ä",     "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=a');
+		tab:append_category("å—ä¿¡ãƒˆãƒ¬ã‚¤", "GMAIL_INBOX");
+		tab:append_category("ã‚¹ã‚¿ãƒ¼ä»˜ã", "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=r');
+		tab:append_category("é€ä¿¡æ¸ˆã¿",   "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=s');
+		tab:append_category("ã™ã¹ã¦",     "GMAIL_INBOX", 'https://mail.google.com/mail/h/?s=a');
 
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
@@ -182,31 +182,31 @@ mz3.add_event_listener("creating_default_group", "gmail.on_creating_default_grou
 
 
 ----------------------------------------
--- ƒp[ƒT
+-- ãƒ‘ãƒ¼ã‚µ
 ----------------------------------------
 
 --------------------------------------------------
--- yóMƒgƒŒƒCz
+-- ã€å—ä¿¡ãƒˆãƒ¬ã‚¤ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function gmail_inbox_parser(parent, body, html)
 	mz3.logger_debug("gmail_inbox_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
 	
-	-- ƒƒOƒCƒ“”»’è
+	-- ãƒ­ã‚°ã‚¤ãƒ³åˆ¤å®š
 	is_logged_in = false;
 	GALX = '';
 	continue_value = '';
@@ -214,8 +214,8 @@ function gmail_inbox_parser(parent, body, html)
 	for i=0, line_count-1 do
 		line = html:get_at(i);
 		
-		-- <input id="sbb" type="submit" name="nvp_site_mail" value="Ò°Ù‚ğŒŸõ" />
-		-- ã‹L‚ª‚ ‚ê‚ÎƒƒOƒCƒ“Ï = Šù‚ÉóM” 
+		-- <input id="sbb" type="submit" name="nvp_site_mail" value="ãƒ¡ãƒ¼ãƒ«ã‚’æ¤œç´¢" />
+		-- ä¸Šè¨˜ãŒã‚ã‚Œã°ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆ = æ—¢ã«å—ä¿¡ç®±
 		if line_has_strings(line, '<input', '"nvp_site_mail"') then
 			is_logged_in = true;
 			break;
@@ -237,28 +237,28 @@ function gmail_inbox_parser(parent, body, html)
 	end
 	
 	if is_logged_in then
---		mz3.alert('ƒƒOƒCƒ“Ï');
+--		mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆ');
 		
-		-- •¡”s‚É•ª‚©‚ê‚Ä‚¢‚é‚Ì‚Å1s‚ÉŒ‹‡
+		-- è¤‡æ•°è¡Œã«åˆ†ã‹ã‚Œã¦ã„ã‚‹ã®ã§1è¡Œã«çµåˆ
 		line = '';
 		for i=0, line_count-1 do
 			line = line .. html:get_at(i);
 		end
 
-		-- ƒƒOƒCƒ“Ï‚İ‚ÌHTML‚Ìƒp[ƒX
+		-- ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆã¿ã®HTMLã®ãƒ‘ãƒ¼ã‚¹
 		parse_gmail_inbox(parent, body, line);
 	else
-		-- ƒƒOƒCƒ“ˆ—
+		-- ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†
 
 		mail_address  = mz3_account_provider.get_value('GMail', 'id');
 		mail_password = mz3_account_provider.get_value('GMail', 'password');
 		
 		if (mail_address == "" or mail_password == "") then
-			mz3.alert("ƒ[ƒ‹ƒAƒhƒŒƒX‚ÆƒpƒXƒ[ƒh‚ğƒƒOƒCƒ“İ’è‰æ–Ê‚Åİ’è‚µ‚Ä‰º‚³‚¢");
+			mz3.alert("ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”»é¢ã§è¨­å®šã—ã¦ä¸‹ã•ã„");
 			return;
 		end
 
-		-- URL ¶¬
+		-- URL ç”Ÿæˆ
 		url = "https://www.google.com/accounts/ServiceLoginAuth?service=mail";
 		post = mz3_post_data.create();
 		mz3_post_data.append_post_body(post, "Email=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
@@ -279,7 +279,7 @@ function gmail_inbox_parser(parent, body, html)
 --		mz3.alert('continue_value : ' .. mz3.url_encode(continue_value, 'utf8'));
 --		mz3.alert(url);
 		
-		-- ’ÊMŠJn
+		-- é€šä¿¡é–‹å§‹
 		access_type = mz3.get_access_type_by_key("GMAIL_LOGIN");
 		referer = '';
 		user_agent = nil;
@@ -292,11 +292,11 @@ end
 mz3.set_parser("GMAIL_INBOX", "gmail.gmail_inbox_parser");
 
 
---- ƒƒOƒCƒ“Ï‚İ‚Ì GMail óMƒgƒŒƒC‚Ì‰ğÍ
+--- ãƒ­ã‚°ã‚¤ãƒ³æ¸ˆã¿ã® GMail å—ä¿¡ãƒˆãƒ¬ã‚¤ã®è§£æ
 --
--- @param parent ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
--- @param body   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
--- @param line   HTML ‘S•¶‚ğ1s‚ÉŒ‹‡‚µ‚½•¶š—ñ
+-- @param parent ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+-- @param body   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+-- @param line   HTML å…¨æ–‡ã‚’1è¡Œã«çµåˆã—ãŸæ–‡å­—åˆ—
 --
 function parse_gmail_inbox(parent, body, line)
 	mz3.logger_debug("parse_gmail_inbox start");
@@ -310,17 +310,17 @@ function parse_gmail_inbox(parent, body, line)
 	post_url = base_url .. post_url;
 --	mz3.alert(post_url);
 
-	-- V‹Kƒ[ƒ‹ì¬—pURL
+	-- æ–°è¦ãƒ¡ãƒ¼ãƒ«ä½œæˆç”¨URL
 	new_mail_url = line:match('<a href="([^"]+)" accesskey="c"');
 	if new_mail_url ~= nil then
 		new_mail_url = base_url .. new_mail_url;
 		parent:set_text('new_mail_url', new_mail_url);
 	end
 
-	-- 1ƒ[ƒ‹‚Í '<tr ' ‚Ån‚Ü‚é
+	-- 1ãƒ¡ãƒ¼ãƒ«ã¯ '<tr ' ã§å§‹ã¾ã‚‹
 	pos = line:find('<tr ', 1, true);
 	if pos == nil then
-		-- ‰ğÍ’†~
+		-- è§£æä¸­æ­¢
 		return;
 	end
 
@@ -330,15 +330,15 @@ function parse_gmail_inbox(parent, body, line)
 		found = line:find('<tr ', pos, true);
 		if found == nil then
 			looping = false;
-			-- ÅŒã‚Ìƒ[ƒ‹‚Ì‚ ‚Æ‚Í </table> ‚ª—ˆ‚é
+			-- æœ€å¾Œã®ãƒ¡ãƒ¼ãƒ«ã®ã‚ã¨ã¯ </table> ãŒæ¥ã‚‹
 			found = line:find('</table>', pos, true);
 			if found == nil then
-				-- </table> ‚·‚çŒ©‚Â‚©‚ç‚È‚¢‚Ì‚Í‰ö‚µ‚¢‚Ì‚Å’†~
+				-- </table> ã™ã‚‰è¦‹ã¤ã‹ã‚‰ãªã„ã®ã¯æ€ªã—ã„ã®ã§ä¸­æ­¢
 				break;
 			end
 		end
 
-		-- 1ƒ[ƒ‹‚Ì’Šo
+		-- 1ãƒ¡ãƒ¼ãƒ«ã®æŠ½å‡º
 		w = line:sub(pos, found-1);
 --[[
 <tr bgcolor="#E8EEF7"> 
@@ -354,7 +354,7 @@ function parse_gmail_inbox(parent, body, line)
 <font color="#006633"> 
 </font>
 </font> 
-xxx‚©‚çƒ_ƒCƒŒƒNƒgƒƒbƒZ[ƒW‚ª“Í‚«‚Ü‚µ‚½ 
+xxxã‹ã‚‰ãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå±Šãã¾ã—ãŸ 
 <font color="#7777CC"> 
 xxx
 </font>
@@ -368,32 +368,32 @@ xxx
 <input type="checkbox" name="t" value="xx"> 
 <img src="/mail/images/cleardot.gif" width="15" height="15" border="0" alt=""> 
 </td> 
-#ˆÈãA–³‹
+#ä»¥ä¸Šã€ç„¡è¦–
 <td width="25%"> 
 <b>xxx</b>
 </td> 
-#ˆÈãAname
+#ä»¥ä¸Šã€name
 <td width="73%"> 
 <a href="?v=c&th=xx"> 
-#ã‹LAURL ‚Ìˆê•”
+#ä¸Šè¨˜ã€URL ã®ä¸€éƒ¨
 <span class="ts">
 <font size="1">
 <font color="#006633"> 
 </font>
 </font> 
-<b>‚½‚¢‚Æ‚é</b> 
-# ã‹L <b> ƒ^ƒOAtitle
+<b>ãŸã„ã¨ã‚‹</b> 
+# ä¸Šè¨˜ <b> ã‚¿ã‚°ã€title
 <font color="#7777CC"> 
-‚Ù‚ñ‚Ô‚ñ‚Î‚Á‚·‚¢
-‚Ù‚ñ‚Ô‚ñ‚Î‚Á‚·‚¢ &hellip;
+ã»ã‚“ã¶ã‚“ã°ã£ã™ã„
+ã»ã‚“ã¶ã‚“ã°ã£ã™ã„ &hellip;
 </font>
-# ã‹LAquote
+# ä¸Šè¨˜ã€quote
 </span> 
 </a>
 </td> 
 <td width="1%" nowrap> 
 <b>0:55</b> 
-# ã‹LA“ú•t
+# ä¸Šè¨˜ã€æ—¥ä»˜æ™‚åˆ»
 <tr bgcolor="#ffffff"> <td> 
 ...
 ]]
@@ -402,17 +402,17 @@ xxx
 
 		if name~=nil then
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 			
 			--mz3.logger_debug(span);
 			--mz3.logger_debug(date);
 			
-			-- span ‚É‚Í title, quote ‚ªŠÜ‚Ü‚ê‚é‚ªA‚Æ‚è‚ ‚¦‚¸‘S•” title ‚É“ü‚ê‚é
+			-- span ã«ã¯ title, quote ãŒå«ã¾ã‚Œã‚‹ãŒã€ã¨ã‚Šã‚ãˆãšå…¨éƒ¨ title ã«å…¥ã‚Œã‚‹
 			title = span;
 			title = title:gsub('&hellip;', '...');
 
-			-- –¢“ÇEŠù“Ç”»’èF<b> ƒ^ƒO‚Ì—L–³‚ÅB
+			-- æœªèª­ãƒ»æ—¢èª­åˆ¤å®šï¼š<b> ã‚¿ã‚°ã®æœ‰ç„¡ã§ã€‚
 			is_new = line_has_strings(title, '<b>');
 			if is_new then
 				data:set_integer('is_new', 1);
@@ -424,29 +424,29 @@ xxx
 			title = mz3.decode_html_entity(title);
 			data:set_text("title", title);
 
-			-- URL ¶¬ : base_url ‚ÆŒ‹‡‚µ‚Ä¶¬
+			-- URL ç”Ÿæˆ : base_url ã¨çµåˆã—ã¦ç”Ÿæˆ
 			url = base_url .. href;
 			data:set_text("url", url);
 			date = date:gsub('<.->', '');
 			data:set_date(date);
 
-			-- –¼‘O
+			-- åå‰
 			name = name:gsub('<b>', '');
 			name = name:gsub('</b>', '');
 			data:set_text("name", mz3.decode_html_entity(name));
 			data:set_text("author", name);
 			
-			-- ƒXƒ^[—pPOSTæURL
+			-- ã‚¹ã‚¿ãƒ¼ç”¨POSTå…ˆURL
 			data:set_text('post_url', post_url);
 
-			-- URL ‚É‰‚¶‚ÄƒAƒNƒZƒXí•Ê‚ğİ’è
+			-- URL ã«å¿œã˜ã¦ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã‚’è¨­å®š
 			type = mz3.get_access_type_by_key('GMAIL_MAIL');
 			data:set_access_type(type);
 
-			-- data ’Ç‰Á
+			-- data è¿½åŠ 
 			body:add(data.data);
 			
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 		pos = found + 1;
@@ -455,22 +455,22 @@ end
 
 
 --------------------------------------------------
--- yƒƒOƒCƒ“z
+-- ã€ãƒ­ã‚°ã‚¤ãƒ³ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function gmail_login_parser(parent, body, html)
 	mz3.logger_debug("gmail_login_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -490,11 +490,11 @@ function gmail_login_parser(parent, body, html)
 	url = url:gsub('&amp;', '&');
 --	mz3.alert('url : ' .. url);
 	if url == '' then
-		mz3.alert('ƒƒOƒCƒ“‚É¸”s‚µ‚Ü‚µ‚½B\r\nƒ[ƒ‹ƒAƒhƒŒƒX‚ÆƒpƒXƒ[ƒh‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢B');
+		mz3.alert('ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\r\nãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚');
 		return;
 	end
 	
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	access_type = mz3.get_access_type_by_key("GMAIL_INBOX");
 	referer = '';
 	user_agent = nil;
@@ -509,39 +509,39 @@ mz3.set_parser("GMAIL_LOGIN", "gmail.gmail_login_parser");
 
 
 --------------------------------------------------
--- yƒ[ƒ‹z
+-- ã€ãƒ¡ãƒ¼ãƒ«ã€‘
 --
--- ˆø”:
---   data:  ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   data:  ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy: NULL
---   html:  HTMLƒf[ƒ^(CHtmlArray*)
+--   html:  HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function gmail_mail_parser(data, dummy, html)
 	mz3.logger_debug("gmail_mail_parser start");
 
-	-- ƒƒCƒ“ƒrƒ…[Aƒ{ƒfƒBƒŠƒXƒg‚ÌƒAƒCƒRƒ“‚ğŠù“Ç‚É‚·‚é
+	-- ãƒ¡ã‚¤ãƒ³ãƒ“ãƒ¥ãƒ¼ã€ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ—¢èª­ã«ã™ã‚‹
 	mz3_data.set_integer(mz3_main_view.get_selected_body_item(), 'is_new', 0);
 	mz3_main_view.redraw_body_images();
 	
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	data:clear();
 	
 	local t1 = mz3.get_tick_count();
 	
 	local line_count = html:get_count();
 	
-	-- •¡”s‚É•ª‚©‚ê‚Ä‚¢‚é‚Ì‚Å1s‚ÉŒ‹‡
+	-- è¤‡æ•°è¡Œã«åˆ†ã‹ã‚Œã¦ã„ã‚‹ã®ã§1è¡Œã«çµåˆ
 	line = '';
 	for i=0, line_count-1 do
 		line = line .. html:get_at(i);
 	end
 	
-	-- base url ‚Ì‰ğÍ
+	-- base url ã®è§£æ
 	-- <base href="https://mail.google.com/mail/h/xxx/">
 	base_url  = line:match('<base href="(.-)">');
 	data:set_text('base_url', base_url);
@@ -549,25 +549,25 @@ function gmail_mail_parser(data, dummy, html)
 		base_host = base_url:match('(https?://.-)/');
 	end
 	
-	-- u‘S‚Ä“WŠJv=‘SƒXƒŒƒbƒh•\¦‘Î‰
-	-- ¦–³ŒÀƒ‹[ƒv‘Îô‚Ì‚½‚ßAƒƒCƒ“‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡‚Ì‚İÀ{‚·‚é
+	-- ã€Œå…¨ã¦å±•é–‹ã€=å…¨ã‚¹ãƒ¬ãƒƒãƒ‰è¡¨ç¤ºå¯¾å¿œ
+	-- â€»ç„¡é™ãƒ«ãƒ¼ãƒ—å¯¾ç­–ã®ãŸã‚ã€ãƒ¡ã‚¤ãƒ³ç”»é¢ã‹ã‚‰é·ç§»ã—ãŸå ´åˆã®ã¿å®Ÿæ–½ã™ã‚‹
 	if read_gmail_mail_first then
 		read_gmail_mail_first = false;
 
 		-- <a href="?v=c&d=e&th=xxx" class="nu">
-		-- <img src="/mail/images/expand_icon.gif" width="16" height="16" border="0" alt="‚·‚×‚Ä‚ÌƒƒbƒZ[ƒW‚ğ“WŠJ">
-		-- &nbsp;<span class="u">‚·‚×‚Ä“WŠJ</span></a>
+		-- <img src="/mail/images/expand_icon.gif" width="16" height="16" border="0" alt="ã™ã¹ã¦ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å±•é–‹">
+		-- &nbsp;<span class="u">ã™ã¹ã¦å±•é–‹</span></a>
 		
-		if line_has_strings(line, 'alt="‚·‚×‚Ä‚ÌƒƒbƒZ[ƒW‚ğ“WŠJ"') then
-			expand_url = line:match('<a href="([^">]+)"[^>]+><img[^>]+>&nbsp;<span[^>]+>‚·‚×‚Ä“WŠJ');
+		if line_has_strings(line, 'alt="ã™ã¹ã¦ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å±•é–‹"') then
+			expand_url = line:match('<a href="([^">]+)"[^>]+><img[^>]+>&nbsp;<span[^>]+>ã™ã¹ã¦å±•é–‹');
 --			mz3.alert(expand_url);
 --			expand_url = nil;
 			if expand_url ~= nil then
-				mz3.logger_debug('‘SƒXƒŒƒbƒh‚ğæ“¾‚µ‚Ü‚·');
+				mz3.logger_debug('å…¨ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’å–å¾—ã—ã¾ã™');
 
-				data:add_text_array("body", "‘SƒXƒŒƒbƒh‚ğæ“¾‚µ‚Ä‚¢‚Ü‚·B‚µ‚Î‚ç‚­‚¨‘Ò‚¿‰º‚³‚¢BBB");
+				data:add_text_array("body", "å…¨ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’å–å¾—ã—ã¦ã„ã¾ã™ã€‚ã—ã°ã‚‰ããŠå¾…ã¡ä¸‹ã•ã„ã€‚ã€‚ã€‚");
 
-				-- ’ÊMŠJn
+				-- é€šä¿¡é–‹å§‹
 				url = base_url .. expand_url;
 				key = "GMAIL_MAIL";
 				access_type = mz3.get_access_type_by_key(key);
@@ -580,47 +580,47 @@ function gmail_mail_parser(data, dummy, html)
 		end
 	end
 	
-	-- ƒ^ƒCƒgƒ‹
-	-- <h2><font size="+1"><b>‚½‚¢‚Æ‚é</b></font></h2>
+	-- ã‚¿ã‚¤ãƒˆãƒ«
+	-- <h2><font size="+1"><b>ãŸã„ã¨ã‚‹</b></font></h2>
 	title = line:match('<h2><font size=.-><b>(.-)</b>');
 	title = title:gsub('<.->', '');
 	title = title:gsub('^ *', '');
 	title = mz3.decode_html_entity(title);
 	data:set_text('title', title);
 	
-	-- ƒXƒŒƒbƒh•ª—£
-	-- “Á’è‚Ìtable‚Æu•ÔMŠJnƒ^ƒOv‚Å•ª—£‚·‚é
+	-- ã‚¹ãƒ¬ãƒƒãƒ‰åˆ†é›¢
+	-- ç‰¹å®šã®tableã¨ã€Œè¿”ä¿¡é–‹å§‹ã‚¿ã‚°ã€ã§åˆ†é›¢ã™ã‚‹
 	
 	one_mail_start_tags = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#efefef"> <tr> <td> ';
 	reply_start_tags    = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#e0ecff" class="qr"> <tr> ';
 	
-	-- ŠG•¶šURLƒŠƒXƒg
-	-- —á) emoji_urls[0] = 'https://mail.google.com/mail/e/ezweb_ne_jp/B60';
+	-- çµµæ–‡å­—URLãƒªã‚¹ãƒˆ
+	-- ä¾‹) emoji_urls[0] = 'https://mail.google.com/mail/e/ezweb_ne_jp/B60';
 	emoji_urls = {}
 	local one_mail = '';
 	local mail_count = 0;
 	local start = 1;
 	local pos = 1;
 	while true do
-		-- ƒ[ƒ‹ŠJnƒ^ƒO‚ğ’T‚·
+		-- ãƒ¡ãƒ¼ãƒ«é–‹å§‹ã‚¿ã‚°ã‚’æ¢ã™
 		pos = line:find(one_mail_start_tags, start, true);
 		if pos == nil then
-			-- u•ÔMŠJnƒ^ƒOv‚Ü‚Å‚ğ1’Ê‚Æ‚·‚é
+			-- ã€Œè¿”ä¿¡é–‹å§‹ã‚¿ã‚°ã€ã¾ã§ã‚’1é€šã¨ã™ã‚‹
 			pos = line:find(reply_start_tags, start, true);
 			if pos == nil then
-				-- u•ÔMŠJnƒ^ƒOv‚ª‚È‚¢‚Ì‚ÅÅŒã‚Ü‚ÅB
+				-- ã€Œè¿”ä¿¡é–‹å§‹ã‚¿ã‚°ã€ãŒãªã„ã®ã§æœ€å¾Œã¾ã§ã€‚
 				one_mail = line:sub(start);
 			else
 				one_mail = line:sub(start, pos-1);
 			end
 
-			-- ®Œ`AData‰»
+			-- æ•´å½¢ã€DataåŒ–
 			parse_one_mail(data, one_mail, mail_count);
 			break;
 		else
 			one_mail = line:sub(start, pos-1);
 			
-			-- ®Œ`AData‰»
+			-- æ•´å½¢ã€DataåŒ–
 			parse_one_mail(data, one_mail, mail_count);
 			
 			start = pos + one_mail_start_tags:len();
@@ -629,12 +629,12 @@ function gmail_mail_parser(data, dummy, html)
 	end
 	
 	if pos ~= nil then
-		-- u•ÔMŠJnƒ^ƒOvˆÈ~‚ğ—p‚¢‚Ä•ÔMƒtƒH[ƒ€‚ğæ“¾
+		-- ã€Œè¿”ä¿¡é–‹å§‹ã‚¿ã‚°ã€ä»¥é™ã‚’ç”¨ã„ã¦è¿”ä¿¡ãƒ•ã‚©ãƒ¼ãƒ ã‚’å–å¾—
 		reply_form = line:sub(pos);
-		-- Å‰‚Ì <form>..</form> ‚ª•ÔMƒtƒH[ƒ€B
+		-- æœ€åˆã® <form>..</form> ãŒè¿”ä¿¡ãƒ•ã‚©ãƒ¼ãƒ ã€‚
 		reply_form = reply_form:match('<form.-</form>');
-		-- data ‚ÉƒtƒH[ƒ€‚ğ‚»‚Ì‚Ü‚Ü–„‚ß‚ñ‚Å‚¨‚­
-		-- •ÔMÀs‚É‚±‚ÌƒtƒH[ƒ€‚Ì“à—e‚ğ—˜—p‚·‚é
+		-- data ã«ãƒ•ã‚©ãƒ¼ãƒ ã‚’ãã®ã¾ã¾åŸ‹ã‚è¾¼ã‚“ã§ãŠã
+		-- è¿”ä¿¡å®Ÿè¡Œæ™‚ã«ã“ã®ãƒ•ã‚©ãƒ¼ãƒ ã®å†…å®¹ã‚’åˆ©ç”¨ã™ã‚‹
 		data:set_text('reply_form', reply_form);
 	end
 	
@@ -642,7 +642,7 @@ function gmail_mail_parser(data, dummy, html)
 --		print(k, v);
 --	end
 --	print(#emoji_urls);
-	-- –¢ƒ[ƒh‚ÌŠG•¶š‚ª‚ ‚ê‚Îƒ[ƒhŠJn
+	-- æœªãƒ­ãƒ¼ãƒ‰ã®çµµæ–‡å­—ãŒã‚ã‚Œã°ãƒ­ãƒ¼ãƒ‰é–‹å§‹
 	get_next_emoji_url();
 	
 	local t2 = mz3.get_tick_count();
@@ -651,10 +651,10 @@ end
 mz3.set_parser("GMAIL_MAIL", "gmail.gmail_mail_parser");
 
 
---- emoji_urls ‚Ìæ“ª—v‘f‚É‘Î‚µ‚ÄƒŠƒNƒGƒXƒg‚·‚é
+--- emoji_urls ã®å…ˆé ­è¦ç´ ã«å¯¾ã—ã¦ãƒªã‚¯ã‚¨ã‚¹ãƒˆã™ã‚‹
 function get_next_emoji_url()
 	if #emoji_urls >= 1 then
-		-- ’ÊMŠJn
+		-- é€šä¿¡é–‹å§‹
 		url = emoji_urls[1];
 --		mz3.alert(url);
 		access_type = mz3.get_access_type_by_key("GMAIL_EMOJI");
@@ -669,22 +669,22 @@ function get_next_emoji_url()
 end
 
 
---- ƒXƒŒƒbƒh“à‚Ì1’Ê‚Ìƒ[ƒ‹‚ğ‰ğÍ‚µAdata ‚Éİ’è‚·‚é
+--- ã‚¹ãƒ¬ãƒƒãƒ‰å†…ã®1é€šã®ãƒ¡ãƒ¼ãƒ«ã‚’è§£æã—ã€data ã«è¨­å®šã™ã‚‹
 --
--- @param data MZ3Data ƒIƒuƒWƒFƒNƒg
--- @param line 1’Ê‚Ìƒ[ƒ‹‚É‘Î‰‚·‚éHTML
+-- @param data MZ3Data ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+-- @param line 1é€šã®ãƒ¡ãƒ¼ãƒ«ã«å¯¾å¿œã™ã‚‹HTML
 --
 function parse_one_mail(data, line, count)
 
 	mz3.logger_debug("parse_one_mail(" .. count .. ")");
 
 	if count==0 then
-		-- Å‰‚Íƒwƒbƒ_[‚È‚Ì‚Å–³‹
+		-- æœ€åˆã¯ãƒ˜ãƒƒãƒ€ãƒ¼ãªã®ã§ç„¡è¦–
 		return;
 	end
 
 	if count>=2 then
-		-- 2Œ–ÚˆÈ~‚Íq—v‘f‚Æ‚µ‚Ä“Š“ü‚·‚é
+		-- 2ä»¶ç›®ä»¥é™ã¯å­è¦ç´ ã¨ã—ã¦æŠ•å…¥ã™ã‚‹
 		child = MZ3Data:create();
 		parse_one_mail(child, line, 1);
 		data:add_child(child);
@@ -693,13 +693,13 @@ function parse_one_mail(data, line, count)
 	end
 --	mz3.logger_debug(line);
 
-	-- –¼‘O
-	-- <h3>... <b>‚È‚Ü‚¦</b> ...</h3>
+	-- åå‰
+	-- <h3>... <b>ãªã¾ãˆ</b> ...</h3>
 	name = line:match('<h3>.-<b>(.-)</b>');
 	data:set_text("name", mz3.decode_html_entity(name));
 	data:set_text("author", mz3.decode_html_entity(name));
 	
-	-- “ú•t
+	-- æ—¥ä»˜
 	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
 	date = line:match('<td align="right" valign="top"> (.-) <');
 	if date ~= nil then
@@ -707,11 +707,11 @@ function parse_one_mail(data, line, count)
 		data:set_date(date);
 	end
 	
-	-- –{•¶
+	-- æœ¬æ–‡
 	body = line:match('<div class="msg"> ?(.*)$');
 	
 	if body ~= nil then
-		-- ŠÈˆÕHTML‰ğÍ
+		-- ç°¡æ˜“HTMLè§£æ
 		body = body:gsub('<WBR>', '');
 		body = body:gsub('<wbr />', '');
 		body = body:gsub('<b .->', "<b>");
@@ -733,16 +733,16 @@ function parse_one_mail(data, line, count)
 		body = body:gsub('</table>', "");
 		body = body:gsub('<map.-</map>', '');
 
-		-- “à•”ƒŠƒ“ƒN‚Ì•âŠ®(/‚Ån‚Ü‚éê‡‚ÉƒzƒXƒg‚ğ•âŠ®‚·‚é)
+		-- å†…éƒ¨ãƒªãƒ³ã‚¯ã®è£œå®Œ(/ã§å§‹ã¾ã‚‹å ´åˆã«ãƒ›ã‚¹ãƒˆã‚’è£œå®Œã™ã‚‹)
 		body = body:gsub('(<a .-href=")(/.-")', '%1' .. base_host .. '%2');
 		body = body:gsub('(<img .-src=")(/.-")', '%1' .. base_host .. '%2');
-		-- “à•”ƒŠƒ“ƒN‚Ì•âŠ®(?‚Ån‚Ü‚éê‡‚Ébase‚ğ•âŠ®‚·‚é)
+		-- å†…éƒ¨ãƒªãƒ³ã‚¯ã®è£œå®Œ(?ã§å§‹ã¾ã‚‹å ´åˆã«baseã‚’è£œå®Œã™ã‚‹)
 		body = body:gsub('(<a .-href=")(\?.-")', '%1' .. base_host .. '%2');
 		body = body:gsub('(<img .-src=")\?(.-")', '%1' .. base_url .. '%2');
 		body = body:gsub("\r\n", "\n");
 		body = body:gsub('^ *', '');
 
-		-- <img ƒ^ƒO‚¾‚ª src ‚ª‚È‚¢‚à‚Ì‚Ííœ
+		-- <img ã‚¿ã‚°ã ãŒ src ãŒãªã„ã‚‚ã®ã¯å‰Šé™¤
 		local post = 1;
 		local start = 1;
 		local body2 = '';
@@ -755,19 +755,19 @@ function parse_one_mail(data, line, count)
 				body2 = body2 .. body:sub(start, pos-1);
 				img = body:match('<img .->', start);
 				if line_has_strings(img, 'src=') then
-					-- ‚³‚ç‚ÉŠG•¶š‚Å‚ ‚ê‚Î•ÏŠ·
+					-- ã•ã‚‰ã«çµµæ–‡å­—ã§ã‚ã‚Œã°å¤‰æ›
 					-- <img src="https://mail.google.com/mail/e/ezweb_ne_jp/B60" goomoji="ezweb_ne_jp.B60" ... />
 					-- <img src="https://mail.google.com/mail/e/docomo_ne_jp/330" goomoji="docomo_ne_jp.330" ... />
 					emoji_url, goomoji = img:match('src="(https://mail.google.com/mail/e/.-)" goomoji="(.-)"');
 					if emoji_url ~= nil and goomoji ~= nil then
-						-- –¢ƒ[ƒh‚ÌŠG•¶š‚ª‚ ‚ê‚Îƒ_ƒEƒ“ƒ[ƒh‚·‚é
+						-- æœªãƒ­ãƒ¼ãƒ‰ã®çµµæ–‡å­—ãŒã‚ã‚Œã°ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
 						local idx = mz3_image_cache.get_image_index_by_url(emoji_url);
 						if idx==-1 then
-							-- –¢ƒ[ƒh‚È‚Ì‚Åƒ_ƒEƒ“ƒ[ƒh(—\–ñ)‚·‚é
+							-- æœªãƒ­ãƒ¼ãƒ‰ãªã®ã§ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰(äºˆç´„)ã™ã‚‹
 							table.insert(emoji_urls, emoji_url);
 							body2 = body2 .. "[loading...]";
 						else
-							-- ƒ[ƒhÏ‚İ‚È‚Ì‚Åidx‚ğ‚ç‚ñ‚ç‚ñƒrƒ…[Œ`®‚É•ÏŠ·‚·‚é
+							-- ãƒ­ãƒ¼ãƒ‰æ¸ˆã¿ãªã®ã§idxã‚’ã‚‰ã‚“ã‚‰ã‚“ãƒ“ãƒ¥ãƒ¼å½¢å¼ã«å¤‰æ›ã™ã‚‹
 							body2 = body2 .. "[g:" .. idx .. "]";
 						end
 					else
@@ -789,36 +789,36 @@ end
 
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
---- ƒ{ƒfƒBƒŠƒXƒg‚ÌƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 --
 -- @param event_name    'get_end_binary_report_view'
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param http_status   http status
 -- @param url           url
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 --
 function on_get_end_binary_report_view(event_name, serialize_key, http_status, url, filename)
 
 	mz3.logger_debug('on_get_end_binary_report_view', event_name, serialize_key, http_status, url, filename);
 	if serialize_key == "GMAIL_EMOJI" then
-		-- •Û‘¶
+		-- ä¿å­˜
 		local path = mz3.make_image_logfile_path_from_url_md5(url);
 		mz3.logger_debug(path);
 --		mz3.alert(path);
 		mz3.copy_file(filename, path);
 		
-		-- ŠG•¶šƒŠƒXƒg‚©‚çíœ
+		-- çµµæ–‡å­—ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
 		table.remove(emoji_urls, 1);
 
-		-- –¢ƒ[ƒh‚ÌŠG•¶š‚ª‚ ‚ê‚Îƒ[ƒhŠJn
+		-- æœªãƒ­ãƒ¼ãƒ‰ã®çµµæ–‡å­—ãŒã‚ã‚Œã°ãƒ­ãƒ¼ãƒ‰é–‹å§‹
 		if get_next_emoji_url()==false then
-			-- ‘Sƒ[ƒhŠ®—¹
-			-- ‚Æ‚è‚ ‚¦‚¸Ä“xƒ[ƒ‹‚ğóM‚·‚é
-			-- TODO ‰æ–ÊÄ•`‰æ‚Ì‚İ‚É‚µ‚½‚¢
+			-- å…¨ãƒ­ãƒ¼ãƒ‰å®Œäº†
+			-- ã¨ã‚Šã‚ãˆãšå†åº¦ãƒ¡ãƒ¼ãƒ«ã‚’å—ä¿¡ã™ã‚‹
+			-- TODO ç”»é¢å†æç”»ã®ã¿ã«ã—ãŸã„
 			url = mail_url;
 			key = "GMAIL_MAIL";
 			access_type = mz3.get_access_type_by_key(key);
@@ -836,14 +836,14 @@ end
 mz3.add_event_listener("get_end_binary_report_view", "gmail.on_get_end_binary_report_view");
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚ÌƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 --
 -- @param event_name    'get_body_list_default_icon_index'
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param body          body data
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
--- @return (2) [int] ƒAƒCƒRƒ“ƒCƒ“ƒfƒbƒNƒX
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
+-- @return (2) [int] ã‚¢ã‚¤ã‚³ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 --
 function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 
@@ -860,12 +860,12 @@ end
 mz3.add_event_listener("get_body_list_default_icon_index", "gmail.on_get_body_list_default_icon_index");
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
@@ -880,15 +880,15 @@ end
 mz3.add_event_listener("get_view_style", "gmail.on_get_view_style");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 	
 	item = '';
-	item = item .. "–¼‘O : " .. data:get_text('name') .. "\r\n";
-	item = item .. "“ú•t : " .. data:get_date() .. "\r\n";
+	item = item .. "åå‰ : " .. data:get_text('name') .. "\r\n";
+	item = item .. "æ—¥ä»˜ : " .. data:get_date() .. "\r\n";
 	item = item .. "----\r\n";
 
 	item = item .. data:get_text('title') .. "\r\n";
@@ -902,21 +902,21 @@ function on_read_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒ[ƒ‹‘—M
+--- ãƒ¡ãƒ¼ãƒ«é€ä¿¡
 function on_send_mail(serialize_key, event_name, data)
 	mz3.logger_debug('on_send_mail: (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 
-	-- V‹Kƒ[ƒ‹—p‚Ì‰Šú‰»
+	-- æ–°è¦ãƒ¡ãƒ¼ãƒ«ç”¨ã®åˆæœŸåŒ–
 	new_mail_info = {}
 	
-	-- ‘—MæƒAƒhƒŒƒXæ“¾
+	-- é€ä¿¡å…ˆã‚¢ãƒ‰ãƒ¬ã‚¹å–å¾—
 	if do_input_to_address() == false then
 		return true;
 	end
 	
-	-- ‘‚«‚İ‰æ–Ê‚Ö‚Ì‘JˆÚ
+	-- æ›¸ãè¾¼ã¿ç”»é¢ã¸ã®é·ç§»
 	mz3.start_write_view('GMAIL_NEW', mz3_main_view.get_selected_category_item());
 
 	return true;
@@ -925,12 +925,12 @@ end
 
 function do_input_to_address()
 	while true do
-		local to = mz3.show_common_edit_dlg("‘—Mæİ’è", "‘—Mæƒ[ƒ‹ƒAƒhƒŒƒX‚ğ“ü—Í‚µ‚Ä‰º‚³‚¢", new_mail_info.to);
+		local to = mz3.show_common_edit_dlg("é€ä¿¡å…ˆè¨­å®š", "é€ä¿¡å…ˆãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„", new_mail_info.to);
 		if to == nil then
 			return false;
 		end
 		if to:match('^[^@]+@[^@]+$')==nil then
-			mz3.alert("ƒ[ƒ‹ƒAƒhƒŒƒX‚ÌŒ`®‚ª•s³‚Å‚·BÄ“x“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B");
+			mz3.alert("ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã®å½¢å¼ãŒä¸æ­£ã§ã™ã€‚å†åº¦å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚");
 		else
 			new_mail_info.to = to;
 			break;
@@ -940,22 +940,22 @@ function do_input_to_address()
 end
 
 
---- ƒXƒ^[‚ğ•t‚¯‚é
+--- ã‚¹ã‚¿ãƒ¼ã‚’ä»˜ã‘ã‚‹
 function on_add_star_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_add_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 
-	-- POSTƒpƒ‰ƒ[ƒ^¶¬
+	-- POSTãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 	post = MZ3PostData:create();
 
-	-- tƒpƒ‰ƒ[ƒ^‚Íƒ[ƒ‹URL‚©‚çæ“¾‚·‚é
+	-- tãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ãƒ¡ãƒ¼ãƒ«URLã‹ã‚‰å–å¾—ã™ã‚‹
 	t = data:get_text('url');
 	t = t:match('th=(.*)$');
 	post_body = 'redir=%3F&tact=st&nvp_tbu_go=%E5%AE%9F%E8%A1%8C&t=' .. t .. '&bact=';
 	post:append_post_body(post_body);
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	url = data:get_text('post_url');
 	access_type = mz3.get_access_type_by_key("GMAIL_ADD_STAR");
 	referer = '';
@@ -964,22 +964,22 @@ function on_add_star_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
---- ƒXƒ^[‚ğ‚Í‚¸‚·
+--- ã‚¹ã‚¿ãƒ¼ã‚’ã¯ãšã™
 function on_remove_star_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_remove_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 
-	-- POSTƒpƒ‰ƒ[ƒ^¶¬
+	-- POSTãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 	post = MZ3PostData:create();
 
-	-- tƒpƒ‰ƒ[ƒ^‚Íƒ[ƒ‹URL‚©‚çæ“¾‚·‚é
+	-- tãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ãƒ¡ãƒ¼ãƒ«URLã‹ã‚‰å–å¾—ã™ã‚‹
 	t = data:get_text('url');
 	t = t:match('th=(.*)$');
 	post_body = 'redir=%3F&tact=xst&nvp_tbu_go=%E5%AE%9F%E8%A1%8C&t=' .. t .. '&bact=';
 	post:append_post_body(post_body);
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	url = data:get_text('post_url');
 	access_type = mz3.get_access_type_by_key("GMAIL_REMOVE_STAR");
 	referer = '';
@@ -988,22 +988,22 @@ function on_remove_star_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
---- ƒA[ƒJƒCƒu‚·‚é
+--- ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–ã™ã‚‹
 function on_archive_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_archive_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 
-	-- POSTƒpƒ‰ƒ[ƒ^¶¬
+	-- POSTãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 	post = MZ3PostData:create();
 
-	-- tƒpƒ‰ƒ[ƒ^‚Íƒ[ƒ‹URL‚©‚çæ“¾‚·‚é
+	-- tãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ãƒ¡ãƒ¼ãƒ«URLã‹ã‚‰å–å¾—ã™ã‚‹
 	t = data:get_text('url');
 	t = t:match('th=(.*)$');
 	post_body = 'redir=%3F&nvp_a_arch=%83A%81%5b%83J%83C%83u&t=' .. t .. '&bact=';
 	post:append_post_body(post_body);
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	url = data:get_text('post_url');
 	access_type = mz3.get_access_type_by_key("GMAIL_ARCHIVE");
 	referer = '';
@@ -1012,12 +1012,12 @@ function on_archive_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
---- POST Š®—¹ƒCƒxƒ“ƒg
+--- POST å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name    'post_end'
--- @param serialize_key Š®—¹€–Ú‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key å®Œäº†é …ç›®ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param http_status   HTTP Status Code (200, 404, etc...)
--- @param filename      ƒŒƒXƒ|ƒ“ƒXƒtƒ@ƒCƒ‹
+-- @param filename      ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
 -- @param wnd           wnd
 --
 function on_post_end(event_name, serialize_key, http_status, filename)
@@ -1027,24 +1027,24 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		return false;
 	end
 
-	-- ƒXƒe[ƒ^ƒXƒR[ƒhƒ`ƒFƒbƒN
+	-- ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 	if http_status~=200 then
-		-- ƒGƒ‰[ƒAƒŠ‚È‚Ì‚Å’†’f‚·‚é‚½‚ß‚É true ‚ğ•Ô‚·
-		local msg="¸”s‚µ‚Ü‚µ‚½";
+		-- ã‚¨ãƒ©ãƒ¼ã‚¢ãƒªãªã®ã§ä¸­æ–­ã™ã‚‹ãŸã‚ã« true ã‚’è¿”ã™
+		local msg="å¤±æ•—ã—ã¾ã—ãŸ";
 		mz3.logger_error(msg);
 		mz3_main_view.set_info_text(msg);
 		return true;
 	end
 
-	-- ƒŠƒNƒGƒXƒg‚Ìí•Ê‚É‰‚¶‚ÄƒƒbƒZ[ƒW‚ğ•\¦
+	-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆã®ç¨®åˆ¥ã«å¿œã˜ã¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤º
 	if serialize_key == "GMAIL_ADD_STAR" then
-		mz3_main_view.set_info_text("ƒXƒ^[‚Â‚¯‚½I");
+		mz3_main_view.set_info_text("ã‚¹ã‚¿ãƒ¼ã¤ã‘ãŸï¼");
 	end
 	if serialize_key == "GMAIL_REMOVE_STAR" then
-		mz3_main_view.set_info_text("ƒXƒ^[‚Æ‚Á‚½‚Ç[I");
+		mz3_main_view.set_info_text("ã‚¹ã‚¿ãƒ¼ã¨ã£ãŸã©ãƒ¼ï¼");
 	end
 	if serialize_key == "GMAIL_ARCHIVE" then
-		mz3_main_view.set_info_text("ƒA[ƒJƒCƒu‚µ‚½[I");
+		mz3_main_view.set_info_text("ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–ã—ãŸãƒ¼ï¼");
 	end
 
 	return true;
@@ -1052,17 +1052,17 @@ end
 mz3.add_event_listener("post_end", "gmail.on_post_end");
 
 
---- ƒŒƒ|[ƒgƒrƒ…[‚ÅŠJ‚­
+--- ãƒ¬ãƒãƒ¼ãƒˆãƒ“ãƒ¥ãƒ¼ã§é–‹ã
 read_gmail_mail_first = true;
 function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_by_reportview_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
-	-- ƒ[ƒ‹ƒp[ƒT“à–³ŒÀƒ‹[ƒv‘Îô‚Ì‚½‚ßAuƒƒCƒ“‰æ–Ê‚©‚ç‚Ì‘JˆÚƒtƒ‰ƒOv‚ğ—§‚Ä‚Ä‚¨‚­
+	-- ãƒ¡ãƒ¼ãƒ«ãƒ‘ãƒ¼ã‚µå†…ç„¡é™ãƒ«ãƒ¼ãƒ—å¯¾ç­–ã®ãŸã‚ã€ã€Œãƒ¡ã‚¤ãƒ³ç”»é¢ã‹ã‚‰ã®é·ç§»ãƒ•ãƒ©ã‚°ã€ã‚’ç«‹ã¦ã¦ãŠã
 	read_gmail_mail_first = true;
 
 	data = MZ3Data:create(data);
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	url = data:get_text('url');
 	key = "GMAIL_MAIL";
 	access_type = mz3.get_access_type_by_key(key);
@@ -1071,34 +1071,34 @@ function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 	
-	-- ŠG•¶šƒ[ƒhŒã‚ÌÄƒ[ƒh—p
-	-- TODO ‰æ–ÊÄ•`‰æ‚Ì‚İ‚É‚µ‚½‚¢
+	-- çµµæ–‡å­—ãƒ­ãƒ¼ãƒ‰å¾Œã®å†ãƒ­ãƒ¼ãƒ‰ç”¨
+	-- TODO ç”»é¢å†æç”»ã®ã¿ã«ã—ãŸã„
 	mail_url = url;
 
 	return true;
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 
 	if serialize_key=="GMAIL_MAIL" then
-		-- ƒŒƒ|[ƒgƒrƒ…[‚ÅŠJ‚­
+		-- ãƒ¬ãƒãƒ¼ãƒˆãƒ“ãƒ¥ãƒ¼ã§é–‹ã
 		return on_read_by_reportview_menu_item(serialize_key, event_name, data);
 
-		-- ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Å‘S•¶•\¦‚µ‚½‚¢ê‡‚Í‰º‹L‚ÌƒRƒƒ“ƒg‚ğŠO‚·‚±‚Æ
-		-- ‘S•¶•\¦
+		-- ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã§å…¨æ–‡è¡¨ç¤ºã—ãŸã„å ´åˆã¯ä¸‹è¨˜ã®ã‚³ãƒ¡ãƒ³ãƒˆã‚’å¤–ã™ã“ã¨
+		-- å…¨æ–‡è¡¨ç¤º
 --		return on_read_menu_item(serialize_key, event_name, data);
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "gmail.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "gmail.on_body_list_click");
 
 
---- uƒuƒ‰ƒEƒU‚ÅŠJ‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_by_browser_menu_item(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -1107,10 +1107,10 @@ function on_open_by_browser_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -1119,29 +1119,29 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "–{•¶‚ğ“Ç‚Ş...", menu_items.read_by_reportview);
-	menu:append_menu("string", "ƒuƒ‰ƒEƒU‚ÅŠJ‚­...", menu_items.open_by_browser);
+	menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "æœ¬æ–‡ã‚’èª­ã‚€...", menu_items.read_by_reportview);
+	menu:append_menu("string", "ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ã...", menu_items.open_by_browser);
 
 	menu:append_menu("separator");
-	menu:append_menu("string", "ƒXƒ^[‚ğ•t‚¯‚é...", menu_items.add_star);
-	menu:append_menu("string", "ƒXƒ^[‚ğ‚Í‚¸‚·...", menu_items.rmv_star);
-	menu:append_menu("string", "ƒA[ƒJƒCƒu...", menu_items.archive);
-	menu:append_menu("string", "ƒ[ƒ‹‚ğì¬...", menu_items.send_mail);
+	menu:append_menu("string", "ã‚¹ã‚¿ãƒ¼ã‚’ä»˜ã‘ã‚‹...", menu_items.add_star);
+	menu:append_menu("string", "ã‚¹ã‚¿ãƒ¼ã‚’ã¯ãšã™...", menu_items.rmv_star);
+	menu:append_menu("string", "ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–...", menu_items.archive);
+	menu:append_menu("string", "ãƒ¡ãƒ¼ãƒ«ã‚’ä½œæˆ...", menu_items.send_mail);
 
 	menu:append_menu("separator");
-	menu:append_menu("string", "ƒ[ƒ‹‚ÌƒvƒƒpƒeƒB...", menu_items.read);
+	menu:append_menu("string", "ãƒ¡ãƒ¼ãƒ«ã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£...", menu_items.read);
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	
 	return true;
@@ -1149,12 +1149,12 @@ end
 mz3.add_event_listener("popup_body_menu",  "gmail.on_popup_body_menu");
 
 
---- ƒŒƒ|[ƒgƒrƒ…[‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒ¬ãƒãƒ¼ãƒˆãƒ“ãƒ¥ãƒ¼ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_report_menu'
--- @param serialize_key ƒŒƒ|[ƒgƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
--- @param report_item   ƒŒƒ|[ƒgƒAƒCƒeƒ€
--- @param sub_item_idx  ‘I‘ğƒAƒCƒeƒ€‚ÌƒCƒ“ƒfƒbƒNƒX
+-- @param serialize_key ãƒ¬ãƒãƒ¼ãƒˆã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+-- @param report_item   ãƒ¬ãƒãƒ¼ãƒˆã‚¢ã‚¤ãƒ†ãƒ 
+-- @param sub_item_idx  é¸æŠã‚¢ã‚¤ãƒ†ãƒ ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 -- @param wnd           wnd
 --
 function on_popup_report_menu(event_name, serialize_key, report_item, sub_item_idx, wnd)
@@ -1162,36 +1162,36 @@ function on_popup_report_menu(event_name, serialize_key, report_item, sub_item_i
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	report_item = MZ3Data:create(report_item);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	menu_edit = MZ3Menu:create_popup_menu();
 	menu_layout = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "–ß‚é", ID_BACK_MENU);
+	menu:append_menu("string", "æˆ»ã‚‹", ID_BACK_MENU);
 	menu:append_menu("separator");
 	
-	menu:append_menu("string", "•ÔM", ID_WRITE_COMMENT);
+	menu:append_menu("string", "è¿”ä¿¡", ID_WRITE_COMMENT);
 
-	menu:append_menu("string", "Ä“Ç", IDM_RELOAD_PAGE);
+	menu:append_menu("string", "å†èª­è¾¼", IDM_RELOAD_PAGE);
 
-	menu_edit:append_menu("string", "ƒRƒs[", ID_EDIT_COPY);
-	menu:append_submenu("•ÒW", menu_edit);
+	menu_edit:append_menu("string", "ã‚³ãƒ”ãƒ¼", ID_EDIT_COPY);
+	menu:append_submenu("ç·¨é›†", menu_edit);
 	
-	menu:append_menu("string", "ƒuƒ‰ƒEƒU‚ÅŠJ‚­i‚±‚Ìƒy[ƒWj...", ID_OPEN_BROWSER);
+	menu:append_menu("string", "ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ãï¼ˆã“ã®ãƒšãƒ¼ã‚¸ï¼‰...", ID_OPEN_BROWSER);
 
-	-- TODO ‹¤’Ê‰»
+	-- TODO å…±é€šåŒ–
 	menu:append_menu("separator");
-	menu_layout:append_menu("string", "ªƒŠƒXƒg‚ğ‹·‚­‚·‚é", IDM_LAYOUT_REPORTLIST_MAKE_NARROW);
-	menu_layout:append_menu("string", "«ƒŠƒXƒg‚ğL‚­‚·‚é", IDM_LAYOUT_REPORTLIST_MAKE_WIDE);
-	menu:append_submenu("‰æ–ÊƒŒƒCƒAƒEƒg", menu_layout);
+	menu_layout:append_menu("string", "â†‘ãƒªã‚¹ãƒˆã‚’ç‹­ãã™ã‚‹", IDM_LAYOUT_REPORTLIST_MAKE_NARROW);
+	menu_layout:append_menu("string", "â†“ãƒªã‚¹ãƒˆã‚’åºƒãã™ã‚‹", IDM_LAYOUT_REPORTLIST_MAKE_WIDE);
+	menu:append_submenu("ç”»é¢ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ", menu_layout);
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	menu_edit:delete();
 	menu_layout:delete();
@@ -1201,10 +1201,10 @@ end
 mz3.add_event_listener("popup_report_menu",  "gmail.on_popup_report_menu");
 
 
---- ƒŒƒ|[ƒg‰æ–Ê‚©‚ç‚Ì•ÔM‚Ì‘‚«‚İí•Ê‚Ì”»’è
+--- ãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã‹ã‚‰ã®è¿”ä¿¡æ™‚ã®æ›¸ãè¾¼ã¿ç¨®åˆ¥ã®åˆ¤å®š
 --
 -- @param event_name  'get_write_view_type_by_report_item_access_type'
--- @param report_item [MZ3Data] ƒŒƒ|[ƒg‰æ–Ê‚Ì—v‘f
+-- @param report_item [MZ3Data] ãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã®è¦ç´ 
 --
 function on_get_write_view_type_by_report_item_access_type(event_name, report_item)
 
@@ -1223,19 +1223,19 @@ end
 mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "gmail.on_get_write_view_type_by_report_item_access_type");
 
 
---- ‘‚«‚İ‰æ–Ê‚Ì‰Šú‰»ƒCƒxƒ“ƒg
+--- æ›¸ãè¾¼ã¿ç”»é¢ã®åˆæœŸåŒ–ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name      'init_write_view'
--- @param write_view_type ‘‚«‚İí•Ê
--- @param write_item      [MZ3Data] ‘‚«‚İ‰æ–Ê‚Ì—v‘f
+-- @param write_view_type æ›¸ãè¾¼ã¿ç¨®åˆ¥
+-- @param write_item      [MZ3Data] æ›¸ãè¾¼ã¿ç”»é¢ã®è¦ç´ 
 --
--- @return [1] ok                  true ‚Ìê‡ƒ`ƒF[ƒ“I—¹
--- @return [2] is_from_main_view   1 ‚Ìê‡ƒƒCƒ“‰æ–Ê‚É–ß‚éA0 ‚Ìê‡ƒŒƒ|[ƒg‰æ–Ê‚É–ß‚é
--- @return [3] init_focus          ‰ŠúƒtƒH[ƒJƒX
---                                 'body'  : –{•¶‚©‚çŠJn
---                                 'title' : ƒ^ƒCƒgƒ‹‚©‚çŠJn
--- @return [4] enable_combo_box    1 ‚Ìê‡ƒRƒ“ƒ{ƒ{ƒbƒNƒX—LŒø
--- @return [5] enable_title_change 1 ‚Ìê‡ƒ^ƒCƒgƒ‹•ÏX—LŒø
+-- @return [1] ok                  true ã®å ´åˆãƒã‚§ãƒ¼ãƒ³çµ‚äº†
+-- @return [2] is_from_main_view   1 ã®å ´åˆãƒ¡ã‚¤ãƒ³ç”»é¢ã«æˆ»ã‚‹ã€0 ã®å ´åˆãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã«æˆ»ã‚‹
+-- @return [3] init_focus          åˆæœŸãƒ•ã‚©ãƒ¼ã‚«ã‚¹
+--                                 'body'  : æœ¬æ–‡ã‹ã‚‰é–‹å§‹
+--                                 'title' : ã‚¿ã‚¤ãƒˆãƒ«ã‹ã‚‰é–‹å§‹
+-- @return [4] enable_combo_box    1 ã®å ´åˆã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹æœ‰åŠ¹
+-- @return [5] enable_title_change 1 ã®å ´åˆã‚¿ã‚¤ãƒˆãƒ«å¤‰æ›´æœ‰åŠ¹
 --
 function on_init_write_view(event_name, write_view_type, write_item)
 
@@ -1243,42 +1243,42 @@ function on_init_write_view(event_name, write_view_type, write_item)
 	
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
 	if write_view_key=='GMAIL_REPLY' then
-		-- ƒ[ƒ‹–{•¶b•ÔM
+		-- ãƒ¡ãƒ¼ãƒ«æœ¬æ–‡ï½œè¿”ä¿¡
 		
-		-- ƒ^ƒCƒgƒ‹•ÏXF—LŒø‰»
+		-- ã‚¿ã‚¤ãƒˆãƒ«å¤‰æ›´ï¼šæœ‰åŠ¹åŒ–
 		enable_title_change = 1;
 
-		-- ƒ^ƒCƒgƒ‹‚Ì‰Šú’lİ’è
+		-- ã‚¿ã‚¤ãƒˆãƒ«ã®åˆæœŸå€¤è¨­å®š
 		local title = 'Re: ' .. write_item:get_text('title');
 		mz3_write_view.set_text('title_edit', title);
 		
-		-- ŒöŠJ”ÍˆÍƒRƒ“ƒ{ƒ{ƒbƒNƒXF–³Œø
+		-- å…¬é–‹ç¯„å›²ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ï¼šç„¡åŠ¹
 		enable_combo_box = 0;
 		
-		-- ƒtƒH[ƒJƒXF–{•¶‚©‚çŠJn
+		-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ï¼šæœ¬æ–‡ã‹ã‚‰é–‹å§‹
 		init_focus = 'body';
 
-		-- ƒLƒƒƒ“ƒZƒ‹AƒŒƒ|[ƒg‰æ–Ê‚É–ß‚é
+		-- ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã€ãƒ¬ãƒãƒ¼ãƒˆç”»é¢ã«æˆ»ã‚‹
 		is_from_main_view = 0;
 		
 		return true, is_from_main_view, init_focus, enable_combo_box, enable_title_change;
 	elseif write_view_key=='GMAIL_NEW' then
-		-- ƒ[ƒ‹ì¬
+		-- ãƒ¡ãƒ¼ãƒ«ä½œæˆ
 		
-		-- ƒ^ƒCƒgƒ‹•ÏXF—LŒø‰»
+		-- ã‚¿ã‚¤ãƒˆãƒ«å¤‰æ›´ï¼šæœ‰åŠ¹åŒ–
 		enable_title_change = 1;
 
-		-- ƒ^ƒCƒgƒ‹‚Ì‰Šú’lİ’è
+		-- ã‚¿ã‚¤ãƒˆãƒ«ã®åˆæœŸå€¤è¨­å®š
 		local title = '';
 		mz3_write_view.set_text('title_edit', '');
 		
-		-- ŒöŠJ”ÍˆÍƒRƒ“ƒ{ƒ{ƒbƒNƒXF–³Œø
+		-- å…¬é–‹ç¯„å›²ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ï¼šç„¡åŠ¹
 		enable_combo_box = 0;
 
-		-- ƒtƒH[ƒJƒXFƒ^ƒCƒgƒ‹‚©‚çŠJn
+		-- ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ï¼šã‚¿ã‚¤ãƒˆãƒ«ã‹ã‚‰é–‹å§‹
 		init_focus = 'title';
 
-		-- ƒLƒƒƒ“ƒZƒ‹A-- ƒƒCƒ“‰æ–Ê‚É–ß‚é
+		-- ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã€-- ãƒ¡ã‚¤ãƒ³ç”»é¢ã«æˆ»ã‚‹
 		is_from_main_view = 1;
 		
 		return true, is_from_main_view, init_focus, enable_combo_box, enable_title_change;
@@ -1289,11 +1289,11 @@ end
 mz3.add_event_listener("init_write_view", "gmail.on_init_write_view");
 
 
---- ‘‚«‚İ‰æ–Ê‚Åu‰æ‘œ‚ª“Y•t‰Â”\‚Èƒ‚[ƒh‚©v‚Ì”»’è
+--- æ›¸ãè¾¼ã¿ç”»é¢ã§ã€Œç”»åƒãŒæ·»ä»˜å¯èƒ½ãªãƒ¢ãƒ¼ãƒ‰ã‹ã€ã®åˆ¤å®š
 --
 -- @param event_name      'is_enable_write_view_attach_image_mode'
--- @param write_view_type ‘‚«‚İí•Ê
--- @param write_item      [MZ3Data] ‘‚«‚İ‰æ–Ê‚Ì—v‘f
+-- @param write_view_type æ›¸ãè¾¼ã¿ç¨®åˆ¥
+-- @param write_item      [MZ3Data] æ›¸ãè¾¼ã¿ç”»é¢ã®è¦ç´ 
 --
 function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, write_item)
 
@@ -1302,7 +1302,7 @@ function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, 
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
 	service_type = mz3.get_service_type(write_view_key);
 	if service_type=='gmail' then
-		-- ‚Æ‚è‚ ‚¦‚¸“Y•t•s‰Â
+		-- ã¨ã‚Šã‚ãˆãšæ·»ä»˜ä¸å¯
 		return true, 0;
 	end
 
@@ -1311,11 +1311,11 @@ end
 mz3.add_event_listener("is_enable_write_view_attach_image_mode", "gmail.on_is_enable_write_view_attach_image_mode");
 
 
---- ‘‚«‚İ‰æ–Ê‚Ì‘‚«‚İƒ{ƒ^ƒ“‰Ÿ‰ºƒCƒxƒ“ƒg
+--- æ›¸ãè¾¼ã¿ç”»é¢ã®æ›¸ãè¾¼ã¿ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name      'click_write_view_send_button'
--- @param write_view_type ‘‚«‚İí•Ê
--- @param write_item      [MZ3Data] ‘‚«‚İ‰æ–Ê‚Ì—v‘f
+-- @param write_view_type æ›¸ãè¾¼ã¿ç¨®åˆ¥
+-- @param write_item      [MZ3Data] æ›¸ãè¾¼ã¿ç”»é¢ã®è¦ç´ 
 --
 function on_click_write_view_send_button(event_name, write_view_type, write_item)
 
@@ -1324,25 +1324,25 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
 	service_type = mz3.get_service_type(write_view_key);
 	if service_type=='gmail' then
-		-- ‘—Mˆ—
+		-- é€ä¿¡å‡¦ç†
 		
 		local title = mz3_write_view.get_text('title_edit');
 		local body  = mz3_write_view.get_text('body_edit');
 		
 		if title=='' then
-			mz3.alert('ƒ^ƒCƒgƒ‹‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢');
+			mz3.alert('ã‚¿ã‚¤ãƒˆãƒ«ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„');
 			return true;
 		end
 		if body=='' then
-			mz3.alert('ƒ[ƒ‹–{•¶‚ğ“ü—Í‚µ‚Ä‰º‚³‚¢');
+			mz3.alert('ãƒ¡ãƒ¼ãƒ«æœ¬æ–‡ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„');
 			return true;
 		end
 		
 		if write_view_key=="GMAIL_REPLY" then
-			-- ƒ[ƒ‹•ÔMˆ—
+			-- ãƒ¡ãƒ¼ãƒ«è¿”ä¿¡å‡¦ç†
 			local reply_form = write_item:get_text('reply_form');
 			if reply_form==nil then
-				mz3.alert('•ÔM‚Å‚«‚Ü‚¹‚ñ');
+				mz3.alert('è¿”ä¿¡ã§ãã¾ã›ã‚“');
 				return true;
 			end
 			
@@ -1353,10 +1353,10 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 				mail_to = reply_form:match('<input type="radio" id="reply" name="qrr" value="o".-<b>To:</b> ?(.-)</');
 			end
 			if mail_to=="" or mail_to==nil then
-				mz3.alert('‘—Mæƒ[ƒ‹ƒAƒhƒŒƒX‚ªæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½BÄ“xƒ[ƒ‹‚ğæ“¾‚µ‚Ä‰º‚³‚¢B');
+				mz3.alert('é€ä¿¡å…ˆãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒå–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚å†åº¦ãƒ¡ãƒ¼ãƒ«ã‚’å–å¾—ã—ã¦ä¸‹ã•ã„ã€‚');
 				return true;
 			end
-			msg = mz3.decode_html_entity(mail_to) .. ' ‚Éƒ[ƒ‹‚ğ‘—M‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H' .. "\r\n";
+			msg = mz3.decode_html_entity(mail_to) .. ' ã«ãƒ¡ãƒ¼ãƒ«ã‚’é€ä¿¡ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ' .. "\r\n";
 			msg = msg .. '----' .. "\r\n";
 			msg = msg .. title .. "\r\n";
 	--		msg = msg .. '----';
@@ -1365,20 +1365,20 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 			end
 		
 			------------------------------------------
-			-- POST ƒpƒ‰ƒ[ƒ^¶¬
+			-- POST ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 			------------------------------------------
 
-			-- URL æ“¾
+			-- URL å–å¾—
 			-- <form action="?v=b&qrt=n&..." name="qrf" method="POST"> 
 			local url = reply_form:match('<form action="(.-)"');
 			if url==nil then
-				mz3.alert('•ÔM‚Å‚«‚Ü‚¹‚ñ(‘—Mæurlæ“¾¸”s)');
+				mz3.alert('è¿”ä¿¡ã§ãã¾ã›ã‚“(é€ä¿¡å…ˆurlå–å¾—å¤±æ•—)');
 				return true;
 			end
 			url = write_item:get_text('base_url') .. url;
 			--mz3.alert(url);
 			
-			-- hidden ’l‚ÌûW
+			-- hidden å€¤ã®åé›†
 			local redir = reply_form:match('<input type="hidden" name="redir" value="(.-)"');
 			redir = redir:gsub('&amp;', '&');
 			local qrr   = reply_form:match('<input type="hidden" name="qrr" value="(.-)"');
@@ -1387,7 +1387,7 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 			end
 			
 			
-			-- POSTƒpƒ‰ƒ[ƒ^¶¬
+			-- POSTãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 			post = MZ3PostData:create();
 			post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
 			
@@ -1395,7 +1395,7 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 			post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
 			post:append_post_body('\r\n');
-			post:append_post_body(mz3.convert_encoding('‘—M', 'sjis', 'utf8') .. '\r\n');
+			post:append_post_body(mz3.convert_encoding('é€ä¿¡', 'sjis', 'utf8') .. '\r\n');
 			
 			-- redir
 			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
@@ -1431,7 +1431,7 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 			-- end of post data
 			post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
 
-			-- ’ÊMŠJn
+			-- é€šä¿¡é–‹å§‹
 			access_type = mz3.get_access_type_by_key("GMAIL_REPLY");
 			referer = write_item:get_text('url');
 			user_agent = nil;
@@ -1440,22 +1440,22 @@ function on_click_write_view_send_button(event_name, write_view_type, write_item
 		end
 		
 		if write_view_key=="GMAIL_NEW" then
-			-- ƒ[ƒ‹ì¬
-			msg = new_mail_info.to .. ' ‚Éƒ[ƒ‹‚ğ‘—M‚µ‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H' .. "\r\n";
+			-- ãƒ¡ãƒ¼ãƒ«ä½œæˆ
+			msg = new_mail_info.to .. ' ã«ãƒ¡ãƒ¼ãƒ«ã‚’é€ä¿¡ã—ã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ' .. "\r\n";
 			msg = msg .. '----' .. "\r\n";
 			msg = msg .. title .. "\r\n";
 			if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
 				return true;
 			end
 			
-			-- ‚Ü‚¸‚ÍV‹Kƒ[ƒ‹ì¬‰æ–Ê‚ğæ“¾‚·‚é
+			-- ã¾ãšã¯æ–°è¦ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢ã‚’å–å¾—ã™ã‚‹
 			local url = write_item:get_text('new_mail_url');
 			if url==nil or url=="" then
-				mz3.alert('ƒ[ƒ‹ì¬‰æ–Ê‚ÌURL‚ªæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½BÄ“xƒ[ƒ‹ˆê——‚ğæ“¾‚µ‚Ä‰º‚³‚¢B');
+				mz3.alert('ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢ã®URLãŒå–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚å†åº¦ãƒ¡ãƒ¼ãƒ«ä¸€è¦§ã‚’å–å¾—ã—ã¦ä¸‹ã•ã„ã€‚');
 				return true;
 			end
 			
-			-- ’ÊMŠJn
+			-- é€šä¿¡é–‹å§‹
 			access_type = mz3.get_access_type_by_key("GMAIL_NEW1");
 			referer = '';
 			user_agent = nil;
@@ -1470,20 +1470,20 @@ end
 mz3.add_event_listener("click_write_view_send_button", "gmail.on_click_write_view_send_button");
 
 
---- ‘‚«‚İ‰æ–Ê‚Ì‘‚«‚İŠ®—¹ƒCƒxƒ“ƒg
+--- æ›¸ãè¾¼ã¿ç”»é¢ã®æ›¸ãè¾¼ã¿å®Œäº†ã‚¤ãƒ™ãƒ³ãƒˆ
 --
 -- @param event_name      'get_end_write_view'
--- @param write_view_type ‘‚«‚İí•Ê
--- @param write_item      [MZ3Data] ‘‚«‚İ‰æ–Ê‚Ì—v‘f
+-- @param write_view_type æ›¸ãè¾¼ã¿ç¨®åˆ¥
+-- @param write_item      [MZ3Data] æ›¸ãè¾¼ã¿ç”»é¢ã®è¦ç´ 
 -- @param http_status     HTTP Status Code (200, 404, etc...)
--- @param filename        ƒŒƒXƒ|ƒ“ƒXƒtƒ@ƒCƒ‹
--- @param access_type     ’ÊM‚ÌƒAƒNƒZƒXí•Ê
+-- @param filename        ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«
+-- @param access_type     é€šä¿¡ã®ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥
 -- 
 --
 function on_get_end_write_view(event_name, write_view_type, write_item, http_status, filename, access_type)
-	-- GMail ƒ[ƒ‹•ÔM‚Å‚Í“ŠeŒã‚ÉƒŠƒ_ƒCƒŒƒNƒg‚·‚é‚½‚ß get_end ‚É‚È‚éB
+	-- GMail ãƒ¡ãƒ¼ãƒ«è¿”ä¿¡ã§ã¯æŠ•ç¨¿å¾Œã«ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã™ã‚‹ãŸã‚ get_end ã«ãªã‚‹ã€‚
 	
-	-- CWriteView::OnPostEnd ‚Æ“¯—l‚Ìˆ—‚ğs‚¤B
+	-- CWriteView::OnPostEnd ã¨åŒæ§˜ã®å‡¦ç†ã‚’è¡Œã†ã€‚
 	
 	write_item = MZ3Data:create(write_item);
 	
@@ -1494,74 +1494,74 @@ function on_get_end_write_view(event_name, write_view_type, write_item, http_sta
 		return false;
 	end
 
-	-- •ÔMŠ®—¹ƒ`ƒFƒbƒN
+	-- è¿”ä¿¡å®Œäº†ãƒã‚§ãƒƒã‚¯
 	if write_view_key == "GMAIL_REPLY" then
 		if http_status==200 then
-			-- ¬Œ÷
+			-- æˆåŠŸ
 			
-			-- ƒƒbƒZ[ƒW•\¦
-			mz3.alert('ƒ[ƒ‹‚ğ•ÔM‚µ‚Ü‚µ‚½');
+			-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤º
+			mz3.alert('ãƒ¡ãƒ¼ãƒ«ã‚’è¿”ä¿¡ã—ã¾ã—ãŸ');
 			
-			-- ‰Šú‰»
+			-- åˆæœŸåŒ–
 			mz3_write_view.set_text('title_edit', '');
 			mz3_write_view.set_text('body_edit', '');
 			
-			-- ‘O‚Ì‰æ–Ê‚É–ß‚é
+			-- å‰ã®ç”»é¢ã«æˆ»ã‚‹
 			mz3.change_view('main_view');
 			
 		else
-			-- ¸”s
-			mz3.logger_error('¸”s:' .. http_status);
+			-- å¤±æ•—
+			mz3.logger_error('å¤±æ•—:' .. http_status);
 			
-			mz3.alert('“Še‚É¸”s‚µ‚Ü‚µ‚½B');
+			mz3.alert('æŠ•ç¨¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚');
 			
-			-- TODO ƒoƒbƒNƒAƒbƒv
+			-- TODO ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—
 		end
 		return true;
 	end
 	
-	-- ƒ[ƒ‹‘—M
+	-- ãƒ¡ãƒ¼ãƒ«é€ä¿¡
 	if serialize_key == "GMAIL_NEW" then
 		if http_status==200 then
-			-- ¬Œ÷
+			-- æˆåŠŸ
 			
-			-- ƒƒbƒZ[ƒW•\¦
-			mz3.alert('ƒ[ƒ‹‚ğ‘—M‚µ‚Ü‚µ‚½');
+			-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤º
+			mz3.alert('ãƒ¡ãƒ¼ãƒ«ã‚’é€ä¿¡ã—ã¾ã—ãŸ');
 			
-			-- ‰Šú‰»
+			-- åˆæœŸåŒ–
 			mz3_write_view.set_text('title_edit', '');
 			mz3_write_view.set_text('body_edit', '');
 			
-			-- ‘O‚Ì‰æ–Ê‚É–ß‚é
+			-- å‰ã®ç”»é¢ã«æˆ»ã‚‹
 			mz3.change_view('main_view');
 			
 		else
-			-- ¸”s
-			mz3.logger_error('¸”s:' .. http_status);
+			-- å¤±æ•—
+			mz3.logger_error('å¤±æ•—:' .. http_status);
 			
-			mz3.alert('“Še‚É¸”s‚µ‚Ü‚µ‚½B');
+			mz3.alert('æŠ•ç¨¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚');
 			
-			-- TODO ƒoƒbƒNƒAƒbƒv
+			-- TODO ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—
 		end
 		return true;
 	end
 	
-	-- ƒ[ƒ‹ì¬‰æ–ÊFƒ[ƒ‹‘—MŠJn
+	-- ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢ï¼šãƒ¡ãƒ¼ãƒ«é€ä¿¡é–‹å§‹
 	if serialize_key == "GMAIL_NEW1" then
 		if http_status==200 then
-			-- ¬Œ÷
+			-- æˆåŠŸ
 			
-			-- –{•¶æ“¾
+			-- æœ¬æ–‡å–å¾—
 			local f = io.open(filename, 'r');
 			local file = f:read('*a');
 			f:close();
 			
-			-- ‘—M—pPOST’l(hidden)‚ğŠÜ‚Şform‚ğæ“¾‚·‚é
+			-- é€ä¿¡ç”¨POSTå€¤(hidden)ã‚’å«ã‚€formã‚’å–å¾—ã™ã‚‹
 			
 			-- <base href="https://mail.google.com/mail/h/xxx/">
 			base_url = file:match('<base href="(.-)">');
 
-			-- ƒtƒH[ƒ€æ“¾(2‚Â‚ ‚éƒtƒH[ƒ€‚ğname="f"‚Å¯•Ê)
+			-- ãƒ•ã‚©ãƒ¼ãƒ å–å¾—(2ã¤ã‚ã‚‹ãƒ•ã‚©ãƒ¼ãƒ ã‚’name="f"ã§è­˜åˆ¥)
 --[[
 <form action="?v=b&fv=b&cpt=c&at=xxx&pv=tl&cs=c" name="f" enctype="multipart/form-data" method="POST">
 ... </form>
@@ -1569,25 +1569,25 @@ function on_get_end_write_view(event_name, write_view_type, write_item, http_sta
 			send_form = file:match('<form action="[^"]+" name="f".-</form>');
 --			mz3.alert(send_form);
 			
-			-- URL æ“¾
+			-- URL å–å¾—
 			-- <form action="?v=b&fv=b&cpt=c&at=xxx&pv=tl&cs=c" name="f" enctype="multipart/form-data" method="POST">
 			local url = send_form:match('<form action="(.-)"');
 			if url==nil then
-				mz3.alert('ƒ[ƒ‹‘—M‚Å‚«‚Ü‚¹‚ñ(‘—Mæurlæ“¾¸”s)');
+				mz3.alert('ãƒ¡ãƒ¼ãƒ«é€ä¿¡ã§ãã¾ã›ã‚“(é€ä¿¡å…ˆurlå–å¾—å¤±æ•—)');
 				return true;
 			end
 			url = base_url .. url;
 --			mz3.alert(url);
 
-			-- ƒ†[ƒU“ü—Í’læ“¾
+			-- ãƒ¦ãƒ¼ã‚¶å…¥åŠ›å€¤å–å¾—
 			local title = mz3_write_view.get_text('title_edit');
 			local body  = mz3_write_view.get_text('body_edit');
 			
-			-- hidden ’l‚ÌûW
+			-- hidden å€¤ã®åé›†
 			local redir = send_form:match('<input type="hidden" name="redir" value="(.-)"');
 			redir = redir:gsub('&amp;', '&');
 			
-			-- POSTƒpƒ‰ƒ[ƒ^¶¬
+			-- POSTãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”Ÿæˆ
 			post = MZ3PostData:create();
 			post:set_content_type('multipart/form-data; boundary=---------------------------7d62ee108071e' .. '\r\n');
 			
@@ -1595,7 +1595,7 @@ function on_get_end_write_view(event_name, write_view_type, write_item, http_sta
 			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
 			post:append_post_body('Content-Disposition: form-data; name="nvp_bu_send"' .. '\r\n');
 			post:append_post_body('\r\n');
-			post:append_post_body(mz3.convert_encoding('‘—M', 'sjis', 'utf8') .. '\r\n');
+			post:append_post_body(mz3.convert_encoding('é€ä¿¡', 'sjis', 'utf8') .. '\r\n');
 			
 			-- redir
 			post:append_post_body('-----------------------------7d62ee108071e' .. '\r\n');
@@ -1640,7 +1640,7 @@ function on_get_end_write_view(event_name, write_view_type, write_item, http_sta
 			-- end of post data
 			post:append_post_body('-----------------------------7d62ee108071e--' .. '\r\n');
 
-			-- ’ÊMŠJn
+			-- é€šä¿¡é–‹å§‹
 			access_type = mz3.get_access_type_by_key("GMAIL_NEW");
 			referer = write_item:get_text('url');
 			user_agent = nil;
@@ -1648,12 +1648,12 @@ function on_get_end_write_view(event_name, write_view_type, write_item, http_sta
 			return true;
 
 		else
-			-- ¸”s
-			mz3.logger_error('¸”s:' .. http_status);
+			-- å¤±æ•—
+			mz3.logger_error('å¤±æ•—:' .. http_status);
 			
-			mz3.alert('ƒ[ƒ‹ì¬‰æ–Ê‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½BÄ“xƒŠƒgƒ‰ƒC‚µ‚Ä‚­‚¾‚³‚¢B');
+			mz3.alert('ãƒ¡ãƒ¼ãƒ«ä½œæˆç”»é¢ã®å–å¾—ã«å¤±æ•—ã—ã¾ã—ãŸã€‚å†åº¦ãƒªãƒˆãƒ©ã‚¤ã—ã¦ãã ã•ã„ã€‚');
 			
-			-- TODO ƒoƒbƒNƒAƒbƒv
+			-- TODO ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—
 		end
 		
 		return true;
@@ -1664,12 +1664,12 @@ end
 mz3.add_event_listener("get_end_write_view", "gmail.on_get_end_write_view");
 
 
---- ‘‚«‚İ‰æ–Ê‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦(‘¼‰æ–Ê‚Æˆá‚¢’Ç‰ÁŒ`®‚Æ‚È‚é“_‚É’ˆÓ)
+--- æ›¸ãè¾¼ã¿ç”»é¢ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º(ä»–ç”»é¢ã¨é•ã„è¿½åŠ å½¢å¼ã¨ãªã‚‹ç‚¹ã«æ³¨æ„)
 --
 -- @param event_name    'popup_write_menu'
--- @param serialize_key ‘‚«‚İí•Ê‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
--- @param write_item    ‘‚«‚İ‰æ–Ê‚Ìƒf[ƒ^
--- @param menu          ƒƒjƒ…[
+-- @param serialize_key æ›¸ãè¾¼ã¿ç¨®åˆ¥ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+-- @param write_item    æ›¸ãè¾¼ã¿ç”»é¢ã®ãƒ‡ãƒ¼ã‚¿
+-- @param menu          ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 --
 function on_popup_write_menu(event_name, serialize_key, write_item, menu)
 	service_type = mz3.get_service_type(serialize_key);
@@ -1678,10 +1678,10 @@ function on_popup_write_menu(event_name, serialize_key, write_item, menu)
 	end
 
 	if serialize_key == "GMAIL_NEW" then
-		-- ƒƒjƒ…[•ÏX
+		-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼å¤‰æ›´
 		menu = MZ3Menu:create_popup_menu(menu);
 		menu:append_menu("separator");
-		menu:append_menu("string", "‘—Mæ•ÏX (" .. new_mail_info.to .. ")", menu_items.change_to_address);
+		menu:append_menu("string", "é€ä¿¡å…ˆå¤‰æ›´ (" .. new_mail_info.to .. ")", menu_items.change_to_address);
 	end
 	
 	return true;
@@ -1689,11 +1689,11 @@ end
 mz3.add_event_listener("popup_write_menu",  "gmail.on_popup_write_menu");
 
 
---- TO ƒAƒhƒŒƒX•ÏX
+--- TO ã‚¢ãƒ‰ãƒ¬ã‚¹å¤‰æ›´
 function on_change_to_address(serialize_key, event_name, data)
 	mz3.logger_debug('on_change_to_address: (' .. serialize_key .. ', ' .. event_name .. ')');
 
-	-- ‘—MæƒAƒhƒŒƒXæ“¾
+	-- é€ä¿¡å…ˆã‚¢ãƒ‰ãƒ¬ã‚¹å–å¾—
 	do_input_to_address();
 	
 	return true;

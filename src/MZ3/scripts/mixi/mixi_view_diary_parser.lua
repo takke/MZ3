@@ -9,46 +9,46 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
--- TODO ƒzƒXƒg‘¤‚Åİ’è‚µ‚Ä‚¢‚é‚ªA–{—ˆ‚Í‚±‚¿‚ç‚Åİ’è‚·‚×‚«B
+-- TODO ãƒ›ã‚¹ãƒˆå´ã§è¨­å®šã—ã¦ã„ã‚‹ãŒã€æœ¬æ¥ã¯ã“ã¡ã‚‰ã§è¨­å®šã™ã¹ãã€‚
 
 
 --------------------------------------------------
--- ymixi “ú‹LÚ×z
--- [content] view_diary.pl —pƒp[ƒT
+-- ã€mixi æ—¥è¨˜è©³ç´°ã€‘
+-- [content] view_diary.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/view_diary.pl
 --
--- ˆø”:
---   data:  ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   data:  ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy: NULL
---   html:  HTMLƒf[ƒ^(CHtmlArray*)
+--   html:  HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_view_diary_parser(data, dummy, html)
 	mz3.logger_debug("mixi_view_diary_parser start");
 	local t1 = mz3.get_tick_count();
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 	
 	data:clear();
 
-	-- ‚Æ‚è‚ ‚¦‚¸‰üso—Í
+	-- ã¨ã‚Šã‚ãˆãšæ”¹è¡Œå‡ºåŠ›
 	data:add_body_with_extract("<br>");
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	i = 10;
 	while i < line_count do
 		line = html:get_at(i);
 
-		-- <title> ƒ^ƒO‚©‚çƒ^ƒCƒgƒ‹‚ğæ“¾‚·‚é
+		-- <title> ã‚¿ã‚°ã‹ã‚‰ã‚¿ã‚¤ãƒˆãƒ«ã‚’å–å¾—ã™ã‚‹
 		if line_has_strings(line, "<title>", "</title>") then
-			-- ©•ª‚Ì“ú‹L‚È‚ç@@u<title>[mixi] ƒ^ƒCƒgƒ‹</title>v
-			-- ©•ªˆÈŠO‚Ì“ú‹L‚È‚çu<title>[mixi] –¼‘O | ƒ^ƒCƒgƒ‹</title>v
-			-- ‚Æ‚¢‚¤Œ`®‚È‚Ì‚ÅAƒ^ƒCƒgƒ‹•”‚¾‚¯‚ğ’Šo
+			-- è‡ªåˆ†ã®æ—¥è¨˜ãªã‚‰ã€€ã€€ã€Œ<title>[mixi] ã‚¿ã‚¤ãƒˆãƒ«</title>ã€
+			-- è‡ªåˆ†ä»¥å¤–ã®æ—¥è¨˜ãªã‚‰ã€Œ<title>[mixi] åå‰ | ã‚¿ã‚¤ãƒˆãƒ«</title>ã€
+			-- ã¨ã„ã†å½¢å¼ãªã®ã§ã€ã‚¿ã‚¤ãƒˆãƒ«éƒ¨ã ã‘ã‚’æŠ½å‡º
 			local title = line:match("<title>%[mixi%] (.-)</title>");
 			title = mz3.decode_html_entity(title);
 			after = title:match(" | (.-)$");
@@ -59,7 +59,7 @@ function mixi_view_diary_parser(data, dummy, html)
 			data:set_text("title", title);
 		end
 		
-		-- uÅ‹ß‚Ì“ú‹Lv‚Ìæ“¾
+		-- ã€Œæœ€è¿‘ã®æ—¥è¨˜ã€ã®å–å¾—
 		if line_has_strings(line, '<ul class="contentsListDiary">') then
 			i = i + 1;
 			while i<line_count do
@@ -76,8 +76,8 @@ function mixi_view_diary_parser(data, dummy, html)
 			end
 		end
 
-		-- “ú‚Ìæ“¾
-		-- ŒöŠJ”ÍˆÍ‚Ìæ“¾
+		-- æ—¥æ™‚ã®å–å¾—
+		-- å…¬é–‹ç¯„å›²ã®å–å¾—
 		if line_has_strings(line, '<div', 'listDiaryTitle') then
 			i = i+1;
 			while i<line_count do
@@ -99,17 +99,17 @@ function mixi_view_diary_parser(data, dummy, html)
 			end
 		end
 
-		-- “ú‹L‚Ì’˜Ò
+		-- æ—¥è¨˜ã®è‘—è€…
 		if line_has_strings(line, '<div', 'class', 'diaryTitle') then
-			-- ©•ª‚Ì“ú‹L‚È‚çuXXX‚Ì“ú‹LvA©•ªˆÈŠO‚È‚çuXXX‚³‚ñ‚Ì“ú‹Lv‚Ì‚Í‚¸B
-			-- ‚±‚Ì‹K‘¥‚Å’˜Ò‚ğ‰ğÍB
+			-- è‡ªåˆ†ã®æ—¥è¨˜ãªã‚‰ã€ŒXXXã®æ—¥è¨˜ã€ã€è‡ªåˆ†ä»¥å¤–ãªã‚‰ã€ŒXXXã•ã‚“ã®æ—¥è¨˜ã€ã®ã¯ãšã€‚
+			-- ã“ã®è¦å‰‡ã§è‘—è€…ã‚’è§£æã€‚
 
-			-- Ÿ‚Ìs‚Ì <h2> ‚©‚çæ“¾
+			-- æ¬¡ã®è¡Œã® <h2> ã‹ã‚‰å–å¾—
 			line = html:get_at(i+1);
 			if line_has_strings(line, 'diaryTitleFriend') then
-				author = line:match('<h2>(.-)‚³‚ñ‚Ì“ú‹L</h2>');
+				author = line:match('<h2>(.-)ã•ã‚“ã®æ—¥è¨˜</h2>');
 			else
-				author = line:match('<h2>(.-)‚Ì“ú‹L</h2>');
+				author = line:match('<h2>(.-)ã®æ—¥è¨˜</h2>');
 			end
 			if author~=nil then
 				author = mz3.decode_html_entity(author);
@@ -118,7 +118,7 @@ function mixi_view_diary_parser(data, dummy, html)
 			end
 		end
 
-		-- “ú‹L‚Ì“Y•tÊ^
+		-- æ—¥è¨˜ã®æ·»ä»˜å†™çœŸ
 		if line_has_strings(line, '<div', 'class', 'diaryPhoto') then
 			i = i + 1;
 			while i<line_count do
@@ -133,14 +133,14 @@ function mixi_view_diary_parser(data, dummy, html)
 --			data:add_body_with_extract("<br>");
 		end
 
-		-- ‘O‚Ì“ú‹L‚Ö‚ÌƒŠƒ“ƒN
+		-- å‰ã®æ—¥è¨˜ã¸ã®ãƒªãƒ³ã‚¯
 		if line_has_strings(line, '<div', 'class', 'diaryPagingLeft') then
 			local link = line:match('<a.*</a>');
 			if link~=nil then
 				data:set_text('prev_diary', link);
 			end
 		end
-		-- Ÿ‚Ì“ú‹L‚Ö‚ÌƒŠƒ“ƒN
+		-- æ¬¡ã®æ—¥è¨˜ã¸ã®ãƒªãƒ³ã‚¯
 		if line_has_strings(line, '<div', 'class', 'diaryPagingRight') then
 			local link = line:match('<a.*</a>');
 			if link~=nil then
@@ -148,9 +148,9 @@ function mixi_view_diary_parser(data, dummy, html)
 			end
 		end
 
-		-- TODO ‚»‚ê‚ç‚µ‚¢ƒTƒ“ƒvƒ‹HTML‚ªŒ©‚ ‚½‚ç‚È‚¢‚Ì‚Å‚Æ‚è‚ ‚¦‚¸•ú’u
+		-- TODO ãã‚Œã‚‰ã—ã„ã‚µãƒ³ãƒ—ãƒ«HTMLãŒè¦‹ã‚ãŸã‚‰ãªã„ã®ã§ã¨ã‚Šã‚ãˆãšæ”¾ç½®
 --[[
-		// ‘S‚Ä‚ğ•\¦‚Ö‚ÌƒŠƒ“ƒN
+		// å…¨ã¦ã‚’è¡¨ç¤ºã¸ã®ãƒªãƒ³ã‚¯
 		try {
 			const xml2stl::Node& li = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 												   .getNode(L"div", L"id=diaryComment")
@@ -165,7 +165,7 @@ function mixi_view_diary_parser(data, dummy, html)
 			data_.SetFullDiary( FullLink );
 
 		} catch (xml2stl::NodeNotFoundException& e) {
-			// l‚Ì“ú‹L‚Ìê‡
+			// äººã®æ—¥è¨˜ã®å ´åˆ
 			try {
 				const xml2stl::Node& li = bodyMainArea.getNode(L"div", L"id=bodyMainAreaMain")
 													   .getNode(L"div", L"id=diaryComment")
@@ -178,14 +178,14 @@ function mixi_view_diary_parser(data, dummy, html)
 				data_.SetFullDiary( FullLink );
 
 			} catch (xml2stl::NodeNotFoundException& e) {
-				// ƒŠƒ“ƒN‚ª‚È‚©‚Á‚½‚Æ”»’f‚·‚é
-				MZ3LOGGER_INFO( util::FormatString( L"u‘S‚Ä‚ğ•\¦vƒŠƒ“ƒNæ“¾ƒGƒ‰[ : %s", e.getMessage().c_str()) );
+				// ãƒªãƒ³ã‚¯ãŒãªã‹ã£ãŸã¨åˆ¤æ–­ã™ã‚‹
+				MZ3LOGGER_INFO( util::FormatString( L"ã€Œå…¨ã¦ã‚’è¡¨ç¤ºã€ãƒªãƒ³ã‚¯å–å¾—ã‚¨ãƒ©ãƒ¼ : %s", e.getMessage().c_str()) );
 			}
-			MZ3LOGGER_INFO( util::FormatString( L"©•ª‚Ì“ú‹L‚Ìu‘S‚Ä‚ğ•\¦vƒŠƒ“ƒNæ“¾ƒGƒ‰[ : %s", e.getMessage().c_str()) );
+			MZ3LOGGER_INFO( util::FormatString( L"è‡ªåˆ†ã®æ—¥è¨˜ã®ã€Œå…¨ã¦ã‚’è¡¨ç¤ºã€ãƒªãƒ³ã‚¯å–å¾—ã‚¨ãƒ©ãƒ¼ : %s", e.getMessage().c_str()) );
 		}
 ]]
 
-		-- –{•¶æ“¾
+		-- æœ¬æ–‡å–å¾—
 		if line_has_strings(line, '<div', 'id', 'diary_body') then
 			local sub_html = line;
 			i = i + 1;
@@ -198,15 +198,15 @@ function mixi_view_diary_parser(data, dummy, html)
 				sub_html = sub_html .. line;
 				i = i + 1;
 			end
-			-- script ƒ^ƒO‚Ìœ‹
+			-- script ã‚¿ã‚°ã®é™¤å»
 			sub_html = sub_html:gsub('<script.-</script>', '');
 			data:add_body_with_extract(sub_html);
 		end
 
-		-- ƒRƒƒ“ƒgæ“¾
+		-- ã‚³ãƒ¡ãƒ³ãƒˆå–å¾—
 		i = parseDiaryComment(data, line, i, line_count, html);
 		
-		-- POST URL ‰ğÍ
+		-- POST URL è§£æ
 		if line_has_strings(line, '<form', 'comment_form') and
 		   line_has_strings(line, 'add_comment.pl') then
 			-- <form action="add_comment.pl?diary_id=xxx" method="post" name="comment_form">
@@ -234,7 +234,7 @@ function mixi_view_diary_parser(data, dummy, html)
 				i = i + 1;
 			end
 			
-			-- ‚±‚Ì“ŠeƒtƒH[ƒ€‚ª‚ ‚Á‚½‚ç‰ğÍI—¹
+			-- ã“ã®æŠ•ç¨¿ãƒ•ã‚©ãƒ¼ãƒ ãŒã‚ã£ãŸã‚‰è§£æçµ‚äº†
 			break;
 		end
 		
@@ -246,14 +246,14 @@ function mixi_view_diary_parser(data, dummy, html)
 end
 
 
--- ƒRƒƒ“ƒg‚Ìæ“¾
+-- ã‚³ãƒ¡ãƒ³ãƒˆã®å–å¾—
 function parseDiaryComment(data, line, i, line_count, html)
 	if line_has_strings(line, 'diaryMainArea02') and
 	   (line_has_strings(line, 'commentList') or
 	    line_has_strings(line, 'deleteButton'))
 	then
 		
-		-- 2Œ–ÚˆÈ~‚Íq—v‘f‚Æ‚µ‚Ä“Š“ü‚·‚é
+		-- 2ä»¶ç›®ä»¥é™ã¯å­è¦ç´ ã¨ã—ã¦æŠ•å…¥ã™ã‚‹
 		comment_index = 1;
 		in_dd = false;
 		child = MZ3Data:create();
@@ -282,14 +282,14 @@ function parseDiaryComment(data, line, i, line_count, html)
 			if line_has_strings(line, 'commentTitleName') then
 				local v = line:match('<a.->(.-)</a>');
 				if v==nil then
-					-- ©•ª‚Ì“ú‹L‚È‚ç2s–Ú‚É‚ ‚é
+					-- è‡ªåˆ†ã®æ—¥è¨˜ãªã‚‰2è¡Œç›®ã«ã‚ã‚‹
 					i = i+1;
 					line = html:get_at(i);
 					v = line:match('<a.->(.-)</a>');
 				end
-				-- –¼‘O
+				-- åå‰
 				child:set_text('author', v);
-				-- ƒRƒƒ“ƒg”Ô†
+				-- ã‚³ãƒ¡ãƒ³ãƒˆç•ªå·
 				child:set_integer('comment_index', comment_index);
 				comment_index = comment_index+1;
 			end
@@ -322,7 +322,7 @@ function parseDiaryComment(data, line, i, line_count, html)
 end
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
 mz3.set_parser("MIXI_DIARY",         "mixi.mixi_view_diary_parser");
 mz3.set_parser("MIXI_NEIGHBORDIARY", "mixi.mixi_view_diary_parser");

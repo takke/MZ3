@@ -20,45 +20,45 @@ function get_json_value(line, key)
 end
 
 --------------------------------------------------
--- [list] gooƒz[ƒ€ —F’BE’–Ú‚Ìl‚Ì‚Ğ‚Æ‚±‚Æˆê——ƒp[ƒT
+-- [list] gooãƒ›ãƒ¼ãƒ  å‹é”ãƒ»æ³¨ç›®ã®äººã®ã²ã¨ã“ã¨ä¸€è¦§ãƒ‘ãƒ¼ã‚µ
 --
 -- http://home.goo.ne.jp/api/quote/quotes/friends/json
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function quote_quotes_friends_parser(parent, body, html)
 	mz3.logger_debug("quote_quotes_friends_parser start");
 	local t1 = mz3.get_tick_count();
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 	parent = MZ3Data:create(parent);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 
-	-- TODO V’…ƒ}[ƒW{d•¡–h~ˆ—
+	-- TODO æ–°ç€ãƒãƒ¼ã‚¸ï¼‹é‡è¤‡é˜²æ­¢å‡¦ç†
 --[[
-	-- V‹K‚É’Ç‰Á‚·‚éƒf[ƒ^ŒQ
+	-- æ–°è¦ã«è¿½åŠ ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ç¾¤
 	CMixiDataList new_list;
 
-	-- d•¡–h~—p‚Ì id ˆê——‚ğ¶¬B
+	-- é‡è¤‡é˜²æ­¢ç”¨ã® id ä¸€è¦§ã‚’ç”Ÿæˆã€‚
 	std::set<int> id_set;
 	for (size_t i=0; i<out_.size(); i++) {
 		id_set.insert( out_[i].GetID() );
 	}
 ]]
 
-	-- ƒIƒuƒWƒFƒNƒg¶¬
+	-- ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
 	local data = MZ3Data:create();
 	type_user = mz3.get_access_type_by_key("GOOHOME_USER");
 	data:set_access_type(type_user);
 
-	-- ‚Ğ‚Æ‚±‚ÆAPI‚Ìjson‚Ís’PˆÊ‚É—v‘f‚ª‚ ‚é‚Ì‚ÅAs’PˆÊ‚Éƒp[ƒX‚·‚é
+	-- ã²ã¨ã“ã¨APIã®jsonã¯è¡Œå˜ä½ã«è¦ç´ ãŒã‚ã‚‹ã®ã§ã€è¡Œå˜ä½ã«ãƒ‘ãƒ¼ã‚¹ã™ã‚‹
 	local line_count = html:get_count();
 	local in_quote = false;
 	
@@ -67,11 +67,11 @@ function quote_quotes_friends_parser(parent, body, html)
 		if line_has_strings(line, "\"user\": {") then
 --			mz3.logger_debug(i .. " : " .. line);
 			if in_quote then
-				-- ˆê‚Â‘O‚Ì‰ğÍŒ‹‰Ê‚ğ“o˜^
+				-- ä¸€ã¤å‰ã®è§£æçµæœã‚’ç™»éŒ²
 				body:add(data.data);
 				data:delete();
 				
-				-- Ÿ‚Ì—v‘f—pƒf[ƒ^‚ğ¶¬
+				-- æ¬¡ã®è¦ç´ ç”¨ãƒ‡ãƒ¼ã‚¿ã‚’ç”Ÿæˆ
 				data = MZ3Data:create();
 				data:set_access_type(type_user);
 			end
@@ -111,25 +111,25 @@ function quote_quotes_friends_parser(parent, body, html)
 					data:set_integer("friends", v);
 				end
 				
-				-- text : •¡”s‚Ì‰Â”\«‚ª‚ ‚é‚Ì‚Å‚±‚±‚Åƒp[ƒX
+				-- text : è¤‡æ•°è¡Œã®å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ã“ã“ã§ãƒ‘ãƒ¼ã‚¹
 				if line_has_strings(line, "\"text\":") then
-					-- " ˆÈ~‚Ì•¶š—ñæ“¾
+					-- " ä»¥é™ã®æ–‡å­—åˆ—å–å¾—
 					local after_dq = line:match(":[^\"]*\"(.*)");
 					--mz3.logger_debug(after_dq);
 					
 					if after_dq:find("\"", 1, true) ~= nil then
-						-- I—¹
+						-- çµ‚äº†
 						local text = after_dq:match("(.*)\"");
 						data:add_text_array("body", text);
 					else
-						-- " ‚ªŒ©‚Â‚©‚é‚Ü‚Åæ“¾‚·‚é
+						-- " ãŒè¦‹ã¤ã‹ã‚‹ã¾ã§å–å¾—ã™ã‚‹
 						data:add_text_array("body", after_dq);
 						data:add_text_array("body", "\r\n");
 						i = i+1;
 						while i<line_count-1 do
 							line = html:get_at(i);
 							if line:find("\"", 1, true) ~= nil then
-								-- I—¹
+								-- çµ‚äº†
 								local text = line:match("(.*)\"");
 								data:add_text_array("body", text);
 								break;
@@ -146,7 +146,7 @@ function quote_quotes_friends_parser(parent, body, html)
 				-- favorited
 				v = get_json_value(line, "favorited");
 				if v ~= nil then
-					data:set_integer("favorited", v=="false" and 0 or 1);	-- 3€‰‰Zq
+					data:set_integer("favorited", v=="false" and 0 or 1);	-- 3é …æ¼”ç®—å­
 				end
 				-- favorites
 				v = get_json_value(line, "favorites");
@@ -158,7 +158,7 @@ function quote_quotes_friends_parser(parent, body, html)
 				if v ~= nil then
 					data:set_integer("comments", v);
 
-					-- ƒRƒƒ“ƒg”‚ğƒ{ƒfƒB‚Ì––”ö‚É‚Â‚¯‚é
+					-- ã‚³ãƒ¡ãƒ³ãƒˆæ•°ã‚’ãƒœãƒ‡ã‚£ã®æœ«å°¾ã«ã¤ã‘ã‚‹
 					data:add_text_array("body", "(" .. v .. ")");
 				end
 				-- created_at
@@ -171,7 +171,7 @@ function quote_quotes_friends_parser(parent, body, html)
 				if v ~= nil then
 					data:set_text("id", v);
 
-					-- ‰{——URL‚Æ‚µ‚Ä‚Ğ‚Æ‚±‚Æ‚ÌURL‚ğ\’z‚µ‚Äİ’è‚µ‚Ä‚¨‚­
+					-- é–²è¦§URLã¨ã—ã¦ã²ã¨ã“ã¨ã®URLã‚’æ§‹ç¯‰ã—ã¦è¨­å®šã—ã¦ãŠã
 					-- http://home.goo.ne.jp/quote/user/{goo_id}/detail/{id}?cnt={comments}
 					url = string.format("http://home.goo.ne.jp/quote/user/%s/detail/%s?cnt=%d",
 							data:get_text("goo_id"),
@@ -184,17 +184,17 @@ function quote_quotes_friends_parser(parent, body, html)
 		end
 	end
 
-	-- TODO V’…ƒ}[ƒW{d•¡–h~ˆ—
+	-- TODO æ–°ç€ãƒãƒ¼ã‚¸ï¼‹é‡è¤‡é˜²æ­¢å‡¦ç†
 	if in_quote then
 		body:add(data.data);
 	end
 --[[
 
-	-- ¶¬‚µ‚½ƒf[ƒ^‚ğo—Í‚É”½‰f
+	-- ç”Ÿæˆã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ã«åæ˜ 
 	TwitterParserBase::MergeNewList(out_, new_list);
 ]]
 
-	-- ƒIƒuƒWƒFƒNƒgíœ
+	-- ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
 	data:delete();
 
 	local t2 = mz3.get_tick_count();

@@ -4,20 +4,20 @@
  * http://www.mz3.jp/license.txt
 ]]
 --------------------------------------------------
--- MZ3 Script : ƒ†[ƒeƒBƒŠƒeƒB
+-- MZ3 Script : ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
 --
 -- $Id$
 --------------------------------------------------
 mz3.logger_debug('util.lua start');
 
 --------------------------------------------------
--- ŠÖ”ŒÄ‚Ño‚µ‚ÌƒoƒbƒNƒgƒŒ[ƒX‚ğo—Í‚·‚é
+-- é–¢æ•°å‘¼ã³å‡ºã—ã®ãƒãƒƒã‚¯ãƒˆãƒ¬ãƒ¼ã‚¹ã‚’å‡ºåŠ›ã™ã‚‹
 --------------------------------------------------
 function show_backtrace()
-	-- level=1 ‚ª ‚±‚ÌŠÖ”
-	-- level=2 ‚ª ‚±‚ÌŠÖ”‚ÌŒÄ‚Ño‚µ‚à‚Æ(wait_loop)
-	-- level=3 ‚ª ƒtƒbƒNŠÖ”
-	-- ‚±‚ê‚ç‚ÌŠÖ”‚Ì•\¦‚ğ”ğ‚¯‚Ä‚¢‚Ü‚·B
+	-- level=1 ãŒ ã“ã®é–¢æ•°
+	-- level=2 ãŒ ã“ã®é–¢æ•°ã®å‘¼ã³å‡ºã—ã‚‚ã¨(wait_loop)
+	-- level=3 ãŒ ãƒ•ãƒƒã‚¯é–¢æ•°
+	-- ã“ã‚Œã‚‰ã®é–¢æ•°ã®è¡¨ç¤ºã‚’é¿ã‘ã¦ã„ã¾ã™ã€‚
 	local level = 4
 
 	print("backtrace:")
@@ -31,7 +31,7 @@ end
 
 
 --------------------------------------------------
--- line ‚Éw’è‚³‚ê‚½‘S•¶š—ñ‚ğ‡‚ÉŠÜ‚Ş‚©
+-- line ã«æŒ‡å®šã•ã‚ŒãŸå…¨æ–‡å­—åˆ—ã‚’é †ã«å«ã‚€ã‹
 --------------------------------------------------
 function line_has_strings(line, ...)
 	local args = {...}
@@ -51,7 +51,7 @@ end
 
 
 ------------------------------------------------------------
--- line ‚Éw’è‚³‚ê‚½‘S•¶š—ñ‚ğ‡‚ÉŠÜ‚Ş‚©(targets‚Íƒe[ƒuƒ‹)
+-- line ã«æŒ‡å®šã•ã‚ŒãŸå…¨æ–‡å­—åˆ—ã‚’é †ã«å«ã‚€ã‹(targetsã¯ãƒ†ãƒ¼ãƒ–ãƒ«)
 ------------------------------------------------------------
 function line_has_strings_table(line, targets)
 	local args = targets
@@ -71,10 +71,10 @@ end
 
 
 --------------------------------------------------
--- URL‚©‚çƒpƒ‰ƒ[ƒ^‚ğæ“¾‚·‚é
+-- URLã‹ã‚‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹
 --------------------------------------------------
 function get_param_from_url(url, param)
-	-- ? ˆÈ~‚ğ’Šo
+	-- ? ä»¥é™ã‚’æŠ½å‡º
 	local val = url:match("[\?&]" .. param .. "=([^&]+).*$");
 	if (val == nil) then
 		return "";
@@ -85,7 +85,7 @@ end
 
 
 ----------------------------------------
--- form ‰ğÍ—p•”•i
+-- form è§£æç”¨éƒ¨å“
 ----------------------------------------
 
 function dump_forms(forms)
@@ -101,7 +101,7 @@ function dump_forms(forms)
 end
 
 
---- parse_form —p‰Šú•Ï”¶¬
+--- parse_form ç”¨åˆæœŸå¤‰æ•°ç”Ÿæˆ
 function new_init_form()
 	local init_form = {
 		["name"] = nil,
@@ -113,22 +113,22 @@ function new_init_form()
 end
 
 
---- ƒtƒH[ƒ€‰ğÍ
+--- ãƒ•ã‚©ãƒ¼ãƒ è§£æ
 -- 
--- HTML ‚Ì‘Sform‚ğ‰ğÍ‚µAƒe[ƒuƒ‹‚É•ÏŠ·‚·‚éB
--- ƒtƒH[ƒ€‚Ì name, action, method ‚Æ‘Shiddenƒ^ƒO‚ğƒe[ƒuƒ‹‰»‚·‚éB
+-- HTML ã®å…¨formã‚’è§£æã—ã€ãƒ†ãƒ¼ãƒ–ãƒ«ã«å¤‰æ›ã™ã‚‹ã€‚
+-- ãƒ•ã‚©ãƒ¼ãƒ ã® name, action, method ã¨å…¨hiddenã‚¿ã‚°ã‚’ãƒ†ãƒ¼ãƒ–ãƒ«åŒ–ã™ã‚‹ã€‚
 --
 function parse_form(line, base_url)
-	-- ƒ^ƒO•ª‰ğ
+	-- ã‚¿ã‚°åˆ†è§£
 	target = line;
 --	mz3.logger_debug(line);
 	
 	local forms = {}
 	local form = new_init_form();
 	
-	-- </form> ‚ªŒ©‚Â‚©‚ê‚ÎI—¹
+	-- </form> ãŒè¦‹ã¤ã‹ã‚Œã°çµ‚äº†
 	while true do
-		-- TODO match ‚Í’x‚¢Bposition ‚É‚æ‚éƒXƒ‰ƒCƒhŒ^ˆ—‚É•ÏX‚·‚é‚±‚ÆB
+		-- TODO match ã¯é…ã„ã€‚position ã«ã‚ˆã‚‹ã‚¹ãƒ©ã‚¤ãƒ‰å‹å‡¦ç†ã«å¤‰æ›´ã™ã‚‹ã“ã¨ã€‚
 		left, tag, right = target:match('^(.-)(<.->)(.-)$');
 --		mz3.logger_debug(left);
 --		mz3.logger_debug("tag : " .. tag);
@@ -145,7 +145,7 @@ function parse_form(line, base_url)
 			local v = tag:match('action="(.-)"');
 			if v~=nil then
 				form.action = mz3.decode_html_entity(v);
-				-- "http://" ‚â "https://" ‚Ån‚Ü‚éê‡‚Í base_url ‚ğ•t‚¯‚È‚¢
+				-- "http://" ã‚„ "https://" ã§å§‹ã¾ã‚‹å ´åˆã¯ base_url ã‚’ä»˜ã‘ãªã„
 				if string.sub(form.action, 1, 7) ~= "http://" and
 				   string.sub(form.action, 1, 8) ~= "https://" then
 					form.action = base_url .. form.action;
@@ -197,18 +197,18 @@ function parse_form(line, base_url)
 end
 
 
---- html ‚Ì i s–Ú‚©‚ç start_region_params ` end_region_params ‚ÌŠÔ‚ğæ“¾‚·‚é
+--- html ã® i è¡Œç›®ã‹ã‚‰ start_region_params ã€œ end_region_params ã®é–“ã‚’å–å¾—ã™ã‚‹
 --
--- start_region_params ‚Ì‘S‚Ä‚Ì—v‘f‚ª1s‚ÉŒ»‚ê‚½‚çŠJns‚Æ‚İ‚È‚·B
--- end_region_params   ‚Ì‘S‚Ä‚Ì—v‘f‚ª1s‚ÉŒ»‚ê‚½‚çI—¹s‚Æ‚İ‚È‚·B
+-- start_region_params ã®å…¨ã¦ã®è¦ç´ ãŒ1è¡Œã«ç¾ã‚ŒãŸã‚‰é–‹å§‹è¡Œã¨ã¿ãªã™ã€‚
+-- end_region_params   ã®å…¨ã¦ã®è¦ç´ ãŒ1è¡Œã«ç¾ã‚ŒãŸã‚‰çµ‚äº†è¡Œã¨ã¿ãªã™ã€‚
 --
--- @param html MZ3HTMLArray ƒIƒuƒWƒFƒNƒg
--- @param i    s”Ô†(0 origin)
--- @param start_region_params ŠJns”F¯—p•¶š—ñƒe[ƒuƒ‹
--- @param end_region_params   I—¹s”F¯—p•¶š—ñƒe[ƒuƒ‹
+-- @param html MZ3HTMLArray ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+-- @param i    è¡Œç•ªå·(0 origin)
+-- @param start_region_params é–‹å§‹è¡Œèªè­˜ç”¨æ–‡å­—åˆ—ãƒ†ãƒ¼ãƒ–ãƒ«
+-- @param end_region_params   çµ‚äº†è¡Œèªè­˜ç”¨æ–‡å­—åˆ—ãƒ†ãƒ¼ãƒ–ãƒ«
 --
--- @return [1] ŠJns`I—¹s‚Ü‚Å‚Ì•¶š—ñ(¦’ˆÓFŠJns‚ÆI—¹s‚ÍŠÜ‚Ü‚È‚¢)
--- @return [2] I—¹s‚ªŒ»‚ê‚½s”Ô†
+-- @return [1] é–‹å§‹è¡Œã€œçµ‚äº†è¡Œã¾ã§ã®æ–‡å­—åˆ—(â€»æ³¨æ„ï¼šé–‹å§‹è¡Œã¨çµ‚äº†è¡Œã¯å«ã¾ãªã„)
+-- @return [2] çµ‚äº†è¡ŒãŒç¾ã‚ŒãŸè¡Œç•ªå·
 --
 function get_sub_html(html, start_line, end_line, start_region_params, end_region_params)
 

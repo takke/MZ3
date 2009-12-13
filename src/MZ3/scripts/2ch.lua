@@ -12,83 +12,83 @@ mz3.logger_debug('2ch.lua start');
 module("2ch", package.seeall)
 
 --------------------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»AƒƒOƒCƒ“İ’è—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ã€ãƒ­ã‚°ã‚¤ãƒ³è¨­å®šç”¨)
 --------------------------------------------------
 mz3.regist_service('2ch', false);
 
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 
--- ”Âˆê——   = ƒƒCƒ“‰æ–Ê ƒJƒeƒSƒŠ{ƒ{ƒfƒB
--- ƒXƒŒˆê—— = ƒƒCƒ“‰æ–Ê ƒJƒeƒSƒŠ{ƒ{ƒfƒB
--- ƒXƒŒƒbƒh = ƒŒƒ|[ƒg‰æ–Ê
+-- æ¿ä¸€è¦§   = ãƒ¡ã‚¤ãƒ³ç”»é¢ ã‚«ãƒ†ã‚´ãƒªï¼‹ãƒœãƒ‡ã‚£
+-- ã‚¹ãƒ¬ä¸€è¦§ = ãƒ¡ã‚¤ãƒ³ç”»é¢ ã‚«ãƒ†ã‚´ãƒªï¼‹ãƒœãƒ‡ã‚£
+-- ã‚¹ãƒ¬ãƒƒãƒ‰ = ãƒ¬ãƒãƒ¼ãƒˆç”»é¢
 
 
--- ”Âˆê——
+-- æ¿ä¸€è¦§
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('2ch');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('2CH_BBS_MENU');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('2ch ”Âˆê——');								-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('2ch\\bbs_menu.html');				-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('sjis');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('2ch');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('2CH_BBS_MENU');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('2ch æ¿ä¸€è¦§');								-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('2ch\\bbs_menu.html');				-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('sjis');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://menu.2ch.net/bbsmenu.html');
-type:set_body_header(1, 'title', 'ƒJƒeƒSƒŠ');
-type:set_body_header(2, 'name', '”Â');
+type:set_body_header(1, 'title', 'ã‚«ãƒ†ã‚´ãƒª');
+type:set_body_header(2, 'name', 'æ¿');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 
 
--- ƒXƒŒˆê——
+-- ã‚¹ãƒ¬ä¸€è¦§
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('2ch');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('2CH_SUBJECT');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('2ch ƒXƒŒˆê——');							-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('2ch\\subject_{urlafter:/}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('sjis');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('2ch');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('2CH_SUBJECT');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('2ch ã‚¹ãƒ¬ä¸€è¦§');							-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('2ch\\subject_{urlafter:/}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('sjis');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://menu.2ch.net/dummy.html');
-type:set_body_header(1, 'title', 'ƒXƒŒ');
-type:set_body_header(2, 'name', '”Â');
+type:set_body_header(1, 'title', 'ã‚¹ãƒ¬');
+type:set_body_header(2, 'name', 'æ¿');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 type:set_cruise_target(true);
 
 
--- ƒXƒŒƒbƒh
+-- ã‚¹ãƒ¬ãƒƒãƒ‰
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('body');										-- ƒJƒeƒSƒŠ
-type:set_service_type('2ch');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('2CH_THREAD');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('2ch ƒXƒŒ');								-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('2ch\\thread_{urlafter:/}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('sjis');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('body');										-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('2ch');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('2CH_THREAD');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('2ch ã‚¹ãƒ¬');								-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('2ch\\thread_{urlafter:/}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('sjis');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 
 
--- 2chƒuƒbƒNƒ}[ƒN
+-- 2chãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- ƒJƒeƒSƒŠ
-type:set_service_type('2ch');									-- ƒT[ƒrƒXí•Ê
-type:set_serialize_key('2CH_BOOKMARK');							-- ƒVƒŠƒAƒ‰ƒCƒYƒL[
-type:set_short_title('‚¨‹C‚É“ü‚èƒXƒŒ');						-- ŠÈˆÕƒ^ƒCƒgƒ‹
-type:set_request_method('GET');									-- ƒŠƒNƒGƒXƒgƒƒ\ƒbƒh
-type:set_cache_file_pattern('2ch\\subject_{urlafter:/}.html');	-- ƒLƒƒƒbƒVƒ…ƒtƒ@ƒCƒ‹
-type:set_request_encoding('sjis');								-- ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+type:set_info_type('category');									-- ã‚«ãƒ†ã‚´ãƒª
+type:set_service_type('2ch');									-- ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥
+type:set_serialize_key('2CH_BOOKMARK');							-- ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+type:set_short_title('ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬');						-- ç°¡æ˜“ã‚¿ã‚¤ãƒˆãƒ«
+type:set_request_method('GET');									-- ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
+type:set_cache_file_pattern('2ch\\subject_{urlafter:/}.html');	-- ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒ•ã‚¡ã‚¤ãƒ«
+type:set_request_encoding('sjis');								-- ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
 type:set_default_url('http://menu.2ch.net/dummy.html');
-type:set_body_header(1, 'title', 'ƒXƒŒ');
-type:set_body_header(2, 'name', '”Â');
+type:set_body_header(1, 'title', 'ã‚¹ãƒ¬');
+type:set_body_header(2, 'name', 'æ¿');
 type:set_body_integrated_line_pattern(1, '%2');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 menu_items.read               = mz3_menu.regist_menu("2ch.on_read_menu_item");
@@ -99,39 +99,39 @@ menu_items.search_post_bbs    = mz3_menu.regist_menu("2ch.on_search_post_bbs");
 menu_items.add_bookmark       = mz3_menu.regist_menu("2ch.on_add_bookmark");
 menu_items.remove_bookmark    = mz3_menu.regist_menu("2ch.on_remove_bookmark");
 
--- ”Â‘I‘ğ—p‚Ìƒƒjƒ…[
+-- æ¿é¸æŠç”¨ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 menu_items.select_bbs = {}
-THE_BBS_DIV = 6;		-- ƒOƒ‹[ƒv‰»‚·‚éŒÂ”B‚±‚ÌŒÂ”‚Ü‚Å on_select_bbs_n ‚ğ—pˆÓ‚·‚é‚±‚Æ
+THE_BBS_DIV = 6;		-- ã‚°ãƒ«ãƒ¼ãƒ—åŒ–ã™ã‚‹å€‹æ•°ã€‚ã“ã®å€‹æ•°ã¾ã§ on_select_bbs_n ã‚’ç”¨æ„ã™ã‚‹ã“ã¨
 for i=0, THE_BBS_DIV-1 do
 	menu_items.select_bbs[i]     = mz3_menu.regist_menu("2ch.on_select_bbs_" .. i);
 end
 
 ----------------------------------------
--- 2ch ƒvƒ‰ƒOƒCƒ“‹¤’Ê’è”
+-- 2ch ãƒ—ãƒ©ã‚°ã‚¤ãƒ³å…±é€šå®šæ•°
 ----------------------------------------
 bookmark_file_path = mz3_dir .. "2ch_bookmark.tsv";
 
 
 ----------------------------------------
--- ƒƒjƒ…[‚Ö‚Ì“o˜^
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸ã®ç™»éŒ²
 ----------------------------------------
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' 2ch', 1, true) ~= nil then
-		-- óMƒgƒŒƒC
+		-- å—ä¿¡ãƒˆãƒ¬ã‚¤
 		local tab = MZ3GroupItem:create("2ch");
 
-		tab:append_category("‚¨‹C‚É“ü‚èƒXƒŒ", "2CH_BOOKMARK");
-		tab:append_category("”Âˆê——", "2CH_BBS_MENU");
+		tab:append_category("ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬", "2CH_BOOKMARK");
+		tab:append_category("æ¿ä¸€è¦§", "2CH_BBS_MENU");
 
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
@@ -142,38 +142,38 @@ mz3.add_event_listener("creating_default_group", "2ch.on_creating_default_group"
 
 
 ----------------------------------------
--- ƒp[ƒT
+-- ãƒ‘ãƒ¼ã‚µ
 ----------------------------------------
 
 --------------------------------------------------
--- y”Âˆê——z
+-- ã€æ¿ä¸€è¦§ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function the_2ch_bbsmenu_parser(parent, body, html)
 	mz3.logger_debug("the_2ch_bbsmenu_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
 	
-	-- data ¶¬
+	-- data ç”Ÿæˆ
 	data = MZ3Data:create();
 	type = mz3.get_access_type_by_key('2CH_SUBJECT');
 	data:set_access_type(type);
 	
-	-- •ûjF
-	-- '<BR><BR><B>...</B>' ‚Å•\Œ»‚³‚ê‚éuƒOƒ‹[ƒvv’PˆÊ‚Å€–Ú‚ğì‚éB
-	-- ‚©‚ÂATHE_BBS_DIV ŒÂ‚²‚Æ‚É•Ê€–Ú‚ğì‚éB
+	-- æ–¹é‡ï¼š
+	-- '<BR><BR><B>...</B>' ã§è¡¨ç¾ã•ã‚Œã‚‹ã€Œã‚°ãƒ«ãƒ¼ãƒ—ã€å˜ä½ã§é …ç›®ã‚’ä½œã‚‹ã€‚
+	-- ã‹ã¤ã€THE_BBS_DIV å€‹ã”ã¨ã«åˆ¥é …ç›®ã‚’ä½œã‚‹ã€‚
 	
 	line = '';
 	local line_count = html:get_count();
@@ -187,24 +187,24 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 			group = line:match('^<BR><BR><B>(.-)</');
 		end
 		if group~=nil then
-			-- VƒOƒ‹[ƒv”­Œ©
-			-- 2Œ–ÚˆÈ~‚Å‚ ‚ê‚Î‚±‚±‚Ü‚Å‚Ì•ª‚ğƒŠƒXƒg‚É’Ç‰Á
+			-- æ–°ã‚°ãƒ«ãƒ¼ãƒ—ç™ºè¦‹
+			-- 2ä»¶ç›®ä»¥é™ã§ã‚ã‚Œã°ã“ã“ã¾ã§ã®åˆ†ã‚’ãƒªã‚¹ãƒˆã«è¿½åŠ 
 			if current_group ~= nil then
-				-- ‚±‚±‚Ü‚Å‚Ì•ª‚ğ‚Í‚«o‚·
+				-- ã“ã“ã¾ã§ã®åˆ†ã‚’ã¯ãå‡ºã™
 --				mz3.logger_debug(group);
 
-				-- ƒ^ƒCƒgƒ‹‚ÌŒã‚ë‚É•t‚¯‚é
+				-- ã‚¿ã‚¤ãƒˆãƒ«ã®å¾Œã‚ã«ä»˜ã‘ã‚‹
 				link_no = data:get_link_list_size();
 				if link_no > 0 then
 --					local title = data:get_text('title');
 --					data:set_text('title', title .. ' (' .. link_no .. ')');
 
-					-- ƒŠƒXƒg‚É’Ç‰Á
+					-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 					body:add(data.data);
 				end
 			end
 
-			-- ‰Šú‰»
+			-- åˆæœŸåŒ–
 			data:clear();
 			data:set_text('name', '');
 			data:set_text('title', group);
@@ -217,31 +217,31 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 		end
 
 		if is_start then
-			-- <A HREF=http://headline.2ch.net/bbynamazu/>’nkheadline</A><br>
-			-- <A HREF=http://www.monazilla.org/ TARGET=_blank>2chƒc[ƒ‹</A><br>
+			-- <A HREF=http://headline.2ch.net/bbynamazu/>åœ°éœ‡headline</A><br>
+			-- <A HREF=http://www.monazilla.org/ TARGET=_blank>2chãƒ„ãƒ¼ãƒ«</A><br>
 			local url, title = nil, nil;
 			if line_has_strings(line, '<A') then
 				url, title = line:match('<A HREF=(.-)/>(.-)</A>');
 			end
 			if url~= nil and title~=nil then
 				
-				-- Šù‚É THE_BBS_DIV ŒÂˆÈã‚ ‚ê‚Î‚Í‚«o‚·
+				-- æ—¢ã« THE_BBS_DIV å€‹ä»¥ä¸Šã‚ã‚Œã°ã¯ãå‡ºã™
 				link_no = data:get_link_list_size();
 				if link_no >= THE_BBS_DIV then
 --					local title = data:get_text('title');
 --					data:set_text('title', title .. ' (' .. link_no .. ')');
 
-					-- ƒŠƒXƒg‚É’Ç‰Á
+					-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 					body:add(data.data);
 					
-					-- ‰Šú‰»
+					-- åˆæœŸåŒ–
 					data:clear();
 					data:set_text('name', '');
 					data:set_text('title', '');
 					
 				end
 				
-				-- \’z
+				-- æ§‹ç¯‰
 				name = data:get_text('name');
 --				if name:len() < 30 then
 					if name == '' then
@@ -260,18 +260,18 @@ function the_2ch_bbsmenu_parser(parent, body, html)
 	end
 
 	if current_group ~= nil then
-		-- ƒ^ƒCƒgƒ‹‚ÌŒã‚ë‚É•t‚¯‚é
+		-- ã‚¿ã‚¤ãƒˆãƒ«ã®å¾Œã‚ã«ä»˜ã‘ã‚‹
 		link_no = data:get_link_list_size();
 		if link_no > 0 then
 --			local title = data:get_text('title');
 --			data:set_text('title', title .. ' (' .. link_no .. ')');
 
-			-- ƒŠƒXƒg‚É’Ç‰Á
+			-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 			body:add(data.data);
 		end
 	end
 
-	-- data íœ
+	-- data å‰Šé™¤
 	data:delete();
 
 	local t2 = mz3.get_tick_count();
@@ -281,22 +281,22 @@ mz3.set_parser("2CH_BBS_MENU", "2ch.the_2ch_bbsmenu_parser");
 
 
 --------------------------------------------------
--- yƒXƒŒƒbƒhˆê——z
+-- ã€ã‚¹ãƒ¬ãƒƒãƒ‰ä¸€è¦§ã€‘
 --
--- ˆø”:
---   parent: ãƒyƒCƒ“‚Ì‘I‘ğƒIƒuƒWƒFƒNƒg(MZ3Data*)
---   body:   ‰ºƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3DataList*)
---   html:   HTMLƒf[ƒ^(CHtmlArray*)
+-- å¼•æ•°:
+--   parent: ä¸Šãƒšã‚¤ãƒ³ã®é¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(MZ3Data*)
+--   body:   ä¸‹ãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3DataList*)
+--   html:   HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function the_2ch_subject_parser(parent, body, html)
 	mz3.logger_debug("the_2ch_subject_parser start");
 	
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	body:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -306,11 +306,11 @@ function the_2ch_subject_parser(parent, body, html)
 	for i=0, line_count-1 do
 		line = html:get_at(i);
 		
-		-- 1246883533.dat<>y’²¸z ‚P‚W`‚R‚SÎ‚Ì”¼”‚ªuq‹Ÿ—~‚µ‚­‚È‚¢vBŒ‹¥‚µ‚È‚¢——R‚Íu‚¢‚¢ˆÙ«‚ª‚¢‚È‚¢vuŒoÏ“I‚É•sˆÀv‚È‚Çc‹“ss’²¸š‚R (212)
+		-- 1246883533.dat<>ã€èª¿æŸ»ã€‘ ï¼‘ï¼˜ã€œï¼“ï¼”æ­³ã®åŠæ•°ãŒã€Œå­ä¾›æ¬²ã—ããªã„ã€ã€‚çµå©šã—ãªã„ç†ç”±ã¯ã€Œã„ã„ç•°æ€§ãŒã„ãªã„ã€ã€ŒçµŒæ¸ˆçš„ã«ä¸å®‰ã€ãªã©â€¦äº¬éƒ½å¸‚èª¿æŸ»â˜…ï¼“ (212)
 		local tno, title = line:match('^(.-)\.dat<>(.-)$');
 		if tno~= nil and title~=nil then
 
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 			
 			type = mz3.get_access_type_by_key('2CH_THREAD');
@@ -320,17 +320,17 @@ function the_2ch_subject_parser(parent, body, html)
 			data:set_text('title', title);
 --			data:set_text('title', parent:get_text('name'));
 
-			-- parent url ‚©‚ç test/read.cgi/xxx ‚ÌURL‚ğ¶¬‚·‚é
+			-- parent url ã‹ã‚‰ test/read.cgi/xxx ã®URLã‚’ç”Ÿæˆã™ã‚‹
 			parent_url = parent:get_text('url');
 			local domain, category = parent_url:match('http://(.-)/(.-)/subject.txt');
 			url = 'http://' .. domain .. '/test/read.cgi/' .. category .. '/' .. tno .. '/l50';
 			data:set_text('url', url);
 			data:set_text('browse_uri', url);
 
-			-- ƒŠƒXƒg‚É’Ç‰Á
+			-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 			body:add(data.data);
 			
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 			
 			if body:get_count()>=t2ch_thread_view_limit then
@@ -346,21 +346,21 @@ mz3.set_parser("2CH_SUBJECT", "2ch.the_2ch_subject_parser");
 
 
 --------------------------------------------------
--- yƒXƒŒƒbƒhz
+-- ã€ã‚¹ãƒ¬ãƒƒãƒ‰ã€‘
 --
--- ˆø”:
---   data:  ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   data:  ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy: NULL
---   html:  HTMLƒf[ƒ^(CHtmlArray*)
+--   html:  HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function thread_parser(data, dummy, html)
 	mz3.logger_debug("thread_parser start");
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 
-	-- ‘SÁ‹
+	-- å…¨æ¶ˆå»
 	data:clear();
 	
 	local t1 = mz3.get_tick_count();
@@ -376,18 +376,18 @@ function thread_parser(data, dummy, html)
 			base_url = line:match('<base href="(.-)"');
 		end
 		
-		-- ƒ^ƒCƒgƒ‹
+		-- ã‚¿ã‚¤ãƒˆãƒ«
 		if line_has_strings(line, '<title') then
 			local title = line:match('<title>(.-)</title>');
 			data:set_text('title', title);
 		end
 
-		-- <dt>1 F<font color=green><b>™‚Î‚®‘¾™ƒÓ š</b></font>F2009/07/06(Œ) 23:34:25 ID:???i<dd> š“dÔ“à‚ÅƒiƒCƒtŒ©‚¹‹º‚·A‘åã  –\—Ísˆ×–@ˆá”½—e‹^‚Å‘ß•ß <br>  <br> E“dÔ“à‚ÅŒg‘Ñ“d˜b‚Ìg—p‚ğ’ˆÓ‚³‚ê‚½‘Šè‚ÉƒiƒCƒt‚ğŒ©‚¹‚Ä‹º‚µ‚½‚Æ‚µ‚ÄA‘åã•{Œx“V‰¤›‚Í <br> @‚U“úA–\—Ísˆ×ˆ”±–@ˆá”½‚Ì‹^‚¢‚ÅA•ºŒÉŒ§“òès’·F–{’ÊA‰ïĞˆõ‘¾“c—¹—e‹^Òi‚R‚Oj‚ğ <br> @Œ»s”Æ‘ß•ß‚µ‚½B <br>  <br> @‘ß•ß—e‹^‚Í‚U“úŒßŒã‚Q‚T‚O•ª‚²‚ëA‚i‚qŠÖ¼ü‚Ì“Œ•”sê‘O|“V‰¤›ŠÔ‚ğ‘–s‚µ‚Ä‚¢‚½ <br> @‰õ‘¬“dÔ“à‚ÅA“Ş—ÇŒ§‘å˜aŒSRs‚Ì’j«‰ïĞˆõi‚U‚Wj‚©‚çŒg‘Ñ“d˜b‚ÌƒQ[ƒ€‚ğ‚â‚ß‚é‚æ‚¤ <br> @’ˆÓ‚³‚ê‚½‚±‚Æ‚É• ‚ğ—§‚ÄA‚Á‚Ä‚¢‚½ƒiƒCƒt‚ğæ‚èo‚µuE‚µ‚Ä‚µ‚Ü‚¤‚¼v‚Æ‹º‚µ‚½‹^‚¢B <br>  <br> @“V‰¤›‚É‚æ‚é‚ÆA‘¾“c—e‹^Ò‚Íu• ‚ª—§‚Á‚½‚Ì‚Ån•¨‚ğ¦‚µ‚½v‚Æ—e‹^‚ğ”F‚ß‚Ä‚¢‚éB <br>  <br> @“dÔ‚Éæ‚è‡‚í‚¹‚Ä‚¢‚½‚i‚qĞˆõ‚ªæ‚è‰Ÿ‚³‚¦A“V‰¤›‰w‚ÅŒx@Š¯‚Éˆø‚«“n‚µ‚½B’j«‚âæ‹q‚É <br> @‚¯‚ª‚Í‚È‚©‚Á‚½B <br>  <br> @<a href="http://ime.nu/www.47news.jp/CN/200907/CN2009070601000800.html" target="_blank">http://www.47news.jp/CN/200907/CN2009070601000800.html</a> <br>  <br> ¦‘OƒXƒŒ <br> <a href="http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/" target="_blank">http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/</a> <br><br>
+		-- <dt>1 ï¼š<font color=green><b>â˜†ã°ãå¤ªâ˜†Ï† â˜…</b></font>ï¼š2009/07/06(æœˆ) 23:34:25 ID:???i<dd> â˜…é›»è»Šå†…ã§ãƒŠã‚¤ãƒ•è¦‹ã›è„…ã™ã€å¤§é˜ª  æš´åŠ›è¡Œç‚ºæ³•é•åå®¹ç–‘ã§é€®æ• <br>  <br> ãƒ»é›»è»Šå†…ã§æºå¸¯é›»è©±ã®ä½¿ç”¨ã‚’æ³¨æ„ã•ã‚ŒãŸç›¸æ‰‹ã«ãƒŠã‚¤ãƒ•ã‚’è¦‹ã›ã¦è„…ã—ãŸã¨ã—ã¦ã€å¤§é˜ªåºœè­¦å¤©ç‹å¯ºç½²ã¯ <br> ã€€ï¼–æ—¥ã€æš´åŠ›è¡Œç‚ºå‡¦ç½°æ³•é•åã®ç–‘ã„ã§ã€å…µåº«çœŒå°¼å´å¸‚é•·æ´²æœ¬é€šã€ä¼šç¤¾å“¡å¤ªç”°äº†å®¹ç–‘è€…ï¼ˆï¼“ï¼ï¼‰ã‚’ <br> ã€€ç¾è¡ŒçŠ¯é€®æ•ã—ãŸã€‚ <br>  <br> ã€€é€®æ•å®¹ç–‘ã¯ï¼–æ—¥åˆå¾Œï¼’æ™‚ï¼•ï¼åˆ†ã”ã‚ã€ï¼ªï¼²é–¢è¥¿ç·šã®æ±éƒ¨å¸‚å ´å‰âˆ’å¤©ç‹å¯ºé–“ã‚’èµ°è¡Œã—ã¦ã„ãŸ <br> ã€€å¿«é€Ÿé›»è»Šå†…ã§ã€å¥ˆè‰¯çœŒå¤§å’Œéƒ¡å±±å¸‚ã®ç”·æ€§ä¼šç¤¾å“¡ï¼ˆï¼–ï¼˜ï¼‰ã‹ã‚‰æºå¸¯é›»è©±ã®ã‚²ãƒ¼ãƒ ã‚’ã‚„ã‚ã‚‹ã‚ˆã† <br> ã€€æ³¨æ„ã•ã‚ŒãŸã“ã¨ã«è…¹ã‚’ç«‹ã¦ã€æŒã£ã¦ã„ãŸãƒŠã‚¤ãƒ•ã‚’å–ã‚Šå‡ºã—ã€Œæ®ºã—ã¦ã—ã¾ã†ãã€ã¨è„…ã—ãŸç–‘ã„ã€‚ <br>  <br> ã€€å¤©ç‹å¯ºç½²ã«ã‚ˆã‚‹ã¨ã€å¤ªç”°å®¹ç–‘è€…ã¯ã€Œè…¹ãŒç«‹ã£ãŸã®ã§åˆƒç‰©ã‚’ç¤ºã—ãŸã€ã¨å®¹ç–‘ã‚’èªã‚ã¦ã„ã‚‹ã€‚ <br>  <br> ã€€é›»è»Šã«ä¹—ã‚Šåˆã‚ã›ã¦ã„ãŸï¼ªï¼²ç¤¾å“¡ãŒå–ã‚ŠæŠ¼ã•ãˆã€å¤©ç‹å¯ºé§…ã§è­¦å¯Ÿå®˜ã«å¼•ãæ¸¡ã—ãŸã€‚ç”·æ€§ã‚„ä¹—å®¢ã« <br> ã€€ã‘ãŒã¯ãªã‹ã£ãŸã€‚ <br>  <br> ã€€<a href="http://ime.nu/www.47news.jp/CN/200907/CN2009070601000800.html" target="_blank">http://www.47news.jp/CN/200907/CN2009070601000800.html</a> <br>  <br> â€»å‰ã‚¹ãƒ¬ <br> <a href="http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/" target="_blank">http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/</a> <br><br>
 		if line_has_strings(line, '<dt>') then
-			local count, name, date, content = line:match('<dt>(.-)F(.-)F(.-)<dd>(.*)$');
+			local count, name, date, content = line:match('<dt>(.-)ï¼š(.-)ï¼š(.-)<dd>(.*)$');
 			count = tonumber(count);
 			if count>=2 then
-				-- 2Œ–ÚˆÈ~‚Íq—v‘f‚Æ‚µ‚Ä“Š“ü‚·‚é
+				-- 2ä»¶ç›®ä»¥é™ã¯å­è¦ç´ ã¨ã—ã¦æŠ•å…¥ã™ã‚‹
 				child = MZ3Data:create();
 				parse_one_item(child, count, name, date, content);
 				data:add_child(child);
@@ -397,13 +397,13 @@ function thread_parser(data, dummy, html)
 			end
 		end
 		
-		if line_has_strings(line, '<a', 'V’…ƒŒƒX‚Ì•\¦') then
+		if line_has_strings(line, '<a', 'æ–°ç€ãƒ¬ã‚¹ã®è¡¨ç¤º') then
 			next_line = i+1;
 			break;
 		end
 	end
 	
-	-- “à•”ƒŠƒ“ƒN’Šo
+	-- å†…éƒ¨ãƒªãƒ³ã‚¯æŠ½å‡º
 	for i=next_line, line_count-1 do
 		line = html:get_at(i);
 		
@@ -422,19 +422,19 @@ mz3.set_parser("2CH_THREAD", "2ch.thread_parser");
 
 function parse_one_item(data, count, name, date, content)
 	
-	-- ƒŒƒX”Ô
+	-- ãƒ¬ã‚¹ç•ª
 	data:set_integer('comment_index', count);
 	
-	-- –¼‘O
-	-- <a href="mailto:sage"><b>–¼–³‚µ‚³‚ñ—\ü”N</b></a>
-	-- <font color=green><b>™‚Î‚®‘¾™ƒÓ š</b></font>
-	-- <font color=green><b>–¼–³‚µ‚³‚ñ—\ü”N</b></font>
-	-- <a href="mailto:sage"><b> </b>ŸwMzNGLjdrw <b></b></a>
+	-- åå‰
+	-- <a href="mailto:sage"><b>åç„¡ã—ã•ã‚“ï¼ åå‘¨å¹´</b></a>
+	-- <font color=green><b>â˜†ã°ãå¤ªâ˜†Ï† â˜…</b></font>
+	-- <font color=green><b>åç„¡ã—ã•ã‚“ï¼ åå‘¨å¹´</b></font>
+	-- <a href="mailto:sage"><b> </b>â—†wMzNGLjdrw <b></b></a>
 	name1 = name:gsub('<.->', '');
 	data:set_text("name", mz3.decode_html_entity(name1));
 	data:set_text("author", mz3.decode_html_entity(name1));
 	
-	-- “ú•t
+	-- æ—¥ä»˜
 	data:set_date(date);
 
 	data:add_text_array("body", "\r\n");
@@ -442,17 +442,17 @@ function parse_one_item(data, count, name, date, content)
 end
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
---- ƒ{ƒfƒBƒŠƒXƒg‚ÌƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒXæ“¾
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ã‚¢ã‚¤ã‚³ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å–å¾—
 --
 -- @param event_name    'creating_default_group'
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param body          body data
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
--- @return (2) [int] ƒAƒCƒRƒ“ƒCƒ“ƒfƒbƒNƒX
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
+-- @return (2) [int] ã‚¢ã‚¤ã‚³ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 --
 function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 
@@ -468,7 +468,7 @@ end
 mz3.add_event_listener("get_body_list_default_icon_index", "2ch.on_get_body_list_default_icon_index");
 
 
---- ‘S•¶•\¦ƒƒjƒ…[‚Ü‚½‚Íƒ_ƒuƒ‹ƒNƒŠƒbƒNƒCƒxƒ“ƒg
+--- å…¨æ–‡è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¾ãŸã¯ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
@@ -476,7 +476,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	
 	item = '';
 	item = item .. data:get_text('title') .. "\r\n";
---	item = item .. "“ú•t : " .. data:get_date() .. "\r\n";
+--	item = item .. "æ—¥ä»˜ : " .. data:get_date() .. "\r\n";
 	item = item .. "----\r\n";
 
 --	item = item .. data:get_text('title') .. "\r\n";
@@ -489,13 +489,13 @@ function on_read_menu_item(serialize_key, event_name, data)
 	return true;
 end
 
---- ƒŒƒ|[ƒgƒrƒ…[‚ÅŠJ‚­
+--- ãƒ¬ãƒãƒ¼ãƒˆãƒ“ãƒ¥ãƒ¼ã§é–‹ã
 function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_read_by_reportview_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	data = MZ3Data:create(data);
 
-	-- ’ÊMŠJn
+	-- é€šä¿¡é–‹å§‹
 	url = data:get_text('url');
 	key = "2CH_THREAD";
 	access_type = mz3.get_access_type_by_key(key);
@@ -508,27 +508,27 @@ function on_read_by_reportview_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN(‚Ü‚½‚ÍEnter)‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯(ã¾ãŸã¯Enter)ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 function on_body_list_click(serialize_key, event_name, data)
 
 	if serialize_key=="2CH_SUBJECT" then
-		-- ƒƒjƒ…[•\¦
+		-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 		return on_popup_body_menu(event_name, serialize_key, mz3_main_view.get_selected_body_item(), mz3_main_view.get_wnd());
 --[[
-		-- ƒJƒeƒSƒŠ’Ç‰Á
+		-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
 		body = mz3_main_view.get_selected_body_item();
 		body = MZ3Data:create(body);
 		name = body:get_text('name');
 		
 --		mz3.alert(name);
 		
-		-- ƒJƒeƒSƒŠ’Ç‰Á
-		title = "„¤" .. name;
+		-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+		title = "â””" .. name;
 		url = body:get_text('url');
 		key = "2CH_SUBJECT";
 		mz3_main_view.append_category(title, url, key);
 		
-		-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+		-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 		access_type = mz3.get_access_type_by_key(key);
 		referer = '';
 		user_agent = nil;
@@ -539,44 +539,44 @@ function on_body_list_click(serialize_key, event_name, data)
 	end
 	
 	if serialize_key=="2CH_THREAD" then
-		-- ƒƒjƒ…[•\¦
+		-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --		return on_popup_body_menu(event_name, serialize_key, mz3_main_view.get_selected_body_item(), mz3_main_view.get_wnd());
 
-		-- ƒvƒƒpƒeƒB•\¦
+		-- ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£è¡¨ç¤º
 		return on_read_menu_item(serialize_key, event_name, data);
 	end
 	
-	-- •W€‚Ìˆ—‚ğ‘±s
+	-- æ¨™æº–ã®å‡¦ç†ã‚’ç¶šè¡Œ
 	return false;
 end
 mz3.add_event_listener("dblclk_body_list", "2ch.on_body_list_click");
 mz3.add_event_listener("enter_body_list",  "2ch.on_body_list_click");
 
 
---- ”Â‘I‘ğ—p‚Ìƒƒjƒ…[ƒCƒxƒ“ƒg
+--- æ¿é¸æŠç”¨ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¤ãƒ™ãƒ³ãƒˆ
 function on_select_bbs_n(serialize_key, event_name, data)
 
-	-- ƒCƒxƒ“ƒg‚ÌID‚ğæ“¾‚µA‚Ç‚Ì€–Ú‚ª‘I‘ğ‚³‚ê‚½‚©‚ğ”»’è‚·‚é
+	-- ã‚¤ãƒ™ãƒ³ãƒˆã®IDã‚’å–å¾—ã—ã€ã©ã®é …ç›®ãŒé¸æŠã•ã‚ŒãŸã‹ã‚’åˆ¤å®šã™ã‚‹
 	local id = mz3_selected_menu_id;
 	local base_id = menu_items.select_bbs[0];
 	local index = id - base_id;
 
-	-- ƒŠƒ“ƒNˆê——‚©‚ç URL, TEXT ‚ğæ“¾‚µAƒJƒeƒSƒŠ‚ğ’Ç‰Á‚·‚é
+	-- ãƒªãƒ³ã‚¯ä¸€è¦§ã‹ã‚‰ URL, TEXT ã‚’å–å¾—ã—ã€ã‚«ãƒ†ã‚´ãƒªã‚’è¿½åŠ ã™ã‚‹
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	n = body:get_link_list_size();
 	if index < n then
 		
-		-- ƒŠƒ“ƒNˆê——‚©‚çæ“¾‚·‚é
+		-- ãƒªãƒ³ã‚¯ä¸€è¦§ã‹ã‚‰å–å¾—ã™ã‚‹
 		name = body:get_link_list_text(index);
 		url  = body:get_link_list_url(index);
 
-		-- ƒJƒeƒSƒŠ’Ç‰Á
-		title = "„¤" .. name;
+		-- ã‚«ãƒ†ã‚´ãƒªè¿½åŠ 
+		title = "â””" .. name;
 		key = "2CH_SUBJECT";
 		mz3_main_view.append_category(title, url, key);
 		
-		-- ’Ç‰Á‚µ‚½ƒJƒeƒSƒŠ‚Ìæ“¾ŠJn
+		-- è¿½åŠ ã—ãŸã‚«ãƒ†ã‚´ãƒªã®å–å¾—é–‹å§‹
 		access_type = mz3.get_access_type_by_key(key);
 		referer = '';
 		user_agent = nil;
@@ -599,7 +599,7 @@ on_select_bbs_8 = on_select_bbs_n;
 on_select_bbs_9 = on_select_bbs_n;
 
 
---- uƒuƒ‰ƒEƒU‚ÅŠJ‚­vƒƒjƒ…[—pƒnƒ“ƒhƒ‰
+--- ã€Œãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ãã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒãƒ³ãƒ‰ãƒ©
 function on_open_by_browser_menu_item(serialize_key, event_name, data)
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -608,10 +608,10 @@ function on_open_by_browser_menu_item(serialize_key, event_name, data)
 end
 
 
---- ƒ{ƒfƒBƒŠƒXƒg‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒœãƒ‡ã‚£ãƒªã‚¹ãƒˆã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_body_menu'
--- @param serialize_key ƒ{ƒfƒBƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ãƒœãƒ‡ã‚£ã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 -- @param body          body
 -- @param wnd           wnd
 --
@@ -621,52 +621,52 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	body = MZ3Data:create(body);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 
 	if serialize_key=="2CH_THREAD" then
-		menu:append_menu("string", "ÅV‚Ìˆê——‚ğæ“¾", IDM_CATEGORY_OPEN);
-		menu:append_menu("string", "ƒXƒŒ‚ğŠJ‚­...", menu_items.read_by_reportview);
-		menu:append_menu("string", "ƒuƒ‰ƒEƒU‚ÅŠJ‚­...", menu_items.open_by_browser);
+		menu:append_menu("string", "æœ€æ–°ã®ä¸€è¦§ã‚’å–å¾—", IDM_CATEGORY_OPEN);
+		menu:append_menu("string", "ã‚¹ãƒ¬ã‚’é–‹ã...", menu_items.read_by_reportview);
+		menu:append_menu("string", "ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ã...", menu_items.open_by_browser);
 
 		menu:append_menu("separator");
-		menu:append_menu("string", "ƒvƒƒpƒeƒB...", menu_items.read);
+		menu:append_menu("string", "ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£...", menu_items.read);
 		
-		-- ƒJƒeƒSƒŠ‚Ìí•Ê‚ªu‚¨‹C‚É“ü‚èƒXƒŒv‚¾‚Á‚½‚çíœ‚ğ’Ç‰Á‚·‚éB
-		-- u‚¨‹C‚É“ü‚èƒXƒŒvˆÈŠO‚¾‚Á‚½‚ç’Ç‰Áƒƒjƒ…[‚ğ’Ç‰ÁB
+		-- ã‚«ãƒ†ã‚´ãƒªã®ç¨®åˆ¥ãŒã€ŒãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬ã€ã ã£ãŸã‚‰å‰Šé™¤ã‚’è¿½åŠ ã™ã‚‹ã€‚
+		-- ã€ŒãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬ã€ä»¥å¤–ã ã£ãŸã‚‰è¿½åŠ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’è¿½åŠ ã€‚
 		menu:append_menu("separator");
 		local category_type = mz3_main_view.get_selected_category_access_type();
 		if category_type==mz3.get_access_type_by_key('2CH_BOOKMARK') then
-			menu:append_menu("string", "‚¨‹C‚É“ü‚èƒXƒŒ‚©‚çíœ", menu_items.remove_bookmark);
+			menu:append_menu("string", "ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬ã‹ã‚‰å‰Šé™¤", menu_items.remove_bookmark);
 		else
-			menu:append_menu("string", "‚¨‹C‚É“ü‚èƒXƒŒ‚É’Ç‰Á", menu_items.add_bookmark);
+			menu:append_menu("string", "ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬ã«è¿½åŠ ", menu_items.add_bookmark);
 		end
 
 		menu:append_menu("separator");
-		-- ƒXƒŒ ŒŸõ
-		menu:append_menu("string", "ƒXƒŒŒŸõ", menu_items.search_post_thread);
+		-- ã‚¹ãƒ¬ æ¤œç´¢
+		menu:append_menu("string", "ã‚¹ãƒ¬æ¤œç´¢", menu_items.search_post_thread);
 	elseif serialize_key=="2CH_SUBJECT" then
-		-- ”z‰º‚Ì”Âˆê——‚ğ•\¦
+		-- é…ä¸‹ã®æ¿ä¸€è¦§ã‚’è¡¨ç¤º
 		n = body:get_link_list_size();
 		if n > 0 then
 			for i=0, n-1 do
-				id = menu_items.select_bbs[i];		-- –{—ˆ‚ÍƒCƒ“ƒfƒbƒNƒXŒŸ¸‚·‚×‚«
+				id = menu_items.select_bbs[i];		-- æœ¬æ¥ã¯ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹æ¤œæŸ»ã™ã¹ã
 				menu:append_menu("string", "" .. body:get_link_list_text(i), id);
 			end
 			menu:append_menu("separator");
 		end
 		
-		-- ”ÂŒŸõ
-		menu:append_menu("string", "”ÂŒŸõ", menu_items.search_post_bbs);
+		-- æ¿æ¤œç´¢
+		menu:append_menu("string", "æ¿æ¤œç´¢", menu_items.search_post_bbs);
 	end
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	
 	return true;
@@ -674,12 +674,12 @@ end
 mz3.add_event_listener("popup_body_menu",  "2ch.on_popup_body_menu");
 
 
---- ƒŒƒ|[ƒgƒrƒ…[‚Ìƒ|ƒbƒvƒAƒbƒvƒƒjƒ…[•\¦
+--- ãƒ¬ãƒãƒ¼ãƒˆãƒ“ãƒ¥ãƒ¼ã®ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤º
 --
 -- @param event_name    'popup_report_menu'
--- @param serialize_key ƒŒƒ|[ƒgƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
--- @param report_item   ƒŒƒ|[ƒgƒAƒCƒeƒ€
--- @param sub_item_idx  ‘I‘ğƒAƒCƒeƒ€‚ÌƒCƒ“ƒfƒbƒNƒX
+-- @param serialize_key ãƒ¬ãƒãƒ¼ãƒˆã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
+-- @param report_item   ãƒ¬ãƒãƒ¼ãƒˆã‚¢ã‚¤ãƒ†ãƒ 
+-- @param sub_item_idx  é¸æŠã‚¢ã‚¤ãƒ†ãƒ ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 -- @param wnd           wnd
 --
 --[[
@@ -688,36 +688,36 @@ function on_popup_report_menu(event_name, serialize_key, report_item, sub_item_i
 		return false;
 	end
 
-	-- ƒCƒ“ƒXƒ^ƒ“ƒX‰»
+	-- ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
 	report_item = MZ3Data:create(report_item);
 	
-	-- ƒƒjƒ…[¶¬
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ
 	menu = MZ3Menu:create_popup_menu();
 	menu_edit = MZ3Menu:create_popup_menu();
 	menu_layout = MZ3Menu:create_popup_menu();
 	
-	menu:append_menu("string", "–ß‚é", ID_BACK_MENU);
+	menu:append_menu("string", "æˆ»ã‚‹", ID_BACK_MENU);
 	menu:append_menu("separator");
 	
-	menu:append_menu("string", "•ÔM", ID_WRITE_COMMENT);
+	menu:append_menu("string", "è¿”ä¿¡", ID_WRITE_COMMENT);
 
-	menu:append_menu("string", "Ä“Ç", IDM_RELOAD_PAGE);
+	menu:append_menu("string", "å†èª­è¾¼", IDM_RELOAD_PAGE);
 
-	menu_edit:append_menu("string", "ƒRƒs[", ID_EDIT_COPY);
-	menu:append_submenu("•ÒW", menu_edit);
+	menu_edit:append_menu("string", "ã‚³ãƒ”ãƒ¼", ID_EDIT_COPY);
+	menu:append_submenu("ç·¨é›†", menu_edit);
 	
-	menu:append_menu("string", "ƒuƒ‰ƒEƒU‚ÅŠJ‚­i‚±‚Ìƒy[ƒWj...", ID_OPEN_BROWSER);
+	menu:append_menu("string", "ãƒ–ãƒ©ã‚¦ã‚¶ã§é–‹ãï¼ˆã“ã®ãƒšãƒ¼ã‚¸ï¼‰...", ID_OPEN_BROWSER);
 
-	-- TODO ‹¤’Ê‰»
+	-- TODO å…±é€šåŒ–
 	menu:append_menu("separator");
-	menu_layout:append_menu("string", "ªƒŠƒXƒg‚ğ‹·‚­‚·‚é", IDM_LAYOUT_REPORTLIST_MAKE_NARROW);
-	menu_layout:append_menu("string", "«ƒŠƒXƒg‚ğL‚­‚·‚é", IDM_LAYOUT_REPORTLIST_MAKE_WIDE);
-	menu:append_submenu("‰æ–ÊƒŒƒCƒAƒEƒg", menu_layout);
+	menu_layout:append_menu("string", "â†‘ãƒªã‚¹ãƒˆã‚’ç‹­ãã™ã‚‹", IDM_LAYOUT_REPORTLIST_MAKE_NARROW);
+	menu_layout:append_menu("string", "â†“ãƒªã‚¹ãƒˆã‚’åºƒãã™ã‚‹", IDM_LAYOUT_REPORTLIST_MAKE_WIDE);
+	menu:append_submenu("ç”»é¢ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆ", menu_layout);
 
-	-- ƒ|ƒbƒvƒAƒbƒv
+	-- ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
 	menu:popup(wnd);
 	
-	-- ƒƒjƒ…[ƒŠƒ\[ƒXíœ
+	-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒªã‚½ãƒ¼ã‚¹å‰Šé™¤
 	menu:delete();
 	menu_edit:delete();
 	menu_layout:delete();
@@ -729,17 +729,17 @@ mz3.add_event_listener("popup_report_menu",  "gmail.on_popup_report_menu");
 
 
 ----------------------------------------
--- estimate ‘ÎÛ‚É’Ç‰Á
+-- estimate å¯¾è±¡ã«è¿½åŠ 
 ----------------------------------------
 
---- estimate ‘ÎÛ”»•ÊƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- estimate å¯¾è±¡åˆ¤åˆ¥ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
 -- @param event_name 'estimate_access_type_by_url'
--- @param url        ‰ğÍ‘ÎÛURL
+-- @param url        è§£æå¯¾è±¡URL
 --
 function on_estimate_access_type(event_name, url, data1, data2)
 
-    -- óM” 
+    -- å—ä¿¡ç®±
     if string.match(url, 'http://.-\.2ch\.net/') then
 		return true, mz3.get_access_type_by_key('2CH_THREAD');
 	end
@@ -749,12 +749,12 @@ end
 mz3.add_event_listener("estimate_access_type_by_url", "2ch.on_estimate_access_type");
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
@@ -769,12 +769,12 @@ end
 mz3.add_event_listener("get_view_style", "2ch.on_get_view_style");
 
 
---- ƒXƒŒŒŸõ
+--- ã‚¹ãƒ¬æ¤œç´¢
 last_searched_index_thread = 0;
 last_searched_key_thread = '';
 function on_search_post_thread(serialize_key, event_name, data)
 
-	local key = mz3.show_common_edit_dlg("ƒXƒŒŒŸõ", "ŒŸõ‚µ‚½‚¢•¶š—ñ‚ğ“ü—Í‚µ‚Ä‰º‚³‚¢", last_searched_key_thread);
+	local key = mz3.show_common_edit_dlg("ã‚¹ãƒ¬æ¤œç´¢", "æ¤œç´¢ã—ãŸã„æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„", last_searched_key_thread);
 	if key == nil then
 		return false;
 	end
@@ -797,11 +797,11 @@ function on_search_post_thread(serialize_key, event_name, data)
 end
 
 
---- ”ÂŒŸõ
+--- æ¿æ¤œç´¢
 last_searched_key_bbs = '';
 function on_search_post_bbs(serialize_key, event_name, data)
 
-	local key = mz3.show_common_edit_dlg("”ÂŒŸõ", "ŒŸõ‚µ‚½‚¢•¶š—ñ‚ğ“ü—Í‚µ‚Ä‰º‚³‚¢", last_searched_key_bbs);
+	local key = mz3.show_common_edit_dlg("æ¿æ¤œç´¢", "æ¤œç´¢ã—ãŸã„æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„", last_searched_key_bbs);
 	if key == nil then
 		return false;
 	end
@@ -823,17 +823,17 @@ function on_search_post_bbs(serialize_key, event_name, data)
 end
 
 
---- ƒJƒeƒSƒŠæ“¾‚Ìƒnƒ“ƒhƒ‰
+--- ã‚«ãƒ†ã‚´ãƒªå–å¾—æ™‚ã®ãƒãƒ³ãƒ‰ãƒ©
 --
 -- @param event_name    'retrieve_category_item'
--- @param serialize_key ƒJƒeƒSƒŠƒAƒCƒeƒ€‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã‚¢ã‚¤ãƒ†ãƒ ã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
 function on_retrieve_category_item(event_name, serialize_key, body, wnd)
 	if serialize_key~="2CH_BOOKMARK" then
 		return false;
 	end
 	
-	-- ƒuƒbƒNƒ}[ƒN‘‚«Š·‚¦
+	-- ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯æ›¸ãæ›ãˆ
 	local list = mz3_main_view.get_body_item_list();
 	list = MZ3DataList:create(list);
 
@@ -841,12 +841,12 @@ function on_retrieve_category_item(event_name, serialize_key, body, wnd)
 
 	local f = io.open(bookmark_file_path, "r");
 	if f~= nil then
-		-- ‘SŒæ“¾
+		-- å…¨ä»¶å–å¾—
 		local file = f:read('*a');
 		f:close();
 		
 		for url, title, thread_name in file:gmatch("(.-)\t(.-)\t(.-)\n") do
-			-- data ¶¬
+			-- data ç”Ÿæˆ
 			data = MZ3Data:create();
 			
 			type = mz3.get_access_type_by_key('2CH_THREAD');
@@ -858,29 +858,29 @@ function on_retrieve_category_item(event_name, serialize_key, body, wnd)
 			data:set_text('url', url);
 			data:set_text('browse_uri', url);
 
-			-- ƒŠƒXƒg‚É’Ç‰Á
+			-- ãƒªã‚¹ãƒˆã«è¿½åŠ 
 			list:add(data.data);
 			
-			-- data íœ
+			-- data å‰Šé™¤
 			data:delete();
 		end
 	end
 
-	-- ƒuƒbƒNƒ}[ƒN‚Íƒ[ƒJƒ‹ƒXƒgƒŒ[ƒW
+	-- ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã¯ãƒ­ãƒ¼ã‚«ãƒ«ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸
 	return true, RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE;
 end
 mz3.add_event_listener("retrieve_category_item", "2ch.on_retrieve_category_item");
 
 
---- ‚¨‹C‚É“ü‚èƒXƒŒ’Ç‰Á
+--- ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬è¿½åŠ 
 function on_add_bookmark(serialize_key, event_name, data)
 
-	-- ’Ç‰Á€–Úæ“¾•ƒTƒjƒ^ƒCƒWƒ“ƒO
+	-- è¿½åŠ é …ç›®å–å¾—ï¼†ã‚µãƒ‹ã‚¿ã‚¤ã‚¸ãƒ³ã‚°
 	local body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	local category = MZ3Data:create(mz3_main_view.get_selected_category_item());
 	
 	local thread_name = category:get_text('name');
-	thread_name = thread_name:gsub('„¤', '');
+	thread_name = thread_name:gsub('â””', '');
 	thread_name = thread_name:gsub("\n", "");
 	
 	local new_url = body:get_text('url');
@@ -890,50 +890,50 @@ function on_add_bookmark(serialize_key, event_name, data)
 
 	local new_item_line = new_url .. "\t" .. new_title .. "\t" .. thread_name;
 
-	-- ‘¶İƒ`ƒFƒbƒN
+	-- å­˜åœ¨ãƒã‚§ãƒƒã‚¯
 	local f = io.open(bookmark_file_path, "r");
 	if f~= nil then
-		-- ‘SŒæ“¾
+		-- å…¨ä»¶å–å¾—
 		local file = f:read('*a');
 		f:close();
 		
 		for url, title, thread_name in file:gmatch("(.-)\t(.-)\t(.-)\n") do
 			if url==new_url then
-				mz3.alert(new_title .. '‚ÍŠù‚É“o˜^‚³‚ê‚Ä‚¢‚Ü‚·');
+				mz3.alert(new_title .. 'ã¯æ—¢ã«ç™»éŒ²ã•ã‚Œã¦ã„ã¾ã™');
 				return;
 			end
 		end
 	end
 	
 	
-	-- ’Ç‰Á
+	-- è¿½åŠ 
 	f = io.open(bookmark_file_path, "a");
 	if f~=nil then
 		f:write(new_item_line .. "\n");
 		f:close();
 		
-		mz3.alert(new_title .. "‚ğ’Ç‰Á‚µ‚Ü‚µ‚½B");
+		mz3.alert(new_title .. "ã‚’è¿½åŠ ã—ã¾ã—ãŸã€‚");
 	end
 end
 
 
---- ‚¨‹C‚É“ü‚èƒXƒŒíœ
+--- ãŠæ°—ã«å…¥ã‚Šã‚¹ãƒ¬å‰Šé™¤
 function on_remove_bookmark(serialize_key, event_name, data)
 
-	-- íœ‘ÎÛæ“¾
+	-- å‰Šé™¤å¯¾è±¡å–å¾—
 	local body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	
 	local target_url = body:get_text('url');
 	local target_title = body:get_text('title');
 
-	-- íœ‚µ‚Â‚Âì¬
+	-- å‰Šé™¤ã—ã¤ã¤ä½œæˆ
 	local f = io.open(bookmark_file_path, "r");
 	if f~= nil then
-		-- ‘SŒæ“¾
+		-- å…¨ä»¶å–å¾—
 		local file = f:read('*a');
 		f:close();
 		
-		-- íœ
+		-- å‰Šé™¤
 		f = io.open(bookmark_file_path, "w");
 		if f~=nil then
 			local deleted = false;
@@ -948,9 +948,9 @@ function on_remove_bookmark(serialize_key, event_name, data)
 			f:close();
 			
 			if deleted then
-				mz3.alert(target_title .. " ‚ğíœ‚µ‚Ü‚µ‚½B");
+				mz3.alert(target_title .. " ã‚’å‰Šé™¤ã—ã¾ã—ãŸã€‚");
 			else
-				mz3.alert(target_title .. " ‚ÍíœÏ‚İ‚Å‚·B");
+				mz3.alert(target_title .. " ã¯å‰Šé™¤æ¸ˆã¿ã§ã™ã€‚");
 			end
 		end
 	end

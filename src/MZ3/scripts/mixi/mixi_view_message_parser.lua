@@ -9,49 +9,49 @@
 module("mixi", package.seeall)
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
--- TODO ƒzƒXƒg‘¤‚Åİ’è‚µ‚Ä‚¢‚é‚ªA–{—ˆ‚Í‚±‚¿‚ç‚Åİ’è‚·‚×‚«B
---      ‚½‚¾‚µA
---      inbox, outbox ƒp[ƒT‚æ‚è‚àæ‚É“o˜^‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢A
---      estimate ‘ÎÛ‚É‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢A‚È‚Ç‚Ì‰Û‘èƒAƒŠB
+-- TODO ãƒ›ã‚¹ãƒˆå´ã§è¨­å®šã—ã¦ã„ã‚‹ãŒã€æœ¬æ¥ã¯ã“ã¡ã‚‰ã§è¨­å®šã™ã¹ãã€‚
+--      ãŸã ã—ã€
+--      inbox, outbox ãƒ‘ãƒ¼ã‚µã‚ˆã‚Šã‚‚å…ˆã«ç™»éŒ²ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ã€
+--      estimate å¯¾è±¡ã«ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ã€ãªã©ã®èª²é¡Œã‚¢ãƒªã€‚
 
 
 --------------------------------------------------
--- ymixi ƒƒbƒZ[ƒWÚ×z
--- [content] view_message.pl —pƒp[ƒT
+-- ã€mixi ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è©³ç´°ã€‘
+-- [content] view_message.pl ç”¨ãƒ‘ãƒ¼ã‚µ
 --
 -- http://mixi.jp/view_message.pl
 --
--- ˆø”:
---   data:  ãƒyƒCƒ“‚ÌƒIƒuƒWƒFƒNƒgŒQ(MZ3Data*)
+-- å¼•æ•°:
+--   data:  ä¸Šãƒšã‚¤ãƒ³ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç¾¤(MZ3Data*)
 --   dummy: NULL
---   html:  HTMLƒf[ƒ^(CHtmlArray*)
+--   html:  HTMLãƒ‡ãƒ¼ã‚¿(CHtmlArray*)
 --------------------------------------------------
 function mixi_view_message_parser(data, dummy, html)
 	mz3.logger_debug("mixi_view_message_parser start");
 	local t1 = mz3.get_tick_count();
 
-	-- wrapperƒNƒ‰ƒX‰»
+	-- wrapperã‚¯ãƒ©ã‚¹åŒ–
 	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 
-	-- s”æ“¾
+	-- è¡Œæ•°å–å¾—
 	local line_count = html:get_count();
 	for i=250, line_count-1 do
 		line = html:get_at(i);
 
-		-- “ú•t’Šo
-		-- <dt>“ú•t</dt>
-		-- <dd>2008”N11Œ12“ú 1113•ª</dd>
-		if line_has_strings(line, "<dt>“ú•t</dt>") then
+		-- æ—¥ä»˜æŠ½å‡º
+		-- <dt>æ—¥ä»˜</dt>
+		-- <dd>2008å¹´11æœˆ12æ—¥ 11æ™‚13åˆ†</dd>
+		if line_has_strings(line, "<dt>æ—¥ä»˜</dt>") then
 			line1 = html:get_at(i+1);
 			
-			-- Œ`®‚ª“Áê‚È‚Ì‚Å’¼Úİ’è‚·‚é
+			-- å½¢å¼ãŒç‰¹æ®Šãªã®ã§ç›´æ¥è¨­å®šã™ã‚‹
 			data:set_date(line1:match("<dd>(.*)</dd>"));
 		end
 
-		-- ·olID’Šo
+		-- å·®å‡ºäººIDæŠ½å‡º
 		if line_has_strings(line, "<a", "href=", "show_friend.pl?id=", "\">", "</a>") then
 			--mz3.logger_debug(line);
 			id = line:match("\?id=([^\"]+)\"");
@@ -60,29 +60,29 @@ function mixi_view_message_parser(data, dummy, html)
 			data:set_integer("owner_id", id);
 		end
 
-		-- –{•¶’Šo
+		-- æœ¬æ–‡æŠ½å‡º
 		if line_has_strings(line, "<div", "class=", "messageDetailBody" ) then
 
 			data:add_text_array("body", "\r\n");
 
-			-- ®Œ`‚µ‚Ä’Ç‰Á
+			-- æ•´å½¢ã—ã¦è¿½åŠ 
 			data:add_body_with_extract(line);
 
-			-- </div> ‚ª‘¶İ‚·‚ê‚ÎI—¹B
+			-- </div> ãŒå­˜åœ¨ã™ã‚Œã°çµ‚äº†ã€‚
 			if line_has_strings(line, "</div") then
-				mz3.logger_debug("š</div>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·(1)");
+				mz3.logger_debug("â˜…</div>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™(1)");
 				break;
 			end
 
-			-- •’Ê‚ÌƒƒbƒZ[ƒW
+			-- æ™®é€šã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 			for j=i+1, line_count-1 do
 				line = html:get_at(j);
 
-				-- ®Œ`‚µ‚Ä’Ç‰Á
+				-- æ•´å½¢ã—ã¦è¿½åŠ 
 				data:add_body_with_extract(line);
 				
 				if line_has_strings(line, "</div") then
-					mz3.logger_debug("š</div>‚ªŒ©‚Â‚©‚Á‚½‚Ì‚ÅI—¹‚µ‚Ü‚·(2)");
+					mz3.logger_debug("â˜…</div>ãŒè¦‹ã¤ã‹ã£ãŸã®ã§çµ‚äº†ã—ã¾ã™(2)");
 					break;
 				end
 			end
@@ -98,7 +98,7 @@ end
 
 
 ----------------------------------------
--- ƒp[ƒT‚Ì“o˜^
+-- ãƒ‘ãƒ¼ã‚µã®ç™»éŒ²
 ----------------------------------------
--- óM” 
+-- å—ä¿¡ç®±
 mz3.set_parser("MIXI_MESSAGE", "mixi.mixi_view_message_parser");

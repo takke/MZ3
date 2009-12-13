@@ -12,46 +12,46 @@ mz3.logger_debug('RSS.lua start');
 module("RSS", package.seeall)
 
 ----------------------------------------
--- ƒT[ƒrƒX‚Ì“o˜^(ƒ^ƒu‰Šú‰»—p)
+-- ã‚µãƒ¼ãƒ“ã‚¹ã®ç™»éŒ²(ã‚¿ãƒ–åˆæœŸåŒ–ç”¨)
 ----------------------------------------
 mz3.regist_service('RSS', true);
 
 ----------------------------------------
--- ƒAƒNƒZƒXí•Ê‚Ì“o˜^
+-- ã‚¢ã‚¯ã‚»ã‚¹ç¨®åˆ¥ã®ç™»éŒ²
 ----------------------------------------
 -- TODO
 
 ----------------------------------------
--- ƒƒjƒ…[€–Ú“o˜^(Ã“I‚É—pˆÓ‚·‚é‚±‚Æ)
+-- ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ç™»éŒ²(é™çš„ã«ç”¨æ„ã™ã‚‹ã“ã¨)
 ----------------------------------------
 menu_items = {}
 -- TODO
 
 
 ----------------------------------------
--- ƒT[ƒrƒX—pŠÖ”
+-- ã‚µãƒ¼ãƒ“ã‚¹ç”¨é–¢æ•°
 ----------------------------------------
 
 ----------------------------------------
--- ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 ----------------------------------------
 
---- ƒfƒtƒHƒ‹ƒg‚ÌƒOƒ‹[ƒvƒŠƒXƒg¶¬ƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰
+--- ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚°ãƒ«ãƒ¼ãƒ—ãƒªã‚¹ãƒˆç”Ÿæˆã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
 --
--- @param serialize_key ƒVƒŠƒAƒ‰ƒCƒYƒL[(nil)
+-- @param serialize_key ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼(nil)
 -- @param event_name    'creating_default_group'
 -- @param group         MZ3GroupData
 --
 function on_creating_default_group(serialize_key, event_name, group)
 
-	-- ƒTƒ|[ƒg‚·‚éƒT[ƒrƒXí•Ê‚Ìæ“¾(ƒXƒy[ƒX‹æØ‚è)
+	-- ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã‚µãƒ¼ãƒ“ã‚¹ç¨®åˆ¥ã®å–å¾—(ã‚¹ãƒšãƒ¼ã‚¹åŒºåˆ‡ã‚Š)
 	services = mz3_group_data.get_services(group);
 	if services:find(' RSS', 1, true) ~= nil then
 
-		-- RSSƒ^ƒu’Ç‰Á
+		-- RSSã‚¿ãƒ–è¿½åŠ 
 		local tab = MZ3GroupItem:create("RSS");
-		tab:append_category("‚Í‚Äƒu Å‹ß‚Ìl‹CƒGƒ“ƒgƒŠ[", "RSS_FEED", "http://b.hatena.ne.jp/hotentry?mode=rss");
---		tab:append_category("‚µ‚å‚±‚½‚ñ™‚Ô‚ë‚®", "RSS_FEED", "http://blog.excite.co.jp/shokotan/index.xml");
+		tab:append_category("ã¯ã¦ãƒ– æœ€è¿‘ã®äººæ°—ã‚¨ãƒ³ãƒˆãƒªãƒ¼", "RSS_FEED", "http://b.hatena.ne.jp/hotentry?mode=rss");
+--		tab:append_category("ã—ã‚‡ã“ãŸã‚“â˜†ã¶ã‚ã", "RSS_FEED", "http://blog.excite.co.jp/shokotan/index.xml");
 		tab:append_category("CNET Japan", "RSS_FEED", "http://japan.cnet.com/rss/index.rdf");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
@@ -60,12 +60,12 @@ end
 mz3.add_event_listener("creating_default_group", "RSS.on_creating_default_group", false);
 
 
---- ViewStyle •ÏX
+--- ViewStyle å¤‰æ›´
 --
 -- @param event_name    'get_view_style'
--- @param serialize_key ƒJƒeƒSƒŠ‚ÌƒVƒŠƒAƒ‰ƒCƒYƒL[
+-- @param serialize_key ã‚«ãƒ†ã‚´ãƒªã®ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã‚­ãƒ¼
 --
--- @return (1) [bool] ¬Œ÷‚Í true, ‘±s‚Í false
+-- @return (1) [bool] æˆåŠŸæ™‚ã¯ true, ç¶šè¡Œæ™‚ã¯ false
 -- @return (2) [int] VIEW_STYLE_*
 --
 function on_get_view_style(event_name, serialize_key)
