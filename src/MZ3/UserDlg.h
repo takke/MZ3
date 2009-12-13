@@ -4,7 +4,6 @@
  * http://www.mz3.jp/license.txt
  */
 #pragma once
-#include "c:\program files\microsoft visual studio 8\vc\atlmfc\include\afxwin.h"
 
 
 // CUserDlg ダイアログ
