@@ -633,22 +633,36 @@ int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output )
 /// UTF-8‚©‚çUCS2(SJIS)‚Ö‚Ì•ÏŠ·
 int utf8_to_ucs2( const kf_buf_type& input, std::vector<wchar_t>& output )
 {
+	return utf8_to_ucs2((const char*)&input[0], output, input.size());
+}
+
+/// UTF-8‚©‚çUCS2(SJIS)‚Ö‚Ì•ÏŠ·
+int utf8_to_ucs2( const char* input, std::vector<wchar_t>& output, int input_length/*=-1*/ )
+{
 	LPSTR pszUTF8 = NULL;
 	bool bUtf8withBOM = false;
 
-	pszUTF8 = (LPSTR)calloc( input.size(), sizeof(char) );
+	if (input_length < 0) {
+		input_length = strlen(input);
+	}
+
+	pszUTF8 = (LPSTR)calloc( input_length, sizeof(char) );
 	if ( pszUTF8 == NULL ) {
 		return -1;
 	}
 
 	// BOM”»’è
-	if ( (unsigned char)input[0] == 0xEF && (unsigned char)input[1] == 0xBB && (unsigned char)input[2] == 0xBF ) {
+	if (input_length>=3 &&
+		(unsigned char)input[0] == 0xEF &&
+		(unsigned char)input[1] == 0xBB &&
+		(unsigned char)input[2] == 0xBF)
+	{
 		bUtf8withBOM = true;
 	} else {
 		bUtf8withBOM = false;
 	}
 
-	CStringA strUtf8( bUtf8withBOM ? (LPSTR)&input[0]+3 : (LPSTR)&input[0], bUtf8withBOM ? input.size()-3 : input.size() );
+	CStringA strUtf8( bUtf8withBOM ? (LPSTR)&input[0]+3 : (LPSTR)&input[0], bUtf8withBOM ? input_length-3 : input_length );
 
 	// UTF-8 ‚©‚ç UCS-2 ‚É•ÏŠ·‚µ‚½•¶Žš—ñ‚Ì’·‚³‚ðŒvŽZ
 	int nUCS2Length = MultiByteToWideChar(CP_UTF8, 0, strUtf8, -1, NULL, 0 );

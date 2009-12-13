@@ -11,6 +11,7 @@
 #include "util_mz3.h"
 #include "util_gui.h"
 #include "MainFrm.h"
+#include "kfm.h"
 
 /// MZ3 用ユーティリティ
 namespace util
@@ -430,7 +431,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 
 			switch (rdata.m_type) {
 			case MyLuaData::MyLuaDataType_String:
-				rdata.m_strText = lua_tostring(L, idx);
+				rdata.m_strText = CStringA(MyUTF82WCS2(lua_tostring(L, idx)));
 				break;
 			case MyLuaData::MyLuaDataType_Integer:
 				rdata.m_number = lua_tointeger(L, idx);

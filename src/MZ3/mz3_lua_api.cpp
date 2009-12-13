@@ -54,7 +54,7 @@ function mz3.get_app_name()
 int lua_mz3_get_app_name(lua_State *L)
 {
 	// 結果をスタックに積む
-	lua_pushstring(L, CStringA(MZ3_APP_NAME));
+	lua_pushstring(L, MyWCS2UTF8(MZ3_APP_NAME));
 
 	// 戻り値の数を返す
 	return 1;
@@ -70,7 +70,7 @@ function mz3.get_app_version()
 int lua_mz3_get_app_version(lua_State *L)
 {
 	// 結果をスタックに積む
-	lua_pushstring(L, CStringA(MZ3_VERSION_TEXT_SHORT));
+	lua_pushstring(L, MyWCS2UTF8(MZ3_VERSION_TEXT_SHORT));
 
 	// 戻り値の数を返す
 	return 1;
@@ -109,7 +109,7 @@ function mz3.logger_error(msg)
 int lua_mz3_logger_error(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
+	s.Append( MyUTF82WCS2(lua_tostring(L, -1)) );
 
 	MZ3LOGGER_ERROR(s);
 
@@ -126,7 +126,7 @@ function mz3.logger_info(msg)
 int lua_mz3_logger_info(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
+	s.Append( MyUTF82WCS2(lua_tostring(L, -1)) );
 
 	MZ3LOGGER_INFO(s);
 
@@ -143,7 +143,7 @@ function mz3.logger_debug(msg)
 int lua_mz3_logger_debug(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
+	s.Append( MyUTF82WCS2(lua_tostring(L, -1)) );
 
 	MZ3LOGGER_DEBUG(s);
 
@@ -160,7 +160,7 @@ function mz3.trace(msg)
 int lua_mz3_trace(lua_State *L)
 {
 	CString s( MZ3_LUA_LOGGER_HEADER );
-	s.Append( CString(lua_tostring(L, -1)) );
+	s.Append( MyUTF82WCS2(lua_tostring(L, -1)) );
 
 	MZ3_TRACE(s);
 
@@ -193,8 +193,8 @@ function mz3.alert(msg, title)
 */
 int lua_mz3_alert(lua_State *L)
 {
-	CString msg(lua_tostring(L, 1));		// 第1引数
-	CString title(lua_tostring(L, 2));		// 第2引数
+	CString msg = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
+	CString title = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
 
 	MessageBox(GetActiveWindow(), msg, title, MB_OK);
 
@@ -215,9 +215,9 @@ function mz3.confirm(msg, title, type)
 int lua_mz3_confirm(lua_State *L)
 {
 	const char* func_name = "mz3.confirm";
-	CString msg(lua_tostring(L, 1));		// 第1引数
-	CString title(lua_tostring(L, 2));		// 第2引数
-	CStringA type(lua_tostring(L, 3));		// 第3引数
+	CString  msg   = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
+	CString  title = MyUTF82WCS2(lua_tostring(L, 2));		// 第2引数
+	CStringA type  = lua_tostring(L, 3);					// 第3引数
 
 	UINT uType = MB_YESNO;
 	if (type=="yes_no") {
@@ -250,13 +250,13 @@ function mz3.decode_html_entity(text)
 */
 int lua_mz3_decode_html_entity(lua_State *L)
 {
-	CString value(lua_tostring(L, 1));			// 第1引数
+	CString value = MyUTF82WCS2(lua_tostring(L, 1));			// 第1引数
 
 	// 変換
 	mixi::ParserUtil::ReplaceEntityReferenceToCharacter(value);
 
 	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(value));
+	lua_pushstring(L, MyWCS2UTF8(value));
 
 	// 戻り値の数を返す
 	return 1;
@@ -274,8 +274,8 @@ int lua_mz3_url_encode(lua_State *L)
 {
 	const char* func_name = "mz3.url_encode";
 
-	CString text(lua_tostring(L, 1));			// 第1引数
-	CStringA encoding(lua_tostring(L, 2));		// 第2引数
+	CString text = MyUTF82WCS2(lua_tostring(L, 1));			// 第1引数
+	CStringA encoding(lua_tostring(L, 2));					// 第2引数
 
 	// 変換
 	CString url_encoded_text;
@@ -290,7 +290,7 @@ int lua_mz3_url_encode(lua_State *L)
 	}
 
 	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(url_encoded_text));
+	lua_pushstring(L, MyWCS2UTF8(url_encoded_text));
 
 	// 戻り値の数を返す
 	return 1;
@@ -309,17 +309,19 @@ int lua_mz3_convert_encoding(lua_State *L)
 {
 	const char* func_name = "mz3.convert_encoding";
 
-	CStringA text(lua_tostring(L, 1));				// 第1引数
-	CStringA in_encoding(lua_tostring(L, 2));		// 第2引数
-	CStringA out_encoding(lua_tostring(L, 3));		// 第3引数
+	CString text = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
+	CStringA in_encoding(lua_tostring(L, 2));			// 第2引数
+	CStringA out_encoding(lua_tostring(L, 3));			// 第3引数
 
 	// 変換
 	if (in_encoding == "sjis" && out_encoding == "utf8") {
+		// text is already ucs2
 		CStringA result;
-		kfm::ucs2_to_utf8(CString(text), result);
+		kfm::ucs2_to_utf8(text, result);
 		lua_pushstring(L, result);
 	} else if (in_encoding == "utf8" && out_encoding == "sjis") {
-		kfm::kf_buf_type result;
+		// text is already ucs2
+/*		kfm::kf_buf_type result;
 		kfm::kf_buf_type in_text;
 
 		in_text.resize(text.GetLength()+1);
@@ -327,6 +329,8 @@ int lua_mz3_convert_encoding(lua_State *L)
 
 		kfm::utf8_to_mbcs(in_text, result);
 		lua_pushstring(L, (char*)&result[0]);
+*/
+		lua_pushstring(L, CStringA(text));
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
 		lua_error(L);
@@ -347,7 +351,7 @@ function mz3.make_image_logfile_path_from_url_md5(url)
 */
 int lua_mz3_make_image_logfile_path_from_url_md5(lua_State *L)
 {
-	CString url(lua_tostring(L, 1));				// 第1引数
+	CString url = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
 
 	CStringA path(util::MakeImageLogfilePathFromUrlMD5( url ));
 	lua_pushstring(L, path);
@@ -367,8 +371,8 @@ function mz3.copy_file(from_path, to_path)
 int lua_mz3_copy_file(lua_State *L)
 {
 	// 引数取得
-	CString from_path(lua_tostring(L, 1));
-	CString to_path(lua_tostring(L, 2));
+	CString from_path = MyUTF82WCS2(lua_tostring(L, 1));
+	CString to_path   = MyUTF82WCS2(lua_tostring(L, 2));
 
 	// ファイルコピー
 	CopyFile( from_path, to_path, FALSE/*bFailIfExists, 上書き*/ );
@@ -416,7 +420,7 @@ function mz3.estimate_access_type_by_url(url)
 */
 int lua_mz3_estimate_access_type_by_url(lua_State *L)
 {
-	CString url(lua_tostring(L, 1));			// 第1引数
+	CString url = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
 
 	// 変換
 	ACCESS_TYPE type = util::EstimateAccessTypeByUrl(url);
@@ -738,7 +742,7 @@ function mz3.open_url_by_browser_with_confirm(url)
 */
 int lua_mz3_open_url_by_browser_with_confirm(lua_State *L)
 {
-	CString url(lua_tostring(L, 1));		// 第1引数
+	CString url = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
 
 	util::OpenUrlByBrowserWithConfirm( url );
 	
@@ -753,7 +757,7 @@ function mz3.open_url_by_browser(url)
 */
 int lua_mz3_open_url_by_browser(lua_State *L)
 {
-	CString url(lua_tostring(L, 1));		// 第1引数
+	CString url = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
 
 	util::OpenUrlByBrowser( url );
 	
@@ -779,12 +783,12 @@ function mz3.get_open_file_name(wnd, caption, title, flags, initial_dir, initial
 int lua_mz3_get_open_file_name(lua_State *L)
 {
 	// 引数の取得
-	CWnd* wnd = (CWnd*)lua_touserdata(L, 1);
-	CString title(lua_tostring(L, 2));
-	CString filter0(lua_tostring(L, 3));
-	int flags = lua_tointeger(L, 4);
-	CString initial_dir(lua_tostring(L, 5));
-	CString initial_file(lua_tostring(L, 6));
+	CWnd* wnd            = (CWnd*)lua_touserdata(L, 1);
+	CString title        = MyUTF82WCS2(lua_tostring(L, 2));
+	CString filter0      = MyUTF82WCS2(lua_tostring(L, 3));
+	int flags            = lua_tointeger(L, 4);
+	CString initial_dir  = MyUTF82WCS2(lua_tostring(L, 5));
+	CString initial_file = MyUTF82WCS2(lua_tostring(L, 6));
 
 	// filter の \0 の復元
 	std::vector<WCHAR> szFilter;
@@ -823,7 +827,7 @@ int lua_mz3_get_open_file_name(lua_State *L)
 	ofn.lpstrInitialDir = initial_dir;
 //	if (GetOpenFileName(&ofn) == IDOK) {
 	if (util::GetOpenFileNameEx(&ofn) == IDOK) {
-		lua_pushstring(L, CStringA(szFile));
+		lua_pushstring(L, MyWCS2UTF8(szFile));
 	} else {
 		lua_pushnil(L);
 	}
@@ -855,7 +859,7 @@ int lua_mz3_camera_capture(lua_State *L)
 
 		if (SHCameraCapture(&shcc) == S_OK) {
 			LPCTSTR szFile = shcc.szFile;
-			lua_pushstring(L, CStringA(szFile));
+			lua_pushstring(L, MyWCS2UTF8(szFile));
 		} else {
 			lua_pushnil(L);
 		}
@@ -886,16 +890,16 @@ function mz3.show_common_edit_dlg(caption, msg, initial_text)
 int lua_mz3_show_common_edit_dlg(lua_State *L)
 {
 	// 引数の取得
-	CString title(lua_tostring(L, 1));
-	CString msg(lua_tostring(L, 2));
-	CString initial_text(lua_tostring(L, 3));
+	CString title = MyUTF82WCS2(lua_tostring(L, 1));
+	CString msg   = MyUTF82WCS2(lua_tostring(L, 2));
+	CString initial_text = MyUTF82WCS2(lua_tostring(L, 3));
 
 	CCommonEditDlg dlg;
 	dlg.SetTitle( title );
 	dlg.SetMessage( msg );
 	dlg.mc_strEdit = initial_text;
 	if (dlg.DoModal()==IDOK) {
-		lua_pushstring(L, CStringA(dlg.mc_strEdit));
+		lua_pushstring(L, MyWCS2UTF8(dlg.mc_strEdit));
 	} else {
 		lua_pushnil(L);
 	}
@@ -952,7 +956,8 @@ int lua_mz3_start_write_view(lua_State *L)
 	CStringA write_view_type(lua_tostring(L, 1));
 	MZ3Data* pData = (MZ3Data*)lua_touserdata(L, 2);
 
-	theApp.m_pWriteView->StartWriteView(theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)write_view_type), pData);
+	theApp.m_pWriteView->StartWriteView(
+		theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)write_view_type), pData);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1029,7 +1034,7 @@ int lua_mz3_get_text_length(lua_State *L)
 	const char* func_name = "mz3.get_text_length";
 
 	// 引数取得
-	CString text(lua_tostring(L, 1));
+	CString text = MyUTF82WCS2(lua_tostring(L, 1));
 
 	int length = text.GetLength();
 
@@ -1107,10 +1112,10 @@ int lua_mz3_account_provider_get_value(lua_State *L)
 	std::string param_name   = lua_tostring(L, 2);
 
 	if (param_name=="id") {
-		CStringA v( theApp.m_loginMng.GetId(CString(service_name)) );
+		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetId(CString(service_name)) );
 		lua_pushstring(L, v);
 	} else if (param_name=="password") {
-		CStringA v( theApp.m_loginMng.GetPassword(CString(service_name)) );
+		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetPassword(CString(service_name)) );
 		lua_pushstring(L, v);
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
@@ -1136,7 +1141,7 @@ function mz3_image_cache.get_image_index_by_url(url)
 int lua_mz3_image_cache_get_image_index_by_url(lua_State *L)
 {
 	// 引数の取得
-	CString url(lua_tostring(L, 1));
+	CString url = MyUTF82WCS2(lua_tostring(L, 1));
 
 	CString path = util::MakeImageLogfilePathFromUrlMD5( url );
 	int imageIndex = theApp.m_imageCache.GetImageIndex(path);
@@ -1227,13 +1232,13 @@ int lua_mz3_data_get_text(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
 
 	// 値取得
-	CString value = data->GetTextValue(CString(name));
+	CString value = data->GetTextValue(name);
 
 	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(value));
+	lua_pushstring(L, MyWCS2UTF8(value));
 
 	// 戻り値の数を返す
 	return 1;
@@ -1258,7 +1263,7 @@ int lua_mz3_data_get_date(lua_State *L)
 	}
 
 	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(data->GetDate()));
+	lua_pushstring(L, MyWCS2UTF8(data->GetDate()));
 
 	// 戻り値の数を返す
 	return 1;
@@ -1288,10 +1293,10 @@ int lua_mz3_data_set_date(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* date = lua_tostring(L, 2);			// 第2引数
+	CString date = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
 
 	// 値設定
-	data->SetDate(CString(date));
+	data->SetDate(date);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1314,11 +1319,11 @@ int lua_mz3_data_set_text(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
-	const char* value = lua_tostring(L, 3);			// 第3引数
+	CString name  = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
+	CString value = MyUTF82WCS2(lua_tostring(L, 3));			// 第3引数
 
 	// 値設定
-	data->SetTextValue(CString(name), CString(value));
+	data->SetTextValue(name, value);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1341,14 +1346,14 @@ int lua_mz3_data_get_text_array(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
 	int idx = lua_tointeger(L, 3);					// 第3引数
 
 	// 値取得
-	CString value = data->GetTextArrayValue(CString(name), idx);
+	CString value = data->GetTextArrayValue(name, idx);
 
 	// 結果をスタックに戻す
-	lua_pushstring(L, CStringA(value));
+	lua_pushstring(L, MyWCS2UTF8(value));
 
 	// 戻り値の数を返す
 	return 1;
@@ -1371,10 +1376,10 @@ int lua_mz3_data_get_text_array_size(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
 
 	// 値取得
-	int size = data->GetTextArraySize(CString(name));
+	int size = data->GetTextArraySize(name);
 
 	// 結果をスタックに戻す
 	lua_pushinteger(L, size);
@@ -1400,11 +1405,11 @@ int lua_mz3_data_add_text_array(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
-	const char* value = lua_tostring(L, 3);			// 第3引数
+	CString name  = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
+	CString value = MyUTF82WCS2(lua_tostring(L, 3));	// 第3引数
 
 	// 値設定
-	data->AddTextArray(CString(name), CString(value));
+	data->AddTextArray(name, value);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1427,10 +1432,10 @@ int lua_mz3_data_add_body_with_extract(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* value = lua_tostring(L, 2);			// 第2引数
+	CString value = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
 
 	// 値設定
-	mixi::ParserUtil::AddBodyWithExtract(*data, CString(value));
+	mixi::ParserUtil::AddBodyWithExtract(*data, value);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1453,10 +1458,10 @@ int lua_mz3_data_get_integer(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
 
 	// 値取得
-	int value = data->GetIntValue(CString(name));
+	int value = data->GetIntValue(name);
 
 	// 結果をスタックに戻す
 	lua_pushinteger(L, value);
@@ -1482,11 +1487,11 @@ int lua_mz3_data_set_integer(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
 	int value = lua_tointeger(L, 3);				// 第3引数
 
 	// 値設定
-	data->SetIntValue(CString(name), value);
+	data->SetIntValue(name, value);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1509,10 +1514,10 @@ int lua_mz3_data_get_integer64_as_string(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
 
 	// 値取得
-	INT64 value = data->GetInt64Value(CString(name));
+	INT64 value = data->GetInt64Value(name);
 
 	// 結果をスタックに戻す
 	// 64bit値なので文字列として返す
@@ -1541,11 +1546,11 @@ int lua_mz3_data_set_integer64_from_string(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* name = lua_tostring(L, 2);			// 第2引数
-	const char* value = lua_tostring(L, 3);			// 第3引数
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
+	CStringA value(MyUTF82WCS2(lua_tostring(L, 3)));			// 第3引数
 
 	// 値設定
-	data->SetInt64Value(CString(name), _atoi64(value));
+	data->SetInt64Value(name, _atoi64(value));
 
 	// 戻り値の数を返す
 	return 0;
@@ -1692,10 +1697,10 @@ int lua_mz3_data_parse_date_line(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* szLine = lua_tostring(L, 2);		// 第2引数
+	CString szLine = MyUTF82WCS2(lua_tostring(L, 2));		// 第2引数
 
 	// 日付のパース
-	mixi::ParserUtil::ParseDate(CString(szLine), *data);
+	mixi::ParserUtil::ParseDate(szLine, *data);
 
 	// 戻り値の数を返す
 	return 0;
@@ -1754,7 +1759,7 @@ int lua_mz3_data_get_link_list_url(lua_State *L)
 
 	// 値取得
 	if (0<=idx && (unsigned int)idx<data->m_linkList.size()) {
-		CStringA url( data->m_linkList[idx].url );
+		CStringA url = MyWCS2UTF8( data->m_linkList[idx].url );
 
 		// 結果をスタックに戻す
 		lua_pushstring(L, url);
@@ -1792,7 +1797,7 @@ int lua_mz3_data_get_link_list_text(lua_State *L)
 
 	// 値取得
 	if (0<=idx && (unsigned int)idx<data->m_linkList.size()) {
-		CStringA text( data->m_linkList[idx].text );
+		CStringA text = MyWCS2UTF8( data->m_linkList[idx].text );
 
 		// 結果をスタックに戻す
 		lua_pushstring(L, text);
@@ -1826,14 +1831,14 @@ int lua_mz3_data_add_link_list(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* url = lua_tostring(L, 2);	// 第2引数
-	const char* text = lua_tostring(L, 3);	// 第3引数
-	const char* type = lua_tostring(L, 4);	// 第4引数
+	CString url  = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
+	CString text = MyUTF82WCS2(lua_tostring(L, 3));	// 第3引数
+	const char* type = lua_tostring(L, 4);			// 第4引数
 
 	if (type!=NULL && strcmp(type, "page")==0) {
-		data->m_linkPage.push_back(CMixiData::Link(CString(url), CString(text)));
+		data->m_linkPage.push_back(CMixiData::Link(url, text));
 	} else {
-		data->m_linkList.push_back(CMixiData::Link(CString(url), CString(text)));
+		data->m_linkList.push_back(CMixiData::Link(url, text));
 	}
 
 	// 戻り値の数を返す
@@ -2108,7 +2113,7 @@ int lua_mz3_post_data_set_content_type(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	CString content_type(lua_tostring(L, 2));
+	CString content_type = MyUTF82WCS2(lua_tostring(L, 2));
 
 	// 追加
 	post->SetContentType(content_type);
@@ -2164,7 +2169,7 @@ int lua_mz3_post_data_append_additional_header(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	CString text(lua_tostring(L, 2));
+	CString text = MyUTF82WCS2(lua_tostring(L, 2));
 
 	// 追加
 	post->AppendAdditionalHeader(text);
@@ -2192,7 +2197,7 @@ int lua_mz3_post_data_append_file(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	CString filename(lua_tostring(L, 2));
+	CString filename = MyUTF82WCS2(lua_tostring(L, 2));
 
 	// 追加
 	bool rval = mixi::PostDataGeneratorBase::appendFile(*post, filename);
@@ -2336,11 +2341,11 @@ int lua_mz3_menu_insert_menu(lua_State *L)
 		return 0;
 	}
 	int index = lua_tointeger(L, 2);					// 第2引数
-	const char* title = lua_tostring(L, 3);				// 第3引数
+	CString title = MyUTF82WCS2(lua_tostring(L, 3));	// 第3引数
 	int item_id = lua_tointeger(L, 4);					// 第4引数
 
 	// メニュー作成
-	pMenu->InsertMenu(index, MF_BYPOSITION | MF_STRING, ID_LUA_MENU_BASE +item_id, CString(title));
+	pMenu->InsertMenu(index, MF_BYPOSITION | MF_STRING, ID_LUA_MENU_BASE +item_id, title);
 
 	// 戻り値の数を返す
 	return 0;
@@ -2368,7 +2373,7 @@ int lua_mz3_menu_append_menu(lua_State *L)
 		return 0;
 	}
 	const char* type = lua_tostring(L, 2);				// 第2引数
-	const char* title = lua_tostring(L, 3);				// 第3引数
+	CString title = MyUTF82WCS2(lua_tostring(L, 3));	// 第3引数
 	int item_id = lua_tointeger(L, 4);					// 第4引数
 
 	// メニュー作成
@@ -2404,7 +2409,7 @@ int lua_mz3_menu_append_submenu(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	const char* title = lua_tostring(L, 2);				// 第2引数
+	CString title = MyUTF82WCS2(lua_tostring(L, 2));	// 第2引数
 	CMenu* pSubMenu = (CMenu*)lua_touserdata(L, 3);		// 第3引数
 	if (pSubMenu==NULL) {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
@@ -2413,7 +2418,7 @@ int lua_mz3_menu_append_submenu(lua_State *L)
 	}
 
 	// メニュー作成
-	pMenu->AppendMenu(MF_POPUP, (UINT)pSubMenu->m_hMenu, CString(title));
+	pMenu->AppendMenu(MF_POPUP, (UINT)pSubMenu->m_hMenu, title);
 
 	// 戻り値の数を返す
 	return 0;
@@ -2500,8 +2505,8 @@ int lua_mz3_inifile_get_value(lua_State *L)
 {
 	const char* func_name = "mz3_inifile.get_value";
 
-	const char* name = lua_tostring(L, 1);				// 第1引数
-	const char* section = lua_tostring(L, 2);			// 第2引数
+	CString name    = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
+	CString section = MyUTF82WCS2(lua_tostring(L, 2));		// 第2引数
 
 	// 読込
 	const CString& fileName = theApp.m_filepath.inifile;
@@ -2512,13 +2517,15 @@ int lua_mz3_inifile_get_value(lua_State *L)
 		inifile::StaticMethod::Create( util::my_wcstombs((LPCTSTR)fileName).c_str() );
 	}
 
-	if(! inifile.Load( theApp.m_filepath.inifile ) ) {
+	if (!inifile.Load( theApp.m_filepath.inifile )) {
 		// 結果(エラーなのでnil)をスタックに積む
 		lua_pushnil(L);
 	} else {
 		// 結果をスタックに積む
-		std::string s = inifile.GetValue(name, section);
-		lua_pushstring(L, s.c_str());
+		CStringA name_a(name);
+		CStringA section_a(section);
+		std::string s = inifile.GetValue((const char*)name_a, (const char*)section_a);
+		lua_pushstring(L, MyWCS2UTF8(CString(s.c_str())));
 	}
 
 	// 戻り値の数を返す
@@ -2662,7 +2669,7 @@ int lua_mz3_access_type_info_set_short_title(lua_State *L)
 
 	// 引数取得
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
-	CString short_title(lua_tostring(L, 2));
+	CString short_title = MyUTF82WCS2(lua_tostring(L, 2));
 
 	theApp.m_accessTypeInfo.m_map[access_type].shortText = short_title;
 
@@ -2719,7 +2726,7 @@ int lua_mz3_access_type_info_set_cache_file_pattern(lua_State *L)
 
 	// 引数取得
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
-	CString file_pattern(lua_tostring(L, 2));
+	CString file_pattern = MyUTF82WCS2(lua_tostring(L, 2));
 
 	theApp.m_accessTypeInfo.m_map[access_type].cacheFilePattern = file_pattern;
 
@@ -2778,7 +2785,7 @@ int lua_mz3_access_type_info_set_default_url(lua_State *L)
 
 	// 引数取得
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
-	CString url(lua_tostring(L, 2));
+	CString url = MyUTF82WCS2(lua_tostring(L, 2));
 
 	theApp.m_accessTypeInfo.m_map[access_type].defaultCategoryURL = url;
 
@@ -2808,7 +2815,7 @@ int lua_mz3_access_type_info_set_body_header(lua_State *L)
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
 	int header_no = lua_tointeger(L, 2);
 	const std::string& header_type = lua_tostring(L, 3);
-	CString header_text(lua_tostring(L, 4));
+	CString header_text = MyUTF82WCS2(lua_tostring(L, 4));
 
 	AccessTypeInfo::BodyHeaderColumn col;
 	if (header_type=="date") {
@@ -2858,7 +2865,7 @@ int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
 	// 引数取得
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
 	int line_no = lua_tointeger(L, 2);
-	CString pattern(lua_tostring(L, 3));
+	CString pattern = MyUTF82WCS2(lua_tostring(L, 3));
 
 	switch (line_no) {
 	case 1:	theApp.m_accessTypeInfo.m_map[access_type].bodyIntegratedLinePattern1 = pattern;	break;
@@ -2955,7 +2962,7 @@ int lua_mz3_group_data_get_group_item_by_name(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
-	CString name(lua_tostring(L, 2));
+	CString name = MyUTF82WCS2(lua_tostring(L, 2));
 
 	CGroupItem* pItem = NULL;
 	size_t n = pGroup->groups.size();
@@ -3024,10 +3031,10 @@ int lua_mz3_group_item_create(lua_State *L)
 	const char* func_name = "mz3_group_item.create";
 
 	// 引数取得
-	const char* title = lua_tostring(L, 1);
+	CString title = MyUTF82WCS2(lua_tostring(L, 1));
 
 	CGroupItem* pTab = new CGroupItem();
-	pTab->init(CString(title), L"", ACCESS_GROUP_GENERAL);
+	pTab->init(title, L"", ACCESS_GROUP_GENERAL);
 
 	// 結果をスタックに積む
 	lua_pushlightuserdata(L, pTab);
@@ -3061,15 +3068,15 @@ int lua_mz3_group_item_append_category(lua_State *L)
 //		lua_error(L);
 		return 0;
 	}
-	const char* title = lua_tostring(L, 2);
-	const char* serialize_key = lua_tostring(L, 3);
-	const char* url = lua_tostring(L, 4);
+	CStringA title         (MyUTF82WCS2(lua_tostring(L, 2)));
+	CStringA serialize_key (MyUTF82WCS2(lua_tostring(L, 3)));
+	CStringA url           (MyUTF82WCS2(lua_tostring(L, 4)));
 
 	// アクセス種別の取得
-	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(serialize_key);
+	ACCESS_TYPE type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)serialize_key);
 
 	// 追加
-	Mz3GroupData::appendCategoryByIniData(theApp.m_accessTypeInfo, *pTab, title, type, url);
+	Mz3GroupData::appendCategoryByIniData(theApp.m_accessTypeInfo, *pTab, (const char*)title, type, url);
 
 	// 結果をスタックに積む
 	lua_pushboolean(L, 1);
@@ -3341,8 +3348,8 @@ function mz3_main_view.append_category(title, url, key);
 int lua_mz3_main_view_append_category(lua_State *L)
 {
 	// 引数の取得
-	CString title(lua_tostring(L, 1));
-	CString url(lua_tostring(L, 2));
+	CString title = MyUTF82WCS2(lua_tostring(L, 1));
+	CString url   = MyUTF82WCS2(lua_tostring(L, 2));
 	const char* key = lua_tostring(L, 3);
 
 	ACCESS_TYPE access_type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(key);
@@ -3397,7 +3404,7 @@ function mz3_main_view.set_edit_text(text);
 int lua_mz3_main_view_set_edit_text(lua_State *L)
 {
 	// 引数の取得
-	CString text(lua_tostring(L, 1));
+	CString text = MyUTF82WCS2(lua_tostring(L, 1));
 
 	// 文字列設定
 	theApp.m_pMainView->SetDlgItemText(IDC_STATUS_EDIT, text);
@@ -3418,7 +3425,7 @@ int lua_mz3_main_view_get_edit_text(lua_State *L)
 	theApp.m_pMainView->GetDlgItemText(IDC_STATUS_EDIT, text);
 
 	// 設定
-	lua_pushstring(L, CStringA(text));
+	lua_pushstring(L, MyWCS2UTF8(text));
 
 	// 戻り値の数を返す
 	return 1;
@@ -3434,7 +3441,7 @@ function mz3_main_view.set_info_text(text);
 int lua_mz3_main_view_set_info_text(lua_State *L)
 {
 	// 引数の取得
-	CString text(lua_tostring(L, 1));
+	CString text = MyUTF82WCS2(lua_tostring(L, 1));
 
 	// 文字列設定
 	util::MySetInformationText( theApp.m_pMainView->m_hWnd, text);
@@ -3520,19 +3527,19 @@ int lua_mz3_write_view_get_text(lua_State *L)
 	const char* func_name = "mz3_write_view.get_text";
 
 	// 引数の取得
-	CString name(lua_tostring(L, 1));
+	CString name = MyUTF82WCS2(lua_tostring(L, 1));
 
 	if (name=="title_edit") {
 		CString s;
 		theApp.m_pWriteView->GetDlgItemText(IDC_WRITE_TITLE_EDIT, s);
 
-		lua_pushstring(L, CStringA(s));
+		lua_pushstring(L, MyWCS2UTF8(s));
 	
 	} else if (name=="body_edit") {
 		CString s;
 		theApp.m_pWriteView->GetDlgItemText(IDC_WRITE_BODY_EDIT, s);
 
-		lua_pushstring(L, CStringA(s));
+		lua_pushstring(L, MyWCS2UTF8(s));
 	
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
@@ -3557,8 +3564,8 @@ int lua_mz3_write_view_set_text(lua_State *L)
 	const char* func_name = "mz3_write_view.set_text";
 
 	// 引数の取得
-	CString name(lua_tostring(L, 1));
-	CString value(lua_tostring(L, 2));
+	CString name  = MyUTF82WCS2(lua_tostring(L, 1));
+	CString value = MyUTF82WCS2(lua_tostring(L, 2));
 
 	if (name=="title_edit") {
 		theApp.m_pWriteView->SetDlgItemText(IDC_WRITE_TITLE_EDIT, value);

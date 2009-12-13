@@ -1368,7 +1368,7 @@ function on_click_update_button(event_name, serialize_key)
 			return true;
 		end
 	elseif serialize_key == 'TWITTER_UPDATE' then
-		msg = 'Twitterで発言します。\n'
+		msg = 'Twitterで発言します。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'

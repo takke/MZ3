@@ -82,7 +82,30 @@ int utf8_to_mbcs( const kf_buf_type& input, kf_buf_type& output );
 /// UTF-8‚©‚çUCS2(SJIS)‚Ö‚Ì•ÏŠ·
 int utf8_to_ucs2( const kf_buf_type& input, std::vector<TCHAR>& output );
 
+/// UTF-8‚©‚çUCS2(SJIS)‚Ö‚Ì•ÏŠ·
+int utf8_to_ucs2( const char* input, std::vector<TCHAR>& output, int input_length=-1 );
+
 /// UCS2(SJIS) ‚©‚ç UTF-8 ‚Ö‚Ì•ÏŠ·
 bool ucs2_to_utf8(const CString& strText, CStringA& strResult);
 
+}// namespace kfm
+
+inline CStringA MyWCS2UTF8(const LPCTSTR wcs)
+{
+	if (wcs==NULL) {
+		return NULL;
+	}
+	CStringA utf8;
+	kfm::ucs2_to_utf8(wcs, utf8);
+	return utf8;
+}
+
+inline CStringW MyUTF82WCS2(const char* utf8)
+{
+	if (utf8==NULL) {
+		return NULL;
+	}
+	std::vector<TCHAR> wcs;
+	kfm::utf8_to_ucs2(utf8, wcs);
+	return &wcs[0];
 }
