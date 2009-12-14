@@ -353,8 +353,8 @@ int lua_mz3_make_image_logfile_path_from_url_md5(lua_State *L)
 {
 	CString url = MyUTF82WCS2(lua_tostring(L, 1));		// 第1引数
 
-	CStringA path(util::MakeImageLogfilePathFromUrlMD5( url ));
-	lua_pushstring(L, path);
+	CString path(util::MakeImageLogfilePathFromUrlMD5( url ));
+	lua_pushstring(L, MyWCS2UTF8(path));
 
 	// 戻り値の数を返す
 	return 1;
@@ -2258,7 +2258,7 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 	int index = lua_tointeger(L, 2);							// 第2引数
 
 	// 結果をスタックに積む
-	lua_pushstring(L, CStringA(htmlarray->GetAt(index)));
+	lua_pushstring(L, MyWCS2UTF8(htmlarray->GetAt(index)));
 
 	// 戻り値の数を返す
 	return 1;
@@ -2592,7 +2592,7 @@ int lua_mz3_access_type_info_set_info_type(lua_State *L)
 	} else if (info_type=="other") {
 		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_OTHER;
 	} else {
-		lua_pushstring(L, "サポート外のinfo_typeです");
+		lua_pushstring(L, MyWCS2UTF8(L"サポート外のinfo_typeです"));
 		lua_error(L);
 		return 0;
 	}
@@ -2836,7 +2836,7 @@ int lua_mz3_access_type_info_set_body_header(lua_State *L)
 	case 2:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol2 = col;	break;
 	case 3:	theApp.m_accessTypeInfo.m_map[access_type].bodyHeaderCol3 = col;	break;
 	default:
-		lua_pushstring(L, "header_no は 1～3 のみサポートしています");
+		lua_pushstring(L, MyWCS2UTF8(L"header_no は 1～3 のみサポートしています"));
 		lua_error(L);
 		return 0;
 	}
@@ -2871,7 +2871,7 @@ int lua_mz3_access_type_info_set_body_integrated_line_pattern(lua_State *L)
 	case 1:	theApp.m_accessTypeInfo.m_map[access_type].bodyIntegratedLinePattern1 = pattern;	break;
 	case 2:	theApp.m_accessTypeInfo.m_map[access_type].bodyIntegratedLinePattern2 = pattern;	break;
 	default:
-		lua_pushstring(L, "line_no は 1～2 のみサポートしています");
+		lua_pushstring(L, MyWCS2UTF8(L"line_no は 1～2 のみサポートしています"));
 		lua_error(L);
 		return 0;
 	}
@@ -3354,7 +3354,7 @@ int lua_mz3_main_view_append_category(lua_State *L)
 
 	ACCESS_TYPE access_type = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey(key);
 	if (access_type==ACCESS_INVALID) {
-		lua_pushstring(L, "不正なシリアライズキーです");
+		lua_pushstring(L, MyWCS2UTF8(L"不正なシリアライズキーです"));
 		lua_error(L);
 		return 0;
 	}
