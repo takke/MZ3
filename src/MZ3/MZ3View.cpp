@@ -1445,13 +1445,22 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			MEASUREITEMSTRUCT measureItemStruct;
 			m_bodyList.MeasureItem(&measureItemStruct);
 			MZ3_TRACE(L"アイテムの高さ : %d\n", measureItemStruct.itemHeight);
-			if (measureItemStruct.itemHeight>=64) {
+#ifdef WINCE
+			bool bWM = true;
+#else
+			bool bWM = false;
+#endif
+			int hItem = measureItemStruct.itemHeight;
+			// WM      では 64 48 32 16
+			// Windows では 32 16
+			// で表示する
+			if (bWM && hItem>=64) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList64(), LVSIL_SMALL);
 				iconMode = CBodyListCtrl::ICON_MODE_64;
-			} else if (measureItemStruct.itemHeight>=48) {
+			} else if (bWM && hItem>=48) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList48(), LVSIL_SMALL);
 				iconMode = CBodyListCtrl::ICON_MODE_48;
-			} else if (measureItemStruct.itemHeight>=32) {
+			} else if (hItem>=32) {
 				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
 				iconMode = CBodyListCtrl::ICON_MODE_32;
 			} else {
