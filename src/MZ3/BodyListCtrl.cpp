@@ -30,7 +30,7 @@ namespace INTEGRATED_MODE_STYLE {
 static const int BOX_MARGIN_BOTTOM_PT   = 2;	///< ボックス間マージン(下側)[pt]
 static const int EACH_LINE_MARGIN_PT    = 1;	///< 行間マージン[pt]
 static const int FIRST_LINE_MARGIN_LEFT = 4;	///< 1行目、左マージン
-static const int OTHER_LINE_MARGIN_LEFT = 4+16;	///< 2行目以降、左マージン
+static const int OTHER_LINE_MARGIN_LEFT = 4+4;	///< 2行目以降、左マージン
 };
 
 /* 統合カラムモード
@@ -658,31 +658,34 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 描画
 		rcDraw = rcAllLabels;
 		rcDraw.top    += lfHeightPx +theApp.pt2px(INTEGRATED_MODE_STYLE::EACH_LINE_MARGIN_PT);
-		rcDraw.left   += INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT;
+		rcDraw.left   += theApp.pt2px(INTEGRATED_MODE_STYLE::OTHER_LINE_MARGIN_LEFT);
 		// 左右分割描画
 		csDrawRight = pDC->GetOutputTextExtent( strLine2Right );
 		csDrawAllText = pDC->GetOutputTextExtent( strLine2 );
-		if( csDrawAllText.cx > rcDraw.Width() && csDrawRight.cx < rcDraw.Width() ) {
-			// 二つに分割した文字列を両端に分けて描画する
-			// 左側文字列は右側文字列分を除いた領域に描画する
-			CRect rcDrawLeft( rcDraw );
-			rcDrawLeft.right -= csDrawRight.cx; 
-			pDC->DrawText(strLine2Left,
-				-1,
-				rcDrawLeft,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS);
-			// 右側文字列は右寄せで描画する
-			pDC->DrawText(strLine2Right,
-				-1,
-				rcDraw,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_RIGHT | DT_END_ELLIPSIS);
 
+		if (theApp.m_optionMng.m_bBodyListIntegratedColumnModeLine <= 2) {
+			const int nDrawFlags = DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS;
+			if( csDrawAllText.cx > rcDraw.Width() && csDrawRight.cx < rcDraw.Width() ) {
+				// 二つに分割した文字列を両端に分けて描画する
+				// 左側文字列は右側文字列分を除いた領域に描画する
+				CRect rcDrawLeft( rcDraw );
+				rcDrawLeft.right -= csDrawRight.cx; 
+				pDC->DrawText(strLine2Left, -1, rcDrawLeft, nDrawFlags);
+
+				// 右側文字列は右寄せで描画する
+				pDC->DrawText(strLine2Right, -1, rcDraw, nDrawFlags);
+
+			} else {
+				// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま左詰めで描画する
+				pDC->DrawText(strLine2, -1, rcDraw, nDrawFlags);
+			}
 		} else {
-			// 右側文字列の幅が描画領域より広いならしょうがないのでそのまま左詰めで描画する
-			pDC->DrawText(strLine2,
-				-1,
-				rcDraw,
-				DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS);
+#ifdef WINCE
+			const int nDrawFlags = DT_WORDBREAK | DT_NOPREFIX | DT_LEFT | DT_END_ELLIPSIS;
+#else
+			const int nDrawFlags = DT_WORDBREAK | DT_NOPREFIX | DT_EDITCONTROL | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS;
+#endif
+			pDC->DrawText(strLine2, -1, rcDraw, nDrawFlags);
 		}
 
 		// フォントを戻す
@@ -857,19 +860,19 @@ void CBodyListCtrl::SetHeader(LPCTSTR col1, LPCTSTR col2, LPCTSTR col3)
 
 	if( col1 != NULL ) {
 		this->GetHeaderCtrl()->GetItem(0, &hdi);
-		wcscpy(hdi.pszText, col1);
+		wcsncpy(hdi.pszText, col1, 128);
 		this->GetHeaderCtrl()->SetItem(0, &hdi);
 	}
 
 	if( col2 != NULL ) {
 		this->GetHeaderCtrl()->GetItem(1, &hdi);
-		wcscpy(hdi.pszText, col2);
+		wcsncpy(hdi.pszText, col2, 128);
 		this->GetHeaderCtrl()->SetItem(1, &hdi);
 	}
 
 	if( col3 != NULL ) {
 		this->GetHeaderCtrl()->GetItem(2, &hdi);
-		wcscpy(hdi.pszText, col3);
+		wcsncpy(hdi.pszText, col3, 128);
 		this->GetHeaderCtrl()->SetItem(2, &hdi);
 	}
 }
@@ -1083,7 +1086,8 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
-		lpMeasureItemStruct->itemHeight = lfHeightPx*2 +theApp.pt2px(INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
+		int N = theApp.m_optionMng.m_bBodyListIntegratedColumnModeLine;
+		lpMeasureItemStruct->itemHeight = lfHeightPx*N +theApp.pt2px(INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM_PT)*1;
 	} else {
 		// カラムモード
 		lpMeasureItemStruct->itemHeight = lfHeightPx   +theApp.pt2px(COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
