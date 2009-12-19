@@ -329,7 +329,8 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 								const MyLuaData& pData2=MyLuaData(), 
 								const MyLuaData& pData3=MyLuaData(), 
 								const MyLuaData& pData4=MyLuaData(),
-								const MyLuaData& pData5=MyLuaData()
+								const MyLuaData& pData5=MyLuaData(),
+								const MyLuaData& pData6=MyLuaData()
 								);
 
 // 引用ユーザリストがなければ作成する

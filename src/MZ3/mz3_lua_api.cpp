@@ -87,11 +87,11 @@ function mz3.regist_service(service_name, default_selected)
 int lua_mz3_regist_service(lua_State *L)
 {
 	// 引数の取得
-	const char* name = lua_tostring(L, 1);
+	CStringA name(MyUTF82WCS2(lua_tostring(L, 1)));
 	bool selected = lua_toboolean(L, 2) != 0 ? true : false;
 
 	// 登録
-	theApp.m_luaServices.push_back(CMZ3App::Service(name, selected));
+	theApp.m_luaServices.push_back(CMZ3App::Service((const char*)name, selected));
 
 	// 戻り値の数を返す
 	return 0;
@@ -1082,19 +1082,19 @@ int lua_mz3_account_provider_set_param(lua_State *L)
 	const char* func_name = "mz3_account_provider.set_param";
 
 	// 引数の取得
-	const char* service_name = lua_tostring(L, 1);
-	std::string param_name   = lua_tostring(L, 2);
-	const char* param_value  = lua_tostring(L, 3);
+	CStringA service_name(MyUTF82WCS2(lua_tostring(L, 1)));
+	CStringA param_name(MyUTF82WCS2(lua_tostring(L, 2)));
+	CStringA param_value(MyUTF82WCS2(lua_tostring(L, 3)));
 
 	CMZ3App::AccountData* pData = NULL;
 	for (size_t i=0; i<theApp.m_luaAccounts.size(); i++) {
-		if (theApp.m_luaAccounts[i].service_name==service_name) {
+		if (theApp.m_luaAccounts[i].service_name==(const char*)service_name) {
 			pData = &theApp.m_luaAccounts[i];
 			break;
 		}
 	}
 	if (pData==NULL) {
-		theApp.m_luaAccounts.push_back( CMZ3App::AccountData(service_name) );
+		theApp.m_luaAccounts.push_back( CMZ3App::AccountData((const char*)service_name) );
 
 		pData = &theApp.m_luaAccounts[ theApp.m_luaAccounts.size()-1 ];
 	}
@@ -1568,7 +1568,7 @@ int lua_mz3_data_set_integer64_from_string(lua_State *L)
 		return 0;
 	}
 	CString name = MyUTF82WCS2(lua_tostring(L, 2));			// 第2引数
-	CStringA value(MyUTF82WCS2(lua_tostring(L, 3)));			// 第3引数
+	CStringA value(MyUTF82WCS2(lua_tostring(L, 3)));		// 第3引数
 
 	// 値設定
 	data->SetInt64Value(name, _atoi64(value));
@@ -2162,6 +2162,7 @@ int lua_mz3_post_data_append_post_body(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
+	// URLエンコード済みのはずなので変換不要
 	CStringA text = lua_tostring(L, 2);
 
 	// 追加

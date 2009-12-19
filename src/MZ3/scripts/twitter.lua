@@ -749,12 +749,18 @@ function on_twitter_update(serialize_key, event_name, data)
 	-- モード変更反映(ボタン名称変更)
 	mz3_main_view.update_control_status();
 
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	-- フォーカス移動
 	mz3_main_view.set_focus('edit');
 end
 
 --- 「写真を投稿」メニュー用ハンドラ
 function on_twitter_update_with_twitpic(serialize_key, event_name, data)
+
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	-- ファイル選択画面
 	OFN_EXPLORER = 0x00080000;
@@ -787,6 +793,9 @@ end
 --- 「写真を投稿」メニュー用ハンドラ
 function on_twitter_update_with_twitpic_now(serialize_key, event_name, data)
 
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	-- 撮影画面
 	twitpic_target_file = mz3.camera_capture(mz3_main_view.get_wnd());
 --	mz3.alert(twitpic_target_file);
@@ -808,6 +817,9 @@ end
 
 --- 「返信」メニュー用ハンドラ
 function on_twitter_reply(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_UPDATE);
 
@@ -844,6 +856,9 @@ end
 
 --- 「メッセージ送信」メニュー用ハンドラ
 function on_twitter_new_dm(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	-- モード変更
 	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_TWITTER_DM);
 
@@ -891,7 +906,6 @@ end
 
 --- 「フォローする」メニュー用ハンドラ
 function on_twitter_create_friendships(serialize_key, event_name, data)
-
 	-- 確認
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
@@ -915,6 +929,8 @@ end
 
 --- 「フォローやめる」メニュー用ハンドラ
 function on_twitter_destroy_friendships(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	-- 確認
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
@@ -948,6 +964,9 @@ end
 
 --- 「@xxx のタイムライン」メニュー用ハンドラ
 function on_show_friend_timeline(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('name');
@@ -974,6 +993,9 @@ function on_show_follower_tl_3(serialize_key, event_name, data)	show_follower_tl
 function on_show_follower_tl_4(serialize_key, event_name, data)	show_follower_tl(4) end
 function on_show_follower_tl_5(serialize_key, event_name, data)	show_follower_tl(5) end
 function show_follower_tl(num)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	-- 発言内の num 番目の @xxx ユーザの TL を表示する
 	name = follower_names[num];
 	
@@ -994,6 +1016,8 @@ end
 
 --- 「ReTweet」メニュー用ハンドラ
 function on_retweet_menu_item(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	msg = 'この発言をReTweetしますか？ \r\n'
 	   .. '\r\n'
@@ -1045,33 +1069,32 @@ end
 
 --- 「ホーム」メニュー用ハンドラ
 function on_open_home(serialize_key, event_name, data)
-
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	
 	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name'));
 end
 
 
 --- 「友達のお気に入り」メニュー用ハンドラ
 function on_open_friend_favorites_by_browser(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	
 	mz3.open_url_by_browser_with_confirm("http://twitter.com/" .. body:get_text('name') .. "/favorites");
 end
 
 
 --- 「友達のサイト」メニュー用ハンドラ
 function on_open_friend_site(serialize_key, event_name, data)
-
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	
 	mz3.open_url_by_browser_with_confirm(body:get_text('url'));
 end
 
 
 --- 「友達のお気に入り」メニュー用ハンドラ
 function on_open_friend_favorites(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
@@ -1119,6 +1142,8 @@ end
 
 --- 「前のページを取得」メニュー用ハンドラ
 function on_get_prev_page(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
 
 	-- max_id の探索(log は含まない)
 	local max_id = get_max_id_from_body_list();
@@ -1608,12 +1633,14 @@ mz3.add_event_listener("get_end",  "twitter.on_get_end");
 
 --- ボディリストのポップアップメニュー表示
 --
--- @param event_name    'popup_body_menu'
+-- @param event_name    'popup_body_menu' or others(詳細画面からの場合)
 -- @param serialize_key ボディアイテムのシリアライズキー
 -- @param body          body
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
+	mz3.logger_debug('on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
+
 	if serialize_key~="TWITTER_USER" then
 		return false;
 	end
@@ -1629,7 +1656,12 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	name = body:get_text('name');
 
-	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	if event_name == 'popup_body_menu' then
+		menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	else
+		-- 詳細画面の場合
+		menu:append_menu("string", "メイン画面に戻る", menu_items.show_main_view);
+	end
 	
 	-- N 件未満であれば「前のページを取得」を表示
 	list = mz3_main_view.get_body_item_list();
@@ -1835,6 +1867,9 @@ last_searched_index = 0;
 last_searched_key = '';
 function on_search_post(serialize_key, event_name, data)
 
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
 	local key = mz3.show_common_edit_dlg("発言検索", "検索したい文字列を入力して下さい", last_searched_key);
 	if key == nil then
 		return false;
@@ -2008,14 +2043,15 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	y = y_margin;
 	w = cx - x - x_margin;
 	h = line_height;
-	format = 0;
+	format = DT_LEFT;
 	text = data:get_text('name') .. " / " .. data:get_text('author');
 	g:draw_text(text, x, y, w, h, format);
 
 	-- 日付
 	g:set_color("text", "MainBodyListDefaultText");
 	text = data:get_date();
-	y = y + line_height*1.5;
+	y = y + line_height*1.0;
+	format = DT_RIGHT;
 	g:draw_text(text, x, y, w, h, format);
 
 	-- source
@@ -2023,11 +2059,12 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 --	item = item .. "source : " .. source .. "\r\n";
 	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
 	if s_url ~= nil then
-		text = "source : " .. s_name;
+		text = s_name;
 	else
-		text = "source : " .. source;
+		text = source;
 	end
 	y = y + line_height;
+	format = DT_RIGHT;
 	g:draw_text(text, x, y, w, h, format);
 	--[[
 	if s_url ~= nil then
@@ -2065,8 +2102,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	x = x_margin;
 	y = y + h + y_margin;
 	w = cx - x - x_margin;
-	h_button = 25;
-	h = cy - y - y_margin - h_button - y_margin;
+	h = cy - y - y_margin - y_margin;
 --	g:draw_rect("border", x, y, w, h, "MainBodyListDefaultText");
 	
 	-- その他の情報
@@ -2113,6 +2149,20 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	g:set_color("text", "MainBodyListDefaultText");
 	g:draw_text(item, x, y, w, h, format);
 
+	-- 項目番号(ページ番号風で)
+	local list = mz3_main_view.get_body_item_list();
+	list = MZ3DataList:create(list);
+	local n = list:get_count();
+	idx = mz3_main_view.get_selected_body_item_idx();
+	text = (idx+1) .. ' / ' .. n;
+	g:set_color("text", "MainBodyListDefaultText");
+	x = x_margin;
+	y = cy - 30;
+	w = cx - x - x_margin;
+	h = line_height;
+	format = DT_NOPREFIX + DT_RIGHT;
+	g:draw_text(text, x, y, w, h, format);
+
 	-- 色を戻す
 	g:set_color("text", color_text_org);
 	g:set_color("bk", color_bk_org);
@@ -2120,6 +2170,95 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	return true;
 end
 mz3.add_event_listener("draw_detail_view",  "twitter.on_draw_detail_view");
+
+
+--- 詳細画面のキー押下イベント
+function on_keydown_detail_view(event_name, serialize_key, data, key)
+	mz3.logger_debug('on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+	if key == VK_DOWN or key == VK_UP then
+		local list = mz3_main_view.get_body_item_list();
+		list = MZ3DataList:create(list);
+		local n = list:get_count();
+		
+		idx = mz3_main_view.get_selected_body_item_idx();
+		if key == VK_DOWN then
+			-- 次の項目を表示
+			if idx < n-1 then
+				mz3_main_view.select_body_item(idx+1);
+			end
+		else
+			-- 前の項目を表示
+			if idx >= 1 then
+				mz3_main_view.select_body_item(idx-1);
+			end
+		end
+		data = mz3_main_view.get_selected_body_item();
+		mz3.show_detail_view(data);
+		return true;
+	end
+	
+	if key == VK_RETURN or key == VK_ESCAPE or key == VK_BACK then
+		-- 閉じる
+		mz3.change_view('main_view');
+	end
+	
+	if key == VK_F2 then
+		-- とりあえずボディリストのメニューを表示しておく
+		on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
+	end
+	
+	return true;
+end
+mz3.add_event_listener("keydown_detail_view", "twitter.on_keydown_detail_view");
+
+
+--- 詳細画面のクリックイベント
+function on_click_detail_view(event_name, serialize_key, data, x, y, cx, cy)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+	-- 下側1/2であれば項目移動
+	if y > cy/2 then
+		if x < cx/2 then
+			-- 左側：前の項目を表示
+			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_UP);
+		else
+			-- 右側：次の項目を表示
+			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_DOWN);
+		end
+	else
+		-- 閉じる
+		mz3.change_view('main_view');
+	end
+	
+	return true;
+end
+mz3.add_event_listener("click_detail_view", "twitter.on_click_detail_view");
+
+
+--- 詳細画面の右クリックイベント
+function on_rclick_detail_view(event_name, serialize_key, data, x, y, cx, cy)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+	-- とりあえずボディリストのメニューを表示しておく
+	on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
+	
+	return true;
+end
+mz3.add_event_listener("rclick_detail_view", "twitter.on_rclick_detail_view");
 
 
 mz3.logger_debug('twitter.lua end');

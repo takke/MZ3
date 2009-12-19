@@ -721,9 +721,6 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 	//--- 詳細ビュー
 	{
 		CDetailView* pView = theApp.m_pDetailView;
-
-		// ボタン
-		pView->GetDlgItem(IDC_EXIT_BUTTON)->SetFont( &theApp.m_font );
 	}
 
 	// サイズ変更

@@ -58,7 +58,17 @@ DT_NOPREFIX     = 0x00000800;
 DT_EDITCONTROL  = 0x00002000;
 DT_BOTTOM       = 0x00000008;
 DT_LEFT         = 0x00000000;
+DT_RIGHT        = 0x00000002;
 DT_END_ELLIPSIS = 0x00008000;
+
+-- Key map
+VK_DOWN = 0x28;
+VK_UP   = 0x26;
+VK_RETURN = 0x0D;
+VK_ESCAPE = 0x1B;
+VK_BACK   = 0x08;
+VK_F1     = 0x70;
+VK_F2     = 0x71;
 
 ----------------------------------------------------------------------
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)

@@ -349,7 +349,8 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 								const MyLuaData& data2, 
 								const MyLuaData& data3, 
 								const MyLuaData& data4,
-								const MyLuaData& data5
+								const MyLuaData& data5,
+								const MyLuaData& data6
 								)
 {
 	CStringA strHookFuncName(szFuncName);
@@ -382,7 +383,7 @@ bool CallMZ3ScriptHookFunction2(const char* szEventName, const char* szFuncName,
 	int n_arg = 1;
 	lua_pushstring(L, szEventName);
 
-	MyLuaDataPtr data_args[] = {&data1, &data2, &data3, &data4, &data5, NULL};
+	MyLuaDataPtr data_args[] = {&data1, &data2, &data3, &data4, &data5, &data6, NULL};
 	for (int i=0; data_args[i]!=NULL; i++) {
 		MyLuaDataPtr pData = data_args[i];
 		switch (pData->m_type) {
@@ -459,7 +460,8 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 								 const MyLuaData& data2, 
 								 const MyLuaData& data3, 
 								 const MyLuaData& data4, 
-								 const MyLuaData& data5
+								 const MyLuaData& data5,
+								 const MyLuaData& data6
 								 )
 {
 	if (theApp.m_luaHooks.count((const char*)szEventName)==0) {
@@ -480,7 +482,7 @@ bool CallMZ3ScriptHookFunctions2(const char* szEventName,
 		if (CallMZ3ScriptHookFunction2(szEventName, 
 									   hookFuncNames[i].c_str(), 
 									   pRetValList, 
-									   data1, data2, data3, data4, data5))
+									   data1, data2, data3, data4, data5, data6))
 		{
 			rval = true;
 			break;
