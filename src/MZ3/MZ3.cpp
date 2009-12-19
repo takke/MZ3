@@ -15,6 +15,7 @@
 #include "WriteView.h"
 #include "Ran2View.h"
 #include "DownloadView.h"
+#include "DetailView.h"
 #include "AboutDlg.h"
 #include "util.h"
 #include "util_gui.h"
@@ -319,6 +320,7 @@ BOOL CMZ3App::InitInstance()
 	m_pReportView	= new CReportView;
 	m_pWriteView	= new CWriteView;
 	m_pDownloadView	= new CDownloadView;
+	m_pDetailView	= new CDetailView;
 
 	// ビューの初期化
 	INT viewID = AFX_IDW_PANE_FIRST + 1;
@@ -339,6 +341,11 @@ BOOL CMZ3App::InitInstance()
 	((CView*)m_pDownloadView)->Create(NULL, MZ3_APP_NAME _T(" DownloadView"), WS_CHILD, rect,
 		m_pMainWnd, viewID, &newContext);
 	m_pDownloadView->OnInitialUpdate();
+
+	// 詳細ビューの初期化
+	((CView*)m_pDetailView)->Create(NULL, MZ3_APP_NAME _T(" DetailView"), WS_CHILD, rect,
+		m_pMainWnd, viewID, &newContext);
+	m_pDetailView->OnInitialUpdate();
 
 	// メイン ウィンドウが初期化されたので、表示と更新を行う
 	m_pMainWnd->ShowWindow( SW_SHOW );
@@ -1091,8 +1098,8 @@ bool CMZ3App::LoadSkinSetting()
 	theApp.m_bgImageReportListCtrl.setImageFileName( m_skininfo.strReportListCtrlImageFileName );
 
 	// ブラシの初期化
-	theApp.m_brushMainStatusBar.CreateSolidBrush( m_skininfo.clrMainStatusBG );
-	theApp.m_brushMainEdit.CreateSolidBrush( m_skininfo.clrMainEditBG );
+	theApp.m_brushMainStatusBar.CreateSolidBrush( m_skininfo.getColor("MainStatusBG") );
+	theApp.m_brushMainEdit.CreateSolidBrush( m_skininfo.getColor("MainEditBG") );
 
 	return true;
 }

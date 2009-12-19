@@ -73,6 +73,7 @@
 #define IDC_STATIC_10                   210
 #define IDD_CHOOSE_CLIENT_TYPE_DIALOG   210
 #define IDC_STATIC_11                   211
+#define IDD_DETAILVIEW                  211
 #define IDC_STATIC_12                   212
 #define IDC_STATIC_13                   213
 #define IDC_TOTAL_BYTES_STATIC          214

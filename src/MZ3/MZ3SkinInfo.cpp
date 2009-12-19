@@ -76,61 +76,52 @@ bool CMZ3SkinInfo::loadSkinInifile( LPCTSTR szSkinName )
 		}
 
 		// レポート画面、リストの文字色
-		clrReportListText					= loadColorFromInifile( inifile, clrReportListText, 
-																	"ReportListTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "ReportListText", "ReportListTextColor", SECTION_NAME );
+		
 		// メイン画面、カテゴリコントロールのアクティブ項目の文字色
-		clrMainCategoryListActiveText		= loadColorFromInifile( inifile, clrMainCategoryListActiveText, 
-																	"MainCategoryListActiveTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainCategoryListActiveText", "MainCategoryListActiveTextColor", SECTION_NAME );
+		
 		// メイン画面、カテゴリコントロールの非アクティブ項目の文字色
-		clrMainCategoryListInactiveText		= loadColorFromInifile( inifile, clrMainCategoryListInactiveText, 
-																	"MainCategoryListInactiveTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainCategoryListInactiveText", "MainCategoryListInactiveTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールのデフォルト文字色
-		clrMainBodyListDefaultText			= loadColorFromInifile( inifile, clrMainBodyListDefaultText, 
-																	"MainBodyListDefaultTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainBodyListDefaultText", "MainBodyListDefaultTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの未読文字色
-		clrMainBodyListNonreadText			= loadColorFromInifile( inifile, clrMainBodyListNonreadText, 
-																	"MainBodyListNonreadTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainBodyListNonreadText", "MainBodyListNonreadTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの新着記事の文字色
-		clrMainBodyListNewItemText			= loadColorFromInifile( inifile, clrMainBodyListNewItemText, 
-																	"MainBodyListNewItemTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainBodyListNewItemText", "MainBodyListNewItemTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールのあしあとのマイミクの文字色
-		clrMainBodyListFootprintMyMixiText	= loadColorFromInifile( inifile, clrMainBodyListFootprintMyMixiText, 
-																	"MainBodyListFootprintMyMixiTextColor", SECTION_NAME );
+		setColorFromInifile( inifile, "MainBodyListFootprintMyMixiText", "MainBodyListFootprintMyMixiTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの外部ブログの文字色
-		clrMainBodyListExternalBlogText		= loadColorFromInifile( inifile, clrMainBodyListExternalBlogText, 
-																	"MainBodyListExternalBlogTextColor", SECTION_NAME );
-
+		setColorFromInifile( inifile, "MainBodyListExternalBlogText", "MainBodyListExternalBlogTextColor", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの日付区切り線
-		clrMainBodyListDayBreakLine			= loadColorFromInifile( inifile, clrMainBodyListDayBreakLine, 
-																	"MainBodyListDayBreakLine", SECTION_NAME );
-
+		setColorFromInifile( inifile, "MainBodyListDayBreakLine", "MainBodyListDayBreakLine", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの強調２
-		clrMainBodyListEmphasis2			= loadColorFromInifile( inifile, clrMainBodyListEmphasis2, 
-																	"MainBodyListEmphasis2", SECTION_NAME );
-
+		setColorFromInifile( inifile, "MainBodyListEmphasis2", "MainBodyListEmphasis2", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの強調３
-		clrMainBodyListEmphasis3			= loadColorFromInifile( inifile, clrMainBodyListEmphasis3, 
-																	"MainBodyListEmphasis3", SECTION_NAME );
-
+		setColorFromInifile( inifile, "MainBodyListEmphasis3", "MainBodyListEmphasis3", SECTION_NAME );
+		
 		// メイン画面、ボディコントロールの強調４
-		clrMainBodyListEmphasis4			= loadColorFromInifile( inifile, clrMainBodyListEmphasis4, 
-																	"MainBodyListEmphasis4", SECTION_NAME );
-
+		setColorFromInifile( inifile, "MainBodyListEmphasis4", "MainBodyListEmphasis4", SECTION_NAME );
+		
 		// メイン画面、ステータスバーの背景色
-		clrMainStatusBG						= loadColorFromInifile( inifile, clrMainStatusBG, 
-																	"MainStatusBG", SECTION_NAME);
-
+		setColorFromInifile( inifile, "MainStatusBG", "MainStatusBG", SECTION_NAME);
+		
 		// メイン画面、ステータスバーの文字色
-		clrMainStatusText					= loadColorFromInifile( inifile, clrMainStatusText, 
-																	"MainStatusText", SECTION_NAME);
-
+		setColorFromInifile( inifile, "MainStatusText", "MainStatusText", SECTION_NAME);
+		
 		// メイン画面、エディットコントロールの背景色
-		clrMainEditBG						= loadColorFromInifile( inifile, clrMainEditBG, 
-																	"MainEditBG", SECTION_NAME);
-
+		setColorFromInifile( inifile, "MainEditBG", "MainEditBG", SECTION_NAME);
+		
 		// メイン画面、エディットコントロールの文字色
-		clrMainEditText						= loadColorFromInifile( inifile, clrMainEditText, 
-																	"MainEditText", SECTION_NAME);
+		setColorFromInifile( inifile, "MainEditText", "MainEditText", SECTION_NAME);
 
 		// メイン画面、カテゴリコントロールの枠線有無
 		bMainCategoryListBorder = loadBoolVar(inifile, bMainCategoryListBorder, "MainCategoryListBorder", SECTION_NAME);
@@ -159,23 +150,24 @@ bool CMZ3SkinInfo::setDefaultInfo()
 	strMainCategoryCtrlImageFileName	= L"header.jpg";			// メイン画面のカテゴリコントロール用背景画像ファイル名
 	strReportListCtrlImageFileName		= L"report.jpg";			// レポート画面のリストコントロール用背景画像ファイル名
 
-	clrReportListText					= RGB(0x00, 0x00, 0x00);	// レポート画面、リストの文字色
-	clrMainCategoryListActiveText		= RGB(0xFF, 0x00, 0x00);	// メイン画面、カテゴリコントロールのアクティブ項目の文字色
-	clrMainCategoryListInactiveText		= RGB(0x00, 0x00, 0x00);	// メイン画面、カテゴリコントロールの非アクティブ項目の文字色
-	clrMainBodyListDefaultText			= RGB(0x00, 0x00, 0x00);	// メイン画面、ボディコントロールのデフォルト文字色
-	clrMainBodyListNonreadText			= RGB(0x00, 0x00, 0xFF);	// メイン画面、ボディコントロールの未読文字色
-	clrMainBodyListNewItemText			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの新着記事の文字色
-	clrMainBodyListFootprintMyMixiText	= RGB(0x00, 0x00, 0xFF);	// メイン画面、ボディコントロールのあしあとのマイミクの文字色
-	clrMainBodyListExternalBlogText		= RGB(0x80, 0x80, 0x80);	// メイン画面、ボディコントロールの外部ブログの文字色
-	clrMainBodyListDayBreakLine			= RGB(0xC0, 0xC0, 0xFF);	// メイン画面、ボディコントロールの日付区切り線
-	clrMainBodyListEmphasis2			= RGB(0xFF, 0x00, 0x00);	// メイン画面、ボディコントロールの強調２(デフォルト：赤)
-	clrMainBodyListEmphasis3			= RGB(0x00, 0xA0, 0x00);	// メイン画面、ボディコントロールの強調３(デフォルト：緑)
-	clrMainBodyListEmphasis4			= RGB(0xCC, 0x00, 0xCC);	// メイン画面、ボディコントロールの強調４(デフォルト：ピンク)
+	colorMap.clear();
+	setColor("ReportListText", 					RGB(0x00, 0x00, 0x00));	// レポート画面、リストの文字色
+	setColor("MainCategoryListActiveText",		RGB(0xFF, 0x00, 0x00));	// メイン画面、カテゴリコントロールのアクティブ項目の文字色
+	setColor("MainCategoryListInactiveText",	RGB(0x00, 0x00, 0x00));	// メイン画面、カテゴリコントロールの非アクティブ項目の文字色
+	setColor("MainBodyListDefaultText",			RGB(0x00, 0x00, 0x00));	// メイン画面、ボディコントロールのデフォルト文字色
+	setColor("MainBodyListNonreadText",			RGB(0x00, 0x00, 0xFF));	// メイン画面、ボディコントロールの未読文字色
+	setColor("MainBodyListNewItemText",			RGB(0xFF, 0x00, 0x00));	// メイン画面、ボディコントロールの新着記事の文字色
+	setColor("MainBodyListFootprintMyMixiText",	RGB(0x00, 0x00, 0xFF));	// メイン画面、ボディコントロールのあしあとのマイミクの文字色
+	setColor("MainBodyListExternalBlogText",	RGB(0x80, 0x80, 0x80));	// メイン画面、ボディコントロールの外部ブログの文字色
+	setColor("MainBodyListDayBreakLine",		RGB(0xC0, 0xC0, 0xFF));	// メイン画面、ボディコントロールの日付区切り線
+	setColor("MainBodyListEmphasis2",			RGB(0xFF, 0x00, 0x00));	// メイン画面、ボディコントロールの強調２(デフォルト：赤)
+	setColor("MainBodyListEmphasis3",			RGB(0x00, 0xA0, 0x00));	// メイン画面、ボディコントロールの強調３(デフォルト：緑)
+	setColor("MainBodyListEmphasis4",			RGB(0xCC, 0x00, 0xCC));	// メイン画面、ボディコントロールの強調４(デフォルト：ピンク)
 
-	clrMainStatusBG						= RGB(0xEE, 0xEE, 0xEE);	// メイン画面、ステータスバーの背景色
-	clrMainStatusText					= RGB(0x00, 0x00, 0x00);	// メイン画面、ステータスバーの文字色
-	clrMainEditBG						= RGB(0xFF, 0xFF, 0xFF);	// メイン画面、エディットコントロールの背景色
-	clrMainEditText						= RGB(0x00, 0x00, 0x00);	// メイン画面、エディットコントロールの文字色
+	setColor("MainStatusBG",					RGB(0xEE, 0xEE, 0xEE));	// メイン画面、ステータスバーの背景色
+	setColor("MainStatusText",					RGB(0x00, 0x00, 0x00));	// メイン画面、ステータスバーの文字色
+	setColor("MainEditBG",						RGB(0xFF, 0xFF, 0xFF));	// メイン画面、エディットコントロールの背景色
+	setColor("MainEditText",					RGB(0x00, 0x00, 0x00));	// メイン画面、エディットコントロールの文字色
 
 	bMainCategoryListBorder = true;			// メイン画面、カテゴリコントロールの枠線有無
 	bMainBodyListBorder		= true;			// メイン画面、ボディコントロールの枠線有無
@@ -196,6 +188,14 @@ CString CMZ3SkinInfo::loadSkinTitle( LPCTSTR szSkinName )
 		return skininfo.strSkinTitle;
 	}
 }
+
+void CMZ3SkinInfo::setColorFromInifile( inifile::IniFile& inifile, LPCSTR szColorName, LPCSTR key, LPCSTR section )
+{
+	COLORREF clrDefault = getColor(szColorName);
+	COLORREF clr = loadColorFromInifile(inifile, clrDefault, key, section);
+	setColor(szColorName, clr);
+}
+
 
 COLORREF CMZ3SkinInfo::loadColorFromInifile( inifile::IniFile& inifile, COLORREF defaultColor, LPCSTR key, LPCSTR section )
 {

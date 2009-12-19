@@ -243,7 +243,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// 背景画像なしの場合
 //				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 				// 暫定的にステータスバーの背景色を利用する
-				pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+				pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
 				pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
 			}else{
 				// ビットマップの描画
@@ -340,7 +340,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 //		sw_coloring.start();
 		if (pData!=NULL) {
 
-			COLORREF clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+			COLORREF clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 			switch (pData->GetAccessType()) {
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
@@ -352,13 +352,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(*pData);
 					if (lastIndex == -1) {
 						// 全くの未読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListNonreadText");
 					} else if (lastIndex >= pData->GetCommentCount()) {
 						// 既読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 					} else {
 						// 未読分あり：新着記事
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNewItemText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListNewItemText");
 					}
 				}
 				break;
@@ -370,16 +370,16 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// 外部ブログは薄く表示
 				if( pData->GetURL().Find( L"?url=http" ) != -1 ) {
 					// "?url=http" を含むので外部ブログとみなす
-					clrTextFg = theApp.m_skininfo.clrMainBodyListExternalBlogText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListExternalBlogText");
 				} else {
 					// mixi 日記
 					// 未読なら青、既読なら黒
 					if( util::ExistFile(util::MakeLogfilePath( *pData )) ) {
 						// ログあり:既読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 					}else{
 						// ログなし:未読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListNonreadText");
 					}
 				}
 				break;
@@ -390,10 +390,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// ログがあれば（既読なら）黒、未読なら青
 				if( util::ExistFile(util::MakeLogfilePath( *pData )) ) {
 					// ログあり:既読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 				}else{
 					// ログなし:未読
-					clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListNonreadText");
 				}
 				break;
 
@@ -402,9 +402,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// ユーザプロフィール
 				// マイミクなら青にする。
 				if( pData->IsMyMixi() ) {
-					clrTextFg = theApp.m_skininfo.clrMainBodyListFootprintMyMixiText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListFootprintMyMixiText");
 				}else{
-					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 				}
 				break;
 
@@ -423,10 +423,10 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					// 存在チェック。
 					if( util::ExistFile(util::MakeLogfilePath(mixi) ) ) {
 						// ログあり:既読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 					}else{
 						// ログなし:未読
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListNonreadText");
 					}
 				}
 				break;
@@ -435,14 +435,14 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// Twitter 項目
 				{
 					// デフォルト値設定
-					clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 
 					// 自分宛の発言を強調表示する
 					const CString& bodyText = pData->GetBody();
 					LPCTSTR szMyTwitterID = theApp.m_loginMng.GetTwitterId();
 					if (bodyText.Find(util::FormatString(L"@%s", szMyTwitterID))!=-1) {
 						// 強調２
-						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis2;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListEmphasis2");
 						break;
 					}
 
@@ -454,14 +454,14 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					const CString& pTargetName = pData->GetName();
 					if (pTargetName==szMyTwitterID) {
 						// 同じオーナーID：強調表示
-						clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis4;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListEmphasis4");
 						break;
 					}
 
 					// 選択項目と同じオーナーIDの項目を強調表示する。
 					if (pSelectedData->GetOwnerID()==pData->GetOwnerID()) {
 						// 同じオーナーID：強調表示
-						clrTextFg = theApp.m_skininfo.clrMainBodyListNonreadText;
+						clrTextFg = theApp.m_skininfo.getColor("MainBodyListNonreadText");
 						break;
 					}
 
@@ -477,7 +477,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 						
 						// 一致すれば強調表示
 						if (pTargetName==szQuoteUser) {
-							clrTextFg = theApp.m_skininfo.clrMainBodyListEmphasis3;
+							clrTextFg = theApp.m_skininfo.getColor("MainBodyListEmphasis3");
 							break;
 						}
 					}
@@ -487,13 +487,13 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			default:
 				// 色づけなし
 				// 黒にする
-				clrTextFg = theApp.m_skininfo.clrMainBodyListDefaultText;
+				clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 				break;
 			}
 
 			// 色の設定
 			clrTextSave = pDC->SetTextColor(clrTextFg);
-			clrBkSave = pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+			clrBkSave = pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
 		}
 //		sw_coloring.stop();
 
@@ -809,7 +809,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 	// 描画処理
 	if (bDrawDayBreakBar) {
-		COLORREF clrDayBreakBar = theApp.m_skininfo.clrMainBodyListDayBreakLine;
+		COLORREF clrDayBreakBar = theApp.m_skininfo.getColor("MainBodyListDayBreakLine");
 		CPen penDayBreakBar(PS_SOLID, 1, clrDayBreakBar);
 
 		CPen* pOldPen = pDC->SelectObject(&penDayBreakBar);

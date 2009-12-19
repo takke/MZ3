@@ -60,6 +60,7 @@ class CMZ3View;
 class CReportView;
 class CWriteView;
 class CDownloadView;
+class CDetailView;
 class CMZ3BackgroundImage;
 class MouseGestureManager;
 class CHtmlArray;
@@ -143,6 +144,7 @@ public:
 	CReportView*		m_pReportView;			///< レポートビュー
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
 	CDownloadView*		m_pDownloadView;		///< ダウンロードビュー
+	CDetailView*		m_pDetailView;			///< 詳細ビュー
 
 	MouseGestureManager* m_pMouseGestureManager;///< マウスジェスチャ管理
 

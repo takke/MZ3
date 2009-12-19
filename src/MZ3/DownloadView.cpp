@@ -137,8 +137,6 @@ void CDownloadView::OnInitialUpdate()
  */
 void CDownloadView::OnSize(UINT nType, int cx, int cy)
 {
-	CFormView::OnSize(nType, cx, cy);
-
 	// 前回の値を保存し、(0,0) の場合はその値を利用する
 	static int s_cx = 0;
 	static int s_cy = 0;

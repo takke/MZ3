@@ -124,7 +124,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if( !theApp.m_optionMng.IsUseBgImage() || !theApp.m_bgImageReportListCtrl.isEnableImage() ) {
 //		pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 		// 暫定的にステータスバーの背景色を利用する
-		pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+		pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
 		pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
 	}
 
@@ -207,7 +207,7 @@ void CReportListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		clrBkSave = pDC->SetBkColor( ::GetSysColor(COLOR_HIGHLIGHT) );
 	} else {
 		// 非選択状態
-		COLORREF clrTextFg = theApp.m_skininfo.clrReportListText;
+		COLORREF clrTextFg = theApp.m_skininfo.getColor("ReportListText");
 
 		// 色づけ処理
 		clrTextSave = pDC->SetTextColor(clrTextFg);

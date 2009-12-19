@@ -120,7 +120,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// 背景画像なしの場合
 //				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 				// 暫定的にステータスバーの背景色を利用する
-				pDC->SetBkColor(theApp.m_skininfo.clrMainStatusBG);
+				pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
 				pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
 			}else{
 				// ビットマップの描画
@@ -161,9 +161,9 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// 非選択状態なので、アクティブなら赤、そうでなければ黒で描画
 		COLORREF clrTextFg;
 		if (lvi.iItem == GetActiveItem()) {
-			clrTextFg = theApp.m_skininfo.clrMainCategoryListActiveText;
+			clrTextFg = theApp.m_skininfo.getColor("MainCategoryListActiveText");
 		} else {
-			clrTextFg = theApp.m_skininfo.clrMainCategoryListInactiveText;
+			clrTextFg = theApp.m_skininfo.getColor("MainCategoryListInactiveText");
 		}
 
 		// 色づけ処理

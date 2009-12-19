@@ -318,7 +318,10 @@ private:
 
 	bool DoInitialize();
 	void MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi);
+
+public:
 	void MyShowReportView(CMixiData& mixi);
+	void MyShowDetailView(CMixiData& mixi);
 
 public:
 	/**

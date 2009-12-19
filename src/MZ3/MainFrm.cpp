@@ -13,6 +13,7 @@
 #include "ReportView.h"
 #include "WriteView.h"
 #include "DownloadView.h"
+#include "DetailView.h"
 #include "MZ3View.h"
 #include "Ran2View.h"
 #include "UserDlg.h"
@@ -355,6 +356,17 @@ void CMainFrame::OnBackButton()
 
 		// メイン画面のリロード(アイコンリロードの可能性があるため)
 		theApp.m_pMainView->OnSelchangedGroupTab();
+
+		return;
+	}
+
+	if (pActiveView == theApp.m_pDetailView) {
+		// 詳細ビュー → メインビュー
+		m_bForwardPageEnabled = FALSE;
+		m_bBackPageEnabled = FALSE;
+
+		// 戻る
+		theApp.ChangeView(theApp.m_pMainView);
 
 		return;
 	}
@@ -1088,6 +1100,12 @@ void CMainFrame::OnMenuAction()
 
 	if (pActiveView == theApp.m_pDownloadView) {
 		// ダウンロードビュー
+		// 処理なし
+		return;
+	}
+
+	if (pActiveView == theApp.m_pDetailView) {
+		// 詳細ビュー
 		// 処理なし
 		return;
 	}

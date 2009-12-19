@@ -1045,6 +1045,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DetailView.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\DownloadView.cpp"
 					>
 				</File>
@@ -1416,6 +1420,10 @@
 				</File>
 				<File
 					RelativePath=".\DebugDlg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DetailView.h"
 					>
 				</File>
 				<File

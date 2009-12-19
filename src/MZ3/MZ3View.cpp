@@ -14,6 +14,7 @@
 #include "MZ3View.h"
 #include "ReportView.h"
 #include "DownloadView.h"
+#include "DetailView.h"
 #include "MainFrm.h"
 #include "WriteView.h"
 #include "CommonEditDlg.h"
@@ -3518,7 +3519,7 @@ void CMZ3View::MyParseMixiHtml(LPCTSTR szHtmlfile, CMixiData& mixi)
 }
 
 /**
- * レポートビューを開き、mixi データを参照する
+ * レポートビューを開き、データを参照する
  */
 void CMZ3View::MyShowReportView(CMixiData& mixi)
 {
@@ -3529,6 +3530,19 @@ void CMZ3View::MyShowReportView(CMixiData& mixi)
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
 	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE );
 	theApp.ChangeView( theApp.m_pReportView );
+}
+
+/**
+ * 詳細ビューを開き、データを参照する
+ */
+void CMZ3View::MyShowDetailView(CMixiData& data)
+{
+	// 詳細ビューに遷移
+	theApp.m_pDetailView->m_data = data;
+
+	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
+	theApp.ChangeView( theApp.m_pDetailView );
 }
 
 void CMZ3View::OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -5436,7 +5450,7 @@ void CMZ3View::OnPaint()
 					// 残り部分を塗りつぶす
 					if (rectIcon.Height() > iconHeight) {
 						CRect rect(m_rectIcon.left, m_rectIcon.top + iconHeight, m_rectIcon.right, m_rectIcon.bottom);
-						dc.FillSolidRect(rect, theApp.m_skininfo.clrMainStatusBG);
+						dc.FillSolidRect(rect, theApp.m_skininfo.getColor("MainStatusBG"));
 					}
 
 					bDrawFinished = true;
@@ -5457,7 +5471,7 @@ void CMZ3View::OnPaint()
 						// 残り部分を塗りつぶす
 						if (rectIcon.Height() > rectIcon.Width()) {
 							CRect rect(m_rectIcon.left, m_rectIcon.top + rectIcon.Width(), m_rectIcon.right, m_rectIcon.bottom);
-							dc.FillSolidRect(rect, theApp.m_skininfo.clrMainStatusBG);
+							dc.FillSolidRect(rect, theApp.m_skininfo.getColor("MainStatusBG"));
 						}
 
 						bDrawFinished = true;
@@ -5467,7 +5481,7 @@ void CMZ3View::OnPaint()
 
 			if (!bDrawFinished) {
 				// 塗りつぶす
-				dc.FillSolidRect( m_rectIcon, theApp.m_skininfo.clrMainStatusBG );
+				dc.FillSolidRect( m_rectIcon, theApp.m_skininfo.getColor("MainStatusBG"));
 			}
 		}
 		break;
@@ -6938,12 +6952,12 @@ HBRUSH CMZ3View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	switch (idc) {
 	case IDC_INFO_EDIT:
 		pDC->SetBkMode(TRANSPARENT);
-		pDC->SetTextColor(theApp.m_skininfo.clrMainStatusText);
+		pDC->SetTextColor(theApp.m_skininfo.getColor("MainStatusText"));
 		return (HBRUSH)theApp.m_brushMainStatusBar;
 
 	case IDC_STATUS_EDIT:
-		pDC->SetBkColor(theApp.m_skininfo.clrMainEditBG);
-		pDC->SetTextColor(theApp.m_skininfo.clrMainEditText);
+		pDC->SetBkColor(theApp.m_skininfo.getColor("MainEditBG"));
+		pDC->SetTextColor(theApp.m_skininfo.getColor("MainEditText"));
 		return (HBRUSH)theApp.m_brushMainEdit;
 
 	default:

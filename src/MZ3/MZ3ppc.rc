@@ -866,6 +866,13 @@ BEGIN
     LTEXT           "注意：タブの設定が初期化されるのでご注意下さい。",IDC_NOTICE_STATIC,7,39,105,21
 END
 
+IDD_DETAILVIEW DIALOG  0, 0, 87, 98
+STYLE DS_SETFONT | WS_CHILD | WS_SYSMENU
+FONT 9, "MS UI Gothic"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDC_EXIT_BUTTON,57,78,24,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
