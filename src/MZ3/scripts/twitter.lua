@@ -995,7 +995,7 @@ end
 --- 「ReTweet」メニュー用ハンドラ
 function on_retweet_menu_item(serialize_key, event_name, data)
 
-	msg = 'この発言をReTweetしますか？\r\n'
+	msg = 'この発言をReTweetしますか？ \r\n'
 	   .. '\r\n'
 	   .. '「はい」：すぐにReTweetします(公式RT)\r\n'
 	   .. '「いいえ」：コメントを追加できます';
@@ -1186,6 +1186,10 @@ function on_read_menu_item(serialize_key, event_name, data)
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
+	data = mz3_main_view.get_selected_body_item();
+	mz3.show_detail_view(data);
+	return true;
+--[[
 	-- 本文を1行に変換して表示
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
@@ -1210,6 +1214,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	mz3.alert(item, data:get_text('name'));
 
 	return true;
+]]
 end
 
 
@@ -1347,7 +1352,7 @@ function on_click_update_button(event_name, serialize_key)
 	local len = mz3.get_text_length(text);
 	if len > 140 then
 		msg = '140文字を超過しています(' .. len .. '文字)\n'
-			.. '投稿に失敗する可能性がありますが続行しますか？\n'
+			.. '投稿に失敗する可能性がありますが続行しますか？ \n'
 			.. '----\n'
 			.. text;
 		if mz3.confirm(msg, '文字数：' .. len, 'yes_no') ~= 'yes' then
@@ -1635,7 +1640,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 
 	menu:append_menu("string", "全文を読む...", menu_items.read);
-	menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
+--	menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
 
 	menu:append_menu("separator");
 
@@ -1962,6 +1967,159 @@ function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
+
+
+--- 詳細画面の描画
+function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+	-- オブジェクト化
+	data = MZ3Data:create(data);
+	g = MZ3Graphics:create(dc);
+
+	-- アイコンの描画
+	x_margin = 10;
+	y_margin = 10;
+	icon_size = 64;
+	x = x_margin;
+	y = y_margin;
+	w = icon_size;
+	h = icon_size;
+	image_url = data:get_text_array('image', 0);
+	image_cache_index = mz3_image_cache.get_image_index_by_url(image_url);
+	if image_cache_index >= 0 then
+		g:draw_image(image_cache_index, x, y, w, h);
+	end
+
+	-- 文字列の描画
+	line_height = g:get_line_height();
+	
+	-- アイコンの右側
+
+	-- 名前
+	color_text_org = g:set_color("text", "MainBodyListNonreadText");
+	color_bk_org = g:set_color("bk", "MainStatusBG");
+
+	x = x + icon_size +x_margin;
+	y = y_margin;
+	w = cx - x - x_margin;
+	h = line_height;
+	format = 0;
+	text = data:get_text('name') .. " / " .. data:get_text('author');
+	g:draw_text(text, x, y, w, h, format);
+
+	-- 日付
+	g:set_color("text", "MainBodyListDefaultText");
+	text = data:get_date();
+	y = y + line_height*1.5;
+	g:draw_text(text, x, y, w, h, format);
+
+	-- source
+	source = data:get_text('source');
+--	item = item .. "source : " .. source .. "\r\n";
+	s_url, s_name = source:match("href=\"(.-)\".*>(.*)<");
+	if s_url ~= nil then
+		text = "source : " .. s_name;
+	else
+		text = "source : " .. source;
+	end
+	y = y + line_height;
+	g:draw_text(text, x, y, w, h, format);
+	--[[
+	if s_url ~= nil then
+		text = " (" .. s_url .. ")";
+		y = y + line_height;
+		g:draw_text(text, x, y, w, h, format);
+	end
+	]]
+
+	-- 本文
+	g:set_color("text", "MainBodyListNonreadText");
+	text = data:get_text_array_joined_text('body');
+	text = text:gsub("\r\n", "");
+	y = y_margin + icon_size + line_height/2;
+	h = line_height * 7;
+	x = x_margin;
+	w = cx - x - x_margin;
+	
+	-- 本文用枠描画
+	g:draw_rect("border", x, y, w, h, "MainBodyListNonreadText");
+	
+	border_margin = 5;
+	x = x +border_margin;
+	y = y +border_margin;
+	w = w -border_margin*2;
+	h = h -border_margin*2;
+	if mz3.get_app_name()=="MZ3" then
+		format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+	else
+		format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+	end
+	g:draw_text(text, x, y, w, h, format);
+
+	-- その他の情報用枠線
+	x = x_margin;
+	y = y + h + y_margin;
+	w = cx - x - x_margin;
+	h_button = 25;
+	h = cy - y - y_margin - h_button - y_margin;
+--	g:draw_rect("border", x, y, w, h, "MainBodyListDefaultText");
+	
+	-- その他の情報
+	--[[
+	x = x +border_margin;
+	y = y +border_margin;
+	w = w -border_margin*2;
+	h = h -border_margin*2;
+	]]
+
+	item = '';
+	item = item .. "description : " .. data:get_text('title') .. "\r\n";
+	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
+	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+
+	-- location 等はここでパースする
+	user = data:get_text('user_tag');
+
+	-- <location>East Tokyo United</location>
+	location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
+	-- <followers_count>555</followers_count>
+	followers_count = user:match('<followers_count>([^<]*)<');
+	-- <friends_count>596</friends_count>
+	friends_count = user:match('<friends_count>([^<]*)<');
+	-- <favourites_count>361</favourites_count>
+	favourites_count = user:match('<favourites_count>([^<]*)<');
+	-- <statuses_count>7889</statuses_count>
+	statuses_count = user:match('<statuses_count>([^<]*)<');
+
+	if location ~= nil then
+		item = item .. "location : " .. location .. "\r\n";
+	end
+	
+	if friends_count ~= nil then
+		item = item .. "followings : " .. friends_count
+		            .. ", "
+		            .. "followers : " .. followers_count
+		            .. ", "
+		            .. "fav : " .. favourites_count
+		            .. "\r\n"
+		            .. "発言数 : " .. statuses_count
+		            .. "\r\n";
+	end
+	g:set_color("text", "MainBodyListDefaultText");
+	g:draw_text(item, x, y, w, h, format);
+
+	-- 色を戻す
+	g:set_color("text", color_text_org);
+	g:set_color("bk", color_bk_org);
+
+	return true;
+end
+mz3.add_event_listener("draw_detail_view",  "twitter.on_draw_detail_view");
 
 
 mz3.logger_debug('twitter.lua end');

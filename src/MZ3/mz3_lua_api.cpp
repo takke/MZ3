@@ -964,6 +964,26 @@ int lua_mz3_start_write_view(lua_State *L)
 }
 
 /*
+--- 詳細画面の起動
+--
+-- @param data            MZ3Data(allow nil)
+--
+function mz3.show_detail_view(write_view_type, data)
+*/
+int lua_mz3_show_detail_view(lua_State *L)
+{
+	const char* func_name = "mz3.show_detail_view";
+
+	// 引数取得
+	MZ3Data* pData = (MZ3Data*)lua_touserdata(L, 1);
+
+	theApp.m_pMainView->MyShowDetailView(*pData);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- mixiのログアウト状態判定
 --
 -- @param serialize_key シリアライズキー
@@ -1151,6 +1171,7 @@ int lua_mz3_image_cache_get_image_index_by_url(lua_State *L)
 		if (!image.load( path )) {
 			// ロードエラー
 			MZ3LOGGER_ERROR(util::FormatString(L"画像ロード失敗 [%s][%s]", path, url));
+			imageIndex = -1;
 		} else {
 			// リサイズして画像キャッシュに追加する。
 			imageIndex = theApp.AddImageToImageCache(theApp.m_pMainView, image, path);
@@ -3584,6 +3605,173 @@ int lua_mz3_write_view_set_text(lua_State *L)
 
 
 //-----------------------------------------------
+// MZ3 Graphics API
+//-----------------------------------------------
+
+/*
+--- 文字列の描画
+--
+function mz3_graphics.draw_text(dc, text, x, y, w, h, format);
+*/
+int lua_mz3_graphics_draw_text(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+	CString text = MyUTF82WCS2(lua_tostring(L, 2));
+	int x = lua_tointeger(L, 3);
+	int y = lua_tointeger(L, 4);
+	int w = lua_tointeger(L, 5);
+	int h = lua_tointeger(L, 6);
+	int format = lua_tointeger(L, 7);
+
+	// 文字列の描画
+	CRect rect(x, y, x+w, y+h);
+	pDC->DrawText(text, &rect, format);
+
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- 画像の描画
+--
+function mz3_graphics.draw_image(dc, image_cache_index, x, y, w, h);
+*/
+int lua_mz3_graphics_draw_image(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+	int image_cache_index = lua_tointeger(L, 2);
+	int x = lua_tointeger(L, 3);
+	int y = lua_tointeger(L, 4);
+	int w = lua_tointeger(L, 5);
+	int h = lua_tointeger(L, 6);
+
+	// 画像の描画
+	CImageList& imageList = theApp.m_imageCache.GetImageList64();
+	imageList.Draw(pDC, image_cache_index, CPoint(x, y), ILD_NORMAL);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- 色の変更
+--
+-- @param dc				  DC
+-- @param type				  "text" or "bg"
+-- @param color_or_color_name 文字列の場合はスキンのカラー名、数値の場合はRGB色
+--
+-- @return 元の色
+--
+function mz3_graphics.set_color(dc, type, color_or_color_name);
+*/
+int lua_mz3_graphics_set_color(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+	CStringA strColorType = lua_tostring(L, 2);
+	COLORREF color = RGB(0, 0, 0);
+	if (!lua_isnumber(L, 3)) {
+		// 名前(スキン名)から取得
+		CStringA strColorName = lua_tostring(L, 3);
+		color = theApp.m_skininfo.getColor(strColorName);
+	} else {
+		color = (COLORREF) lua_tointeger(L, 3);
+	}
+
+	// 色の変更
+	COLORREF clrOrg;
+	if (strColorType == "text") {
+		clrOrg = pDC->SetTextColor(color);
+	} else {
+		clrOrg = pDC->SetBkColor(color);
+	}
+
+	lua_pushnumber(L, clrOrg);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 行の高さ
+--
+-- @param dc DC
+--
+-- @return 行の高さ(px)
+--
+function mz3_graphics.get_line_height(dc);
+*/
+int lua_mz3_graphics_get_line_height(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+
+	// フォントの高さ取得
+	CSize charSize = pDC->GetTextExtent(CString(L"●"));
+	int lfHeightPx = charSize.cy;
+	lua_pushnumber(L, lfHeightPx);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- 矩形の描画
+--
+-- @param dc				  DC
+-- @param type				  "border" or "fill"
+-- @param x					  x
+-- @param y					  y
+-- @param w					  w
+-- @param h					  h
+-- @param color_or_color_name 文字列の場合はスキンのカラー名、数値の場合はRGB色
+--
+function mz3_graphics.draw_rect(dc, type, x, y, w, h, color_or_color_name);
+*/
+int lua_mz3_graphics_draw_rect(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+	CStringA strDrawType = lua_tostring(L, 2);
+	int x = lua_tointeger(L, 3);
+	int y = lua_tointeger(L, 4);
+	int w = lua_tointeger(L, 5);
+	int h = lua_tointeger(L, 6);
+	COLORREF color = RGB(0, 0, 0);
+	if (!lua_isnumber(L, 7)) {
+		// 名前(スキン名)から取得
+		CStringA strColorName = lua_tostring(L, 7);
+		color = theApp.m_skininfo.getColor(strColorName);
+	} else {
+		color = (COLORREF) lua_tointeger(L, 7);
+	}
+
+	// 矩形の描画
+	CRect rect(x, y, x+w, y+h);
+	if (strDrawType == "border") {
+		CPen pen(PS_SOLID, 1, color);
+		CPen* pOldPen = pDC->SelectObject(&pen);
+		
+		pDC->MoveTo(rect.left, rect.top);
+		pDC->LineTo(rect.right, rect.top);		// 上辺
+		pDC->LineTo(rect.right, rect.bottom);	// 右辺
+		pDC->LineTo(rect.left, rect.bottom);	// 下辺
+		pDC->LineTo(rect.left, rect.top);		// 左辺
+
+		pDC->SelectObject(pOldPen);
+	} else {
+		pDC->FillSolidRect(&rect, color);
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+
+//-----------------------------------------------
 // MZ3 API table
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
@@ -3618,6 +3806,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"change_view",							lua_mz3_change_view},
 	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
 	{"start_write_view",					lua_mz3_start_write_view},
+	{"show_detail_view",					lua_mz3_show_detail_view},
 	{"set_vib_status",						lua_mz3_set_vib_status},
 	{"get_text_length",						lua_mz3_get_text_length},
 	{NULL, NULL}
@@ -3754,6 +3943,14 @@ static const luaL_Reg lua_mz3_image_cache_lib[] = {
 	{"get_image_index_by_url",	lua_mz3_image_cache_get_image_index_by_url},
 	{NULL, NULL}
 };
+static const luaL_Reg lua_mz3_graphics_lib[] = {
+	{"draw_text",				lua_mz3_graphics_draw_text},
+	{"draw_image",				lua_mz3_graphics_draw_image},
+	{"set_color",				lua_mz3_graphics_set_color},
+	{"draw_rect",				lua_mz3_graphics_draw_rect},
+	{"get_line_height",			lua_mz3_graphics_get_line_height},
+	{NULL, NULL}
+};
 
 void mz3_lua_open_api(lua_State *L)
 {
@@ -3774,4 +3971,5 @@ void mz3_lua_open_api(lua_State *L)
 	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
 	luaL_register(L, "mz3_account_provider", lua_mz3_account_provider_lib);
 	luaL_register(L, "mz3_image_cache", lua_mz3_image_cache_lib);
+	luaL_register(L, "mz3_graphics", lua_mz3_graphics_lib);
 }

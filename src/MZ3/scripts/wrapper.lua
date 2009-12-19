@@ -229,3 +229,27 @@ function MZ3PostData:set_content_type(ct)	return mz3_post_data.set_content_type(
 function MZ3PostData:append_post_body(text)	return mz3_post_data.append_post_body(self.post_data, text);	end
 function MZ3PostData:append_additional_header(header)	return mz3_post_data.append_additional_header(self.post_data, header);	end
 function MZ3PostData:append_file(filename)	return mz3_post_data.append_file(self.post_data, filename);	end
+
+
+--------------------------------------------------
+-- Wrapper for mz3_graphics
+--------------------------------------------------
+MZ3Graphics = {};
+
+function MZ3Graphics:create(dc)
+	-- インスタンス用テーブル
+	local object = {}
+	
+	-- メンバー変数の設定
+	object.dc = dc;
+	
+	-- テーブルに見あたらないキーをクラスから引いてくるように設定
+	setmetatable(object, { __index = MZ3Graphics });
+	return object;
+end
+
+function MZ3Graphics:draw_text(text, x, y, w, h, format)		return mz3_graphics.draw_text(self.dc, text, x, y, w, h, format);		end
+function MZ3Graphics:draw_image(image_cache_index, x, y, w, h)	return mz3_graphics.draw_image(self.dc, image_cache_index, x, y, w, h);	end
+function MZ3Graphics:set_color(type, color_or_color_name)		return mz3_graphics.set_color(self.dc, type, color_or_color_name);		end
+function MZ3Graphics:draw_rect(type, x, y, w, h, color_or_color_name)	return mz3_graphics.draw_rect(self.dc, type, x, y, w, h, color_or_color_name);	end
+function MZ3Graphics:get_line_height()							return mz3_graphics.get_line_height(self.dc);	end

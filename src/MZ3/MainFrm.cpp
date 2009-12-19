@@ -718,6 +718,14 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		pView->m_viewlimitCombo.SetFont( &theApp.m_font );
 	}
 
+	//--- 詳細ビュー
+	{
+		CDetailView* pView = theApp.m_pDetailView;
+
+		// ボタン
+		pView->GetDlgItem(IDC_EXIT_BUTTON)->SetFont( &theApp.m_font );
+	}
+
 	// サイズ変更
 	{
 #ifdef WINCE
@@ -743,6 +751,8 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		theApp.m_pMainView->OnSize( 0, w, h );
 		theApp.m_pReportView->OnSize( 0, w, h );
 		theApp.m_pWriteView->OnSize( 0, w, h );
+		theApp.m_pDetailView->OnSize( 0, w, h );
+		theApp.m_pDetailView->Invalidate(TRUE);
 	}
 	return false;
 }

@@ -52,6 +52,14 @@ RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE = 1;	-- ローカルストレージ経�
 RETRIEVE_CATEGORY_ITEM_RVAL_INETACCESS = 0;		-- インターネットにアクセス
 RETRIEVE_CATEGORY_ITEM_RVAL_DONE = 2;			-- ハンドラ側で処理完了、何もしない
 
+-- mz3_graphics.draw_text() 用定数
+DT_WORDBREAK    = 0x00000010;
+DT_NOPREFIX     = 0x00000800;
+DT_EDITCONTROL  = 0x00002000;
+DT_BOTTOM       = 0x00000008;
+DT_LEFT         = 0x00000000;
+DT_END_ELLIPSIS = 0x00008000;
+
 ----------------------------------------------------------------------
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)
 ----------------------------------------------------------------------
