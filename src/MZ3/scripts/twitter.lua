@@ -1674,16 +1674,18 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", "メイン画面に戻る", menu_items.show_main_view);
 	end
 	
-	-- N 件未満であれば「前のページを取得」を表示
-	list = mz3_main_view.get_body_item_list();
-	list = MZ3DataList:create(list);
-	local n = list:get_count();
-	if n < 100 then
-		menu:append_menu("string", "前のページを取得", menu_items.get_prev_page);
-	end
+	if event_name == 'popup_body_menu' then
+		-- N 件未満であれば「前のページを取得」を表示
+		list = mz3_main_view.get_body_item_list();
+		list = MZ3DataList:create(list);
+		local n = list:get_count();
+		if n < 100 then
+			menu:append_menu("string", "前のページを取得", menu_items.get_prev_page);
+		end
 
-	menu:append_menu("string", "全文を読む...", menu_items.read);
---	menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
+		menu:append_menu("string", "全文を読む...", menu_items.read);
+--		menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
+	end
 
 	menu:append_menu("separator");
 
@@ -2168,7 +2170,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	text = (idx+1) .. ' / ' .. n;
 	g:set_color("text", "MainBodyListDefaultText");
 	x = x_margin;
-	y = cy - 30;
+	y = cy - line_height*2;
 	w = cx - x - x_margin;
 	h = line_height;
 	format = DT_NOPREFIX + DT_RIGHT;
@@ -2202,11 +2204,19 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 			-- 次の項目を表示
 			if idx < n-1 then
 				mz3_main_view.select_body_item(idx+1);
+			else
+				-- 先頭に戻る
+				if n>0 then
+					mz3_main_view.select_body_item(0);
+				end
 			end
 		else
 			-- 前の項目を表示
 			if idx >= 1 then
 				mz3_main_view.select_body_item(idx-1);
+			else
+				-- 末尾に戻る
+				mz3_main_view.select_body_item(n-1);
 			end
 		end
 		data = mz3_main_view.get_selected_body_item();
