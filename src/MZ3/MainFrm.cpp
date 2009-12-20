@@ -1113,7 +1113,7 @@ void CMainFrame::OnMenuAction()
 
 	if (pActiveView == theApp.m_pDetailView) {
 		// Ú×ƒrƒ…[
-		// ˆ—‚È‚µ
+		theApp.m_pDetailView->PopupDetailMenu(CPoint(0, 0), 0);
 		return;
 	}
 

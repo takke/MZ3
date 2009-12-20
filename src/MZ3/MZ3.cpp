@@ -688,18 +688,27 @@ void CMZ3App::ChangeView( CView* pNewView )
 	::SetWindowLong( pActiveView->m_hWnd, GWL_ID, ::GetWindowLong(pNewView->m_hWnd, GWL_ID) );
 	::SetWindowLong( pNewView->m_hWnd,    GWL_ID, tempId );
 
-	//--- 現在のビュー
-	// 非表示化
-	pActiveView->ShowWindow( SW_HIDE );
+	if (pNewView != pActiveView) {
+		// ビューが異なる場合
 
-	// MZ3 非表示完了通知
-	::SendMessage( pActiveView->m_hWnd, WM_MZ3_HIDE_VIEW, NULL, NULL );
+		//--- 現在のビュー
+		// 非表示化
+		pActiveView->ShowWindow( SW_HIDE );
+	
+		// MZ3 非表示完了通知
+		::SendMessage( pActiveView->m_hWnd, WM_MZ3_HIDE_VIEW, NULL, NULL );
 
-	//--- 切り替え先ビュー
-	pNewView->ShowWindow( SW_SHOW );
-	((CFrameWnd*)m_pMainWnd)->SetActiveView( pNewView );
-	((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
-	m_pMainWnd->UpdateWindow();
+		//--- 切り替え先ビュー
+		pNewView->ShowWindow( SW_SHOW );
+		((CFrameWnd*)m_pMainWnd)->SetActiveView( pNewView );
+		((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
+		m_pMainWnd->UpdateWindow();
+	} else {
+		// 既に切り替え先のビューを表示している場合
+		pNewView->Invalidate(TRUE);
+		((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
+		m_pMainWnd->UpdateWindow();
+	}
 
 	// MZ3 切り替え完了通知
 	::SendMessage( pNewView->m_hWnd, WM_MZ3_FIT, NULL, NULL );

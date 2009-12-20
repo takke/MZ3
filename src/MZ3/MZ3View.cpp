@@ -3537,6 +3537,9 @@ void CMZ3View::MyShowReportView(CMixiData& mixi)
  */
 void CMZ3View::MyShowDetailView(CMixiData& data)
 {
+	// 復帰先フォーカスを下ペインにしておく
+	m_hotList = &m_bodyList;
+
 	// 詳細ビューに遷移
 	theApp.m_pDetailView->m_data = data;
 

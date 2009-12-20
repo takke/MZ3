@@ -132,6 +132,7 @@ type:set_request_encoding('utf8');							-- エンコーディング
 menu_items = {}
 menu_items.read                  = mz3_menu.regist_menu("twitter.on_read_menu_item");
 menu_items.show_user_info        = mz3_menu.regist_menu("twitter.on_show_user_info");
+menu_items.show_main_view        = mz3_menu.regist_menu("twitter.on_show_main_view");
 menu_items.retweet               = mz3_menu.regist_menu("twitter.on_retweet_menu_item");
 
 menu_items.get_prev_page         = mz3_menu.regist_menu("twitter.on_get_prev_page");
@@ -1295,6 +1296,16 @@ function on_show_user_info(serialize_key, event_name, data)
 end
 
 
+--- メイン画面に戻る
+function on_show_main_view(serialize_key, event_name, data)
+	mz3.logger_debug('on_show_main_view : (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	mz3.change_view('main_view');
+
+	return true;
+end
+
+
 --- Twitter に投稿する
 function do_post_to_twitter(text)
 
@@ -2209,7 +2220,7 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 	end
 	
 	if key == VK_F2 then
-		-- とりあえずボディリストのメニューを表示しておく
+		-- ボディリストのメニューを表示
 		on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 	end
 	
@@ -2253,12 +2264,23 @@ function on_rclick_detail_view(event_name, serialize_key, data, x, y, cx, cy)
 		return false;
 	end
 
-	-- とりあえずボディリストのメニューを表示しておく
+	-- ボディリストのメニューを表示
 	on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 	
 	return true;
 end
 mz3.add_event_listener("rclick_detail_view", "twitter.on_rclick_detail_view");
+
+
+--- 詳細画面のポップアップメニュー
+function on_popup_detail_menu(event_name, serialize_key, data, wnd)
+
+	-- ボディリストのメニューを表示
+	on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
+	
+	return true;
+end
+mz3.add_event_listener("popup_detail_menu", "twitter.on_popup_detail_menu");
 
 
 mz3.logger_debug('twitter.lua end');
