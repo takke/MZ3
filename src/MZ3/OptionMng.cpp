@@ -408,6 +408,7 @@ void Option::Sync(bool bSave)
 		m_nTwitterGetPageCount = normalizeTwitterGetPageCount(m_nTwitterGetPageCount);
 	}
 	SyncIniValue(inifile, bSave, m_bTwitterReloadTLAfterPost, "ReloadTLAfterPost", "Twitter");
+	SyncIniValue(inifile, bSave, m_nTwitterRTStyle, "TwitterRTStyle", "Twitter");
 
 	// èIóπèàóù
 	if (bSave) {

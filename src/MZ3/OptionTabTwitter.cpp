@@ -81,6 +81,26 @@ BOOL COptionTabTwitter::OnInitDialog()
 		}
 	}
 
+	// RTStyle
+	{
+		CComboBox* pComboBox = (CComboBox*)GetDlgItem(IDC_TWITTER_RT_STYLE_COMBO);
+		int selectedData = theApp.m_optionMng.m_nTwitterRTStyle;
+		LPCTSTR items[] = { L"RT @takke: 発言",
+							L"公式RT",
+							L"QT @takke: 発言",
+							L"公式RT/RT(選択)",
+							NULL
+						  };
+		for (int i=0; items[i]!=NULL; i++) {
+			LPCTSTR s = items[i];
+			int idx = pComboBox->InsertString(i, s);
+			pComboBox->SetItemData(idx, idx);
+			if (selectedData==idx) {
+				pComboBox->SetCurSel(idx);
+			}
+		}
+	}
+
 	// 投稿後にタイムラインを取得する
 	CheckDlgButton( IDC_TWITTER_RELOAD_TL_AFTER_POST_CHECK, 
 					theApp.m_optionMng.m_bTwitterReloadTLAfterPost ? BST_CHECKED : BST_UNCHECKED );
@@ -114,6 +134,16 @@ void COptionTabTwitter::OnOK()
 		if (idx>=0) {
 			int n = pComboBox->GetItemData(idx);
 			theApp.m_optionMng.m_nTwitterGetPageCount = option::Option::normalizeTwitterGetPageCount(n);
+		}
+	}
+
+	// RTStyle
+	{
+		CComboBox* pComboBox = (CComboBox*)GetDlgItem(IDC_TWITTER_RT_STYLE_COMBO);
+		int idx = pComboBox->GetCurSel();
+		if (idx>=0) {
+			int n = pComboBox->GetItemData(idx);
+			theApp.m_optionMng.m_nTwitterRTStyle = n;
 		}
 	}
 

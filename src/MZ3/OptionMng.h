@@ -135,6 +135,11 @@ public:
 	int				m_nTwitterStatusLineCount;		///< Twitterモード時のステータス行数
 	int				m_nTwitterGetPageCount;			///< Twitterモード時の取得ページ数
 	bool			m_bTwitterReloadTLAfterPost;	///< 投稿後にタイムラインを取得する
+	int				m_nTwitterRTStyle;				///< ReTweet 形式
+													///< 0:"RT @takke: 発言"
+													///< 1:"公式RT"
+													///< 2:"QT @takke: 発言"
+													///< 3:"公式RT/RT"
 
 public:
 	Option()
@@ -213,6 +218,7 @@ public:
 #endif
 		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
 		, m_bTwitterReloadTLAfterPost(false)
+		, m_nTwitterRTStyle(0)
 		, m_bUseDevVerCheck(false)
 		, m_bShowNetProgressBar(false)
 	{

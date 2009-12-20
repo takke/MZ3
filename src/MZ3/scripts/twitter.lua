@@ -1020,11 +1020,28 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
 	mz3.change_view('main_view');
 
-	msg = 'この発言をReTweetしますか？ \r\n'
-	   .. '\r\n'
-	   .. '「はい」：すぐにReTweetします(公式RT)\r\n'
-	   .. '「いいえ」：コメントを追加できます';
-	if mz3.confirm(msg, nil, 'yes_no') == 'yes' then
+	local rt_style = mz3_inifile.get_value('TwitterRTStyle', 'Twitter');
+	-- 0: RT
+	-- 1: 公式RT
+	-- 2: QT
+	-- 3: 公式RT/RT
+
+	local rt_mode = 0;
+	if rt_style == "3" then
+		msg = 'この発言をReTweetしますか？ \r\n'
+		   .. '\r\n'
+		   .. '「はい」：すぐにReTweetします(公式RT)\r\n'
+		   .. '「いいえ」：コメントを追加できます';
+		if mz3.confirm(msg, nil, 'yes_no') == 'yes' then
+			rt_mode = "1";
+		else
+			rt_mode = "0";
+		end
+	else
+		rt_mode = rt_style;
+	end
+	
+	if rt_mode == "1" then
 		-- 公式RT
 		serialize_key = 'TWITTER_UPDATE_RETWEET';
 
@@ -1058,7 +1075,13 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 		-- エディットコントロールに文字列設定
 		data = mz3_main_view.get_selected_body_item();
 		data = MZ3Data:create(data);
-		text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
+		if rt_mode == "0" then
+			-- RT
+			text = "RT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
+		else
+			-- QT
+			text = "QT @" .. data:get_text('name') .. ": " .. data:get_text_array_joined_text('body');
+		end
 		text = text:gsub("\r\n", "");
 		mz3_main_view.set_edit_text(text);
 
