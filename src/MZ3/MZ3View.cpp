@@ -666,6 +666,9 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	case MAGNIFY_MODE_BODY:
 	default:
 		{
+			// ƒ^ƒu”ñ•\Ž¦
+			hGroup = 0;
+
 			int hItem0 = 0;
 			if (m_categoryList.GetItemCount() > 0) {
 				CRect rectItem0;
@@ -683,7 +686,12 @@ void CMZ3View::MySetLayout(int cx, int cy)
 //		hGroup, hCategory, hBody));
 
 	int y = 0;
-	util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
+	if (hGroup != 0) {
+		m_groupTab.ShowWindow(SW_SHOW);
+		util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
+	} else {
+		m_groupTab.ShowWindow(SW_HIDE);
+	}
 	y += hGroup;
 
 	util::MoveDlgItemWindow( this, IDC_HEADER_LIST, 0, y, cx, hCategory+1 );
