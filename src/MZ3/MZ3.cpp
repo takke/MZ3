@@ -885,7 +885,7 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontF
 		fontFace);					// lpszFacename
 
 	// 小フォント作成
-	newHeight = - theApp.pt2px(fontHeight-2);	// 負数とすることで pixel 値指定とする
+	newHeight = - theApp.pt2px(fontHeight-1);	// 負数とすることで pixel 値指定とする
 	theApp.m_fontSmall.Detach();
 	theApp.m_fontSmall.CreateFont( 
 		newHeight,					// nHeight
