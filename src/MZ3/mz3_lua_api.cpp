@@ -3650,8 +3650,17 @@ int lua_mz3_graphics_draw_image(lua_State *L)
 	int h = lua_tointeger(L, 6);
 
 	// 画像の描画
-	CImageList& imageList = theApp.m_imageCache.GetImageList64();
-	imageList.Draw(pDC, image_cache_index, CPoint(x, y), ILD_NORMAL);
+	CImageList* imageList = NULL;
+	if (w >= 64) {
+		imageList = &theApp.m_imageCache.GetImageList64();
+	} else if (w >= 48) {
+		imageList = &theApp.m_imageCache.GetImageList48();
+	} else if (w >= 32) {
+		imageList = &theApp.m_imageCache.GetImageList32();
+	} else {
+		imageList = &theApp.m_imageCache.GetImageList16();
+	}
+	imageList->Draw(pDC, image_cache_index, CPoint(x, y), ILD_NORMAL);
 
 	// 戻り値の数を返す
 	return 0;
@@ -3717,6 +3726,41 @@ int lua_mz3_graphics_get_line_height(lua_State *L)
 
 	// 戻り値の数を返す
 	return 1;
+}
+
+/*
+--- フォントサイズ
+--
+-- @param dc   DC
+-- @param size 1:大、0:標準、-1:小
+--
+function mz3_graphics.set_font_size(dc, size);
+*/
+int lua_mz3_graphics_set_font_size(lua_State *L)
+{
+	// 引数の取得
+	CDC* pDC = (CDC*)lua_touserdata(L, 1);
+	int size = lua_tointeger(L, 2);
+
+	// フォント変更
+	CFont* pFont = NULL;
+	switch (size) {
+	case -1:
+		pFont = &theApp.m_fontSmall;
+		break;
+	case 1:
+		pFont = &theApp.m_fontBig;
+		break;
+	case 0:
+	default:
+		pFont = &theApp.m_font;
+		break;
+	}
+
+	pDC->SelectObject(pFont);
+
+	// 戻り値の数を返す
+	return 0;
 }
 
 /*
@@ -3950,6 +3994,7 @@ static const luaL_Reg lua_mz3_graphics_lib[] = {
 	{"set_color",				lua_mz3_graphics_set_color},
 	{"draw_rect",				lua_mz3_graphics_draw_rect},
 	{"get_line_height",			lua_mz3_graphics_get_line_height},
+	{"set_font_size",			lua_mz3_graphics_set_font_size},
 	{NULL, NULL}
 };
 

@@ -62,8 +62,10 @@ DT_RIGHT        = 0x00000002;
 DT_END_ELLIPSIS = 0x00008000;
 
 -- Key map
-VK_DOWN = 0x28;
-VK_UP   = 0x26;
+VK_DOWN   = 0x28;
+VK_UP     = 0x26;
+VK_RIGHT  = 0x27;
+VK_LEFT   = 0x25;
 VK_RETURN = 0x0D;
 VK_ESCAPE = 0x1B;
 VK_BACK   = 0x08;

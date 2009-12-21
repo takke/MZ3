@@ -253,3 +253,4 @@ function MZ3Graphics:draw_image(image_cache_index, x, y, w, h)	return mz3_graphi
 function MZ3Graphics:set_color(type, color_or_color_name)		return mz3_graphics.set_color(self.dc, type, color_or_color_name);		end
 function MZ3Graphics:draw_rect(type, x, y, w, h, color_or_color_name)	return mz3_graphics.draw_rect(self.dc, type, x, y, w, h, color_or_color_name);	end
 function MZ3Graphics:get_line_height()							return mz3_graphics.get_line_height(self.dc);	end
+function MZ3Graphics:set_font_size(size)						return mz3_graphics.set_font_size(self.dc, size)	end

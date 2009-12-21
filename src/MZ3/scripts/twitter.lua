@@ -2053,9 +2053,9 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	g = MZ3Graphics:create(dc);
 
 	-- アイコンの描画
-	x_margin = 10;
-	y_margin = 10;
-	icon_size = 64;
+	x_margin = 5;
+	y_margin = 5;
+	icon_size = 48;
 	x = x_margin;
 	y = y_margin;
 	w = icon_size;
@@ -2066,7 +2066,10 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 		g:draw_image(image_cache_index, x, y, w, h);
 	end
 
+	----------------------------------------------
 	-- 文字列の描画
+	----------------------------------------------
+	g:set_font_size(1);		-- 大サイズフォント
 	line_height = g:get_line_height();
 	
 	-- アイコンの右側
@@ -2084,6 +2087,8 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	g:draw_text(text, x, y, w, h, format);
 
 	-- 日付
+	g:set_font_size(0);		-- 中サイズフォント
+	line_height = g:get_line_height();
 	g:set_color("text", "MainBodyListDefaultText");
 	text = data:get_date();
 	y = y + line_height*1.0;
@@ -2111,11 +2116,15 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	]]
 
 	-- 本文
+	g:set_font_size(1);		-- 大サイズフォント
+	line_height = g:get_line_height();
 	g:set_color("text", "MainBodyListNonreadText");
 	text = data:get_text_array_joined_text('body');
 	text = text:gsub("\r\n", "");
 	y = y_margin + icon_size + line_height/2;
-	h = line_height * 7;
+--	h = line_height * 7;
+	-- 高さは画面の高さの 1/3 程度
+	h = cy / 3;
 	x = x_margin;
 	w = cx - x - x_margin;
 	
@@ -2136,7 +2145,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 
 	-- その他の情報用枠線
 	x = x_margin;
-	y = y + h + y_margin;
+	y = y + (h +border_margin*2);
 	w = cx - x - x_margin;
 	h = cy - y - y_margin - y_margin;
 --	g:draw_rect("border", x, y, w, h, "MainBodyListDefaultText");
@@ -2183,6 +2192,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 		            .. "\r\n";
 	end
 	g:set_color("text", "MainBodyListDefaultText");
+	g:set_font_size(0);		-- 中サイズフォント
 	g:draw_text(item, x, y, w, h, format);
 
 	-- 項目番号(ページ番号風で)
@@ -2193,10 +2203,11 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	text = (idx+1) .. ' / ' .. n;
 	g:set_color("text", "MainBodyListDefaultText");
 	x = x_margin;
-	y = cy - line_height*2;
+	y = cy - line_height - y_margin;
 	w = cx - x - x_margin;
 	h = line_height;
 	format = DT_NOPREFIX + DT_RIGHT;
+	g:set_font_size(-1);	-- 小サイズフォント
 	g:draw_text(text, x, y, w, h, format);
 
 	-- 色を戻す
@@ -2218,8 +2229,9 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 	end
 
 	if key == VK_DOWN or key == VK_UP then
-		local list = mz3_main_view.get_body_item_list();
-		list = MZ3DataList:create(list);
+		-- 下キー：次の発言
+		-- 上キー：前の発言
+		local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
 		local n = list:get_count();
 		
 		idx = mz3_main_view.get_selected_body_item_idx();
@@ -2247,14 +2259,44 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 		return true;
 	end
 	
+	if key == VK_RIGHT or key == VK_LEFT then
+		-- 左右キー：同一発言者の前後の発言
+		local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
+		local n = list:get_count();
+		local data = MZ3Data:create(data);
+		local owner_id = data:get_integer('owner_id');
+		
+		local idx = mz3_main_view.get_selected_body_item_idx();
+		if key == VK_RIGHT then
+			idx = idx +1;
+		else
+			idx = idx -1;
+		end
+		while 0 <= idx and idx < n do
+			local f = MZ3Data:create(list:get_data(idx));
+			if owner_id == f:get_integer('owner_id') then
+				mz3_main_view.select_body_item(idx);
+				mz3.show_detail_view(f.data);
+				return true;
+			end
+			if key == VK_RIGHT then
+				idx = idx +1;
+			else
+				idx = idx -1;
+			end
+		end
+	end
+	
 	if key == VK_RETURN or key == VK_ESCAPE or key == VK_BACK then
 		-- 閉じる
 		mz3.change_view('main_view');
+		return true;
 	end
 	
 	if key == VK_F2 then
 		-- ボディリストのメニューを表示
 		on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
+		return true;
 	end
 	
 	return true;
@@ -2270,14 +2312,23 @@ function on_click_detail_view(event_name, serialize_key, data, x, y, cx, cy)
 		return false;
 	end
 
-	-- 下側1/2であれば項目移動
 	if y > cy/2 then
+		-- 下側1/3であれば項目移動
 		if x < cx/2 then
 			-- 左側：前の項目を表示
 			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_UP);
 		else
 			-- 右側：次の項目を表示
 			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_DOWN);
+		end
+	elseif y < cy/4 then
+		-- 上側1/3であれば同一発言者の項目移動
+		if x < cx/2 then
+			-- 左側：前の発言を表示
+			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_LEFT);
+		else
+			-- 右側：次の発言を表示
+			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_RIGHT);
 		end
 	else
 		-- 閉じる

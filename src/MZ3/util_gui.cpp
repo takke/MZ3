@@ -340,6 +340,7 @@ void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ3Backgr
 	::SetStretchBltMode( hdcDest, COLORONCOLOR );
 #else
 	::SetStretchBltMode( hdcDest, HALFTONE );
+	::SetBrushOrgEx( hdcDest, 0, 0, NULL );
 #endif
 	// アスペクト比固定でリサイズ
 	CSize size = image.getBitmapSize();
@@ -347,6 +348,8 @@ void MakeResizedImage( CWnd* pWnd, CMZ3BackgroundImage& resizedImage, CMZ3Backgr
 	// リサイズしたサイズで描画
 	int x = (w - sizeDest.cx)/2;
 	int y = (h - sizeDest.cy)/2;
+//	wprintf(util::FormatString(L" MakeResizedImage : %dx%d => %dx%d\n", 
+//									   size.cx, size.cy, sizeDest.cx, sizeDest.cy));
 	::StretchBlt( hdcDest, x, y, sizeDest.cx, sizeDest.cy, hdcFrom, 0, 0, size.cx, size.cy, SRCCOPY );
 
 	// メモリDCの解放
