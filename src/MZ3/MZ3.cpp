@@ -705,7 +705,7 @@ void CMZ3App::ChangeView( CView* pNewView )
 		m_pMainWnd->UpdateWindow();
 	} else {
 		// Šù‚ÉØ‚è‘Ö‚¦æ‚Ìƒrƒ…[‚ð•\Ž¦‚µ‚Ä‚¢‚éê‡
-		pNewView->Invalidate(TRUE);
+		pNewView->Invalidate(FALSE);
 		((CFrameWnd*)m_pMainWnd)->RecalcLayout( TRUE );
 		m_pMainWnd->UpdateWindow();
 	}

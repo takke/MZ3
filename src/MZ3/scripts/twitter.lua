@@ -2040,6 +2040,16 @@ function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 end
 
 
+--- アイコンの描画
+function draw_user_icon(g, f, x, y, w, h)
+	image_url = f:get_text_array('image', 0);
+	image_cache_index = mz3_image_cache.get_image_index_by_url(image_url);
+	if image_cache_index >= 0 then
+		g:draw_image(image_cache_index, x, y, w, h);
+	end
+end
+
+
 --- 詳細画面の描画
 function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 
@@ -2052,22 +2062,45 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	data = MZ3Data:create(data);
 	g = MZ3Graphics:create(dc);
 
-	-- アイコンの描画
+	-- 画面端のマージン
 	x_margin = 5;
 	y_margin = 5;
-	icon_size = 48;
-	x = x_margin;
-	y = y_margin;
-	w = icon_size;
-	h = icon_size;
-	image_url = data:get_text_array('image', 0);
-	image_cache_index = mz3_image_cache.get_image_index_by_url(image_url);
-	if image_cache_index >= 0 then
-		g:draw_image(image_cache_index, x, y, w, h);
-	end
 
 	----------------------------------------------
-	-- 文字列の描画
+	-- ページ番号
+	----------------------------------------------
+	g:set_font_size(-1);		-- 小サイズフォント
+	line_height = g:get_line_height();
+	x = x_margin;
+	y = y_margin;
+
+	-- 項目番号(ページ番号風で)
+	local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
+	local n = list:get_count();
+	idx = mz3_main_view.get_selected_body_item_idx();
+	text = (idx+1) .. '/' .. n;
+	g:set_color("text", "MainBodyListDefaultText");
+	x = x_margin;
+	y = y_margin;
+	w = cx - x - x_margin;
+	h = line_height;
+	format = DT_NOPREFIX + DT_RIGHT;
+	g:draw_text(text, x, y, w, h, format);
+
+	----------------------------------------------
+	-- ユーザアイコンの描画
+	----------------------------------------------
+	icon_size = 48;
+	x = x_margin;
+--	y_icon = y_margin + line_height;
+	y_icon = y_margin;
+	y = y_icon;
+	w = icon_size;
+	h = icon_size;
+	draw_user_icon(g, data, x, y, w, h);
+
+	----------------------------------------------
+	-- アイコンの右側文字列の描画
 	----------------------------------------------
 	g:set_font_size(1);		-- 大サイズフォント
 	line_height = g:get_line_height();
@@ -2079,7 +2112,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	color_bk_org = g:set_color("bk", "MainStatusBG");
 
 	x = x + icon_size +x_margin;
-	y = y_margin;
+	y = y_icon;
 	w = cx - x - x_margin;
 	h = line_height;
 	format = DT_LEFT;
@@ -2087,12 +2120,12 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	g:draw_text(text, x, y, w, h, format);
 
 	-- 日付
-	g:set_font_size(0);		-- 中サイズフォント
-	line_height = g:get_line_height();
 	g:set_color("text", "MainBodyListDefaultText");
 	text = data:get_date();
-	y = y + line_height*1.0;
+	y = y + line_height*1.5;
 	format = DT_RIGHT;
+	g:set_font_size(0);		-- 中サイズフォント
+	line_height = g:get_line_height();
 	g:draw_text(text, x, y, w, h, format);
 
 	-- source
@@ -2115,13 +2148,17 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	end
 	]]
 
+	----------------------------------------------
+	-- 本文～その他の情報
+	----------------------------------------------
+
 	-- 本文
 	g:set_font_size(1);		-- 大サイズフォント
 	line_height = g:get_line_height();
 	g:set_color("text", "MainBodyListNonreadText");
 	text = data:get_text_array_joined_text('body');
 	text = text:gsub("\r\n", "");
-	y = y_margin + icon_size + line_height/2;
+	y = y_icon + icon_size + line_height/2;
 --	h = line_height * 7;
 	-- 高さは画面の高さの 1/3 程度
 	h = cy / 3;
@@ -2159,9 +2196,8 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	]]
 
 	item = '';
-	item = item .. "description : " .. data:get_text('title') .. "\r\n";
-	item = item .. "id : " .. data:get_integer64_as_string('id') .. "\r\n";
-	item = item .. "owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+	item = item .. "id : " .. data:get_integer64_as_string('id')
+	            .. ", owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 	-- location 等はここでパースする
 	user = data:get_text('user_tag');
@@ -2191,13 +2227,17 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 		            .. "発言数 : " .. statuses_count
 		            .. "\r\n";
 	end
+	item = item --.. "description : "
+	       .. data:get_text('title') .. "\r\n";
 	g:set_color("text", "MainBodyListDefaultText");
 	g:set_font_size(0);		-- 中サイズフォント
 	g:draw_text(item, x, y, w, h, format);
 
 	-- 項目番号(ページ番号風で)
-	local list = mz3_main_view.get_body_item_list();
-	list = MZ3DataList:create(list);
+--[[
+	g:set_font_size(-1);	-- 小サイズフォント
+	line_height = g:get_line_height();
+	local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
 	local n = list:get_count();
 	idx = mz3_main_view.get_selected_body_item_idx();
 	text = (idx+1) .. ' / ' .. n;
@@ -2207,8 +2247,48 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	w = cx - x - x_margin;
 	h = line_height;
 	format = DT_NOPREFIX + DT_RIGHT;
-	g:set_font_size(-1);	-- 小サイズフォント
 	g:draw_text(text, x, y, w, h, format);
+]]
+	----------------------------------------------
+	-- 前後ユーザアイコンの描画
+	----------------------------------------------
+	icon_size = 32;
+	h = icon_size;
+	local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
+	local n = list:get_count();
+	local idx = mz3_main_view.get_selected_body_item_idx();
+
+	g:set_font_size(-1);	-- 小サイズフォント
+	line_height = g:get_line_height();
+
+	local y_lr_icon = cy - icon_size - y_margin;
+	local y_lr_text = cy - line_height - y_margin;
+
+	-- 前ユーザアイコンの描画
+	if idx > 0 then
+		local f = MZ3Data:create(list:get_data(idx-1));
+		format = DT_NOPREFIX + DT_LEFT;
+
+		x = x_margin;
+		draw_user_icon(g, f, x, y_lr_icon, icon_size, h);
+
+		x = x_margin + icon_size + x_margin;
+		w = cx / 2;
+		g:draw_text('≪' .. f:get_text('name'), x, y_lr_text, w, h, format);
+	end
+
+	-- 次ユーザアイコンの描画
+	if idx < n-1 then
+		local f = MZ3Data:create(list:get_data(idx+1));
+		format = DT_NOPREFIX + DT_RIGHT;
+
+		x = cx - icon_size - x_margin;
+		draw_user_icon(g, f, x, y_lr_icon, icon_size, h);
+
+		x = cx /2;
+		w = cx /2 - icon_size - x_margin;
+		g:draw_text(f:get_text('name') .. '≫', x, y_lr_text, w, h, format);
+	end
 
 	-- 色を戻す
 	g:set_color("text", color_text_org);
@@ -2233,8 +2313,7 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 		-- 上キー：前の発言
 		local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
 		local n = list:get_count();
-		
-		idx = mz3_main_view.get_selected_body_item_idx();
+		local idx = mz3_main_view.get_selected_body_item_idx();
 		if key == VK_DOWN then
 			-- 次の項目を表示
 			if idx < n-1 then
@@ -2312,7 +2391,7 @@ function on_click_detail_view(event_name, serialize_key, data, x, y, cx, cy)
 		return false;
 	end
 
-	if y > cy/2 then
+	if y > cy*2/3 then
 		-- 下側1/3であれば項目移動
 		if x < cx/2 then
 			-- 左側：前の項目を表示
@@ -2321,7 +2400,7 @@ function on_click_detail_view(event_name, serialize_key, data, x, y, cx, cy)
 			-- 右側：次の項目を表示
 			on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_DOWN);
 		end
-	elseif y < cy/4 then
+	elseif y < cy*1/3 then
 		-- 上側1/3であれば同一発言者の項目移動
 		if x < cx/2 then
 			-- 左側：前の発言を表示
@@ -2341,7 +2420,7 @@ mz3.add_event_listener("click_detail_view", "twitter.on_click_detail_view");
 
 
 --- 詳細画面の右クリックイベント
-function on_rclick_detail_view(event_name, serialize_key, data, x, y, cx, cy)
+function on_rclick_detail_view(event_name, serialize_key, data, x, y)
 
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type~='Twitter' then
@@ -2354,6 +2433,29 @@ function on_rclick_detail_view(event_name, serialize_key, data, x, y, cx, cy)
 	return true;
 end
 mz3.add_event_listener("rclick_detail_view", "twitter.on_rclick_detail_view");
+
+
+--- 詳細画面のマウスホイールイベント
+function on_mousewheel_detail_view(event_name, serialize_key, data, z_delta, vkey, x, y)
+
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+--	mz3.logger_debug('z_delta : ' .. z_delta);
+
+	if z_delta > 0 then
+		-- 上方向：前の項目を表示
+		on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_UP);
+	else
+		-- 下方向：次の項目を表示
+		on_keydown_detail_view("keydown_detail_view", serialize_key, data, VK_DOWN);
+	end
+
+	return true;
+end
+mz3.add_event_listener("mousewheel_detail_view", "twitter.on_mousewheel_detail_view");
 
 
 --- 詳細画面のポップアップメニュー

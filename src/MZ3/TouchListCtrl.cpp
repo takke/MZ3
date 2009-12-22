@@ -463,6 +463,7 @@ bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 	// 裏画面バッファの解放
 	if( m_memDC != NULL ){
 		m_memDC->DeleteDC();
+		delete m_memDC;
 	}
 	m_memDC = new CDC();
 
@@ -499,6 +500,7 @@ bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 void CTouchListCtrl::OnDestroy()
 {
 	CListCtrl::OnDestroy();
+
 	//--- 解放
 	// 裏画面バッファの解放
 	if( m_memDC != NULL ){

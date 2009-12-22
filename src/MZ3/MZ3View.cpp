@@ -1391,6 +1391,8 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 					image.load( miniImagePath );
 					if (image.isEnableImage()) {
 						// リサイズして画像キャッシュに追加する。
+//						CSize size = image.getBitmapSize();
+//						MZ3LOGGER_DEBUG(util::FormatString(L"AddImageToImageCache from %dx%d", size.cx, size.cy));
 						theApp.AddImageToImageCache(this, image, miniImagePath);
 
 						bUseExtendedIcon = true;
