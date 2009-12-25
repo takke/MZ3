@@ -221,6 +221,13 @@ void CMZ3View::OnInitialUpdate()
 	TRACE(_T("Rect = (%d, %d) - (%d, %d)\n"), rect.left, rect.top, rect.right, rect.bottom);
 	OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 
+	// 起動時に上ペインを最大化するオプションの反映
+	if (theApp.m_optionMng.m_bMagnifyModeCategoryAtStart) {
+		m_magnifyMode = MAGNIFY_MODE_CATEGORY;
+	} else {
+		m_magnifyMode = MAGNIFY_MODE_DEFAULT;
+	}
+
 	// インターネット回線を開く
 //	theApp.m_inet.Open();
 

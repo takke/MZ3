@@ -117,6 +117,7 @@ public:
 	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
 	int				m_bBodyListIntegratedColumnModeLine;///< ボディリストのカラムの統合モード
 	bool			m_bOneClickCategoryFetchMode;		///< 上ペインのリストクリック時に取得する
+	bool			m_bMagnifyModeCategoryAtStart;		///< 起動時に上ペインを最大化する
 
 	//--- 通信
 	int				m_recvBufSize;					///< 受信バッファサイズ
@@ -205,6 +206,7 @@ public:
 		, m_bBodyListIntegratedColumnMode( true )
 		, m_bBodyListIntegratedColumnModeLine( 3 )
 		, m_bOneClickCategoryFetchMode( true )
+		, m_bMagnifyModeCategoryAtStart( false )
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )
 		, m_nTwitterStatusLineCount(3)

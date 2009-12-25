@@ -394,6 +394,9 @@ void Option::Sync(bool bSave)
 	// 上ペインのリストクリック時に取得する
 	SyncIniValue(inifile, bSave, m_bOneClickCategoryFetchMode, "MainViewOneClickCategoryFetchMode", "MainView");
 
+	// 起動時に上ペインを最大化する
+	SyncIniValue(inifile, bSave, m_bMagnifyModeCategoryAtStart, "MainViewMagnifyModeCategoryAtStart", "MainView");
+
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
 	SyncIniValue(inifile, bSave, m_strTwitterPostFotterText, "PostFotterText", "Twitter" );

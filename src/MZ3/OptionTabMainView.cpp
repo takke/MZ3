@@ -57,6 +57,9 @@ BOOL COptionTabMainView::OnInitDialog()
 
 	// 上ペインのリストクリック時に取得する
 	CheckDlgButton( IDC_ONE_CLICK_CATEGORY_FETCH_MODE_CHECK, theApp.m_optionMng.m_bOneClickCategoryFetchMode ? BST_CHECKED : BST_UNCHECKED);
+	
+	// 起動時に上ペインを最大化する
+	CheckDlgButton( IDC_MAGNIFY_MODE_CATEGORY_AT_START_CHECK, theApp.m_optionMng.m_bMagnifyModeCategoryAtStart ? BST_CHECKED : BST_UNCHECKED);
 
 	UpdateControlItemStatus();
 
@@ -80,6 +83,9 @@ void COptionTabMainView::OnOK()
 
 	// 上ペインのリストクリック時に取得する
 	theApp.m_optionMng.m_bOneClickCategoryFetchMode = IsDlgButtonChecked( IDC_ONE_CLICK_CATEGORY_FETCH_MODE_CHECK ) == BST_CHECKED;
+
+	// 起動時に上ペインを最大化する
+	theApp.m_optionMng.m_bMagnifyModeCategoryAtStart = IsDlgButtonChecked( IDC_MAGNIFY_MODE_CATEGORY_AT_START_CHECK ) == BST_CHECKED;
 
 	CPropertyPage::OnOK();
 }
