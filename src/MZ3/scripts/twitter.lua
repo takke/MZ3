@@ -2151,6 +2151,10 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	----------------------------------------------
 	-- 本文～その他の情報
 	----------------------------------------------
+	
+	-- 開始Y座標はクライアント名の下側とアイコンの下側の下の方とする
+	local y_source_bottom = y + line_height + y_margin;
+	local y_icon_bottom   = y_icon + icon_size + line_height/2;
 
 	-- 本文
 	g:set_font_size(1);		-- 大サイズフォント
@@ -2158,7 +2162,11 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	g:set_color("text", "MainBodyListNonreadText");
 	text = data:get_text_array_joined_text('body');
 	text = text:gsub("\r\n", "");
-	y = y_icon + icon_size + line_height/2;
+	if y_source_bottom > y_icon_bottom then
+		y = y_source_bottom;
+	else
+		y = y_icon_bottom;
+	end
 --	h = line_height * 7;
 	-- 高さは画面の高さの 1/3 程度
 	h = cy / 3;
