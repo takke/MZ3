@@ -1128,11 +1128,11 @@ int lua_mz3_account_provider_get_value(lua_State *L)
 	const char* func_name = "mz3_account_provider.get_value";
 
 	// à¯êîÇÃéÊìæ
-	const char* service_name = lua_tostring(L, 1);
+	CString service_name = MyUTF82WCS2(lua_tostring(L, 1));
 	std::string param_name   = lua_tostring(L, 2);
 
 	if (param_name=="id") {
-		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetId(CString(service_name)) );
+		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetId(service_name) );
 		lua_pushstring(L, v);
 	} else if (param_name=="password") {
 		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetPassword(CString(service_name)) );

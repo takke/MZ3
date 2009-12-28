@@ -1355,8 +1355,9 @@ function do_post_to_twitter(text)
 
 	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
 	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
-		if text:find("RT @", 1, false)~=nil then
-			-- RTが含まれているので追加しない
+		if text:find("RT @", 1, false)~=nil or 
+		   text:find("QT @", 1, false)~=nil then
+			-- RT/QTが含まれているので追加しない
 		else
 			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
