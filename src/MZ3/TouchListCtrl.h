@@ -33,6 +33,10 @@ public:
 	bool	m_bBlackScrollMode;				///< ブラックスクロールモード
 											///< スクロール中、描画範囲外にiPhone風の塗りつぶしを行う。
 											///< WMだとリストの再描画が遅いので。
+	DWORD	m_dwLastDrawTick;				///< 前回の描画時刻(TickTime)
+
+	bool	m_bFullPageDrawForBlackScrollStart;	///< N画面分の描画(縦ドラッグ開始時に有効)
+
 	CTouchListCtrl(void);
 	~CTouchListCtrl(void);
 
@@ -74,6 +78,8 @@ protected:
 	CDC*		m_memDC;			///< 裏画面DC
 	CBitmap*	m_memBMP;			///< 裏画面バッファ
 	CBitmap*	m_oldBMP;			///< 旧画面の情報
+	int			m_yBackSurfaceStart;///< 裏画面の描画開始位置(表に転送する境界判定用)
+	int			m_yBackSurfaceEnd;	///< 裏画面の描画終了位置(表に転送する境界判定用)
 
 	int		m_drawStartTopOffset;	///< 描画開始オフセット(ピクセル)
 
@@ -90,7 +96,8 @@ protected:
 
 	// パン関連情報
 	bool	m_bPanDragging;			///< 横方向マウスドラッグ中
-	bool	m_bScrollDragging;		///< スクロール中
+	bool	m_bVerticalDragging;	///< スクロール中
+
 	int		m_offsetPixelX;			///< 横方向オフセットピクセル数
 	int		m_dPxelX;				///< 横方向単位時間移動量 [pixels/10msec]
 	DWORD	m_dwPanScrollLastTick;	///< パンスクロール開始時刻
@@ -98,6 +105,7 @@ protected:
 	bool	m_bCanPanScroll;		///< パンスクロールアニメ可能か
 	PAN_SCROLL_DIRECTION m_drPanScrollDirection;	///< パンスクロール方向
 	HANDLE	m_hPanScrollEvent;		///<
+
 public:
 	// 背景描画フラグの設定／取得
 	bool	IsDrawBk() { return m_bDrawBk; }
@@ -105,7 +113,7 @@ public:
 		m_bDrawBk = bDrawBk; 
 	}
 	// 描画
-	int DrawDetail(bool bForceDraw=true);
+	int DrawBackSurface(bool bForceDraw=true);
 
 	void ResetAllTimer();
 
@@ -186,6 +194,6 @@ public:
 	afx_msg void OnLvnInsertitem(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-	void DrawItemToBackSurface(int nItem);
+	void DrawItemToBackSurface(int nItem, bool bDrawBk=false);
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 };

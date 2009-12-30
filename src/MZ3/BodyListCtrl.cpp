@@ -55,7 +55,7 @@ CBodyListCtrl::CBodyListCtrl()
 #ifdef WINCE
 	// スクロール時に iPhone 風の再描画を行う
 	// TODO 1画面ではやはり足りない。遅延的に複数画面分確保できるようにしてから復活させること。
-//	m_bBlackScrollMode = true;
+	m_bBlackScrollMode = true;
 #endif
 	// 横スライドによる移動をオンにする
 	// （コンストラクタで設定し、以降変更しないこと）
@@ -1117,7 +1117,7 @@ LRESULT CBodyListCtrl::OnSetFont(WPARAM wParam, LPARAM lParam)
 
 void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	bool bDragging = m_bPanDragging || m_bScrollDragging;
+	bool bDragging = m_bPanDragging || m_bVerticalDragging;
 
 	// 先に親を呼び出し、選択変更する
 	CTouchListCtrl::OnLButtonUp(nFlags, point);

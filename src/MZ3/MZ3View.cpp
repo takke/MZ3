@@ -694,7 +694,9 @@ void CMZ3View::MySetLayout(int cx, int cy)
 
 	int y = 0;
 	if (hGroup != 0) {
-		m_groupTab.ShowWindow(SW_SHOW);
+		if (m_groupTab.m_hWnd != NULL) {
+			m_groupTab.ShowWindow(SW_SHOW);
+		}
 		util::MoveDlgItemWindow( this, IDC_GROUP_TAB,   0, y, cx, hGroup    );
 	} else {
 		m_groupTab.ShowWindow(SW_HIDE);
@@ -1605,7 +1607,7 @@ void CMZ3View::SetBodyList( CMixiDataList& body )
 	m_bodyList.m_bStopDraw = false;
 
 	// バックバッファ経由で再描画
-	m_bodyList.DrawDetail();
+	m_bodyList.DrawBackSurface();
 	m_bodyList.UpdateWindow();
 
 	if (m_bodyList.GetItemCount()==0) {
@@ -3642,7 +3644,7 @@ bool CMZ3View::MyChangeBodyHeader(void)
 	} else {
 		// 再描画
 		// バックバッファ経由で再描画
-		m_bodyList.DrawDetail();
+		m_bodyList.DrawBackSurface();
 		m_bodyList.UpdateWindow();
 	}
 
@@ -5559,7 +5561,7 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	m_bodyList.DeleteAllItems();
 	m_bodyList.SetRedraw(TRUE);
 	// バックバッファ経由で再描画
-	m_bodyList.DrawDetail();
+	m_bodyList.DrawBackSurface();
 	m_bodyList.UpdateWindow();
 
 	// グループ定義ファイルの保存
