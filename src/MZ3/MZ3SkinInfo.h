@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <hash_map>
+
 /**
  * スキン情報
  *
@@ -20,7 +22,7 @@ public:
 	CString strMainCategoryCtrlImageFileName;	///< メイン画面のカテゴリコントロール用背景画像ファイル名
 	CString strReportListCtrlImageFileName;		///< レポート画面のリストコントロール用背景画像ファイル名
 
-	std::map<std::string, COLORREF> colorMap;	///< 各種カラーのマップ(カラー名 => カラー)
+	stdext::hash_map<std::string, COLORREF> colorMap;	///< 各種カラーのマップ(カラー名 => カラー)
 
 	COLORREF getColor(const char* szColorName)
 	{

@@ -248,7 +248,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 	// ‘SÁ‹‚µ‚È‚¢
 
 	// d•¡–h~—p‚Ì id ˆê——‚ğ¶¬
-	std::set<INT64> id_set;
+	stdext::hash_set<INT64> id_set;
 	int n = body_.size();
 	for (int i=0; i<n; i++) {
 		INT64 id = body_[i].GetID();

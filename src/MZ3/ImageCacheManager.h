@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <set>
+#include <hash_map>
 
 /**
  * 画像キャッシュ
@@ -21,7 +21,7 @@ class ImageCacheManager
 	CStringArray	m_imageListMap;		///< m_imageList の各インデックスに
 										///< どのファイルが格納されているかを示す疑似マップ
 
-	typedef std::map<std::wstring, int> wstring_to_index_map;
+	typedef stdext::hash_map<std::wstring, int> wstring_to_index_map;
 	wstring_to_index_map m_loadedFileToIndexMap;	///< ロード済みファイルから
 													///< m_imageList のインデックスを引くマップ
 

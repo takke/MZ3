@@ -10,13 +10,19 @@
 #include "constants.h"
 #include <vector>
 #include <string>
-#include <map>
+//#include <map>
+#include <hash_map>
+
+// hash_map 関連で多数発生する warning を抑制「C4503: 装飾された名前の長さが限界を超えました。名前は切り捨てられます。」
+#pragma warning(disable:4503)
+
 
 class MZ3Data;
 typedef std::vector<MZ3Data> MZ3DataList;
 
 typedef std::wstring				MZ3String;			///< 文字列型
 typedef std::vector<std::wstring>	MZ3StringArray;		///< 文字列配列型
+typedef stdext::hash_map<MZ3String, MZ3StringArray> MZ3StringsMap;	///< 文字列配列のmap
 
 extern int g_nMZ3DataInstances;							///< MZ3Data オブジェクト数
 
@@ -24,7 +30,7 @@ extern int g_nMZ3DataInstances;							///< MZ3Data オブジェクト数
 class MZ3StringArrayMap
 {
 private:
-	std::map<MZ3String, MZ3StringArray> m_theMap;	///< 文字列配列のmap
+	MZ3StringsMap					m_theMap;	///< 文字列配列のmap
 
 	/// m_StringArrayMap から文字列配列オブジェクトを取得する
 	MZ3StringArray* GetStringArray(LPCTSTR key)
@@ -38,7 +44,7 @@ private:
 		if( m_theMap.size() == 0 ){
 			return NULL;
 		}
-		const std::map<MZ3String, MZ3StringArray>::const_iterator& v = m_theMap.find(key);
+		const MZ3StringsMap::const_iterator& v = m_theMap.find(key);
 		if (v==m_theMap.end()) {
 			return NULL;
 		}
@@ -85,9 +91,12 @@ public:
 	}
 };
 
-typedef std::map<MZ3String, MZ3String>	MZ3StringMap;
-typedef std::map<MZ3String, INT32>		MZ3Int32Map;
-typedef std::map<MZ3String, INT64>		MZ3Int64Map;
+//typedef std::map<MZ3String, MZ3String>	MZ3StringMap;
+//typedef std::map<MZ3String, INT32>		MZ3Int32Map;
+//typedef std::map<MZ3String, INT64>		MZ3Int64Map;
+typedef stdext::hash_map<MZ3String, MZ3String>	MZ3StringMap;
+typedef stdext::hash_map<MZ3String, INT32>		MZ3Int32Map;
+typedef stdext::hash_map<MZ3String, INT64>		MZ3Int64Map;
 
 /**
  * MZ3 のデータ管理クラス

@@ -1767,7 +1767,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 //			util::StopWatch sw_detect, sw_draw;
 //			sw_detect.start();
 
-			static std::set<int> redrawItems;
+			static stdext::hash_set<int> redrawItems;
 			redrawItems.clear();
 
 			// selected, s_lastSelected ‚ÍÄ•`‰æ
@@ -1789,7 +1789,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 				// “¯ˆêID‚Ì€–Ú‚Í•`‰æó‘Ô‚É•Ï‰»‚ª‚È‚¢‚Ì‚ÅÄ•`‰æ‚µ‚È‚¢
 			} else {
 				// Ä•`‰æ‘ÎÛ‚Æ‚È‚éƒ†[ƒUID
-				static std::set<int> redrawTargetUsers;
+				static stdext::hash_set<int> redrawTargetUsers;
 				redrawTargetUsers.clear();
 
 				redrawTargetUsers.insert(sel_data.GetOwnerID());
@@ -1810,7 +1810,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 			// selected, s_lastSelected ‚ÌŒ¾‹yƒ†[ƒU‚ÍÄ•`‰æ
-			static std::set<CString> redrawTargetUsers;
+			static stdext::hash_set<std::wstring> redrawTargetUsers;
 			redrawTargetUsers.clear();
 			for (int i=0; i<2; i++) {
 				MZ3Data* pSelectedData = (i==0) ? &sel_data : &last_sel_data;
@@ -1829,7 +1829,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 				}
 
 				if (redrawItems.count(idx)==0 && 0 <= idx && idx < (int)pCategory->m_body.size()) {
-					if (redrawTargetUsers.count(pCategory->m_body[idx].GetName()) > 0) {
+					if (redrawTargetUsers.count((LPCTSTR)pCategory->m_body[idx].GetName()) > 0) {
 						redrawItems.insert(idx);
 					}
 				}
@@ -1839,7 +1839,7 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 			
 			// Ä•`‰æ
 //			sw_draw.start();
-			for (std::set<int>::iterator it=redrawItems.begin(); it!=redrawItems.end(); it++) {
+			for (stdext::hash_set<int>::iterator it=redrawItems.begin(); it!=redrawItems.end(); it++) {
 				int idx = (*it);
 				m_bodyList.DrawItemWithBackSurface(idx);
 			}

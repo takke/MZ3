@@ -26,6 +26,8 @@
 #include "EmojiMap.h"
 #include "ImageCacheManager.h"
 #include "AccessTypeInfo.h"
+#include <hash_map>
+#include <hash_set>
 
 #ifndef WINCE
 	#include "gdiplus.h"
@@ -174,7 +176,7 @@ public:
 	//--- 画像
 	ImageCacheManager	m_imageCache;			///< グローバル画像キャッシュ（16x16）
 
-	std::set<std::wstring> m_notFoundFileList;	///< 存在しないファイルの集合
+	stdext::hash_set<std::wstring> m_notFoundFileList;	///< 存在しないファイルの集合
 												///< ファイルI/OがWMだとやけに遅いのでキャッシュ化
 
 	//--- 通信系
@@ -210,8 +212,8 @@ public:
 		AccountData(const std::string& sn="", const std::string& idn="", const std::string& pwn="")
 			: service_name(sn), id_name(idn), password_name(pwn) {}
 	};
-	std::map<std::string, std::string> m_luaParsers;				///< シリアライズキー → パーサ名
-	std::map<std::string, std::vector<std::string>> m_luaHooks;		///< {イベント} → パーサ名
+	stdext::hash_map<std::string, std::string> m_luaParsers;				///< シリアライズキー → パーサ名
+	stdext::hash_map<std::string, std::vector<std::string>> m_luaHooks;		///< {イベント} → パーサ名
 	std::vector<std::string>						m_luaMenus;		///< 登録済みメニュー項目
 	std::vector<Service>							m_luaServices;	///< 登録済みサービス群
 	std::vector<AccountData>						m_luaAccounts;	///< 登録済みアカウント情報(ログイン設定用)
