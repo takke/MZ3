@@ -83,6 +83,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.camera_capture">mz3.camera_capture</a>&nbsp;(wnd)</td>
+	<td class="summary">カメラ撮影(撮影結果のファイル名を返す)  ※MZ3 & Pro Mode Only  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.change_view">mz3.change_view</a>&nbsp;(view_name)</td>
 	<td class="summary">ビュー切り替え  </td>
 	</tr>
@@ -215,6 +220,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3.show_common_edit_dlg">mz3.show_common_edit_dlg</a>&nbsp;(caption, msg, initial_text, title)</td>
 	<td class="summary">共通エディット画面の表示  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.show_detail_view">mz3.show_detail_view</a>&nbsp;(write_view_type, data)</td>
+	<td class="summary">詳細画面の起動  </td>
 	</tr>
 
 	<tr>
@@ -460,6 +470,36 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3_data_list.merge">mz3_data_list.merge</a>&nbsp;(data_list, new_list, max_size)</td>
 	<td class="summary">data_list のmerge   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.draw_image">mz3_graphics.draw_image</a>&nbsp;(dc, image_cache_index, x, y, w, h)</td>
+	<td class="summary">画像の描画  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.draw_rect">mz3_graphics.draw_rect</a>&nbsp;(dc, type, x, y, w, h, color_or_color_name)</td>
+	<td class="summary">矩形の描画  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.draw_text">mz3_graphics.draw_text</a>&nbsp;(dc, text, x, y, w, h, format)</td>
+	<td class="summary">文字列の描画  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.get_line_height">mz3_graphics.get_line_height</a>&nbsp;(dc)</td>
+	<td class="summary">行の高さ  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.set_color">mz3_graphics.set_color</a>&nbsp;(dc, type, color_or_color_name)</td>
+	<td class="summary">色の変更  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_graphics.set_font_size">mz3_graphics.set_font_size</a>&nbsp;(dc, size)</td>
+	<td class="summary">フォントサイズ  </td>
 	</tr>
 
 	<tr>
@@ -838,6 +878,35 @@ Win32 API の MessageBox() を呼び出す。
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.camera_capture"></a><strong>mz3.camera_capture</strong>&nbsp;(wnd)</dt>
+<dd>
+カメラ撮影(撮影結果のファイル名を返す)  ※MZ3 & Pro Mode Only 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  wnd: ウィンドウ(mz3_main_view.get_wnd() 等で取得した値) 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+(string) 選択ファイルパス, ユーザキャンセル時は nil 
 
 
 
@@ -1654,6 +1723,36 @@ URL をブラウザで開く(確認付き)
 
 <h3>Return value:</h3>
 (string) ユーザ入力値, ユーザキャンセル時は nil 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.show_detail_view"></a><strong>mz3.show_detail_view</strong>&nbsp;(write_view_type, data)</dt>
+<dd>
+詳細画面の起動 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  write_view_type: 
+	</li>
+	
+	<li>
+	  data: MZ3Data(allow nil) 
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -3153,6 +3252,248 @@ data_list のmerge
 	
 	<li>
 	  max_size: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.draw_image"></a><strong>mz3_graphics.draw_image</strong>&nbsp;(dc, image_cache_index, x, y, w, h)</dt>
+<dd>
+画像の描画 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: 
+	</li>
+	
+	<li>
+	  image_cache_index: 
+	</li>
+	
+	<li>
+	  x: 
+	</li>
+	
+	<li>
+	  y: 
+	</li>
+	
+	<li>
+	  w: 
+	</li>
+	
+	<li>
+	  h: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.draw_rect"></a><strong>mz3_graphics.draw_rect</strong>&nbsp;(dc, type, x, y, w, h, color_or_color_name)</dt>
+<dd>
+矩形の描画 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: DC
+	</li>
+	
+	<li>
+	  type: "border" or "fill"
+	</li>
+	
+	<li>
+	  x: x
+	</li>
+	
+	<li>
+	  y: y
+	</li>
+	
+	<li>
+	  w: w
+	</li>
+	
+	<li>
+	  h: h
+	</li>
+	
+	<li>
+	  color_or_color_name: 文字列の場合はスキンのカラー名、数値の場合はRGB色 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.draw_text"></a><strong>mz3_graphics.draw_text</strong>&nbsp;(dc, text, x, y, w, h, format)</dt>
+<dd>
+文字列の描画 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: 
+	</li>
+	
+	<li>
+	  text: 
+	</li>
+	
+	<li>
+	  x: 
+	</li>
+	
+	<li>
+	  y: 
+	</li>
+	
+	<li>
+	  w: 
+	</li>
+	
+	<li>
+	  h: 
+	</li>
+	
+	<li>
+	  format: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.get_line_height"></a><strong>mz3_graphics.get_line_height</strong>&nbsp;(dc)</dt>
+<dd>
+行の高さ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: DC 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+行の高さ(px) 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.set_color"></a><strong>mz3_graphics.set_color</strong>&nbsp;(dc, type, color_or_color_name)</dt>
+<dd>
+色の変更 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: DC
+	</li>
+	
+	<li>
+	  type: "text" or "bg"
+	</li>
+	
+	<li>
+	  color_or_color_name: 文字列の場合はスキンのカラー名、数値の場合はRGB色 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+元の色 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_graphics.set_font_size"></a><strong>mz3_graphics.set_font_size</strong>&nbsp;(dc, size)</dt>
+<dd>
+フォントサイズ 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  dc: DC
+	</li>
+	
+	<li>
+	  size: 1:大、0:標準、-1:小 
 	</li>
 	
 </ul>
