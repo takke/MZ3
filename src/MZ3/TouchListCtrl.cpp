@@ -487,7 +487,7 @@ bool CTouchListCtrl::MyMakeBackBuffers(CDC* pdc)
 	//--- バッファ生成
 	// 裏画面バッファの確保
 	// 画面の高さを3倍して余裕をもたせてみた
-	if (m_memBMP->CreateCompatibleBitmap( pdc , m_screenWidth , m_screenHeight*23 ) != TRUE) {
+	if (m_memBMP->CreateCompatibleBitmap( pdc , m_screenWidth , m_screenHeight*3 ) != TRUE) {
 		CString msg;
 		msg.Format(TEXT("CreateCompatibleBitmap error! w[%d], h[%d]"), m_screenWidth, m_screenHeight*3);
 		MZ3LOGGER_FATAL(msg);
@@ -916,9 +916,11 @@ int	CTouchListCtrl::DrawBackSurface( bool bForceDraw /* = true */ )
 		int N_OVER_OFFSET_LINES = 1;
 
 		if (m_bFullPageDrawForBlackScrollStart) {
+			// 裏画面用に上下2画面分、余分に描画する
 			N_OVER_OFFSET_LINES = GetCountPerPage();
 		}
 
+		// 裏画面描画範囲初期化
 		m_yBackSurfaceStart = 65535;
 		m_yBackSurfaceEnd   = 0;
 		for (int i=-N_OVER_OFFSET_LINES; i <= GetCountPerPage()+N_OVER_OFFSET_LINES; i++) {
@@ -933,7 +935,8 @@ int	CTouchListCtrl::DrawBackSurface( bool bForceDraw /* = true */ )
 			}
 
 			// バックバッファにアイテムを描画する
-			DrawItemToBackSurface(nItem, true);
+			// 裏画面に3画面分描画する際は背景も描画する
+			DrawItemToBackSurface(nItem, m_bFullPageDrawForBlackScrollStart);
 		}
 
 		// フォントを元に戻す
