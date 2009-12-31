@@ -570,7 +570,7 @@ void CMainFrame::OnUpdateAutoReloadButton(CCmdUI* pCmdUI)
 // -----------------------------------------------------------------------------
 void CMainFrame::OnSettingGeneral()
 {
-	if( theApp.m_bSmartphone ) {
+	if (theApp.m_Platforms.Smartphone) {
 		// Smartphone/Standard Edition では COptionSheet 等が利用できないため、警告メッセージを表示する。
 		MessageBox( 
 			L"Smartphone/Standard Edition ではオプション画面を表示できません。\n"
@@ -771,7 +771,7 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		int h = rect.Height() - rect.top;
 
 		// Smartphone/Standard Edition の場合はツールバーの分だけ微調整
-		if( theApp.m_bSmartphone ) {
+		if (theApp.m_Platforms.Smartphone) {
 			h += MZ3_TOOLBAR_HEIGHT;
 		}
 

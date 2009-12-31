@@ -63,11 +63,6 @@ CMZ3App::CMZ3App()
 	, m_bgImageMainBodyCtrl(L"body.jpg")
 	, m_bgImageMainCategoryCtrl(L"header.jpg")
 	// プラットフォーム用のフラグ
-	, m_bPocketPC(FALSE)
-	, m_bSmartphone(FALSE)
-	, m_bWinMoFiveOh(FALSE)
-	, m_bWinMo2003(FALSE)
-	, m_bWinMo2003_SE(FALSE)
 	, m_pMouseGestureManager(NULL)
 	, m_luaState(NULL)
 	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
@@ -355,7 +350,7 @@ BOOL CMZ3App::InitInstance()
 	((CMainFrame*)m_pMainWnd)->MySetTitle();
 
 #ifdef WINCE
-	if( m_bSmartphone ) {
+	if (m_Platforms.Smartphone) {
 		// 全画面表示
 		::SHFullScreen(m_pMainWnd->m_hWnd, SHFS_HIDETASKBAR | SHFS_HIDESIPBUTTON );
 		::ShowWindow(((CMainFrame*)m_pMainWnd)->m_hCommandBar, SW_HIDE);
@@ -556,25 +551,42 @@ void CMZ3App::InitPlatformFlags()
 	TCHAR atchPlat[64];
 	SystemParametersInfo(SPI_GETPLATFORMTYPE, 64, (PVOID)atchPlat, 0);
 
-	if (_tcsncmp(atchPlat, L"PocketPC", 64) == 0)
-	{
-		m_bPocketPC = TRUE;
+	if (_tcsncmp(atchPlat, L"PocketPC", 64) == 0) {
+		m_Platforms.PocketPC = true;
 	}
 
-	if (_tcsncmp(atchPlat, L"SmartPhone", 64) == 0)
-	{
-		m_bSmartphone = TRUE;
+	if (_tcsncmp(atchPlat, L"SmartPhone", 64) == 0) {
+		m_Platforms.Smartphone = true;
 	}
 
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
-	if ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion == 01)) 
-		m_bWinMoFiveOh = TRUE;
-	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 20)) 
-		m_bWinMo2003 = TRUE;
-	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 21)) 
-		m_bWinMo2003_SE = TRUE;
+	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 20)) {
+		m_Platforms.WM2003 = true;
+	}
+	if ((osvi.dwMajorVersion == 4) && (osvi.dwMinorVersion == 21)) {
+		m_Platforms.WM2003_SE = true;
+	}
+	if ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion >= 1)) {
+		m_Platforms.WM5_0 = true;
+	}
+	if ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion >= 2)) {
+		// Revision により判定
+		// @see http://social.msdn.microsoft.com/Forums/en-US/windowsmobiledev/thread/dbca8f36-e907-48fb-96d2-109dc81f28cc
+		if (osvi.dwBuildNumber < 14000) {
+			m_Platforms.WM6_0 = true;
+		}
+		if (osvi.dwBuildNumber < 21000) {
+			m_Platforms.WM6_1 = true;
+		}
+		if (osvi.dwBuildNumber < 23000) {
+			m_Platforms.WM6_5 = true;
+		}
+		if (osvi.dwBuildNumber >= 23000) {
+			m_Platforms.WM6_5_1 = true;
+		}
+	}
 #endif
 }
 
@@ -1048,7 +1060,7 @@ int CMZ3App::GetInfoRegionHeight( int fontHeight )
 	case SR_QVGA:
 	default:
 		// VGA 以外
-		if (m_bSmartphone) {
+		if (m_Platforms.Smartphone) {
 			// Smartphone/Standard Edition 環境
 			// X02HT での検証結果を受けて下記の値を設定。
 			return fontHeight +6;
@@ -1082,7 +1094,7 @@ int CMZ3App::GetTabHeight( int fontHeight )
 	case SR_QVGA:
 	default:
 		// VGA 以外
-		if( theApp.m_bSmartphone ) {
+		if (theApp.m_Platforms.Smartphone) {
 			// Smartphone/Standard Edition 環境
 			return fontHeight +8;
 		} else {

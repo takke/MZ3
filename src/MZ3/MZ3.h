@@ -126,11 +126,30 @@ public:
 	ScreenResolution	m_currentDisplayMode;	///< 解像度
 
 	/// プラットフォーム用のフラグ
-	BOOL				m_bPocketPC;
-	BOOL				m_bSmartphone;
-	BOOL				m_bWinMoFiveOh;
-	BOOL				m_bWinMo2003;
-	BOOL				m_bWinMo2003_SE;
+	struct Platforms {
+		bool PocketPC;
+		bool Smartphone;
+		bool WM2003;		///< Windows Mobile 2003
+		bool WM2003_SE;		///< Windows Mobile 2003 SE
+		bool WM5_0;			///< Windows Mobile 5
+		bool WM6_0;			///< Windows Mobile 6
+		bool WM6_1;			///< Windows Mobile 6.1
+		bool WM6_5;			///< Windows Mobile 6.5
+		bool WM6_5_1;		///< Windows Mobile 6.5 SE (or 6.5.1)
+
+		Platforms()
+			: PocketPC(false)
+			, Smartphone(false)
+			, WM2003(false)
+			, WM2003_SE(false)
+			, WM5_0(false)
+			, WM6_0(false)
+			, WM6_1(false)
+			, WM6_5(false)
+			, WM6_5_1(false)
+		{}
+	};
+	Platforms			m_Platforms;			///< Platform
 
 	bool				m_bProMode;				///< ProMode
 

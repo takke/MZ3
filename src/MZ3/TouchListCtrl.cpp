@@ -234,7 +234,7 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 
 		// スクロール中か？
-		if ( m_bVerticalDragging ) {
+		if (m_bVerticalDragging) {
 
 			// 慣性スクロール情報取得
 			m_autoScrollInfo.push( GetTickCount(), point );
@@ -270,6 +270,7 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 		}
+
 		// フラグクリア
 		m_bDragging = false;
 		m_bPanDragging = false;
@@ -301,7 +302,7 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		MySetDragFlagWhenMovedPixelOverLimit(dx, dy);
 
 		// 縦スクロール中か？
-		if ( m_bVerticalDragging ) {
+		if (m_bVerticalDragging) {
 			//if( m_bCanSlide ){
 			//	SetSelectItem( m_iDragStartItem );
 			//}
@@ -366,6 +367,7 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 				// オフセットの調整（念のため）
 				MyAdjustDrawOffset();
 				m_autoScrollInfo.clear();
+
 				// ドラッグフラグクリア
 				m_bDragging = false;
 				m_bPanDragging = false;
@@ -1539,9 +1541,16 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 			if( GetItemCount()-GetCountPerPage() > 0 ) {
 				// 縦スクロール可能ならば
 				// 縦ドラッグ開始
-				m_bVerticalDragging = true;
 
-				m_bFullPageDrawForBlackScrollStart = true;
+				if (theApp.m_Platforms.WM6_5 || theApp.m_Platforms.WM6_5_1) {
+					// WM6.5 以降であれば無効
+				} else {
+					m_bVerticalDragging = true;
+
+					if (m_bBlackScrollMode) {
+						m_bFullPageDrawForBlackScrollStart = true;
+					}
+				}
 			}
 		}
 	}

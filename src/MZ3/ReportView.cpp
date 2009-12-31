@@ -1940,7 +1940,7 @@ LRESULT CReportView::OnFit(WPARAM wParam, LPARAM lParam)
 {
 	RECT rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	if( theApp.m_bPocketPC ) {
+	if (theApp.m_Platforms.PocketPC) {
 		OnSize(SIZE_RESTORED, rect.right - rect.left, rect.bottom - (rect.top*2));
 	}
 
