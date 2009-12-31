@@ -140,6 +140,7 @@
 #define IDC_USE_RUN_CONFIRM_DLG_CHECK   1038
 #define IDC_ACCESS_TYPE_LIST            1038
 #define IDC_GROUP_TAB                   1039
+#define IDC_SHOW_BALLOON_ON_NEW_TL_CHECK 1039
 #define IDC_CHANGE_LOG_FOLDER_BUTTON    1040
 #define IDC_SHOW_ICON_CHECK             1040
 #define IDC_PROGRESS_BAR                1041

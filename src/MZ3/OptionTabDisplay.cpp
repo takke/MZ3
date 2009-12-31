@@ -61,6 +61,16 @@ BOOL COptionTabDisplay::OnInitDialog()
 	// ダウンロード後の確認画面
 	CheckDlgButton( IDC_USE_RUN_CONFIRM_DLG_CHECK, theApp.m_optionMng.m_bUseRunConfirmDlg ? BST_CHECKED : BST_UNCHECKED );
 
+	// 通知領域に新着TLをバルーン表示する
+	CheckDlgButton( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK, theApp.m_optionMng.m_bShowBalloonOnNewTL ? BST_CHECKED : BST_UNCHECKED );
+#ifdef WINCE
+	CWnd* pItem = GetDlgItem( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK );
+	if (pItem != NULL) {
+		pItem->ShowWindow(SW_HIDE);
+	}
+#endif
+
+
 	return TRUE;
 }
 
@@ -91,6 +101,9 @@ void COptionTabDisplay::OnOK()
 
 	// ダウンロード後の確認画面
 	theApp.m_optionMng.m_bUseRunConfirmDlg = IsDlgButtonChecked( IDC_USE_RUN_CONFIRM_DLG_CHECK ) == BST_CHECKED ? true : false;
+
+	// 通知領域に新着TLをバルーン表示する
+	theApp.m_optionMng.m_bShowBalloonOnNewTL = IsDlgButtonChecked( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }

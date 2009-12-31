@@ -140,6 +140,7 @@ void Option::Sync(bool bSave)
 	SyncIniValue(inifile, bSave, m_bBootCheckMnC, "CheckMnC", "Boot");
 
 	//--- UI
+	// バルーン表示有無
 	SyncIniValue(inifile, bSave, m_bShowBalloonOnNewTL, "ShowBalloonOnNewTL", "UI");
 
 	// 背景画像の有無
