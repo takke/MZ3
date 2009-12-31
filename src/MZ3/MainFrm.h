@@ -122,6 +122,10 @@ public:
 	afx_msg void OnMenuStop();
 //	afx_msg void OnWinIniChange(LPCTSTR lpszSection);
 	afx_msg void OnMenuOpenMenu();
+#ifndef WINCE
+	NOTIFYICONDATA m_notifyIconData;
+	afx_msg LONG OnTrayIcon ( WPARAM wParam, LPARAM lParam );
+#endif
 };
 
 

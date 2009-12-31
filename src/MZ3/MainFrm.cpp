@@ -95,6 +95,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_RELOAD_CATEGORY_LIST_LOG, &CMainFrame::OnMenuReloadCategoryListLog)
 //	ON_WM_WININICHANGE()
 	ON_COMMAND(ID_MENU_OPEN_MENU, &CMainFrame::OnMenuOpenMenu)
+#ifndef WINCE
+	ON_MESSAGE(WM_TRAYICONMESSAGE, &CMainFrame::OnTrayIcon)
+#endif
 END_MESSAGE_MAP()
 
 
@@ -231,6 +234,42 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	wp.cy = rc.Height();
 	wp.flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
 	SendMessage( WM_WINDOWPOSCHANGED, 0, (LPARAM)&wp );
+#endif
+
+#ifndef WINCE
+	// 通知領域のアイコンを作成
+	LPCTSTR pszToolTipMsg = MZ3_APP_NAME;
+
+	m_notifyIconData.cbSize           = sizeof(NOTIFYICONDATA);
+	m_notifyIconData.hWnd	          = this->m_hWnd;
+	m_notifyIconData.uID              = 1;
+	m_notifyIconData.uFlags           = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	m_notifyIconData.uCallbackMessage = WM_TRAYICONMESSAGE;
+	m_notifyIconData.hIcon            = AfxGetApp()->LoadIconW(IDR_MAINFRAME_WIN32);
+	lstrcpy(m_notifyIconData.szTip, pszToolTipMsg);
+
+	// アイコンを登録できるかエラーになるまで繰り返す
+	while (true) {
+		if (Shell_NotifyIcon(NIM_ADD, &m_notifyIconData)) {
+			// 登録できたら終わり
+			break;
+		} else {
+			// タイムアウトかどうか調べる
+			if (::GetLastError() != ERROR_TIMEOUT) {
+				// アイコン登録エラー
+				break;
+			}
+
+			// 登録できていないことを確認する
+			if (Shell_NotifyIcon(NIM_MODIFY, &m_notifyIconData)) {
+				// 登録できていた
+				break;
+			} else {
+				// 登録できていなかった
+				::Sleep(200L);
+			}
+		}
+	}
 #endif
 
 	return 0;
@@ -1145,6 +1184,11 @@ void CMainFrame::OnDestroy()
 		DestroyMenu(m_hMenu);
 	}
 #endif
+
+#ifndef WINCE
+	// 通知領域のアイコンを削除
+	Shell_NotifyIcon(NIM_DELETE, &m_notifyIconData);
+#endif
 }
 
 BOOL CMainFrame::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
@@ -1444,3 +1488,31 @@ void CMainFrame::OnSelectCategory(UINT nID)
 
 	}
 }
+
+#ifndef WINCE
+/// トレイアイコン通知
+LONG CMainFrame::OnTrayIcon( WPARAM wParam, LPARAM lParam )
+{
+	switch (lParam) {
+	case WM_LBUTTONDOWN:
+		// 最小化 or 元に戻す
+		{
+			CRect r;
+			GetClientRect(&r);
+			if (r.Height()==0) {
+				ShowWindow(SW_RESTORE);
+			} else {
+				ShowWindow(SW_MINIMIZE);
+			}
+		}
+		break;
+
+	case WM_RBUTTONDOWN:
+		// 仮にメニューを表示
+		OnMenuOpenMenu();
+		break;
+	}
+
+	return FALSE;
+}
+#endif
