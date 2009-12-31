@@ -576,11 +576,9 @@ void CMZ3App::InitPlatformFlags()
 		// @see http://social.msdn.microsoft.com/Forums/en-US/windowsmobiledev/thread/dbca8f36-e907-48fb-96d2-109dc81f28cc
 		if (osvi.dwBuildNumber < 14000) {
 			m_Platforms.WM6_0 = true;
-		}
-		if (osvi.dwBuildNumber < 21000) {
+		} else if (osvi.dwBuildNumber < 21000) {
 			m_Platforms.WM6_1 = true;
-		}
-		if (osvi.dwBuildNumber < 23000) {
+		} else if (osvi.dwBuildNumber < 23000) {
 			m_Platforms.WM6_5 = true;
 		}
 		if (osvi.dwBuildNumber >= 23000) {
