@@ -6281,6 +6281,32 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 					MZ3_TRACE(L"　★新着件数=%d\n", new_count);
 
+					// 1ページ目で新着のものをバルーン表示する
+#ifndef WINCE
+					if (theApp.m_optionMng.m_bShowBaloonOnNewTL && page==1) {
+						CString strBaloon;
+						size_t body_size = body.size();
+						for (size_t i=0; i<body_size; i++) {
+							MZ3Data& data = body[i];
+							if (data.GetIntValue(L"new_flag", 0)) {
+								if (!strBaloon.IsEmpty()) {
+									strBaloon += L"\n";
+								}
+
+								strBaloon.AppendFormat(L"%s : %s", data.GetName(), data.GetBody());
+							}
+						}
+
+						CMainFrame* pMainFrame = (CMainFrame*)theApp.m_pMainWnd;
+						NOTIFYICONDATA& nid = pMainFrame->m_notifyIconData;
+						nid.uFlags = NIF_INFO;
+						wcsncpy(nid.szInfoTitle, MZ3_APP_NAME L" 新着TL", sizeof(nid.szInfoTitle) / sizeof(nid.szInfoTitle[0]) -1);
+						wcsncpy(nid.szInfo, strBaloon, sizeof(nid.szInfo) / sizeof(nid.szInfo[0]) -1);
+						nid.dwInfoFlags = NIIF_INFO;
+						Shell_NotifyIcon(NIM_MODIFY, &nid);
+					}
+#endif
+
 					// 最大ページ数未満で、かつ、新着件数が閾値よりも多い場合
 					if (page<theApp.m_optionMng.m_nTwitterGetPageCount && new_count >= 20/2) {
 	//				if (page<50 && new_count >= 20/2) {

@@ -253,6 +253,9 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 	for (int i=0; i<n; i++) {
 		INT64 id = body_[i].GetID();
 		id_set.insert(id);
+
+		// ‘S‚Ä‚Ì new ƒtƒ‰ƒO‚ð‰ðœ
+		body_[i].SetIntValue(L"new_flag", 0);
 	}
 
 	util::StopWatch sw;
@@ -271,6 +274,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 			// data ¶¬
 			MZ3Data data;
 			data.SetAccessType(ACCESS_TWITTER_USER);
+			data.SetIntValue(L"new_flag", 1);
 
 			int i_in_status = 0;
 			bool bInUser = false;	// /status      : false

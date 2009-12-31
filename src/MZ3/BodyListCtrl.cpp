@@ -54,7 +54,7 @@ CBodyListCtrl::CBodyListCtrl()
 {
 #ifdef WINCE
 	// スクロール時に iPhone 風の再描画を行う
-	// TODO 1画面ではやはり足りない。遅延的に複数画面分確保できるようにしてから復活させること。
+	// 3画面分確保できるようにしたが、T-01A/WM6.5で正常動作するだろうか。。。
 	m_bBlackScrollMode = true;
 #endif
 	// 横スライドによる移動をオンにする

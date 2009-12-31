@@ -192,6 +192,7 @@ function my_add_new_user(new_list, status, id)
 
 	-- data 生成
 	data = MZ3Data:create();
+	data:set_integer('new_flag', 1);
 	
 	-- id : status/id
 	data:set_integer64_from_string('id', id);
@@ -314,9 +315,12 @@ function twitter_friends_timeline_parser(parent, body, html)
 	id_set = {};
 	n = body:get_count();
 	for i=0, n-1 do
-		id = mz3_data.get_integer64_as_string(body:get_data(i), 'id');
+		local f = body:get_data(i);
+		id = mz3_data.get_integer64_as_string(f, 'id');
 --		mz3.logger_debug(id);
 		id_set[ "" .. id ] = true;
+		-- 全ての new フラグを解除
+		mz3_data.set_integer('new_flag', 0);
 	end
 
 	local t1 = mz3.get_tick_count();
