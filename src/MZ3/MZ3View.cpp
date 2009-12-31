@@ -6308,7 +6308,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 
 					// 1ページ目で新着のものをバルーン表示する
 #ifndef WINCE
-					if (theApp.m_optionMng.m_bShowBalloonOnNewTL && page==1) {
+					if (theApp.m_optionMng.m_bShowBalloonOnNewTL && page==1 && new_count>0) {
 						CString strBalloon;
 						size_t body_size = body.size();
 						for (size_t i=0; i<body_size; i++) {

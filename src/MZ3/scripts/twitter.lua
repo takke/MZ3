@@ -320,7 +320,7 @@ function twitter_friends_timeline_parser(parent, body, html)
 --		mz3.logger_debug(id);
 		id_set[ "" .. id ] = true;
 		-- 全ての new フラグを解除
-		mz3_data.set_integer('new_flag', 0);
+		mz3_data.set_integer(f, 'new_flag', 0);
 	end
 
 	local t1 = mz3.get_tick_count();
