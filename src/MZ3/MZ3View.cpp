@@ -2046,7 +2046,7 @@ BOOL CMZ3View::PreTranslateMessage(MSG* pMsg)
 		case WM_RBUTTONDOWN:
 		case WM_RBUTTONUP:
 		case WM_MOUSEWHEEL:
-			ResetIntervalTimer();
+			ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_YES);
 			break;
 		default:
 			break;
@@ -4757,7 +4757,7 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 				// 現在のViewがMZ3View以外なので定期取得を行わない。
 				
 				// タイマーを更新（さらにN秒経つまで待つ）
-				ResetIntervalTimer();
+				ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_YES);
 				return;
 			}
 
@@ -4850,9 +4850,34 @@ bool CMZ3View::RetrieveCategoryItem(void)
 /**
  * タイマーを更新（さらにN秒経つまで待つ）
  */
-void CMZ3View::ResetIntervalTimer(void)
+void CMZ3View::ResetIntervalTimer(bool bRetry /* = false */)
 {
-	m_dwIntervalTimerStartMsec = GetTickCount();
+	if (bRetry) {
+		// 経過以外の処理(キー押下等による引き延ばし)
+		// 残り M 秒以内であれば M 秒に戻す
+		int nElapsedSec = (GetTickCount() - m_dwIntervalTimerStartMsec)/1000;
+		MZ3LOGGER_DEBUG(util::FormatString(L"☆経過時間=%dsec", nElapsedSec));
+		const int M = 5;
+		if (nElapsedSec >= theApp.m_optionMng.m_nIntervalCheckSec - M) {
+			// elapsed = (now - m_dwIntervalTimerStartMsec) / 1000
+			// elapsed = theApp.m_optionMng.m_nIntervalCheckSec - M
+			//
+			// theApp.m_optionMng.m_nIntervalCheckSec - M <= (now - m_dwIntervalTimerStartMsec) / 1000
+			// (theApp.m_optionMng.m_nIntervalCheckSec - M) * 1000 <= now - m_dwIntervalTimerStartMsec
+			// m_dwIntervalTimerStartMsec = now - (theApp.m_optionMng.m_nIntervalCheckSec - M) * 1000
+			m_dwIntervalTimerStartMsec = GetTickCount() - (theApp.m_optionMng.m_nIntervalCheckSec - M) * 1000;
+
+			int nElapsedSecNew = (GetTickCount() - m_dwIntervalTimerStartMsec)/1000;
+			MZ3LOGGER_DEBUG(
+				util::FormatString(L"☆タイマーリセット : リセット後の経過時間=%dsec, 残り時間=%dsec",
+				nElapsedSecNew,
+				theApp.m_optionMng.m_nIntervalCheckSec - nElapsedSecNew
+				));
+		}
+	} else {
+		// タイマー初期化
+		m_dwIntervalTimerStartMsec = GetTickCount();
+	}
 }
 
 BOOL CMZ3View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
@@ -4869,14 +4894,14 @@ BOOL CMZ3View::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			case NM_CLICK:
 			case NM_DBLCLK:
 //			case LVN_ITEMCHANGED:
-				ResetIntervalTimer();
+				ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_YES);
 				break;
 			}
 			break;
 		case IDC_GROUP_TAB:
 			switch(pnmhdr->code ) {
 			case TCN_SELCHANGE:
-				ResetIntervalTimer();
+				ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_YES);
 				break;
 			}
 			break;

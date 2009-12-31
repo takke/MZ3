@@ -377,7 +377,8 @@ public:
 	bool RetrieveCategoryItem(void);
 
 public:
-	void ResetIntervalTimer(void);
+#define	RESET_INTERVAL_TIMER_RETRY_YES	true
+	void ResetIntervalTimer(bool bRetry=false);
 	bool AppendCategoryList(const CCategoryItem& categoryItem);
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
 
