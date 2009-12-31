@@ -140,7 +140,7 @@ void Option::Sync(bool bSave)
 	SyncIniValue(inifile, bSave, m_bBootCheckMnC, "CheckMnC", "Boot");
 
 	//--- UI
-	SyncIniValue(inifile, bSave, m_bShowBaloonOnNewTL, "ShowBaloonOnNewTL", "UI");
+	SyncIniValue(inifile, bSave, m_bShowBalloonOnNewTL, "ShowBalloonOnNewTL", "UI");
 
 	// ”wŒi‰æ‘œ‚Ì—L–³
 	SyncIniValue(inifile, bSave, m_bUseBgImage, "UseBgImage", "UI");

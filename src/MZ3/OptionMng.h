@@ -29,7 +29,7 @@ private:
 	bool			m_bDebugMode;			///< デバッグモード
 public:
 	bool			m_bUseDevVerCheck;		///< バージョンチェックに開発版も含める
-	bool			m_bShowBaloonOnNewTL;	///< [MZ4] バルーン表示有無
+	bool			m_bShowBalloonOnNewTL;	///< [MZ4] バルーン表示有無
 
 private:
 	CString			m_proxyServer;			///< プロキシのサーバ
@@ -224,7 +224,7 @@ public:
 		, m_nTwitterRTStyle(0)
 		, m_bUseDevVerCheck(false)
 		, m_bShowNetProgressBar(false)
-		, m_bShowBaloonOnNewTL(true)
+		, m_bShowBalloonOnNewTL(true)
 	{
 	}
 
