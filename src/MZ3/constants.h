@@ -61,6 +61,11 @@
 /// ビュー非表示
 #define WM_MZ3_HIDE_VIEW			WM_APP + 41
 
+// タスクトレイ関連
+#ifndef WINCE
+#define WM_TRAYICONMESSAGE			WM_APP +100
+#endif
+
 /**
  * アクセスタイプ
  */

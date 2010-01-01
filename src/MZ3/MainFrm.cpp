@@ -1509,7 +1509,11 @@ LONG CMainFrame::OnTrayIcon( WPARAM wParam, LPARAM lParam )
 
 	case WM_RBUTTONDOWN:
 		// 仮にメニューを表示
+		SetForegroundWindow();	// メニューが残るのを抑止
+
 		OnMenuOpenMenu();
+
+		PostMessage(WM_NULL);	// メニューが残るのを抑止
 		break;
 	}
 
