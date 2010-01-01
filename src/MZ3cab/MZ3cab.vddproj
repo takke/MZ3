@@ -453,6 +453,42 @@
         "CertificateHash" = "8:"
         "TimeStampServer" = "8:"
         }
+        "TkTw_D_W32"
+        {
+        "DisplayName" = "8:TkTw_D_W32"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:TkTw_D_W32\\MZ3cab.cab"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "SignOutput" = "11:FALSE"
+        "CertificateHash" = "8:"
+        "TimeStampServer" = "8:"
+        }
+        "TkTw_R_W32c"
+        {
+        "DisplayName" = "8:TkTw_R_W32c"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:TkTw_R_W32c\\MZ3cab.cab"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "SignOutput" = "11:FALSE"
+        "CertificateHash" = "8:"
+        "TimeStampServer" = "8:"
+        }
+        "TkTw_R_WM"
+        {
+        "DisplayName" = "8:TkTw_R_WM"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:TkTw_R_WM\\MZ3cab.cab"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "SignOutput" = "11:FALSE"
+        "CertificateHash" = "8:"
+        "TimeStampServer" = "8:"
+        }
     }
     "Deployable"
     {

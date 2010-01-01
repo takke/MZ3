@@ -365,7 +365,7 @@ function parse_next_back_link(line, base_url, title_set_at)
 	end
 	
 	-- <ul><li><a href="new_bbs.pl?page=1">前を表示</a></li>
-	-- <li>51件〜100件を表示</li>
+	-- <li>51件～100件を表示</li>
 	-- <li><a href="new_bbs.pl?page=3">次を表示</a></li></ul>
 	if line_has_strings(line, base_url) then
 		
@@ -1022,6 +1022,31 @@ function on_retrieve_category_item(event_name, serialize_key, body, wnd)
 	return true, RETRIEVE_CATEGORY_ITEM_RVAL_LOCALSTORAGE;
 end
 mz3.add_event_listener("retrieve_category_item", "mixi.on_retrieve_category_item");
+
+
+--- ボディリストのアイコンのインデックス取得
+--
+-- @param event_name    'creating_default_group'
+-- @param serialize_key シリアライズキー(nil)
+-- @param body          body data
+--
+-- @return (1) [bool] 成功時は true, 続行時は false
+-- @return (2) [int] アイコンインデックス
+--
+function on_get_body_list_default_icon_index(event_name, serialize_key, body)
+
+	if serialize_key == "MIXI_BBS"        then return true, 0; end
+	if serialize_key == "MIXI_EVENT"      then return true, 1; end
+	if serialize_key == "MIXI_ENQUETE"    then return true, 2; end
+	if serialize_key == "MIXI_EVENT_JOIN" then return true, 3; end
+	if serialize_key == "MIXI_BIRTHDAY"   then return true, 4; end
+	if serialize_key == "MIXI_SCHEDULE"   then return true, 5; end
+	if serialize_key == "MIXI_MESSAGE"    then return true, 7; end
+	if serialize_key == "RSS_ITEM"        then return true, 8; end
+
+	return false;
+end
+mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
 
 
 ----------------------------------------

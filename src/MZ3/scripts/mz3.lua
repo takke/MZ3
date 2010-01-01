@@ -76,31 +76,6 @@ VK_F2     = 0x71;
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)
 ----------------------------------------------------------------------
 
---- ボディリストのアイコンのインデックス取得
---
--- @param event_name    'creating_default_group'
--- @param serialize_key シリアライズキー(nil)
--- @param body          body data
---
--- @return (1) [bool] 成功時は true, 続行時は false
--- @return (2) [int] アイコンインデックス
---
-function on_get_body_list_default_icon_index(event_name, serialize_key, body)
-
-	if serialize_key == "MIXI_BBS"        then return true, 0; end
-	if serialize_key == "MIXI_EVENT"      then return true, 1; end
-	if serialize_key == "MIXI_ENQUETE"    then return true, 2; end
-	if serialize_key == "MIXI_EVENT_JOIN" then return true, 3; end
-	if serialize_key == "MIXI_BIRTHDAY"   then return true, 4; end
-	if serialize_key == "MIXI_SCHEDULE"   then return true, 5; end
-	if serialize_key == "MIXI_MESSAGE"    then return true, 7; end
-	if serialize_key == "RSS_ITEM"        then return true, 8; end
-
-	return false;
-end
-mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
-
-
 --- クロスポスト管理データを初期化する
 --
 -- @param from どこから初期ポストしたか。管理データにそのデータを登録しないようにするため。
@@ -178,13 +153,20 @@ end
 require("scripts\\util");		-- ユーティリティ
 require("scripts\\wrapper");	-- APIラッパークラス
 -- 各サービス用スクリプトロード
-require("scripts\\mixi");		-- mixi
+local build_type = mz3.get_app_build_type();
+if build_type == "MZ3" then
+	require("scripts\\mixi");		-- mixi
+end
+
 require("scripts\\twitter");	-- Twitter
-require("scripts\\gmail");		-- GMail
-require("scripts\\wassr");		-- Wassr
-require("scripts\\goohome");	-- goohome
-require("scripts\\RSS");		-- RSS
-require("scripts\\2ch");		-- 2ch
-require("scripts\\auone");		-- auone
+
+if build_type == "MZ3" then
+	require("scripts\\gmail");		-- GMail
+	require("scripts\\wassr");		-- Wassr
+	require("scripts\\goohome");	-- goohome
+	require("scripts\\RSS");		-- RSS
+	require("scripts\\2ch");		-- 2ch
+	require("scripts\\auone");		-- auone
+end
 
 mz3.logger_info('mz3.lua end');

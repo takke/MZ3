@@ -247,7 +247,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_notifyIconData.uCallbackMessage = WM_TRAYICONMESSAGE;
 	m_notifyIconData.hIcon            = (HICON)::LoadImage(
 											::AfxGetInstanceHandle(),
+#ifdef BT_TKTW
+											MAKEINTRESOURCE(IDR_MAINFRAME_TKTW),
+#else
 											MAKEINTRESOURCE(IDR_MAINFRAME_WIN32),
+#endif
 											IMAGE_ICON,
 											16, // desired width
 											16, // desired height
@@ -1413,7 +1417,12 @@ void CMainFrame::OnMenuOpenMenu()
 	int   flags = util::GetPopupFlagsForSoftKeyMenu1();
 
 	CMenu menu;
+#ifdef BT_TKTW
+	menu.LoadMenu(IDR_MAINFRAME_CE_TKTW);
+#endif
+#ifdef BT_MZ3
 	menu.LoadMenu(IDR_MAINFRAME_CE);
+#endif
 	CMenu* pSubMenu = menu.GetSubMenu(0);
 
 	CView* pActiveView = GetActiveView();

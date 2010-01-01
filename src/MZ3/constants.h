@@ -9,10 +9,16 @@
 #pragma once
 
 /// アプリケーション名
-#ifdef WINCE
-#define	MZ3_APP_NAME				L"MZ3"
-#else
-#define	MZ3_APP_NAME				L"MZ4"
+#ifdef BT_MZ3
+# ifdef WINCE
+#  define	MZ3_APP_NAME				L"MZ3"
+# else
+#  define	MZ3_APP_NAME				L"MZ4"
+# endif
+#endif
+
+#ifdef BT_TKTW
+# define	MZ3_APP_NAME				L"TkTweets"
 #endif
 
 // ヘルプファイルパス

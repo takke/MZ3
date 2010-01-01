@@ -151,9 +151,9 @@ public:
 		, m_bUseGlobalProxy( true )
 		, m_bBootCheckMnC( false )
 		, m_bUseBgImage( TRUE )
-		, m_fontHeight( 9 )					// 初期値は Load() 内で設定される
-		, m_fontHeightBig( 11 )				// 初期値は Load() 内で設定される
-		, m_fontHeightMedium( 9 )			// 初期値は Load() 内で設定される
+		, m_fontHeight( 8 )					// 初期値は Load() 内で設定される
+		, m_fontHeightBig( 10 )				// 初期値は Load() 内で設定される
+		, m_fontHeightMedium( 8 )			// 初期値は Load() 内で設定される
 		, m_fontHeightSmall( 7 )			// 初期値は Load() 内で設定される
 #ifdef WINCE
 		, m_recvBufSize( 2048 )

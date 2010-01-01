@@ -58,6 +58,12 @@ enum ScreenResolution {
 	SR_VGA,				///< 640x480
 };
 
+/// BuildType
+enum AppBuildType {
+	APP_BT_MZ3 = 0,		///< MZ3
+	APP_BT_TKTW,		///< TkTweets
+};
+
 class CMZ3View;
 class CReportView;
 class CWriteView;
@@ -151,7 +157,8 @@ public:
 	};
 	Platforms			m_Platforms;			///< Platform
 
-	bool				m_bProMode;				///< ProMode
+	bool				m_bProMode;				///< ProMode (MZ3 Plus)
+	AppBuildType		m_AppBuildType;			///< BuildType
 
 public:
 	//--- ƒƒK[

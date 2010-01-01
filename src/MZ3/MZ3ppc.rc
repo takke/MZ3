@@ -64,7 +64,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\MZ3.ico"
+IDR_MAINFRAME           ICON                    "res\\App.ico"
 IDR_MAINFRAME_WIN32     ICON                    "res\\MZ4.ico"
 IDR_MZ3TYPE             ICON                    "res\\MZ3Doc.ico"
 IDI_NO_PHOTO_ICON       ICON                    "res\\NoPhotoIcon.ico"
@@ -79,6 +79,8 @@ IDI_SCHEDULE_ICON       ICON                    "res\\schedule.ico"
 IDI_MAIL_NEW_ICON       ICON                    "res\\mail_new.ico"
 IDI_MAIL_OPENED_ICON    ICON                    "res\\mail_opened.ico"
 IDI_RSS_ICON            ICON                    "res\\RSS.ico"
+IDR_MAINFRAME_TKTW      ICON                    "res\\TkTweets.ico"
+IDR_MAINFRAME_TKTW_WIN32 ICON                    "res\\idr_main.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -286,7 +288,7 @@ BEGIN
             MENUITEM "ブックマークから削除(&D)",              ID_DEL_BOOKMARK
         END
         MENUITEM SEPARATOR
-        MENUITEM "新着チェック(&C)",                  IDM_CHECK_NEW
+        MENUITEM "mixi新着チェック(&C)",              IDM_CHECK_NEW
         MENUITEM "全てを巡回(&A)",                   IDM_START_CRUISE
         MENUITEM "未読を巡回(&R)",                   IDM_START_CRUISE_UNREAD_ONLY
         MENUITEM SEPARATOR
@@ -319,7 +321,7 @@ BEGIN
         MENUITEM "一般(&O)...",                   ID_SETTING_GENERAL
         MENUITEM "ログイン設定(&L)...",               ID_SETTING_LOGIN
         MENUITEM "定期取得(&I)",                    ID_ENABLE_INTERVAL_CHECK
-        POPUP "記事取得(&G)"
+        POPUP "mixi記事取得(&G)"
         BEGIN
             MENUITEM "全件取得(&A)",                    IDM_GETPAGE_ALL
             MENUITEM "最新２０件取得(&P)",                 IDM_GETPAGE_LATEST10
@@ -442,6 +444,138 @@ BEGIN
             MENUITEM "mixi新着チェック",                  IDM_CHECK_NEW
             MENUITEM "全てを巡回",                       IDM_START_CRUISE
             MENUITEM "未読を巡回",                       IDM_START_CRUISE_UNREAD_ONLY
+        END
+        POPUP "ヘルプ"
+        BEGIN
+            MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
+            MENUITEM "改版履歴",                        ID_HISTORY_MENU
+            MENUITEM SEPARATOR
+            MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
+            MENUITEM "バージョン情報...",                  ID_APP_ABOUT
+            MENUITEM SEPARATOR
+            POPUP "デバッグツール"
+            BEGIN
+                MENUITEM "デバッグ情報...",                   ID_SHOW_DEBUG_INFO
+                MENUITEM "エラーログを開く",                    ID_ERRORLOG_MENU
+                MENUITEM "URLを開く...",                   ID_MENU_OPEN_URL
+                MENUITEM "HTMLを開く...",                  ID_MENU_OPEN_LOCAL_FILE
+                MENUITEM "スクリプトのリロード",                  ID_MENU_RELOAD_LUA_SCRIPTS
+            END
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "終了",                          ID_MENU_CLOSE
+    END
+END
+
+IDR_MAINFRAME_TKTW_WIN32 MENU 
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "終了(&X)",                      ID_MENU_CLOSE
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "切り取り(&T)",                    ID_EDIT_CUT
+        MENUITEM "コピー(&C)",                     ID_EDIT_COPY
+        MENUITEM "貼り付け(&P)",                    ID_EDIT_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "全て選択(&A)",                    ID_SELECT_ALL
+    END
+    POPUP "ウィンドウ(&W)"
+    BEGIN
+        MENUITEM "戻る(&P)",                      ID_MENU_BACK
+        MENUITEM "進む(&N)",                      ID_MENU_NEXT
+        MENUITEM SEPARATOR
+        MENUITEM "上ペイン最大化",                     IDM_LAYOUT_MAGNIFY_CATEGORY_LIST
+        MENUITEM "下ペイン最大化",                     IDM_LAYOUT_MAGNIFY_BODY_LIST
+        MENUITEM "上下ペインの最大化を戻す",                IDM_LAYOUT_MAGNIFY_DEFAULT
+        MENUITEM SEPARATOR
+        MENUITEM "ダウンロードマネージャ(&D)",             ID_DOWNLOAD_MANAGER_VIEW
+    END
+    POPUP "設定(&P)"
+    BEGIN
+        MENUITEM "一般(&O)...",                   ID_SETTING_GENERAL
+        MENUITEM "ログイン設定(&L)...",               ID_SETTING_LOGIN
+        MENUITEM "定期取得(&I)",                    ID_ENABLE_INTERVAL_CHECK
+        POPUP "文字サイズ(&S)"
+        BEGIN
+            MENUITEM "大きくする(&W)\tCtrl+W",           ID_MENU_FONT_MAGNIFY
+            MENUITEM "小さくする(&S)\tCtrl+S",           ID_MENU_FONT_SHRINK
+            MENUITEM SEPARATOR
+            MENUITEM "大(&1)",                       ID_CHANGE_FONT_BIG
+            MENUITEM "中(&2)",                       ID_CHANGE_FONT_MEDIUM
+            MENUITEM "小(&3)",                       ID_CHANGE_FONT_SMALL
+        END
+        MENUITEM "スキン変更(&D)...",                ID_CHANGE_SKIN
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "TkTweets ヘルプ(&H)",            ID_HELP_MENU
+        MENUITEM "改版履歴(&C)",                    ID_HISTORY_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "ソフトウェアの更新を確認(&N)...",         ID_MENU_CHECK_UPDATE
+        MENUITEM "バージョン情報(&V)...",              ID_APP_ABOUT
+        MENUITEM SEPARATOR
+        POPUP "デバッグツール(&D)"
+        BEGIN
+            MENUITEM "デバッグ情報(&D)...",               ID_SHOW_DEBUG_INFO
+            MENUITEM "エラーログを開く(&L)",                ID_ERRORLOG_MENU
+            MENUITEM "URLを開く(&U)...",               ID_MENU_OPEN_URL
+            MENUITEM "HTMLを開く(&H)...",              ID_MENU_OPEN_LOCAL_FILE
+            MENUITEM "スクリプトのリロード(&S)\tCtrl+F5",     ID_MENU_RELOAD_LUA_SCRIPTS
+            MENUITEM "カテゴリログのリロード(&R)\tCtrl+Shift+F5", ID_MENU_RELOAD_CATEGORY_LIST_LOG
+        END
+    END
+END
+
+IDR_MAINFRAME_TKTW MENU 
+BEGIN
+    MENUITEM "メニュー",                        ID_MENU_OPEN_MENU
+    MENUITEM "アクション",                       ID_MENU_ACTION
+END
+
+IDR_MAINFRAME_CE_TKTW MENU 
+BEGIN
+    POPUP "メニュー"
+    BEGIN
+        MENUITEM "中止",                          ID_MENU_STOP
+        POPUP "画面"
+        BEGIN
+            MENUITEM "戻る",                          ID_MENU_BACK
+            MENUITEM "進む",                          ID_MENU_NEXT
+            MENUITEM SEPARATOR
+            MENUITEM "上ペイン最大化",                     IDM_LAYOUT_MAGNIFY_CATEGORY_LIST
+            MENUITEM "下ペイン最大化",                     IDM_LAYOUT_MAGNIFY_BODY_LIST
+            MENUITEM "上下ペインの最大化を戻す",                IDM_LAYOUT_MAGNIFY_DEFAULT
+            MENUITEM SEPARATOR
+            MENUITEM "ダウンロードマネージャ",                 ID_DOWNLOAD_MANAGER_VIEW
+        END
+        POPUP "カテゴリ"
+        BEGIN
+            MENUITEM "dummy",                       ID_DUMMY
+        END
+        POPUP "設定"
+        BEGIN
+            MENUITEM "一般...",                       ID_SETTING_GENERAL
+            MENUITEM "ログイン設定...",                   ID_SETTING_LOGIN
+            MENUITEM "定期取得",                        ID_ENABLE_INTERVAL_CHECK
+            POPUP "文字サイズ"
+            BEGIN
+                MENUITEM "大きくする",                       ID_MENU_FONT_MAGNIFY
+                MENUITEM "小さくする",                       ID_MENU_FONT_SHRINK
+                MENUITEM SEPARATOR
+                MENUITEM "大",                           ID_CHANGE_FONT_BIG
+                MENUITEM "中",                           ID_CHANGE_FONT_MEDIUM
+                MENUITEM "小",                           ID_CHANGE_FONT_SMALL
+            END
+            MENUITEM "スキン変更...",                    ID_CHANGE_SKIN
+        END
+        POPUP "編集"
+        BEGIN
+            MENUITEM "切り取り",                        ID_EDIT_CUT
+            MENUITEM "コピー",                         ID_EDIT_COPY
+            MENUITEM "貼り付け",                        ID_EDIT_PASTE
+            MENUITEM "全て選択",                        ID_SELECT_ALL
         END
         POPUP "ヘルプ"
         BEGIN
@@ -772,7 +906,7 @@ FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     COMBOBOX        IDC_TYPE_COMBO,7,7,48,63,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "メールアドレス",IDC_ID_STATIC,7,24,113,8
-    EDITTEXT        IDC_LOGIN_MAIL_EDIT,6,36,84,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_LOGIN_MAIL_EDIT,7,35,84,14,ES_AUTOHSCROLL
     LTEXT           "パスワード",IDC_PASSWORD_STATIC,7,54,113,8
     EDITTEXT        IDC_LOGIN_PASSWORD_EDIT,7,67,84,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,7,87,40,14

@@ -61,6 +61,28 @@ int lua_mz3_get_app_name(lua_State *L)
 }
 
 /*
+--- BuildType("MZ3", "TkTwitter")を返す
+--
+-- @return [string] アプリケーション名
+--
+function mz3.get_app_build_type()
+*/
+int lua_mz3_get_app_build_type(lua_State *L)
+{
+	// 結果をスタックに積む
+#ifdef BT_MZ3
+	lua_pushstring(L, MyWCS2UTF8(L"MZ3"));
+#elif BT_TKTW
+	lua_pushstring(L, MyWCS2UTF8(L"TkTweets"));
+#else
+	lua_pushstring(L, MyWCS2UTF8(L"?"));
+#endif
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- アプリケーションのバージョン("1.0.0 Beta13")を返す
 --
 -- @return [string] バージョン文字列
@@ -3821,6 +3843,7 @@ int lua_mz3_graphics_draw_rect(lua_State *L)
 //-----------------------------------------------
 static const luaL_Reg lua_mz3_lib[] = {
 	{"get_app_name",						lua_mz3_get_app_name},
+	{"get_app_build_type",					lua_mz3_get_app_build_type},
 	{"get_app_version",						lua_mz3_get_app_version},
 	{"regist_service",						lua_mz3_regist_service},
 	{"logger_error",						lua_mz3_logger_error},

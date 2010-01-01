@@ -68,6 +68,12 @@ CMZ3App::CMZ3App()
 	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
 	, m_access(false)
 	, m_bProMode(false)
+#ifdef BT_MZ3
+	, m_AppBuildType(APP_BT_MZ3)
+#endif
+#ifdef BT_TKTW
+	, m_AppBuildType(APP_BT_TKTW)
+#endif
 {
 }
 
@@ -219,6 +225,9 @@ BOOL CMZ3App::InitInstance()
 
 		// 初期化
 		MZ3LOGGER_INFO( L"タブ初期化" );
+#ifdef BT_TKTW
+		m_root.initForTopPage(m_accessTypeInfo, Mz3GroupData::InitializeType());
+#else
 		// クライアント選択画面を表示
 		CChooseClientTypeDlg dlg;
 		if (dlg.DoModal()==IDOK) {
@@ -227,7 +236,7 @@ BOOL CMZ3App::InitInstance()
 		} else {
 			return FALSE;
 		}
-
+#endif
 		theApp.SaveGroupData();
 	}
 
@@ -241,7 +250,6 @@ BOOL CMZ3App::InitInstance()
 				// 設定された内容で初期化
 				m_root.initForTopPage(m_accessTypeInfo, dlg.m_initType);
 			}
-
 			// 次回以降は表示しない
 			m_optionMng.m_StartupTransitionDoneType = option::Option::STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED;
 			theApp.SaveGroupData();
@@ -277,10 +285,19 @@ BOOL CMZ3App::InitInstance()
 
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
-#ifdef WINCE
+#ifdef BT_MZ3
+# ifdef WINCE
 		IDR_MAINFRAME,
-#else
+# else
 		IDR_MAINFRAME_WIN32,
+# endif
+#endif
+#ifdef BT_TKTW
+# ifdef WINCE
+		IDR_MAINFRAME_TKTW,
+# else
+		IDR_MAINFRAME_TKTW_WIN32,
+# endif
 #endif
 		RUNTIME_CLASS(CMZ3Doc),
 		RUNTIME_CLASS(CMainFrame),       // メイン SDI フレーム ウィンドウ
@@ -403,6 +420,7 @@ BOOL CMZ3App::InitInstance()
 #endif
 
 	// 絵文字定義ファイルのロード
+#ifdef BT_MZ3
 	{
 		inifile::IniFile emojifile;
 		if (emojifile.Load( m_filepath.emojifile )) {
@@ -453,6 +471,7 @@ BOOL CMZ3App::InitInstance()
 			}
 		}
 	}
+#endif
 
 	//--- テスト用コード
 #ifdef DEBUG

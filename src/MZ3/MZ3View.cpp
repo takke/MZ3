@@ -648,6 +648,11 @@ void CMZ3View::MySetLayout(int cx, int cy)
 
 	// cy = hGroup + hCategory + hBody + hInfo + hPost
 
+#ifdef BT_TKTW
+	// TkTweets はタブ非表示
+	hGroup = 0;
+#endif
+
 	int hCategory = 0;
 	int hBody     = 0;
 
@@ -4629,8 +4634,20 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	menu.LoadMenu(IDR_CATEGORY_MENU);
 	CMenu* pSubMenu = menu.GetSubMenu(0);
 
-	// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
 	CCategoryItem* pCategory = m_selGroup->getFocusedCategory();
+	int CATEGORY_MENU_LAYOUT_SUB_MENU_IDX = 6;
+	int CATEGORY_MENU_APPEND_SUB_MENU_IDX = 7;
+#ifdef BT_TKTW
+	// TkTweets : 巡回、日記、RSSメニューを削除する
+	pSubMenu->DeleteMenu(1, MF_GRAYED | MF_BYPOSITION);	// BAR
+	pSubMenu->DeleteMenu(IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(ID_WRITE_DIARY, MF_GRAYED | MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(ID_ADD_RSS_FEED_MENU, MF_GRAYED | MF_BYCOMMAND);
+	CATEGORY_MENU_LAYOUT_SUB_MENU_IDX -= 4;
+	CATEGORY_MENU_APPEND_SUB_MENU_IDX -= 4;
+#else
+	// 巡回対象以外のカテゴリであれば巡回メニューを無効化する
 	if (pCategory != NULL) {
 		if (theApp.m_accessTypeInfo.isCruiseTarget(pCategory->m_mixi.GetAccessType())) {
 			// 巡回対象なので巡回メニューを無効化しない
@@ -4651,9 +4668,9 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 		pSubMenu->EnableMenuItem( IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 		pSubMenu->EnableMenuItem( IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND );
 	}
+#endif
 
 	// 画面レイアウト
-	const int CATEGORY_MENU_LAYOUT_SUB_MENU_IDX = 6;
 	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_LAYOUT_SUB_MENU_IDX) {
 		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
 	} else {
@@ -4674,7 +4691,6 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}
 
 	// 項目を追加
-	const int CATEGORY_MENU_APPEND_SUB_MENU_IDX = 7;
 	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_APPEND_SUB_MENU_IDX) {
 		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
 	} else {

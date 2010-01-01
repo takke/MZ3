@@ -51,6 +51,9 @@
 #define IDI_MAIL_NEW_ICON               177
 #define IDI_MAIL_OPENED_ICON            178
 #define IDI_RSS_ICON                    179
+#define IDR_MAINFRAME_TKTW_WIN32        180
+#define IDR_MAINFRAME_TKTW              182
+#define IDR_MAINFRAME_CE_TKTW           183
 #define IDD_ABOUTBOX_WIDE               200
 #define IDC_STATIC_1                    201
 #define IDD_REPORTVIEW                  201
