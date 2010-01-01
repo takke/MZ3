@@ -30,3 +30,16 @@
 @echo ■ src ファイルを収集します
 @echo %cab_from% ⇒ %cab_to%
 @copy %cab_from% %cab_to%
+
+
+:
+:--- TkTweets ---
+:
+: コピー元/先の CAB ファイル
+@set cab_from=..\src\MZ3cab\TkTw_R_WM\TkTweets.CAB
+@set cab_to=.\TkTweets.%MZ3_VERSION%.CAB
+
+:----- CAB ファイルの収集 -----
+@echo ■ src ファイルを収集します
+@echo %cab_from% ⇒ %cab_to%
+@copy %cab_from% %cab_to%
