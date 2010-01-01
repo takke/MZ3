@@ -514,6 +514,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi,POST Œn
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_POST_COMMENT_CONFIRM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
@@ -603,6 +604,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_POST_NEWDIARY_REGIST";
+#endif
 
 	//------------------------------------------------------------------
 	//--- Twitter Œn
@@ -705,6 +707,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi echo ŠÖ˜A
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_MIXI_RECENT_ECHO;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -752,11 +755,12 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_RECENT_ECHO_ITEM";
-
+#endif
 
 	//------------------------------------------------------------------
 	//--- Wassr Œn
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_WASSR_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -795,10 +799,12 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "WASSR_USER";
+#endif
 
 	//------------------------------------------------------------------
 	//--- gooƒz[ƒ€ Œn
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -838,11 +844,12 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "GOOHOME_USER";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-
+#endif
 
 	//------------------------------------------------------------------
 	//--- RSS Reader
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_RSS_READER_FEED;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -883,6 +890,7 @@ bool AccessTypeInfo::init()
 //	m_map[type].cacheFilePattern = L"rss\\{urlafter://}.rss";
 	m_map[type].requestEncoding = ENCODING_NOCONVERSION;
 	m_map[type].serializeKey = "RSS_AUTO_DISCOVERY";
+#endif
 
 	//------------------------------------------------------------------
 	//--- ‚»‚Ì‘¼

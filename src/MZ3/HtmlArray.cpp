@@ -145,6 +145,7 @@ BOOL CHtmlArray::IsPostSucceeded( WRITEVIEW_TYPE type )
 		const CString& line = this->GetAt(i);
 
 		switch( type ) {
+#ifdef BT_MZ3
 		case WRITEVIEW_TYPE_REPLYMESSAGE:
 		case WRITEVIEW_TYPE_NEWMESSAGE:
 			// <p class="messageAlert">送信が完了しました。</p>
@@ -152,7 +153,7 @@ BOOL CHtmlArray::IsPostSucceeded( WRITEVIEW_TYPE type )
 				return TRUE;
 			}
 			break;
-
+#endif
 		default:
 			if (line.Find(L"書き込みが完了しました。反映に時間がかかることがあります。") != -1) {
 				return TRUE;

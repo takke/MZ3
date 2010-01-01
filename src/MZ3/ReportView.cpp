@@ -1657,7 +1657,11 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			// レポートビューに遷移
 			theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+#ifdef BT_MZ3
 			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
+#else
+			theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
+#endif
 			theApp.ChangeView( theApp.m_pReportView );
 
 			// ログファイルに保存
@@ -1873,6 +1877,7 @@ void CReportView::OnImageButton()
  */
 void CReportView::OnWriteComment()
 {
+#ifdef BT_MZ3
 	// 引用方法の確認
 	quote::QuoteType quoteType = quote::QUOTETYPE_INVALID;
 	int idx = m_list.GetSelectedItem();
@@ -1922,7 +1927,7 @@ void CReportView::OnWriteComment()
 
 		((CEdit*)pWriteView->GetDlgItem(IDC_WRITE_BODY_EDIT))->SetWindowText(str);
 	}
-
+#endif
 }
 
 /**
@@ -1958,7 +1963,11 @@ LRESULT CReportView::OnChangeView(WPARAM wParam, LPARAM lParam)
 	theApp.ChangeView(theApp.m_pReportView);
 
 	// Write ビューが有効ならONに。
+#ifdef BT_MZ3
 	theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE);
+#else
+	theApp.EnableCommandBarButton(ID_FORWARD_BUTTON, FALSE);
+#endif
 
 	theApp.EnableCommandBarButton(ID_WRITE_BUTTON, TRUE);
 	theApp.EnableCommandBarButton(ID_OPEN_BROWSER, TRUE);
@@ -2104,6 +2113,7 @@ void CReportView::OnOpenProfileLog()
  */
 void CReportView::OnSendMessage()
 {
+#ifdef BT_MZ3
 	// 選択アイテムの取得
 	int idx = m_list.GetSelectedItem();
 	if( idx < 0 ) {
@@ -2132,6 +2142,7 @@ void CReportView::OnSendMessage()
 
 	// 書き込み画面生成
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &s_mixi );
+#endif
 }
 
 /**
@@ -2168,7 +2179,11 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	// 「進む」削除
 	int idxPage = 7;		// 「ページ」メニュー（次へが有効の場合は-1となる）
 	int idxDiarySeparator = 5;
+#ifdef BT_MZ3
 	if( theApp.m_pWriteView->IsWriteCompleted() ) {
+#else
+	if( false ) {
+#endif
 		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
 		idxPage --;
 		idxDiarySeparator--;

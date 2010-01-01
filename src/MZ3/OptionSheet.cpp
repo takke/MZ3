@@ -46,7 +46,9 @@ void COptionSheet::SetPage()
 	AddPage( &m_tabDisplay );	// 表示タブ
 	AddPage( &m_tabUi );		// 操作タブ
 	AddPage( &m_tabMainView );	// メイン画面タブ
+#ifdef BT_MZ3
 	AddPage( &m_tabReport );	// レポート画面タブ
+#endif
 	AddPage( &m_tabGet );		// 取得タブ
 	AddPage( &m_tabLog );		// ログタブ
 	AddPage( &m_tabProxy );		// プロキシタブ

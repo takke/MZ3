@@ -362,6 +362,7 @@ void CMainFrame::OnBackButton()
 		return;
 	}
 
+#ifdef BT_MZ3
 	if (pActiveView == theApp.m_pWriteView) {
 		// Write ビュー（日記, 新規メッセージ） → メインビュー
 		// Write ビュー（日記以外）             → レポートビュー
@@ -395,6 +396,7 @@ void CMainFrame::OnBackButton()
 		}
 		return;
 	}
+#endif
 
 	if (pActiveView == theApp.m_pDownloadView) {
 		// ダウンロードビュー → メインビュー
@@ -445,26 +447,34 @@ void CMainFrame::OnForwardButton()
 	if (pActiveView == theApp.m_pReportView) {
 		// レポートビュー → 書き込みビュー
 		// 但し、未送信の場合のみ。
+#ifdef BT_MZ3
 		if (!theApp.m_pWriteView->IsWriteCompleted()) {
 			m_bForwardPageEnabled = FALSE;
 			m_bBackPageEnabled = TRUE;
 
 			theApp.ChangeView( theApp.m_pWriteView );
 		}
+#endif
 		return;
 	}
 
+#ifdef BT_MZ3
 	if (pActiveView == theApp.m_pWriteView) {
 		// 書き込みビュー → （遷移先なし）
 		return;
 	}
+#endif
 
 	if (pActiveView == theApp.m_pMainView ) {
 		// メインビュー → レポートビュー
 
 		// 書き込みビューに行けるなら、NEXT ボタンを有効に。
 		// 送信完了フラグ(IsWriteCompleted())がOFFなら、「書き込みビューに行ける」と判断する
+#ifdef BT_MZ3
 		m_bForwardPageEnabled = theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE;
+#else
+		m_bForwardPageEnabled = FALSE;
+#endif
 		m_bBackPageEnabled = TRUE;
 
 		theApp.ChangeView(theApp.m_pReportView);
@@ -748,6 +758,7 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 	}
 
 	//--- 書き込みビュー
+#ifdef BT_MZ3
 	{
 		CWriteView* pView = theApp.m_pWriteView;
 
@@ -767,6 +778,7 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		// 公開範囲コンボボックス
 		pView->m_viewlimitCombo.SetFont( &theApp.m_font );
 	}
+#endif
 
 	//--- 詳細ビュー
 	{
@@ -797,7 +809,9 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		// 各Viewに通知を送る
 		theApp.m_pMainView->OnSize( 0, w, h );
 		theApp.m_pReportView->OnSize( 0, w, h );
+#ifdef BT_MZ3
 		theApp.m_pWriteView->OnSize( 0, w, h );
+#endif
 		theApp.m_pDetailView->OnSize( 0, w, h );
 		theApp.m_pDetailView->Invalidate(TRUE);
 	}
@@ -1149,11 +1163,13 @@ void CMainFrame::OnMenuAction()
 		return;
 	}
 
+#ifdef BT_MZ3
 	if (pActiveView == theApp.m_pWriteView) {
 		// Write ビュー
 		theApp.m_pWriteView->PopupWriteBodyMenu();
 		return;
 	}
+#endif
 
 	if (pActiveView == theApp.m_pDownloadView) {
 		// ダウンロードビュー

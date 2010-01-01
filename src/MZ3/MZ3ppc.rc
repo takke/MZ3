@@ -579,7 +579,7 @@ BEGIN
         END
         POPUP "ヘルプ"
         BEGIN
-            MENUITEM "MZ3 ヘルプ",                     ID_HELP_MENU
+            MENUITEM "TkTweets ヘルプ",                ID_HELP_MENU
             MENUITEM "改版履歴",                        ID_HISTORY_MENU
             MENUITEM SEPARATOR
             MENUITEM "ソフトウェアの更新を確認...",             ID_MENU_CHECK_UPDATE
@@ -756,7 +756,7 @@ FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL         "全データ取得",IDC_PAGE_GETALL_RADIO,"Button",BS_AUTORADIOBUTTON,14,20,55,10
     CONTROL         "最新２０件取得",IDC_PAGE_GETLATEST_RADIO,"Button",BS_AUTORADIOBUTTON,69,20,59,10
-    GROUPBOX        "記事取得",IDC_STATIC,7,7,125,28
+    GROUPBOX        "記事取得",IDC_PAGE_GET_GROUP,7,7,125,28
     LTEXT           "受信バッファ",IDC_STATIC,14,54,38,8
     COMBOBOX        IDC_RECV_BUF_COMBO,69,52,52,48,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "受信",IDC_STATIC,7,41,125,28
@@ -785,12 +785,12 @@ FONT 9, "ＭＳ Ｐゴシック"
 BEGIN
     CONTROL         "起動時に新着コメント等をチェックする",IDC_BOOT_MNC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,125,10
     CONTROL         "バージョンチェックに開発版も含める",IDC_USE_DEV_VER_CHECK_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,121,10
-    LTEXT           "引用符号",IDC_STATIC,12,59,38,8
+    LTEXT           "引用符号",IDC_QUOTE_MARK_STATIC,12,59,38,8
     EDITTEXT        IDC_QUOTE_MARK_EDIT,57,56,65,14,ES_AUTOHSCROLL
-    GROUPBOX        "返信",IDC_STATIC,7,46,125,27
+    GROUPBOX        "返信",IDC_QUOTE_MARK_GROUP,7,46,125,27
     CONTROL         "URLを開くときに確認する",IDC_CONFIRM_OPEN_URL_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,90,89,10
     GROUPBOX        "ブラウザ連携",IDC_STATIC,7,79,125,28
-    LTEXT           "(mixi)",IDC_STATIC,17,18,18,8
+    LTEXT           "(mixi)",IDC_BOOT_MNC_STATIC,17,18,18,8
 END
 
 IDD_DEBUG_DIALOG DIALOG  0, 0, 119, 72

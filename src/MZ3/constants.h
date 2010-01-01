@@ -132,6 +132,7 @@ enum ACCESS_TYPE {
 	ACCESS_MIXI_ADD_ECHO_REPLY,			///< エコー返信：add_echo.pl
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
+#ifdef BT_MZ3
 	ACCESS_POST_COMMENT_CONFIRM,		///< コメント投稿（確認画面）
 	ACCESS_POST_COMMENT_REGIST,			///< コメント投稿（書き込み画面）
 	ACCESS_POST_NEWDIARY_CONFIRM,		///< 日記投稿（確認画面）
@@ -142,6 +143,7 @@ enum ACCESS_TYPE {
 	ACCESS_POST_NEWMESSAGE_ENTRY,		///< 新規メッセージ（入力画面）
 	ACCESS_POST_NEWMESSAGE_CONFIRM,		///< 新規メッセージ（確認画面）
 	ACCESS_POST_NEWMESSAGE_REGIST,		///< 新規メッセージ（書き込み画面）
+#endif
 
 	//----------------------------------------------
 	// Twitter
@@ -161,26 +163,32 @@ enum ACCESS_TYPE {
 	//----------------------------------------------
 	// Wassr
 	//----------------------------------------------
+#ifdef BT_MZ3
 	//--- Wassr Timeline 系
 	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] Wassr, friends_timeline.xml
 	ACCESS_WASSR_UPDATE,				///< [POST] Wassr, ステータス更新
 	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
+#endif
 
 	//----------------------------------------------
 	// gooホーム
 	//----------------------------------------------
+#ifdef BT_MZ3
 	//--- gooホーム ひとこと関連
 	ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS,	///< [GET] quotes/friends/json
 	ACCESS_GOOHOME_USER,					///< gooHome, 各発言要素
 	ACCESS_GOOHOME_QUOTE_UPDATE,			///< [POST] ひとこと発言
+#endif
 
 	//----------------------------------------------
 	// RSS
 	//----------------------------------------------
+#ifdef BT_MZ3
 	//--- RSS Reader
 	ACCESS_RSS_READER_FEED,				///< RSS Reader Feed
 	ACCESS_RSS_READER_ITEM,				///< RSS Reader Item
 	ACCESS_RSS_READER_AUTO_DISCOVERY,	///< RSS Reader; RSS AutoDiscovery 用Item
+#endif
 
 	//--- その他
 	ACCESS_HELP,						///< Readme.txt 専用の特殊タイプ

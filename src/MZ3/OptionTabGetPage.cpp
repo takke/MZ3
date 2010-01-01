@@ -77,12 +77,17 @@ BOOL COptionTabGetPage::OnInitDialog()
 void COptionTabGetPage::Load()
 {
 	// Žæ“¾Ží•Ê
+#ifdef BT_MZ3
 	if (theApp.m_optionMng.GetPageType() == 0) {
 		((CButton*)GetDlgItem(IDC_PAGE_GETALL_RADIO))->SetCheck(BST_CHECKED);
-	}
-	else {
+	} else {
 		((CButton*)GetDlgItem(IDC_PAGE_GETLATEST_RADIO))->SetCheck(BST_CHECKED);
 	}
+#else
+	GetDlgItem(IDC_PAGE_GET_GROUP)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_PAGE_GETALL_RADIO)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_PAGE_GETLATEST_RADIO)->ShowWindow(SW_HIDE);
+#endif
 
 	// Ž©“®Ú‘±
 	CheckDlgButton( IDC_USE_AUTOCONNECTION_CHECK, 

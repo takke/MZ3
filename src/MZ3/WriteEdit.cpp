@@ -7,6 +7,8 @@
 //
 
 #include "stdafx.h"
+#ifdef BT_MZ3
+
 #include "MZ3.h"
 #include "WriteEdit.h"
 #include "WriteView.h"
@@ -63,3 +65,5 @@ void CWriteEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 	CEdit::OnLButtonDown(nFlags, point);
 }
+
+#endif

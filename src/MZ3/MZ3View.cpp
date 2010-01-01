@@ -1142,10 +1142,12 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+#ifdef BT_MZ3
 	case ACCESS_RSS_READER_AUTO_DISCOVERY:
 		// RSS AutoDiscovery を試みる
 		DoAccessEndProcForRssAutoDiscovery();
 		break;
+#endif
 
 	case ACCESS_SOFTWARE_UPDATE_CHECK:
 		// バージョンチェック
@@ -1729,10 +1731,12 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnViewBbsList();
 		return;
 
+#ifdef BT_MZ3
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
 		OnMenuRssRead();
 		return;
+#endif
 
 	default:
 		// 特殊な要素以外なので、通信処理開始。
@@ -2149,6 +2153,7 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
  */
 void CMZ3View::OnWriteDiary()
 {
+#ifdef BT_MZ3
 	if (wcslen(theApp.m_loginMng.GetMixiOwnerID()) == 0) {
 		// オーナーＩＤを取得する
 		// 日記一覧から取得
@@ -2178,6 +2183,7 @@ void CMZ3View::OnWriteDiary()
 	}
 
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWDIARY, NULL );
+#endif
 }
 
 /**
@@ -2656,10 +2662,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			PopupBodyMenu();
 			break;
 
+#ifdef BT_MZ3
 		case ACCESS_RSS_READER_ITEM:
 			// 詳細表示
 			OnMenuRssRead();
 			break;
+#endif
 
 		default:
 			// 特殊な要素以外なので、通信処理開始。
@@ -3552,7 +3560,11 @@ void CMZ3View::MyShowReportView(CMixiData& mixi)
 	theApp.m_pReportView->SetData( mixi );
 
 	theApp.EnableCommandBarButton( ID_BACK_BUTTON, TRUE );
+#ifdef BT_MZ3
 	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, theApp.m_pWriteView->IsWriteCompleted() ? FALSE : TRUE );
+#else
+	theApp.EnableCommandBarButton( ID_FORWARD_BUTTON, FALSE );
+#endif
 	theApp.ChangeView( theApp.m_pReportView );
 }
 
@@ -3986,6 +3998,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		}
 		break;
 
+#ifdef BT_MZ3
 	case ACCESS_RSS_READER_ITEM:
 		{
 			CMenu menu;
@@ -4016,7 +4029,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
 		break;
-
+#endif
 	}
 	return true;
 }
@@ -4316,10 +4329,12 @@ bool CMZ3View::MoveToNextCruiseCategory(void)
  */
 void CMZ3View::OnSendNewMessage()
 {
+#ifdef BT_MZ3
 	static CMixiData mixi;
 	mixi = GetSelectedBodyItem();
 
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &mixi );
+#endif
 }
 
 int CMZ3View::GetListWidth(void)
@@ -4639,11 +4654,11 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	int CATEGORY_MENU_APPEND_SUB_MENU_IDX = 7;
 #ifdef BT_TKTW
 	// TkTweets : 巡回、日記、RSSメニューを削除する
-	pSubMenu->DeleteMenu(1, MF_GRAYED | MF_BYPOSITION);	// BAR
-	pSubMenu->DeleteMenu(IDM_CRUISE, MF_GRAYED | MF_BYCOMMAND);
-	pSubMenu->DeleteMenu(IDM_CHECK_CRUISE, MF_GRAYED | MF_BYCOMMAND);
-	pSubMenu->DeleteMenu(ID_WRITE_DIARY, MF_GRAYED | MF_BYCOMMAND);
-	pSubMenu->DeleteMenu(ID_ADD_RSS_FEED_MENU, MF_GRAYED | MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(1, MF_BYPOSITION);	// BAR
+	pSubMenu->DeleteMenu(IDM_CRUISE, MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(IDM_CHECK_CRUISE, MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(ID_WRITE_DIARY, MF_BYCOMMAND);
+	pSubMenu->DeleteMenu(ID_ADD_RSS_FEED_MENU, MF_BYCOMMAND);
 	CATEGORY_MENU_LAYOUT_SUB_MENU_IDX -= 4;
 	CATEGORY_MENU_APPEND_SUB_MENU_IDX -= 4;
 #else
@@ -4687,6 +4702,15 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 			// 上下ペインを元に戻す
 			pLayoutMenu->EnableMenuItem(IDM_LAYOUT_MAGNIFY_DEFAULT,
 				(m_magnifyMode==MAGNIFY_MODE_DEFAULT ? MF_GRAYED : MF_ENABLED) | MF_BYCOMMAND);
+#ifdef BT_TKTW
+			// TkTweets : タブ関連メニュー削除
+			pLayoutMenu->DeleteMenu(6, MF_BYPOSITION);	// border
+			pLayoutMenu->DeleteMenu(ID_TABMENU_MOVE_TO_RIGHT, MF_BYCOMMAND);
+			pLayoutMenu->DeleteMenu(ID_TABMENU_MOVE_TO_LEFT, MF_BYCOMMAND);
+			pLayoutMenu->DeleteMenu(ID_TABMENU_EDIT, MF_BYCOMMAND);
+			pLayoutMenu->DeleteMenu(ID_TABMENU_DELETE, MF_BYCOMMAND);
+			pLayoutMenu->DeleteMenu(ID_TABMENU_ADD, MF_BYCOMMAND);
+#endif
 		}
 	}
 
@@ -5218,6 +5242,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 	//----------------------------------------------------------------
 	// TODO 以下のコードを Twitter に倣って Luaスクリプト化すること 
 	//----------------------------------------------------------------
+#ifdef BT_MZ3
 
 	// 入力文字列を取得
 	CString strStatus;
@@ -5332,6 +5357,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 		L"", 
 		CInetAccess::FILE_HTML, 
 		&post, strUser, strPassword );
+#endif
 }
 
 /**
@@ -6579,6 +6605,7 @@ void CMZ3View::OnAddRssFeedMenu()
 	 * 5. 4. が成功すればフィードを追加して終了。title タグからタイトルを自動付与すること。
 	 * 6. 4. が失敗すればエラー出力して終了。
 	 */
+#ifdef BT_MZ3
 	if (theApp.m_access) {
 		// アクセス中は再アクセス不可
 		return;
@@ -6601,7 +6628,7 @@ void CMZ3View::OnAddRssFeedMenu()
 		// 通信開始
 		AccessProc( &s_data, s_data.GetURL(), CInetAccess::ENCODING_NOCONVERSION );
 	}
-
+#endif
 }
 
 /**
@@ -6711,6 +6738,7 @@ void CMZ3View::OnLuaMenu(UINT nID)
  */
 bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 {
+#ifdef BT_MZ3
 	// まずは RSSフィードであるか確認する。
 
 	// HTML の取得
@@ -6789,6 +6817,7 @@ bool CMZ3View::DoAccessEndProcForRssAutoDiscovery(void)
 		MessageBox( util::FormatString(L"%d 個の RSS を追加しました", nAppendedFeed) );
 		break;
 	}
+#endif
 
 	return true;
 }

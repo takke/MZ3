@@ -45,12 +45,19 @@ BOOL COptionTabMainView::OnInitDialog()
 
 	// ユーザやコミュニティの画像
 	CheckDlgButton( IDC_SHOW_MINI_IMAGE_CHECK, theApp.m_optionMng.m_bShowMainViewMiniImage ? BST_CHECKED : BST_UNCHECKED );
+#ifdef BT_TKTW
+	SetDlgItemText(IDC_SHOW_MINI_IMAGE_CHECK, L"ユーザのアイコンを表示する");
+#endif
 
 	// 画像の自動取得
 	CheckDlgButton( IDC_AUTO_LOAD_MINI_IMAGE_CHECK, theApp.m_optionMng.m_bAutoLoadMiniImage ? BST_CHECKED : BST_UNCHECKED );
 
 	// トピック等のアイコン表示
+#ifdef BT_MZ3
 	CheckDlgButton( IDC_SHOW_ICON_CHECK, theApp.m_optionMng.m_bShowMainViewIcon ? BST_CHECKED : BST_UNCHECKED );
+#else
+	GetDlgItem(IDC_SHOW_ICON_CHECK)->ShowWindow(SW_HIDE);
+#endif
 
 	// 下ペインのリストを１行で表示する
 	CheckDlgButton( IDC_NO_INTEGRATED_MODE_CHECK, theApp.m_optionMng.m_bBodyListIntegratedColumnMode ? BST_UNCHECKED : BST_CHECKED);

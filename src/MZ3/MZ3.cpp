@@ -330,7 +330,9 @@ BOOL CMZ3App::InitInstance()
 
 	m_pMainView		= (CMZ3View*)((CFrameWnd*)m_pMainWnd)->GetActiveView();
 	m_pReportView	= new CReportView;
+#ifdef BT_MZ3
 	m_pWriteView	= new CWriteView;
+#endif
 	m_pDownloadView	= new CDownloadView;
 	m_pDetailView	= new CDetailView;
 
@@ -345,9 +347,11 @@ BOOL CMZ3App::InitInstance()
 	m_pReportView->OnInitialUpdate();
 
 	// 書き込みビューの初期化
+#ifdef BT_MZ3
 	((CView*)m_pWriteView)->Create(NULL, MZ3_APP_NAME _T(" WriteView"), WS_CHILD, rect,
 		m_pMainWnd, viewID, &newContext);
 	m_pWriteView->OnInitialUpdate();
+#endif
 
 	// ダウンロードビューの初期化
 	((CView*)m_pDownloadView)->Create(NULL, MZ3_APP_NAME _T(" DownloadView"), WS_CHILD, rect,

@@ -66,7 +66,11 @@ enum AppBuildType {
 
 class CMZ3View;
 class CReportView;
+
+#ifdef BT_MZ3
 class CWriteView;
+#endif
+
 class CDownloadView;
 class CDetailView;
 class CMZ3BackgroundImage;
@@ -170,7 +174,9 @@ public:
 	CFont				m_fontBig;				///< 共通フォント(大) : 共通フォントに対する相対指定
 	CMZ3View*			m_pMainView;			///< メインビュー
 	CReportView*		m_pReportView;			///< レポートビュー
+#ifdef BT_MZ3
 	CWriteView*			m_pWriteView;			///< 書き込みビュー
+#endif
 	CDownloadView*		m_pDownloadView;		///< ダウンロードビュー
 	CDetailView*		m_pDetailView;			///< 詳細ビュー
 

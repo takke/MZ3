@@ -36,6 +36,7 @@ class MZ3ContentParser : MZ3ParserBase
 //	virtual bool parse( CMixiData& out_, const CHtmlArray& html_ ) = 0;
 };
 
+#ifdef BT_MZ3
 /**
  * [list] RSS ÉpÅ[ÉT
  */
@@ -63,6 +64,8 @@ public:
 	static bool parse( CMixiDataList& out_, const std::vector<TCHAR>& text_ );
 	static bool parseLinkRecursive( CMixiDataList& out_, const xml2stl::Node& node );
 };
+#endif
+
 
 //Å°Å°Å°MZ3ì∆é©Å°Å°Å°
 

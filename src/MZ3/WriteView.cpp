@@ -7,6 +7,9 @@
 //
 
 #include "stdafx.h"
+
+#ifdef BT_MZ3
+
 #include "MZ3.h"
 #include "WriteView.h"
 #include "ReportView.h"
@@ -1796,3 +1799,5 @@ void CWriteView::OnLuaMenu(UINT nID)
 	const std::string& strFuncName = theApp.m_luaMenus[idx];
 	util::CallMZ3ScriptHookFunction("", "select_menu", strFuncName.c_str(), &m_data);
 }
+
+#endif	// BT_MZ3

@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#ifdef BT_MZ3
 
 // CWriteEdit
 
@@ -23,4 +24,4 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
-
+#endif

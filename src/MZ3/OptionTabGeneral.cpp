@@ -42,13 +42,24 @@ BOOL COptionTabGeneral::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	// 起動時の新着チェック
+#ifdef BT_MZ3
 	CheckDlgButton( IDC_BOOT_MNC_CHECK, theApp.m_optionMng.IsBootCheckMnC() ? BST_CHECKED : BST_UNCHECKED );
+#else
+	GetDlgItem(IDC_BOOT_MNC_CHECK)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BOOT_MNC_STATIC)->ShowWindow(SW_HIDE);
+#endif
 
 	// バージョンチェックに開発版も含める
 	CheckDlgButton( IDC_USE_DEV_VER_CHECK_CHECK, theApp.m_optionMng.m_bUseDevVerCheck ? BST_CHECKED : BST_UNCHECKED );
 
 	// 引用符号
+#ifdef BT_MZ3
 	SetDlgItemText( IDC_QUOTE_MARK_EDIT, theApp.m_optionMng.GetQuoteMark() );
+#else
+	GetDlgItem(IDC_QUOTE_MARK_GROUP)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_QUOTE_MARK_STATIC)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_QUOTE_MARK_EDIT)->ShowWindow(SW_HIDE);
+#endif
 
 	// URLを開くときに確認する
 	CheckDlgButton( IDC_CONFIRM_OPEN_URL_CHECK, 

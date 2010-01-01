@@ -713,7 +713,9 @@ int lua_mz3_open_url(lua_State *L)
 	// コントロール状態の変更
 	theApp.m_pMainView->MyUpdateControlStatus();
 	theApp.m_pReportView->MyUpdateControlStatus();
+#ifdef BT_MZ3
 	theApp.m_pWriteView->MyUpdateControlStatus();
+#endif
 
 	CInetAccess::FILE_TYPE type = CInetAccess::FILE_HTML;
 	if (file_type=="text") {
@@ -949,8 +951,10 @@ int lua_mz3_change_view(lua_State *L)
 		hwndTarget = theApp.m_pReportView->m_hWnd;
 	} else if (view_name=="main_view") {
 		hwndTarget = theApp.m_pMainView->m_hWnd;
+#ifdef BT_MZ3
 	} else if (view_name=="write_view") {
 		hwndTarget = theApp.m_pWriteView->m_hWnd;
+#endif
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
 		lua_error(L);
@@ -972,6 +976,7 @@ function mz3.start_write_view(write_view_type, data)
 */
 int lua_mz3_start_write_view(lua_State *L)
 {
+#ifdef BT_MZ3
 	const char* func_name = "mz3.start_write_view";
 
 	// 引数取得
@@ -980,6 +985,7 @@ int lua_mz3_start_write_view(lua_State *L)
 
 	theApp.m_pWriteView->StartWriteView(
 		theApp.m_accessTypeInfo.getAccessTypeBySerializeKey((const char*)write_view_type), pData);
+#endif
 
 	// 戻り値の数を返す
 	return 0;
@@ -3200,6 +3206,7 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_ECHO_REPLY;
 		break;
 
+#ifdef BT_MZ3
 	case 4:
 		//TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_WASSR_UPDATE;
@@ -3209,6 +3216,7 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 		//TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_GOOHOME_QUOTE_UPDATE;
 		break;
+#endif
 	}
 
 	// 戻り値の数を返す
@@ -3545,6 +3553,7 @@ int lua_mz3_report_view_get_wnd(lua_State *L)
 // MZ3 WriteView API
 //-----------------------------------------------
 
+#ifdef BT_MZ3
 /*
 --- 書き込み画面の取得
 --
@@ -3625,7 +3634,7 @@ int lua_mz3_write_view_set_text(lua_State *L)
 	// 戻り値の数を返す
 	return 0;
 }
-
+#endif
 
 //-----------------------------------------------
 // MZ3 Graphics API
@@ -3988,12 +3997,14 @@ static const luaL_Reg lua_mz3_report_view_lib[] = {
 	{"get_wnd",					lua_mz3_report_view_get_wnd},
 	{NULL, NULL}
 };
+#ifdef BT_MZ3
 static const luaL_Reg lua_mz3_write_view_lib[] = {
 	{"get_text",				lua_mz3_write_view_get_text},
 	{"set_text",				lua_mz3_write_view_set_text},
 	{"get_wnd",					lua_mz3_write_view_get_wnd},
 	{NULL, NULL}
 };
+#endif
 static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
 	{"set_content_type",		lua_mz3_post_data_set_content_type},
@@ -4036,7 +4047,9 @@ void mz3_lua_open_api(lua_State *L)
 
 	luaL_register(L, "mz3_main_view", lua_mz3_main_view_lib);
 	luaL_register(L, "mz3_report_view", lua_mz3_report_view_lib);
+#ifdef BT_MZ3
 	luaL_register(L, "mz3_write_view", lua_mz3_write_view_lib);
+#endif
 	luaL_register(L, "mz3_post_data", lua_mz3_post_data_lib);
 	luaL_register(L, "mz3_account_provider", lua_mz3_account_provider_lib);
 	luaL_register(L, "mz3_image_cache", lua_mz3_image_cache_lib);

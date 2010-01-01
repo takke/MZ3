@@ -187,6 +187,10 @@
 #define IDC_STATIC_FDQ_COPYRIGHT        1078
 #define IDC_NOTICE_STATIC               1079
 #define IDC_SERVICE_LIST                1084
+#define IDC_BOOT_MNC_STATIC             1086
+#define IDC_QUOTE_MARK_GROUP            1087
+#define IDC_QUOTE_MARK_STATIC           1088
+#define IDC_PAGE_GET_GROUP              1089
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_SETTING_LOGIN                32775
@@ -345,7 +349,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         34245
-#define _APS_NEXT_CONTROL_VALUE         1086
+#define _APS_NEXT_CONTROL_VALUE         1090
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

@@ -131,7 +131,9 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
 	case ACCESS_LIST_BBS:						body.clear();	return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:					body.clear();	return mixi::ShowCalendarParser::parse( body, html );
+#ifdef BT_MZ3
 	case ACCESS_RSS_READER_FEED:				body.clear();	return parser::RssFeedParser::parse( body, html );
+#endif
 	default:
 		break;
 	}
@@ -428,6 +430,7 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 	return true;
 }
 
+#ifdef BT_MZ3
 //
 // RSS 用パーサ
 //
@@ -693,6 +696,8 @@ bool RssAutoDiscoveryParser::parseLinkRecursive( CMixiDataList& out_, const xml2
 
 	return true;
 }
+#endif	// BT_MZ3
+
 
 bool MZ3ParserBase::ExtractLinks(CMixiData &data_)
 {

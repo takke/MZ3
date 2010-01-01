@@ -207,7 +207,11 @@ public:
 		, m_bBodyListIntegratedColumnMode( true )
 		, m_bBodyListIntegratedColumnModeLine( 3 )
 		, m_bOneClickCategoryFetchMode( true )
+#ifdef BT_TKTW
+		, m_bMagnifyModeCategoryAtStart( true )
+#else
 		, m_bMagnifyModeCategoryAtStart( false )
+#endif
 		, m_bAddSourceTextOnTwitterPost( true )
 		, m_StartupTransitionDoneType( STARTUP_TRANSITION_DONE_TYPE_FONT_SIZE_SCALED )
 		, m_nTwitterStatusLineCount(3)

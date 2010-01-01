@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#ifdef BT_MZ3
+
 #include "PostData.h"
 #include "WriteEdit.h"
 #include "afxwin.h"
@@ -193,4 +195,4 @@ public:
 	void PopupWriteBodyMenu(void);
 };
 
-
+#endif

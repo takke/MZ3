@@ -543,8 +543,10 @@ CString MakeImageLogfilePath( CMixiData& data )
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
 	case ACCESS_TWITTER_USER:
+#ifdef BT_MZ3
 	case ACCESS_WASSR_USER:
 	case ACCESS_GOOHOME_USER:
+#endif
 	case ACCESS_MIXI_ECHO_USER:
 		// これらのアクセス種別では強制的に表示
 		bShowImage = true;
