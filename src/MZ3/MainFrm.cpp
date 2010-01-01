@@ -245,7 +245,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_notifyIconData.uID              = 1;
 	m_notifyIconData.uFlags           = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	m_notifyIconData.uCallbackMessage = WM_TRAYICONMESSAGE;
-	m_notifyIconData.hIcon            = AfxGetApp()->LoadIconW(IDR_MAINFRAME_WIN32);
+	m_notifyIconData.hIcon            = (HICON)::LoadImage(
+											::AfxGetInstanceHandle(),
+											MAKEINTRESOURCE(IDR_MAINFRAME_WIN32),
+											IMAGE_ICON,
+											16, // desired width
+											16, // desired height
+											LR_DEFAULTCOLOR);
+
 	lstrcpy(m_notifyIconData.szTip, pszToolTipMsg);
 
 	// アイコンを登録できるかエラーになるまで繰り返す
