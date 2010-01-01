@@ -318,7 +318,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Release_Win32\&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Release_Win32_c\&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Release_Win32\&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\Release_Win32_c\&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\TkTweets_Release_Win32\&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\src\MZ3\TkTweets_Release_Win32_c\&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
