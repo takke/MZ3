@@ -46,6 +46,7 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 
 	ACCESS_TYPE accessTypeList[] = { 
 		ACCESS_PLAIN,
+#ifdef BT_MZ3
 		ACCESS_DIARY, 
 		ACCESS_NEIGHBORDIARY,
 		ACCESS_BBS, 
@@ -59,6 +60,7 @@ BOOL CChooseAccessTypeDlg::OnInitDialog()
 		ACCESS_MESSAGE, 
 		ACCESS_NEWS, 
 		ACCESS_SCHEDULE, 
+#endif
 		ACCESS_INVALID 
 	};
 

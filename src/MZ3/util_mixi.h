@@ -54,6 +54,7 @@ inline CString GetLogIdString( const CMixiData& mixi )
 {
 	CString logId;
 
+#ifdef BT_MZ3
 	switch (mixi.GetAccessType()) {
 	case ACCESS_DIARY:
 	case ACCESS_MYDIARY:
@@ -80,6 +81,7 @@ inline CString GetLogIdString( const CMixiData& mixi )
 		logId = L"";
 		break;
 	}
+#endif
 
 	return logId;
 }

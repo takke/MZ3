@@ -60,6 +60,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 	}
 
 	// アクセス種別分離に伴う移行処理
+#ifdef BT_MZ3
 	switch( category_type ) {
 	case ACCESS_LIST_FAVORITE_USER:
 		// お気に入りユーザ
@@ -69,16 +70,21 @@ bool Mz3GroupData::appendCategoryByIniData(
 		}
 		break;
 	}
+#endif
 
 	// URL が指定されていればその URL を用いる。
 	CString url = default_category_url;
-	if( category_url!=NULL && strlen(category_url) > 0 ) {
+	if (category_url!=NULL && strlen(category_url) > 0) {
+#ifdef BT_MZ3
 		// 旧形式iniファイルの移行処理
 		if (category_type == ACCESS_LIST_FOOTSTEP && strcmp(category_url, "show_log.pl")==0) {
 			// 旧あしあとURLはAPI用URLに置換(デフォルトURLを採用する)
-		} else if (category_type == ACCESS_LIST_FRIEND && strcmp(category_url, "list_friend.pl")==0) {
+		} else 
+		if (category_type == ACCESS_LIST_FRIEND && strcmp(category_url, "list_friend.pl")==0) {
 			// 旧マイミク一覧URLはAPI用URLに置換(デフォルトURLを採用する)
-		} else if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
+		} else 
+#endif
+		if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
 			       strstr(category_url, "http://twitter.com/statuses/friends_timeline.xml")!=NULL)
 		{
 			// friends_timeline.xml を home_timeline.xml に書き換える

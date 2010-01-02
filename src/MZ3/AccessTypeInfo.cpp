@@ -29,6 +29,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi,リスト系
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_LIST_INTRO;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -306,6 +307,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
+#endif
 
 	//------------------------------------------------------------------
 	//--- mixi,一般
@@ -331,6 +333,7 @@ bool AccessTypeInfo::init()
 	m_map[type].cacheFilePattern = L"home.html";
 	m_map[type].serializeKey = "MIXI_HOME";
 
+#ifdef BT_MZ3
 	type = ACCESS_DIARY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
@@ -443,6 +446,7 @@ bool AccessTypeInfo::init()
 	// url(2) : http://mixi.jp/view_message.pl?id=xxx&box=outbox
 	m_map[type].cacheFilePattern = L"message\\{urlparam:box}\\{urlparam:id}.html";
 	m_map[type].serializeKey = "MIXI_MESSAGE";
+#endif
 
 	type = ACCESS_IMAGE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -453,6 +457,7 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "MIXI_IMAGE";
 
+#ifdef BT_MZ3
 	type = ACCESS_MOVIE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
@@ -461,6 +466,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_MOVIE";
+#endif
 
 	type = ACCESS_DOWNLOAD;
 	m_map[type] = AccessTypeInfo::Data(
@@ -471,6 +477,7 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "DOWNLOAD";
 
+#ifdef BT_MZ3
 	type = ACCESS_PROFILE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
@@ -486,7 +493,7 @@ bool AccessTypeInfo::init()
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
 		, "mixi"
-		, L"プロフィール"
+		, L"誕生日"
 		, REQUEST_METHOD_GET
 		);
 	// url(1) : http://mixi.jp/show_friend.pl?id={user_id}
@@ -510,6 +517,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_SCHEDULE";
+#endif
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系

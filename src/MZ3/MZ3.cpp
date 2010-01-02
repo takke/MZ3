@@ -1191,6 +1191,7 @@ bool CMZ3App::SaveGroupData(void)
  */
 bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 {
+#ifdef BT_MZ3
 	if (util::IsMixiAccessType(aType)) {
 		if (mixi::MixiParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
 			return true;
@@ -1199,6 +1200,7 @@ bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 

@@ -342,6 +342,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 			COLORREF clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 			switch (pData->GetAccessType()) {
+#ifdef BT_MZ3
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
 			case ACCESS_EVENT_JOIN:
@@ -362,7 +363,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					}
 				}
 				break;
+#endif
 
+#ifdef BT_MZ3
 			case ACCESS_DIARY:
 			case ACCESS_MYDIARY:
 			case ACCESS_NEIGHBORDIARY:
@@ -383,7 +386,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					}
 				}
 				break;
+#endif
 
+#ifdef BT_MZ3
 			case ACCESS_NEWS:
 			case ACCESS_MESSAGE:
 				// ニュース
@@ -407,7 +412,9 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 				}
 				break;
+#endif
 
+#ifdef BT_MZ3
 			case ACCESS_COMMUNITY:
 				// コミュニティ
 				{
@@ -430,6 +437,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 					}
 				}
 				break;
+#endif
 
 			case ACCESS_TWITTER_USER:
 				// Twitter 項目

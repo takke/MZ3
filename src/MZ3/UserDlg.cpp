@@ -52,6 +52,11 @@ BOOL CUserDlg::OnInitDialog()
 	mc_comboType.SetCurSel( 0 );
 	m_idxSelectedCombo = 0;
 
+#ifdef BT_TKTW
+	// TkTweets : サービス選択不要
+	mc_comboType.ShowWindow(SW_HIDE);
+#endif
+
 	MyLoadControlData();
 
 	return TRUE;  // return TRUE unless you set the focus to a control

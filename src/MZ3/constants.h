@@ -83,6 +83,7 @@ enum ACCESS_TYPE {
 	//----------------------------------------------
 	ACCESS_LOGIN=0,				///< ログイン
 	ACCESS_MAIN,				///< メイン(home.pl)
+#ifdef BT_MZ3
 	ACCESS_DIARY,				///< 日記内容(view_diary.pl)
 	ACCESS_NEIGHBORDIARY,		///< 日記内容(neighbor_diary.pl)	//MOriyama追加 次の日記、前の日記
 	ACCESS_BBS,					///< コミュニティ内容(view_bbs.pl)
@@ -96,10 +97,15 @@ enum ACCESS_TYPE {
 	ACCESS_PROFILE,				///< 個人ページ(show_friend.pl)
 	ACCESS_BIRTHDAY,			///< 誕生日個人ページ(show_friend.pl)  //MOriyama追加
 	ACCESS_COMMUNITY,			///< コミュニティページ(view_community.pl)
-	ACCESS_IMAGE,				///< 画像
 	ACCESS_MOVIE,				///< 動画
 	ACCESS_SCHEDULE,			///< 追加した予定  //MOriyama追加
 	ACCESS_MIXI_ECHO_USER,		///< エコーのオブジェクト
+#endif
+	ACCESS_IMAGE,				///< 画像
+
+	//----------------------------------------------
+	// 汎用
+	//----------------------------------------------
 	ACCESS_DOWNLOAD,			///< 汎用ダウンロード
 	ACCESS_PLAIN,				///< 汎用テキストデータ
 
@@ -107,6 +113,7 @@ enum ACCESS_TYPE {
 	ACCESS_GROUP_GENERAL,		///< グループ 一般
 
 	//--- LIST 系：カテゴリリストの項目。
+#ifdef BT_MZ3
 	ACCESS_LIST_MYDIARY,			///< 自分の日記一覧
 	ACCESS_LIST_DIARY,				///< マイミク最新日記一覧
 	ACCESS_LIST_NEW_COMMENT,		///< 最新コメント一覧
@@ -116,7 +123,6 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_FOOTSTEP,			///< 足跡
 	ACCESS_LIST_COMMENT,			///< コメント一覧
 	ACCESS_LIST_NEWS,				///< ニュース一覧
-	ACCESS_LIST_BOOKMARK,			///< ブックマーク
 	ACCESS_LIST_FAVORITE_USER,		///< お気に入りユーザ
 	ACCESS_LIST_FAVORITE_COMMUNITY,	///< お気に入りコミュ
 	ACCESS_LIST_FRIEND,				///< マイミク一覧
@@ -125,11 +131,15 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_BBS,				///< トピック一覧(list_bbs.pl)
 	ACCESS_LIST_NEW_BBS_COMMENT,	///< コミュニティコメント記入履歴
 	ACCESS_LIST_CALENDAR,			///< カレンダー  //icchu追加
+#endif
+	ACCESS_LIST_BOOKMARK,			///< ブックマーク
 
 	//--- mixi echo 関連
+#ifdef BT_MZ3
 	ACCESS_MIXI_RECENT_ECHO,			///< みんなのエコー：recent_echo.pl
 	ACCESS_MIXI_ADD_ECHO,				///< エコー書き込む：add_echo.pl
 	ACCESS_MIXI_ADD_ECHO_REPLY,			///< エコー返信：add_echo.pl
+#endif
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。
 #ifdef BT_MZ3

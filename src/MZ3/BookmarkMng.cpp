@@ -62,6 +62,7 @@ void Bookmark::Save( CMixiDataList& bookmark )
 
 	for (int i=0; i<count; i++) {
 		CMixiData& data = bookmark[i];
+#ifdef BT_MZ3
 		switch (data.GetAccessType()) {
 		case ACCESS_BBS:
 			type = _T("b");
@@ -76,6 +77,7 @@ void Bookmark::Save( CMixiDataList& bookmark )
 			type = _T("j");
 			break;
 		}
+#endif
 		buf.Format(_T("%s<>%d<>%s<>%s\n"), type, data.GetID(), data.GetName(), data.GetTitle());
 		fputws(buf, fp);
 	}
@@ -92,6 +94,7 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 
 	{
 		CString type = str.Tokenize(_T("<>"), index);
+#ifdef BT_MZ3
 		if (type == _T("b")) {
 			data.SetAccessType( ACCESS_BBS );
 		}else if (type == _T("e")) {
@@ -101,6 +104,7 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 		}else if (type == _T("j")) {
 			data.SetAccessType( ACCESS_EVENT_JOIN );
 		}
+#endif
 	}
 	{
 		CString id = str.Tokenize(_T("<>"), index);
@@ -120,6 +124,7 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 	{
 		// URL ê∂ê¨
 		CString uri;
+#ifdef BT_MZ3
 		switch (data.GetAccessType()) {
 		case ACCESS_BBS:
 			uri.Format( _T("view_bbs.pl?id=%d"), data.GetID() );
@@ -132,6 +137,7 @@ void Bookmark::Devide( LPCTSTR line, CMixiDataList& bookmark )
 			uri.Format( _T("view_event.pl?id=%d"), data.GetID() );
 			break;
 		}
+#endif
 
 		data.SetURL(uri);
 	}

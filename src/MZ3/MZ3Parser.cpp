@@ -111,6 +111,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 		return true;
 	}
 
+#ifdef BT_MZ3
 	switch (aType) {
 //	case ACCESS_MAIN:							body.clear();	return mixi::HomeParser::parse( parent, html );
 	case ACCESS_LIST_DIARY:						body.clear();	return mixi::ListNewFriendDiaryParser::parse( body, html );
@@ -131,12 +132,11 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
 	case ACCESS_LIST_BBS:						body.clear();	return mixi::ListBbsParser::parse( body, html );
 	case ACCESS_LIST_CALENDAR:					body.clear();	return mixi::ShowCalendarParser::parse( body, html );
-#ifdef BT_MZ3
 	case ACCESS_RSS_READER_FEED:				body.clear();	return parser::RssFeedParser::parse( body, html );
-#endif
 	default:
 		break;
 	}
+#endif
 
 	CString msg;
 	msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
@@ -164,6 +164,7 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	}
 
 	switch (aType) {
+#ifdef BT_MZ3
 //	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
 //	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
@@ -176,19 +177,22 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 //	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
 //	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
+#endif
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
 	case ACCESS_ERRORLOG:		return parser::ErrorlogParser::parse( mixi, html );
+#ifdef BT_MZ3
 	case ACCESS_SCHEDULE:
+#endif
 	case ACCESS_PLAIN:			return parser::PlainTextParser::parse( mixi, html );
 	default:
-		{
-			CString msg;
-			msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
-			MZ3LOGGER_ERROR(msg);
-			MessageBox(NULL, msg, NULL, MB_OK);
-		}
-		return false;
+		break;
 	}
+
+	CString msg;
+	msg.Format( L"サポート外のアクセス種別です(%d:%s)", aType, theApp.m_accessTypeInfo.getShortText(aType) );
+	MZ3LOGGER_ERROR(msg);
+	MessageBox(NULL, msg, NULL, MB_OK);
+	return false;
 }
 
 //

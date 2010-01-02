@@ -94,6 +94,8 @@ public:
 	}
 };
 
+
+#ifdef BT_MZ3
 /**
  * コメント投稿の確認画面用 POST 電文生成クラス（書き込み画面⇒確認画面ボタン）
  * 
@@ -163,7 +165,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * コメント投稿の書き込み画面用 POST 電文生成クラス（確認画面｜書き込みボタン押下）
  * 
@@ -224,7 +229,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * 日記投稿の確認画面用 POST 電文生成クラス（書き込み画面⇒確認画面ボタン）
  * 
@@ -302,7 +310,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * 日記投稿の書き込み画面用 POST 電文生成クラス（確認画面｜書き込みボタン押下）
  * 
@@ -343,7 +354,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * メッセージ返信の確認画面用 POST 電文生成クラス（書き込み画面⇒確認画面ボタン）
  * 
@@ -398,7 +412,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * メッセージ返信の書き込み画面用 POST 電文生成クラス（確認画面｜書き込みボタン押下）
  * 
@@ -450,7 +467,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * 新規メッセージの確認画面用 POST 電文生成クラス（書き込み画面⇒確認画面ボタン）
  * 
@@ -502,7 +522,10 @@ public:
 		return true;
 	}
 };
+#endif
 
+
+#ifdef BT_MZ3
 /**
  * 新規メッセージの書き込み画面用 POST 電文生成クラス（確認画面｜書き込みボタン押下）
  * 
@@ -551,6 +574,6 @@ public:
 		return true;
 	}
 };
-
+#endif
 
 }

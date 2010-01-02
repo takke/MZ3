@@ -873,12 +873,16 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	int idx = (int)m_categoryList.GetItemData( pNMLV->iItem );
 	m_selGroup->focusedCategory = idx;
 
+#ifdef BT_MZ3
 	if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY) {
 		// 日記ボタンをアクティブにする
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
 	} else {
 		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 	}
+#else
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
+#endif
 
 	// 第1カラムに表示している内容を表示する
 	MySetInfoEditFromBodySelectedData();
@@ -1011,6 +1015,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
+#ifdef BT_MZ3
 	if (aType != ACCESS_LOGIN) {
 		// HTML の取得
 
@@ -1035,6 +1040,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			return TRUE;
 		}
 	}
+#endif
 
 	// ログアウトしていなかったのでファイルコピー
 	if( theApp.m_optionMng.m_bSaveLog ) {
@@ -1047,6 +1053,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	switch (aType) {
+#ifdef BT_MZ3
 	case ACCESS_LOGIN:
 		// --------------------------------------------------
 		// ログイン処理
@@ -1086,7 +1093,9 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+#endif
 
+#ifdef BT_MZ3
 	case ACCESS_MAIN:
 		// --------------------------------------------------
 		// メイン画面
@@ -1141,6 +1150,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
+#endif
 
 #ifdef BT_MZ3
 	case ACCESS_RSS_READER_AUTO_DISCOVERY:
@@ -1721,6 +1731,7 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 
+#ifdef BT_MZ3
 	switch (data.GetAccessType()) {
 	case ACCESS_LIST_FOOTSTEP:
 		return;
@@ -1731,17 +1742,18 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 		OnViewBbsList();
 		return;
 
-#ifdef BT_MZ3
 	case ACCESS_RSS_READER_ITEM:
 		// 詳細表示
 		OnMenuRssRead();
 		return;
-#endif
 
 	default:
-		// 特殊な要素以外なので、通信処理開始。
-		AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
+		break;
 	}
+#endif
+
+	// 特殊な要素以外なので、通信処理開始。
+	AccessProc(&data, util::CreateMixiUrl(data.GetURL()));
 }
 
 /**
@@ -2136,9 +2148,13 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 	theApp.EnableCommandBarButton( ID_IMAGE_BUTTON, FALSE);
 
 	// 書き込みボタン
+#ifdef BT_MZ3
 	// 自分の日記の場合は有効に。
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON,
 		(m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY));
+#else
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
+#endif
 
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
 
@@ -2595,12 +2611,14 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 							theApp.MyLuaExecute(L"goohome.on_goohome_update()");
 
 							return TRUE;
+#ifdef BT_MZ3
 						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 
 							// Lua 関数呼び出しで実装
 							theApp.MyLuaExecute(L"mixi.on_mixi_echo_update()");
 
 							return TRUE;
+#endif
 						}
 					}
 				}
@@ -2657,10 +2675,12 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 
 		switch( GetSelectedBodyItem().GetAccessType() ) {
+#ifdef BT_MZ3
 		case ACCESS_COMMUNITY:
 			// メニュー表示
 			PopupBodyMenu();
 			break;
+#endif
 
 #ifdef BT_MZ3
 		case ACCESS_RSS_READER_ITEM:
@@ -3029,16 +3049,20 @@ void CMZ3View::OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 	// ブラウザボタン
 	// 足あとの場合は有効に。
 	if (m_selGroup!=NULL && m_selGroup->getSelectedCategory()!= NULL) {
+#ifdef BT_MZ3
 		switch (m_selGroup->getSelectedCategory()->m_mixi.GetAccessType()) {
-			case ACCESS_LIST_FOOTSTEP:
-			case ACCESS_LIST_FRIEND:
-				theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
-				break;
+		case ACCESS_LIST_FOOTSTEP:
+		case ACCESS_LIST_FRIEND:
+			theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
+			break;
 
-			default:
-				theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
-				break;
+		default:
+			theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
+			break;
 		}
+#else
+		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
+#endif
 	} else {
 		theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE );
 	}
@@ -3069,6 +3093,7 @@ void CMZ3View::OnOpenBrowser()
 		return;
 	}
 
+#ifdef BT_MZ3
 	switch( GetSelectedBodyItem().GetAccessType() ) {
 	case ACCESS_PROFILE:			// プロフィール
 	case ACCESS_BIRTHDAY:			// 誕生日プロフィール
@@ -3094,6 +3119,9 @@ void CMZ3View::OnOpenBrowser()
 		util::OpenUrlByBrowserWithConfirm( url );
 		break;
 	}
+#else
+	util::OpenUrlByBrowserWithConfirm( url );
+#endif
 }
 
 /**
@@ -3150,6 +3178,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 	// URL 整形
 	CString uri = a_url;
+#ifdef BT_MZ3
 	switch (data->GetAccessType()) {
 	case ACCESS_BBS:
 	case ACCESS_ENQUETE:
@@ -3182,19 +3211,22 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 			break;
 		}
 		break;
-
 	}
+#endif
 
 	// 【API 用】
 	// URL 内のID置換
+#ifdef BT_MZ3
 	uri.Replace( L"{owner_id}", theApp.m_loginMng.GetMixiOwnerID() );
 	uri.Replace( L"{wassr:id}", theApp.m_loginMng.GetWassrId() );
+#endif
 	uri.Replace( L"{twitter:id}", theApp.m_loginMng.GetTwitterId() );
 
 	data->SetBrowseUri(uri);
 
 	// リファラ
 	CString referer;
+#ifdef BT_MZ3
 	switch (data->GetAccessType()) {
 	case ACCESS_ENQUETE:
 		// アンケート
@@ -3207,6 +3239,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		referer = L"http://mixi.jp/list_friend.pl";
 		break;
 	}
+#endif
 
 	// encoding 指定
 	encoding = theApp.GetInetAccessEncodingByAccessType(data->GetAccessType());
@@ -3255,6 +3288,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	}
 
 	// [MZ3-API] GET/POST 直前のフック処理(の予定)
+#ifdef BT_MZ3
 	switch (data->GetAccessType()) {
 	case ACCESS_LIST_FRIEND:
 		// マイミク一覧
@@ -3285,6 +3319,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		}
 		break;
 	}
+#endif
 
 	// UserAgent設定
 	// Wassr はブラウザ風UAだとAPIが叩けない事象の回避
@@ -3312,6 +3347,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 /// 右ソフトキーメニュー｜全部読む
 void CMZ3View::OnGetAll()
 {
+#ifdef BT_MZ3
 	// チェック
 	//if( m_hotList != &m_bodyList ) {
 	//	return;
@@ -3332,11 +3368,13 @@ void CMZ3View::OnGetAll()
 	// 全件に設定し、アクセス開始
 	theApp.m_optionMng.SetPageType( GETPAGE_ALL );
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
+#endif
 }
 
 /// 右ソフトキーメニュー｜最新の20件を読む
 void CMZ3View::OnGetLast10()
 {
+#ifdef BT_MZ3
 	// チェック
 	//if( m_hotList != &m_bodyList ) {
 	//	return;
@@ -3357,6 +3395,7 @@ void CMZ3View::OnGetLast10()
 	// 20件に設定し、アクセス開始
 	theApp.m_optionMng.SetPageType( GETPAGE_LATEST20 );
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
+#endif
 }
 
 /**
@@ -3482,6 +3521,7 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
  */
 void CMZ3View::OnViewLog()
 {
+#ifdef BT_MZ3
 	CMixiData& mixi = GetSelectedBodyItem();
 
 	// レポート画面で開けるタイプのみサポートする
@@ -3534,6 +3574,7 @@ void CMZ3View::OnViewLog()
 
 	// 表示
 	MyShowReportView( s_mixi );
+#endif
 }
 
 /**
@@ -3882,6 +3923,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		return rval!=0 ? true : false;
 	}
 
+#ifdef BT_MZ3
 	switch( bodyItem.GetAccessType() ) {
 	case ACCESS_DIARY:
 	case ACCESS_NEIGHBORDIARY:
@@ -3998,7 +4040,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		}
 		break;
 
-#ifdef BT_MZ3
 	case ACCESS_RSS_READER_ITEM:
 		{
 			CMenu menu;
@@ -4029,8 +4070,9 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 		}
 		break;
-#endif
 	}
+#endif	// BT_MZ3
+
 	return true;
 }
 
@@ -4042,6 +4084,7 @@ bool CMZ3View::PrepareViewBbsList(void)
 		return false;
 	}
 
+#ifdef BT_MZ3
 	// URL はボディのアイテムからidを引き継ぐ。
 	CString url;
 	url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(bodyItem.GetURL()) );
@@ -4056,6 +4099,9 @@ bool CMZ3View::PrepareViewBbsList(void)
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 
 	return AppendCategoryList(categoryItem);
+#else
+	return false;
+#endif
 }
 
 /// コミュニティの右ソフトキーメニュー｜トピック一覧
@@ -4489,6 +4535,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 			// 全て既読なら次のカテゴリへ。
 			bool unread = false;	// 未読フラグ
 			switch( mixi.GetAccessType() ) {
+#ifdef BT_MZ3
 			case ACCESS_BBS:
 			case ACCESS_EVENT:
 			case ACCESS_EVENT_JOIN:
@@ -4509,6 +4556,7 @@ bool CMZ3View::DoNextBodyItemCruise()
 					}
 				}
 				break;
+#endif
 			default:
 				// コミュニティ以外なので、ログの有無で既読・未読を判定する
 				if(! util::ExistFile(util::MakeLogfilePath(mixi)) ) {
@@ -5193,10 +5241,12 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 				return (VIEW_STYLE)rvals[0].m_number;
 			}
 
+#ifdef BT_MZ3
 			if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 				// エコーは Twitter スタイル
 				return VIEW_STYLE_TWITTER;
 			}
+#endif
 
 			if (m_bodyList.IsEnableIcon()) {
 				// 画像があれば「イメージ付き」とする
@@ -6286,10 +6336,12 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	m_categoryList.SetItemText( m_selGroup->selectedCategory, 1, timeStr );
 	SetBodyList( body );		// ボディ一覧に表示
 
+#ifdef BT_MZ3
 	if( aType == ACCESS_LIST_BBS ) {
 		// コミュニティリストの場合は自動的にボディ一覧にフォーカスする
 		m_bodyList.SetFocus();
 	}
+#endif
 
 	if (bParserResult) {
 		// [MZ3-API] : パース後のフック処理
@@ -6302,6 +6354,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 			// イベントハンドラ完了
 		} else {
 			switch (aType) {
+#ifdef BT_MZ3
 			case ACCESS_LIST_FRIEND:
 	//			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
 				// マイミク一覧
@@ -6320,6 +6373,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 					}
 				}
 				break;
+#endif
 
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
 				MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");

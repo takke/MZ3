@@ -498,6 +498,7 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 {
 	// TODO Lua で再実装すること↓
 	// view 系
+#ifdef BT_MZ3
 	if( url.Find( L"home.pl" ) != -1 ) 			{ return ACCESS_MAIN;      } // メイン
 	if( url.Find( L"view_diary.pl" ) != -1 ) 	{ return ACCESS_DIARY;     } // 日記内容
 	if( url.Find( L"neighbor_diary.pl" ) != -1 ){ return ACCESS_NEIGHBORDIARY;} // 日記内容(次の日記、前の日記)
@@ -510,11 +511,14 @@ ACCESS_TYPE EstimateAccessTypeByUrl( const CString& url )
 	if( url.Find( L"view_news.pl" ) != -1 ) 	{ return ACCESS_NEWS;      } // ニュース内容
 	if( url.Find( L"show_friend.pl" ) != -1 ) 	{ return ACCESS_PROFILE;   } // 個人ページ
 	if( url.Find( L"view_community.pl" ) != -1 ){ return ACCESS_COMMUNITY; } // コミュニティページ
+#endif
 
 	// list 系
+#ifdef BT_MZ3
 	if( url.Find( L"list_bookmark.pl?kind=community" ) != -1 ) { return ACCESS_LIST_FAVORITE_COMMUNITY; }
 	if( url.Find( L"list_bookmark.pl" ) != -1 ) { return ACCESS_LIST_FAVORITE_USER; }
 	if( url.Find( L"new_bbs.pl" ) != -1 )		{ return ACCESS_LIST_NEW_BBS; }
+#endif
 
 	// MZ3 API : フック関数呼び出し
 	util::MyLuaDataList rvals;
@@ -539,24 +543,24 @@ CString MakeImageLogfilePath( CMixiData& data )
 {
 	// アクセス種別に応じてパスを生成する
 	bool bShowImage = false;
+#ifdef BT_MZ3
 	switch( data.GetAccessType() ) {
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
 	case ACCESS_TWITTER_USER:
-#ifdef BT_MZ3
 	case ACCESS_WASSR_USER:
 	case ACCESS_GOOHOME_USER:
-#endif
 	case ACCESS_MIXI_ECHO_USER:
 		// これらのアクセス種別では強制的に表示
 		bShowImage = true;
 		break;
-	default:
+	}
+#endif
+	if (!bShowImage) {
 		// 通常のアクセス種別では「show_image」が1であれば表示する
 		if (data.GetIntValue(L"show_image", 0)) {
 			bShowImage = true;
 		}
-		break;
 	}
 
 	if (bShowImage) {

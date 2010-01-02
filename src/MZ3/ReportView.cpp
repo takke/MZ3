@@ -407,11 +407,13 @@ void CReportView::SetData(const CMixiData& data)
 	// タイトルの設定
 	CString title = m_data.GetTitle();
 	switch (m_data.GetAccessType()) {
+#ifdef BT_MZ3
 	case ACCESS_MYDIARY:
 	case ACCESS_MESSAGE:
 	case ACCESS_PROFILE:
 	case ACCESS_BIRTHDAY:
 		break;
+#endif
 	default:
 		if( !m_data.GetName().IsEmpty() ) {
 			title.AppendFormat( _T("(%s)"), (LPCTSTR)m_data.GetName() );
@@ -487,9 +489,13 @@ void CReportView::SetData(const CMixiData& data)
 	}
 
 	// プロフィール表示の場合は常に先頭項目を選択
-	if (m_data.GetAccessType() == ACCESS_PROFILE || m_data.GetAccessType() == ACCESS_BIRTHDAY || m_data.GetAccessType() == ACCESS_NEIGHBORDIARY ) {
+#ifdef BT_MZ3
+	if (m_data.GetAccessType() == ACCESS_PROFILE ||
+		m_data.GetAccessType() == ACCESS_BIRTHDAY ||
+		m_data.GetAccessType() == ACCESS_NEIGHBORDIARY ) {
 		focusItem = 0;
 	}
+#endif
 
 	//--- UI 関連
 	m_list.SetRedraw(TRUE);
@@ -1163,13 +1169,13 @@ void CReportView::SaveIndex()
  */
 void CReportView::OnAddBookmark()
 {
-
+#ifdef BT_MZ3
 	if (m_data.GetAccessType() != ACCESS_BBS &&
 		m_data.GetAccessType() != ACCESS_EVENT &&
 		m_data.GetAccessType() != ACCESS_EVENT_JOIN &&
 		m_data.GetAccessType() != ACCESS_ENQUETE) {
-			::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
-			return;
+		::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
+		return;
 	}
 
 	if( theApp.m_bookmarkMng.Add( &m_data, theApp.m_root.GetBookmarkList() ) != FALSE ) {
@@ -1178,8 +1184,10 @@ void CReportView::OnAddBookmark()
 	else {
 		::MessageBox(m_hWnd, _T("既に登録されています"), MZ3_APP_NAME, NULL);
 	}
-
-
+#else
+	// TODO 暫定
+	::MessageBox(m_hWnd, _T("コミュニティ以外は\n登録出来ません"), MZ3_APP_NAME, NULL);
+#endif
 }
 
 /**
@@ -1228,6 +1236,7 @@ void CReportView::OnLoadMovie(UINT nID)
 		return;
 	}
 
+#ifdef BT_MZ3
 	CString url = m_currentData->GetMovie(nID - ID_REPORT_MOVIE-1);
 	MZ3LOGGER_DEBUG( L"動画ダウンロード開始 url[" + url + L"]" );
 
@@ -1241,6 +1250,7 @@ void CReportView::OnLoadMovie(UINT nID)
 	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
 
 	MyUpdateControlStatus();
+#endif
 }
 
 
@@ -1490,6 +1500,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 	bool bRetry = false;
 	switch( theApp.m_accessType ) {
+#ifdef BT_MZ3
 	case ACCESS_IMAGE:
 	case ACCESS_MOVIE:
 		{
@@ -1640,6 +1651,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			theApp.m_inet.DoGet(util::CreateMixiUrl(m_data.GetURL()), L"", CInetAccess::FILE_HTML );
 		}
 		break;
+#endif
 
 	default:
 		if( theApp.m_accessType == m_data.GetAccessType() ) {
@@ -1724,6 +1736,7 @@ LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 		CString url = theApp.m_inet.GetURL();
 
 		switch( theApp.m_accessType ) {
+#ifdef BT_MZ3
 		case ACCESS_IMAGE:
 			strFilepath.Format(_T("%s\\%s"), 
 				theApp.m_filepath.imageFolder, 
@@ -1735,6 +1748,7 @@ LRESULT CReportView::OnGetEndBinary(WPARAM wParam, LPARAM lParam)
 				theApp.m_filepath.downloadFolder, 
 				util::ExtractFilenameFromUrl( url, L"_mz3_noname.flv" ) );
 			break;
+#endif
 
 		default:
 			strFilepath.Format(_T("%s\\%s"), 
@@ -2055,6 +2069,7 @@ void CReportView::OnOpenProfile()
  */
 void CReportView::OnOpenProfileLog()
 {
+#ifdef BT_MZ3
 	// 選択アイテムの取得
 	int idx = m_list.GetSelectedItem();
 	if( idx < 0 ) {
@@ -2105,6 +2120,7 @@ void CReportView::OnOpenProfileLog()
 
 	// 表示
 	SetData( s_mixi );
+#endif
 }
 
 
@@ -2191,6 +2207,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 
 	// 「書き込み」に関する処理
 	switch( m_data.GetAccessType() ) {
+#ifdef BT_MZ3
 	case ACCESS_MESSAGE:
 		// メッセージなら、送信箱か受信箱かによって処理が異なる
 		if( m_data.GetURL().Find( L"&box=outbox" ) != -1 ) {
@@ -2216,6 +2233,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		break;
 
 	case ACCESS_NEWS:
+#endif
 	default:
 		// ニュース等なら書き込み無効
 		pcThisMenu->RemoveMenu(ID_WRITE_COMMENT, MF_BYCOMMAND);
@@ -2232,6 +2250,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 
 	// 前の日記、次の日記の処理
 	switch( m_data.GetAccessType() ) {
+#ifdef BT_MZ3
 	case ACCESS_DIARY:
 	case ACCESS_NEIGHBORDIARY:
 	case ACCESS_MYDIARY:
@@ -2263,6 +2282,8 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 			}
 		}
 		break;
+#endif
+
 	default:
 		// 前の日記へ
 		pcThisMenu->RemoveMenu(ID_MENU_PREV_DIARY, MF_BYCOMMAND);
@@ -2395,6 +2416,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		pcThisMenu->RemoveMenu(ID_SEND_MESSAGE, MF_BYCOMMAND);
 	} else {
 		// プロフィールページを開く（ログ）はログがなければ無効化
+#ifdef BT_MZ3
 		CMixiData mixi;
 		mixi.SetAccessType( ACCESS_PROFILE );
 		mixi.SetURL( util::FormatString( L"http://mixi.jp/show_friend.pl?id=%d", nUserId ) );
@@ -2402,6 +2424,7 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 		if (!util::ExistFile(path)) {
 			pcThisMenu->EnableMenuItem( ID_OPEN_PROFILE_LOG, MF_GRAYED | MF_BYCOMMAND );
 		}
+#endif
 	}
 
 	// メニューのポップアップ
@@ -2881,6 +2904,7 @@ void CReportView::OnCopyClipboardUrl(UINT nID)
 	CMixiData::Link link = m_currentData->m_linkList[idx];
 	CString url = link.url;
 
+#ifdef BT_MZ3
 	ACCESS_TYPE estimatedAccessType = util::EstimateAccessTypeByUrl( link.url );
 	switch (estimatedAccessType) {
 	case ACCESS_MYDIARY:
@@ -2898,6 +2922,7 @@ void CReportView::OnCopyClipboardUrl(UINT nID)
 		url = util::CreateMixiUrl(link.url);
 		break;
 	}
+#endif
 
 	util::SetClipboardDataTextW( url );
 }

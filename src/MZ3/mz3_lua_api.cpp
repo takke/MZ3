@@ -3196,6 +3196,7 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_NEW_DM;
 		break;
 
+#ifdef BT_MZ3
 	case 2:
 		//TWITTER_STYLE_POST_MODE_MIXI_ECHO			 = 2,	///< mixiエコー入力中
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_ECHO;
@@ -3206,7 +3207,6 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_ECHO_REPLY;
 		break;
 
-#ifdef BT_MZ3
 	case 4:
 		//TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_WASSR_UPDATE;
