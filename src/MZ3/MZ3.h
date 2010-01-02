@@ -58,12 +58,6 @@ enum ScreenResolution {
 	SR_VGA,				///< 640x480
 };
 
-/// BuildType
-enum AppBuildType {
-	APP_BT_MZ3 = 0,		///< MZ3
-	APP_BT_TKTW,		///< TkTweets
-};
-
 class CMZ3View;
 class CReportView;
 
@@ -162,7 +156,6 @@ public:
 	Platforms			m_Platforms;			///< Platform
 
 	bool				m_bProMode;				///< ProMode (MZ3 Plus)
-	AppBuildType		m_AppBuildType;			///< BuildType
 
 public:
 	//--- ƒƒK[
@@ -255,9 +248,9 @@ public:
 	void ChangeView(CView*);
 	CString GetAppDirPath();
 
-//	CString MakeLoginUrl( LPCTSTR nextUrl=L"/home.pl" );
-//	CString MakeLoginUrlForMixiMobile( LPCTSTR nextUrl );
+#ifdef BT_MZ3
 	void StartMixiLoginAccess(HWND hwnd, CMixiData* data);
+#endif
 
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:

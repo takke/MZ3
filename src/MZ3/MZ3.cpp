@@ -68,12 +68,6 @@ CMZ3App::CMZ3App()
 	, m_luaLastRegistedAccessType(ACCESS_TYPE_MZ3_SCRIPT_BASE)
 	, m_access(false)
 	, m_bProMode(false)
-#ifdef BT_MZ3
-	, m_AppBuildType(APP_BT_MZ3)
-#endif
-#ifdef BT_TKTW
-	, m_AppBuildType(APP_BT_TKTW)
-#endif
 {
 }
 
@@ -814,9 +808,9 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
 /**
  * mixi のログイン用通信を開始する
  */
+#ifdef BT_MZ3
 void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 {
-#ifdef BT_MZ3
 	//--- ここからログイン対応
 	static CPostData post_data;
 
@@ -851,8 +845,8 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 		refUrl, 
 		CInetAccess::FILE_HTML, 
 		&post_data);
-#endif
 }
+#endif
 
 /// コマンドバーのボタンの有効・無効制御
 BOOL CMZ3App::EnableCommandBarButton( int nID, BOOL bEnable )
