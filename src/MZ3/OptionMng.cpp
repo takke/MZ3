@@ -134,7 +134,9 @@ void Option::Sync(bool bSave)
 	SyncIniValue(inifile, bSave, m_proxyPassword,   "Password",		  "Proxy");
 
 	//--- Page
+#ifdef BT_MZ3
 	SyncIniValue(inifile, bSave, (int&)m_GetPageType, "GetType", "Page");
+#endif
 
 	//--- Boot
 	SyncIniValue(inifile, bSave, m_bBootCheckMnC, "CheckMnC", "Boot");

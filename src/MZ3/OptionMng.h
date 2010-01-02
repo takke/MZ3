@@ -37,7 +37,9 @@ private:
 	CString			m_proxyUser;			///< プロキシのユーザ
 	CString			m_proxyPassword;		///< プロキシのパスワード
 
+#ifdef BT_MZ3
 	GETPAGE_TYPE	m_GetPageType;			///< ページ取得種別
+#endif
 
 	bool			m_bBootCheckMnC;		///< 起動時のメッセージ確認
 	CString			m_quoteMark;			///< 引用符号
@@ -145,8 +147,10 @@ public:
 
 public:
 	Option()
-		: m_GetPageType( GETPAGE_LATEST20 )
-		, m_bUseAutoConnection( true )
+		: m_bUseAutoConnection( true )
+#ifdef BT_MZ3
+		, m_GetPageType( GETPAGE_LATEST20 )
+#endif
 		, m_bUseProxy( false )
 		, m_bUseGlobalProxy( true )
 		, m_bBootCheckMnC( false )
@@ -283,8 +287,10 @@ public:
 	void SetProxyPassword(LPCTSTR value) { m_proxyPassword = value; }
 	LPCTSTR GetProxyPassword() { return m_proxyPassword; }
 
+#ifdef BT_MZ3
 	GETPAGE_TYPE GetPageType() { return m_GetPageType; }
 	void SetPageType(GETPAGE_TYPE value) { m_GetPageType = value; }
+#endif
 
 	bool IsBootCheckMnC()			{ return m_bBootCheckMnC; }			///< 起動時のチェック
 	void SetBootCheckMnC(bool flag) { m_bBootCheckMnC = flag; }			///< 起動時のチェックの設定

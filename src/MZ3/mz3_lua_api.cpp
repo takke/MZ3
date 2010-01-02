@@ -1018,6 +1018,7 @@ int lua_mz3_show_detail_view(lua_State *L)
 --
 function mz3.is_mixi_logout(serialize_key)
 */
+#ifdef BT_MZ3
 int lua_mz3_is_mixi_logout(lua_State *L)
 {
 	const char* func_name = "mz3.is_mixi_logout";
@@ -1036,6 +1037,7 @@ int lua_mz3_is_mixi_logout(lua_State *L)
 	// 戻り値の数を返す
 	return 1;
 }
+#endif
 
 /*
 --- [MZ3 only] バイブをON/OFFする
@@ -3881,7 +3883,9 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
 	{"copy_file",							lua_mz3_copy_file},
 	{"change_view",							lua_mz3_change_view},
+#ifdef BT_MZ3
 	{"is_mixi_logout",						lua_mz3_is_mixi_logout},
+#endif
 	{"start_write_view",					lua_mz3_start_write_view},
 	{"show_detail_view",					lua_mz3_show_detail_view},
 	{"set_vib_status",						lua_mz3_set_vib_status},

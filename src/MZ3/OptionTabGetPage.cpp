@@ -133,6 +133,7 @@ void COptionTabGetPage::Save()
 
 
 	// 取得種別
+#ifdef BT_MZ3
 	GETPAGE_TYPE type;
 	if (((CButton*)GetDlgItem(IDC_PAGE_GETALL_RADIO))->GetCheck() == BST_CHECKED) {
 		type = GETPAGE_ALL;
@@ -141,6 +142,7 @@ void COptionTabGetPage::Save()
 		type = GETPAGE_LATEST20;
 	}
 	theApp.m_optionMng.SetPageType(type);
+#endif
 
 	// 受信バッファサイズ
 	theApp.m_optionMng.SetRecvBufSize( mc_RecvBufCombo.GetItemData( mc_RecvBufCombo.GetCurSel() ) );

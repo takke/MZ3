@@ -643,33 +643,41 @@ void CMainFrame::OnMenuClose()
 /// 「全件取得」メニュー押下イベント
 void CMainFrame::OnGetpageAll()
 {
+#ifdef BT_MZ3
 	theApp.m_optionMng.SetPageType( GETPAGE_ALL );
+#endif
 }
 
 /// 「全件取得」メニューのチェック状態制御
 void CMainFrame::OnUpdateGetpageAll(CCmdUI *pCmdUI)
 {
+#ifdef BT_MZ3
 	if( theApp.m_optionMng.GetPageType() == GETPAGE_ALL ) {
 		pCmdUI->SetCheck( TRUE );
 	}else{
 		pCmdUI->SetCheck( FALSE );
 	}
+#endif
 }
 
 /// 「最新１０件取得」メニュー押下イベント
 void CMainFrame::OnGetpageLatest10()
 {
+#ifdef BT_MZ3
 	theApp.m_optionMng.SetPageType( GETPAGE_LATEST20 );
+#endif
 }
 
 /// 「最新１０件取得」メニューのチェック状態制御
 void CMainFrame::OnUpdateGetpageLatest10(CCmdUI *pCmdUI)
 {
+#ifdef BT_MZ3
 	if( theApp.m_optionMng.GetPageType() == GETPAGE_LATEST20 ) {
 		pCmdUI->SetCheck( TRUE );
 	}else{
 		pCmdUI->SetCheck( FALSE );
 	}
+#endif
 }
 
 /// 「文字サイズ｜大」メニュー

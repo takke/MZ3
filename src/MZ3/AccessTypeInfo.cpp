@@ -312,6 +312,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- mixi,ˆê”Ê
 	//------------------------------------------------------------------
+#ifdef BT_MZ3
 	type = ACCESS_LOGIN;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
@@ -333,7 +334,6 @@ bool AccessTypeInfo::init()
 	m_map[type].cacheFilePattern = L"home.html";
 	m_map[type].serializeKey = "MIXI_HOME";
 
-#ifdef BT_MZ3
 	type = ACCESS_DIARY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY

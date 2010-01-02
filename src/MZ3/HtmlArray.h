@@ -25,7 +25,9 @@ public:
 	void		TranslateToVectorBuffer( std::vector<TCHAR>& text ) const;
 
 	bool		GetPostConfirmData(CPostData*);
+#ifdef BT_MZ3
 	BOOL		IsPostSucceeded(WRITEVIEW_TYPE type);
+#endif
 };
 
 

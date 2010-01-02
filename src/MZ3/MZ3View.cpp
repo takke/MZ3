@@ -1230,10 +1230,12 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 	CMixiData* pMixi = (CMixiData*)lParam;
 
 	ACCESS_TYPE aType = pMixi->GetAccessType();
+#ifdef BT_MZ3
 	if (aType == ACCESS_LOGIN) {
 		// ログインの場合は待避させているから元に戻す
 		*pMixi = theApp.m_mixiBeforeRelogin;
 	}
+#endif
 
 	// 通信エラーが発生した場合の処理
 	LPCTSTR smsg = L"エラーが発生しました";
@@ -3154,6 +3156,7 @@ bool CMZ3View::DoNewCommentCheck(void)
 		return false;
 	}
 
+#ifdef BT_MZ3
 	static CMixiData mixi;
 	mixi.SetAccessType( ACCESS_MAIN );
 
@@ -3162,6 +3165,9 @@ bool CMZ3View::DoNewCommentCheck(void)
 	AccessProc( &mixi, _T("http://mixi.jp/home.pl") );
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 /**

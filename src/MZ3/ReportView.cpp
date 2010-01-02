@@ -1482,6 +1482,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 	theApp.m_access = false;
 
 	// ログインページ以外であれば、最初にログアウトチェックを行っておく
+#ifdef BT_MZ3
 	if (theApp.m_accessType != ACCESS_LOGIN && theApp.IsMixiLogout(theApp.m_accessType)) {
 		// ログアウト状態になっている
 		MZ3LOGGER_INFO(_T("再度ログインしてからデータを取得します。"));
@@ -1497,6 +1498,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 		return TRUE;
 	}
+#endif
 
 	bool bRetry = false;
 	switch( theApp.m_accessType ) {

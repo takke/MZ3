@@ -816,6 +816,7 @@ CString CMZ3App::MakeLoginUrlForMixiMobile( LPCTSTR nextUrl )
  */
 void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 {
+#ifdef BT_MZ3
 	//--- ここからログイン対応
 	static CPostData post_data;
 
@@ -850,6 +851,7 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 		refUrl, 
 		CInetAccess::FILE_HTML, 
 		&post_data);
+#endif
 }
 
 /// コマンドバーのボタンの有効・無効制御
@@ -1189,9 +1191,9 @@ bool CMZ3App::SaveGroupData(void)
 /**
  * ログアウト状態かどうかを判定する。データ取得直後に呼び出すこと。
  */
+#ifdef BT_MZ3
 bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 {
-#ifdef BT_MZ3
 	if (util::IsMixiAccessType(aType)) {
 		if (mixi::MixiParserBase::IsLogout(theApp.m_filepath.temphtml) ) {
 			return true;
@@ -1200,9 +1202,9 @@ bool CMZ3App::IsMixiLogout( ACCESS_TYPE aType )
 			return true;
 		}
 	}
-#endif
 	return false;
 }
+#endif
 
 /**
  * 古いキャッシュファイルの削除
@@ -1497,6 +1499,7 @@ bool CMZ3App::MyLuaErrorReport(int status)
 	return true;
 }
 
+#ifdef BT_MZ3
 void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 {
 	// 呼び出し前に theApp の値を設定
@@ -1512,6 +1515,7 @@ void CMZ3App::DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html)
 		m_loginMng.Write();
 	}
 }
+#endif
 
 CInetAccess::ENCODING CMZ3App::GetInetAccessEncodingByAccessType(ACCESS_TYPE aType)
 {

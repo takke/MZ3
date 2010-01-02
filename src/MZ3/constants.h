@@ -81,9 +81,9 @@ enum ACCESS_TYPE {
 	//----------------------------------------------
 	// mixi 系
 	//----------------------------------------------
+#ifdef BT_MZ3
 	ACCESS_LOGIN=0,				///< ログイン
 	ACCESS_MAIN,				///< メイン(home.pl)
-#ifdef BT_MZ3
 	ACCESS_DIARY,				///< 日記内容(view_diary.pl)
 	ACCESS_NEIGHBORDIARY,		///< 日記内容(neighbor_diary.pl)	//MOriyama追加 次の日記、前の日記
 	ACCESS_BBS,					///< コミュニティ内容(view_bbs.pl)
@@ -213,22 +213,26 @@ enum ACCESS_TYPE {
 /**
  * ページの取得タイプ
  */
+#ifdef BT_MZ3
 enum GETPAGE_TYPE
 {
 	GETPAGE_ALL = 0,		///< 全件取得
 	GETPAGE_LATEST20 = 1,	///< 最新の２０件取得
 };
+#endif
 
 /**
  * WriteView の処理種別
  *
  * → Lua 化のために ACCESS_TYPE に統一。Entery/Confirm のアクセス種別を用いる。
  */
+#ifdef BT_MZ3
 typedef ACCESS_TYPE WRITEVIEW_TYPE;
 #define WRITEVIEW_TYPE_COMMENT		ACCESS_POST_COMMENT_CONFIRM		///< コメント投稿処理（日記、コミュニティ共用？）
 #define WRITEVIEW_TYPE_NEWDIARY		ACCESS_POST_NEWDIARY_CONFIRM	///< 日記投稿処理
 #define	WRITEVIEW_TYPE_REPLYMESSAGE	ACCESS_POST_REPLYMESSAGE_ENTRY	///< メッセージ返信処理
 #define WRITEVIEW_TYPE_NEWMESSAGE	ACCESS_POST_NEWMESSAGE_ENTRY	///< 新規メッセージの送信処理
+#endif
 
 /// 送信する Content-Type の種別
 typedef LPCTSTR CONTENT_TYPE;

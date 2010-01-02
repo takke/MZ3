@@ -246,10 +246,10 @@ public:
 	};
 	stdext::hash_map<std::string, std::string> m_luaParsers;				///< シリアライズキー → パーサ名
 	stdext::hash_map<std::string, std::vector<std::string>> m_luaHooks;		///< {イベント} → パーサ名
-	std::vector<std::string>						m_luaMenus;		///< 登録済みメニュー項目
-	std::vector<Service>							m_luaServices;	///< 登録済みサービス群
-	std::vector<AccountData>						m_luaAccounts;	///< 登録済みアカウント情報(ログイン設定用)
-	int								   m_luaLastRegistedAccessType;	///< 利用済みアクセス種別
+	std::vector<std::string>		   m_luaMenus;							///< 登録済みメニュー項目
+	std::vector<Service>			   m_luaServices;						///< 登録済みサービス群
+	std::vector<AccountData>		   m_luaAccounts;						///< 登録済みアカウント情報(ログイン設定用)
+	int								   m_luaLastRegistedAccessType;			///< 利用済みアクセス種別
 
 public:
 	void ChangeView(CView*);
@@ -276,7 +276,9 @@ public:
 	void InitResolutionFlags();
 	bool SaveGroupData(void);
 
+#ifdef BT_MZ3
 	bool IsMixiLogout( ACCESS_TYPE aType );
+#endif
 	bool DeleteOldCacheFiles(void);
 	int pt2px(int pt);
 	int AddImageToImageCache(CWnd* pWnd, CMZ3BackgroundImage& srcImage, const CString& strImagePath);
@@ -288,7 +290,9 @@ public:
 	bool MyLuaExecute(LPCTSTR szLuaStatement);
 	bool MyLuaErrorReport(int status);
 
+#ifdef BT_MZ3
 	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
+#endif
 
 	CInetAccess::ENCODING GetInetAccessEncodingByAccessType(ACCESS_TYPE aType);
 
