@@ -4734,7 +4734,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 #endif
 
 	// 画面レイアウト
-	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_LAYOUT_SUB_MENU_IDX) {
+	if ((int)pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_LAYOUT_SUB_MENU_IDX) {
 		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
 	} else {
 		CMenu* pLayoutMenu = pSubMenu->GetSubMenu(CATEGORY_MENU_LAYOUT_SUB_MENU_IDX);
@@ -4763,7 +4763,7 @@ void CMZ3View::PopupCategoryMenu(POINT pt_, int flags_)
 	}
 
 	// 項目を追加
-	if (pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_APPEND_SUB_MENU_IDX) {
+	if ((int)pSubMenu->GetMenuItemCount()<=CATEGORY_MENU_APPEND_SUB_MENU_IDX) {
 		MZ3LOGGER_FATAL(L"カテゴリメニューの項目数が不正です");
 	} else {
 		CMenu* pAppendMenu = pSubMenu->GetSubMenu(CATEGORY_MENU_APPEND_SUB_MENU_IDX);
