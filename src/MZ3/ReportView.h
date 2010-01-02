@@ -96,8 +96,10 @@ private:
 	afx_msg void OnAddBookmark();
 	afx_msg void OnDelBookmark();
 	afx_msg void OnImageButton();
+#ifdef BT_MZ3
 	afx_msg void OnWriteButton();
 	afx_msg void OnWriteComment();
+#endif
 	afx_msg void OnOpenBrowser();
 	afx_msg void OnLoadImage(UINT);
 	afx_msg void OnLoadMovie(UINT);
@@ -152,8 +154,10 @@ private:
 	bool MyLoadMixiViewPage( const CMixiData::Link link );
 public:
 	afx_msg void OnOpenProfile();
+#ifdef BT_MZ3
 	afx_msg void OnOpenProfileLog();
 	afx_msg void OnSendMessage();
+#endif
 	afx_msg void OnDestroy();
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);

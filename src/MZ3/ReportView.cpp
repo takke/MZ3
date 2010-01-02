@@ -82,9 +82,11 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
     ON_MESSAGE(WM_MZ3_ACCESS_INFORMATION, OnAccessInformation)
     ON_MESSAGE(WM_MZ3_CHANGE_VIEW, OnChangeView)
     ON_MESSAGE(WM_MZ3_RELOAD, OnReload)
+#ifdef BT_MZ3
 	ON_COMMAND(ID_WRITE_COMMENT, &CReportView::OnWriteComment)
 	ON_COMMAND(ID_WRITE_MESSAGE, &CReportView::OnWriteComment)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
+#endif
 	ON_COMMAND(ID_EDIT_COPY, &CReportView::OnEditCopy)
     ON_MESSAGE(WM_MZ3_FIT, OnFit)
     ON_COMMAND(ID_OPEN_BROWSER, OnOpenBrowser)
@@ -100,8 +102,10 @@ BEGIN_MESSAGE_MAP(CReportView, CFormView)
 	ON_COMMAND(IDM_LAYOUT_REPORTLIST_MAKE_WIDE, &CReportView::OnLayoutReportlistMakeWide)
 	ON_NOTIFY(NM_RCLICK, IDC_REPORT_LIST, &CReportView::OnNMRclickReportList)
 	ON_COMMAND(ID_OPEN_PROFILE, &CReportView::OnOpenProfile)
+#ifdef BT_MZ3
 	ON_COMMAND(ID_OPEN_PROFILE_LOG, &CReportView::OnOpenProfileLog)
 	ON_COMMAND(ID_SEND_MESSAGE, &CReportView::OnSendMessage)
+#endif
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
@@ -1891,9 +1895,9 @@ void CReportView::OnImageButton()
 /**
  * 書き込み開始（本文入力ビューの表示）
  */
+#ifdef BT_MZ3
 void CReportView::OnWriteComment()
 {
-#ifdef BT_MZ3
 	// 引用方法の確認
 	quote::QuoteType quoteType = quote::QUOTETYPE_INVALID;
 	int idx = m_list.GetSelectedItem();
@@ -1943,16 +1947,18 @@ void CReportView::OnWriteComment()
 
 		((CEdit*)pWriteView->GetDlgItem(IDC_WRITE_BODY_EDIT))->SetWindowText(str);
 	}
-#endif
 }
+#endif
 
 /**
  * 書き込みボタン
  */
+#ifdef BT_MZ3
 void CReportView::OnWriteButton()
 {
 	OnWriteComment();
 }
+#endif
 
 /**
  * ＦＩＴ
@@ -2069,9 +2075,9 @@ void CReportView::OnOpenProfile()
 /**
  * プロフィールページを開く（ログ）
  */
+#ifdef BT_MZ3
 void CReportView::OnOpenProfileLog()
 {
-#ifdef BT_MZ3
 	// 選択アイテムの取得
 	int idx = m_list.GetSelectedItem();
 	if( idx < 0 ) {
@@ -2122,16 +2128,16 @@ void CReportView::OnOpenProfileLog()
 
 	// 表示
 	SetData( s_mixi );
-#endif
 }
+#endif
 
 
 /**
  * メッセージ送信
  */
+#ifdef BT_MZ3
 void CReportView::OnSendMessage()
 {
-#ifdef BT_MZ3
 	// 選択アイテムの取得
 	int idx = m_list.GetSelectedItem();
 	if( idx < 0 ) {
@@ -2160,8 +2166,9 @@ void CReportView::OnSendMessage()
 
 	// 書き込み画面生成
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &s_mixi );
-#endif
 }
+#endif
+
 
 /**
  * メニュー生成
@@ -2199,13 +2206,11 @@ void CReportView::MyPopupReportMenu(POINT pt_, int flags_)
 	int idxDiarySeparator = 5;
 #ifdef BT_MZ3
 	if( theApp.m_pWriteView->IsWriteCompleted() ) {
-#else
-	if( false ) {
-#endif
 		pcThisMenu->RemoveMenu(ID_NEXT_MENU, MF_BYCOMMAND);
 		idxPage --;
 		idxDiarySeparator--;
 	}
+#endif
 
 	// 「書き込み」に関する処理
 	switch( m_data.GetAccessType() ) {

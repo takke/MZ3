@@ -248,10 +248,6 @@ public:
 	void ChangeView(CView*);
 	CString GetAppDirPath();
 
-#ifdef BT_MZ3
-	void StartMixiLoginAccess(HWND hwnd, CMixiData* data);
-#endif
-
 	BOOL EnableCommandBarButton( int nID, BOOL bEnable );
 public:
 	bool MakeNewFont( CFont* pBaseFont, int fontHeight, LPCTSTR fontFace );
@@ -270,7 +266,9 @@ public:
 	bool SaveGroupData(void);
 
 #ifdef BT_MZ3
+	void StartMixiLoginAccess(HWND hwnd, CMixiData* data);
 	bool IsMixiLogout( ACCESS_TYPE aType );
+	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
 #endif
 	bool DeleteOldCacheFiles(void);
 	int pt2px(int pt);
@@ -282,10 +280,6 @@ public:
 	bool MyLuaClose(void);
 	bool MyLuaExecute(LPCTSTR szLuaStatement);
 	bool MyLuaErrorReport(int status);
-
-#ifdef BT_MZ3
-	void DoParseMixiHomeHtml(CMixiData* data, CHtmlArray* html);
-#endif
 
 	CInetAccess::ENCODING GetInetAccessEncodingByAccessType(ACCESS_TYPE aType);
 

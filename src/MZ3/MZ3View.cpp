@@ -96,18 +96,20 @@ BEGIN_MESSAGE_MAP(CMZ3View, CFormView)
     ON_COMMAND(ID_WRITE_BUTTON, OnWriteButton)
 	ON_COMMAND(ID_OPEN_BROWSER, &CMZ3View::OnOpenBrowser)
 	ON_COMMAND(ID_SHOW_DEBUG_INFO, &CMZ3View::OnShowDebugInfo)
-	ON_COMMAND(ID_GET_ALL, &CMZ3View::OnGetAll)
-	ON_COMMAND(ID_GET_LAST10, &CMZ3View::OnGetLast10)
 	ON_COMMAND(ID_VIEW_LOG, &CMZ3View::OnViewLog)
 	ON_COMMAND(ID_OPEN_BROWSER_USER, &CMZ3View::OnOpenBrowserUser)
 	ON_COMMAND(ID_OPEN_INTRO, &CMZ3View::OnOpenIntro)
 	ON_COMMAND(ID_OPEN_SELFINTRO, &CMZ3View::OnOpenSelfintro)
 	ON_COMMAND(IDM_SET_NO_READ, &CMZ3View::OnSetNoRead)
+#ifdef BT_MZ3
 	ON_COMMAND(IDM_VIEW_BBS_LIST, &CMZ3View::OnViewBbsList)
 	ON_COMMAND(IDM_VIEW_BBS_LIST_LOG, &CMZ3View::OnViewBbsListLog)
+	ON_COMMAND(ID_GET_ALL, &CMZ3View::OnGetAll)
+	ON_COMMAND(ID_GET_LAST10, &CMZ3View::OnGetLast10)
 	ON_COMMAND(IDM_CRUISE, &CMZ3View::OnCruise)
 	ON_COMMAND(IDM_CHECK_CRUISE, &CMZ3View::OnCheckCruise)
 	ON_COMMAND(ID_SEND_NEW_MESSAGE, &CMZ3View::OnSendNewMessage)
+#endif
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_NARROW, &CMZ3View::OnLayoutCategoryMakeNarrow)
 	ON_COMMAND(IDM_LAYOUT_CATEGORY_MAKE_WIDE, &CMZ3View::OnLayoutCategoryMakeWide)
 	ON_EN_SETFOCUS(IDC_INFO_EDIT, &CMZ3View::OnEnSetfocusInfoEdit)
@@ -449,10 +451,12 @@ bool CMZ3View::DoInitialize()
 	}
 
 	// 新着メッセージ確認
+#ifdef BT_MZ3
 	if (theApp.m_optionMng.IsBootCheckMnC() != false) {
 		// 新着メッセージ確認
 		DoNewCommentCheck();
 	}
+#endif
 
 	// スタイル変更
 	VIEW_STYLE newStyle = MyGetViewStyleForSelectedCategory();
@@ -1093,9 +1097,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
-#endif
 
-#ifdef BT_MZ3
 	case ACCESS_MAIN:
 		// --------------------------------------------------
 		// メイン画面
@@ -1150,14 +1152,12 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
-#endif
 
-#ifdef BT_MZ3
 	case ACCESS_RSS_READER_AUTO_DISCOVERY:
 		// RSS AutoDiscovery を試みる
 		DoAccessEndProcForRssAutoDiscovery();
 		break;
-#endif
+#endif	// BT_MZ3
 
 	case ACCESS_SOFTWARE_UPDATE_CHECK:
 		// バージョンチェック
@@ -1178,6 +1178,7 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
+#ifdef BT_MZ3
 		case AccessTypeInfo::INFO_TYPE_BODY:
 			// --------------------------------------------------
 			// ボディ項目の取得
@@ -1204,6 +1205,8 @@ LRESULT CMZ3View::OnGetEnd(WPARAM wParam, LPARAM lParam)
 				MyShowReportView( mixi );
 			}
 			break;
+#endif
+
 		default:
 			util::MySetInformationText( m_hWnd, L"完了（アクセス種別不明）" );
 			break;
@@ -1271,7 +1274,9 @@ LRESULT CMZ3View::OnGetError(WPARAM wParam, LPARAM lParam)
 LRESULT CMZ3View::OnGetAbort(WPARAM wParam, LPARAM lParam)
 {
 	m_abort = FALSE;
+#ifdef BT_MZ3
 	m_cruise.stop();
+#endif
 
 	return TRUE;
 }
@@ -1288,7 +1293,9 @@ LRESULT CMZ3View::OnAbort(WPARAM wParam, LPARAM lParam)
 
 	// 中断を送信
 	m_abort = TRUE;
+#ifdef BT_MZ3
 	m_cruise.stop();
+#endif
 
 	theApp.m_access = false;
 
@@ -2601,6 +2608,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 							theApp.MyLuaExecute(L"twitter.on_twitter_update()");
 
 							return TRUE;
+#ifdef BT_MZ3
 						} else if (strServiceType == "Wassr") {
 
 							// Lua 関数呼び出しで実装
@@ -2613,7 +2621,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 							theApp.MyLuaExecute(L"goohome.on_goohome_update()");
 
 							return TRUE;
-#ifdef BT_MZ3
 						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
 
 							// Lua 関数呼び出しで実装
@@ -2676,26 +2683,23 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			return TRUE;
 		}
 
-		switch( GetSelectedBodyItem().GetAccessType() ) {
 #ifdef BT_MZ3
+		switch( GetSelectedBodyItem().GetAccessType() ) {
 		case ACCESS_COMMUNITY:
 			// メニュー表示
 			PopupBodyMenu();
-			break;
-#endif
+			return TRUE;
 
-#ifdef BT_MZ3
 		case ACCESS_RSS_READER_ITEM:
 			// 詳細表示
 			OnMenuRssRead();
-			break;
+			return TRUE;
+		}
 #endif
 
-		default:
-			// 特殊な要素以外なので、通信処理開始。
-			AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
-			break;
-		}
+		// 特殊な要素以外なので、通信処理開始。
+		AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
+
 		return TRUE;
 
 	case VK_PROCESSKEY:	// 0xE5
@@ -3116,14 +3120,10 @@ void CMZ3View::OnOpenBrowser()
 			}
 			util::OpenUrlByBrowserWithConfirmForUser( url, name );
 		}
-		break;
-	default:
-		util::OpenUrlByBrowserWithConfirm( url );
-		break;
+		return;
 	}
-#else
-	util::OpenUrlByBrowserWithConfirm( url );
 #endif
+	util::OpenUrlByBrowserWithConfirm( url );
 }
 
 /**
@@ -3149,6 +3149,7 @@ void CMZ3View::OnShowDebugInfo()
 /**
  * 新着メッセージのチェック
  */
+#ifdef BT_MZ3
 bool CMZ3View::DoNewCommentCheck(void)
 {
 	if( theApp.m_access ) {
@@ -3156,7 +3157,6 @@ bool CMZ3View::DoNewCommentCheck(void)
 		return false;
 	}
 
-#ifdef BT_MZ3
 	static CMixiData mixi;
 	mixi.SetAccessType( ACCESS_MAIN );
 
@@ -3165,10 +3165,8 @@ bool CMZ3View::DoNewCommentCheck(void)
 	AccessProc( &mixi, _T("http://mixi.jp/home.pl") );
 
 	return true;
-#else
-	return false;
-#endif
 }
+#endif
 
 /**
  * ネットアクセス
@@ -3350,10 +3348,10 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	}
 }
 
+#ifdef BT_MZ3
 /// 右ソフトキーメニュー｜全部読む
 void CMZ3View::OnGetAll()
 {
-#ifdef BT_MZ3
 	// チェック
 	//if( m_hotList != &m_bodyList ) {
 	//	return;
@@ -3374,13 +3372,11 @@ void CMZ3View::OnGetAll()
 	// 全件に設定し、アクセス開始
 	theApp.m_optionMng.SetPageType( GETPAGE_ALL );
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
-#endif
 }
 
 /// 右ソフトキーメニュー｜最新の20件を読む
 void CMZ3View::OnGetLast10()
 {
-#ifdef BT_MZ3
 	// チェック
 	//if( m_hotList != &m_bodyList ) {
 	//	return;
@@ -3401,8 +3397,8 @@ void CMZ3View::OnGetLast10()
 	// 20件に設定し、アクセス開始
 	theApp.m_optionMng.SetPageType( GETPAGE_LATEST20 );
 	AccessProc( &GetSelectedBodyItem(), util::CreateMixiUrl(GetSelectedBodyItem().GetURL()));
-#endif
 }
+#endif
 
 /**
  * カテゴリリストの選択項目の変更時の処理
@@ -4083,6 +4079,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 }
 
 /// トピック一覧の閲覧準備
+#ifdef BT_MZ3
 bool CMZ3View::PrepareViewBbsList(void)
 {
 	CMixiData& bodyItem = GetSelectedBodyItem();
@@ -4090,7 +4087,6 @@ bool CMZ3View::PrepareViewBbsList(void)
 		return false;
 	}
 
-#ifdef BT_MZ3
 	// URL はボディのアイテムからidを引き継ぐ。
 	CString url;
 	url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(bodyItem.GetURL()) );
@@ -4105,9 +4101,6 @@ bool CMZ3View::PrepareViewBbsList(void)
 		CCategoryItem::SAVE_TO_GROUPFILE_NO );
 
 	return AppendCategoryList(categoryItem);
-#else
-	return false;
-#endif
 }
 
 /// コミュニティの右ソフトキーメニュー｜トピック一覧
@@ -4147,10 +4140,12 @@ void CMZ3View::OnViewBbsListLog()
 	// フォーカスをボディリストに。
 	m_bodyList.SetFocus();
 }
+#endif
 
 /**
  * 巡回
  */
+#ifdef BT_MZ3
 void CMZ3View::OnCruise()
 {
 	CCategoryItem* pCategory = m_selGroup->getFocusedCategory();
@@ -4176,6 +4171,8 @@ void CMZ3View::OnCruise()
 
 	AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()));
 }
+#endif
+
 
 /**
  * Readme.txt を解析し、レポート画面で表示する。
@@ -4256,6 +4253,7 @@ void CMZ3View::MyShowErrorlog(void)
 /**
  * 巡回予約
  */
+#ifdef BT_MZ3
 void CMZ3View::OnCheckCruise()
 {
 	CCategoryItem* pCategory = m_selGroup->getFocusedCategory();
@@ -4289,6 +4287,7 @@ void CMZ3View::OnCheckCruise()
 	// グループ定義ファイルの保存
 	theApp.SaveGroupData();
 }
+
 
 bool CMZ3View::CruiseToNextCategory(void)
 {
@@ -4332,6 +4331,7 @@ bool CMZ3View::CruiseToNextCategory(void)
 	return true;
 }
 
+
 /**
  * 巡回開始
  */
@@ -4350,6 +4350,7 @@ void CMZ3View::StartCruise( bool unreadOnly )
 
 	CruiseToNextCategory();
 }
+
 
 /**
  * 次の巡回項目を探索する
@@ -4377,17 +4378,114 @@ bool CMZ3View::MoveToNextCruiseCategory(void)
 }
 
 /**
+ *
+ * @return 巡回継続の場合は true、巡回終了の場合は false を返す
+ */
+bool CMZ3View::DoNextBodyItemCruise()
+{
+	CMixiDataList& bodyList = m_selGroup->getSelectedCategory()->GetBodyList();
+	if( m_cruise.targetBodyItem >= (int)bodyList.size() ) {
+		// 巡回終了
+		if( m_cruise.autoCruise ) {
+			// 予約巡回なので次に進む
+			m_cruise.targetCategoryIndex++;
+			bool rval = CruiseToNextCategory();
+			if( rval ) {
+				// 通信終了
+
+				// 項目を選択/表示状態にする
+				int idx = m_selGroup->getSelectedCategory()->selectedBody;
+				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
+				m_bodyList.EnsureVisible( idx, FALSE );
+			}
+			return rval;
+		}else{
+			// 一時巡回なのでここで終了。
+			m_cruise.finish();
+			MessageBox( L"クイック巡回完了" );
+
+			// 通信終了
+			return false;
+		}
+	}else{
+		// 次の巡回対象を取得する
+
+		// 次のボディ要素に移動する
+
+		m_selGroup->getSelectedCategory()->selectedBody = m_cruise.targetBodyItem;
+
+		CMixiData& mixi = GetSelectedBodyItem();
+
+		// 未読巡回モードなら、既読要素をスキップする
+		if( m_cruise.unreadOnly ) {
+
+			// 未読巡回モードなので、次の未読要素を探索する。
+			// 全て既読なら次のカテゴリへ。
+			bool unread = false;	// 未読フラグ
+			switch( mixi.GetAccessType() ) {
+			case ACCESS_BBS:
+			case ACCESS_EVENT:
+			case ACCESS_EVENT_JOIN:
+			case ACCESS_ENQUETE:
+				// コミュニティ、イベント、アンケートなので、
+				// 該当トピックのコメントを全て既読なら既読と判定する。
+				{
+					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(mixi);
+					if (lastIndex == -1) {
+						// 全くの未読
+						unread = true;
+					} else if (lastIndex >= mixi.GetCommentCount()) {
+						// 更新なし
+						unread = false;
+					} else {
+						// 未読あり
+						unread = true;
+					}
+				}
+				break;
+			default:
+				// コミュニティ以外なので、ログの有無で既読・未読を判定する
+				if(! util::ExistFile(util::MakeLogfilePath(mixi)) ) {
+					unread = true;
+				}
+				break;
+			}
+			if(! unread ) {
+				// 既読なので次のボディ要素へ。
+				m_cruise.targetBodyItem ++;
+
+				// 再帰呼び出しにより、次の巡回項目を探す。
+				return DoNextBodyItemCruise();
+			}
+		}
+
+		// 項目を選択/表示状態にする
+		int idxNext = m_cruise.targetBodyItem;
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
+		m_bodyList.EnsureVisible( idxNext, FALSE );
+
+		// 取得する
+		AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
+
+		// 通信継続
+		return true;
+	}
+}
+#endif	// BT_MZ3
+
+/**
  * メッセージを送る
  */
+#ifdef BT_MZ3
 void CMZ3View::OnSendNewMessage()
 {
-#ifdef BT_MZ3
 	static CMixiData mixi;
 	mixi = GetSelectedBodyItem();
 
 	theApp.m_pWriteView->StartWriteView( WRITEVIEW_TYPE_NEWMESSAGE, &mixi );
-#endif
 }
+#endif
+
 
 int CMZ3View::GetListWidth(void)
 {
@@ -4493,103 +4591,6 @@ void CMZ3View::OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult)
 */
 
 	*pResult = 0;
-}
-
-/**
- *
- * @return 巡回継続の場合は true、巡回終了の場合は false を返す
- */
-bool CMZ3View::DoNextBodyItemCruise()
-{
-	CMixiDataList& bodyList = m_selGroup->getSelectedCategory()->GetBodyList();
-	if( m_cruise.targetBodyItem >= (int)bodyList.size() ) {
-		// 巡回終了
-		if( m_cruise.autoCruise ) {
-			// 予約巡回なので次に進む
-			m_cruise.targetCategoryIndex++;
-			bool rval = CruiseToNextCategory();
-			if( rval ) {
-				// 通信終了
-
-				// 項目を選択/表示状態にする
-				int idx = m_selGroup->getSelectedCategory()->selectedBody;
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idx, true );
-				m_bodyList.EnsureVisible( idx, FALSE );
-			}
-			return rval;
-		}else{
-			// 一時巡回なのでここで終了。
-			m_cruise.finish();
-			MessageBox( L"クイック巡回完了" );
-
-			// 通信終了
-			return false;
-		}
-	}else{
-		// 次の巡回対象を取得する
-
-		// 次のボディ要素に移動する
-
-		m_selGroup->getSelectedCategory()->selectedBody = m_cruise.targetBodyItem;
-
-		CMixiData& mixi = GetSelectedBodyItem();
-
-		// 未読巡回モードなら、既読要素をスキップする
-		if( m_cruise.unreadOnly ) {
-
-			// 未読巡回モードなので、次の未読要素を探索する。
-			// 全て既読なら次のカテゴリへ。
-			bool unread = false;	// 未読フラグ
-			switch( mixi.GetAccessType() ) {
-#ifdef BT_MZ3
-			case ACCESS_BBS:
-			case ACCESS_EVENT:
-			case ACCESS_EVENT_JOIN:
-			case ACCESS_ENQUETE:
-				// コミュニティ、イベント、アンケートなので、
-				// 該当トピックのコメントを全て既読なら既読と判定する。
-				{
-					int lastIndex = mixi::ParserUtil::GetLastIndexFromIniFile(mixi);
-					if (lastIndex == -1) {
-						// 全くの未読
-						unread = true;
-					} else if (lastIndex >= mixi.GetCommentCount()) {
-						// 更新なし
-						unread = false;
-					} else {
-						// 未読あり
-						unread = true;
-					}
-				}
-				break;
-#endif
-			default:
-				// コミュニティ以外なので、ログの有無で既読・未読を判定する
-				if(! util::ExistFile(util::MakeLogfilePath(mixi)) ) {
-					unread = true;
-				}
-				break;
-			}
-			if(! unread ) {
-				// 既読なので次のボディ要素へ。
-				m_cruise.targetBodyItem ++;
-
-				// 再帰呼び出しにより、次の巡回項目を探す。
-				return DoNextBodyItemCruise();
-			}
-		}
-
-		// 項目を選択/表示状態にする
-		int idxNext = m_cruise.targetBodyItem;
-		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxNext, true );
-		m_bodyList.EnsureVisible( idxNext, FALSE );
-
-		// 取得する
-		AccessProc( &mixi, util::CreateMixiUrl(mixi.GetURL()) );
-
-		// 通信継続
-		return true;
-	}
 }
 
 void CMZ3View::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
@@ -5514,7 +5515,10 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 				// http://twitter.com/statuses/replies.xml や
 				// http://twitter.com/statuses/user_timeline/takke.xml であれば再取得しない。
 				CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-				if (pCategory!=NULL && wcsstr(pCategory->m_mixi.GetURL(), L"friends_timeline.xml")!=NULL) {
+				if (pCategory!=NULL && 
+					(wcsstr(pCategory->m_mixi.GetURL(), L"friends_timeline.xml")!=NULL ||
+					 wcsstr(pCategory->m_mixi.GetURL(), L"home_timeline.xml")!=NULL)
+					) {
 					RetrieveCategoryItem();
 				}
 			}
@@ -5677,8 +5681,14 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 		m_categoryList.EnsureVisible( idxNew, FALSE );
 	}
 
-	// フォーカスをカテゴリリストに。
-	m_categoryList.SetFocus();
+	// フォーカス
+	if (m_magnifyMode == MAGNIFY_MODE_DEFAULT) {
+		// 拡大表示モード以外ならカテゴリリストに。
+		m_categoryList.SetFocus();
+	} else {
+		// 拡大表示モードならボディリストに。
+		m_bodyList.SetFocus();
+	}
 
 	// ボディリストは消去しておく。
 	m_bodyList.DeleteAllItems();
@@ -6303,6 +6313,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	util::MySetInformationText( m_hWnd, _T("解析中 : 1/3") );
 
 	// 巡回モード（リストモード）の場合は、巡回モードを終了する。
+#ifdef BT_MZ3
 	if( m_cruise.enable() && !m_cruise.isFetchListMode() ) {
 		// リストモード以外なので通信を終了する
 		// 例えばボディモードの最後の要素が「次へ」のような場合にはここに来る。
@@ -6317,6 +6328,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		}
 		return false;
 	}
+#endif
 
 	// HTML の取得
 	CHtmlArray html;
@@ -6464,6 +6476,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	}
 
 	// 巡回モードなら、ボディ要素の取得を開始する
+#ifdef BT_MZ3
 	if( m_cruise.enable() ) {
 		// 巡回モード
 
@@ -6485,6 +6498,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 			return true;
 		}
 	}
+#endif
 
 	return false;
 }
@@ -7175,6 +7189,7 @@ bool CMZ3View::MySetInfoEditFromBodySelectedData(void)
 	return true;
 }
 
+/// 拡大表示モードの変更
 void CMZ3View::MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo)
 {
 	switch (magnifyModeTo) {

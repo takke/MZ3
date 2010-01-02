@@ -928,7 +928,9 @@ void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 
 void CMainFrame::OnCheckNew()
 {
+#ifdef BT_MZ3
 	theApp.m_pMainView->DoNewCommentCheck();
+#endif
 }
 
 /**
@@ -1130,7 +1132,9 @@ void CMainFrame::OnSkinMenuItem(UINT nID)
  */
 void CMainFrame::OnStartCruise()
 {
+#ifdef BT_MZ3
 	theApp.m_pMainView->StartCruise( false );
+#endif
 }
 
 /**
@@ -1138,7 +1142,9 @@ void CMainFrame::OnStartCruise()
  */
 void CMainFrame::OnStartCruiseUnreadOnly()
 {
+#ifdef BT_MZ3
 	theApp.m_pMainView->StartCruise( true );
+#endif
 }
 
 /**

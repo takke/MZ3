@@ -85,6 +85,7 @@ private:
 	 * <li>巡回対象カテゴリ探索にもどる
 	 * </ul>
 	 */
+#ifdef BT_MZ3
 	class CruiseInfo {
 	public:
 		/// 巡回状態
@@ -154,6 +155,7 @@ private:
 		bool isFetchBodyMode() { return state == CRUISE_STATE_BODY; } ///< ボディ取得モード？
 	};
 	CruiseInfo		m_cruise;				///< 巡回情報
+#endif
 
 public:
 	CGroupItem*		m_selGroup;				///< 現在選択されているグループタブ項目
@@ -238,19 +240,21 @@ public:
 	afx_msg void OnOpenBrowser();
 	afx_msg void OnNMSetfocusHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnShowDebugInfo();
-	afx_msg void OnGetAll();
-	afx_msg void OnGetLast10();
 	afx_msg void OnHdnItemclickBodyList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTcnSelchangeGroupTab(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnOpenBrowserUser();
 	afx_msg void OnOpenIntro();
 	afx_msg void OnOpenSelfintro();
 	afx_msg void OnSetNoRead();
+#ifdef BT_MZ3
 	afx_msg void OnViewBbsList();
 	afx_msg void OnViewBbsListLog();
+	afx_msg void OnGetAll();
+	afx_msg void OnGetLast10();
 	afx_msg void OnCruise();
 	afx_msg void OnCheckCruise();
 	afx_msg void OnSendNewMessage();
+#endif
 	afx_msg void OnHdnEndtrackHeaderList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 	afx_msg void OnLayoutCategoryMakeNarrow();
@@ -342,7 +346,9 @@ public:
 		return pSelectedCategory->GetSelectedBody();
 	}
 
+#ifdef BT_MZ3
 	bool DoNewCommentCheck(void);
+#endif
 	bool DoCheckSoftwareUpdate(void);
 	bool MyChangeBodyHeader(void);
 	void MyUpdateCategoryListByGroupItem(void);
@@ -362,18 +368,23 @@ public:
 	bool PopupBodyMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	void PopupCategoryMenu(POINT pt_=CPoint(0,0), int flags_=0);
 	bool PopupTabMenu(POINT pt_=CPoint(0,0), int flags_=0);
+#ifdef BT_MZ3
 	bool PrepareViewBbsList(void);
+#endif
 	void MyShowHelp(void);
 	void MyShowHistory(void);
 	void MyShowErrorlog(void);
 
+#ifdef BT_MZ3
 	void StartCruise( bool unreadOnly );
 	bool CruiseToNextCategory(void);
 
 	bool MoveToNextCruiseCategory(void);
+	bool DoNextBodyItemCruise();
+#endif
+
 	void ResetColumnWidth();
 	int  GetListWidth(void);
-	bool DoNextBodyItemCruise();
 	bool RetrieveCategoryItem(void);
 
 public:
