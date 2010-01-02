@@ -223,7 +223,11 @@ public:
 #else
 		, m_nTwitterGetPageCount(3)
 #endif
+#ifdef BT_TKTW
+		, m_strTwitterPostFotterText(L" *TkTw*")
+#else
 		, m_strTwitterPostFotterText(L" *" MZ3_APP_NAME L"*")
+#endif
 		, m_bTwitterReloadTLAfterPost(false)
 		, m_nTwitterRTStyle(0)
 		, m_bUseDevVerCheck(false)

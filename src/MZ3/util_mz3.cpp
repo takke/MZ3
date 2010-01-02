@@ -543,19 +543,19 @@ CString MakeImageLogfilePath( CMixiData& data )
 {
 	// アクセス種別に応じてパスを生成する
 	bool bShowImage = false;
-#ifdef BT_MZ3
 	switch( data.GetAccessType() ) {
+#ifdef BT_MZ3
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
-	case ACCESS_TWITTER_USER:
 	case ACCESS_WASSR_USER:
 	case ACCESS_GOOHOME_USER:
 	case ACCESS_MIXI_ECHO_USER:
+#endif
+	case ACCESS_TWITTER_USER:
 		// これらのアクセス種別では強制的に表示
 		bShowImage = true;
 		break;
 	}
-#endif
 	if (!bShowImage) {
 		// 通常のアクセス種別では「show_image」が1であれば表示する
 		if (data.GetIntValue(L"show_image", 0)) {
