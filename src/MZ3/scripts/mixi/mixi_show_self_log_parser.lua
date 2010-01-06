@@ -57,7 +57,7 @@ function mixi_show_self_log_parser(parent, body, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=140, line_count-1 do
+	for i=330, line_count-1 do
 		line = html:get_at(i);
 
 		-- 次へ、前への抽出処理
@@ -68,7 +68,7 @@ function mixi_show_self_log_parser(parent, body, html)
 
 		-- 項目探索
 		-- <span class="date">02月16日 09:39</span>
-		if line_has_strings(line, "<span", "class", "data") or
+		if line_has_strings(line, "<span", "class", "date") or
 		   line_has_strings(line, "<span", "class", "name")  then
 
 			in_data_region = true;
