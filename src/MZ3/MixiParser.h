@@ -8,11 +8,12 @@
 #include "MZ3Parser.h"
 #include "xml2stl.h"
 
+#ifdef BT_MZ3
+
 /// mixi用パーサ
 namespace mixi {
 
 /// 各種mixiパーサの基本クラス
-#ifdef BT_MZ3
 class MixiParserBase : public parser::MZ3ParserBase
 {
 public:
@@ -21,10 +22,8 @@ public:
 	 */
 	static bool IsLogout( LPCTSTR szHtmlFilename );
 };
-#endif
 
 
-#ifdef BT_MZ3
 /// list 系ページに対するパーサの基本クラス
 class MixiListParser : public MixiParserBase
 {
@@ -83,11 +82,9 @@ protected:
 	}
 
 };
-#endif
 
 
 /// contents 系ページに対するパーサの基本クラス
-#ifdef BT_MZ3
 class MixiContentParser : public MixiParserBase, public parser::MZ3ContentParser
 {
 public:
@@ -290,12 +287,10 @@ public:
 	}
 
 };
-#endif
 
 
 //■■■共通■■■
 
-#ifdef BT_MZ3
 /**
  * 画像ダウンロードCGI 用パーサ
  *
@@ -332,10 +327,8 @@ public:
 		return uri;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] home.pl ログイン後のメイン画面用パーサ
  * 【メイントップ画面】
@@ -371,10 +364,8 @@ public:
 		return false;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 //■■■日記■■■
 /**
  * [list] list_diary.pl 用パーサ
@@ -497,10 +488,8 @@ private:
 	}
 
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] list_comment.pl 用パーサ
  * 【最近のコメント一覧】
@@ -612,10 +601,8 @@ public:
 		return true;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] new_friend_diary.pl 用パーサ
  * 【マイミク最新日記一覧】
@@ -746,10 +733,8 @@ private:
 	}
 
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] new_comment.pl 用パーサ
  * 【日記コメント記入履歴一覧】
@@ -844,7 +829,6 @@ public:
 		return true;
 	}
 };
-#endif
 
 
 /**
@@ -1250,169 +1234,8 @@ private:
 
 
 //■■■コミュニティ■■■
-/**
- * [list] new_bbs.pl 用パーサ
- * 【コミュニティ最新書き込み一覧】
- * http://mixi.jp/new_bbs.pl
- */
-/*
-class NewBbsParser : public MixiListParser
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
-	{
-		MZ3LOGGER_DEBUG( L"NewBbsParser.parse() start." );
-
-		INT_PTR count = html_.GetCount();
-
-		// 「次」、「前」のリンク
-		CMixiData backLink;
-		CMixiData nextLink;
-
-		BOOL dataFind = FALSE;
-
-		for (int i=140; i<count; i++) {
-			const CString& str = html_.GetAt(i);
-
-			// 「次」、「前」のリンク
-			// 項目発見前にのみ存在する
-			if( !dataFind ) {
-				// 「次を表示」、「前を表示」のリンクを抽出する
-				if( parseNextBackLink( nextLink, backLink, str ) ) {
-					continue;
-				}
-			}
-
-			// 項目探索
-			// <dt class="iconTopic">2007年10月01日&nbsp;22:14</dt>
-			if( util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconTopic" ) ||
-				util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEvent" ) ||
-				util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEnquete" ) )
-			{
-				dataFind = TRUE;
-
-				CMixiData data;
-
-				// 日付
-				ParserUtil::ParseDate(str, data);
-
-				// 見出し
-				i += 1;
-				CString str2 = html_.GetAt(i);
-				// <dd><a href="view_bbs.pl?id=20728968&comment_count=3&comm_id=1198460">【チャット】集え！xxx</a> (MZ3 -Mixi for ZERO3-)</dd>
-				CString after;
-				if (!util::GetAfterSubString( str2, L"href=", after )) {
-					MZ3LOGGER_ERROR(L"取得できません:" + str );
-					return false;
-				}
-				CString title;
-				util::GetBetweenSubString( after, L">", L"<", title );
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
-				
-				//アンケート、イベントの場合はタイトルの前にマークを付ける
-				if(util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEvent" )){
-					data.SetTitle(L"【☆】" + title);
-				}else if(util::LineHasStringsNoCase( str, L"<dt", L"class", L"iconEnquete" )){
-					data.SetTitle(L"【＠】" + title);
-				}else{
-					data.SetTitle(title);
-				}
-
-				// ＵＲＩ
-				CString href;
-				util::GetBetweenSubString( str2, L"\"", L"\"", href );
-
-				// &で分解する
-				while (href.Replace(_T("&amp;"), _T("&")));
-
-				data.SetURL(href);
-				data.SetCommentCount(
-					MixiUrlParser::GetCommentCount( href ) );
-
-				// URL に応じてアクセス種別を設定
-				data.SetAccessType( util::EstimateAccessTypeByUrl(href) );
-
-				// ＩＤを設定
-				data.SetID( MixiUrlParser::GetID(href) );
-
-				// コミュニティ名
-				CString communityName;
-				util::GetBetweenSubString( str2, L"</a>", L"</dd>", communityName );
-
-				// 整形：最初と最後の括弧を取り除く
-				communityName.Trim();
-				util::GetBetweenSubString( communityName, L"(", L")", communityName );
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( communityName );
-				data.SetName(communityName);
-				out_.push_back( data );
-			}
-			else if ( dataFind ) {
-				if( str.Find(_T("</ul>")) != -1 ) {
-					// 終了タグ発見
-					break;
-				}
-			}
-		}
-
-		// 前、次のリンクがあれば、追加する。
-		if( !backLink.GetTitle().IsEmpty() ) {
-			out_.insert( out_.begin(), backLink );
-		}
-		if( !nextLink.GetTitle().IsEmpty() ) {
-			out_.push_back( nextLink );
-		}
-
-		MZ3LOGGER_DEBUG( L"NewBbsParser.parse() finished." );
-		return true;
-	}
-
-private:
-	/// 「次を表示」、「前を表示」のリンクを抽出する
-	static bool parseNextBackLink( CMixiData& nextLink, CMixiData& backLink, CString str )
-	{
-		// 正規表現のコンパイル（一回のみ）
-		static MyRegex reg;
-		if( !util::CompileRegex( reg, L"<a href=[\"]?new_bbs.pl([?]page=[^\"^>]+)[\"]?>([^<]+)</a>" ) ) {
-			MZ3LOGGER_FATAL( FAILED_TO_COMPILE_REGEX_MSG );
-			return false;
-		}
-
-		if( parseNextBackLinkBase( nextLink, backLink, str, reg, L"new_bbs.pl", ACCESS_LIST_NEW_BBS ) ) {
-			// Name 要素は不要なので削除（詳細リストの右側に表示されてしまうのを回避するための暫定処置）
-			nextLink.SetName(L"");
-			backLink.SetName(L"");
-			return true;
-		}
-		return false;
-	}
-
-};
-*/
-
-/**
- * [list] new_bbs_comment.pl 用パーサ
- * 【コミュニティコメント記入履歴】
- * http://mixi.jp/new_bbs_comment.pl
- */
-/*
-class ListNewBbsCommentParser : public MixiListParser
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
-	{
-		MZ3LOGGER_DEBUG( L"ListNewBbsCommentParser.parse() start." );
-
-		// NewBbsParser に委譲
-		bool rval = NewBbsParser::parse( out_, html_ );
-
-		MZ3LOGGER_DEBUG( L"ListNewBbsCommentParser.parse() finished." );
-		return rval;
-	}
-};
-*/
 
 
-#ifdef BT_MZ3
 /**
  * [list] list_community.pl 用パーサ。
  * 【コミュニティ一覧】
@@ -1583,10 +1406,8 @@ private:
 					reg, L"list_community.pl", ACCESS_LIST_COMMUNITY );
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] list_comment.pl 用パーサ
  * 【コミュニティーのトピック一覧】
@@ -1753,10 +1574,8 @@ private:
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"list_bbs.pl", ACCESS_LIST_BBS );
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] view_bbs.pl 用パーサ
  * 【コミュニティートピック詳細】
@@ -2029,10 +1848,8 @@ private:
 		return retIndex;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] view_enquete.pl 用パーサ
  * 【アンケート詳細】
@@ -2394,10 +2211,8 @@ private:
 	}
 
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] view_event.pl 用パーサ
  * 【イベント詳細】
@@ -2710,10 +2525,8 @@ private:
 	}
 
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] list_event_member.pl 用パーサ
  * 【イベント参加者一覧】
@@ -2825,7 +2638,6 @@ public:
 
 private:
 };
-#endif
 
 
 /**
@@ -3124,7 +2936,6 @@ public:
 */
 
 
-#ifdef BT_MZ3
 //■■■ニュース■■■
 /**
  * [list] list_news_category.pl 用パーサ。
@@ -3304,10 +3115,8 @@ private:
 	}
 
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [content] view_news.pl 用パーサ
  * 【ニュース記事】
@@ -3390,186 +3199,9 @@ public:
 	}
 
 };
-#endif
 
 
 
-//■■■メッセージ■■■
-/**
- * [list] list_message.pl 用パーサ
- * 【メッセージ一覧】
- * http://mixi.jp/list_message.pl
- */
-/*
-class ListMessageParser : public MixiListParser
-{
-public:
-	static bool parse( CMixiDataList& out_, const CHtmlArray& html_ )
-	{
-		MZ3LOGGER_DEBUG( L"ListMessageParser.parse() start." );
-
-		// 「次」、「前」のリンク
-		CMixiData backLink;
-		CMixiData nextLink;
-
-		INT_PTR count = html_.GetCount();
-
-		bool bInMessages = false;
-
-		for (int i=100; i<count; i++) {
-			const CString& line = html_.GetAt(i);
-
-			// <td><a HREF="view_message.pl?id=xxx&box=inbox">件名</a></td>
-
-			if (util::LineHasStringsNoCase( line, _T("view_message.pl")) ) {
-				bInMessages = true;
-
-				CMixiData data;
-				data.SetAccessType(ACCESS_MESSAGE);
-
-				// リンクを取得
-				CString buf;
-				if( util::GetAfterSubString( line, L"<a", buf ) < 0 ) {
-					continue;
-				}
-				// buf: HREF="view_message.pl?id=xxx&box=inbox">件名</a></td>
-
-				CString link;
-				if( util::GetBetweenSubString( buf, L"href=\"", L"\"", link ) < 0 ) {
-					continue;
-				}
-				data.SetURL(link);
-
-				// 見だし
-				CString title;
-				if( util::GetBetweenSubString( buf, L">", L"<", title ) < 0 ) {
-					continue;
-				}
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( title );
-				data.SetTitle(title);
-
-				// 名前
-				// 前の行から取得する
-				const CString& line0 = html_.GetAt( i-1 );
-				// line01: <td class="sender">
-				// line02: なまえ
-				//
-				// line0: </td>
-				if( util::LineHasStringsNoCase( line0, L"</td>" ) ) {
-					const CString& line01 = html_.GetAt( i-4 );
-					if( util::LineHasStringsNoCase( line01, L"<td", L"class=" , L"sender" ,L">" ) ) {
-						const CString& line02 = html_.GetAt( i-3 );
-						buf = line02;
-						buf.Replace( L"\n" , L"" );
-					} else {
-						continue;
-					}
-				}
-				mixi::ParserUtil::ReplaceEntityReferenceToCharacter( buf );
-				data.SetName(buf);
-				data.SetAuthor(buf);
-
-				// 次の行から、日付を取得
-				const CString& line2 = html_.GetAt( i+2 );
-				// line2: <td calss="date">04月08日<a ... > ... </td></tr>
-				if( util::GetBetweenSubString( line2, L"<td class=\"date\">", L"<a", buf ) < 0 ) {
-					continue;
-				}
-				data.SetDate( buf );
-
-				out_.push_back( data );
-			}
-
-			if( bInMessages && util::LineHasStringsNoCase( line, L"</table>" ) ) {
-				// 検索終了
-				break;
-			}
-		}
-
-		MZ3LOGGER_DEBUG( L"ListMessageParser.parse() finished." );
-		return true;
-	}
-};
-*/
-
-
-
-/**
- * [content] view_message.pl 用パーサ
- * 【メッセージ詳細】
- * http://mixi.jp/view_message.pl
- */
-/*
-class ViewMessageParser : public MixiContentParser
-{
-public:
-	static bool parse( CMixiData& data_, const CHtmlArray& html_ )
-	{
-		MZ3LOGGER_DEBUG( L"ViewMessageParser.parse() start." );
-
-		data_.ClearAllList();
-
-		INT_PTR count = html_.GetCount();
-
-
-		for (int i=0; i<count; i++) {
-			CString str = html_.GetAt(i);
-
-			// 日付抽出
-			// <dt>日付</dt>
-			// <dd>2008年11月12日 11時13分</dd>
-			if( util::LineHasStringsNoCase( str, L"<dt>日付</dt>" ) ) {
-				const CString line0 = html_.GetAt( i+1 );
-				CString buf = line0;
-				buf.Replace(_T("時"), _T(":"));
-				ParserUtil::ParseDate(buf, data_);
-				if( util::GetBetweenSubString( line0 , L"<dd>", L"</dd>", buf ) ) {
-					data_.SetDate( buf );
-				}
-				continue;
-			}
-
-			// 差出人ID抽出
-			if( util::LineHasStringsNoCase( str, L"<a", L"href=" , L"show_friend.pl?id=", L"\">", L"</a>" ) ) {
-				CString buf;
-				util::GetBetweenSubString( str, L"show_friend.pl?id=", L"\"", buf );
-				data_.SetOwnerID(_wtoi(buf));
-				continue;
-			}
-
-			// 本文抽出
-			if( util::LineHasStringsNoCase( str, L"<div", L"class=", L"messageDetailBody" ) ) {
-
-				data_.AddBody(_T("\r\n"));
-				ParserUtil::AddBodyWithExtract( data_, str );
-
-				// </div> が存在すれば終了。
-				if( util::LineHasStringsNoCase( str, L"</div>" ) ) {
-					break;
-				}
-
-				for (int j=i+1; j<count; j++) {
-					str = html_.GetAt(j);
-					ParserUtil::AddBodyWithExtract( data_, str );
-
-					if( util::LineHasStringsNoCase( str, L"</div>" ) ) {
-						// 終了フラグ発見
-						break;
-					}
-				}
-				break;
-
-			}
-		}
-
-		MZ3LOGGER_DEBUG( L"ViewMessageParser.parse() finished." );
-		return true;
-	}
-};
-*/
-
-
-#ifdef BT_MZ3
 //■■■その他■■■
 /**
  * [list] list_friend.pl 用パーサ。
@@ -3701,10 +3333,8 @@ public:
 		return rval;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] show_intro.pl 用パーサ。
  * 【紹介文】
@@ -3862,10 +3492,8 @@ private:
 		return parseNextBackLinkBase( nextLink, backLink, str, reg, L"show_intro.pl", ACCESS_LIST_INTRO );
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] show_log.pl 用パーサ
  * 【足あと】
@@ -3951,10 +3579,8 @@ public:
 		return true;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] 足あとAPI 用パーサ
  * 【足あと】
@@ -4033,10 +3659,8 @@ public:
 		return true;
 	}
 };
-#endif
 
 
-#ifdef BT_MZ3
 /**
  * [list] show_calendar.pl 用パーサ。
  * 【カレンダー】
@@ -4195,7 +3819,7 @@ private:
 			reg, L"show_calendar.pl", ACCESS_LIST_CALENDAR );
 	}
 };
-#endif
-
 
 }//namespace mixi
+
+#endif	// BT_MZ3

@@ -117,13 +117,9 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 	case ACCESS_LIST_DIARY:						body.clear();	return mixi::ListNewFriendDiaryParser::parse( body, html );
 	case ACCESS_LIST_NEW_COMMENT:				body.clear();	return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					body.clear();	return mixi::ListCommentParser::parse( body, html );
-//	case ACCESS_LIST_NEW_BBS:					body.clear();	return mixi::NewBbsParser::parse( body, html );
-//	case ACCESS_LIST_NEW_BBS_COMMENT:			body.clear();	return mixi::ListNewBbsCommentParser::parse( body, html );
 	case ACCESS_LIST_MYDIARY:					body.clear();	return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::ShowLogParser::parse( body, html );
 	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::TrackParser::parse( body, html );
-//	case ACCESS_LIST_MESSAGE_IN:				body.clear();	return mixi::ListMessageParser::parse( body, html );
-//	case ACCESS_LIST_MESSAGE_OUT:				body.clear();	return mixi::ListMessageParser::parse( body, html );
 	case ACCESS_LIST_NEWS:						body.clear();	return mixi::ListNewsCategoryParser::parse( body, html );
 //	case ACCESS_LIST_FAVORITE_USER:				body.clear();	return mixi::ListBookmarkParser::parse( body, html );
 //	case ACCESS_LIST_FAVORITE_COMMUNITY:		body.clear();	return mixi::ListBookmarkParser::parse( body, html );
@@ -175,7 +171,6 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_BIRTHDAY:
 //	case ACCESS_PROFILE:		return mixi::ShowFriendParser::parse( mixi, html );
 //	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
-//	case ACCESS_MESSAGE:		return mixi::ViewMessageParser::parse( mixi, html );
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 #endif
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
