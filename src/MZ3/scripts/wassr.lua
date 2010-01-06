@@ -382,7 +382,7 @@ function on_click_update_button(event_name, serialize_key)
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'WASSR_UPDATE' then
-		msg = 'Wassrで発言します。\n'
+		msg = 'Wassrで発言します。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'

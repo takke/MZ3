@@ -845,7 +845,7 @@ function on_click_update_button(event_name, serialize_key)
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'MIXI_ADD_ECHO' then
-		msg = 'mixi エコーで発言します。\n'
+		msg = 'mixi エコーで発言します。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
@@ -855,7 +855,7 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
 		local username = data:get_text('name');
-		msg = 'mixi エコーで ' .. username .. ' さんに返信します。\n'
+		msg = 'mixi エコーで ' .. username .. ' さんに返信します。 \n'
 		   .. '---- 発言 ----\n'
 		   .. text .. '\n'
 		   .. '----\n'
