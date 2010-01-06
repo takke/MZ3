@@ -902,15 +902,15 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontF
 		0,							// nWidth
 		0,							// nEscapement
 		0,							// nOrientation
-		FW_MEDIUM,					// nWeight
+		FW_NORMAL,					// nWeight
 		FALSE,						// bItalic
 		FALSE,						// bUnderline
-		0,							// cStrikeOut
+		FALSE,						// cStrikeOut
 		DEFAULT_CHARSET,			// nCharSet
 		OUT_DEFAULT_PRECIS,			// nOutPrecision
 		CLIP_DEFAULT_PRECIS,		// nClipPrecision
 		fontQuality,				// nQuality
-		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		DEFAULT_PITCH | FF_DONTCARE,// nPitchAndFamily
 		fontFace);					// lpszFacename
 
 	// 小フォント作成
@@ -921,15 +921,15 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontF
 		0,							// nWidth
 		0,							// nEscapement
 		0,							// nOrientation
-		FW_MEDIUM,					// nWeight
+		FW_NORMAL,					// nWeight
 		FALSE,						// bItalic
 		FALSE,						// bUnderline
-		0,							// cStrikeOut
+		FALSE,						// cStrikeOut
 		DEFAULT_CHARSET,			// nCharSet
 		OUT_DEFAULT_PRECIS,			// nOutPrecision
 		CLIP_DEFAULT_PRECIS,		// nClipPrecision
 		fontQuality,				// nQuality
-		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		DEFAULT_PITCH | FF_DONTCARE,// nPitchAndFamily
 		fontFace);					// lpszFacename
 
 	// 大フォント作成
@@ -940,15 +940,15 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontF
 		0,							// nWidth
 		0,							// nEscapement
 		0,							// nOrientation
-		FW_MEDIUM,					// nWeight
+		FW_NORMAL,					// nWeight
 		FALSE,						// bItalic
 		FALSE,						// bUnderline
-		0,							// cStrikeOut
+		FALSE,						// cStrikeOut
 		DEFAULT_CHARSET,			// nCharSet
 		OUT_DEFAULT_PRECIS,			// nOutPrecision
 		CLIP_DEFAULT_PRECIS,		// nClipPrecision
 		fontQuality,				// nQuality
-		DEFAULT_PITCH | FF_SWISS,	// nPitchAndFamily
+		DEFAULT_PITCH | FF_DONTCARE,// nPitchAndFamily
 		fontFace);					// lpszFacename
 	return true;
 }

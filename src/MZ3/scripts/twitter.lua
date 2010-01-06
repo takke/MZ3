@@ -1660,7 +1660,7 @@ function on_get_end(event_name, serialize_key, http_status)
 		-- エラーアリなので中断するために true を返す
 		mz3.logger_error(msg);
 		mz3_main_view.set_info_text(msg);
-		mz3.alert("サーバエラー(" .. http_status .. ") : " .. msg);
+		--mz3.alert("サーバエラー(" .. http_status .. ") : " .. msg);
 		return true;
 	end
 	-- エラーなしなので続行する(後続の解析処理等を継続)
