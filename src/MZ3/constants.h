@@ -115,7 +115,6 @@ enum ACCESS_TYPE {
 	//--- LIST 系：カテゴリリストの項目。
 #ifdef BT_MZ3
 	ACCESS_LIST_MYDIARY,			///< 自分の日記一覧
-	ACCESS_LIST_DIARY,				///< マイミク最新日記一覧
 	ACCESS_LIST_NEW_COMMENT,		///< 最新コメント一覧
 	ACCESS_LIST_NEW_BBS,			///< コミュニティ書き込み一覧(new_bbs.pl)
 //	ACCESS_LIST_MESSAGE_IN,			///< メッセージ一覧（受信箱）

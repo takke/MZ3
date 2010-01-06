@@ -63,23 +63,6 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%2";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
-	type = ACCESS_LIST_DIARY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"日記一覧"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].cacheFilePattern = L"new_friend_diary.html";
-	m_map[type].serializeKey = "DIARY";
-	m_map[type].bCruiseTarget = true;
-	m_map[type].defaultCategoryURL = L"new_friend_diary.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-
 	type = ACCESS_LIST_NEW_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -446,18 +429,7 @@ bool AccessTypeInfo::init()
 	// url(2) : http://mixi.jp/view_message.pl?id=xxx&box=outbox
 	m_map[type].cacheFilePattern = L"message\\{urlparam:box}\\{urlparam:id}.html";
 	m_map[type].serializeKey = "MIXI_MESSAGE";
-#endif
 
-	type = ACCESS_IMAGE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "mixi"
-		, L"画像"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "MIXI_IMAGE";
-
-#ifdef BT_MZ3
 	type = ACCESS_MOVIE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
@@ -466,18 +438,7 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_MOVIE";
-#endif
 
-	type = ACCESS_DOWNLOAD;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "mixi"
-		, L"ダウンロード"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "DOWNLOAD";
-
-#ifdef BT_MZ3
 	type = ACCESS_PROFILE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY
@@ -518,6 +479,25 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "MIXI_SCHEDULE";
 #endif
+
+	type = ACCESS_IMAGE;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "mixi"
+		, L"画像"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].serializeKey = "MIXI_IMAGE";
+
+	type = ACCESS_DOWNLOAD;
+	m_map[type] = AccessTypeInfo::Data(
+		INFO_TYPE_OTHER
+		, "mixi"
+		, L"ダウンロード"
+		, REQUEST_METHOD_GET
+		);
+	m_map[type].serializeKey = "DOWNLOAD";
+
 
 	//------------------------------------------------------------------
 	//--- mixi,POST 系

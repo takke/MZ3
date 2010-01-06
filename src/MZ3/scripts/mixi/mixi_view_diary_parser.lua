@@ -11,7 +11,139 @@ module("mixi", package.seeall)
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
--- TODO ホスト側で設定しているが、本来はこちらで設定すべき。
+-- マイミク最新日記一覧
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('category');									-- カテゴリ
+type:set_service_type('mixi');									-- サービス種別
+type:set_serialize_key('DIARY');								-- シリアライズキー
+type:set_short_title('日記一覧');								-- 簡易タイトル
+type:set_request_method('GET');									-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\new_friend_diary.html');		-- キャッシュファイル
+type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_default_url('http://mixi.jp/new_friend_diary.pl');
+type:set_body_header(1, 'title', 'タイトル');
+type:set_body_header(2, 'name', '名前>>');
+type:set_body_header(3, 'date', '日時>>');
+type:set_body_integrated_line_pattern(1, '%2\t(%3)');
+type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
+
+-- TODO 「mixi 日記詳細」はホスト側で設定しているが、本来はこちらで設定すべき。
+
+
+--------------------------------------------------
+-- 【mixi マイミク最新日記一覧】
+-- [list] new_friend_diary.pl 用パーサ
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_list_new_friend_diary_parser(parent, body, html)
+	mz3.logger_debug("mixi_list_new_friend_diary_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+	
+	local t1 = mz3.get_tick_count();
+	
+	local back_data = nil;
+	local next_data = nil;
+
+	-- 行数取得
+	local line_count = html:get_count();
+	
+	-- 日記開始フラグの探索
+	local i_start_line = 100;
+	while (i_start_line < line_count) do
+		line = html:get_at(i_start_line);
+		
+		if line_has_strings(line, "newFriendDiary") then
+			i_start_line = i_start_line + 1;
+			break;
+		end
+		
+		i_start_line = i_start_line + 1;
+	end
+	
+	-- 各日記項目の取得
+	local i=i_start_line;
+	for i=i_start_line, line_count-1 do
+		line = html:get_at(i);
+--		mz3.logger_debug(i .. " : " .. html:get_at(i));
+
+		-- 次へ、前への抽出処理
+		if back_data==nil and next_data==nil then
+			back_data, next_data = parse_next_back_link(line, "new_friend_diary.pl");
+		end
+	end
+	
+	-- ul の範囲を取得
+	sub_html = get_sub_html(html, i_start_line, line_count, {'<ul'}, {'</ul>'});
+	
+	-- ul の中の各 dt, dd を取得
+	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
+--		mz3.logger_debug('dt: ' .. dt);
+		
+		-- data 生成
+		data = MZ3Data:create();
+
+		-- 時刻
+		--<dt>12月31日&nbsp;05:32</dt>
+		date = mz3.decode_html_entity(dt);
+		data:set_date(date);
+
+		-- 見出し、URL、名前の抽出
+		--<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
+		-- or
+		--<dd><a href="view_diary.pl?url=xxx&owner_id=xxx">タイトル</a> (なまえ)
+		url, title, name = dd:match('href="(.-)">(.-)</a> %((.-)%)');
+		title = mz3.decode_html_entity(title);
+		data:set_text("title", title);
+
+		-- URL 取得
+		data:set_text("url", url);
+		
+		-- ID 設定
+		id = get_param_from_url(url, "id");
+		data:set_integer('id', id);
+
+		-- 名前
+		name = mz3.decode_html_entity(name);
+		data:set_text("name", name);
+		data:set_text("author", name);
+
+		-- URL に応じてアクセス種別を設定
+		type = mz3.estimate_access_type_by_url(url);
+		data:set_access_type(type);
+
+		-- data 追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
+	end
+
+	-- 前、次へリンクの追加
+	if back_data~=nil then
+		-- 先頭に挿入
+		body:insert(0, back_data.data);
+		back_data:delete();
+	end
+	if next_data~=nil then
+		-- 末尾に追加
+		body:add(next_data.data);
+		next_data:delete();
+	end
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_list_new_friend_diary_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
 
 
 --------------------------------------------------
@@ -324,6 +456,29 @@ end
 ----------------------------------------
 -- パーサの登録
 ----------------------------------------
+mz3.set_parser("DIARY",              "mixi.mixi_list_new_friend_diary_parser");
 mz3.set_parser("MIXI_DIARY",         "mixi.mixi_view_diary_parser");
 mz3.set_parser("MIXI_NEIGHBORDIARY", "mixi.mixi_view_diary_parser");
 mz3.set_parser("MIXI_MYDIARY",       "mixi.mixi_view_diary_parser");
+
+
+----------------------------------------
+-- estimate 対象に追加
+----------------------------------------
+
+--- estimate 対象判別イベントハンドラ
+--
+-- @param event_name 'estimate_access_type_by_url'
+-- @param url        解析対象URL
+--
+function on_estimate_access_type_by_url_for_mixi_diary(event_name, url, data1, data2)
+
+    -- マイミク最新日記一覧
+	if line_has_strings(url, 'new_friend_diary.pl') then
+		return true, mz3.get_access_type_by_key('DIARY');
+	end
+
+	return false;
+end
+-- イベントフック関数の登録
+mz3.add_event_listener("estimate_access_type_by_url", "mixi.on_estimate_access_type_by_url_for_mixi_diary");

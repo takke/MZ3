@@ -1052,18 +1052,19 @@ mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_lis
 ----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------
--- コミュニティ最新書込一覧
-require("scripts\\mixi\\mixi_new_bbs_parser");
 
 -- トップページ
 require("scripts\\mixi\\mixi_home_parser");
 
--- 日記詳細
+-- コミュニティ最新書込一覧
+require("scripts\\mixi\\mixi_new_bbs_parser");
+
+-- マイミク最新日記一覧、日記詳細
 require("scripts\\mixi\\mixi_view_diary_parser");
 
 -- メッセージ(受信箱, 送信箱), 公式メッセージ, メッセージ詳細
-require("scripts\\mixi\\mixi_new_official_message_parser");
-require("scripts\\mixi\\mixi_message_outbox_parser");
+--require("scripts\\mixi\\mixi_new_official_message_parser");	-- inbox_parser に統合
+--require("scripts\\mixi\\mixi_message_outbox_parser");			-- inbox_parser に統合
 require("scripts\\mixi\\mixi_message_inbox_parser");
 require("scripts\\mixi\\mixi_view_message_parser");
 
