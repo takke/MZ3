@@ -47,14 +47,14 @@ function mixi_show_friend_parser(parent, body, html)
 	local t1 = mz3.get_tick_count();
 	local line_count = html:get_count();
 	
-	-- 名前, 画像
+	-- 名前, 画像, 最終ログイン
 	local i=100;
 	local sub_html = '';
-	sub_html, i = get_sub_html(html, i, line_count, {"<div id=", '"myProfile"'}, {'<div id=', '"mymixiList"'});
-	
+	sub_html, i = get_sub_html(html, i, line_count, {"<div", '"profilePhoto"'}, {'<div', 'id="myMixiList"'});
 --	mz3.logger_debug(sub_html);
-	
-	local name = sub_html:match('<h3>(.-)</h3>');
+	--<p class="name">bigappleさん(30)
+	--<span class="loginTime">（最終ログインは45分以内）</span></p>
+	local name = sub_html:match('<p class="name">(.-)%(');
 	if name ~= nil then
 		name = mz3.decode_html_entity(name);
 		parent:set_text('name', name);
@@ -77,40 +77,28 @@ function mixi_show_friend_parser(parent, body, html)
 		parent:add_body_with_extract(last_login);
 	end
 	
-	-- 友人関係
-	-- <p class="friendPath">たっけ ⇒ <a href="show_friend.pl?id=109835">いっちゅう</a></p>
-	local friend_path = sub_html:match('class="friendPath">(.-)</p>');
-	if friend_path ~= nil then
-		parent:add_body_with_extract("<br>");
-		parent:add_body_with_extract(friend_path);
-	end
-	
-	
 	-- プロフィールを全て取得し、本文に設定する。
-	sub_html, i = get_sub_html(html, i, line_count, {'<div id="profile">'}, {'</ul>'});
+	sub_html, i = get_sub_html(html, i, line_count, {'<div id="profile"'}, {'</table>'});
+--	mz3.logger_debug(sub_html);
 	parent:add_body_with_extract("<br>");
-	for li in sub_html:gmatch("<li>(.-)</li>") do
---		<li><dl><dt>所属</dt><dd>Webプログラマ</dd></dl></li>
-		local dt = li:match("<dt>(.-)<");
-		local dd = li:match("<dd>(.-)<");
-		if dt ~= nil and dd ~= nil then
-			parent:add_body_with_extract("■ " .. dt);
-			parent:add_body_with_extract("<br>");
-			
-			parent:add_body_with_extract(dd);
-			parent:add_body_with_extract("<br>");
-			parent:add_body_with_extract("<br>");
-		end
+	for th, td in sub_html:gmatch("<th>(.-)</th>.-<td>(.-)</td>") do
+		parent:add_body_with_extract("■ " .. th);
+		parent:add_body_with_extract("<br>");
+		
+		parent:add_body_with_extract(td);
+		parent:add_body_with_extract("<br>");
+		parent:add_body_with_extract("<br>");
 	end
 	
 	-- 最新の日記取得
 	local child_number = 1;
-	sub_html, i = get_sub_html(html, i, line_count, {'<div id="newFriendDiary">'}, {'</dl>'});
+	sub_html, i = get_sub_html(html, i, line_count, {'<div', 'id="diaryFeed"'}, {'</dl>'});
 	-- dt/span, dd/a が交互に出現する。
 	-- <dt><span>05月03日</span></dt>
 	-- <dd><a href="view_diary.pl?id=xxx&owner_id=xxx" >WM系の偉い人と飲み会に行って…</a></dd>
 	local child = MZ3Data:create();
 	child:add_body_with_extract("<br>");
+	local has_diary = false;
 	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
 		local date = dt:match("<span>(.-)<");
 		
@@ -118,15 +106,20 @@ function mixi_show_friend_parser(parent, body, html)
 			child:add_body_with_extract("■ " .. date .. " : " .. dd);
 			child:add_body_with_extract("<br>");
 		end
+		
+		has_diary = true;
 	end
-	child:set_integer("comment_index", child_number);
-	child:set_text('author', "最新の日記");
-	parent:add_child(child);
-	child_number = child_number + 1;
-	child:delete();
+	if has_diary then
+		child:set_integer("comment_index", child_number);
+		child:set_text('author', "最新の日記");
+		parent:add_child(child);
+		child_number = child_number + 1;
+		child:delete();
+	end
 	
 	-- 紹介文取得
-	sub_html, i = get_sub_html(html, i, line_count, {'<div id="intro">'}, {'</ul>'});
+	sub_html, i = get_sub_html(html, i, line_count, {'<div id="intro"'}, {'</ul>'});
+	mz3.logger_debug(sub_html);
 	--[[
 <dl>
 <dt><a href="show_friend.pl?id=xxx"><img src="xxx.jpg" alt="ゆ" onerror="javascript:this.width=76;this.height=76;" /></a>
