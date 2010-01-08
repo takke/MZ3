@@ -1424,8 +1424,8 @@ function on_click_update_button(event_name, serialize_key)
 		while true do
 			local ulen = text:len();
 			text = text:sub(1, ulen-1);
-			len = mz3.get_text_length(text);
-			if len <= 140 then
+			wlen = mz3.get_text_length(text);
+			if wlen <= 140 then
 				break;
 			end
 		end
