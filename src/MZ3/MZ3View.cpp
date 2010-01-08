@@ -4959,7 +4959,7 @@ void CMZ3View::ResetIntervalTimer(bool bRetry /* = false */)
 		// Žc‚è M •bˆÈ“à‚Å‚ ‚ê‚Î M •b‚É–ß‚·
 		int nElapsedSec = (GetTickCount() - m_dwIntervalTimerStartMsec)/1000;
 		MZ3LOGGER_DEBUG(util::FormatString(L"™Œo‰ßŽžŠÔ=%dsec", nElapsedSec));
-		const int M = 5;
+		const int M = 10;
 		if (nElapsedSec >= theApp.m_optionMng.m_nIntervalCheckSec - M) {
 			// elapsed = (now - m_dwIntervalTimerStartMsec) / 1000
 			// elapsed = theApp.m_optionMng.m_nIntervalCheckSec - M
