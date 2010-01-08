@@ -38,7 +38,7 @@ function mixi_view_message_parser(data, dummy, html)
 
 	-- 行数取得
 	local line_count = html:get_count();
-	for i=250, line_count-1 do
+	for i=200, line_count-1 do
 		line = html:get_at(i);
 
 		-- 日付抽出

@@ -234,7 +234,7 @@ function mixi_recent_echo_parser(parent, body, html)
 				sub_html = sub_html .. line;
 			end
 			
---			mz3.alert(sub_html);
+--			mz3.logger_debug(sub_html);
 			
 			-- URL 取得
 			url = sub_html:match('<a href="(.-)"');
@@ -473,7 +473,9 @@ function on_mixi_echo_show_profile(serialize_key, event_name, data)
 	data = MZ3Data:create(data);
 	
 	-- URL 取得
-	url = complement_mixi_url(data:get_text('url'));
+	url = data:get_text('url');
+	-- view_echo.pl なのでプロフィールページURLに置換する
+	url = 'http://mixi.jp/show_friend.pl?id=' .. get_param_from_url(url, 'id');
 --	mz3.alert(url);
 	
 	-- プロフィール取得アクセス開始
@@ -485,7 +487,6 @@ function on_mixi_echo_show_profile(serialize_key, event_name, data)
 
 	-- 表示状態更新
 	mz3_main_view.update_control_status();
-
 end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
