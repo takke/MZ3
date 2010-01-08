@@ -63,7 +63,7 @@ function mixi_show_friend_parser(parent, body, html)
 	end
 	
 	-- ユーザ画像
-	local url = sub_html:match('<img src="(.-)"');
+	local url = sub_html:match('<img [^>]*src="(.-)"');
 	if url ~= nil then
 		parent:add_link_list(url, 'ユーザ画像');
 		parent:add_text_array("body", "<_a><<ユーザ画像>></_a>");
