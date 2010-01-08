@@ -389,7 +389,8 @@ public:
 
 public:
 #define	RESET_INTERVAL_TIMER_RETRY_YES	true
-	void ResetIntervalTimer(bool bRetry=false);
+#define	RESET_INTERVAL_TIMER_RETRY_NO	false
+	void ResetIntervalTimer(bool bRetry);
 	bool AppendCategoryList(const CCategoryItem& categoryItem);
 	bool DoAccessEndProcForBody(ACCESS_TYPE aType);
 

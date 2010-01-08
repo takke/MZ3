@@ -743,6 +743,10 @@ bool CMainFrame::ChangeAllViewFont(int fontHeight)
 		// インフォメーションエディット
 		pView->m_infoEdit.SetFont( &theApp.m_font );
 
+		// ステータスエディット
+		//pView->m_statusEdit.SetFont( &theApp.m_font );
+		//pView->m_statusEdit.ModifyStyle(0, ES_AUTOHSCROLL);
+
 		// ビュー内容の再設定
 		pView->ResetViewContent();
 	}
@@ -860,7 +864,7 @@ void CMainFrame::OnEnableIntervalCheck()
 		}
 
 		// 設定する
-		theApp.m_pMainView->ResetIntervalTimer();
+		theApp.m_pMainView->ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_NO);
 	}
 
 	// オプションのトグル
