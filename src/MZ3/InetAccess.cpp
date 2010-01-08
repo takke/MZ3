@@ -1003,6 +1003,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			}
 		}
 
+		util::MySetInformationText( m_hwnd, _T("データ受信中") );
 		DWORD dwOneRecvSize = theApp.m_optionMng.GetRecvBufSize();	// 一度に受信するサイズ
 		{
 			// バリデーション
