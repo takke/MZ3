@@ -160,15 +160,15 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 
 	switch (aType) {
 #ifdef BT_MZ3
-//	case ACCESS_DIARY:			return mixi::ViewDiaryParser::parse( mixi, html );
-//	case ACCESS_NEIGHBORDIARY:	return mixi::ViewDiaryParser::parse( mixi, html );
+//	case ACCESS_DIARY:
+//	case ACCESS_NEIGHBORDIARY:
+//	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
 	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
 	case ACCESS_EVENT_JOIN:
 	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
 	case ACCESS_EVENT_MEMBER:	return mixi::ListEventMemberParser::parse( mixi, html );
 	case ACCESS_BIRTHDAY:
-//	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 #endif
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );

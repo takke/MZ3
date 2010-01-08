@@ -355,6 +355,8 @@ void CMZ3View::OnInitialUpdate()
 	{
 		// フォント変更
 		m_infoEdit.SetFont( &theApp.m_font );
+		//m_statusEdit.SetFont( &theApp.m_font );
+		//m_statusEdit.ModifyStyle(0, ES_AUTOHSCROLL);
 	}
 
 	// ボタン制御
@@ -629,6 +631,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 			pUpdateButton->GetClientRect(&rectUpdateButton);
 		}
 		hPost = rectUpdateButton.Height();
+		//hPost = hInfoBase;
 #ifdef WINCE
 		hInfo = (int)(hInfoBase * (1+0.8*(theApp.m_optionMng.m_nTwitterStatusLineCount-1)));
 #else
@@ -4840,7 +4843,9 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == TIMERID_INTERVAL_CHECK) {
 		// 定期取得機能
-		if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		if (!theApp.m_optionMng.m_bEnableIntervalCheck) {
+			KillTimer(nIDEvent);
+		} else {
 			// フォーカスチェック
 			// 現在のアプリが MZ3：
 			//  フォーカスがカテゴリリストにある場合
@@ -4861,11 +4866,8 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 			if( nElapsedSec >= theApp.m_optionMng.m_nIntervalCheckSec ) {
 				util::MySetInformationText( m_hWnd, _T("☆定期取得を開始します") );
 
-				// 経過。取得開始。
+				// 経過。取得開始。タイマーは内部で更新する。
 				RetrieveCategoryItem();
-
-				// タイマーを更新
-				ResetIntervalTimer();
 			} else {
 				// カウントダウン
 				int restSec = theApp.m_optionMng.m_nIntervalCheckSec - nElapsedSec;
@@ -4909,6 +4911,11 @@ bool CMZ3View::RetrieveCategoryItem(void)
 	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 	if (pCategory==NULL) {
 		return false;
+	}
+
+	// 定期取得タイマー更新
+	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_NO);
 	}
 
 	// MZ3 API : ハンドラ呼び出し
