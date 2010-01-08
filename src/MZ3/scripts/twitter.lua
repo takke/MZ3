@@ -1442,7 +1442,7 @@ function on_click_update_button(event_name, serialize_key)
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'TWITTER_NEW_DM' then
-		msg = data:get_text('name') .. ' さんに以下のメッセージを送信します。\n'
+		msg = data:get_text('name') .. ' さんに以下のメッセージを送信します。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
@@ -1460,7 +1460,7 @@ function on_click_update_button(event_name, serialize_key)
 			return true;
 		end
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
-		msg = 'twitpicで投稿します。\n'
+		msg = 'twitpicで投稿します。 \n'
 		   .. '---- 発言 ----\n'
 		   .. text .. '\n'
 		   .. '---- ファイル ----\n'

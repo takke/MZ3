@@ -55,7 +55,7 @@ function on_check_account(event_name, service_name, id, password)
 --	mz3.alert(service_name);
 	if service_name == 'gooホーム' then
 		if password ~= '' and is_valid_quote_mail_address(password)==false then
-			msg = "gooホームひとこと投稿アドレスは下記の形式です。\n"
+			msg = "gooホームひとこと投稿アドレスは下記の形式です。 \n"
 			    .." quote-XXXXXXXXXXXX@home.goo.ne.jp\n"
 			    .."入力されたアドレス：\n"
 			    .." " .. password
