@@ -1363,8 +1363,13 @@ function do_post_to_twitter(text)
 		   text:find("QT @", 1, false)~=nil then
 			-- RT/QTが含まれているので追加しない
 		else
-			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
-			post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+			-- 長さが 140 文字超えるのであれば追加しない。
+			local footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+			local appended_text = text .. footer_text;
+			local len = mz3.get_text_length(text);
+			if len <= 140 then
+				post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+			end
 		end
 	end
 	post:append_post_body('&source=');
@@ -1415,8 +1420,17 @@ function on_click_update_button(event_name, serialize_key)
 	-- 文字長チェック
 	local len = mz3.get_text_length(text);
 	if len > 140 then
+		-- 140 文字になるまで減らす
+		while true do
+			local ulen = text:len();
+			text = text:sub(1, ulen-1);
+			len = mz3.get_text_length(text);
+			if len <= 140 then
+				break;
+			end
+		end
 		msg = '140文字を超過しています(' .. len .. '文字)\n'
-			.. '投稿に失敗する可能性がありますが続行しますか？ \n'
+			.. '140文字までを投稿しますか？ \n'
 			.. '----\n'
 			.. text;
 		if mz3.confirm(msg, '文字数：' .. len, 'yes_no') ~= 'yes' then
@@ -1442,7 +1456,7 @@ function on_click_update_button(event_name, serialize_key)
 		   .. text .. '\n'
 		   .. '----\n'
 		   .. 'よろしいですか？';
-		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
+		if mz3.confirm(msg, len .. '文字', 'yes_no') ~= 'yes' then
 			return true;
 		end
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
@@ -1505,7 +1519,7 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body(mz3.convert_encoding(text, 'sjis', 'utf8'));
 		-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
 		if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
-			footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
+			local footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
 			post:append_post_body(mz3.convert_encoding(footer_text, 'sjis', 'utf8'));
 		end
 		post:append_post_body('\r\n');
