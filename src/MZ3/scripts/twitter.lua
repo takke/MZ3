@@ -128,10 +128,10 @@ type:set_request_encoding('utf8');							-- エンコーディング
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('category');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
-type:set_serialize_key('TWITTER_USER');		-- シリアライズキー
+type:set_serialize_key('TWITTER_FOLLOWERS');				-- シリアライズキー
 type:set_short_title('フォロワー一覧');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('twitter\\followers.xml');	-- キャッシュファイル
+type:set_cache_file_pattern('twitter\\followers.xml');		-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
 type:set_default_url('http://twitter.com/statuses/followers.xml');
 type:set_body_header(1, 'name', '名前');
@@ -140,12 +140,12 @@ type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');									-- カテゴリ
+type:set_info_type('category');								-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
-type:set_serialize_key('TWITTER_USER');		-- シリアライズキー
-type:set_short_title('フォロワー一覧');						-- 簡易タイトル
+type:set_serialize_key('TWITTER_FOLLOWINGS');				-- シリアライズキー
+type:set_short_title('フォロー一覧');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('twitter\\friends.xml');	-- キャッシュファイル
+type:set_cache_file_pattern('twitter\\friends.xml');		-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
 type:set_default_url('http://twitter.com/statuses/friends.xml');
 type:set_body_header(1, 'name', '名前');
@@ -195,7 +195,6 @@ menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_upd
 menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
 menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
 menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
-menu_items.twitter_followers     = mz3_menu.regist_menu("twitter.on_twitter_followers");
 
 -- 発言内のハッシュタグ #xxx 抽出リスト
 menu_items.search_hash_list = {}
@@ -688,7 +687,7 @@ mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parse
 
 
 --------------------------------------------------
--- [list] followers用パーサ
+-- [list] followers/friends用パーサ
 --
 -- http://twitter.com/statuses/followers.xml
 -- http://twitter.com/statuses/friends.xml
@@ -782,7 +781,7 @@ function twitter_followers_parser(parent, body, html)
 				-- Image : user/user/profile_image_url
 				profile_image_url = user:match('<profile_image_url>([^<]*)</profile_image_url>');
 				profile_image_url = mz3.decode_html_entity(profile_image_url);
-				mz3.logger_debug(profile_image_url);
+--				mz3.logger_debug(profile_image_url);
 				data:add_text_array('image', profile_image_url);
 
 				-- 画像表示フラグを立てる
@@ -803,7 +802,8 @@ function twitter_followers_parser(parent, body, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("twitter_followers_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
-mz3.set_parser("TWITTER_USER", "twitter.twitter_followers_parser");
+mz3.set_parser("TWITTER_FOLLOWERS", "twitter.twitter_followers_parser");
+mz3.set_parser("TWITTER_FOLLOWINGS", "twitter.twitter_followers_parser");
 
 
 ----------------------------------------
@@ -1841,7 +1841,7 @@ mz3.add_event_listener("get_end",  "twitter.on_get_end");
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	mz3.logger_debug('on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
 
-	if serialize_key~="TWITTER_USER"  then
+	if serialize_key~="TWITTER_USER" then
 		return false;
 	end
 
@@ -2011,8 +2011,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 		local tab = MZ3GroupItem:create("Twitter");
 		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/friends_timeline.xml");
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
-		tab:append_category("フォロー一覧", "TWITTER_USER", "http://twitter.com/statuses/friends.xml");
-		tab:append_category("フォロワー一覧", "TWITTER_USER", "http://twitter.com/statuses/followers.xml");
+		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "http://twitter.com/statuses/friends.xml");
+		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "http://twitter.com/statuses/followers.xml");
 		tab:append_category("リスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
 		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists/memberships.xml");
 		tab:append_category("お気に入り", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
