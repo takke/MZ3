@@ -6936,10 +6936,15 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 	// バージョン、URL、タイトルの取得
 	const xml2stl::Node* pLatestVerNode = NULL;
 	try {
-#ifdef WINCE
+#ifdef BT_MZ3
+# ifdef WINCE
 		pLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz3");
-#else
+# else
 		pLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz4");
+# endif
+#endif
+#ifdef BT_TKTW
+		pLatestVerNode = &root.getNode(L"latest_version").getNode(L"tktweets");
 #endif
 	} catch (xml2stl::NodeNotFoundException& e) {
 		MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
@@ -6954,6 +6959,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 			pLatestVerNode->getProperty(L"title").c_str()));
 
 	const xml2stl::Node* pDevLatestVerNode = NULL;
+#ifdef BT_MZ3
 	if (theApp.m_optionMng.m_bUseDevVerCheck) {
 		try {
 #ifdef WINCE
@@ -6972,6 +6978,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 				pDevLatestVerNode->getProperty(L"url").c_str(),
 				pDevLatestVerNode->getProperty(L"title").c_str()));
 	}
+#endif
 
 	// バージョン番号の正規化
 	// 0.9.3.7       => 0.9310700
