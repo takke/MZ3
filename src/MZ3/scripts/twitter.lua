@@ -755,11 +755,15 @@ function twitter_followers_parser(parent, body, html)
 				screen_name = screen_name:gsub('&amp;', '&');
 				screen_name = mz3.decode_html_entity(screen_name);
 
-				description = description:gsub('&amp;', '&');
-				description = mz3.decode_html_entity(description);
+				if description ~= nil then
+					description = description:gsub('&amp;', '&');
+					description = mz3.decode_html_entity(description);
+				end
 
-				text = text:gsub('&amp;', '&');
-				text = mz3.decode_html_entity(text);
+				if text ~= nil then
+					text = text:gsub('&amp;', '&');
+					text = mz3.decode_html_entity(text);
+				end
 
 				data:set_integer64_from_string('id', id);
 				data:set_integer('owner_id', owner_id);
