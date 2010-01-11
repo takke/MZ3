@@ -127,14 +127,26 @@ BOOL CMZ3App::InitInstance()
 #endif
 */
 	// ProMode 判定
-	HINSTANCE hProDll = LoadLibrary (_T("mz3plus.dll"));
+#ifdef WINCE
+	// MZ3
+	CString strMZ3PlusDLLOrg = theApp.GetAppDirPath() + _T("\\mz3plus.dll");
+	CString strMZ3PlusDLLAlt = theApp.GetAppDirPath() + _T("\\mz3plus_.dll");
+
+	// MZ3+ => MZ3 バージョンアップ時に MZ3+ を維持するために別ファイルで保存
+	CopyFile(strMZ3PlusDLLOrg, strMZ3PlusDLLAlt, /*bFailIfExists=*/TRUE);
+
+	HINSTANCE hProDll = LoadLibrary(strMZ3PlusDLLOrg);
+	if (hProDll == NULL) {
+		hProDll = LoadLibrary (strMZ3PlusDLLAlt);
+	}
 	if (hProDll == NULL) {
 		m_bProMode = false;
 	} else {
 		m_bProMode = true;
 		FreeLibrary(hProDll);
 	}
-#ifndef WINCE
+#else
+	// MZ4
 	m_bProMode = true;
 #endif
 
