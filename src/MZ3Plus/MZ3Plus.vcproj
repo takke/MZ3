@@ -17,93 +17,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="0"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;MZ3PLUS_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
-				MinimalRebuild="true"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
-				Culture="1041"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.01"
-				OutputFile="$(OutDir)/MZ3Plus.dll"
-				LinkIncremental="2"
-				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/MZ3Plus.pdb"
-				SubSystem="0"
-				StackReserveSize="65536"
-				StackCommitSize="4096"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/MZ3Plus.lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
@@ -210,14 +123,6 @@
 			<File
 				RelativePath=".\stdafx.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 					>
