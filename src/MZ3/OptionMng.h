@@ -27,6 +27,7 @@ public:
 
 private:
 	bool			m_bDebugMode;			///< デバッグモード
+
 public:
 	bool			m_bUseDevVerCheck;		///< バージョンチェックに開発版も含める
 	bool			m_bShowBalloonOnNewTL;	///< [MZ4] バルーン表示有無
@@ -41,9 +42,10 @@ private:
 	GETPAGE_TYPE	m_GetPageType;			///< ページ取得種別
 #endif
 
+	//--- BOOT
 	bool			m_bBootCheckMnC;		///< 起動時のメッセージ確認
-	CString			m_quoteMark;			///< 引用符号
 
+	CString			m_quoteMark;			///< 引用符号
 	BOOL			m_bUseBgImage;			///< 背景に画像を表示するかどうか
 	int				m_totalRecvBytes;		///< 総データ受信量
 
@@ -55,8 +57,7 @@ public:
 	CString			m_strWindowPos;			///< ウィンドウ位置・サイズ
 #endif
 
-	bool			m_bConfirmOpenURL;			///< URLを開くときに確認する
-//	bool			m_bConvertUrlForMixiMobile;	///< mixi モバイルのURLに変換するかどうか
+	bool			m_bConfirmOpenURL;		///< URLを開くときに確認する
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）

@@ -348,6 +348,9 @@ void Option::Sync(bool bSave)
 		m_nIntervalCheckSec = normalizeIntervalCheckSec(m_nIntervalCheckSec);
 	}
 
+	// 定期取得有効・無効
+	SyncIniValue(inifile, bSave, m_bEnableIntervalCheck, "EnableIntervalCheck", "UI" );
+
 	// 前回終了時のタブのインデックス
 	SyncIniValue(inifile, bSave, m_lastTopPageTabIndex, "LastTopPageTabIndex", "UI" );
 

@@ -476,6 +476,14 @@ bool CMZ3View::DoInitialize()
 		MyUpdateControlStatus();
 	}
 
+	// 定期取得の復帰
+	if (theApp.m_optionMng.m_bEnableIntervalCheck) {
+		// タイマー開始
+		ResetIntervalTimer(RESET_INTERVAL_TIMER_RETRY_NO);
+		::KillTimer(theApp.m_pMainView->m_hWnd, TIMERID_INTERVAL_CHECK);
+		::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_INTERVAL_CHECK, 1000, NULL);
+	}
+
 	return true;
 }
 
