@@ -28,5 +28,3 @@
 
 :----- CAB/LZH ファイル名の変更/アップロード
 @call 99_release.bat
-
-pause

@@ -52,4 +52,7 @@ type %DAT_FILE% | sftp -C takeuchi@mz3.jp
 : スクリプトファイル削除
 del %DAT_FILE%
 
+
+pause
+
 :END
