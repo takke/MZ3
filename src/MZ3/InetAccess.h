@@ -8,6 +8,7 @@
 #include "wininet.h"
 #include "constants.h"
 #include "PostData.h"
+#include "kfm.h"
 
 // CInetAccess コマンド ターゲット
 
@@ -80,6 +81,7 @@ public:
 		ENCODING_NOCONVERSION = 3,
 	};
 	ENCODING			m_encodingFrom;			///< 通信取得データのエンコーディング（デフォルトは mixi HTML なので EUC-JP）
+	kfm::kf_buf_type	out_buf;
 
 	DWORD				m_dwHttpStatus;			///< HTTPステータス
 

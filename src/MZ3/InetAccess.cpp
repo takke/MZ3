@@ -13,7 +13,6 @@
 
 #include "MyRegex.h"
 #include "wininet.h"
-#include "kfm.h"
 #include "util.h"
 
 #pragma comment(lib, "wininet.lib")
@@ -1107,7 +1106,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 //		sw.start();
 
 		// ï∂éöÉRÅ[Éhïœä∑(SJISÇ…ïœä∑)
-		kfm::kf_buf_type out_buf;
+		out_buf.clear();
 
 		switch (m_encodingFrom) {
 		case ENCODING_EUC:

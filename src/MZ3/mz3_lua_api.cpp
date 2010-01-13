@@ -594,10 +594,11 @@ int lua_mz3_add_event_listener(lua_State *L)
 -- @param file_type   ファイル種別("text", "binary")
 -- @param user_agent  ユーザエージェント(nil の場合 "MZ3" or "MZ4" が自動設定される)
 -- @param post        POST 用オブジェクト(未サポート)
+-- @param blocking    GET のブロッキング型(未指定時は非ブロッキング型)
 --
 -- @return なし
 --
-function mz3.open_url(wnd, access_type, url, referer, type, user_agent, post)
+function mz3.open_url(wnd, access_type, url, referer, type, user_agent, post, blocking)
 */
 int lua_mz3_open_url(lua_State *L)
 {
@@ -609,6 +610,7 @@ int lua_mz3_open_url(lua_State *L)
 	CStringA file_type = lua_tostring(L, 5);					// 第5引数
 	const char* user_agent = lua_tostring(L, 6);				// 第6引数
 	CPostData* post = (CPostData*)lua_touserdata(L, 7);			// 第7引数
+	bool blocking = lua_toboolean(L, 8) ? true : false;			// 第8引数
 
 	HWND hwnd = NULL;
 	if (wnd != NULL) {
@@ -729,7 +731,22 @@ int lua_mz3_open_url(lua_State *L)
 	if (bPost) {
 		theApp.m_inet.DoPost(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
 	} else {
-		theApp.m_inet.DoGet(CString(url), CString(referer), type, strUser, strPassword, strUserAgent );
+		if (!blocking) {
+			theApp.m_inet.DoGet(CString(url), CString(referer), type, strUser, strPassword, strUserAgent );
+		} else {
+			theApp.m_inet.DoGetBlocking(CString(url), CString(referer), type);
+			int status = theApp.m_inet.m_dwHttpStatus;
+			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
+			CString strWcs2(pszMbcs);
+			CStringA strUtf8;
+			kfm::ucs2_to_utf8(strWcs2, strUtf8);
+
+			// 返却
+			lua_pushinteger(L, status);
+			lua_pushstring(L, strUtf8);
+			theApp.m_access = false;
+			return 2;
+		}
 	}
 
 	// 戻り値の数を返す
