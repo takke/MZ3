@@ -158,6 +158,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5A92B67FDBCB4D499B5AE87D0240FAF1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5B894F25D849448E9E7CDBC73A2C53D1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -189,6 +195,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6412E34ADCA14EA0A0E2BD7C9464997E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_67D44DA143364431896AA70155586551"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -932,6 +944,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_5A92B67FDBCB4D499B5AE87D0240FAF1"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\google_reader.lua"
+            "TargetName" = "8:google_reader.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_5B894F25D849448E9E7CDBC73A2C53D1"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\RSS.lua"
@@ -1028,6 +1058,24 @@
             "TargetName" = "8:skin.ini"
             "Tag" = "8:"
             "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_67D44DA143364431896AA70155586551"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\google_reader.luac"
+            "TargetName" = "8:google_reader.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
