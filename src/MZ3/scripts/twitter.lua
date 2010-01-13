@@ -1386,6 +1386,7 @@ function on_read_menu_item(serialize_key, event_name, data)
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
+	-- 詳細画面で表示
 	data = mz3_main_view.get_selected_body_item();
 	mz3.show_detail_view(data);
 	return true;
