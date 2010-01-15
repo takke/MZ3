@@ -23,7 +23,6 @@ mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
 mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
 
 
-
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
@@ -234,8 +233,9 @@ function my_add_new_user(new_list, status, id)
 	text = status:match('<text>([^<]*)<');
 	text = text:gsub('&amp;', '&');
 	text = mz3.decode_html_entity(text);
+
 	data:add_text_array('body', text);
-	
+
 	-- @takke などがあればバイブする
 --	if line_has_strings(text, "@" .. my_twitter_name) then
 --		mz3.set_vib_status(true);
@@ -261,7 +261,7 @@ function my_add_new_user(new_list, status, id)
 	s = s:gsub('&amp;', '&');
 	s = mz3.decode_html_entity(s);
 	data:set_text('name', s);
-	
+
 	-- author : status/user/name
 	s = user:match('<name>([^<]*)<');
 	s = s:gsub('&amp;', '&');
@@ -365,7 +365,8 @@ function twitter_friends_timeline_parser(parent, body, html)
 --		mz3.logger_debug('line:' .. i);
 		
 		if line_has_strings(line, '<status>') then
-			status = line;
+			-- status = line;
+			status, i = get_sub_html(html, i, line_count, {'<status>'}, {'</status>'});
 			
 			-- </status> まで取得する
 			-- ただし、同一IDがあればskipする
@@ -851,7 +852,7 @@ function on_set_basic_auth_account(event_name, serialize_key)
 		end
 		id       = mz3_account_provider.get_value('Twitter', 'id');
 		password = mz3_account_provider.get_value('Twitter', 'password');
-		
+
 		if id=='' or password=='' then
 			mz3.alert('ログイン設定画面でユーザIDとパスワードを設定してください');
 			return true, 1;
@@ -1058,6 +1059,7 @@ end
 
 --- 「フォローする」メニュー用ハンドラ
 function on_twitter_create_friendships(serialize_key, event_name, data)
+
 	-- 確認
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
