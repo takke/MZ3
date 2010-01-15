@@ -131,10 +131,7 @@ function auone_inbox_parser(parent, body, html, is_from_login_parser)
 --		mz3.alert('ログイン済');
 		
 		-- 複数行に分かれているので1行に結合
-		line = '';
-		for i=0, line_count-1 do
-			line = line .. html:get_at(i);
-		end
+		line = html:get_all_text();
 
 		-- ログイン済みの受信トレイのパース
 		gmail.parse_gmail_inbox(parent, body, line);

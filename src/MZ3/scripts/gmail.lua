@@ -240,10 +240,7 @@ function gmail_inbox_parser(parent, body, html)
 --		mz3.alert('ログイン済');
 		
 		-- 複数行に分かれているので1行に結合
-		line = '';
-		for i=0, line_count-1 do
-			line = line .. html:get_at(i);
-		end
+		line = html:get_all_text();
 
 		-- ログイン済みのHTMLのパース
 		parse_gmail_inbox(parent, body, line);
@@ -490,7 +487,7 @@ function gmail_login_parser(parent, body, html)
 	url = url:gsub('&amp;', '&');
 --	mz3.alert('url : ' .. url);
 	if url == '' then
-		mz3.alert('ログインに失敗しました。\r\nメールアドレスとパスワードを確認してください。');
+		mz3.alert('ログインに失敗しました。 \r\nメールアドレスとパスワードを確認してください。');
 		return;
 	end
 	
@@ -536,10 +533,7 @@ function gmail_mail_parser(data, dummy, html)
 	local line_count = html:get_count();
 	
 	-- 複数行に分かれているので1行に結合
-	line = '';
-	for i=0, line_count-1 do
-		line = line .. html:get_at(i);
-	end
+	line = html:get_all_text();
 	
 	-- base url の解析
 	-- <base href="https://mail.google.com/mail/h/xxx/">

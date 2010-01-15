@@ -522,8 +522,8 @@ function twitter_lists_parser(parent, body, html)
 
 	-- リストがなければメッセージを表示
 	if body:get_count()==0 then
-		mz3.alert("リストがありませんでした。\r\n\r\n"
-			   .. "Twitter のWeb版からリストを作成してください。\r\n"
+		mz3.alert("リストがありませんでした。 \r\n\r\n"
+			   .. "Twitter のWeb版からリストを作成してください。 \r\n"
 			   .. "MZ3/4ではTwitter側の制限のため、「フォローしているリスト」を取得できません。");
 
 --[[
