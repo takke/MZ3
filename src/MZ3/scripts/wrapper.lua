@@ -119,6 +119,7 @@ end
 
 function MZ3HTMLArray:get_count(index)	return mz3_htmlarray.get_count(self.htmlarray);		end
 function MZ3HTMLArray:get_at(index)		return mz3_htmlarray.get_at(self.htmlarray, index);	end
+function MZ3HTMLArray:get_all_text()	return mz3_htmlarray.get_all_text(self.htmlarray);	end
 
 
 --------------------------------------------------

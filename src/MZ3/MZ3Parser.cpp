@@ -352,6 +352,16 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 					} else if (tagName == L"in_reply_to_status_id" && MyGetMatchString(line, L">", L"<", s)) {
 						// in_reply_to_status_id : status/in_reply_to_status_id
 						data.SetIntValue(L"in_reply_to_status_id", _wtol(s));
+					} else if (tagName == L"retweeted_status") {
+						// </retweeted_status> ‚Ü‚Å“Ç‚Ý”ò‚Î‚·(RT‘Î‰ž)
+						i++;
+						while (i<count) {
+							const CString& line = html_.GetAt(i);
+							if (line.Find(L"</retweeted_status>") != -1) {
+								break;
+							}
+							i++;
+						}
 					}
 
 				} else {

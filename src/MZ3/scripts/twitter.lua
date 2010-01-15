@@ -365,9 +365,8 @@ function twitter_friends_timeline_parser(parent, body, html)
 --		mz3.logger_debug('line:' .. i);
 		
 		if line_has_strings(line, '<status>') then
-			-- status = line;
-			status, i = get_sub_html(html, i, line_count, {'<status>'}, {'</status>'});
-			
+			status = line;
+
 			-- </status> まで取得する
 			-- ただし、同一IDがあればskipする
 			i = i+1;
@@ -402,6 +401,19 @@ function twitter_friends_timeline_parser(parent, body, html)
 					my_add_new_user(new_list, status, id);
 					break;
 				end
+
+				-- <retweeted_status> があれば </retweeted_status> までを読み飛ばす
+				if i_in_status > 8 and line_has_strings(line, '<retweeted_status>') then
+					i = i+1;
+					while i<line_count do
+						line = html:get_at(i);
+						if line_has_strings(line, '</retweeted_status>') then
+							break;
+						end
+						i = i+1;
+					end
+				end
+
 				i = i+1;
 				i_in_status = i_in_status+1;
 			end

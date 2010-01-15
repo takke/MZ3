@@ -2333,6 +2333,36 @@ int lua_mz3_htmlarray_get_at(lua_State *L)
 	return 1;
 }
 
+/*
+--- 全て結合した文字列を返す
+--
+--
+function mz3_htmlarray.get_all_text(htmlarray, index)
+*/
+int lua_mz3_htmlarray_get_all_text(lua_State *L)
+{
+	const char* func_name = "mz3_htmlarray.get_all_text";
+
+	// 引数取得
+	CHtmlArray* htmlarray = (CHtmlArray*)lua_touserdata(L, 1);	// 第1引数
+	if (htmlarray==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 結果をスタックに積む
+	CString s;
+	u_int count = htmlarray->GetCount();
+	for (u_int i=0; i<count; i++) {
+		s += htmlarray->GetAt(i);
+	}
+	lua_pushstring(L, MyWCS2UTF8(s));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 //-----------------------------------------------
 // MZ3 Menu API
 //-----------------------------------------------
@@ -3949,6 +3979,7 @@ static const luaL_Reg lua_mz3_data_list_lib[] = {
 static const luaL_Reg lua_mz3_htmlarray_lib[] = {
 	{"get_count",		lua_mz3_htmlarray_get_count},
 	{"get_at",			lua_mz3_htmlarray_get_at},
+	{"get_all_text",	lua_mz3_htmlarray_get_all_text},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_menu_lib[] = {

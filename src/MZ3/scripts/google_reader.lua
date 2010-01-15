@@ -182,10 +182,7 @@ function google_reader_tag_list_parser(parent, body, html)
 --		mz3.alert('ログイン済');
 		
 		-- 複数行に分かれているので1行に結合
-		line = '';
-		for i=0, line_count-1 do
-			line = line .. html:get_at(i);
-		end
+		line = html:get_all_text();
 
 		-- ログイン済みのHTMLのパース
 		parse_tag_list(parent, body, line);
@@ -354,11 +351,7 @@ function google_reader_atom_list_parser(parent, body, html)
 	local t1 = mz3.get_tick_count();
 	
 	-- 複数行に分かれているので1行に結合
-	line = '';
-	local line_count = html:get_count();
-	for i=0, line_count-1 do
-		line = line .. html:get_at(i);
-	end
+	local line = html:get_all_text();
 	
 	-- data 生成
 	data = MZ3Data:create();
@@ -370,30 +363,29 @@ function google_reader_atom_list_parser(parent, body, html)
 
 		-- id
 		-- <id gr:original-id="http://rss.rssad.jp/rss/ad/xxx/xxx?type=2&ent=xxx">tag:google.com,2005:reader/item/xxx</id>
-		id = entry_tag:match('<id .->(.-)</');
-		updated = entry_tag:match('<updated>(.-)</');
-		title = entry_tag:match('<title.->(.-)</');
+		local id = entry_tag:match('<id .->(.-)</');
+		local updated = entry_tag:match('<updated>(.-)</');
+		local title = entry_tag:match('<title.->(.-)</');
 		title = title:gsub('&amp;', '&');
 		title = mz3.decode_html_entity(title);
-		author = '';
-		source = entry_tag:match('<source.->(.-)</source>');
+		local author = '';
+		local source = entry_tag:match('<source.->(.-)</source>');
 		if source ~= nil then
 			author = source:match('<title.->(.-)</');
 			author = author:gsub('&amp;', '&');
-			-- TODO O&#39;Reilly 対応
 			author = mz3.decode_html_entity(author);
 			-- TODO alternate 抽出＋メニュー追加
 		end
 
 		-- URL : <link rel="alternate" href="..."> を対象とする。
 		-- いわゆる代替URLなのでWebページとなる。
-		url = entry_tag:match('<link rel="alternate" href="(.-)"');
+		local url = entry_tag:match('<link rel="alternate" href="(.-)"');
 		if url ~= nil then
 			url = url:gsub('&amp;', '&');
 			-- TODO decode_html_entity 必要？
 		end
 		
-		summary = entry_tag:match('<summary.->(.-)</summary>');
+		local summary = entry_tag:match('<summary.->(.-)</summary>');
 		if summary ~= nil then
 			summary = summary:gsub('&amp;', '&');
 			summary = mz3.decode_html_entity(summary);
