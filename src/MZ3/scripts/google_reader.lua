@@ -337,6 +337,7 @@ mz3.set_parser("GOOGLE_READER_LOGIN", "greader.google_reader_login_parser");
 --   body:   下ペインのオブジェクト群(MZ3DataList*)
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
+reset_body_list_pos = 0;	-- 取得後のボディリストの選択位置
 function google_reader_atom_list_parser(parent, body, html)
 	mz3.logger_debug("google_reader_atom_list_parser start");
 	
@@ -345,8 +346,27 @@ function google_reader_atom_list_parser(parent, body, html)
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 
-	-- 全消去
-	body:clear();
+	-- リクエストのURLが「次へ」であればクリアしない
+	local last_url = mz3.get_last_request_url();
+	local insert_at = 0;
+	local next_link_pos = 0;
+	reset_body_list_pos = 0;
+	if line_has_strings(last_url, 'c=') then
+		-- 「次へ」のリクエストなので既存の「次へ」を削除する
+		local n = body:get_count();
+		for i=0, n-1 do
+			d = MZ3Data:create(body:get_data(i));
+			if d:get_serialize_key() == 'GOOGLE_READER_ATOM_LIST' then
+				insert_at = i;
+				next_link_pos = i;
+				reset_body_list_pos = i;
+				break;
+			end
+		end
+	else
+		-- 全消去
+		body:clear();
+	end
 	
 	local t1 = mz3.get_tick_count();
 	
@@ -374,7 +394,10 @@ function google_reader_atom_list_parser(parent, body, html)
 			author = source:match('<title.->(.-)</');
 			author = author:gsub('&amp;', '&');
 			author = mz3.decode_html_entity(author);
-			-- TODO alternate 抽出＋メニュー追加
+			-- alternate 抽出＋メニュー追加
+			-- <link rel="alternate" href="http://journal.mycom.co.jp" type="text/html"/>
+			link_url = source:match('<link .-href="(.-)"');
+			data:add_link_list(link_url, link_url);
 		end
 
 		-- URL : <link rel="alternate" href="..."> を対象とする。
@@ -403,7 +426,39 @@ function google_reader_atom_list_parser(parent, body, html)
 		data:set_access_type(mz3.get_access_type_by_key('GOOGLE_READER_ATOM_ITEM'));
 
 		-- data 追加
-		body:add(data.data);
+		body:insert(insert_at, data.data);
+		insert_at = insert_at + 1;
+	end
+	
+	-- <gr:continuation>CPPz-oaxoZ8C</gr:continuation>
+	continuation = line:match('<gr:continuation>(.-)</gr:continuation>');
+	if continuation ~= nil then
+		-- continuation 追加
+		
+		-- URL はカテゴリから取得＆連結
+		local category = MZ3Data:create(mz3_main_view.get_selected_category_item());
+		local category_url = category:get_text('url');
+		local url = category_url;
+		if url:find("?", 1, false)~=nil then
+			-- ? を含む
+			url = url .. '&c=' .. continuation;
+		else
+			-- ? を含まない
+			url = url .. '?c=' .. continuation;
+		end
+		
+		-- 既にあれば書き換える
+		if next_link_pos == 0 then
+			data:set_text("name", '次のページ');
+			data:set_text("title", '');
+			data:set_text("url", url);
+			data:parse_date_line('');
+			data:set_access_type(mz3.get_access_type_by_key('GOOGLE_READER_ATOM_LIST'));
+			body:add(data.data);
+		else
+			d = MZ3Data:create(body:get_data(next_link_pos));
+			d:set_text('url', url);
+		end
 	end
 	
 	-- data 削除
@@ -418,6 +473,20 @@ mz3.set_parser("GOOGLE_READER_ATOM_LIST", "greader.google_reader_atom_list_parse
 ----------------------------------------
 -- イベントハンドラ
 ----------------------------------------
+
+function on_after_get_end(event_name, serialize_key, body)
+	if serialize_key == 'GOOGLE_READER_ATOM_LIST' then
+		if reset_body_list_pos ~= 0 then
+			-- カーソル位置の復帰
+			mz3_main_view.select_body_item(reset_body_list_pos);
+		end
+		return true;
+	end
+	
+	return false;
+end
+mz3.add_event_listener('after_get_end', 'greader.on_after_get_end');
+
 
 --- ボディリストのアイコンのインデックス取得
 --
@@ -522,12 +591,14 @@ function on_show_folder(serialize_key, event_name, data)
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	name = body:get_text('name');
-	
-	-- カテゴリ追加
-	title = "+" .. name;
 	url = body:get_text('url');
 	key = "GOOGLE_READER_ATOM_LIST";
-	mz3_main_view.append_category(title, url, key);
+	
+	if line_has_strings(url, 'c=') == false then
+		-- カテゴリ追加
+		title = "+" .. name;
+		mz3_main_view.append_category(title, url, key);
+	end
 	
 	-- 追加したカテゴリの取得開始
 	access_type = mz3.get_access_type_by_key(key);
@@ -685,6 +756,16 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
 		menu:append_menu("separator");
 		menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+
+		-- リンク追加
+		n = body:get_link_list_size();
+		if n > 0 then
+			menu:append_menu("separator");
+			for i=0, n-1 do
+				id = ID_REPORT_URL_BASE+(i+1);
+				menu:append_menu("string", "link : " .. body:get_link_list_text(i), id);
+			end
+		end
 
 		-- ポップアップ
 		menu:popup(wnd);
