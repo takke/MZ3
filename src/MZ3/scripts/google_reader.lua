@@ -786,7 +786,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- インスタンス化
 	body = MZ3Data:create(body);
 	serialize_key = body:get_serialize_key();
-	mz3.logger_debug('on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
+	mz3.logger_debug('greader.on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	if serialize_key=="GOOGLE_READER_ATOM_LIST" then
 		
@@ -996,7 +996,7 @@ mz3.add_event_listener("draw_detail_view",  "greader.on_draw_detail_view");
 
 --- 詳細画面のキー押下イベント
 function on_keydown_detail_view(event_name, serialize_key, data, key)
-	mz3.logger_debug('on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
+	mz3.logger_debug('greader.on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
 
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type~='GoogleReader' then
@@ -1046,7 +1046,8 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 	
 	if key == VK_F2 then
 		-- ボディリストのメニューを表示
-		on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
+		mz3.logger_debug('VK_F2');
+		greader.on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 		return true;
 	end
 	
@@ -1125,9 +1126,7 @@ mz3.add_event_listener("mousewheel_detail_view", "greader.on_mousewheel_detail_v
 function on_popup_detail_menu(event_name, serialize_key, data, wnd)
 
 	-- ボディリストのメニューを表示
-	on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
-	
-	return true;
+	return greader.on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 end
 mz3.add_event_listener("popup_detail_menu", "greader.on_popup_detail_menu");
 

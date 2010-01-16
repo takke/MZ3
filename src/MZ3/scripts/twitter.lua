@@ -1854,7 +1854,7 @@ mz3.add_event_listener("get_end",  "twitter.on_get_end");
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
-	mz3.logger_debug('on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
+	mz3.logger_debug('twitter.on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	if serialize_key~="TWITTER_USER" then
 		return false;
@@ -2492,7 +2492,7 @@ mz3.add_event_listener("draw_detail_view",  "twitter.on_draw_detail_view");
 
 --- 詳細画面のキー押下イベント
 function on_keydown_detail_view(event_name, serialize_key, data, key)
-	mz3.logger_debug('on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
+	mz3.logger_debug('twitter.on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
 
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type~='Twitter' then
@@ -2653,9 +2653,7 @@ mz3.add_event_listener("mousewheel_detail_view", "twitter.on_mousewheel_detail_v
 function on_popup_detail_menu(event_name, serialize_key, data, wnd)
 
 	-- ボディリストのメニューを表示
-	on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
-	
-	return true;
+	return on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 end
 mz3.add_event_listener("popup_detail_menu", "twitter.on_popup_detail_menu");
 
