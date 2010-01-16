@@ -94,10 +94,11 @@
 
 // Win32 用依存ファイル
 #ifndef WINCE
-#include <math.h>
-#include <shlobj.h>
+# include <math.h>
+# include <shlobj.h>
 // GDI+
-#include <atlimage.h>
+# include <atlimage.h>
+# include <gdiplus.h>
 #endif
 
 // MD5
@@ -109,3 +110,17 @@ extern "C" {
 #include "../../src_lib/lua/src/lualib.h"
 #include "../../src_lib/lua/src/lauxlib.h"
 }
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <functional>
+#include <hash_map>
+#include <map>
+#include <hash_set>
+#include <stdio.h>
+#include <time.h>
+#include <sstream>
+#include <list>

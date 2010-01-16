@@ -10,7 +10,6 @@
 #include "MZ3.h"
 #include "LoginMng.h"
 #include "bf.h"
-#include "Winsock2.h"
 #include "util.h"
 
 /// オプションデータ
