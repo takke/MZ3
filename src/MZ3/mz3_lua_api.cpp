@@ -754,6 +754,19 @@ int lua_mz3_open_url(lua_State *L)
 }
 
 /*
+--- 前回のリクエストのURL取得
+--
+function mz3.get_last_request_url()
+*/
+int lua_mz3_get_last_request_url(lua_State *L)
+{
+	lua_pushstring(L, MyWCS2UTF8(theApp.m_inet.GetURL()));
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- キーボード操作
 --
 -- @param key   キー値
@@ -1184,6 +1197,42 @@ int lua_mz3_account_provider_get_value(lua_State *L)
 	} else if (param_name=="password") {
 		CStringA v = MyWCS2UTF8( theApp.m_loginMng.GetPassword(CString(service_name)) );
 		lua_pushstring(L, v);
+	} else {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
+--- アカウント情報の設定
+--
+-- @param service_name サービス名
+-- @param param_name   パラメータ名('id', 'password')
+-- @param param_value  パラメータ値
+--
+function mz3_account_provider.set_value(service_name, param_name, param_value)
+*/
+int lua_mz3_account_provider_set_value(lua_State *L)
+{
+	const char* func_name = "mz3_account_provider.set_value";
+
+	// 引数の取得
+	CString service_name = MyUTF82WCS2(lua_tostring(L, 1));
+	CStringA param_name   = lua_tostring(L, 2);
+	CString param_value  = MyUTF82WCS2(lua_tostring(L, 3));
+
+	if (param_name=="id") {
+		theApp.m_loginMng.SetId(service_name, param_value);
+		theApp.m_loginMng.Write();
+		lua_pushboolean(L, 1);
+	} else if (param_name=="password") {
+		theApp.m_loginMng.SetPassword(service_name, param_value);
+		theApp.m_loginMng.Write();
+		lua_pushboolean(L, 1);
 	} else {
 		lua_pushstring(L, make_invalid_arg_error_string(func_name));
 		lua_error(L);
@@ -3919,6 +3968,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"set_parser",							lua_mz3_set_parser},
 	{"add_event_listener",					lua_mz3_add_event_listener},
 	{"open_url",							lua_mz3_open_url},
+	{"get_last_request_url",				lua_mz3_get_last_request_url},
 	{"keybd_event",							lua_mz3_keybd_event},
 	{"open_url_by_browser_with_confirm",	lua_mz3_open_url_by_browser_with_confirm},
 	{"open_url_by_browser",					lua_mz3_open_url_by_browser},
@@ -4068,6 +4118,7 @@ static const luaL_Reg lua_mz3_post_data_lib[] = {
 static const luaL_Reg lua_mz3_account_provider_lib[] = {
 	{"set_param",				lua_mz3_account_provider_set_param},
 	{"get_value",				lua_mz3_account_provider_get_value},
+	{"set_value",				lua_mz3_account_provider_set_value},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_image_cache_lib[] = {
