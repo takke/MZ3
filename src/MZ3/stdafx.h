@@ -124,3 +124,5 @@ extern "C" {
 #include <time.h>
 #include <sstream>
 #include <list>
+
+#include "MZ3.h"
