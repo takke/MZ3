@@ -16,9 +16,29 @@ module("gmail", package.seeall)
 --------------------------------------------------
 mz3.regist_service('gmail', true);
 
+
+-- 旧アカウントの移行
+--
+-- v1.2.x まで： 'GMail'
+-- v1.3.x 以降： 'Google'
+--
+-- 'GMail' のものがあり、'Google' のものがなければ、'Google' に移行する
+--
+local GMail_id = mz3_account_provider.get_value('GMail', 'id');
+local GMail_pw = mz3_account_provider.get_value('GMail', 'password');
+local Google_id = mz3_account_provider.get_value('Google', 'id');
+local Google_pw = mz3_account_provider.get_value('Google', 'password');
+if GMail_id ~= '' and Google_id == '' and
+   GMail_pw ~= '' and Google_pw == '' then
+	mz3_account_provider.set_value('Google', 'id', GMail_id);
+	mz3_account_provider.set_value('Google', 'password', GMail_pw);
+	mz3.logger_info('GMail の ID/PW を Google に移行しました');
+end
+
+
 -- ログイン設定画面のプルダウン名、表示名の設定
-mz3_account_provider.set_param('GMail', 'id_name', 'メールアドレス');
-mz3_account_provider.set_param('GMail', 'password_name', 'パスワード');
+mz3_account_provider.set_param('Google', 'id_name', 'メールアドレス');
+mz3_account_provider.set_param('Google', 'password_name', 'パスワード');
 
 
 ----------------------------------------
@@ -247,8 +267,8 @@ function gmail_inbox_parser(parent, body, html)
 	else
 		-- ログイン処理
 
-		mail_address  = mz3_account_provider.get_value('GMail', 'id');
-		mail_password = mz3_account_provider.get_value('GMail', 'password');
+		mail_address  = mz3_account_provider.get_value('Google', 'id');
+		mail_password = mz3_account_provider.get_value('Google', 'password');
 		
 		if (mail_address == "" or mail_password == "") then
 			mz3.alert("メールアドレスとパスワードをログイン設定画面で設定して下さい");

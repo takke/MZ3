@@ -17,9 +17,11 @@ module("greader", package.seeall)
 mz3.regist_service('GoogleReader', true);
 
 -- ログイン設定画面のプルダウン名、表示名の設定
--- TODO とりあえず GMail を使う
---mz3_account_provider.set_param('GMail', 'id_name', 'メールアドレス');
---mz3_account_provider.set_param('GMail', 'password_name', 'パスワード');
+-- 'Google' を利用する。
+-- Gmail プラグインと同様だが、Gmail プラグインがない場合を考慮し、
+-- ここで設定する。
+mz3_account_provider.set_param('Google', 'id_name', 'メールアドレス');
+mz3_account_provider.set_param('Google', 'password_name', 'パスワード');
 
 
 ----------------------------------------
@@ -90,7 +92,16 @@ type = MZ3AccessTypeInfo:create();
 type:set_info_type('post');										-- カテゴリ
 type:set_service_type('GoogleReader');							-- サービス種別
 type:set_serialize_key('GOOGLE_READER_ADD_STAR');				-- シリアライズキー
-type:set_short_title('GoogleReader スター');							-- 簡易タイトル
+type:set_short_title('GoogleReader スター');					-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');								-- エンコーディング
+
+-- 既読
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('post');										-- カテゴリ
+type:set_service_type('GoogleReader');							-- サービス種別
+type:set_serialize_key('GOOGLE_READER_SET_READ');				-- シリアライズキー
+type:set_short_title('GoogleReader 既読');						-- 簡易タイトル
 type:set_request_method('POST');								-- リクエストメソッド
 type:set_request_encoding('utf8');								-- エンコーディング
 
@@ -105,7 +116,7 @@ menu_items.read               = mz3_menu.regist_menu("greader.on_read_menu_item"
 menu_items.open_by_browser    = mz3_menu.regist_menu("greader.on_open_by_browser_menu_item");
 menu_items.add_star           = mz3_menu.regist_menu("greader.on_add_star_menu_item");
 menu_items.show_main_view     = mz3_menu.regist_menu("greader.on_show_main_view");
-
+menu_items.set_read_to_feed   = mz3_menu.regist_menu("greader.on_set_read_to_feed");
 
 ----------------------------------------
 -- メニューへの登録
@@ -190,9 +201,8 @@ function google_reader_tag_list_parser(parent, body, html)
 	else
 		-- ログイン処理
 
-		-- TODO とりあえず Gmail と同じもの
-		mail_address  = mz3_account_provider.get_value('GMail', 'id');
-		mail_password = mz3_account_provider.get_value('GMail', 'password');
+		mail_address  = mz3_account_provider.get_value('Google', 'id');
+		mail_password = mz3_account_provider.get_value('Google', 'password');
 		
 		if (mail_address == "" or mail_password == "") then
 			mz3.alert("メールアドレスとパスワードをログイン設定画面で設定して下さい");
@@ -430,6 +440,9 @@ function google_reader_atom_list_parser(parent, body, html)
 		insert_at = insert_at + 1;
 	end
 	
+	-- data 削除
+	data:delete();
+	
 	-- <gr:continuation>CPPz-oaxoZ8C</gr:continuation>
 	continuation = line:match('<gr:continuation>(.-)</gr:continuation>');
 	if continuation ~= nil then
@@ -449,20 +462,23 @@ function google_reader_atom_list_parser(parent, body, html)
 		
 		-- 既にあれば書き換える
 		if next_link_pos == 0 then
+			-- data 生成
+			data = MZ3Data:create();
+			
 			data:set_text("name", '次のページ');
 			data:set_text("title", '');
 			data:set_text("url", url);
 			data:parse_date_line('');
 			data:set_access_type(mz3.get_access_type_by_key('GOOGLE_READER_ATOM_LIST'));
 			body:add(data.data);
+
+			-- data 削除
+			data:delete();
 		else
 			d = MZ3Data:create(body:get_data(next_link_pos));
 			d:set_text('url', url);
 		end
 	end
-	
-	-- data 削除
-	data:delete();
 
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("google_reader_atom_list_parser end; elapsed : " .. (t2-t1) .. "[msec]");
@@ -609,11 +625,8 @@ function on_show_folder(serialize_key, event_name, data)
 end
 
 
---- スターを付ける
-function on_add_star_menu_item(serialize_key, event_name, data)
-	mz3.logger_debug('on_add_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
-
-	-- token 取得
+--- token 取得
+function get_google_reader_token()
 	url = 'http://www.google.com/reader/api/0/token';
 	referer = '';
 	user_agent = nil;
@@ -625,9 +638,23 @@ function on_add_star_menu_item(serialize_key, event_name, data)
 	
 	if status ~= 200 then
 		mz3.alert('トークンの取得に失敗しました。');
-		return true;
+		return nil;
 	end
 	
+	return token;
+end
+
+
+--- スターを付ける
+function on_add_star_menu_item(serialize_key, event_name, data)
+	mz3.logger_debug('on_add_star_menu_item: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	-- token 取得
+	token = get_google_reader_token();
+	if token == nil then
+		return true;
+	end
+
 	-- POST
 	data = MZ3Data:create(data);
 
@@ -639,11 +666,42 @@ function on_add_star_menu_item(serialize_key, event_name, data)
 	post:append_post_body('&a=' .. mz3.url_encode('user/-/state/com.google/starred', 'utf8'));
 	post:append_post_body('&ac=edit');
 	post:append_post_body('&T=' .. token);
---	mz3.alert(data:get_text('id'));
 
 	-- 通信開始
 	url = 'http://www.google.co.jp/reader/api/0/edit-tag?client=MZ3';
 	access_type = mz3.get_access_type_by_key("GOOGLE_READER_ADD_STAR");
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+	return true;
+end
+
+
+--- 記事の既読
+function on_set_read_to_feed(serialize_key, event_name, data)
+	mz3.logger_debug('on_set_read_to_feed: (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	-- token 取得
+	token = get_google_reader_token();
+	if token == nil then
+		return true;
+	end
+
+	-- POST
+	data = MZ3Data:create(data);
+
+	-- POSTパラメータ生成
+	post = MZ3PostData:create();
+
+	-- iパラメータはデータから取得する
+	post:append_post_body('i=' .. mz3.url_encode(data:get_text('id'), 'utf8'));
+	post:append_post_body('&a=' .. mz3.url_encode('user/-/state/com.google/read', 'utf8'));
+	post:append_post_body('&ac=edit');
+	post:append_post_body('&T=' .. token);
+
+	-- 通信開始
+	url = 'http://www.google.co.jp/reader/api/0/edit-tag?client=MZ3';
+	access_type = mz3.get_access_type_by_key("GOOGLE_READER_SET_READ");
 	referer = '';
 	user_agent = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
@@ -678,6 +736,9 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	-- リクエストの種別に応じてメッセージを表示
 	if serialize_key == "GOOGLE_READER_ADD_STAR" then
 		mz3_main_view.set_info_text("スターつけた！");
+	end
+	if serialize_key == "GOOGLE_READER_SET_READ" then
+		mz3_main_view.set_info_text("既読にした！");
 	end
 
 	return true;
@@ -755,7 +816,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 		menu:append_menu("string", "ブラウザで開く...", menu_items.open_by_browser);
 		menu:append_menu("separator");
-		menu:append_menu("string", "スターを付ける...", menu_items.add_star);
+		menu:append_menu("string", "スターを付ける", menu_items.add_star);
+--		menu:append_menu("string", "この記事を既読にする", menu_items.set_read_to_feed);
 
 		-- リンク追加
 		n = body:get_link_list_size();
