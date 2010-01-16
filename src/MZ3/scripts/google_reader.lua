@@ -783,10 +783,12 @@ end
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
+	-- インスタンス化
+	body = MZ3Data:create(body);
+	serialize_key = body:get_serialize_key();
+	mz3.logger_debug('on_popup_body_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
 
 	if serialize_key=="GOOGLE_READER_ATOM_LIST" then
-		-- インスタンス化
-		body = MZ3Data:create(body);
 		
 		-- メニュー生成
 		menu = MZ3Menu:create_popup_menu();
@@ -802,8 +804,6 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		return true;
 	end
 	if serialize_key=="GOOGLE_READER_ATOM_ITEM" then
-		-- インスタンス化
-		body = MZ3Data:create(body);
 		
 		-- メニュー生成
 		menu = MZ3Menu:create_popup_menu();
