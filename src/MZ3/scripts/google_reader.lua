@@ -426,6 +426,14 @@ function google_reader_atom_list_parser(parent, body, html)
 			summary = '';
 		end
 		
+		-- URL を抽出し、リンクにする
+		if line_has_strings(summary, 'ttp') then
+			for url in summary:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+				data:add_link_list(url, url);
+--				mz3.logger_debug('抽出URL: ' .. url);
+			end
+		end
+
 		-- set
 		data:set_text("id", id);		-- 通常のアイテムと違い、ID が文字列である点に注意
 		data:set_text("name", author);
@@ -892,8 +900,8 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	x = x +x_margin;
 	y = y_margin;
 	w = cx - x - x_margin;
-	h = line_height;
-	format = DT_LEFT;
+	h = line_height * 3.2;
+	format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
 	
 	color_text_org = g:set_color("text", "MainBodyListNonreadText");
 	color_bk_org = g:set_color("bk", "MainStatusBG");
@@ -910,7 +918,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	-- 日付
 	g:set_color("text", "MainBodyListDefaultText");
 	text = data:get_date();
-	y = y + line_height *1.2;
+	y = y + h;
 	format = DT_RIGHT;
 	g:set_font_size(0);		-- 中サイズフォント
 	line_height = g:get_line_height();
@@ -929,14 +937,14 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	line_height = g:get_line_height();
 	g:set_color("text", "MainBodyListNonreadText");
 	text = data:get_text_array_joined_text('body');
---	text = text:gsub("\r\n", "");
+	-- 画像、タグ除去
 	text = text:gsub('<img .->', '[画像]');
 	text = text:gsub('<br.-/?>', '\r\n');
 	text = text:gsub("<.->", "");
 	y = y_source_bottom;
 	-- 高さは画面の高さからN行引いた程度
 --	h = cy * 2 / 3;
-	h = cy - line_height * 6;
+	h = cy - line_height * 8;
 	x = x_margin;
 	w = cx - x - x_margin;
 	
