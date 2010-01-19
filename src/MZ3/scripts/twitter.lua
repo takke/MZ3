@@ -190,10 +190,12 @@ menu_items.open_friend_site      = mz3_menu.regist_menu("twitter.on_open_friend_
 menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
 menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
 menu_items.search_hash           = mz3_menu.regist_menu("twitter.on_search_hash_list");
+menu_items.twitter_search        = mz3_menu.regist_menu("twitter.on_twitter_search");
 menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
 menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
 menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
 menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
+menu_items.search_favotter       = mz3_menu.regist_menu("twitter.on_search_search_favotter");
 
 -- 発言内のハッシュタグ #xxx 抽出リスト
 menu_items.search_hash_list = {}
@@ -1977,13 +1979,16 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
 	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
 	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
-	menu:append_submenu("その他", submenu);
+	submenu:append_menu("string", "@" .. name .. " のふぁぼられ", menu_items.search_favotter);
 
 	-- URL が空でなければ「サイト」を追加
 	url = body:get_text('url');
 	if url~=nil and url:len()>0 then
 		submenu:append_menu("string", "@" .. name .. " のサイトをブラウザで開く", menu_items.open_friend_site);
 	end
+
+	submenu:append_menu("string", "Twitter検索...", menu_items.twitter_search);
+	menu:append_submenu("その他", submenu);
 
 	-- リンク追加
 	n = body:get_link_list_size();
@@ -2113,6 +2118,32 @@ function on_search_post(serialize_key, event_name, data)
 end
 
 
+--- Twitter 検索
+function on_twitter_search(serialize_key, event_name, data)
+
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	local key = mz3.show_common_edit_dlg("Twitter検索", "検索したい文字列を入力して下さい");
+	if key == nil then
+		return false;
+	end
+
+	-- カテゴリ追加
+	title = key .. " - Twitter Search";
+	url = "http://search.twitter.com/search.rss?q=" .. mz3.url_encode(key, 'utf8');
+	key = "RSS_FEED";
+	mz3_main_view.append_category(title, url, key);
+	
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
 --- ステータス削除メニュー用ハンドラ
 function on_twitter_update_destroy(serialize_key, event_name, data)
 
@@ -2220,6 +2251,29 @@ function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+--- ふぁぼられメニュー用ハンドラ
+function on_search_search_favotter(serialize_key, event_name, data)
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+	title = "@" .. name .. "のふぁぼられ";
+	
+	key = "RSS_FEED";
+
+	-- URL 生成
+	url = "http://favotter.matope.com/userrss.php?user=" .. name .. "&mode=new.feed";
+
+	mz3_main_view.append_category(title, url, key);
+
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+
 end
 
 
