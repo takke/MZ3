@@ -20,6 +20,7 @@
 
 :----- Win32, lzh ファイルの生成 -----
 @call 50_archive_win32.bat
+@call 51_archive_tktweets_win32.bat
 
 :----- luadoc ファイルの生成 -----
 @call 60_make_mz3_luadoc.bat

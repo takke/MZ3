@@ -9,21 +9,21 @@
 
 :----- ファイルのコピー -----
 @echo ■ ファイルを収集します
-copy ..\src\MZ3\Release_Win32\MZ4.exe MZ3_win32\
-copy ..\src\MZ3\Release_Win32_c\MZ4.exe MZ3_win32\MZ4_c.exe
+copy ..\src\MZ3\Release_Win32\MZ4.exe    MZ3_win32\
+copy ..\src\MZ3\Release_Win32_c\MZ4.exe  MZ3_win32\MZ4_c.exe
 copy ..\src\JRegexDLL\Release\jregex.dll MZ3_win32\
-:copy ..\src\lua\Release\lua.dll MZ3_win32\
+:copy ..\src\lua\Release\lua.dll          MZ3_win32\
 del /Q MZ3_win32\scripts\*
-copy ..\src\MZ3\scripts\* MZ3_win32\scripts\
+copy ..\src\MZ3\scripts\*                MZ3_win32\scripts\
 del /Q MZ3_win32\scripts\mixi\*
-copy ..\src\MZ3\scripts\mixi\* MZ3_win32\scripts\mixi
+copy ..\src\MZ3\scripts\mixi\*           MZ3_win32\scripts\mixi
 del /Q MZ3_win32\scripts\goohome\*
-copy ..\src\MZ3\scripts\goohome\* MZ3_win32\scripts\goohome
+copy ..\src\MZ3\scripts\goohome\*        MZ3_win32\scripts\goohome
 del /Q MZ3_win32\user_scripts\*
-copy ..\src\MZ3\user_scripts\* MZ3_win32\user_scripts\
-copy ..\doc\Readme.txt MZ3_win32\
-copy ..\ChangeLog.txt MZ3_win32\
-copy toppage_group_sample.ini MZ3_win32\
+copy ..\src\MZ3\user_scripts\*           MZ3_win32\user_scripts\
+copy ..\doc\Readme.txt                   MZ3_win32\
+copy ..\ChangeLog.txt                    MZ3_win32\
+copy toppage_group_sample.ini            MZ3_win32\
 
 :----- ファイルの圧縮 -----
 @set archive=MZ3_win32.lzh
