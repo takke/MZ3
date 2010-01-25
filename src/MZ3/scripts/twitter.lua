@@ -754,7 +754,7 @@ function twitter_followers_parser(parent, body, html)
 				local followers_count = user:match('<followers_count>(.-)</followers_count>');
 				local friends_count   = user:match('<friends_count>(.-)</friends_count>');
 
-				status, i = get_sub_html(html, i, line_count, {'<status>'}, {'</status>'});
+				status, j = get_sub_html(html, i, line_count, {'<status>'}, {'</status>'});
 				local id         = status:match('<id>(.-)</id>');
 				local created_at = user:match('<created_at>(.-)</created_at>');
 				local text       = user:match('<text>(.-)</text>');
