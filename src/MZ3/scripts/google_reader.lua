@@ -171,14 +171,27 @@ function google_reader_tag_list_parser(parent, body, html)
 
 	-- 全消去
 	body:clear();
-	
+
 	local t1 = mz3.get_tick_count();
-	
+
+	-- サービス利用判定
+	is_use_check = false;
+	error_word = "401 Client Error";
+
 	-- ログイン判定
 	is_logged_in = false;
+	
 	local line_count = html:get_count();
 	for i=0, line_count-1 do
 		line = html:get_at(i);
+
+		-- サービス利用判定
+		if line_has_strings(line, error_word) then
+			-- サービスを登録していないと無限ループする
+			is_logged_in = true;
+			break;
+		end
+
 --		mz3.logger_debug(line);
 		
 		-- <object><list name="tags"><object>
@@ -188,42 +201,45 @@ function google_reader_tag_list_parser(parent, body, html)
 			break;
 		end
 	end
-	
-	if is_logged_in then
---		mz3.alert('ログイン済');
-		
-		-- 複数行に分かれているので1行に結合
-		line = html:get_all_text();
 
-		-- ログイン済みのHTMLのパース
-		parse_tag_list(parent, body, line);
-
+	if is_use_check then
 	else
-		-- ログイン処理
+		if is_logged_in then
+--			mz3.alert('ログイン済');
+			
+			-- 複数行に分かれているので1行に結合
+			line = html:get_all_text();
 
-		mail_address  = mz3_account_provider.get_value('Google', 'id');
-		mail_password = mz3_account_provider.get_value('Google', 'password');
-		
-		if (mail_address == "" or mail_password == "") then
-			mz3.alert("メールアドレスとパスワードをログイン設定画面で設定して下さい");
-			return;
+			-- ログイン済みのHTMLのパース
+			parse_tag_list(parent, body, line);
+
+		else
+			-- ログイン処理
+
+			mail_address  = mz3_account_provider.get_value('Google', 'id');
+			mail_password = mz3_account_provider.get_value('Google', 'password');
+			
+			if (mail_address == "" or mail_password == "") then
+				mz3.alert("メールアドレスとパスワードをログイン設定画面で設定して下さい");
+				return;
+			end
+
+			-- URL 生成
+			url = "https://www.google.com/accounts/ClientLogin";
+			post = mz3_post_data.create();
+			mz3_post_data.append_post_body(post, "Email=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
+			mz3_post_data.append_post_body(post, "Passwd=" .. mz3.url_encode(mail_password, 'utf8') .. "&");
+			mz3_post_data.append_post_body(post, "service=reader");
+--			mz3_post_data.append_post_body(post, "continue=" .. mz3.url_encode(continue_value, 'utf8'));
+			
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("GOOGLE_READER_LOGIN");
+			referer = '';
+			user_agent = nil;
+			mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 		end
-
-		-- URL 生成
-		url = "https://www.google.com/accounts/ClientLogin";
-		post = mz3_post_data.create();
-		mz3_post_data.append_post_body(post, "Email=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
-		mz3_post_data.append_post_body(post, "Passwd=" .. mz3.url_encode(mail_password, 'utf8') .. "&");
-		mz3_post_data.append_post_body(post, "service=reader");
---		mz3_post_data.append_post_body(post, "continue=" .. mz3.url_encode(continue_value, 'utf8'));
-		
-		-- 通信開始
-		access_type = mz3.get_access_type_by_key("GOOGLE_READER_LOGIN");
-		referer = '';
-		user_agent = nil;
-		mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 	end
-	
+
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("google_reader_tag_list_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
