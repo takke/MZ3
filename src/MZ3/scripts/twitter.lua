@@ -1970,6 +1970,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 
 --	menu:append_menu("separator");
+	local build_type = mz3.get_app_build_type();
 	
 	submenu:append_menu("string", "@" .. name .. " をフォローする", menu_items.create_friendships);
 	submenu:append_menu("string", "@" .. name .. " のフォローをやめる", menu_items.destroy_friendships);
@@ -1979,7 +1980,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
 	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
 	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
-	submenu:append_menu("string", "@" .. name .. " のふぁぼられ", menu_items.search_favotter);
+	if build_type == "MZ3" then
+		-- TkTweets では RSS がないので非表示とする
+		submenu:append_menu("string", "@" .. name .. " のふぁぼられ", menu_items.search_favotter);
+	end
 
 	-- URL が空でなければ「サイト」を追加
 	url = body:get_text('url');
@@ -1987,7 +1991,10 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		submenu:append_menu("string", "@" .. name .. " のサイトをブラウザで開く", menu_items.open_friend_site);
 	end
 
-	submenu:append_menu("string", "Twitter検索...", menu_items.twitter_search);
+	if build_type == "MZ3" then
+		-- TkTweets では RSS がないので非表示とする
+		submenu:append_menu("string", "Twitter検索...", menu_items.twitter_search);
+	end
 	menu:append_submenu("その他", submenu);
 
 	-- リンク追加
