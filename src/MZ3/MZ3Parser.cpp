@@ -350,7 +350,10 @@ bool TwitterFriendsTimelineXmlParser::parse( CMixiData& parent, CMixiDataList& b
 
 					} else if (tagName == L"in_reply_to_status_id" && MyGetMatchString(line, L">", L"<", s)) {
 						// in_reply_to_status_id : status/in_reply_to_status_id
-						data.SetIntValue(L"in_reply_to_status_id", _wtol(s));
+						data.SetInt64Value(L"in_reply_to_status_id", _atoi64(CStringA(s)));
+					} else if (tagName == L"in_reply_to_screen_name" && MyGetMatchString(line, L">", L"<", s)) {
+						// in_reply_to_screen_name : status/in_reply_to_screen_name
+						data.SetTextValue(L"in_reply_to_screen_name", s);
 					} else if (tagName == L"retweeted_status") {
 						// </retweeted_status> ‚Ü‚Å“Ç‚Ý”ò‚Î‚·(RT‘Î‰ž)
 						i++;

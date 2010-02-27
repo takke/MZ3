@@ -192,6 +192,7 @@ menu_items.destroy_favourings    = mz3_menu.regist_menu("twitter.on_twitter_dest
 menu_items.create_friendships    = mz3_menu.regist_menu("twitter.on_twitter_create_friendships");
 menu_items.destroy_friendships   = mz3_menu.regist_menu("twitter.on_twitter_destroy_friendships");
 menu_items.show_status_url       = mz3_menu.regist_menu("twitter.on_show_status_url");
+menu_items.show_reply_status_url = mz3_menu.regist_menu("twitter.on_show_reply_status_url");
 menu_items.show_friend_timeline  = mz3_menu.regist_menu("twitter.on_show_friend_timeline");
 menu_items.open_home             = mz3_menu.regist_menu("twitter.on_open_home");
 menu_items.open_friend_favorites = mz3_menu.regist_menu("twitter.on_open_friend_favorites");
@@ -297,7 +298,10 @@ function my_add_new_user(new_list, status, id)
 	data:set_integer('owner_id', user:match('<id>([^<]*)<'));
 	
 	-- in_reply_to_status_id : status/in_reply_to_status_id
---	data:set_integer('in_reply_to_status_id', status:match('<in_reply_to_status_id>([^<]*)</'));
+	data:set_integer64_from_string('in_reply_to_status_id', status:match('<in_reply_to_status_id>([^<]*)</'));
+
+	-- in_reply_to_screen_name : status/in_reply_to_screen_name
+	data:set_integer('in_reply_to_screen_name', status:match('<in_reply_to_screen_name>([^<]*)</'));
 
 	-- URL : status/user/url
 	url = user:match('<url>([^<]*)<');
@@ -1207,9 +1211,18 @@ end
 
 --- 「ステータスページを開く」メニュー用ハンドラ
 function on_show_status_url(serialize_key, event_name, data)
-	body = mz3_main_view.get_selected_body_item();
+	local body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
 	local url = "http://twitter.com/" .. body:get_text('name') .. "/statuses/" .. body:get_integer64_as_string('id');
+	mz3.open_url_by_browser_with_confirm(url);
+end
+
+
+--- 「返信先の発言を開く」メニュー用ハンドラ
+function on_show_reply_status_url(serialize_key, event_name, data)
+	local body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	local url = "http://twitter.com/" .. body:get_text('in_reply_to_screen_name') .. "/statuses/" .. body:get_integer64_as_string('in_reply_to_status_id');
 	mz3.open_url_by_browser_with_confirm(url);
 end
 
@@ -2036,6 +2049,9 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "ステータスページを開く", menu_items.show_status_url);
+	if body:get_integer64_as_string('in_reply_to_status_id') ~= '' then
+		menu:append_menu("string", "返信先の発言を開く", menu_items.show_reply_status_url);
+	end
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
 	
 	-- 発言内の @XXX を抽出し、メニュー化
@@ -2100,6 +2116,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:delete();
 	submenu:delete();
 	submenu_hash:delete();
+	submenu_twitpic:delete();
 	
 	return true;
 end
@@ -2126,11 +2143,12 @@ function on_popup_edit_menu(event_name, serialize_key, body, wnd)
 	-- メニュー生成
 	menu = MZ3Menu:create_popup_menu();
 	submenu = MZ3Menu:create_popup_menu();
+	submenu_twitpic = MZ3Menu:create_popup_menu();
 	
 	name = body:get_text('name');
 
 	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
-	menu:append_menu("string", "つぶやく", menu_items.update);
+--	menu:append_menu("string", "つぶやく", menu_items.update);
 	
 	if mz3_pro_mode and mz3.get_app_name()=="MZ3" then
 		-- Pro & MZ3 only
@@ -2149,6 +2167,7 @@ function on_popup_edit_menu(event_name, serialize_key, body, wnd)
 	-- メニューリソース削除
 	menu:delete();
 	submenu:delete();
+	submenu_twitpic:delete();
 	
 	return true;
 end
