@@ -740,14 +740,25 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		{
 			// アイコンの幅は16, 32, 48, 64pxとする
 			int iconWidth = 16;
-			if (hInfo>=64) {
-				iconWidth = 64;
-			} else if (hInfo>=48) {
-				iconWidth = 48;
-			} else if (hInfo>=32) {
-				iconWidth = 32;
-			} else {
-				iconWidth = 16;
+			switch (theApp.m_optionMng.m_bodyListIconSize) {
+			case option::Option::BODYLIST_ICONSIZE_64:
+			case option::Option::BODYLIST_ICONSIZE_48:
+			case option::Option::BODYLIST_ICONSIZE_32:
+			case option::Option::BODYLIST_ICONSIZE_16:
+				iconWidth = (int)theApp.m_optionMng.m_bodyListIconSize;
+				break;
+			default:
+				// Auto
+				if (hInfo>=64) {
+					iconWidth = 64;
+				} else if (hInfo>=48) {
+					iconWidth = 48;
+				} else if (hInfo>=32) {
+					iconWidth = 32;
+				} else {
+					iconWidth = 16;
+				}
+				break;
 			}
 			// 高さは hInfo 固定
 			m_rectIcon.SetRect( 0, y, iconWidth, y+hInfo );
@@ -1508,22 +1519,31 @@ void CMZ3View::SetBodyImageList( CMixiDataList& body )
 			bool bWM = false;
 #endif
 			int hItem = measureItemStruct.itemHeight;
-			// WM      では 64 48 32 16
-			// Windows では 32 16
-			// で表示する
-			if (bWM && hItem>=64) {
-				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList64(), LVSIL_SMALL);
-				iconMode = CBodyListCtrl::ICON_MODE_64;
-			} else if (bWM && hItem>=48) {
-				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList48(), LVSIL_SMALL);
-				iconMode = CBodyListCtrl::ICON_MODE_48;
-			} else if (hItem>=32) {
-				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList32(), LVSIL_SMALL);
-				iconMode = CBodyListCtrl::ICON_MODE_32;
-			} else {
-				m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
-				iconMode = CBodyListCtrl::ICON_MODE_16;
+			switch (theApp.m_optionMng.m_bodyListIconSize) {
+			case option::Option::BODYLIST_ICONSIZE_64:
+			case option::Option::BODYLIST_ICONSIZE_48:
+			case option::Option::BODYLIST_ICONSIZE_32:
+			case option::Option::BODYLIST_ICONSIZE_16:
+				// 値=サイズ
+				iconMode = (CBodyListCtrl::ICON_MODE)theApp.m_optionMng.m_bodyListIconSize;
+				break;
+			default:
+				// Auto
+				// WM      では 64 48 32 16
+				// Windows では 32 16
+				// で表示する
+				if (bWM && hItem>=64) {
+					iconMode = CBodyListCtrl::ICON_MODE_64;
+				} else if (bWM && hItem>=48) {
+					iconMode = CBodyListCtrl::ICON_MODE_48;
+				} else if (hItem>=32) {
+					iconMode = CBodyListCtrl::ICON_MODE_32;
+				} else {
+					iconMode = CBodyListCtrl::ICON_MODE_16;
+				}
+				break;
 			}
+			m_bodyList.SetImageList(&theApp.m_imageCache.GetImageListBySize((int)iconMode), LVSIL_SMALL);
 		} else {
 			m_bodyList.SetImageList(&theApp.m_imageCache.GetImageList16(), LVSIL_SMALL);
 			iconMode = CBodyListCtrl::ICON_MODE_16;
@@ -5614,19 +5634,28 @@ void CMZ3View::OnPaint()
 					CImageList* pImageList = NULL;
 					int h = rectIcon.Height();
 					int iconHeight = h;
-					if (h>=64) {
-						pImageList = &theApp.m_imageCache.GetImageList64();
-						iconHeight = 64;
-					} else if (h>=48) {
-						pImageList = &theApp.m_imageCache.GetImageList48();
-						iconHeight = 48;
-					} else if (h>=32) {
-						pImageList = &theApp.m_imageCache.GetImageList32();
-						iconHeight = 32;
-					} else {
-						pImageList = &theApp.m_imageCache.GetImageList16();
-						iconHeight = 16;
+					switch (theApp.m_optionMng.m_bodyListIconSize) {
+					case option::Option::BODYLIST_ICONSIZE_64:
+					case option::Option::BODYLIST_ICONSIZE_48:
+					case option::Option::BODYLIST_ICONSIZE_32:
+					case option::Option::BODYLIST_ICONSIZE_16:
+						iconHeight = (int)theApp.m_optionMng.m_bodyListIconSize;
+						break;
+					default:
+						// Auto
+						if (h>=64) {
+							iconHeight = 64;
+						} else if (h>=48) {
+							iconHeight = 48;
+						} else if (h>=32) {
+							iconHeight = 32;
+						} else {
+							iconHeight = 16;
+						}
+						break;
 					}
+					pImageList = &theApp.m_imageCache.GetImageListBySize(iconHeight);
+
 					ImageList_DrawEx(
 						pImageList->m_hImageList, iconIndex,
 						dc.GetSafeHdc(),

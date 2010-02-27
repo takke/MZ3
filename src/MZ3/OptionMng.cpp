@@ -366,6 +366,11 @@ void Option::Sync(bool bSave)
 	// 起動時に上ペインを最大化する
 	SyncIniValue(inifile, bSave, m_bMagnifyModeCategoryAtStart, "MainViewMagnifyModeCategoryAtStart", "MainView");
 
+	// アイコンサイズ
+	int size = (int)m_bodyListIconSize;
+	SyncIniValue(inifile, bSave, size, "BodyListIconSize", "MainView");
+	m_bodyListIconSize = (option::Option::BODYLIST_ICONSIZE)size;
+
 	//--- Twitter
 	SyncIniValue(inifile, bSave, m_bAddSourceTextOnTwitterPost, "AddSourceTextOnTwitterPost", "Twitter");
 	SyncIniValue(inifile, bSave, m_strTwitterPostFotterText, "PostFotterText", "Twitter" );

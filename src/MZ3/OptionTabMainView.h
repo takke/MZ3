@@ -4,6 +4,7 @@
  * http://www.mz3.jp/license.txt
  */
 #pragma once
+#include "afxwin.h"
 
 #ifndef SMARTPHONE2003_UI_MODEL
 
@@ -29,6 +30,7 @@ public:
 	virtual void OnOK();
 	afx_msg void OnBnClickedShowMiniImageCheck();
 	void UpdateControlItemStatus(void);
+	CComboBox mc_comboIconSize;
 };
 
 #endif

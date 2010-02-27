@@ -119,6 +119,15 @@ public:
 	bool			m_bOneClickCategoryFetchMode;		///< 上ペインのリストクリック時に取得する
 	bool			m_bMagnifyModeCategoryAtStart;		///< 起動時に上ペインを最大化する
 
+	enum BODYLIST_ICONSIZE {
+		BODYLIST_ICONSIZE_AUTO = 0,		///< 自動
+		BODYLIST_ICONSIZE_64 = 64,
+		BODYLIST_ICONSIZE_48 = 48,
+		BODYLIST_ICONSIZE_32 = 32,
+		BODYLIST_ICONSIZE_16 = 16,
+	};
+	BODYLIST_ICONSIZE m_bodyListIconSize;			///< ボディリストのアイコンサイズ
+
 	//--- 通信
 	int				m_recvBufSize;					///< 受信バッファサイズ
 	bool			m_bUseAutoConnection;			///< 自動接続を使う？
@@ -231,6 +240,7 @@ public:
 		, m_bUseDevVerCheck(false)
 		, m_bShowNetProgressBar(false)
 		, m_bShowBalloonOnNewTL(true)
+		, m_bodyListIconSize(BODYLIST_ICONSIZE_AUTO)
 	{
 	}
 

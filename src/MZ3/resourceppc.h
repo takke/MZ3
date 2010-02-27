@@ -191,6 +191,8 @@
 #define IDC_QUOTE_MARK_GROUP            1087
 #define IDC_QUOTE_MARK_STATIC           1088
 #define IDC_PAGE_GET_GROUP              1089
+#define IDC_COMBO1                      1090
+#define IDC_ICON_SIZE_COMBO             1090
 #define ID_SETTING                      32772
 #define ID_STOP_BUTTON                  32773
 #define ID_SETTING_LOGIN                32775
@@ -349,7 +351,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        180
 #define _APS_NEXT_COMMAND_VALUE         34245
-#define _APS_NEXT_CONTROL_VALUE         1090
+#define _APS_NEXT_CONTROL_VALUE         1091
 #define _APS_NEXT_SYMED_VALUE           118
 #endif
 #endif

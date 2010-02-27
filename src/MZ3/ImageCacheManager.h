@@ -69,6 +69,36 @@ public:
 	}
 
 	/**
+	 * 指定されたサイズに適した画像リストを返す
+	 */
+	CImageList& GetImageListBySize(int h) {
+		if (h>=64) {
+			return m_imageList64;
+		} else if (h>=48) {
+			return m_imageList48;
+		} else if (h>=32) {
+			return m_imageList32;
+		} else {
+			return m_imageList16;
+		}
+	}
+
+	/**
+	 * 指定されたサイズに適した画像サイズを返す
+	 */
+	int GetSuiteImageSizeByHeight(int h) {
+		if (h>=64) {
+			return 64;
+		} else if (h>=48) {
+			return 48;
+		} else if (h>=32) {
+			return 32;
+		} else {
+			return 16;
+		}
+	}
+
+	/**
 	 * 指定されたパスの画像のインデックスを返す。
 	 *
 	 * 未ロードであれば -1 を返す。

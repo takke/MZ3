@@ -29,6 +29,7 @@ COptionTabMainView::~COptionTabMainView()
 void COptionTabMainView::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_ICON_SIZE_COMBO, mc_comboIconSize);
 }
 
 
@@ -68,6 +69,26 @@ BOOL COptionTabMainView::OnInitDialog()
 	// 起動時に上ペインを最大化する
 	CheckDlgButton( IDC_MAGNIFY_MODE_CATEGORY_AT_START_CHECK, theApp.m_optionMng.m_bMagnifyModeCategoryAtStart ? BST_CHECKED : BST_UNCHECKED);
 
+	// アイコンサイズ
+	mc_comboIconSize.ResetContent();
+	int idx = 0;
+	mc_comboIconSize.InsertString(idx, L"自動");
+	mc_comboIconSize.SetItemData(idx++, 0);
+	mc_comboIconSize.InsertString(idx, L"64px");
+	mc_comboIconSize.SetItemData(idx++, 64);
+	mc_comboIconSize.InsertString(idx, L"48px");
+	mc_comboIconSize.SetItemData(idx++, 48);
+	mc_comboIconSize.InsertString(idx, L"32px");
+	mc_comboIconSize.SetItemData(idx++, 32);
+	mc_comboIconSize.InsertString(idx, L"16px");
+	mc_comboIconSize.SetItemData(idx++, 16);
+	for (int i=0; i<mc_comboIconSize.GetCount(); i++) {
+		if (mc_comboIconSize.GetItemData(i) == theApp.m_optionMng.m_bodyListIconSize) {
+			mc_comboIconSize.SetCurSel(i);
+			break;
+		}
+	}
+
 	UpdateControlItemStatus();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -93,6 +114,12 @@ void COptionTabMainView::OnOK()
 
 	// 起動時に上ペインを最大化する
 	theApp.m_optionMng.m_bMagnifyModeCategoryAtStart = IsDlgButtonChecked( IDC_MAGNIFY_MODE_CATEGORY_AT_START_CHECK ) == BST_CHECKED;
+
+	// アイコンサイズ
+	int idx = mc_comboIconSize.GetCurSel();
+	if (0 <= idx && idx <= mc_comboIconSize.GetCount()-1) {
+		theApp.m_optionMng.m_bodyListIconSize = (option::Option::BODYLIST_ICONSIZE)mc_comboIconSize.GetItemData(idx);
+	}
 
 	CPropertyPage::OnOK();
 }
