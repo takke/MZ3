@@ -21,6 +21,20 @@ mz3_account_provider.set_param('mixi', 'id_name', 'メールアドレス');
 mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
 
 
+----------------------------------------
+-- アクセス種別の登録
+----------------------------------------
+
+-- イベント参加者一覧
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('body');									-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('MIXI_EVENT_MEMBER');				-- シリアライズキー
+type:set_short_title('イベント参加者一覧');					-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_request_encoding('euc-jp');						-- エンコーディング
+
+
 --------------------------------------------------
 -- 【プロフィール】
 -- [content] show_friend.pl 用パーサ
@@ -119,7 +133,7 @@ function mixi_show_friend_parser(parent, body, html)
 	
 	-- 紹介文取得
 	sub_html, i = get_sub_html(html, i, line_count, {'<div id="intro"'}, {'</ul>'});
-	mz3.logger_debug(sub_html);
+--	mz3.logger_debug(sub_html);
 	--[[
 <dl>
 <dt><a href="show_friend.pl?id=xxx"><img src="xxx.jpg" alt="ゆ" onerror="javascript:this.width=76;this.height=76;" /></a>
@@ -160,6 +174,71 @@ function mixi_show_friend_parser(parent, body, html)
 	mz3.logger_debug("mixi_show_friend_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("MIXI_PROFILE", "mixi.mixi_show_friend_parser");
+
+
+--------------------------------------------------
+-- 【イベント参加者一覧】
+-- [content] list_event_member.pl 用パーサ
+--
+-- http://mixi.jp/list_event_member.pl
+--
+-- 引数:
+--   parent: 上ペインのオブジェクト群(MZ3Data*)
+--   dummy:  NULL
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_list_event_member_parser(parent, body, html)
+	mz3.logger_debug("mixi_list_event_member_parser start");
+	local t1 = mz3.get_tick_count();
+
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	html = MZ3HTMLArray:create(html);
+
+	parent:clear();
+	
+	-- 複数行に分かれているので1行に結合
+	local line = html:get_all_text();
+	
+	-- タイトルを取得する
+	name = line:match('<div class="pageTitle communityTitle002">.-<h2>(.-)</');
+	if name ~= nil then
+		parent:set_text('title', name);
+	end
+	parent:set_text('name', '');
+	
+	target_region = line:match('<div class="iconList03">.-<ul.->(.-)</ul>');
+	user_num = 1;
+	for li_tag in target_region:gmatch("<li.->(.-)</li>") do
+--		mz3.logger_debug(li_tag);
+		
+		local name = mz3.decode_html_entity(li_tag:match('<span>(.-)<'));
+		local href = mz3.decode_html_entity(li_tag:match('<a.-href="(.-)"'));
+		local image_url = mz3.decode_html_entity(li_tag:match('(http://profile\.img.-\.jpg)'));
+		
+		if name ~= '' and href ~= '' then
+			local child = MZ3Data:create();
+			
+			child:set_integer('comment_index', user_num);
+			child:set_text('name', name);
+			child:set_text('title', name);
+			child:set_text('author', name);
+			child:set_integer('author_id', get_param_from_url(href, 'id'));
+			child:set_text('url', href);
+			child:set_access_type(mz3.get_access_type_by_key('MIXI_PROFILE'));
+			child:add_link_list(image_url, 'ユーザ画像');
+
+			parent:add_child(child);
+
+			child:delete();
+			user_num = user_num +1;
+		end
+	end
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_list_event_member_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("MIXI_EVENT_MEMBER", "mixi.mixi_list_event_member_parser");
 
 
 --------------------------------------------------
@@ -721,6 +800,11 @@ function on_estimate_access_type(event_name, url, data1, data2)
 	end
 	if line_has_strings(url, 'http://mixi.jp/list_bookmark.pl', 'kind=community') then
 		return true, mz3.get_access_type_by_key('FAVORITE_COMMUNITY');
+	end
+
+	-- イベント参加者一覧
+	if line_has_strings(url, 'mixi.jp', 'list_event_member.pl') then
+		return true, mz3.get_access_type_by_key('MIXI_EVENT_MEMBER');
 	end
 
     -- エコー

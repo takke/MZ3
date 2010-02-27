@@ -90,7 +90,6 @@ enum ACCESS_TYPE {
 	ACCESS_ENQUETE,				///< アンケート(view_enquete.pl)
 	ACCESS_EVENT,				///< イベント(view_event.pl)
 	ACCESS_EVENT_JOIN,			///< 参加イベント(view_event.pl)  //MOriyama追加
-	ACCESS_EVENT_MEMBER,		///< イベント参加者一覧(list_event_member.pl)
 	ACCESS_MYDIARY,				///< 自分の日記内容(view_diary.pl)
 	ACCESS_MESSAGE,				///< メッセージ(view_message.pl)
 	ACCESS_NEWS,				///< ニュース内容(view_news.pl)

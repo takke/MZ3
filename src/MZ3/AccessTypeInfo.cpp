@@ -397,15 +397,6 @@ bool AccessTypeInfo::init()
 	m_map[type].cacheFilePattern = L"event\\{urlparam:comm_id}\\{urlparam:id}.html";
 	m_map[type].serializeKey = "MIXI_EVENT_JOIN";
 
-	type = ACCESS_EVENT_MEMBER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_BODY		// v0.9.1 時点ではReportViewの[ページ]からの遷移のみサポート
-		, "mixi"
-		, L"イベント参加者一覧"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "MIXI_EVENT_MEMBER";
-
 	type = ACCESS_MYDIARY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_BODY

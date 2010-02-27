@@ -167,7 +167,6 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
 	case ACCESS_EVENT_JOIN:
 	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
-	case ACCESS_EVENT_MEMBER:	return mixi::ListEventMemberParser::parse( mixi, html );
 	case ACCESS_BIRTHDAY:
 	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 #endif
