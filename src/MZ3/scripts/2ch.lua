@@ -306,7 +306,7 @@ function the_2ch_subject_parser(parent, body, html)
 	for i=0, line_count-1 do
 		line = html:get_at(i);
 		
-		-- 1246883533.dat<>【調査】 １８〜３４歳の半数が「子供欲しくない」。結婚しない理由は「いい異性がいない」「経済的に不安」など…京都市調査★３ (212)
+		-- 1246883533.dat<>【調査】 １８～３４歳の半数が「子供欲しくない」。結婚しない理由は「いい異性がいない」「経済的に不安」など…京都市調査★３ (212)
 		local tno, title = line:match('^(.-)\.dat<>(.-)$');
 		if tno~= nil and title~=nil then
 
@@ -539,11 +539,11 @@ function on_body_list_click(serialize_key, event_name, data)
 	end
 	
 	if serialize_key=="2CH_THREAD" then
-		-- メニュー表示
---		return on_popup_body_menu(event_name, serialize_key, mz3_main_view.get_selected_body_item(), mz3_main_view.get_wnd());
+		-- スレを開く
+		return on_read_by_reportview_menu_item(serialize_key, event_name, mz3_main_view.get_selected_body_item());
 
 		-- プロパティ表示
-		return on_read_menu_item(serialize_key, event_name, data);
+--		return on_read_menu_item(serialize_key, event_name, data);
 	end
 	
 	-- 標準の処理を続行
