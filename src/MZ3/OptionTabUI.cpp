@@ -57,10 +57,18 @@ BOOL COptionTabUI::OnInitDialog()
 #endif
 
 	// らんらんビューとカテゴリリストのパンスクロール
+#ifdef BT_MZ3
 	CheckDlgButton( IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK, theApp.m_optionMng.m_bUseRan2PanScrollAnimation ? BST_CHECKED : BST_UNCHECKED );
+#else
+	GetDlgItem(IDC_USE_RAN2_PAN_SCROLL_ANIMATION_CHECK)->ShowWindow(SW_HIDE);
+#endif
 
 	// 横ドラッグでの項目移動
+#ifdef BT_MZ3
 	CheckDlgButton( IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK, theApp.m_optionMng.m_bUseRan2HorizontalDragMove ? BST_CHECKED : BST_UNCHECKED );
+#else
+	GetDlgItem(IDC_USE_RAN2_HORIZONTAL_DRAG_MOVE_CHECK)->ShowWindow(SW_HIDE);
+#endif
 
 	return TRUE;
 }
