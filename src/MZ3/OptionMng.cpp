@@ -164,45 +164,6 @@ void Option::Sync(bool bSave)
 	}
 	SyncIniValue(inifile, bSave, m_fontHeight, "FontHeight", "UI");
 
-	// フォントサイズ（大）
-	if (!bSave) {
-		// 初期値設定
-#ifdef WINCE
-//		switch( theApp.GetDisplayMode() ) {
-//		case SR_VGA:		m_fontHeightBig = 28; break;
-//		case SR_QVGA:
-//		default:			m_fontHeightBig = 14; break;
-//		}
-		m_fontHeightBig = 11;
-#else
-		m_fontHeightBig = 13;
-#endif
-	}
-	SyncIniValue(inifile, bSave, m_fontHeightBig, "FontHeight_Big", "UI");
-
-	// フォントサイズ（中）
-	if (!bSave) {
-		// 初期値設定
-		m_fontHeightMedium = m_fontHeight;
-	}
-	SyncIniValue(inifile, bSave, m_fontHeightMedium, "FontHeight_Medium", "UI");
-
-	// フォントサイズ（小）
-	if (!bSave) {
-		// 初期値設定
-#ifdef WINCE
-//		switch( theApp.GetDisplayMode() ) {
-//		case SR_VGA:		m_fontHeightSmall = 18; break;
-//		case SR_QVGA:
-//		default:			m_fontHeightSmall = 10; break;
-//		}
-		m_fontHeightSmall = 7;
-#else
-		m_fontHeightSmall = 9;
-#endif
-	}
-	SyncIniValue(inifile, bSave, m_fontHeightSmall, "FontHeight_Small", "UI");
-
 	// フォント名
 	SyncIniValue(inifile, bSave, m_fontFace, "FontFace", "UI");
 

@@ -271,9 +271,6 @@ BOOL CMZ3App::InitInstance()
 			// px 換算値を pt 換算値に変換する
 			int iDPI = theApp.GetDPI();
 			m_optionMng.m_fontHeight       = ::MulDiv(m_optionMng.m_fontHeight       , 72, iDPI);
-			m_optionMng.m_fontHeightBig    = ::MulDiv(m_optionMng.m_fontHeightBig    , 72, iDPI);
-			m_optionMng.m_fontHeightMedium = ::MulDiv(m_optionMng.m_fontHeightMedium , 72, iDPI);
-			m_optionMng.m_fontHeightSmall  = ::MulDiv(m_optionMng.m_fontHeightSmall  , 72, iDPI);
 
 			MZ3LOGGER_DEBUG(util::FormatString(L"移行後：m_fontHeight : %d", m_optionMng.m_fontHeight));
 

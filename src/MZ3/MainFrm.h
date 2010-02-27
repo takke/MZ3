@@ -76,9 +76,6 @@ public:
 	afx_msg void OnGetpageAll();
 	afx_msg void OnGetpageLatest10();
 	afx_msg void OnUpdateGetpageLatest10(CCmdUI *pCmdUI);
-	afx_msg void OnChangeFontBig();
-	afx_msg void OnChangeFontMedium();
-	afx_msg void OnChangeFontSmall();
 	bool ChangeAllViewFont(int fontHeight=-1);
 	afx_msg void OnChangeFontNormal();
 	afx_msg void OnUpdateMenuBack(CCmdUI *pCmdUI);

@@ -62,10 +62,6 @@ public:
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）
 
-	int				m_fontHeightBig;		///< フォント（大）のサイズ（0 の場合は設定しない）
-	int				m_fontHeightMedium;		///< フォント（中）のサイズ（0 の場合は設定しない）
-	int				m_fontHeightSmall;		///< フォント（小）のサイズ（0 の場合は設定しない）
-
 	int				m_longReturnRangeMSec;	///< 長押し判定時間（ミリ秒）
 
 	CString			m_logFolder;			///< ログ出力先フォルダ。"" の場合はデフォルト出力先。
@@ -157,9 +153,6 @@ public:
 		, m_bBootCheckMnC( false )
 		, m_bUseBgImage( TRUE )
 		, m_fontHeight( 8 )					// 初期値は Load() 内で設定される
-		, m_fontHeightBig( 10 )				// 初期値は Load() 内で設定される
-		, m_fontHeightMedium( 8 )			// 初期値は Load() 内で設定される
-		, m_fontHeightSmall( 7 )			// 初期値は Load() 内で設定される
 #ifdef WINCE
 		, m_recvBufSize( 2048 )
 #else

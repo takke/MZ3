@@ -50,9 +50,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_CLOSE, &CMainFrame::OnMenuClose)
 	ON_COMMAND(IDM_GETPAGE_ALL, &CMainFrame::OnGetpageAll)
 	ON_COMMAND(IDM_GETPAGE_LATEST10, &CMainFrame::OnGetpageLatest10)
-	ON_COMMAND(ID_CHANGE_FONT_BIG, &CMainFrame::OnChangeFontBig)
-	ON_COMMAND(ID_CHANGE_FONT_MEDIUM, &CMainFrame::OnChangeFontMedium)
-	ON_COMMAND(ID_CHANGE_FONT_SMALL, &CMainFrame::OnChangeFontSmall)
 	ON_COMMAND(ID_MENU_BACK, &CMainFrame::OnMenuBack)
 	ON_COMMAND(ID_MENU_NEXT, &CMainFrame::OnMenuNext)
 	ON_COMMAND(IDM_CHECK_NEW, &CMainFrame::OnCheckNew)
@@ -678,27 +675,6 @@ void CMainFrame::OnUpdateGetpageLatest10(CCmdUI *pCmdUI)
 		pCmdUI->SetCheck( FALSE );
 	}
 #endif
-}
-
-/// 「文字サイズ｜大」メニュー
-void CMainFrame::OnChangeFontBig()
-{
-	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightBig;
-	ChangeAllViewFont();
-}
-
-/// 「文字サイズ｜中」メニュー
-void CMainFrame::OnChangeFontMedium()
-{
-	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightMedium;
-	ChangeAllViewFont();
-}
-
-/// 「文字サイズ｜小」メニュー
-void CMainFrame::OnChangeFontSmall()
-{
-	theApp.m_optionMng.m_fontHeight = theApp.m_optionMng.m_fontHeightSmall;
-	ChangeAllViewFont();
 }
 
 inline void MySetListViewFont( CListCtrl* pListCtrl )
