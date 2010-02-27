@@ -152,6 +152,16 @@ type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 
+-- bit.ly
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_BIT_LY');					-- シリアライズキー
+type:set_short_title('bit.ly');								-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
 ----------------------------------------
@@ -205,6 +215,8 @@ menu_items.search_hash_list[3]   = mz3_menu.regist_menu("twitter.on_search_hash_
 menu_items.search_hash_list[4]   = mz3_menu.regist_menu("twitter.on_search_hash_list_4");
 menu_items.search_hash_list[5]   = mz3_menu.regist_menu("twitter.on_search_hash_list_5");
 hash_list = {}
+
+menu_items.shorten_by_bitly      = mz3_menu.regist_menu("twitter.on_shorten_by_bitly");
 
 
 -- ファイル名
@@ -923,6 +935,7 @@ function on_twitter_update(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
+
 --- 「写真を投稿」メニュー用ハンドラ
 function on_twitter_update_with_twitpic(serialize_key, event_name, data)
 
@@ -1018,6 +1031,77 @@ function on_twitter_reply(serialize_key, event_name, data)
 	VK_END = 0x23;
 	mz3.keybd_event(VK_END, "keydown");
 	mz3.keybd_event(VK_END, "keyup");
+end
+
+
+--- 「URL短縮」メニュー用ハンドラ
+function on_shorten_by_bitly(serialize_key, event_name, data)
+
+	-- 入力文字列を取得
+	local text = mz3_main_view.get_edit_text();
+	
+	-- URL 抽出＆短縮
+	local target = text;
+	text = '';
+
+	mz3_main_view.set_info_text('URL 短縮します');
+
+	-- URL を抽出し、リンクにする
+	while true do
+		left, url, right = target:match("(.-)(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)(.*)");
+		if left == nil then
+			-- 残り出力
+			text = text .. target;
+			break;
+		end
+		
+--		mz3.logger_debug('--');
+--		mz3.logger_debug('left  :/' .. left .. '/');
+--		mz3.logger_debug('url   :/' .. url .. '/');
+--		mz3.logger_debug('right :/' .. right .. '/');
+		
+		-- 左側出力
+		text = text .. left;
+		
+		-- URL 短縮
+		if url:match('http://bit.ly/.*') then
+			-- skip
+			text = text .. url;
+		else
+			local bitly_url = 'http://api.bit.ly/shorten?version=2.0.1&longUrl='
+			                .. mz3.url_encode(url, 'utf8')
+			                .. '&login=takke&apiKey=R_bc9636a2f9e02b56320fb4e616011759 ';
+			local referer = '';
+			local user_agent = nil;
+			local is_blocking = true;
+			local access_type = mz3.get_access_type_by_key("TWITTER_BIT_LY");
+			local status, result_json = mz3.open_url(mz3_main_view.get_wnd(), access_type, bitly_url,
+													 referer, "text", user_agent, nil, is_blocking);
+	--		mz3.logger_debug(status);
+			mz3.logger_debug(result_json);
+
+			-- URL 短縮用通信、状態復帰
+			mz3_main_view.update_control_status();
+			mz3_main_view.set_focus('edit');
+			
+			short_url = result_json:match('"shortUrl": "(.-)"');
+			if status ~= 200
+			   or result_json:match('"statusCode": "OK"') == nil
+			   or short_url == nil then
+				mz3.alert('URL 短縮に失敗しました。 \nURL : ' .. url);
+				return;
+			end
+			
+			text = text .. short_url;
+		end
+		target = right;
+	end
+	
+	-- 反映
+--	mz3.logger_debug('text :/' .. text .. '/');
+	mz3_main_view.set_edit_text(text);
+
+	mz3_main_view.set_info_text('URL 短縮しました');
 end
 
 
@@ -2020,6 +2104,55 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	return true;
 end
 mz3.add_event_listener("popup_body_menu",  "twitter.on_popup_body_menu");
+
+
+--- 入力エリアのポップアップメニュー表示
+--
+-- @param event_name    'popup_edit_menu'
+-- @param serialize_key ボディアイテムのシリアライズキー
+-- @param body          body
+-- @param wnd           wnd
+--
+function on_popup_edit_menu(event_name, serialize_key, body, wnd)
+	mz3.logger_debug('twitter.on_popup_edit_menu : (' .. serialize_key .. ', ' .. event_name .. ')');
+
+	if serialize_key~="TWITTER_USER" then
+		return false;
+	end
+
+	-- インスタンス化
+	body = MZ3Data:create(body);
+	
+	-- メニュー生成
+	menu = MZ3Menu:create_popup_menu();
+	submenu = MZ3Menu:create_popup_menu();
+	
+	name = body:get_text('name');
+
+	menu:append_menu("string", "最新の一覧を取得", IDM_CATEGORY_OPEN);
+	menu:append_menu("string", "つぶやく", menu_items.update);
+	
+	if mz3_pro_mode and mz3.get_app_name()=="MZ3" then
+		-- Pro & MZ3 only
+		submenu_twitpic:append_menu("string", "ファイルを選択...", menu_items.update_with_twitpic);
+		submenu_twitpic:append_menu("string", "カメラで撮影...", menu_items.update_with_twitpic_now);
+		menu:append_submenu("写真を投稿(twitpic)", submenu_twitpic);
+	else
+		menu:append_menu("string", "写真を投稿(twitpic)...", menu_items.update_with_twitpic);
+	end
+
+	menu:append_menu("string", "URL短縮(bit.ly)", menu_items.shorten_by_bitly);
+
+	-- ポップアップ
+	menu:popup(wnd);
+	
+	-- メニューリソース削除
+	menu:delete();
+	submenu:delete();
+	
+	return true;
+end
+mz3.add_event_listener("popup_edit_menu",  "twitter.on_popup_edit_menu");
 
 
 --- デフォルトのグループリスト生成イベントハンドラ

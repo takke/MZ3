@@ -5148,11 +5148,34 @@ void CMZ3View::OnAcceleratorFontShrink()
  */
 void CMZ3View::OnAcceleratorContextMenu()
 {
-	if( GetFocus() == &m_bodyList ) {
+	CWnd* pFocus = GetFocus();
+	if (pFocus == &m_bodyList) {
 		// ボディリストでの右クリックメニュー
 		PopupBodyMenu();
-	}else{
-		// カテゴリリストでの右クリック
+	} else if (pFocus == GetDlgItem(IDC_STATUS_EDIT)) {
+		// 入力エリアの右クリックメニュー
+		POINT pt    = util::GetPopupPosForSoftKeyMenu2();
+		int   flags = util::GetPopupFlagsForSoftKeyMenu2();
+
+		CMixiData& bodyItem = GetSelectedBodyItem();
+
+		// MZ3 API : フック関数呼び出し
+		util::MyLuaDataList rvals;
+		rvals.push_back(util::MyLuaData(0));
+		CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(bodyItem.GetAccessType()));
+		if (util::CallMZ3ScriptHookFunctions2("popup_edit_menu", &rvals, 
+				util::MyLuaData(serializeKey), 
+				util::MyLuaData(&bodyItem), 
+				util::MyLuaData(this)))
+		{
+			int rval = rvals[0].m_number;
+			return;
+		} else {
+			// カテゴリリストでの右クリックメニュー
+			PopupCategoryMenu();
+		}
+	} else{
+		// カテゴリリストでの右クリックメニュー
 		PopupCategoryMenu();
 	}
 }

@@ -729,11 +729,15 @@ int lua_mz3_open_url(lua_State *L)
 	// GET/POST 開始
 	theApp.m_inet.Initialize(hwnd, &s_data, encoding);
 	if (bPost) {
+		// POST
 		theApp.m_inet.DoPost(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
 	} else {
+		// GET
 		if (!blocking) {
+			// 非ブロッキング型アクセス
 			theApp.m_inet.DoGet(CString(url), CString(referer), type, strUser, strPassword, strUserAgent );
 		} else {
+			// ブロッキング型アクセス
 			theApp.m_inet.DoGetBlocking(CString(url), CString(referer), type);
 			int status = theApp.m_inet.m_dwHttpStatus;
 			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
@@ -744,7 +748,10 @@ int lua_mz3_open_url(lua_State *L)
 			// 返却
 			lua_pushinteger(L, status);
 			lua_pushstring(L, strUtf8);
+
+			// 状態復帰
 			theApp.m_access = false;
+
 			return 2;
 		}
 	}
