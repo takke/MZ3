@@ -2049,7 +2049,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("separator");
 
 	menu:append_menu("string", "ステータスページを開く", menu_items.show_status_url);
-	if body:get_integer64_as_string('in_reply_to_status_id') ~= '' then
+	if body:get_integer64_as_string('in_reply_to_status_id') ~= "-1" then
 		menu:append_menu("string", "返信先の発言を開く", menu_items.show_reply_status_url);
 	end
 	menu:append_menu("string", "@" .. name .. " のタイムライン", menu_items.show_friend_timeline);
