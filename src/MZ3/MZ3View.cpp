@@ -367,7 +367,7 @@ void CMZ3View::OnInitialUpdate()
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
 	m_categoryList.SetFocus();
-
+	
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
 
@@ -4525,19 +4525,24 @@ int CMZ3View::GetListWidth(void)
 	int w = rect.Width();
 
 	// ピクセル数の微調整（スクリーン幅より少し小さくする）
+	int wVScrollBarHistoric = 0;	// 縦スクロールバーの幅(歴史的な調査結果)
 #ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
-		w -= 35;
+		wVScrollBarHistoric = 34;
 		break;
 	case SR_QVGA:
 	default:
-		w -= 35/2;
+		wVScrollBarHistoric = 34/2;
 		break;
 	}
 #else
-	w -= 35;
+	wVScrollBarHistoric = 34;
 #endif
+
+	int wVScrollBar = GetSystemMetrics(SM_CXVSCROLL);	// 縦スクロールバーの幅
+	w -= max(wVScrollBar, wVScrollBarHistoric) +1;		// 過去の値と「システム値」の大きい方を採用する。
+
 	return w;
 }
 
