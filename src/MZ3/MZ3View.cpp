@@ -4541,7 +4541,7 @@ int CMZ3View::GetListWidth(void)
 #endif
 
 	int wVScrollBar = GetSystemMetrics(SM_CXVSCROLL);	// 縦スクロールバーの幅
-	w -= max(wVScrollBar, wVScrollBarHistoric) +1;		// 過去の値と「システム値」の大きい方を採用する。
+	w -= max(wVScrollBar, wVScrollBarHistoric) +2;		// 過去の値と「システム値」の大きい方を採用する。
 
 	return w;
 }

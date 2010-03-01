@@ -2512,19 +2512,24 @@ int CReportView::GetListWidth(void)
 	int w = rect.Width();
 
 	// ピクセル数の微調整（スクリーン幅より少し小さくする）
+	int wVScrollBarHistoric = 0;	// 縦スクロールバーの幅(歴史的な調査結果)
 #ifdef WINCE
 	switch( theApp.GetDisplayMode() ) {
 	case SR_VGA:
-		w -= 30;
+		wVScrollBarHistoric = 30;
 		break;
 	case SR_QVGA:
 	default:
-		w -= 30/2;
+		wVScrollBarHistoric = 30/2;
 		break;
 	}
 #else
-	w -= 30;
+	wVScrollBarHistoric = 30;
 #endif
+
+	int wVScrollBar = GetSystemMetrics(SM_CXVSCROLL);	// 縦スクロールバーの幅
+	w -= max(wVScrollBar, wVScrollBarHistoric) +1;		// 過去の値と「システム値」の大きい方を採用する。
+
 	return w;
 }
 
