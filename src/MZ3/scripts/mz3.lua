@@ -158,6 +158,72 @@ function mz3.do_cross_post()
 	return false;
 end
 
+
+--- メイン画面のキー押下イベント
+function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
+	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+
+	local focus = mz3_main_view.get_focus();
+
+	if focus ~= "edit" then
+		if key == VK_J then
+			-- down
+			mz3.keybd_event(VK_DOWN, "keydown");
+			mz3.keybd_event(VK_DOWN, "keyup");
+			return true;
+		end
+
+		if key == VK_K then
+			-- up
+			mz3.keybd_event(VK_UP, "keydown");
+			mz3.keybd_event(VK_UP, "keyup");
+			return true;
+		end
+
+		if key == VK_H then
+			-- left
+			mz3.keybd_event(VK_LEFT, "keydown");
+			mz3.keybd_event(VK_LEFT, "keyup");
+			return true;
+		end
+
+		if key == VK_L then
+			-- left
+			mz3.keybd_event(VK_RIGHT, "keydown");
+			mz3.keybd_event(VK_RIGHT, "keyup");
+			return true;
+		end
+
+		if key == VK_SPACE or key == VK_O then
+			-- 最新TLの取得
+			mz3_main_view.retrieve_category_item();
+			return true;
+		end
+
+		if key == VK_S then
+			-- フォントを小さく
+			mz3.exec_mz3_command("FONT_SHRINK");
+			return true;
+		end
+
+		if key == VK_W then
+			-- フォントを大きく
+			mz3.exec_mz3_command("FONT_MAGNIFY");
+			return true;
+		end
+	end
+
+	if focus == "category_list" then
+		-- カテゴリリスト
+	elseif focus == "body_list" then
+		-- ボディリスト
+	end
+
+	return false;
+end
+mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");
+
+
 -------------------------------------------------
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------

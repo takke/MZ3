@@ -17,6 +17,7 @@
 #include "PostDataGenerator.h"
 #include "util_gui.h"
 #include "CommonEditDlg.h"
+#include "MainFrm.h"
 #ifdef WINCE
 #include "Nled.h"
 #endif
@@ -1130,6 +1131,33 @@ int lua_mz3_get_text_length(lua_State *L)
 	// 戻り値の数を返す
 	return 1;
 }
+
+/*
+--- 汎用MZ3コマンドの実行
+--
+-- @param command コマンド
+--
+function mz3.exec_mz3_command(command)
+*/
+int lua_mz3_exec_mz3_command(lua_State *L)
+{
+	// 引数取得
+	CStringA cmd = lua_tostring(L, 1);
+
+	if (cmd == "FONT_SHRINK") {
+		theApp.m_pMainView->OnAcceleratorFontShrink();
+	} else if (cmd == "FONT_MAGNIFY") {
+		theApp.m_pMainView->OnAcceleratorFontMagnify();
+	} else if (cmd == "NEXT_TAB") {
+		theApp.m_pMainView->OnAcceleratorNextTab();
+	} else if (cmd == "PREV_TAB") {
+		theApp.m_pMainView->OnAcceleratorPrevTab();
+	}
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 Account Provider API
@@ -4019,6 +4047,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"show_detail_view",					lua_mz3_show_detail_view},
 	{"set_vib_status",						lua_mz3_set_vib_status},
 	{"get_text_length",						lua_mz3_get_text_length},
+	{"exec_mz3_command",					lua_mz3_exec_mz3_command},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

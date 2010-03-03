@@ -2448,45 +2448,10 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 
 	local focus = mz3_main_view.get_focus();
 
-	if focus ~= "edit" then
-		if key == VK_J then
-			-- down
-			mz3.keybd_event(VK_DOWN, "keydown");
-			mz3.keybd_event(VK_DOWN, "keyup");
-			return true;
-		end
-
-		if key == VK_K then
-			-- up
-			mz3.keybd_event(VK_UP, "keydown");
-			mz3.keybd_event(VK_UP, "keyup");
-			return true;
-		end
-
-		if key == VK_H then
-			-- left
-			mz3.keybd_event(VK_LEFT, "keydown");
-			mz3.keybd_event(VK_LEFT, "keyup");
-			return true;
-		end
-
-		if key == VK_L then
-			-- left
-			mz3.keybd_event(VK_RIGHT, "keydown");
-			mz3.keybd_event(VK_RIGHT, "keyup");
-			return true;
-		end
-	end
-
 	if focus == "category_list" then
 		-- カテゴリリスト
 	elseif focus == "body_list" then
 		-- ボディリスト
-		if key == VK_SPACE or key == VK_O then
-			-- 最新TLの取得
-			mz3_main_view.retrieve_category_item();
-			return true;
-		end
 
 		if key == VK_R then
 			-- 返信
@@ -2503,6 +2468,12 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 		if key == VK_F then
 			-- ふぁぼる
 			on_twitter_create_favourings(serialize_key, event_name, nil);
+			return true;
+		end
+		
+		if key == VK_D then
+			-- DM
+			on_twitter_new_dm(serialize_key, event_name, nil);
 			return true;
 		end
 		
@@ -2746,6 +2717,8 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	----------------------------------------------
 	-- 前後ユーザアイコンの描画
 	----------------------------------------------
+	g:set_color("text", "MainBodyListDefaultText");
+
 	icon_size = 32;
 	h = icon_size;
 	local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
