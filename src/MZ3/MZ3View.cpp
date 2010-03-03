@@ -685,8 +685,12 @@ void CMZ3View::MySetLayout(int cx, int cy)
 				m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
 				hItem0 = rectItem0.Height();
 			}
-			hCategory = cy - (hInfo + hPost +hGroup -1) - hItem0;
-			hBody     = hItem0;
+
+			// ボディほぼ非表示
+//			hBody     = hItem0;
+			hBody     = 1;
+
+			hCategory = cy - (hInfo + hPost +hGroup -1) - hBody;
 		}
 		break;
 
@@ -702,8 +706,11 @@ void CMZ3View::MySetLayout(int cx, int cy)
 				m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
 				hItem0 = rectItem0.Height();
 			}
-			hCategory = hItem0 +3;
-			hBody     = cy - (hInfo + hPost +hGroup -1) - (hItem0+3);
+
+			// カテゴリもほぼ非表示
+//			hCategory = hItem0 +3;
+			hCategory = 1;
+			hBody     = cy - (hInfo + hPost +hGroup -1) - hCategory;
 		}
 		break;
 	}
@@ -2863,6 +2870,11 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 {
 //	if( theApp.m_access ) return TRUE;	// アクセス中は無視
 
+	// 下ペイン最大化状態であれば上ペインを最大化
+	if (m_magnifyMode == MAGNIFY_MODE_BODY) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+	}
+
 	if( m_categoryList.GetItemState(0, LVIS_FOCUSED) != FALSE ) {
 		// 一番上の項目なら無視
 		return TRUE;
@@ -2896,6 +2908,11 @@ BOOL CMZ3View::CommandMoveUpCategoryList()
 BOOL CMZ3View::CommandMoveDownCategoryList()
 {
 //	if( theApp.m_access ) return TRUE;	// アクセス中は無視
+
+	// 下ペイン最大化状態であれば上ペインを最大化
+	if (m_magnifyMode == MAGNIFY_MODE_BODY) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+	}
 
 	if( m_categoryList.GetItemState(m_categoryList.GetItemCount()-1, LVIS_FOCUSED) != FALSE ) {
 		// 一番下の項目選択中なら、ボディリストの先頭へ。
@@ -2934,6 +2951,11 @@ BOOL CMZ3View::CommandMoveDownCategoryList()
 
 BOOL CMZ3View::CommandMoveUpBodyList()
 {
+	// 上ペイン最大化状態であれば下ペインを最大化
+	if (m_magnifyMode == MAGNIFY_MODE_CATEGORY) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
+	}
+
 	if (m_bodyList.GetItemState(0, LVIS_FOCUSED) != FALSE) {
 		// 一番上。
 		// カテゴリに移動
@@ -2993,6 +3015,11 @@ BOOL CMZ3View::CommandMoveUpBodyList()
 
 BOOL CMZ3View::CommandMoveDownBodyList()
 {
+	// 上ペイン最大化状態であれば下ペインを最大化
+	if (m_magnifyMode == MAGNIFY_MODE_CATEGORY) {
+		MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
+	}
+
 	if (m_bodyList.GetItemState(m_bodyList.GetItemCount()-1, LVIS_FOCUSED) != FALSE) {
 		// 一番下なので無視。
 		if( theApp.m_access ) return TRUE;	// アクセス中は禁止
@@ -4553,7 +4580,7 @@ int CMZ3View::GetListWidth(void)
 #endif
 
 	int wVScrollBar = GetSystemMetrics(SM_CXVSCROLL);	// 縦スクロールバーの幅
-	w -= max(wVScrollBar, wVScrollBarHistoric) +2;		// 過去の値と「システム値」の大きい方を採用する。
+	w -= max(wVScrollBar, wVScrollBarHistoric) +3;		// 過去の値と「システム値」の大きい方を採用する。
 
 	return w;
 }
