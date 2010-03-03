@@ -3372,6 +3372,31 @@ int lua_mz3_main_view_set_focus(lua_State *L)
 }
 
 /*
+--- フォーカス取得
+--
+-- @return string フォーカスコントロール("edit", "category_list", "body_list", "other")
+--
+function mz3_main_view.get_focus();
+*/
+int lua_mz3_main_view_get_focus(lua_State *L)
+{
+	// フォーカス移動
+	CWnd* pFocus = theApp.m_pMainView->GetFocus();
+	if (pFocus->m_hWnd == theApp.m_pMainView->m_categoryList.m_hWnd) {
+		lua_pushstring(L, "category_list");
+	} else if (pFocus->m_hWnd == theApp.m_pMainView->m_bodyList.m_hWnd) {
+		lua_pushstring(L, "body_list");
+	} else if (pFocus->m_hWnd == theApp.m_pMainView->m_statusEdit.m_hWnd) {
+		lua_pushstring(L, "edit");
+	} else {
+		lua_pushstring(L, "other");
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- 現在選択中の下ペイン要素取得
 --
 function mz3_main_view.get_selected_body_item();
@@ -4087,6 +4112,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_post_mode",			lua_mz3_main_view_set_post_mode},
 	{"update_control_status",	lua_mz3_main_view_update_control_status},
 	{"set_focus",				lua_mz3_main_view_set_focus},
+	{"get_focus",				lua_mz3_main_view_get_focus},
 	{"get_selected_body_item",	lua_mz3_main_view_get_selected_body_item},
 	{"get_selected_body_item_idx",	lua_mz3_main_view_get_selected_body_item_idx},
 	{"get_body_item_list",		lua_mz3_main_view_get_body_item_list},

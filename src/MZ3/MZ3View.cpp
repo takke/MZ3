@@ -1941,6 +1941,18 @@ void CMZ3View::OnLvnItemchangedBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 BOOL CMZ3View::OnKeyUp(MSG* pMsg)
 {
+	// Lua API
+	util::MyLuaDataList rvals;
+	if (util::CallMZ3ScriptHookFunctions2("keyup_main_view", &rvals, 
+			util::MyLuaData(pMsg->wParam),
+			util::MyLuaData((GetAsyncKeyState(VK_SHIFT) & 0x8000) ? 1 : 0),
+			util::MyLuaData((GetAsyncKeyState(VK_CONTROL) & 0x8000) ? 1 : 0),
+			util::MyLuaData((GetAsyncKeyState(VK_MENU) & 0x8000) ? 1 : 0)
+			))
+	{
+		return TRUE;
+	}
+
 	// ‹¤’Êˆ—
 	switch (pMsg->wParam) {
 #ifndef WINCE

@@ -68,9 +68,20 @@ VK_RIGHT  = 0x27;
 VK_LEFT   = 0x25;
 VK_RETURN = 0x0D;
 VK_ESCAPE = 0x1B;
+VK_SPACE  = 0x20;
 VK_BACK   = 0x08;
+VK_END    = 0x23;
 VK_F1     = 0x70;
 VK_F2     = 0x71;
+VK_B      = 0x42;
+VK_F      = 0x46;
+VK_H      = 0x48;
+VK_J      = 0x4A;
+VK_K      = 0x4B;
+VK_L      = 0x4C;
+VK_O      = 0x4f;
+VK_R      = 0x52;
+VK_U      = 0x55;
 
 ----------------------------------------------------------------------
 -- MZ3 共通ハンドラ(各サービス毎に書くと遅くなるようなハンドラ)

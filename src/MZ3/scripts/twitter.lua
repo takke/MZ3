@@ -1032,7 +1032,6 @@ function on_twitter_reply(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 
 	-- 末尾へ移動
-	VK_END = 0x23;
 	mz3.keybd_event(VK_END, "keydown");
 	mz3.keybd_event(VK_END, "keyup");
 end
@@ -2436,6 +2435,91 @@ function on_search_search_favotter(serialize_key, event_name, data)
 end
 
 
+--- メイン画面のキー押下イベント
+function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
+	mz3.logger_debug('twitter.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	serialize_key = body:get_serialize_key();
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='Twitter' then
+		return false;
+	end
+
+	local focus = mz3_main_view.get_focus();
+
+	if focus ~= "edit" then
+		if key == VK_J then
+			-- down
+			mz3.keybd_event(VK_DOWN, "keydown");
+			mz3.keybd_event(VK_DOWN, "keyup");
+			return true;
+		end
+
+		if key == VK_K then
+			-- up
+			mz3.keybd_event(VK_UP, "keydown");
+			mz3.keybd_event(VK_UP, "keyup");
+			return true;
+		end
+
+		if key == VK_H then
+			-- left
+			mz3.keybd_event(VK_LEFT, "keydown");
+			mz3.keybd_event(VK_LEFT, "keyup");
+			return true;
+		end
+
+		if key == VK_L then
+			-- left
+			mz3.keybd_event(VK_RIGHT, "keydown");
+			mz3.keybd_event(VK_RIGHT, "keyup");
+			return true;
+		end
+	end
+
+	if focus == "category_list" then
+		-- カテゴリリスト
+	elseif focus == "body_list" then
+		-- ボディリスト
+		if key == VK_SPACE or key == VK_O then
+			-- 最新TLの取得
+			mz3_main_view.retrieve_category_item();
+			return true;
+		end
+
+		if key == VK_R then
+			-- 返信
+			on_twitter_reply(serialize_key, event_name, nil);
+			return true;
+		end
+		
+		if key == VK_U then
+			-- つぶやく
+			on_twitter_update(serialize_key, event_name, nil);
+			return true;
+		end
+		
+		if key == VK_F then
+			-- ふぁぼる
+			on_twitter_create_favourings(serialize_key, event_name, nil);
+			return true;
+		end
+		
+	elseif focus == "edit" then
+		-- エディット
+		if key == VK_B and is_ctrl~=0 then
+			-- URL短縮
+			on_shorten_by_bitly(serialize_key, event_name, nil);
+			return true;
+		end
+	end
+	
+	return false;
+end
+mz3.add_event_listener("keyup_main_view", "twitter.on_keyup_main_view");
+
+
 --- アイコンの描画
 function draw_user_icon(g, f, x, y, w, h)
 	image_url = f:get_text_array('image', 0);
@@ -2565,7 +2649,11 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	end
 --	h = line_height * 7;
 	-- 高さは画面の高さの 1/3 程度
-	h = cy / 3;
+	if detail_view_mode == "normal" then
+		h = cy / 3;
+	else
+		h = cy - y - 3*line_height;
+	end
 	x = x_margin;
 	w = cx - x - x_margin;
 	
@@ -2592,50 +2680,52 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 --	g:draw_rect("border", x, y, w, h, "MainBodyListDefaultText");
 	
 	-- その他の情報
-	--[[
-	x = x +border_margin;
-	y = y +border_margin;
-	w = w -border_margin*2;
-	h = h -border_margin*2;
-	]]
+	if detail_view_mode == "normal" then
+		--[[
+		x = x +border_margin;
+		y = y +border_margin;
+		w = w -border_margin*2;
+		h = h -border_margin*2;
+		]]
 
-	item = '';
-	item = item .. "id : " .. data:get_integer64_as_string('id')
-	            .. ", owner-id : " .. data:get_integer('owner_id') .. "\r\n";
+		item = '';
+		item = item .. "id : " .. data:get_integer64_as_string('id')
+		            .. ", owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
-	-- location 等はここでパースする
-	user = data:get_text('user_tag');
+		-- location 等はここでパースする
+		user = data:get_text('user_tag');
 
-	-- <location>East Tokyo United</location>
-	location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
-	-- <followers_count>555</followers_count>
-	followers_count = user:match('<followers_count>([^<]*)<');
-	-- <friends_count>596</friends_count>
-	friends_count = user:match('<friends_count>([^<]*)<');
-	-- <favourites_count>361</favourites_count>
-	favourites_count = user:match('<favourites_count>([^<]*)<');
-	-- <statuses_count>7889</statuses_count>
-	statuses_count = user:match('<statuses_count>([^<]*)<');
+		-- <location>East Tokyo United</location>
+		location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
+		-- <followers_count>555</followers_count>
+		followers_count = user:match('<followers_count>([^<]*)<');
+		-- <friends_count>596</friends_count>
+		friends_count = user:match('<friends_count>([^<]*)<');
+		-- <favourites_count>361</favourites_count>
+		favourites_count = user:match('<favourites_count>([^<]*)<');
+		-- <statuses_count>7889</statuses_count>
+		statuses_count = user:match('<statuses_count>([^<]*)<');
 
-	if location ~= nil then
-		item = item .. "location : " .. location .. "\r\n";
+		if location ~= nil then
+			item = item .. "location : " .. location .. "\r\n";
+		end
+		
+		if friends_count ~= nil then
+			item = item .. "followings : " .. friends_count
+			            .. ", "
+			            .. "followers : " .. followers_count
+			            .. ", "
+			            .. "fav : " .. favourites_count
+			            .. "\r\n"
+			            .. "発言数 : " .. statuses_count
+			            .. "\r\n";
+		end
+		item = item --.. "description : "
+		       .. data:get_text('title') .. "\r\n";
+		g:set_color("text", "MainBodyListDefaultText");
+		g:set_font_size(0);		-- 中サイズフォント
+		g:draw_text(item, x, y, w, h, format);
 	end
-	
-	if friends_count ~= nil then
-		item = item .. "followings : " .. friends_count
-		            .. ", "
-		            .. "followers : " .. followers_count
-		            .. ", "
-		            .. "fav : " .. favourites_count
-		            .. "\r\n"
-		            .. "発言数 : " .. statuses_count
-		            .. "\r\n";
-	end
-	item = item --.. "description : "
-	       .. data:get_text('title') .. "\r\n";
-	g:set_color("text", "MainBodyListDefaultText");
-	g:set_font_size(0);		-- 中サイズフォント
-	g:draw_text(item, x, y, w, h, format);
 
 	-- 項目番号(ページ番号風で)
 --[[
@@ -2704,6 +2794,7 @@ mz3.add_event_listener("draw_detail_view",  "twitter.on_draw_detail_view");
 
 
 --- 詳細画面のキー押下イベント
+detail_view_mode = "normal";
 function on_keydown_detail_view(event_name, serialize_key, data, key)
 	mz3.logger_debug('twitter.on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
 
@@ -2774,6 +2865,17 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 		-- 閉じる
 		mz3.change_view('main_view');
 		return true;
+	end
+	
+	if key == VK_SPACE then
+		-- トグル「全文表示」「通常表示」
+		if detail_view_mode == "all" then
+			detail_view_mode = "normal";
+		else
+			detail_view_mode = "all";
+		end
+		data = mz3_main_view.get_selected_body_item();
+		mz3.show_detail_view(data);
 	end
 	
 	if key == VK_F2 then
