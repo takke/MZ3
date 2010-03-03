@@ -2437,7 +2437,7 @@ end
 
 --- メイン画面のキー押下イベント
 function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
-	mz3.logger_debug('twitter.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+--	mz3.logger_debug('twitter.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
 
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	serialize_key = body:get_serialize_key();

@@ -160,11 +160,10 @@ end
 
 
 --- メイン画面のキー押下イベント
-function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
-	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
+--	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
 
 	local focus = mz3_main_view.get_focus();
-
 	if focus ~= "edit" then
 		if key == VK_J then
 			-- down
@@ -212,13 +211,13 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 			return true;
 		end
 	end
-
+--[[
 	if focus == "category_list" then
 		-- カテゴリリスト
 	elseif focus == "body_list" then
 		-- ボディリスト
 	end
-
+]]
 	return false;
 end
 mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");
