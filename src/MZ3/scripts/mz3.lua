@@ -216,16 +216,19 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 			return true;
 		end
 
-		if key == VK_S then
-			-- フォントを小さく
-			mz3.exec_mz3_command("FONT_SHRINK");
-			return true;
-		end
+		-- MZ3 only
+		if mz3.get_app_name()=="MZ3" then
+			if key == VK_S then
+				-- フォントを小さく
+				mz3.exec_mz3_command("FONT_SHRINK");
+				return true;
+			end
 
-		if key == VK_W then
-			-- フォントを大きく
-			mz3.exec_mz3_command("FONT_MAGNIFY");
-			return true;
+			if key == VK_W then
+				-- フォントを大きく
+				mz3.exec_mz3_command("FONT_MAGNIFY");
+				return true;
+			end
 		end
 	end
 --[[

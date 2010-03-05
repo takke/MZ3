@@ -230,7 +230,6 @@ function google_reader_tag_list_parser(parent, body, html)
 			mz3_post_data.append_post_body(post, "Email=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
 			mz3_post_data.append_post_body(post, "Passwd=" .. mz3.url_encode(mail_password, 'utf8') .. "&");
 			mz3_post_data.append_post_body(post, "service=reader");
---			mz3_post_data.append_post_body(post, "continue=" .. mz3.url_encode(continue_value, 'utf8'));
 			
 			-- 通信開始
 			access_type = mz3.get_access_type_by_key("GOOGLE_READER_LOGIN");

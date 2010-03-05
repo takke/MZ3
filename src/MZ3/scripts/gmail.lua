@@ -506,11 +506,23 @@ function gmail_login_parser(parent, body, html)
 	end
 	url = url:gsub('&amp;', '&');
 --	mz3.alert('url : ' .. url);
+
 	if url == '' then
-		mz3.alert('ログインに失敗しました。 \r\nメールアドレスとパスワードを確認してください。');
+		mz3.alert('ログインに失敗しました。 \r\n'
+		       .. 'メールアドレスとパスワードを確認してください。 \r\n'
+		       .. '初回ログイン時は再度アクセスするとログインできる場合があります。');
+		auto_login_processing = false;
 		return;
 	end
 	
+	-- 自動ログイン、無限ループ判定
+	if auto_login_processing then
+		mz3.alert('自動ログインに失敗しました。');
+		auto_login_processing = false;
+		return;
+	end
+	auto_login_processing = true;
+
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key("GMAIL_INBOX");
 	referer = '';
