@@ -2457,6 +2457,11 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 				return TRUE;
 			} else {
 #ifdef WINCE
+				// 下ペイン最大化状態であれば上ペインを最大化
+				if (m_magnifyMode == MAGNIFY_MODE_BODY) {
+					MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+				}
+
 				// デフォルト動作
 				return FALSE;
 #else
@@ -2476,6 +2481,11 @@ BOOL CMZ3View::OnKeydownCategoryList( WORD vKey )
 				return CommandSetFocusBodyList();
 			} else {
 #ifdef WINCE
+				// 下ペイン最大化状態であれば上ペインを最大化
+				if (m_magnifyMode == MAGNIFY_MODE_BODY) {
+					MySetMagnifyModeTo(MAGNIFY_MODE_CATEGORY);
+				}
+
 				// デフォルト動作
 				return FALSE;
 #else
