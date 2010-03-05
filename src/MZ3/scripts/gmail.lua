@@ -236,7 +236,7 @@ function gmail_inbox_parser(parent, body, html)
 		
 		-- <input id="sbb" type="submit" name="nvp_site_mail" value="メールを検索" />
 		-- 上記があればログイン済 = 既に受信箱
-		if line_has_strings(line, '<input', '"nvp_site_mail"') then
+		if line_has_strings(line, '<input', 'nvp_site_mail') then
 			is_logged_in = true;
 			break;
 		end
@@ -324,6 +324,9 @@ function parse_gmail_inbox(parent, body, line)
 
 	-- <form action="?at=xxxxx" name="f" method="POST">
 	post_url = line:match('<form action="(%?[^"].-)" name="f".->');
+	if post_url == nil then
+		post_url = line:match('<form action="(%?[^"].-)" name=f.->');
+	end
 	post_url = base_url .. post_url;
 --	mz3.alert(post_url);
 
@@ -415,7 +418,7 @@ xxx
 ...
 ]]
 		name, href, span, date
-			= w:match('<td.->.-</td>.-<td.-> (.-)</td>.-href="(.-)">.-<span.->(.-)</span>.-<td.->(.-)$');
+			= w:match('<td.->.-</td>.-<td.-> ?(.-)</td>.-href="(.-)">.-<span.->(.-)</span>.-<td.->(.-)$');
 
 		if name~=nil then
 
