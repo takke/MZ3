@@ -888,17 +888,32 @@ bool CMZ3App::MakeNewFont( CFont* pBaseFont_Dummy, int fontHeight, LPCTSTR fontF
 {
 #ifdef WINCE
 	int iDPI = ::GetDeviceCaps(NULL, LOGPIXELSY);
-	BYTE fontQuality = NONANTIALIASED_QUALITY;
+/*	BYTE fontQuality = NONANTIALIASED_QUALITY;
 	if (iDPI==192) {
 		// VGA(非RealVGA) ならClearType指定
 		fontQuality = CLEARTYPE_QUALITY;
 	}
+*/
 #else
 	// DPI 値の取得
 	int iDPI = theApp.GetDPI();
 
-	BYTE fontQuality = DEFAULT_QUALITY;
+//	BYTE fontQuality = DEFAULT_QUALITY;
 #endif
+
+#ifndef CLEARTYPE_QUALITY
+#define CLEARTYPE_QUALITY 5
+#endif
+	BYTE fontQuality = DEFAULT_QUALITY;
+	if (theApp.m_optionMng.m_bUseClearTypeFont) {
+		fontQuality = CLEARTYPE_QUALITY;
+	} else {
+#ifdef WINCE
+		fontQuality = NONANTIALIASED_QUALITY;
+#else
+		fontQuality = DEFAULT_QUALITY;
+#endif
+	}
 	int newHeight = - theApp.pt2px(fontHeight);	// 負数とすることで pixel 値指定とする
 
 	MZ3LOGGER_DEBUG( 

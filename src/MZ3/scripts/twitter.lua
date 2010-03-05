@@ -335,11 +335,16 @@ end
 --   body:   下ペインのオブジェクト群(MZ3DataList*)
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
+reset_body_list_id = 0;	-- 取得後のボディリストの復帰位置(Twitter POST ID)
 function twitter_friends_timeline_parser(parent, body, html)
 	mz3.logger_debug("twitter_friends_timeline_parser start");
 
 	-- 返信 id の初期化
 	twitter_reply_id = 0;
+	
+	-- 現在のカーソル位置を記憶
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	reset_body_list_id = body:get_integer64_as_string('id');
 
 	if mz3_pro_mode then
 		-- Pro モードならホスト側に任せる
@@ -2489,6 +2494,33 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 	return false;
 end
 mz3.add_event_listener("keyup_main_view", "twitter.on_keyup_main_view");
+
+
+function on_after_get_end(event_name, serialize_key, body)
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type == 'Twitter' then
+		if mz3_inifile.get_value('CursorRestoreAfterTLFetch', 'Twitter')=='1' and reset_body_list_id ~= 0 then
+		
+			-- カーソル位置の復帰
+			local list = mz3_main_view.get_body_item_list();
+			list = MZ3DataList:create(list);
+			local n = list:get_count();
+			for i=0, n-1 do
+				local data = list:get_data(i);
+				data = MZ3Data:create(data);
+				if data:get_integer64_as_string('id') == reset_body_list_id then
+					mz3_main_view.select_body_item(i);
+					break;
+				end
+			end
+		end
+		-- Twitter のデフォルト動作も継続する(複数ページ取得など)
+		return false;
+	end
+	
+	return false;
+end
+mz3.add_event_listener("after_get_end", "twitter.on_after_get_end");
 
 
 --- アイコンの描画
