@@ -61,6 +61,7 @@ public:
 
 	int				m_fontHeight;			///< フォント（中）のサイズ（0 の場合は設定しない）
 	CString			m_fontFace;				///< フォント名（"" の場合は設定しない）
+	bool			m_bUseClearTypeFont;	///< Clear Type Font
 
 	int				m_longReturnRangeMSec;	///< 長押し判定時間（ミリ秒）
 
@@ -241,6 +242,7 @@ public:
 		, m_bShowNetProgressBar(false)
 		, m_bShowBalloonOnNewTL(true)
 		, m_bodyListIconSize(BODYLIST_ICONSIZE_AUTO)
+		, m_bUseClearTypeFont(true)
 	{
 	}
 

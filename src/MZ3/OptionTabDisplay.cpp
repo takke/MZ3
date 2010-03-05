@@ -63,6 +63,14 @@ BOOL COptionTabDisplay::OnInitDialog()
 	}
 #endif
 
+	// ClearType
+	CheckDlgButton( IDC_USE_CLEAR_TYPE_FONT_CHECK, theApp.m_optionMng.m_bUseClearTypeFont ? BST_CHECKED : BST_UNCHECKED );
+
+	// ここまで用意したけど、たいていの場合はクリアタイプONで問題ないため非表示にしておく。
+	CWnd* pItem = GetDlgItem( IDC_USE_CLEAR_TYPE_FONT_CHECK );
+	if (pItem != NULL) {
+		pItem->ShowWindow(SW_HIDE);
+	}
 
 	return TRUE;
 }
@@ -78,6 +86,9 @@ void COptionTabDisplay::OnOK()
 
 	// 通知領域に新着TLをバルーン表示する
 	theApp.m_optionMng.m_bShowBalloonOnNewTL = IsDlgButtonChecked( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK ) == BST_CHECKED ? true : false;
+
+	// ClearType
+	theApp.m_optionMng.m_bUseClearTypeFont = IsDlgButtonChecked( IDC_USE_CLEAR_TYPE_FONT_CHECK ) == BST_CHECKED ? true : false;
 
 	CPropertyPage::OnOK();
 }

@@ -167,6 +167,9 @@ void Option::Sync(bool bSave)
 	// フォント名
 	SyncIniValue(inifile, bSave, m_fontFace, "FontFace", "UI");
 
+	// ClearType
+	SyncIniValue(inifile, bSave, m_bUseClearTypeFont, "ClearTypeFont", "UI");
+
 	// Xcrawl 誤動作防止機能
 	SyncIniValue(inifile, bSave, m_bUseXcrawlExtension, "UseXcrawlCanceler", "UI" );
 
