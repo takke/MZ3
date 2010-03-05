@@ -56,8 +56,9 @@ BOOL COptionTabDisplay::OnInitDialog()
 
 	// 通知領域に新着TLをバルーン表示する
 	CheckDlgButton( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK, theApp.m_optionMng.m_bShowBalloonOnNewTL ? BST_CHECKED : BST_UNCHECKED );
+	CWnd* pItem = NULL;
 #ifdef WINCE
-	CWnd* pItem = GetDlgItem( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK );
+	pItem = GetDlgItem( IDC_SHOW_BALLOON_ON_NEW_TL_CHECK );
 	if (pItem != NULL) {
 		pItem->ShowWindow(SW_HIDE);
 	}
@@ -67,7 +68,7 @@ BOOL COptionTabDisplay::OnInitDialog()
 	CheckDlgButton( IDC_USE_CLEAR_TYPE_FONT_CHECK, theApp.m_optionMng.m_bUseClearTypeFont ? BST_CHECKED : BST_UNCHECKED );
 
 	// ここまで用意したけど、たいていの場合はクリアタイプONで問題ないため非表示にしておく。
-	CWnd* pItem = GetDlgItem( IDC_USE_CLEAR_TYPE_FONT_CHECK );
+	pItem = GetDlgItem( IDC_USE_CLEAR_TYPE_FONT_CHECK );
 	if (pItem != NULL) {
 		pItem->ShowWindow(SW_HIDE);
 	}
