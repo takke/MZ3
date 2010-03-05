@@ -441,6 +441,7 @@ xxx
 			end
 			title = title:gsub('<.->', '');
 			title = title:gsub('^ *', '');
+			title = title:gsub('\n', '');
 			title = mz3.decode_html_entity(title);
 			data:set_text("title", title);
 
@@ -448,11 +449,15 @@ xxx
 			url = base_url .. href;
 			data:set_text("url", url);
 			date = date:gsub('<.->', '');
+			date = date:gsub('&nbsp;', ' ');
+			date = date:gsub('\n', '');
+			date = date:gsub('^ +', '');
 			data:set_date(date);
 
 			-- 名前
 			name = name:gsub('<b>', '');
 			name = name:gsub('</b>', '');
+			name = name:gsub('\n', '');
 			data:set_text("name", mz3.decode_html_entity(name));
 			data:set_text("author", name);
 			
@@ -621,7 +626,9 @@ function gmail_mail_parser(data, dummy, html)
 	-- 特定のtableと「返信開始タグ」で分離する
 	
 	one_mail_start_tags = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#efefef"> <tr> <td> ';
+	one_mail_start_tags2 = '<table width=98% cellpadding=0 cellspacing=0 border=0 align=center class=h>';
 	reply_start_tags    = '<table width="100%" cellpadding="1" cellspacing="0" border="0" bgcolor="#e0ecff" class="qr"> <tr> ';
+	reply_start_tags2   = 'class=qr>';
 	
 	-- 絵文字URLリスト
 	-- 例) emoji_urls[0] = 'https://mail.google.com/mail/e/ezweb_ne_jp/B60';
@@ -632,10 +639,23 @@ function gmail_mail_parser(data, dummy, html)
 	local pos = 1;
 	while true do
 		-- メール開始タグを探す
+		local len = 0;
 		pos = line:find(one_mail_start_tags, start, true);
-		if pos == nil then
+		if pos ~= nil then
+			len = one_mail_start_tags:len();
+		else
+			pos = line:find(one_mail_start_tags2, start, true);
+			len = one_mail_start_tags2:len();
+		end
+--		mz3.alert(pos);
+		if pos ~= nil then
 			-- 「返信開始タグ」までを1通とする
 			pos = line:find(reply_start_tags, start, true);
+			if pos == nil then
+				pos = line:find(reply_start_tags2, start, true);
+			end
+--			mz3.alert(pos);
+			
 			if pos == nil then
 				-- 「返信開始タグ」がないので最後まで。
 				one_mail = line:sub(start);
@@ -644,6 +664,10 @@ function gmail_mail_parser(data, dummy, html)
 			end
 
 			-- 整形、Data化
+			if mail_count == 0 then
+				mail_count = 1;
+			end
+--			mz3.logger_debug(one_mail);
 			parse_one_mail(data, one_mail, mail_count);
 			break;
 		else
@@ -652,7 +676,7 @@ function gmail_mail_parser(data, dummy, html)
 			-- 整形、Data化
 			parse_one_mail(data, one_mail, mail_count);
 			
-			start = pos + one_mail_start_tags:len();
+			start = pos + len;
 			mail_count = mail_count +1;
 		end
 	end
@@ -731,13 +755,18 @@ function parse_one_mail(data, line, count)
 	-- 日付
 	-- <td align="right" valign="top"> 2009/05/24 8:17 <tr>
 	date = line:match('<td align="right" valign="top"> (.-) <');
+	if date == nil then
+		-- <td align=right valign=top>Fri, Mar 5, 2010 at 11:05 PM<tr>
+		date = line:match('<td align=right valign=top>(.-)<');
+	end
+--	mz3.alert(date);
 	if date ~= nil then
 		date = date:gsub('<.->', '');
 		data:set_date(date);
 	end
 	
 	-- 本文
-	body = line:match('<div class="msg"> ?(.*)$');
+	body = line:match('<div class="?msg"?> ?(.*)$');
 	
 	if body ~= nil then
 		-- 簡易HTML解析
