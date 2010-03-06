@@ -4,7 +4,7 @@
 :----- CAB/LZH ファイル名の変更 -----
 @echo MZ3.%MZ3_VERSION%.CAB 等を別ファイル名に変更できます。
 @set NEW_VER=0
-@set /P NEW_VER="変更する場合は新バージョン番号を入力して下さい(例:1.2.3) > "
+@set /P NEW_VER="変更する場合は新バージョン番号を入力して下さい(例:1.2.3) ※Enterでキャンセル > "
 :echo %NEW_VER%
 
 IF %NEW_VER%==0 GOTO END
