@@ -62,7 +62,7 @@ int lua_mz3_get_app_name(lua_State *L)
 }
 
 /*
---- BuildType("MZ3", "TkTwitter")を返す
+--- BuildType("MZ3", "TkTweets")を返す
 --
 -- @return [string] アプリケーション名
 --

@@ -217,7 +217,8 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 		end
 
 		-- MZ3 only
-		if mz3.get_app_name()=="MZ3" then
+		local app_name = mz3.get_app_name();
+		if app_name=="MZ3" or app_name=="TkTweets" then
 			if key == VK_S then
 				-- フォントを小さく
 				mz3.exec_mz3_command("FONT_SHRINK");

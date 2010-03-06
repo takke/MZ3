@@ -343,8 +343,8 @@ function twitter_friends_timeline_parser(parent, body, html)
 	twitter_reply_id = 0;
 	
 	-- 現在のカーソル位置を記憶
-	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
-	reset_body_list_id = body:get_integer64_as_string('id');
+	body_item = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	reset_body_list_id = body_item:get_integer64_as_string('id');
 
 	if mz3_pro_mode then
 		-- Pro モードならホスト側に任せる
