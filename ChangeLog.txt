@@ -96,8 +96,8 @@ $Id$
 - (低) 8M以上のファイルをダウンロードすると強制終了する(解決策決定済、未着手)
 - (低) RSSフィードの追加時にタイトルが文字化けする場合がある。RSS AutoDiscovery 時のencodingがUTF-8固定のため
 
-http://mz3.jp/bin/MZ3.1.3.2.CAB (WindowsMobile版)
-http://mz3.jp/bin/MZ4.1.3.2.lzh (Windows版)
+http://mz3.jp/bin/MZ3.1.3.3.CAB (WindowsMobile版)
+http://mz3.jp/bin/MZ4.1.3.3.lzh (Windows版)
 
 ** MZ3.i/MZ4 Ver.1.3.2  (2010.02.27)
 - Google Readerプラグインに未登録時の処理追加(by ドトールさん)

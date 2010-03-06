@@ -2503,14 +2503,16 @@ function on_after_get_end(event_name, serialize_key, body)
 		
 			-- カーソル位置の復帰
 			local list = mz3_main_view.get_body_item_list();
-			list = MZ3DataList:create(list);
-			local n = list:get_count();
-			for i=0, n-1 do
-				local data = list:get_data(i);
-				data = MZ3Data:create(data);
-				if data:get_integer64_as_string('id') == reset_body_list_id then
-					mz3_main_view.select_body_item(i);
-					break;
+			if list ~= nil then
+				list = MZ3DataList:create(list);
+				local n = list:get_count();
+				for i=0, n-1 do
+					local data = list:get_data(i);
+					data = MZ3Data:create(data);
+					if data:get_integer64_as_string('id') == reset_body_list_id then
+						mz3_main_view.select_body_item(i);
+						break;
+					end
 				end
 			end
 		end

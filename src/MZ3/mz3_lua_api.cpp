@@ -2144,13 +2144,14 @@ int lua_mz3_data_list_get_count(lua_State *L)
 	// ˆø”æ“¾
 	MZ3DataList* data_list = (MZ3DataList*)lua_touserdata(L, 1);	// ‘æ1ˆø”
 	if (data_list==NULL) {
-		lua_pushstring(L, make_invalid_arg_error_string(func_name));
-		lua_error(L);
-		return 0;
+//		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+//		lua_error(L);
+		lua_pushinteger(L, 0);
+//		return 0;
+	} else {
+		// ŒÂ”
+		lua_pushinteger(L, data_list->size());
 	}
-
-	// ŒÂ”
-	lua_pushinteger(L, data_list->size());
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 1;
