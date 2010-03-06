@@ -2455,6 +2455,12 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 
 	if focus == "category_list" then
 		-- カテゴリリスト
+		if key == VK_U then
+			-- つぶやく
+			on_twitter_update(serialize_key, event_name, nil);
+			return true;
+		end
+		
 	elseif focus == "body_list" then
 		-- ボディリスト
 
