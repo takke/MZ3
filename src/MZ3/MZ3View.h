@@ -335,7 +335,10 @@ public:
 	 */
 	CMixiData& GetSelectedBodyItem(void)
 	{
-		CCategoryItem* pSelectedCategory = m_selGroup->getSelectedCategory();
+		CCategoryItem* pSelectedCategory = NULL;
+		if (m_selGroup != NULL) {
+			pSelectedCategory = m_selGroup->getSelectedCategory();
+		}
 		if (pSelectedCategory==NULL) {
 			// ダミーを返す。本来はNULLを返すなり、Exception投げるなりすべき。
 			static CMixiData s_dummy;
