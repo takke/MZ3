@@ -31,6 +31,7 @@ public:
 	afx_msg void OnBnClickedShowMiniImageCheck();
 	void UpdateControlItemStatus(void);
 	CComboBox mc_comboIconSize;
+	CComboBox mc_comboBodyListLineCount;
 };
 
 #endif

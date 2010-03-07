@@ -671,7 +671,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		csDrawRight = pDC->GetOutputTextExtent( strLine2Right );
 		csDrawAllText = pDC->GetOutputTextExtent( strLine2 );
 
-		if (theApp.m_optionMng.m_bBodyListIntegratedColumnModeLine <= 2) {
+		if (theApp.m_optionMng.m_nBodyListIntegratedColumnModeLine <= 2) {
 			const int nDrawFlags = DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_BOTTOM | DT_LEFT | DT_END_ELLIPSIS;
 			if( csDrawAllText.cx > rcDraw.Width() && csDrawRight.cx < rcDraw.Width() ) {
 				// 二つに分割した文字列を両端に分けて描画する
@@ -1094,7 +1094,7 @@ void CBodyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 
 	if (theApp.m_optionMng.m_bBodyListIntegratedColumnMode) {
 		// 統合カラムモード：高さをN倍する
-		int N = theApp.m_optionMng.m_bBodyListIntegratedColumnModeLine;
+		int N = theApp.m_optionMng.m_nBodyListIntegratedColumnModeLine;
 		lpMeasureItemStruct->itemHeight = lfHeightPx*N +theApp.pt2px(INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM_PT)*1;
 	} else {
 		// カラムモード
