@@ -680,7 +680,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	case MAGNIFY_MODE_CATEGORY:
 		{
 			int hItem0 = 0;
-			if (m_bodyList.GetItemCount() > 0) {
+			if (::IsWindow(m_bodyList.m_hWnd) && m_bodyList.GetItemCount() > 0) {
 				CRect rectItem0;
 				m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
 				hItem0 = rectItem0.Height();
@@ -701,7 +701,7 @@ void CMZ3View::MySetLayout(int cx, int cy)
 			hGroup = 0;
 
 			int hItem0 = 0;
-			if (m_categoryList.GetItemCount() > 0) {
+			if (::IsWindow(m_categoryList.m_hWnd) && m_categoryList.GetItemCount() > 0) {
 				CRect rectItem0;
 				m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
 				hItem0 = rectItem0.Height();
