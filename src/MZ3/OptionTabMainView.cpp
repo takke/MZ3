@@ -74,6 +74,8 @@ BOOL COptionTabMainView::OnInitDialog()
 		mc_comboBodyListLineCount.SetItemData(idx++, 2);
 		mc_comboBodyListLineCount.InsertString(idx, L"3çs");
 		mc_comboBodyListLineCount.SetItemData(idx++, 3);
+		mc_comboBodyListLineCount.InsertString(idx, L"4çs");
+		mc_comboBodyListLineCount.SetItemData(idx++, 4);
 
 		mc_comboBodyListLineCount.SetCurSel(0);	// default
 		int nLine = 1;

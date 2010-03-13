@@ -202,7 +202,7 @@ inline bool MyGetMatchString(const CString& target, const CString& left, const C
 
 inline void MyExtractLinks(const CString& s, MZ3Data& data)
 {
-	if (s.Find( L"ttp://" ) != -1) {
+	if (s.Find( L"ttp://" ) != -1 || s.Find( L"ttps://" ) != -1) {
 		// ƒŠƒ“ƒN’Šo
 		static MyRegex reg4;
 		if( !util::CompileRegex( reg4, L"(https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)" ) ) {
