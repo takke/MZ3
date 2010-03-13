@@ -2760,17 +2760,26 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 
 		return TRUE;
 
+#ifdef WINCE
 	case VK_PROCESSKEY:	// 0xE5
 	case VK_F23:		// 0x86
-		// W-ZERO3 で RETURN キー押下時に飛んでくるキー。
-		if( m_dwLastReturn == 0 ) {
-			// m_dwLastReturn を更新しておく。
-			m_dwLastReturn = GetTickCount();
+		// W-ZERO3 限定なのでとりあえずWMのバージョンで縛っておく
+		if (theApp.m_Platforms.WM6_5 ||
+			theApp.m_Platforms.WM6_5_1)
+		{
+			// 無視
+		} else {
+			// W-ZERO3 で RETURN キー押下時に飛んでくるキー。
+			if( m_dwLastReturn == 0 ) {
+				// m_dwLastReturn を更新しておく。
+				m_dwLastReturn = GetTickCount();
 
-			// 長押し判定用スレッドを開始
-			AfxBeginThread( LongReturnKey_Thread, this );
+				// 長押し判定用スレッドを開始
+				AfxBeginThread( LongReturnKey_Thread, this );
+			}
 		}
 		break;
+#endif
 
 /*	// Lua で実装
 	case VK_LEFT:
