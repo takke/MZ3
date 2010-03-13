@@ -2718,8 +2718,6 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 			}else{
 				// 長押し判定時間以上経っているので、ログを開く
 
-				util::MySetInformationText( m_hWnd, L"ログを開いています..." );
-
 				// ログを開く
 				OnViewLog();
 
@@ -3581,6 +3579,8 @@ bool CMZ3View::MyLoadCategoryLogfile( CCategoryItem& category )
 void CMZ3View::OnViewLog()
 {
 #ifdef BT_MZ3
+	util::MySetInformationText( m_hWnd, L"ログを開いています..." );
+
 	CMixiData& mixi = GetSelectedBodyItem();
 
 	// レポート画面で開けるタイプのみサポートする
