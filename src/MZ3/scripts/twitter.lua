@@ -206,7 +206,8 @@ menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_upd
 menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
 menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
 menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
-menu_items.search_favotter       = mz3_menu.regist_menu("twitter.on_search_search_favotter");
+menu_items.search_favotter       = mz3_menu.regist_menu("twitter.on_search_favotter");
+menu_items.search_user_timeline  = mz3_menu.regist_menu("twitter.on_search_user_timeline");
 
 -- 発言内のハッシュタグ #xxx 抽出リスト
 menu_items.search_hash_list = {}
@@ -2031,6 +2032,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", "発言削除", menu_items.twitter_update_destroy);
 	end
 	menu:append_menu("string", "発言検索", menu_items.search_post);
+	menu:append_menu("string", "ユーザID検索", menu_items.search_user_timeline);
 
 	-- 発言内のハッシュタグ #XXX を抽出し、メニュー化
 	body_text = body:get_text_array_joined_text('body');
@@ -2418,7 +2420,7 @@ end
 
 
 --- ふぁぼられメニュー用ハンドラ
-function on_search_search_favotter(serialize_key, event_name, data)
+function on_search_favotter(serialize_key, event_name, data)
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
 	title = "@" .. name .. "のふぁぼられ";
@@ -2426,7 +2428,7 @@ function on_search_search_favotter(serialize_key, event_name, data)
 	key = "RSS_FEED";
 
 	-- URL 生成
-	url = "http://favotter.matope.com/userrss.php?user=" .. name .. "&mode=new.feed";
+	url = "http://favotter.net/userrss.php?user=" .. name .. "&mode=new.feed";
 
 	mz3_main_view.append_category(title, url, key);
 
@@ -2436,7 +2438,36 @@ function on_search_search_favotter(serialize_key, event_name, data)
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
 
+
+--- 任意ユーザの TL 取得用ハンドラ
+function on_search_user_timeline(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+--[[
+	body = mz3_main_view.get_selected_body_item();
+	body = MZ3Data:create(body);
+	name = body:get_text('name');
+]]
+	local name = mz3.show_common_edit_dlg("ユーザID検索", "検索したいユーザIDを入力して下さい", last_searched_key);
+	if name == nil then
+		return false;
+	end
+
+	-- カテゴリ追加
+	title = "@" .. name .. "のタイムライン";
+	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	key = "TWITTER_FRIENDS_TIMELINE";
+	mz3_main_view.append_category(title, url, key);
+
+	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
 
