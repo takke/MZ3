@@ -73,6 +73,8 @@ VK_BACK   = 0x08;
 VK_END    = 0x23;
 VK_F1     = 0x70;
 VK_F2     = 0x71;
+VK_PRIOR  = 0x21;	-- PageUp
+VK_NEXT   = 0x22;	-- PageDown
 VK_A      = 0x41;
 VK_B      = 0x42;
 VK_C      = 0x43;
@@ -178,10 +180,12 @@ end
 
 --- メイン画面のキー押下イベント
 mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
---	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+--	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. string.format('0x%2x', key) .. ')');
 
 	local focus = mz3_main_view.get_focus();
 	if focus ~= "edit" then
+		-- たいていのキーアサインは入力エリアで無効にすべき
+
 		if key == VK_J then
 			-- down
 			mz3.keybd_event(VK_DOWN, "keydown");
@@ -213,6 +217,18 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 		if key == VK_SPACE or key == VK_O then
 			-- 最新TLの取得
 			mz3_main_view.retrieve_category_item();
+			return true;
+		end
+
+		if key == VK_NEXT and is_ctrl ~= 0 then
+			-- Ctrl+PageDown 次のタブ
+			mz3.exec_mz3_command('NEXT_TAB');
+			return true;
+		end
+
+		if key == VK_PRIOR and is_ctrl ~= 0 then
+			-- Ctrl+PageUp 前のタブ
+			mz3.exec_mz3_command('PREV_TAB');
 			return true;
 		end
 

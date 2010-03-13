@@ -260,7 +260,7 @@ function my_add_new_user(new_list, status, id)
 	
 	-- URL を抽出し、リンクにする
 	if line_has_strings(text, 'ttp') then
-		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%%#]+") do
 			data:add_link_list(url, url);
 --			mz3.logger_debug('抽出URL: ' .. url);
 		end
@@ -648,7 +648,7 @@ function twitter_direct_messages_parser(parent, body, html)
 				data:parse_date_line(s);
 				
 				-- URL を抽出し、リンクにする
-				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+") do
+				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%%#]+") do
 					data:add_link_list(url, url);
 --					mz3.logger_debug(url);
 				end
@@ -1057,7 +1057,7 @@ function on_shorten_by_bitly(serialize_key, event_name, data)
 
 	-- URL を抽出し、リンクにする
 	while true do
-		left, url, right = target:match("(.-)(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)(.*)");
+		left, url, right = target:match("(.-)(h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%%#]+)(.*)");
 		if left == nil then
 			-- 残り出力
 			text = text .. target;
