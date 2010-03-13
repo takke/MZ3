@@ -382,7 +382,7 @@ function thread_parser(data, dummy, html)
 			data:set_text('title', title);
 		end
 
-		-- <dt>1 ：<font color=green><b>☆ばぐ太☆φ ★</b></font>：2009/07/06(月) 23:34:25 ID:???i<dd> ★電車内でナイフ見せ脅す、大阪  暴力行為法違反容疑で逮捕 <br>  <br> ・電車内で携帯電話の使用を注意された相手にナイフを見せて脅したとして、大阪府警天王寺署は <br> 　６日、暴力行為処罰法違反の疑いで、兵庫県尼崎市長洲本通、会社員太田了容疑者（３０）を <br> 　現行犯逮捕した。 <br>  <br> 　逮捕容疑は６日午後２時５０分ごろ、ＪＲ関西線の東部市場前−天王寺間を走行していた <br> 　快速電車内で、奈良県大和郡山市の男性会社員（６８）から携帯電話のゲームをやめるよう <br> 　注意されたことに腹を立て、持っていたナイフを取り出し「殺してしまうぞ」と脅した疑い。 <br>  <br> 　天王寺署によると、太田容疑者は「腹が立ったので刃物を示した」と容疑を認めている。 <br>  <br> 　電車に乗り合わせていたＪＲ社員が取り押さえ、天王寺駅で警察官に引き渡した。男性や乗客に <br> 　けがはなかった。 <br>  <br> 　<a href="http://ime.nu/www.47news.jp/CN/200907/CN2009070601000800.html" target="_blank">http://www.47news.jp/CN/200907/CN2009070601000800.html</a> <br>  <br> ※前スレ <br> <a href="http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/" target="_blank">http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/</a> <br><br>
+		-- <dt>1 ：<font color=green><b>☆ばぐ太☆φ ★</b></font>：2009/07/06(月) 23:34:25 ID:???i<dd> ★電車内でナイフ見せ脅す、大阪  暴力行為法違反容疑で逮捕 <br>  <br> ・電車内で携帯電話の使用を注意された相手にナイフを見せて脅したとして、大阪府警天王寺署は <br> 　６日、暴力行為処罰法違反の疑いで、兵庫県尼崎市長洲本通、会社員太田了容疑者（３０）を <br> 　現行犯逮捕した。 <br>  <br> 　逮捕容疑は６日午後２時５０分ごろ、ＪＲ関西線の東部市場前竏駐V王寺間を走行していた <br> 　快速電車内で、奈良県大和郡山市の男性会社員（６８）から携帯電話のゲームをやめるよう <br> 　注意されたことに腹を立て、持っていたナイフを取り出し「殺してしまうぞ」と脅した疑い。 <br>  <br> 　天王寺署によると、太田容疑者は「腹が立ったので刃物を示した」と容疑を認めている。 <br>  <br> 　電車に乗り合わせていたＪＲ社員が取り押さえ、天王寺駅で警察官に引き渡した。男性や乗客に <br> 　けがはなかった。 <br>  <br> 　<a href="http://ime.nu/www.47news.jp/CN/200907/CN2009070601000800.html" target="_blank">http://www.47news.jp/CN/200907/CN2009070601000800.html</a> <br>  <br> ※前スレ <br> <a href="http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/" target="_blank">http://tsushima.2ch.net/test/read.cgi/newsplus/1246881623/</a> <br><br>
 		if line_has_strings(line, '<dt>') then
 			local count, name, date, content = line:match('<dt>(.-)：(.-)：(.-)<dd>(.*)$');
 			count = tonumber(count);
@@ -617,7 +617,7 @@ end
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	if serialize_key=="2CH_THREAD" or serialize_key=="2CH_SUBJECT" then
-	else	
+	else
 		return false;
 	end
 
@@ -955,6 +955,42 @@ function on_remove_bookmark(serialize_key, event_name, data)
 		end
 	end
 end
+
+
+--- メイン画面のキー押下イベント
+function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
+--	mz3.logger_debug('2ch.on_keyup_main_view : (' .. event_name .. ', ' .. key .. ')');
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	serialize_key = body:get_serialize_key();
+	service_type = mz3.get_service_type(serialize_key);
+	if service_type~='2ch' then
+		return false;
+	end
+
+	local focus = mz3_main_view.get_focus();
+
+	if focus == "category_list" then
+		-- カテゴリリスト
+		
+	elseif focus == "body_list" then
+		-- ボディリスト
+		if key == VK_F and is_ctrl~=0 then
+			if serialize_key=="2CH_THREAD" then
+				on_search_post_thread(serialize_key, event_name, nil);
+			else
+				on_search_post_bbs(serialize_key, event_name, nil);
+			end
+			return true;
+		end
+
+	elseif focus == "edit" then
+		-- エディット
+	end
+	
+	return false;
+end
+mz3.add_event_listener("keyup_main_view", "2ch.on_keyup_main_view");
 
 
 mz3.logger_debug('2ch.lua end');
