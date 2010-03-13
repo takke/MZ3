@@ -2495,12 +2495,6 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 	elseif focus == "body_list" then
 		-- ボディリスト
 
-		if key == VK_R then
-			-- 返信
-			on_twitter_reply(serialize_key, event_name, nil);
-			return true;
-		end
-		
 		if key == VK_U then
 			-- つぶやく
 			on_twitter_update(serialize_key, event_name, nil);
@@ -2516,6 +2510,12 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 		if key == VK_D then
 			-- DM
 			on_twitter_new_dm(serialize_key, event_name, nil);
+			return true;
+		end
+		
+		if key == VK_R then
+			-- 返信
+			on_twitter_reply(serialize_key, event_name, nil);
 			return true;
 		end
 		
@@ -2903,6 +2903,31 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 				idx = idx -1;
 			end
 		end
+	end
+	
+	if key == VK_U then
+		-- つぶやく
+		on_twitter_update(serialize_key, event_name, nil);
+		return true;
+	end
+	
+	if key == VK_F then
+		-- ふぁぼる
+		mz3.change_view('main_view');
+		on_twitter_create_favourings(serialize_key, event_name, nil);
+		return true;
+	end
+	
+	if key == VK_D then
+		-- DM
+		on_twitter_new_dm(serialize_key, event_name, nil);
+		return true;
+	end
+	
+	if key == VK_R then
+		-- 返信
+		on_twitter_reply(serialize_key, event_name, nil);
+		return true;
 	end
 	
 	if key == VK_RETURN or key == VK_ESCAPE or key == VK_BACK then

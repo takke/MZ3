@@ -288,6 +288,28 @@ end
 mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");
 
 
+mz3.on_keydown_detail_view = function (event_name, serialize_key, data, key)
+	mz3.logger_debug('mz3.on_keydown_detail_view : (' .. serialize_key .. ', ' .. event_name .. ', ' .. key .. ')');
+
+	if key == VK_J then
+		-- down
+		mz3.keybd_event(VK_DOWN, "keydown");
+		mz3.keybd_event(VK_DOWN, "keyup");
+		return true;
+	end
+
+	if key == VK_K then
+		-- up
+		mz3.keybd_event(VK_UP, "keydown");
+		mz3.keybd_event(VK_UP, "keyup");
+		return true;
+	end
+
+	return false;
+end
+mz3.add_event_listener("keydown_detail_view", "mz3.on_keydown_detail_view");
+
+
 -------------------------------------------------
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------

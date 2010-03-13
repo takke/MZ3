@@ -3067,7 +3067,7 @@ unsigned int CMZ3View::LongReturnKey_Thread( LPVOID This )
 	if( pView->m_dwLastReturn != 0 ) {
 		// まだ VK_RETURN が来ていないので、ログを開く
 		// のはボタンリリース時で、ここではメッセージのみ変更しておく。
-		util::MySetInformationText( pView->GetSafeHwnd(), L"ログを開きます..." );
+//		util::MySetInformationText( pView->GetSafeHwnd(), L"ログを開きます..." );
 
 		// W-ZERO3 の場合は、VK_PROCESSKEY 押下からの経過時間で長押し判定
 	}else{
