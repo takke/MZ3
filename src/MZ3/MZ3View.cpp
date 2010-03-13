@@ -367,6 +367,7 @@ void CMZ3View::OnInitialUpdate()
 	theApp.EnableCommandBarButton( ID_OPEN_BROWSER, FALSE);
 
 	m_categoryList.SetFocus();
+	m_hotList = &m_categoryList;
 	
 	// 初期化スレッド開始
 	AfxBeginThread( Initialize_Thread, this );
@@ -1692,6 +1693,7 @@ void CMZ3View::OnEnSetfocusInfoEdit()
 	// この行にはフォーカスを移さない
 	// カテゴリリストにフォーカスを移す
 	m_categoryList.SetFocus();
+	m_hotList = &m_categoryList;
 	*/
 
 	// 3ステート
@@ -1723,11 +1725,13 @@ void CMZ3View::OnEnSetfocusInfoEdit()
 	switch (m_magnifyMode) {
 	case MAGNIFY_MODE_DEFAULT:
 		m_bodyList.SetFocus();
+		m_hotList = &m_bodyList;
 		m_infoEdit.SetWindowText( L"標準モード" );
 		break;
 
 	case MAGNIFY_MODE_CATEGORY:
 		m_categoryList.SetFocus();
+		m_hotList = &m_categoryList;
 		m_infoEdit.SetWindowText( L"上ペイン最大表示:ステータスバー押下で戻ります" );
 		break;
 
@@ -1735,6 +1739,7 @@ void CMZ3View::OnEnSetfocusInfoEdit()
 	default:
 		m_infoEdit.SetWindowText( L"下ペイン最大表示:ステータスバー押下で戻ります" );
 		m_bodyList.SetFocus();
+		m_hotList = &m_bodyList;
 		break;
 	}
 
@@ -4205,6 +4210,7 @@ void CMZ3View::OnViewBbsListLog()
 
 	// フォーカスをボディリストに。
 	m_bodyList.SetFocus();
+	m_hotList = &m_bodyList;
 }
 #endif
 
@@ -5001,6 +5007,10 @@ bool CMZ3View::RetrieveCategoryItem(void)
 		case 1:
 			// ブックマーク同様にローカルストレージ経由で取得
 			SetBodyList( pCategory->GetBodyList() );
+
+			// フォーカスをボディリストに。
+			m_bodyList.SetFocus();
+			m_hotList = &m_bodyList;
 			return true;
 
 		case 0:
@@ -5792,9 +5802,11 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	if (m_magnifyMode == MAGNIFY_MODE_DEFAULT) {
 		// 拡大表示モード以外ならカテゴリリストに。
 		m_categoryList.SetFocus();
+		m_hotList = &m_categoryList;
 	} else {
 		// 拡大表示モードならボディリストに。
 		m_bodyList.SetFocus();
+		m_hotList = &m_bodyList;
 	}
 
 	// ボディリストは消去しておく。
@@ -6465,6 +6477,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	if( aType == ACCESS_LIST_BBS ) {
 		// コミュニティリストの場合は自動的にボディ一覧にフォーカスする
 		m_bodyList.SetFocus();
+		m_hotList = &m_bodyList;
 	}
 #endif
 
@@ -7143,6 +7156,10 @@ void CMZ3View::ReloadCategoryListLog()
 
 	// ボディリストに設定
 	SetBodyList( m_selGroup->getSelectedCategory()->GetBodyList() );
+
+	// フォーカスをボディリストに。
+	m_bodyList.SetFocus();
+	m_hotList = &m_bodyList;
 }
 
 /// タブ｜右に移動
@@ -7321,6 +7338,7 @@ void CMZ3View::MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo)
 		// フォーカス移動
 		if (m_bodyList.GetItemCount() > 0) {
 			m_bodyList.SetFocus();
+			m_hotList = &m_bodyList;
 		}
 		break;
 

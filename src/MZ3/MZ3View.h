@@ -159,10 +159,10 @@ private:
 
 public:
 	CGroupItem*		m_selGroup;				///< 現在選択されているグループタブ項目
+	CListCtrl*		m_hotList;				///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 
 private:
 	int				m_preCategory;			///< 前回選択していたカテゴリリスト項目のインデックス
-	CListCtrl*		m_hotList;				///< 現在選択中のリストコントロール（他ビューからの復帰時に利用）
 
 	CImageList		m_iconImageListSmall;		///< アイコン用画像リスト(16x16)
 	CImageList		m_iconImageListLarge;		///< アイコン用画像リスト(32x32)

@@ -3397,8 +3397,14 @@ int lua_mz3_main_view_set_focus(lua_State *L)
 		idc = IDC_STATUS_EDIT;
 	} else if (focus_control=="category_list") {
 		idc = IDC_HEADER_LIST;
+		if (theApp.m_pMainView != NULL) {
+			theApp.m_pMainView->m_hotList = &theApp.m_pMainView->m_categoryList;
+		}
 	} else if (focus_control=="body_list") {
 		idc = IDC_BODY_LIST;
+		if (theApp.m_pMainView != NULL) {
+			theApp.m_pMainView->m_hotList = &theApp.m_pMainView->m_bodyList;
+		}
 	}
 	CWnd* pWnd = theApp.m_pMainView->GetDlgItem(idc);
 	if (pWnd!=NULL) {
