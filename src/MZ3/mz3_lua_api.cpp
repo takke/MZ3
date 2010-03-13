@@ -1135,7 +1135,12 @@ int lua_mz3_get_text_length(lua_State *L)
 /*
 --- 汎用MZ3コマンドの実行
 --
--- @param command コマンド
+-- @param command コマンド("FONT_SHRINK", 
+--                         "FONT_MAGNIFY", 
+--                         "NEXT_TAB", 
+--                         "PREV_TAB", 
+--                         "CHANGE_MAIN_BODY_HEADER_MODE", 
+--                         "SHORT_CUT_MOVE_ON_MAIN_BODY_LIST")
 --
 function mz3.exec_mz3_command(command)
 */
@@ -1152,6 +1157,10 @@ int lua_mz3_exec_mz3_command(lua_State *L)
 		theApp.m_pMainView->OnAcceleratorNextTab();
 	} else if (cmd == "PREV_TAB") {
 		theApp.m_pMainView->OnAcceleratorPrevTab();
+	} else if (cmd == "CHANGE_MAIN_BODY_HEADER_MODE") {
+		theApp.m_pMainView->MyChangeBodyHeader();
+	} else if (cmd == "SHORT_CUT_MOVE_ON_MAIN_BODY_LIST") {
+		theApp.m_pMainView->MyShortCutMoveOnBodyList();
 	}
 
 	// 戻り値の数を返す

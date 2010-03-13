@@ -128,6 +128,7 @@ function mz3.init_cross_post_info(from)
 
 end
 
+
 function mz3.do_cross_post()
 
 --	mz3.alert(#mz3.cross_posts);
@@ -248,13 +249,40 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 			end
 		end
 	end
---[[
+
 	if focus == "category_list" then
 		-- カテゴリリスト
 	elseif focus == "body_list" then
 		-- ボディリスト
+
+		if key == VK_RIGHT then
+
+			-- 画面単位のスクロール : PageDown のシミュレート
+			mz3.keybd_event(VK_NEXT, "keydown");
+			mz3.keybd_event(VK_NEXT, "keyup");
+
+--			mz3.exec_mz3_command('NEXT_TAB');
+
+			-- Ver.1.3.4 以前のデフォルト動作
+--			mz3.exec_mz3_command('CHANGE_MAIN_BODY_HEADER_MODE');
+
+			return true;
+		end
+
+		if key == VK_LEFT then
+
+			-- 画面単位のスクロール : PageUp のシミュレート
+			mz3.keybd_event(VK_PRIOR, "keydown");
+			mz3.keybd_event(VK_PRIOR, "keyup");
+
+--			mz3.exec_mz3_command('PREV_TAB');
+
+			-- Ver.1.3.4 以前のデフォルト動作
+--			mz3.exec_mz3_command('SHORT_CUT_MOVE_ON_MAIN_BODY_LIST');
+
+			return true;
+		end
 	end
-]]
 	return false;
 end
 mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");

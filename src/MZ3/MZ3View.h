@@ -430,6 +430,7 @@ public:
 	afx_msg void OnLayoutMagnifyBodyList();
 	afx_msg void OnLayoutMagnifyCategoryList();
 	afx_msg void OnLayoutMagnifyDefault();
+	bool MyShortCutMoveOnBodyList(void);
 };
 
 #ifndef _DEBUG  // MZ3View.cpp のデバッグ バージョン

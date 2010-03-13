@@ -2774,46 +2774,23 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 		}
 		break;
 
+/*	// Lua で実装
 	case VK_LEFT:
 		// 左ボタン。
 		// ショートカット移動。
-		{
-			CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
-			if (pCategory != NULL) {
-				int idxSel = pCategory->selectedBody;
-				int nItem = m_bodyList.GetItemCount();
-
-				util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
-				if( idxSel == 0 ) {
-					// 一番上 → 一番下
-					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-					m_bodyList.EnsureVisible( nItem-1, FALSE);
-					return TRUE;
-				}else if( idxSel == nItem-1 ) {
-					// 一番下     → 一番上
-					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-					m_bodyList.EnsureVisible( 0, FALSE );
-					return TRUE;
-				}else if( idxSel < nItem/2 ) {
-					// 半分より上 → 一番上
-					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
-					m_bodyList.EnsureVisible( 0, FALSE );
-					return TRUE;
-				}else{
-					// 半分より下 → 一番下
-					util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
-					m_bodyList.EnsureVisible( nItem-1, FALSE);
-					return TRUE;
-				}
-			}
+		if (MyShortCutMoveOnBodyList()) {
+			return TRUE;
 		}
 		// カテゴリに移動
 //		return CommandSetFocusCategoryList();
+*/
+
+/*	// Lua で実装
 	case VK_RIGHT:
 		// 右ボタンで、２つ目の項目を変化させる
 		MyChangeBodyHeader();
 		return TRUE;
-
+*/
 	case VK_BACK:
 #ifndef WINCE
 	case VK_ESCAPE:
@@ -7378,4 +7355,38 @@ void CMZ3View::OnLayoutMagnifyCategoryList()
 void CMZ3View::OnLayoutMagnifyDefault()
 {
 	MySetMagnifyModeTo(MAGNIFY_MODE_DEFAULT);
+}
+
+bool CMZ3View::MyShortCutMoveOnBodyList(void)
+{
+	CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
+	if (pCategory != NULL) {
+		int idxSel = pCategory->selectedBody;
+		int nItem = m_bodyList.GetItemCount();
+
+		util::MySetListCtrlItemFocusedAndSelected( m_bodyList, idxSel, false );
+		if( idxSel == 0 ) {
+			// 一番上 → 一番下
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+			m_bodyList.EnsureVisible( nItem-1, FALSE);
+			return true;
+		}else if( idxSel == nItem-1 ) {
+			// 一番下     → 一番上
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+			m_bodyList.EnsureVisible( 0, FALSE );
+			return true;
+		}else if( idxSel < nItem/2 ) {
+			// 半分より上 → 一番上
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, 0, true );
+			m_bodyList.EnsureVisible( 0, FALSE );
+			return true;
+		}else{
+			// 半分より下 → 一番下
+			util::MySetListCtrlItemFocusedAndSelected( m_bodyList, nItem-1, true );
+			m_bodyList.EnsureVisible( nItem-1, FALSE);
+			return true;
+		}
+	}
+
+	return false;
 }
