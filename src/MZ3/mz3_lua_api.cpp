@@ -3703,6 +3703,24 @@ int lua_mz3_main_view_redraw_body_images(lua_State *L)
 	return 0;
 }
 
+/*
+--- 
+--
+function mz3_main_view.get_body_list_count_per_page();
+*/
+int lua_mz3_main_view_get_body_list_count_per_page(lua_State *L)
+{
+	if (theApp.m_pMainView == NULL) {
+		return 0;
+	}
+
+	int n = theApp.m_pMainView->m_bodyList.GetCountPerPage();
+	lua_pushinteger(L, n);
+
+	// –ß‚è’l‚Ì”‚ğ•Ô‚·
+	return 1;
+}
+
 
 //-----------------------------------------------
 // MZ3 ReportView API
@@ -4171,6 +4189,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"set_info_text",			lua_mz3_main_view_set_info_text},
 	{"retrieve_category_item",	lua_mz3_main_view_retrieve_category_item},
 	{"redraw_body_images",		lua_mz3_main_view_redraw_body_images},
+	{"get_body_list_count_per_page",	lua_mz3_main_view_get_body_list_count_per_page},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_report_view_lib[] = {

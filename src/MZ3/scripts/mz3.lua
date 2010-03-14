@@ -179,6 +179,23 @@ function mz3.do_cross_post()
 end
 
 
+-- メイン画面下ペインのリストのページ単位スクロール
+mz3_main_view.scroll_body_list_page = function (page)
+	local cpp = mz3_main_view.get_body_list_count_per_page();
+	local idx = mz3_main_view.get_selected_body_item_idx();
+	local list = MZ3DataList:create(mz3_main_view.get_body_item_list());
+	local n = list:get_count();
+	idx = idx + page * (cpp -1);
+	if idx > n-1 then
+		idx = n-1;
+	end
+	if idx < 0 then
+		idx = 0;
+	end
+	mz3_main_view.select_body_item(idx);
+end
+
+
 --- メイン画面のキー押下イベント
 mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 --	mz3.logger_debug('mz3.on_keyup_main_view : (' .. event_name .. ', ' .. string.format('0x%2x', key) .. ')');
@@ -222,13 +239,13 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 		end
 
 		if key == VK_NEXT and is_ctrl ~= 0 then
-			-- Ctrl+PageDown 次のタブ
+			-- Ctrl+PageDown : 次のタブ
 			mz3.exec_mz3_command('NEXT_TAB');
 			return true;
 		end
 
 		if key == VK_PRIOR and is_ctrl ~= 0 then
-			-- Ctrl+PageUp 前のタブ
+			-- Ctrl+PageUp : 前のタブ
 			mz3.exec_mz3_command('PREV_TAB');
 			return true;
 		end
@@ -257,9 +274,12 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 
 		if key == VK_RIGHT then
 
-			-- 画面単位のスクロール : PageDown のシミュレート
-			mz3.keybd_event(VK_NEXT, "keydown");
-			mz3.keybd_event(VK_NEXT, "keyup");
+			-- 画面単位のスクロール
+			mz3_main_view.scroll_body_list_page(1);
+			
+			-- PageDown シミュレートでは MZ3 でフォーカス移動になるので使わない
+--			mz3.keybd_event(VK_NEXT, "keydown");
+--			mz3.keybd_event(VK_NEXT, "keyup");
 
 --			mz3.exec_mz3_command('NEXT_TAB');
 
@@ -271,9 +291,12 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 
 		if key == VK_LEFT then
 
-			-- 画面単位のスクロール : PageUp のシミュレート
-			mz3.keybd_event(VK_PRIOR, "keydown");
-			mz3.keybd_event(VK_PRIOR, "keyup");
+			-- 画面単位のスクロール
+			mz3_main_view.scroll_body_list_page(-1);
+
+			-- PageUp シミュレートでは MZ3 でフォーカス移動になるので使わない
+--			mz3.keybd_event(VK_PRIOR, "keydown");
+--			mz3.keybd_event(VK_PRIOR, "keyup");
 
 --			mz3.exec_mz3_command('PREV_TAB');
 
