@@ -274,6 +274,32 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 
 		if key == VK_RIGHT then
 
+			-- 標準動作のスキップ
+			return true;
+		end
+
+		if key == VK_LEFT then
+
+			-- 標準動作のスキップ
+			return true;
+		end
+	end
+	return false;
+end
+mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");
+
+
+--- メイン画面のキー押下イベント
+mz3.on_keydown_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
+--	mz3.logger_debug('mz3.on_keydown_main_view : (' .. event_name .. ', ' .. string.format('0x%2x', key) .. ')');
+
+	local focus = mz3_main_view.get_focus();
+	if focus == "category_list" then
+		-- カテゴリリスト
+	elseif focus == "body_list" then
+		-- ボディリスト
+
+		if key == VK_RIGHT then
 			-- 画面単位のスクロール
 			mz3_main_view.scroll_body_list_page(1);
 			
@@ -286,11 +312,11 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 			-- Ver.1.3.4 以前のデフォルト動作
 --			mz3.exec_mz3_command('CHANGE_MAIN_BODY_HEADER_MODE');
 
+			-- 標準動作のスキップ
 			return true;
 		end
 
 		if key == VK_LEFT then
-
 			-- 画面単位のスクロール
 			mz3_main_view.scroll_body_list_page(-1);
 
@@ -303,12 +329,13 @@ mz3.on_keyup_main_view = function(event_name, key, is_shift, is_ctrl, is_alt)
 			-- Ver.1.3.4 以前のデフォルト動作
 --			mz3.exec_mz3_command('SHORT_CUT_MOVE_ON_MAIN_BODY_LIST');
 
+			-- 標準動作のスキップ
 			return true;
 		end
 	end
 	return false;
 end
-mz3.add_event_listener("keyup_main_view", "mz3.on_keyup_main_view");
+mz3.add_event_listener("keydown_main_view", "mz3.on_keydown_main_view");
 
 
 mz3.on_keydown_detail_view = function (event_name, serialize_key, data, key)
