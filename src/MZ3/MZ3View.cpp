@@ -308,7 +308,7 @@ void CMZ3View::OnInitialUpdate()
 		m_bodyList.ModifyStyle(0, dwStyle);
 
 		// アイコンリストの作成
-		m_iconImageListSmall.Create(16, 16, ILC_COLOR24 | ILC_MASK, 0, 9);
+		m_iconImageListSmall.Create(16, 16, ILC_COLOR16 | ILC_MASK, 0, 9);
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
@@ -320,7 +320,7 @@ void CMZ3View::OnInitialUpdate()
 		m_iconImageListSmall.Add( AfxGetApp()->LoadIcon(IDI_RSS_ICON) );
 		m_bodyList.SetImageList(&m_iconImageListSmall, LVSIL_SMALL);
 
-		m_iconImageListLarge.Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 9);
+		m_iconImageListLarge.Create(32, 32, ILC_COLOR16 | ILC_MASK, 0, 9);
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_TOPIC_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_EVENT_ICON) );
 		m_iconImageListLarge.Add( AfxGetApp()->LoadIcon(IDI_ENQUETE_ICON) );
