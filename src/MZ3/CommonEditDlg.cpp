@@ -34,6 +34,7 @@ void CCommonEditDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, mc_strEdit);
 	DDX_Text(pDX, IDC_EDIT2, mc_strEdit2);
 	DDX_Text(pDX, IDC_MESSAGE_STATIC, mc_strMessage);
+	DDX_Control(pDX, IDC_COMBO1, mc_comboBox);
 }
 
 
@@ -47,6 +48,16 @@ END_MESSAGE_MAP()
 void CCommonEditDlg::OnBnClickedOk()
 {
 	UpdateData();
+
+	// mc_comboBox Ç™ÇPå¬à»è„Ç†ÇÍÇŒ mc_strEdit Ç…ëIëï∂éöóÒÇê›íËÇ∑ÇÈ
+	if (!m_comboTextList.empty()) {
+		int idx = mc_comboBox.GetCurSel();
+		if (0 <= idx && idx < mc_comboBox.GetCount()) {
+			mc_comboBox.GetLBText(idx, m_strSelectedComboText);
+		} else {
+			m_strSelectedComboText = L"";
+		}
+	}
 
 	OnOK();
 }
@@ -68,6 +79,21 @@ BOOL CCommonEditDlg::OnInitDialog()
 	// mc_strEdit2 Ç™ñ¢ê›íËÇ≈Ç†ÇÍÇŒ IDC_EDIT2 ÇîÒï\é¶âª
 	if (mc_strEdit2.IsEmpty()) {
 		GetDlgItem(IDC_EDIT2)->ShowWindow( SW_HIDE );
+	}
+
+	// mc_comboBox Ç™ÇPå¬à»è„Ç†ÇÍÇŒ IDC_EDIT1, IDC_EDIT2 ÇîÒï\é¶âª
+	if (!m_comboTextList.empty()) {
+		GetDlgItem(IDC_EDIT1)->ShowWindow( SW_HIDE );
+		GetDlgItem(IDC_EDIT2)->ShowWindow( SW_HIDE );
+		GetDlgItem(IDC_COMBO1)->ShowWindow( SW_SHOW );
+
+		mc_comboBox.ResetContent();
+		for (u_int i=0; i<m_comboTextList.size(); i++) {
+			mc_comboBox.InsertString(i, m_comboTextList[i]);
+			if (i==0) {
+				mc_comboBox.SetCurSel(0);
+			}
+		}
 	}
 
 	SetWindowText( m_strTitle );

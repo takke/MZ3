@@ -28,9 +28,12 @@ public:
 	CString mc_strEdit;
 	CString mc_strEdit2;
 	CString mc_strMessage;
+	std::vector<CString> m_comboTextList;	///< コンボボックスに設定する文字列
+	CString m_strSelectedComboText;
 
 	afx_msg void OnBnClickedOk();
 	void SetTitle(LPCTSTR szTitle);
 	void SetMessage(LPCTSTR szMessage);
 	virtual BOOL OnInitDialog();
+	CComboBox mc_comboBox;
 };

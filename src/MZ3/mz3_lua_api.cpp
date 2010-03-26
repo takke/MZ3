@@ -971,6 +971,57 @@ int lua_mz3_show_common_edit_dlg(lua_State *L)
 }
 
 /*
+--- 共通選択画面の表示
+--
+-- @param title             キャプション
+-- @param initial_text_list 初期値(table)
+--
+-- @return (string) ユーザ選択値, ユーザキャンセル時は nil
+--
+function mz3.show_common_select_dlg(caption, initial_text_list)
+*/
+int lua_mz3_show_common_select_dlg(lua_State *L)
+{
+	const char* func_name = "mz3.show_common_select_dlg";
+
+	// 引数の取得
+	CString title = MyUTF82WCS2(lua_tostring(L, 1));
+
+	if (!lua_istable(L, 2)) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+	std::vector<CString> initial_text_list;
+
+	lua_pushnil(L);	// 最初のキー
+	while (lua_next(L, 2) != 0) {
+		// キーは -2、値は -1 の位置にある
+		const char* text = lua_tostring(L, -1);
+		initial_text_list.push_back(MyUTF82WCS2(text));
+		// 値を除去し、キーは次の繰り返しのために残す
+		lua_pop(L, 1);
+	}
+
+	CCommonEditDlg dlg;
+	dlg.SetTitle( title );
+	dlg.m_comboTextList = initial_text_list;
+	if (dlg.DoModal()==IDOK) {
+		if (!dlg.m_strSelectedComboText.IsEmpty()) {
+			lua_pushstring(L, MyWCS2UTF8(dlg.m_strSelectedComboText));
+		} else {
+			lua_pushnil(L);
+		}
+	} else {
+		lua_pushnil(L);
+	}
+
+//	lua_pushnil(L);
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- ビュー切り替え
 --
 -- @param view_name ビュー名('main_view', 'report_view', 'write_view')
@@ -4069,6 +4120,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_open_file_name",					lua_mz3_get_open_file_name},
 	{"camera_capture",						lua_mz3_camera_capture},
 	{"show_common_edit_dlg",				lua_mz3_show_common_edit_dlg},
+	{"show_common_select_dlg",				lua_mz3_show_common_select_dlg},
 	{"url_encode",							lua_mz3_url_encode},
 	{"convert_encoding",					lua_mz3_convert_encoding},
 	{"make_image_logfile_path_from_url_md5",lua_mz3_make_image_logfile_path_from_url_md5},
