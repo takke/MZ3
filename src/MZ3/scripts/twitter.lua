@@ -161,6 +161,39 @@ type:set_short_title('bit.ly');								-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+-- リスト系
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_CREATE_LIST');				-- シリアライズキー
+type:set_short_title('リスト作成');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_DELETE_LIST');				-- シリアライズキー
+type:set_short_title('リスト削除');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_ADD_LIST_MEMBER');				-- シリアライズキー
+type:set_short_title('リストに追加');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_DELETE_LIST_MEMBER');				-- シリアライズキー
+type:set_short_title('リストから削除');							-- 簡易タイトル
+type:set_request_method('POST');							-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -220,6 +253,11 @@ hash_list = {}
 
 menu_items.shorten_by_bitly      = mz3_menu.regist_menu("twitter.on_shorten_by_bitly");
 
+-- リスト
+menu_items.create_list           = mz3_menu.regist_menu("twitter.on_create_list");
+menu_items.delete_list           = mz3_menu.regist_menu("twitter.on_delete_list");
+menu_items.add_list_member       = mz3_menu.regist_menu("twitter.on_add_list_member");
+menu_items.delete_list_member       = mz3_menu.regist_menu("twitter.on_delete_list_member");
 
 -- ファイル名
 twitpic_target_file = nil;
@@ -1972,6 +2010,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	submenu = MZ3Menu:create_popup_menu();
 	submenu_hash = MZ3Menu:create_popup_menu();
 	submenu_twitpic = MZ3Menu:create_popup_menu();
+	submenu_List = MZ3Menu:create_popup_menu();
 	
 	name = body:get_text('name');
 
@@ -2033,6 +2072,13 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 	menu:append_menu("string", "発言検索", menu_items.search_post);
 	menu:append_menu("string", "ユーザID検索", menu_items.search_user_timeline);
+
+	submenu_List:append_menu("string", "リストを作成", menu_items.create_list);
+	submenu_List:append_menu("string", "リストを削除", menu_items.delete_list);
+	submenu_List:append_menu("separator");
+	submenu_List:append_menu("string", "リストに追加", menu_items.add_list_member);
+	submenu_List:append_menu("string", "リストから削除", menu_items.delete_list_member);
+	menu:append_submenu("リスト...", submenu_List);
 
 	-- 発言内のハッシュタグ #XXX を抽出し、メニュー化
 	body_text = body:get_text_array_joined_text('body');
@@ -2123,6 +2169,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	submenu:delete();
 	submenu_hash:delete();
 	submenu_twitpic:delete();
+	submenu_List:delete();
 	
 	return true;
 end
@@ -2463,6 +2510,128 @@ function on_search_user_timeline(serialize_key, event_name, data)
 	mz3_main_view.append_category(title, url, key);
 
 	-- 追加したカテゴリの取得開始
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+-- リスト作成
+function on_create_list(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	local name = mz3.show_common_edit_dlg("リスト作成", "リスト名を入力して下さい(半角のみ可)", '');
+	if name == nil then
+		return false;
+	end
+
+	if mz3.confirm("リスト " .. name .. " を作成します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+	url = "http://api.twitter.com/1/" .. id .. "/lists.xml?name=" .. name;
+-- mz3.alert(url);
+	-- 通信開始
+	key = "TWITTER_CREATE_LIST";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+-- リスト削除
+function on_delete_list(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	local name = mz3.show_common_edit_dlg("リスト削除", "リスト名を入力して下さい(半角のみ可)", '');
+	if name == nil then
+		return false;
+	end
+
+	if mz3.confirm("リスト " .. name .. " を削除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+	url = "http://api.twitter.com/1/" .. id .. "/lists/" .. name .. ".xml?_method=DELETE";
+-- mz3.alert(url);
+	-- 通信開始
+	key = "TWITTER_DELETE_LIST";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = '';
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+-- リストにメンバーを追加
+function on_add_list_member(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+
+	local list_name = mz3.show_common_edit_dlg("リストに追加", "追加するリスト名を入力(半角のみ可)", '');
+	if list_name == nil then
+		return false;
+	end
+
+	if mz3.confirm("@" .. name .. "さんをリスト " .. list_name .. " に追加します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name;
+-- mz3.alert(url);
+	-- 通信開始
+	key = "TWITTER_ADD_LIST_MEMBER";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+end
+
+
+-- リストからメンバーを削除
+function on_delete_list_member(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	name = body:get_text('name');
+
+	local list_name = mz3.show_common_edit_dlg("リストから削除", "削除するリスト名を入力(半角のみ可)", '');
+	if list_name == nil then
+		return false;
+	end
+
+	if mz3.confirm("@" .. name .. "さんをリスト " .. list_name .. " から削除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name .. "&_method=DELETE";
+-- mz3.alert(url);
+	-- 通信開始
+	key = "TWITTER_DELETE_LIST_MEMBER";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
