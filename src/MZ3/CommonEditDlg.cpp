@@ -88,7 +88,7 @@ BOOL CCommonEditDlg::OnInitDialog()
 		GetDlgItem(IDC_COMBO1)->ShowWindow( SW_SHOW );
 
 		mc_comboBox.ResetContent();
-		for (u_int i=0; i<m_comboTextList.size(); i++) {
+		for (unsigned int i=0; i<m_comboTextList.size(); i++) {
 			mc_comboBox.InsertString(i, m_comboTextList[i]);
 			if (i==0) {
 				mc_comboBox.SetCurSel(0);
