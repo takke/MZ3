@@ -163,7 +163,7 @@ type:set_request_encoding('utf8');							-- エンコーディング
 
 -- リスト系
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');								-- カテゴリ
+type:set_info_type('post');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
 type:set_serialize_key('TWITTER_CREATE_LIST');				-- シリアライズキー
 type:set_short_title('リスト作成');							-- 簡易タイトル
@@ -171,7 +171,7 @@ type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');								-- カテゴリ
+type:set_info_type('post');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
 type:set_serialize_key('TWITTER_DELETE_LIST');				-- シリアライズキー
 type:set_short_title('リスト削除');							-- 簡易タイトル
@@ -179,18 +179,18 @@ type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');								-- カテゴリ
+type:set_info_type('post');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
-type:set_serialize_key('TWITTER_ADD_LIST_MEMBER');				-- シリアライズキー
-type:set_short_title('リストに追加');							-- 簡易タイトル
+type:set_serialize_key('TWITTER_ADD_LIST_MEMBER');			-- シリアライズキー
+type:set_short_title('リストに追加');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');								-- カテゴリ
+type:set_info_type('post');									-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
-type:set_serialize_key('TWITTER_DELETE_LIST_MEMBER');				-- シリアライズキー
-type:set_short_title('リストから削除');							-- 簡易タイトル
+type:set_serialize_key('TWITTER_DELETE_LIST_MEMBER');		-- シリアライズキー
+type:set_short_title('リストから削除');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
@@ -1877,7 +1877,6 @@ mz3.add_event_listener("click_update_button", "twitter.on_click_update_button");
 -- @param wnd           wnd
 --
 function on_post_end(event_name, serialize_key, http_status, filename)
-
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type~="Twitter" then
 		return false;
@@ -1917,6 +1916,16 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		mz3_main_view.set_info_text("スパム通報しました");
 	elseif serialize_key == "TWITTER_UPDATE_RETWEET" then
 		mz3_main_view.set_info_text("RTしました！");
+	elseif serialize_key == "TWITTER_ADD_LIST_MEMBER" then
+		mz3_main_view.set_info_text("リストに追加しました！");
+	elseif serialize_key == "TWITTER_DELETE_LIST_MEMBER" then
+		mz3_main_view.set_info_text("リストから削除しました！");
+	elseif serialize_key == "TWITTER_CREATE_LIST" then
+		mz3_main_view.set_info_text("リストを作成しました！");
+		list_names_self = {};
+	elseif serialize_key == "TWITTER_DELETE_LIST" then
+		mz3_main_view.set_info_text("リストを削除しました！");
+		list_names_self = {};
 	else
 		-- TWITTER_UPDATE
 --		mz3_main_view.set_info_text("ステータス送信終了");
@@ -2550,35 +2559,7 @@ function on_create_list(serialize_key, event_name, data)
 end
 
 
--- リスト削除
-function on_delete_list(serialize_key, event_name, data)
-	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
-	mz3.change_view('main_view');
-
-	local name = mz3.show_common_edit_dlg("リスト削除", "リスト名を入力して下さい(半角のみ可)", '');
-	if name == nil then
-		return false;
-	end
-
-	if mz3.confirm("リスト " .. name .. " を削除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
-		-- 中止
-		return;
-	end
-
-	-- URL 生成
-	id  = mz3_account_provider.get_value('Twitter', 'id');
-	url = "http://api.twitter.com/1/" .. id .. "/lists/" .. name .. ".xml?_method=DELETE";
--- mz3.alert(url);
-	-- 通信開始
-	key = "TWITTER_DELETE_LIST";
-	access_type = mz3.get_access_type_by_key(key);
-	referer = '';
-	user_agent = nil;
-	post = '';
-	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
-end
-
-
+--- リスト一覧の取得
 function gather_my_list_names_blocking()
 	id  = mz3_account_provider.get_value('Twitter', 'id');
 
@@ -2595,12 +2576,51 @@ function gather_my_list_names_blocking()
 		return false;
 	end
 	
+	mz3.logger_debug(result);
+	
 	list_names_self = {};
-	for list_name in result:gmatch('<list>.-<name>(.-)</name>.-</list>') do
+	for list_name in result:gmatch('<list>.-<slug>(.-)</slug>.-</list>') do
 		table.insert(list_names_self, list_name);
 	end
 
 	return true;
+end
+
+
+-- リスト削除
+function on_delete_list(serialize_key, event_name, data)
+	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
+	mz3.change_view('main_view');
+
+	-- リスト一覧未取得であればここで取得する
+	if #list_names_self == 0 then
+		-- リスト一覧取得 (list_names_self)
+		if gather_my_list_names_blocking() == false then
+			return false;
+		end
+	end
+
+	local list_name = mz3.show_common_select_dlg("リスト削除", list_names_self);
+	if list_name == nil then
+		return false;
+	end
+
+	if mz3.confirm("リスト " .. list_name .. " を削除します。よろしいですか？", nil, "yes_no") ~= 'yes' then
+		-- 中止
+		return;
+	end
+
+	-- URL 生成
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+	url = "http://api.twitter.com/1/" .. id .. "/lists/" .. list_name .. ".xml?_method=DELETE";
+-- mz3.alert(url);
+	-- 通信開始
+	key = "TWITTER_DELETE_LIST";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	post = '';
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
 end
 
 
