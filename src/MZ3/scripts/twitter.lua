@@ -265,6 +265,9 @@ twitpic_target_file = nil;
 -- is_twitter_reply_set = false;
 twitter_reply_id = 0;
 
+-- 自分のリスト一覧(リスト操作用)
+list_names_self = {};
+
 
 --- 1ユーザの追加
 function my_add_new_user(new_list, status, id)
@@ -2576,6 +2579,31 @@ function on_delete_list(serialize_key, event_name, data)
 end
 
 
+function gather_my_list_names_blocking()
+	id  = mz3_account_provider.get_value('Twitter', 'id');
+
+	-- ブロッキング通信開始
+	key = "TWITTER_LISTS";
+	url = "http://twitter.com/" .. id .. "/lists.xml";
+	access_type = mz3.get_access_type_by_key(key);
+	referer = '';
+	user_agent = nil;
+	is_blocking = true;
+	status, result = mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, nil, is_blocking);
+	if status ~= 200 then
+		mz3.alert('リストの取得に失敗しました');
+		return false;
+	end
+	
+	list_names_self = {};
+	for list_name in result:gmatch('<list>.-<name>(.-)</name>.-</list>') do
+		table.insert(list_names_self, list_name);
+	end
+
+	return true;
+end
+
+
 -- リストにメンバーを追加
 function on_add_list_member(serialize_key, event_name, data)
 	-- ビューをメイン画面に移す(詳細画面のメニューに対応するため)
@@ -2584,7 +2612,15 @@ function on_add_list_member(serialize_key, event_name, data)
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
 
-	local list_name = mz3.show_common_edit_dlg("リストに追加", "追加するリスト名を入力(半角のみ可)", '');
+	-- リスト一覧未取得であればここで取得する
+	if #list_names_self == 0 then
+		-- リスト一覧取得 (list_names_self)
+		if gather_my_list_names_blocking() == false then
+			return false;
+		end
+	end
+
+	local list_name = mz3.show_common_select_dlg("リストに追加", list_names_self);
 	if list_name == nil then
 		return false;
 	end
@@ -2597,7 +2633,7 @@ function on_add_list_member(serialize_key, event_name, data)
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
 	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name;
--- mz3.alert(url);
+
 	-- 通信開始
 	key = "TWITTER_ADD_LIST_MEMBER";
 	access_type = mz3.get_access_type_by_key(key);
@@ -2616,7 +2652,15 @@ function on_delete_list_member(serialize_key, event_name, data)
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	name = body:get_text('name');
 
-	local list_name = mz3.show_common_edit_dlg("リストから削除", "削除するリスト名を入力(半角のみ可)", '');
+	-- リスト一覧未取得であればここで取得する
+	if #list_names_self == 0 then
+		-- リスト一覧取得 (list_names_self)
+		if gather_my_list_names_blocking() == false then
+			return false;
+		end
+	end
+
+	local list_name = mz3.show_common_select_dlg("リストから削除", list_names_self);
 	if list_name == nil then
 		return false;
 	end
@@ -2629,7 +2673,7 @@ function on_delete_list_member(serialize_key, event_name, data)
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
 	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name .. "&_method=DELETE";
--- mz3.alert(url);
+
 	-- 通信開始
 	key = "TWITTER_DELETE_LIST_MEMBER";
 	access_type = mz3.get_access_type_by_key(key);
@@ -2686,6 +2730,13 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 			-- 返信
 			on_twitter_reply(serialize_key, event_name, nil);
 			return true;
+		end
+		
+		if key == VK_Z and is_ctrl~=0 and is_alt~=0 then
+			local caption = "キャプション";
+			local list_names = {"test1", "test2"};
+			local v = mz3.show_common_select_dlg(caption, list_names);
+			mz3.alert(v);
 		end
 		
 	elseif focus == "edit" then
