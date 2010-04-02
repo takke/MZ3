@@ -2576,8 +2576,6 @@ function gather_my_list_names_blocking()
 		return false;
 	end
 	
-	mz3.logger_debug(result);
-	
 	list_names_self = {};
 	for list_name in result:gmatch('<list>.-<slug>(.-)</slug>.-</list>') do
 		table.insert(list_names_self, list_name);
@@ -2752,12 +2750,20 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 			return true;
 		end
 		
+		if key == VK_T then
+			-- RT
+			on_retweet_menu_item(serialize_key, event_name, nil);
+			return true;
+		end
+		
+		--[[
 		if key == VK_Z and is_ctrl~=0 and is_alt~=0 then
 			local caption = "キャプション";
 			local list_names = {"test1", "test2"};
 			local v = mz3.show_common_select_dlg(caption, list_names);
 			mz3.alert(v);
 		end
+		]]
 		
 	elseif focus == "edit" then
 		-- エディット
@@ -3167,6 +3173,12 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 	if key == VK_R then
 		-- 返信
 		on_twitter_reply(serialize_key, event_name, nil);
+		return true;
+	end
+	
+	if key == VK_T then
+		-- RT
+		on_retweet_menu_item(serialize_key, event_name, nil);
 		return true;
 	end
 	
