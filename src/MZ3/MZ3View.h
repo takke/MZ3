@@ -18,8 +18,9 @@
 #include "InetAccess.h"
 #include "XcrawlCanceler.h"
 
-#define TIMERID_INTERVAL_CHECK		101
-#define TIMERID_RESTORE_STATUSBAR	102
+#define TIMERID_INTERVAL_CHECK			101
+#define TIMERID_RESTORE_STATUSBAR		102
+#define TIMERID_MAGNIFY_MODE_TRANSITION	103
 class CMZ3Doc;
 
 /**
@@ -52,11 +53,14 @@ public:
 
 	/// 拡大表示モード
 	enum MAGNIFY_MODE {
+		MAGNIFY_MODE_INVALID	= -1,			///< モード外(m_magnifyModeFrom only)
 		MAGNIFY_MODE_DEFAULT	= 0,			///< 標準モード
 		MAGNIFY_MODE_CATEGORY	= 1,			///< カテゴリリスト表示
 		MAGNIFY_MODE_BODY		= 2,			///< ボディリスト表示
 	};
 	MAGNIFY_MODE		m_magnifyMode;			///< 拡大表示モード
+	MAGNIFY_MODE		m_magnifyModeFrom;		///< 拡大表示モード(遷移中の前のモード)
+	DWORD				m_dwMagnifyModeTrasitionStart;	///< 拡大表示モード遷移開始時刻[msec]
 
 
 	ACCESS_TYPE			m_twitterPostAccessType;///< Twitter 風送信アクセス種別

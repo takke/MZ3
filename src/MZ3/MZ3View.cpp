@@ -38,6 +38,10 @@
 
 #define SPLITTER_HEIGHT			10
 
+// 遷移所要時間 [msec]
+#define MAGNIFY_MODE_TRANSITION_MSEC			200
+#define MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL	30
+
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
 LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
 {
@@ -178,6 +182,8 @@ CMZ3View::CMZ3View()
 #else
 	, m_magnifyMode(MAGNIFY_MODE_DEFAULT)
 #endif
+	, m_magnifyModeFrom(MAGNIFY_MODE_INVALID)
+	, m_dwMagnifyModeTrasitionStart(0)
 {
 }
 
@@ -672,6 +678,8 @@ void CMZ3View::MySetLayout(int cx, int cy)
 	int hCategory = 0;
 	int hBody     = 0;
 
+	bool bInMagnifyTransition = false;	// 遷移中
+
 	switch (m_magnifyMode) {
 	case MAGNIFY_MODE_DEFAULT:
 		hCategory = (cy * h1 / (h1+h2)) - (hGroup -1);
@@ -679,39 +687,54 @@ void CMZ3View::MySetLayout(int cx, int cy)
 		break;
 
 	case MAGNIFY_MODE_CATEGORY:
-		{
-			int hItem0 = 0;
-			if (::IsWindow(m_bodyList.m_hWnd) && m_bodyList.GetItemCount() > 0) {
-				CRect rectItem0;
-				m_bodyList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
-				hItem0 = rectItem0.Height();
-			}
-
-			// ボディほぼ非表示
-//			hBody     = hItem0;
-			hBody     = 1;
-
-			hCategory = cy - (hInfo + hPost +hGroup -1) - hBody;
-		}
-		break;
-
 	case MAGNIFY_MODE_BODY:
 	default:
 		{
-			// タブ非表示
-			hGroup = 0;
+			int hBody1 = 1;
+			int hCategory1 = 1;
+			int hBody0 = 1;
+			int hCategory0 = 1;
 
-			int hItem0 = 0;
-			if (::IsWindow(m_categoryList.m_hWnd) && m_categoryList.GetItemCount() > 0) {
-				CRect rectItem0;
-				m_categoryList.GetItemRect(0, &rectItem0, LVIR_BOUNDS);
-				hItem0 = rectItem0.Height();
+			if (m_magnifyMode == MAGNIFY_MODE_CATEGORY) {
+				// ボディほぼ非表示
+				hBody1     = 1;
+				hCategory1 = cy - (hInfo + hPost +hGroup -1) - hBody1;
+				// 遷移元状態(ボディモード)定義
+				hCategory0 = 1;
+				hBody0     = cy - (hInfo + hPost +hGroup -1) - hCategory0;
+			} else {
+				// タブ非表示
+				hGroup = 0;
+
+				// カテゴリもほぼ非表示
+				hCategory1 = 1;
+				hBody1     = cy - (hInfo + hPost +hGroup -1) - hCategory1;
+				// 遷移元状態(カテゴリモード)定義
+				hBody0     = 1;
+				hCategory0 = cy - (hInfo + hPost +hGroup -1) - hBody0;
 			}
 
-			// カテゴリもほぼ非表示
-//			hCategory = hItem0 +3;
-			hCategory = 1;
-			hBody     = cy - (hInfo + hPost +hGroup -1) - hCategory;
+			// 遷移処理
+			if (GetTickCount()-m_dwMagnifyModeTrasitionStart < MAGNIFY_MODE_TRANSITION_MSEC) {
+				// 遷移処理
+				double p = (GetTickCount()-m_dwMagnifyModeTrasitionStart) / (double)MAGNIFY_MODE_TRANSITION_MSEC;
+
+				hBody     = (int)(hBody0     + (hBody1 - hBody0) * p);
+				hCategory = (int)(hCategory0 + (hCategory1 - hCategory0) * p);
+
+				bInMagnifyTransition = true;
+			} else {
+				hBody = hBody1;
+				hCategory = hCategory1;
+
+				// カテゴリの選択項目のみを表示
+				if (m_selGroup != NULL) {
+					m_categoryList.EnsureVisible(m_selGroup->focusedCategory, FALSE);
+					if (m_selGroup->getSelectedCategory() != NULL) {
+						m_bodyList.EnsureVisible(m_selGroup->getSelectedCategory()->selectedBody, FALSE);
+					}
+				}
+			}
 		}
 		break;
 	}
@@ -2375,14 +2398,7 @@ BOOL CMZ3View::CommandSetFocusBodyList()
 {
 	// カテゴリリスト表示であればボディリスト表示に変更
 	if (m_magnifyMode == MAGNIFY_MODE_CATEGORY) {
-		m_magnifyMode = MAGNIFY_MODE_BODY;
-
-		// レイアウト変更反映
-		MySetLayout(0, 0);
-		InvalidateRect( m_rectIcon, FALSE );
-
-		// カテゴリの選択項目のみを表示
-		m_categoryList.EnsureVisible(m_selGroup->selectedCategory, FALSE);
+		MySetMagnifyModeTo(MAGNIFY_MODE_BODY);
 	}
 
 	if (m_bodyList.GetItemCount() != 0) {
@@ -4982,6 +4998,21 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 		return;
 	}
 
+	if (nIDEvent == TIMERID_MAGNIFY_MODE_TRANSITION) {
+		// 拡大表示モード遷移中
+		if (GetTickCount() - m_dwMagnifyModeTrasitionStart > MAGNIFY_MODE_TRANSITION_MSEC) {
+			KillTimer(nIDEvent);
+			Invalidate(TRUE);
+			MySetLayout(0, 0);
+		} else {
+			// レイアウト変更反映
+			MySetLayout(0, 0);
+			InvalidateRect( m_rectIcon, FALSE );
+		}
+
+		return;
+	}
+
 	CFormView::OnTimer(nIDEvent);
 }
 
@@ -7337,6 +7368,14 @@ void CMZ3View::MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo)
 {
 	switch (magnifyModeTo) {
 	case MAGNIFY_MODE_BODY:
+		if (m_magnifyMode==MAGNIFY_MODE_CATEGORY) {
+			// 遷移開始
+			m_magnifyModeFrom = MAGNIFY_MODE_CATEGORY;
+			m_dwMagnifyModeTrasitionStart = GetTickCount();
+			::KillTimer(theApp.m_pMainView->m_hWnd, TIMERID_MAGNIFY_MODE_TRANSITION);
+			::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_MAGNIFY_MODE_TRANSITION, MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL, NULL);
+		}
+
 		// ボディリスト表示に変更
 		m_magnifyMode = MAGNIFY_MODE_BODY;
 
@@ -7355,6 +7394,14 @@ void CMZ3View::MySetMagnifyModeTo(MAGNIFY_MODE magnifyModeTo)
 		break;
 
 	case MAGNIFY_MODE_CATEGORY:
+		if (m_magnifyMode==MAGNIFY_MODE_BODY) {
+			// 遷移開始
+			m_magnifyModeFrom = MAGNIFY_MODE_BODY;
+			m_dwMagnifyModeTrasitionStart = GetTickCount();
+			::KillTimer(theApp.m_pMainView->m_hWnd, TIMERID_MAGNIFY_MODE_TRANSITION);
+			::SetTimer(theApp.m_pMainView->m_hWnd, TIMERID_MAGNIFY_MODE_TRANSITION, MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL, NULL);
+		}
+
 		// カテゴリ最大表示に変更
 		m_magnifyMode = MAGNIFY_MODE_CATEGORY;
 
