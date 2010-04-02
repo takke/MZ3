@@ -159,7 +159,7 @@ BOOL Bookmark::Add( CMixiData* master, CMixiDataList& bookmark )
 
 	CMixiData data;
 	data.SetName(master->GetName());
-	data.SetID(master->GetID());
+	data.SetID((int)master->GetID());
 	data.SetAccessType(master->GetAccessType());
 	data.SetCommentCount(master->GetCommentCount());
 	data.SetURL(master->GetURL());
