@@ -2939,26 +2939,30 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 	-- 高さは画面の高さの 1/3 程度
 	if detail_view_mode == "normal" then
 		h = cy / 3;
-	else
+	elseif detail_view_mode == "all" then
 		h = cy - y - 3*line_height;
+	else
+		h = 0;
 	end
 	x = x_margin;
 	w = cx - x - x_margin;
 	
 	-- 本文用枠描画
-	g:draw_rect("border", x, y, w, h, "MainBodyListNonreadText");
-	
-	border_margin = 5;
-	x = x +border_margin;
-	y = y +border_margin;
-	w = w -border_margin*2;
-	h = h -border_margin*2;
-	if mz3.get_app_name()=="MZ3" then
-		format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
-	else
-		format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+	if h > 0 then
+		g:draw_rect("border", x, y, w, h, "MainBodyListNonreadText");
+		
+		border_margin = 5;
+		x = x +border_margin;
+		y = y +border_margin;
+		w = w -border_margin*2;
+		h = h -border_margin*2;
+		if mz3.get_app_name()=="MZ3" then
+			format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+		else
+			format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+		end
+		g:draw_text(text, x, y, w, h, format);
 	end
-	g:draw_text(text, x, y, w, h, format);
 
 	-- その他の情報用枠線
 	x = x_margin;
@@ -2968,7 +2972,7 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 --	g:draw_rect("border", x, y, w, h, "MainBodyListDefaultText");
 	
 	-- その他の情報
-	if detail_view_mode == "normal" then
+	if detail_view_mode == "normal" or detail_view_mode == "info" then
 		--[[
 		x = x +border_margin;
 		y = y +border_margin;
@@ -3012,6 +3016,11 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 		       .. data:get_text('title') .. "\r\n";
 		g:set_color("text", "MainBodyListDefaultText");
 		g:set_font_size(0);		-- 中サイズフォント
+		if mz3.get_app_name()=="MZ3" then
+			format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+		else
+			format = DT_WORDBREAK + DT_NOPREFIX + DT_EDITCONTROL + DT_LEFT + DT_END_ELLIPSIS;
+		end
 		g:draw_text(item, x, y, w, h, format);
 	end
 
@@ -3189,11 +3198,13 @@ function on_keydown_detail_view(event_name, serialize_key, data, key)
 	end
 	
 	if key == VK_SPACE then
-		-- トグル「全文表示」「通常表示」
-		if detail_view_mode == "all" then
-			detail_view_mode = "normal";
-		else
+		-- 3-state「通常表示」「全文表示」「情報表示」
+		if detail_view_mode == "normal" then
 			detail_view_mode = "all";
+		elseif detail_view_mode == "all" then
+			detail_view_mode = "info";
+		else
+			detail_view_mode = "normal";
 		end
 		data = mz3_main_view.get_selected_body_item();
 		mz3.show_detail_view(data);
