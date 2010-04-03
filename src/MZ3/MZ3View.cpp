@@ -39,7 +39,7 @@
 #define SPLITTER_HEIGHT			10
 
 // 遷移所要時間 [msec]
-#define MAGNIFY_MODE_TRANSITION_MSEC			200
+#define MAGNIFY_MODE_TRANSITION_MSEC			300
 #define MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL	30
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
@@ -5001,7 +5001,16 @@ void CMZ3View::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == TIMERID_MAGNIFY_MODE_TRANSITION) {
 		// 拡大表示モード遷移中
 		if (GetTickCount() - m_dwMagnifyModeTrasitionStart > MAGNIFY_MODE_TRANSITION_MSEC) {
+			// 遷移完了
 			KillTimer(nIDEvent);
+
+			if (m_selGroup != NULL) {
+				m_categoryList.EnsureVisible(m_selGroup->focusedCategory, FALSE);
+				if (m_selGroup->getSelectedCategory() != NULL) {
+					m_bodyList.EnsureVisible(m_selGroup->getSelectedCategory()->selectedBody, FALSE);
+				}
+			}
+
 			Invalidate(TRUE);
 			MySetLayout(0, 0);
 		} else {
