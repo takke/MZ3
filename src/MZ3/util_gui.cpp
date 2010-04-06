@@ -57,8 +57,14 @@ bool DrawBitmap( HDC hdc, HBITMAP hBitmap, int x, int y, int w, int h, int srcx,
 
 	int iSrcWidth  = bmp.bmWidth;
 	int iSrcHeight = bmp.bmHeight;
+	
+	int iSrcY = srcy;
+	while( iSrcY < 0 )
+	{
+		iSrcY += iSrcHeight; 
+	}
 
-	int iSrcTop = srcy % iSrcHeight;
+	int iSrcTop = iSrcY % iSrcHeight;
 	int iTop = y;
 	do {
 		int iLeft = x;

@@ -225,7 +225,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (m_iconMode==ICON_MODE_NONE) {
 		// アイコンなしの場合は、アイコン分だけオフセットをかける
 		if (rcLabel.left > nIconSize) {
-			rcLabel.left -= nIconSize;
+			//rcLabel.left -= nIconSize;
+			rcLabel.left = rcItem.left;
 		}
 	}
 
@@ -235,7 +236,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// 選択されている場合は、
 	// 選択されている文字のみ一行を塗りつぶす
 	if (bSelected) {
-		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
+		pDC->FillRect(rcItem, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// 背景の塗りつぶし
 		if( IsDrawBk() ) {
@@ -244,7 +245,7 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 //				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 				// 暫定的にステータスバーの背景色を利用する
 				pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
-				pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
+				pDC->FillRect(rcItem, &theApp.m_brushMainStatusBar);
 			}else{
 				// ビットマップの描画
 				CRect rectClient;

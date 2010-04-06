@@ -236,28 +236,32 @@ void CTouchListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		// スクロール中か？
 		if (m_bVerticalDragging) {
 
-			// 慣性スクロール情報取得
-			m_autoScrollInfo.push( GetTickCount(), point );
-			double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
-			MZ3_TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
-			if( abs(point.y - m_ptDragStart.y) > m_iItemHeight ){
-				// 1行以上ドラッグしているので慣性スクロール開始
-				MZ3_TRACE( L" 1行以上ドラッグしているので慣性スクロール開始\n" );
-				m_dwAutoScrollStartTick = GetTickCount();
-				m_yAutoScrollMax = 0;
-				MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
+			if (theApp.m_Platforms.WM6_5 || theApp.m_Platforms.WM6_5_1) {
+				// WM6.5 以降であれば無効
 			} else {
-				// 1行未満のドラッグならばすぐに止める
-//				MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
-				MyAdjustDrawOffset();
-				m_autoScrollInfo.clear();
+				// 慣性スクロール情報取得
+				m_autoScrollInfo.push( GetTickCount(), point );
+				double speed = m_autoScrollInfo.calcMouseMoveSpeedY();
+				MZ3_TRACE( L"! speed   : %5.3f [px/msec]\n", speed );
+				if( abs(point.y - m_ptDragStart.y) > m_iItemHeight ){
+					// 1行以上ドラッグしているので慣性スクロール開始
+					MZ3_TRACE( L" 1行以上ドラッグしているので慣性スクロール開始\n" );
+					m_dwAutoScrollStartTick = GetTickCount();
+					m_yAutoScrollMax = 0;
+					MySetAutoScrollTimer( TIMER_INTERVAL_TOUCHLIST_AUTOSCROLL );
+				} else {
+					// 1行未満のドラッグならばすぐに止める
+	//				MyAdjustDrawOffset(MyAdjustDrawOffset_ADJUST_ONLY);
+					MyAdjustDrawOffset();
+					m_autoScrollInfo.clear();
 
-				// ★強制再描画
-				MZ3_TRACE( L" ★強制再描画#0\n" );
-				m_bDragging = false;
-				m_bVerticalDragging = false;
-				DrawBackSurface(true);
-				UpdateWindow();
+					// ★強制再描画
+					MZ3_TRACE( L" ★強制再描画#0\n" );
+					m_bDragging = false;
+					m_bVerticalDragging = false;
+					DrawBackSurface(true);
+					UpdateWindow();
+				}
 			}
 		} else if( m_bPanDragging ){ 
 			// 横方向にドラッグ
@@ -303,28 +307,32 @@ void CTouchListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 		// 縦スクロール中か？
 		if (m_bVerticalDragging) {
-			//if( m_bCanSlide ){
-			//	SetSelectItem( m_iDragStartItem );
-			//}
-			// 縦スクロール中
-			// グーのカーソルに変更
-			::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
+			if (theApp.m_Platforms.WM6_5 || theApp.m_Platforms.WM6_5_1) {
+				// WM6.5 以降であれば無効
+			} else {
+				//if( m_bCanSlide ){
+				//	SetSelectItem( m_iDragStartItem );
+				//}
+				// 縦スクロール中
+				// グーのカーソルに変更
+				::SetCursor( AfxGetApp()->LoadCursor(IDC_GRABBING_CURSOR) );
 
-			// 縦ドラッグ処理
-//			MZ3LOGGER_INFO(util::FormatString(L"OnMouseMove : 前回からの経過時間=%d[msec] (%d)", dwNow - m_dwLastDrawTick, dwNow));
-			ScrollByMoveY( point.y );
+				// 縦ドラッグ処理
+	//			MZ3LOGGER_INFO(util::FormatString(L"OnMouseMove : 前回からの経過時間=%d[msec] (%d)", dwNow - m_dwLastDrawTick, dwNow));
+				ScrollByMoveY( point.y );
 
-			// ドラッグ開始時のN画面確保用フラグを解除しておく
-			m_bFullPageDrawForBlackScrollStart = false;
+				// ドラッグ開始時のN画面確保用フラグを解除しておく
+				m_bFullPageDrawForBlackScrollStart = false;
 
-#ifdef WINCE
-			if( !IsScrollWithBk() ){
-				// WMで、かつ背景同時スクロールでない場合は遅延再描画
-				MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
+	#ifdef WINCE
+				if( !IsScrollWithBk() ){
+					// WMで、かつ背景同時スクロールでない場合は遅延再描画
+					MySetRedrawTimer( TIMER_INTERVAL_TOUCHLIST_SCROLLREDRAW_L );
+				}
+	#endif
+				// 慣性スクロール情報取得
+				m_autoScrollInfo.push( GetTickCount(), point );
 			}
-#endif
-			// 慣性スクロール情報取得
-			m_autoScrollInfo.push( GetTickCount(), point );
 		} else if( m_bPanDragging ){
 			// 横スクロール中
 			// マウスポインタ変更
@@ -1542,15 +1550,15 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 				// 縦スクロール可能ならば
 				// 縦ドラッグ開始
 
-				if (theApp.m_Platforms.WM6_5 || theApp.m_Platforms.WM6_5_1) {
-					// WM6.5 以降であれば無効
-				} else {
+				//if (theApp.m_Platforms.WM6_5 || theApp.m_Platforms.WM6_5_1) {
+				//	// WM6.5 以降であれば無効
+				//} else {
 					m_bVerticalDragging = true;
 
 					if (m_bBlackScrollMode) {
 						m_bFullPageDrawForBlackScrollStart = true;
 					}
-				}
+				//}
 			}
 		}
 	}
