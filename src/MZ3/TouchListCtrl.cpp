@@ -1516,8 +1516,11 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 	// WIN32の場合、半行以上の移動をドラッグとみなす
 	int dyMinLimit = theApp.m_optionMng.GetFontHeight() / 2 + 1 ;
 #else
-	// WMの場合、少しの移動でドラッグとみなす
-	int dyMinLimit = 1;
+//	// WMの場合、少しの移動でドラッグとみなす
+//	int dyMinLimit = 1;
+
+	// WMの場合も、半行以上の移動をドラッグとみなす
+	int dyMinLimit = theApp.m_optionMng.GetFontHeight() / 2 + 1 ;
 #endif
 
 	if (m_bPanDragging) {
@@ -1533,16 +1536,17 @@ void CTouchListCtrl::MySetDragFlagWhenMovedPixelOverLimit(int dx, int dy)
 		// ドラッグ方向が確定していない
 		if( m_bCanSlide &&
 			m_bUseHorizontalDragMove &&
-			( abs(dx) > abs(dy) && abs(dx) > m_screenWidth / 3 ) ) {
-				// 横方向の移動量が大きくて移動量が画面の1/3以上の場合]
-				// ドラッグ方向設定
-				if( dx > 0 ){
-					m_drPanScrollDirection = PAN_SCROLL_DIRECTION_RIGHT;
-				} else {
-					m_drPanScrollDirection = PAN_SCROLL_DIRECTION_LEFT;
-				}
-				// 横ドラッグ開始
-				m_bPanDragging = true;
+			( abs(dx) > abs(dy) && abs(dx) > m_screenWidth / 3 ) )
+		{
+			// 横方向の移動量が大きくて移動量が画面の1/3以上の場合]
+			// ドラッグ方向設定
+			if( dx > 0 ){
+				m_drPanScrollDirection = PAN_SCROLL_DIRECTION_RIGHT;
+			} else {
+				m_drPanScrollDirection = PAN_SCROLL_DIRECTION_LEFT;
+			}
+			// 横ドラッグ開始
+			m_bPanDragging = true;
 		} else if (abs(dy) >= dyMinLimit && (!m_bCanSlide || abs(dx) < abs(dy))) {
 			// 縦移動量がドラッグ開始オフセット以上で、
 			// 「横スライド無効」か、「横スライド有効で縦移動量が横移動量より大きい」場合
