@@ -39,8 +39,8 @@
 #define SPLITTER_HEIGHT			10
 
 // 遷移所要時間 [msec]
-#define MAGNIFY_MODE_TRANSITION_MSEC			300
-#define MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL	30
+#define MAGNIFY_MODE_TRANSITION_MSEC			230
+#define MAGNIFY_MODE_TRANSITION_MSEC_INTERVAL	20
 
 /// アクセス種別と表示種別から、ボディーリストのヘッダー文字列（１カラム目）を取得する
 LPCTSTR MyGetBodyHeaderColName1( ACCESS_TYPE accessType )
