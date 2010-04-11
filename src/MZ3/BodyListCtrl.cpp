@@ -16,23 +16,6 @@
 #include "MixiParserUtil.h"
 #include "MZ3View.h"
 
-/// カラムモードのスタイル
-namespace COLUMN_MODE_STYLE {
-static const int BOX_MARGIN_BOTTOM_PT = 2;	///< ボックス間マージン(下側)[pt]
-static const int FIRST_MARGIN_LEFT	= 4;	///< 第1カラム、左側マージン
-static const int FIRST_MARGIN_RIGHT	= 4;	///< 第1カラム、右側マージン
-static const int OTHER_MARGIN_LEFT	= 12;	///< 第2カラム以降、左側マージン
-static const int OTHER_MARGIN_RIGHT	= 12;	///< 第2カラム以降、右側マージン
-}
-
-/// 統合カラムモードのスタイル
-namespace INTEGRATED_MODE_STYLE {
-static const int BOX_MARGIN_BOTTOM_PT   = 2;	///< ボックス間マージン(下側)[pt]
-static const int EACH_LINE_MARGIN_PT    = 1;	///< 行間マージン[pt]
-static const int FIRST_LINE_MARGIN_LEFT = 4;	///< 1行目、左マージン
-static const int OTHER_LINE_MARGIN_LEFT = 4+4;	///< 2行目以降、左マージン
-};
-
 /* 統合カラムモード
  *            ------x-----------------------  x : FIRST_LINE_MARGIN_LEFT 
  *            ------xx----------------------  xx: OTHER_LINE_MARGIN_LEFT

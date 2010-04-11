@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(CCategoryListCtrl, CTouchListCtrl)
 #ifndef WINCE
 	ON_WM_MOUSEMOVE()
 #endif
+	ON_WM_MEASUREITEM_REFLECT()
 END_MESSAGE_MAP()
 
 
@@ -112,7 +113,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// 選択されている場合は、一行を塗りつぶす
 	if (bSelected == TRUE) {
-		pDC->FillRect(rcAllLabels, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
+		pDC->FillRect(rcItem, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 	}else{
 		// 背景の塗りつぶし
 		if( IsDrawBk() ) {
@@ -121,7 +122,7 @@ void CCategoryListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 //				pDC->FillRect(rcAllLabels, &CBrush(RGB(0xFF, 0xFF, 0xFF)));
 				// 暫定的にステータスバーの背景色を利用する
 				pDC->SetBkColor(theApp.m_skininfo.getColor("MainStatusBG"));
-				pDC->FillRect(rcAllLabels, &theApp.m_brushMainStatusBar);
+				pDC->FillRect(rcItem, &theApp.m_brushMainStatusBar);
 			}else{
 				// ビットマップの描画
 				CRect rectClient;
@@ -401,4 +402,27 @@ void CCategoryListCtrl::MoveSlideLeft()
 {
 	GetParent()->SendMessage( WM_COMMAND , ID_ACCELERATOR_NEXT_TAB , 0 );
 	return;
+}
+
+void CCategoryListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	// px値に変換
+	CDC* pDC = GetDC();
+	CFont* pOldFont = pDC->SelectObject(&theApp.m_font);
+	CSize charSize = pDC->GetTextExtent(CString(L"●"));
+	pDC->SelectObject(pOldFont);
+	ReleaseDC(pDC);
+
+	int lfHeightPx = charSize.cy;
+
+	// 行数
+//	int N = theApp.m_optionMng.m_nCategoryListLine;
+	int N = 2;
+	if (N <= 1) {
+		// 1行モード
+		lpMeasureItemStruct->itemHeight = lfHeightPx   +theApp.pt2px(COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
+	} else {
+		// 統合カラムモード：高さをN倍する
+		lpMeasureItemStruct->itemHeight = lfHeightPx*N +theApp.pt2px(INTEGRATED_MODE_STYLE::BOX_MARGIN_BOTTOM_PT)*(N-1);
+	}
 }
