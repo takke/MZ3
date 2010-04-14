@@ -338,8 +338,17 @@ function mixi_recent_voice_parser(parent, body, html)
 				data:set_date(date);
 			end
 
---[[
+			for dd_feedback in li_tag:gmatch('<dd class="feedback">(.-)</dd') do
+--				mz3.logger_debug(dd_feedback);
+				
+				local name = dd_feedback:match('<a .->(.-)</a>');
+				local url = dd_feedback:match('href="(.-)"');
+				if name ~= nil and url ~= nil then
+					data:add_link_list(complement_mixi_url(url), 'イイネ！by' .. name);
+				end
+			end
 
+--[[
 			-- 引用ユーザがあれば抽出しておく
 			if line_has_strings(comment, '<a', 'view_voice.pl', '</a>') then
 				local ref_user_id, ref_user_name = comment:match('<a href=".-id=(.-)&.-">&gt;&gt;(.-)</');
@@ -371,9 +380,9 @@ function mixi_recent_voice_parser(parent, body, html)
 	mz3.logger_debug("mixi_recent_voice_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 -- みんなのエコー
-mz3.set_parser("MIXI_RECENT_VOICE", "mixi.mixi_recent_voice_parser");
-mz3.set_parser("MIXI_RES_VOICE"   , "mixi.mixi_recent_voice_parser");
-mz3.set_parser("MIXI_LIST_VOICE"  , "mixi.mixi_recent_voice_parser");
+mz3.set_parser("MIXI_RECENT_ECHO", "mixi.mixi_recent_voice_parser");
+mz3.set_parser("MIXI_RES_VOICE"  , "mixi.mixi_recent_voice_parser");
+mz3.set_parser("MIXI_LIST_VOICE" , "mixi.mixi_recent_voice_parser");
 
 
 --------------------------------------------------
@@ -565,7 +574,7 @@ function on_mixi_echo_add_user_echo_list(serialize_key, event_name, data)
 	title = name .. "さんのボイス";
 	author_id = body:get_integer('author_id');
 	url = "http://mixi.jp/list_voice.pl?owner_id=" .. author_id;
-	key = "MIXI_RECENT_VOICE";
+	key = "MIXI_RECENT_ECHO";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始
@@ -587,7 +596,7 @@ function on_mixi_echo_add_ref_user_echo_list(serialize_key, event_name, data)
 	title = name .. "さんのボイス";
 	author_id = body:get_integer('ref_user_id');
 	url = "http://mixi.jp/list_voice.pl?id=" .. author_id;
-	key = "MIXI_RECENT_VOICE";
+	key = "MIXI_RECENT_ECHO";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始
@@ -712,9 +721,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 
 		-- echo
 		local tab = MZ3GroupItem:create("ボイス");
-		tab:append_category("みんなのボイス", "MIXI_RECENT_VOICE", "recent_voice.pl");
-		tab:append_category("自分への返信一覧", "MIXI_RECENT_VOICE", "http://mixi.jp/res_voice.pl");
-		tab:append_category("自分の一覧", "MIXI_RECENT_VOICE", "http://mixi.jp/list_voice.pl?id={owner_id}");
+		tab:append_category("みんなのボイス", "MIXI_RECENT_ECHO", "recent_voice.pl");
+		tab:append_category("自分の一覧", "MIXI_RECENT_ECHO", "http://mixi.jp/list_voice.pl?id={owner_id}");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
@@ -759,9 +767,9 @@ function on_estimate_access_type(event_name, url, data1, data2)
 		return true, mz3.get_access_type_by_key('MIXI_EVENT_MEMBER');
 	end
 
-    -- エコー
+    -- ボイス
 	if line_has_strings(url, 'recent_voice.pl?') then
-		return true, mz3.get_access_type_by_key('MIXI_RECENT_VOICE');
+		return true, mz3.get_access_type_by_key('MIXI_RECENT_ECHO');
 	end
 
 	return false;

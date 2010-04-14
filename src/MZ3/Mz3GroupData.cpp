@@ -103,7 +103,8 @@ bool Mz3GroupData::appendCategoryByIniData(
 			url = strCategoryUrl;
 			category_name = "みんなのボイス";
 		} else if (category_type == ACCESS_MIXI_RECENT_VOICE &&
-			       strstr(category_url, "res_voice.pl")!=NULL)
+			       strstr(category_url, "res_echo.pl")!=NULL &&
+				   strstr(category_name.c_str(), "返信")!=NULL)
 		{
 			// 移行処理：res_voice.pl は 2010/04/14 のmixi仕様変更で消えたので項目としても削除
 			return true;

@@ -98,7 +98,7 @@ enum ACCESS_TYPE {
 	ACCESS_COMMUNITY,			///< コミュニティページ(view_community.pl)
 	ACCESS_MOVIE,				///< 動画
 	ACCESS_SCHEDULE,			///< 追加した予定  //MOriyama追加
-	ACCESS_MIXI_ECHO_USER,		///< エコーのオブジェクト
+	ACCESS_MIXI_VOICE_USER,		///< ボイスのオブジェクト
 #endif
 	ACCESS_IMAGE,				///< 画像
 
@@ -132,11 +132,11 @@ enum ACCESS_TYPE {
 #endif
 	ACCESS_LIST_BOOKMARK,			///< ブックマーク
 
-	//--- mixi echo 関連
+	//--- mixi ボイス 関連
 #ifdef BT_MZ3
-	ACCESS_MIXI_RECENT_ECHO,			///< みんなのエコー：recent_echo.pl
-	ACCESS_MIXI_ADD_ECHO,				///< エコー書き込む：add_echo.pl
-	ACCESS_MIXI_ADD_ECHO_REPLY,			///< エコー返信：add_echo.pl
+	ACCESS_MIXI_RECENT_VOICE,			///< みんなのエコー：recent_voice.pl
+	ACCESS_MIXI_ADD_VOICE,				///< エコー書き込む：add_voice.pl
+	ACCESS_MIXI_ADD_VOICE_REPLY,		///< エコー返信：add_voice.pl
 #endif
 
 	//--- POST 系：POST 時の進捗メッセージ用。CMixiData として保持することはない。

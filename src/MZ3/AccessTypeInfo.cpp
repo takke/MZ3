@@ -697,7 +697,7 @@ bool AccessTypeInfo::init()
 	// http://mixi.jp/recent_voice.pl
 	// => recent_voice.html
 	m_map[type].cacheFilePattern = L"mixi_voice\\{urlafter:mixi.jp/:recent_voice}.html";
-	m_map[type].serializeKey = "MIXI_RECENT_VOICE";
+	m_map[type].serializeKey = "MIXI_RECENT_ECHO";
 	m_map[type].defaultCategoryURL = L"recent_voice.pl";
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"”­Œ¾");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"–¼‘O>>");
