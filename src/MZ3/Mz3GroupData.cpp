@@ -42,7 +42,7 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
  */
 bool Mz3GroupData::appendCategoryByIniData( 
 	AccessTypeInfo& accessTypeInfo, 
-	CGroupItem& group, const std::string& category_name, ACCESS_TYPE category_type, const char* category_url, bool bCruise )
+	CGroupItem& group, std::string category_name, ACCESS_TYPE category_type, const char* category_url, bool bCruise )
 {
 	// デフォルトURL（category_url が未指定の場合に用いるURL）
 	LPCTSTR default_category_url = accessTypeInfo.getDefaultCategoryURL(category_type);
@@ -87,11 +87,27 @@ bool Mz3GroupData::appendCategoryByIniData(
 		if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
 			       strstr(category_url, "http://twitter.com/statuses/friends_timeline.xml")!=NULL)
 		{
-			// friends_timeline.xml を home_timeline.xml に書き換える
+			// 移行処理：friends_timeline.xml を home_timeline.xml に書き換える
 			CString strCategoryUrl(category_url);
 			strCategoryUrl.Replace(L"http://twitter.com/statuses/friends_timeline.xml",
 								   L"http://twitter.com/statuses/home_timeline.xml");
 			url = strCategoryUrl;
+#ifdef BT_MZ3
+		} else if (category_type == ACCESS_MIXI_RECENT_VOICE &&
+			       strstr(category_url, "recent_echo.pl")!=NULL)
+		{
+			// 移行処理：recent_echo.pl を recent_voice.pl に書き換える
+			CString strCategoryUrl(category_url);
+			strCategoryUrl.Replace(L"recent_echo.pl",
+								   L"recent_voice.pl");
+			url = strCategoryUrl;
+			category_name = "みんなのボイス";
+		} else if (category_type == ACCESS_MIXI_RECENT_VOICE &&
+			       strstr(category_url, "res_voice.pl")!=NULL)
+		{
+			// 移行処理：res_voice.pl は 2010/04/14 のmixi仕様変更で消えたので項目としても削除
+			return true;
+#endif
 		} else {
 			// カテゴリURLを採用
 			url = util::my_mbstowcs(category_url).c_str();

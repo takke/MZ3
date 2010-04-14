@@ -243,17 +243,17 @@ mz3.set_parser("MIXI_EVENT_MEMBER", "mixi.mixi_list_event_member_parser");
 
 --------------------------------------------------
 -- 【みんなのエコー一覧】
--- [list] recent_echo.pl 用パーサ
+-- [list] recent_voice.pl 用パーサ
 --
--- http://mixi.jp/recent_echo.pl
+-- http://mixi.jp/recent_voice.pl
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
 --   body:   下ペインのオブジェクト群(MZ3DataList*)
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
-function mixi_recent_echo_parser(parent, body, html)
-	mz3.logger_debug("mixi_recent_echo_parser start");
+function mixi_recent_voice_parser(parent, body, html)
+	mz3.logger_debug("mixi_recent_voice_parser start");
 
 	-- wrapperクラス化
 	body = MZ3DataList:create(body);
@@ -263,7 +263,6 @@ function mixi_recent_echo_parser(parent, body, html)
 	body:clear();
 
 	local t1 = mz3.get_tick_count();
-	local in_data_region = false;
 
 	local line_count = html:get_count();
 	
@@ -275,119 +274,87 @@ function mixi_recent_echo_parser(parent, body, html)
 		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
 		if line_has_strings(line, 'hidden', 'name="post_key"') then
 			mixi.post_key = line:match('value="(.-)"');
+			mz3.logger_debug("post_key: " .. mixi.post_key);
 			break;
 		end
 	end
 
-	-- 行数取得
-	for i=180, line_count-1 do
-		line = html:get_at(i);
-
-		-- 項目探索 以下一行
-		-- <td class="thumb">
-		if line_has_strings(line, "<td", "class", "thumb") then
-		-- <div class="echo_member_id" style="display: none;">ユーザID</div>
-		-- if line_has_strings(line, "<div", "class", "echo_member_id") then
-
+	-- 複数行に分かれているので1行に結合
+	local line = html:get_all_text();
+	
+	for li_tag in line:gmatch('<li class="archive">(.-)<span class="error"') do
+--		mz3.logger_debug(li_tag);
+		
+		-- 以下一行
+		-- <span class="thumb"><a href="list_voice.pl?owner_id=xx">
+		-- <img src="http://profile.img.mixi.jp/photo/member/58/92/xx.jpg" alt="たっけ" /></a></span>
+		local span = li_tag:match('<span class="thumb">(.-)</span>');
+		if span ~= nil then
 			-- data 生成
 			data = MZ3Data:create();
 
-			in_data_region = true;
-
 			-- 画像取得
-			line = html:get_at(i);
-			image_url = line:match('<img src="(.-)"');
+			local image_url = span:match('<img src="(.-)"');
 			if image_url ~= nil then
 				data:add_text_array("image", image_url);
 			--	mz3.alert(image_url);
 			end
-
-			-- </tr>まで継続, いったんバッファリング
-			sub_html = '';
-			for i=i+2, line_count-1 do
-				line = html:get_at(i);
-				
-				if line_has_strings(line, '</tr>') then
-					break;
-				end
-				sub_html = sub_html .. line;
-			end
-			
---			mz3.logger_debug(sub_html);
 			
 			-- URL 取得
-			url = sub_html:match('<a href="(.-)"');
+			local url = span:match('<a href="(.-)"');
 			if url ~= nil then
 				url = complement_mixi_url(url);
 				data:set_text("url", url);
 			end
---[[
-			-- 画像取得
-			image_url = sub_html:match('<img src="(.-)"');
-			if image_url ~= nil then
-				data:add_text_array("image", image_url);
-			--	mz3.alert(image_url);
-			end
-]]
+
 			-- ユーザ名
-			-- name = line:match(">([^<]+)(<.*)$");
-			local s = sub_html:match('<td class="nickname">(.-)</a>');
-			if s ~= nil then
-				if s ~= nil then
-					s = s:gsub('<.->', '');
-					s = s:gsub("\n", '');
-					s = s:gsub('^ +', '');
-					s = s:gsub(' +$', '');
-					data:set_text("name", s);
-				end
-			else
-				i = i +2;
-				line = html:get_at(i);
-				-- s = line:match(">([^<]+)(<.*)$");
-				s = line:match("([^<]+)(<.*)$");
-				data:set_text("name", s);
-				-- mz3.alert(line);
+			local nickname = li_tag:match('name="nickname" value="(.-)"');
+			if nickname ~= nil then
+				data:set_text("name", nickname);
 			end
 
 			-- 発言
-			local comment = sub_html:match('<td class="comment">(.-)<span>');
-			
-			-- 引用ユーザがあれば抽出しておく
-			if line_has_strings(comment, '<a', 'view_echo.pl', '</a>') then
-				local ref_user_id, ref_user_name = comment:match('<a href=".-id=(.-)&.-">&gt;&gt;(.-)</');
-				data:set_integer('ref_user_id', ref_user_id);
-				data:set_text('ref_user_name', ref_user_name);
-			end
-			
-			-- 発言取得
-			if comment ~= nil then
+			local voiced = li_tag:match('<div class="voiced">(.-)</div>');
+			if voiced ~= nil then
+				local comment = voiced:match('<p>(.-)<');
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->', '');
 				comment = comment:gsub('</a>', ' ');
 				data:add_body_with_extract(comment);
 			end
 
+			-- id
+			-- <input type="hidden" name="member_id" value="85892" class="memberId" />
+			local author_id = li_tag:match('name="member_id".-value="(.-)"');
+			if author_id ~= nil then
+				data:set_integer("author_id", author_id);
+				data:set_integer("id", author_id);
+			end
+
 			-- 時間
-			local date = sub_html:match('<span>.-<a.->(.-)</a>');
+			local date = voiced:match('<span>.-<a.->(.-)</a>');
 			if date ~= nil then
 				date = date:gsub("\n", '');
 				data:set_date(date);
 			end
 
-			-- id
-			local author_id = sub_html:match('class="echo_member_id".->(.-)</');
-			if author_id ~= nil then
-				data:set_integer("author_id", author_id);
-				data:set_integer("id", author_id);
+--[[
+
+			-- 引用ユーザがあれば抽出しておく
+			if line_has_strings(comment, '<a', 'view_voice.pl', '</a>') then
+				local ref_user_id, ref_user_name = comment:match('<a href=".-id=(.-)&.-">&gt;&gt;(.-)</');
+				data:set_integer('ref_user_id', ref_user_id);
+				data:set_text('ref_user_name', ref_user_name);
 			end
+			
+			-- echo_post_time
 			local echo_post_time = sub_html:match('class="echo_post_time".->(.-)</');
 			if echo_post_time ~= nil then
 				data:set_text('echo_post_time', echo_post_time);
 			end
-
+]]
 			-- URL に応じてアクセス種別を設定
-			--type = mz3.estimate_access_type_by_url(url);
-			type = mz3.get_access_type_by_key('MIXI_RECENT_ECHO_ITEM');
+			local type = mz3.get_access_type_by_key('MIXI_RECENT_VOICE_ITEM');
 			data:set_access_type(type);
 			
 			-- data 追加
@@ -395,34 +362,18 @@ function mixi_recent_echo_parser(parent, body, html)
 
 			-- data 削除
 			data:delete();
-		end
 
-		if in_data_region then
-			back_data, next_data = parse_next_back_link(line, 'recent_echo.pl', 'title');
-			if back_data ~= nil then
-				back_data:add_body_with_extract(back_data:get_text('title'));
-				body:insert(0, back_data.data);
-			end
-			if next_data ~= nil then
-				next_data:add_body_with_extract(next_data:get_text('title'));
-				body:add(next_data.data);
-			end
 		end
-
-		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("★</ul>が見つかったので終了します");
-			break;
-		end
-
+		
 	end
 
 	local t2 = mz3.get_tick_count();
-	mz3.logger_debug("mixi_recent_echo_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+	mz3.logger_debug("mixi_recent_voice_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 -- みんなのエコー
-mz3.set_parser("MIXI_RECENT_ECHO", "mixi.mixi_recent_echo_parser");
-mz3.set_parser("MIXI_RES_ECHO"   , "mixi.mixi_recent_echo_parser");
-mz3.set_parser("MIXI_LIST_ECHO"  , "mixi.mixi_recent_echo_parser");
+mz3.set_parser("MIXI_RECENT_VOICE", "mixi.mixi_recent_voice_parser");
+mz3.set_parser("MIXI_RES_VOICE"   , "mixi.mixi_recent_voice_parser");
+mz3.set_parser("MIXI_LIST_VOICE"  , "mixi.mixi_recent_voice_parser");
 
 
 --------------------------------------------------
@@ -498,7 +449,7 @@ function on_reset_twitter_style_post_mode(event_name, serialize_key)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='mixi' then
 		-- モード変更
-		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('MIXI_ADD_ECHO'));
+		mz3_main_view.set_post_mode(mz3.get_access_type_by_key('MIXI_ADD_VOICE'));
 		
 		return true;
 	end
@@ -509,9 +460,9 @@ mz3.add_event_listener("reset_twitter_style_post_mode", "mixi.on_reset_twitter_s
 
 --- Twitterスタイルのボタン名称の更新
 function on_update_twitter_update_button(event_name, serialize_key)
-	if serialize_key == 'MIXI_ADD_ECHO' then
+	if serialize_key == 'MIXI_ADD_VOICE' then
 		return true, 'voice';
-	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	elseif serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		return true, '返信';
 	end
 	
@@ -523,7 +474,7 @@ mz3.add_event_listener("update_twitter_update_button", "mixi.on_update_twitter_u
 --- 「つぶやく」メニュー用ハンドラ
 function on_mixi_echo_update(serialize_key, event_name, data)
 	-- モード変更
-	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO);
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_VOICE);
 
 	-- モード変更反映(ボタン名称変更)
 	mz3_main_view.update_control_status();
@@ -532,10 +483,11 @@ function on_mixi_echo_update(serialize_key, event_name, data)
 	mz3_main_view.set_focus('edit');
 end
 
+-- TODO 2010/4/14 仕変で消えた
 --- 「返信」メニュー用ハンドラ
 function on_mixi_echo_reply(serialize_key, event_name, data)
 	-- モード変更
-	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_ECHO_REPLY);
+	mz3_main_view.set_post_mode(MAIN_VIEW_POST_MODE_MIXI_VOICE_REPLY);
 
 	-- モード変更反映(ボタン名称変更)
 	mz3_main_view.update_control_status();
@@ -553,8 +505,8 @@ function on_mixi_echo_show_profile(serialize_key, event_name, data)
 	
 	-- URL 取得
 	url = data:get_text('url');
-	-- view_echo.pl なのでプロフィールページURLに置換する
-	url = 'http://mixi.jp/show_friend.pl?id=' .. get_param_from_url(url, 'id');
+	-- view_voice.pl なのでプロフィールページURLに置換する
+	url = 'http://mixi.jp/show_friend.pl?id=' .. get_param_from_url(url, 'owner_id');
 --	mz3.alert(url);
 	
 	-- プロフィール取得アクセス開始
@@ -570,7 +522,7 @@ end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
-	if serialize_key=="MIXI_RECENT_ECHO_ITEM" then
+	if serialize_key=="MIXI_RECENT_VOICE_ITEM" then
 		-- 全文表示
 		return on_mixi_echo_read_menu_item(serialize_key, event_name, data);
 	end
@@ -612,8 +564,8 @@ function on_mixi_echo_add_user_echo_list(serialize_key, event_name, data)
 	-- カテゴリ追加
 	title = name .. "さんのボイス";
 	author_id = body:get_integer('author_id');
-	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
-	key = "MIXI_RECENT_ECHO";
+	url = "http://mixi.jp/list_voice.pl?owner_id=" .. author_id;
+	key = "MIXI_RECENT_VOICE";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始
@@ -634,8 +586,8 @@ function on_mixi_echo_add_ref_user_echo_list(serialize_key, event_name, data)
 	-- カテゴリ追加
 	title = name .. "さんのボイス";
 	author_id = body:get_integer('ref_user_id');
-	url = "http://mixi.jp/list_echo.pl?id=" .. author_id;
-	key = "MIXI_RECENT_ECHO";
+	url = "http://mixi.jp/list_voice.pl?id=" .. author_id;
+	key = "MIXI_RECENT_VOICE";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始
@@ -655,7 +607,7 @@ end
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
-	if serialize_key~="MIXI_RECENT_ECHO_ITEM" then
+	if serialize_key~="MIXI_RECENT_VOICE_ITEM" then
 		return false;
 	end
 	
@@ -669,7 +621,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("string", "全文を読む...", menu_items.mixi_echo_item_read);
 	menu:append_menu("separator");
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
-	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
+--	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
 	menu:append_menu("string", body:get_text('name') .. " さんのプロフィール", menu_items.mixi_echo_show_profile);
 	menu:append_menu("separator");
 
@@ -759,10 +711,10 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:delete();
 
 		-- echo
-		local tab = MZ3GroupItem:create("エコー");
-		tab:append_category("みんなのエコー", "MIXI_RECENT_ECHO");
-		tab:append_category("自分への返信一覧", "MIXI_RECENT_ECHO", "http://mixi.jp/res_echo.pl");
-		tab:append_category("自分の一覧", "MIXI_RECENT_ECHO", "http://mixi.jp/list_echo.pl?id={owner_id}");
+		local tab = MZ3GroupItem:create("ボイス");
+		tab:append_category("みんなのボイス", "MIXI_RECENT_VOICE", "recent_voice.pl");
+		tab:append_category("自分への返信一覧", "MIXI_RECENT_VOICE", "http://mixi.jp/res_voice.pl");
+		tab:append_category("自分の一覧", "MIXI_RECENT_VOICE", "http://mixi.jp/list_voice.pl?id={owner_id}");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
@@ -808,8 +760,8 @@ function on_estimate_access_type(event_name, url, data1, data2)
 	end
 
     -- エコー
-	if line_has_strings(url, 'recent_echo.pl?') then
-		return true, mz3.get_access_type_by_key('MIXI_RECENT_ECHO');
+	if line_has_strings(url, 'recent_voice.pl?') then
+		return true, mz3.get_access_type_by_key('MIXI_RECENT_VOICE');
 	end
 
 	return false;
@@ -905,10 +857,10 @@ function on_click_update_button(event_name, serialize_key)
 
 	-- 未入力時の処理
 	if text == '' then
-		if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+		if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 			-- 未入力はNG => 何もせずに終了
 			return true;
-		elseif serialize_key == 'MIXI_ADD_ECHO' then
+		elseif serialize_key == 'MIXI_ADD_VOICE' then
 			-- 最新取得
 			mz3_main_view.retrieve_category_item();
 			return true;
@@ -922,7 +874,7 @@ function on_click_update_button(event_name, serialize_key)
 	-- 確認
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
-	if serialize_key == 'MIXI_ADD_ECHO' then
+	if serialize_key == 'MIXI_ADD_VOICE' then
 		msg = 'mixi エコーで発言します。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
@@ -931,7 +883,7 @@ function on_click_update_button(event_name, serialize_key)
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
 		end
-	elseif serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	elseif serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		local username = data:get_text('name');
 		msg = 'mixi エコーで ' .. username .. ' さんに返信します。 \n'
 		   .. '---- 発言 ----\n'
@@ -943,7 +895,7 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	end
 
-	if serialize_key == 'MIXI_ADD_ECHO' then
+	if serialize_key == 'MIXI_ADD_VOICE' then
 		-- 単純投稿は共通処理で。
 
 		-- クロスポスト管理データ初期化
@@ -960,7 +912,7 @@ function on_click_update_button(event_name, serialize_key)
 		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
 		return true;
 	end
-	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
 		local echo_member_id = data:get_integer('author_id');
 		local echo_post_time = data:get_text('echo_post_time');
@@ -979,7 +931,7 @@ function on_click_update_button(event_name, serialize_key)
 		post:append_post_body('&x=28&y=20');
  		post:append_post_body('&parent_member_id=' .. echo_member_id);
  		post:append_post_body('&parent_post_time=' .. echo_post_time);
-		post:append_post_body('&redirect=recent_echo');
+		post:append_post_body('&redirect=recent_voice');
 		post:append_post_body('&post_key=');
 		post:append_post_body(post_key);
 	end
@@ -991,8 +943,8 @@ function on_click_update_button(event_name, serialize_key)
 --	end
 
 	-- POST先URL設定
-	if serialize_key == 'MIXI_ADD_ECHO_REPLY' then
-		url = 'http://mixi.jp/add_echo.pl';
+	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
+		url = 'http://mixi.jp/add_voice.pl';
 	end
 	
 	-- 通信開始
@@ -1009,7 +961,7 @@ mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
 --- echo に投稿する
 function do_post_to_echo(text)
 
-	serialize_key = 'MIXI_ADD_ECHO'
+	serialize_key = 'MIXI_ADD_VOICE'
 
 	post = MZ3PostData:create();
 	local post_key = mixi.post_key;
@@ -1022,7 +974,7 @@ function do_post_to_echo(text)
 	post:append_post_body('&x=28&y=20');
 	post:append_post_body('&post_key=');
 	post:append_post_body(post_key);
-	post:append_post_body('&redirect=recent_echo');
+	post:append_post_body('&redirect=recent_voice');
 
 	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
 --	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
@@ -1031,7 +983,7 @@ function do_post_to_echo(text)
 --	end
 
 	-- POST先URL設定
-	url = 'http://mixi.jp/add_echo.pl';
+	url = 'http://mixi.jp/add_voice.pl';
 	
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key(serialize_key);
@@ -1060,8 +1012,8 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 
 	-- 投稿処理完了
 	
-	if serialize_key == 'MIXI_ADD_ECHO' or 
-	   serialize_key == 'MIXI_ADD_ECHO_REPLY' then
+	if serialize_key == 'MIXI_ADD_VOICE' or 
+	   serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		if mz3.is_mixi_logout(serialize_key) then
 			mz3.alert('未ログインです。エコー一覧をリロードし、mixiにログインして下さい。');
 			return true;
@@ -1070,7 +1022,7 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 			mz3_main_view.set_info_text("エコー書き込み完了");
 
 			-- クロスポスト
-			if serialize_key == "MIXI_ADD_ECHO" then
+			if serialize_key == "MIXI_ADD_VOICE" then
 				if mz3.do_cross_post() then
 					return true;
 				end

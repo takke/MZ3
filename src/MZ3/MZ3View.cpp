@@ -2714,7 +2714,7 @@ BOOL CMZ3View::OnKeydownBodyList( WORD vKey )
 							theApp.MyLuaExecute(L"goohome.on_goohome_update()");
 
 							return TRUE;
-						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
+						} else if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_VOICE) {
 
 							// Lua 関数呼び出しで実装
 							theApp.MyLuaExecute(L"mixi.on_mixi_echo_update()");
@@ -5409,7 +5409,7 @@ CMZ3View::VIEW_STYLE CMZ3View::MyGetViewStyleForSelectedCategory(void)
 			}
 
 #ifdef BT_MZ3
-			if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_ECHO) {
+			if (pCategory->m_mixi.GetAccessType()==ACCESS_MIXI_RECENT_VOICE) {
 				// エコーは Twitter スタイル
 				return VIEW_STYLE_TWITTER;
 			}

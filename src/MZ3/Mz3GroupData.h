@@ -59,7 +59,7 @@ public:
 
 	static bool appendCategoryByIniData( AccessTypeInfo& accessTypeInfo, 
 								  CGroupItem& group, 
-								  const std::string& category_name, 
+								  std::string category_name, 
 								  ACCESS_TYPE category_type, 
 								  const char* category_url=NULL, 
 								  bool bCruise=false );

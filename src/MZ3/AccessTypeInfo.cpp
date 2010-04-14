@@ -687,53 +687,53 @@ bool AccessTypeInfo::init()
 	//--- mixi echo 関連
 	//------------------------------------------------------------------
 #ifdef BT_MZ3
-	type = ACCESS_MIXI_RECENT_ECHO;
+	type = ACCESS_MIXI_RECENT_VOICE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
 		, "mixi"
 		, L"みんなのボイス"
 		, REQUEST_METHOD_GET
 		);
-	// http://mixi.jp/recent_echo.pl
-	// => recent_echo.html
-	m_map[type].cacheFilePattern = L"mixi_echo\\{urlafter:mixi.jp/:recent_echo}.html";
-	m_map[type].serializeKey = "MIXI_RECENT_ECHO";
-	m_map[type].defaultCategoryURL = L"recent_echo.pl";
+	// http://mixi.jp/recent_voice.pl
+	// => recent_voice.html
+	m_map[type].cacheFilePattern = L"mixi_voice\\{urlafter:mixi.jp/:recent_voice}.html";
+	m_map[type].serializeKey = "MIXI_RECENT_VOICE";
+	m_map[type].defaultCategoryURL = L"recent_voice.pl";
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t%3";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";		// "発言"
 
-	// add_echo.pl
-	type = ACCESS_MIXI_ADD_ECHO;
+	// add_voice.pl
+	type = ACCESS_MIXI_ADD_VOICE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"書き込む"
 		, REQUEST_METHOD_POST
 		);
-	m_map[type].serializeKey = "MIXI_ADD_ECHO";
+	m_map[type].serializeKey = "MIXI_ADD_VOICE";
 
-	// add_echo.pl(返信)
-	type = ACCESS_MIXI_ADD_ECHO_REPLY;
+	// add_voice.pl(返信)
+	type = ACCESS_MIXI_ADD_VOICE_REPLY;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
 		, L"書き込む(返信)"
 		, REQUEST_METHOD_POST
 		);
-	m_map[type].serializeKey = "MIXI_ADD_ECHO_REPLY";
+	m_map[type].serializeKey = "MIXI_ADD_VOICE_REPLY";
 
 	// echo 発言
-	type = ACCESS_MIXI_ECHO_USER;
+	type = ACCESS_MIXI_VOICE_USER;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_OTHER
 		, "mixi"
 		, L"mixiボイス発言"
 		, REQUEST_METHOD_GET
 		);
-	m_map[type].serializeKey = "MIXI_RECENT_ECHO_ITEM";
+	m_map[type].serializeKey = "MIXI_RECENT_VOICE_ITEM";
 #endif
 
 	//------------------------------------------------------------------
