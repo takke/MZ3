@@ -116,7 +116,8 @@ public:
 	bool			m_bAutoLoadMiniImage;				///< 画像の自動取得
 
 	bool			m_bBodyListIntegratedColumnMode;	///< ボディリストのカラムの統合モード
-	int				m_nBodyListIntegratedColumnModeLine;///< ボディリストのカラムの統合モード
+	int				m_nBodyListIntegratedColumnModeLine;///< ボディリストのカラムの統合モードにおける行数
+	int				m_nCategoryListLine;				///< カテゴリリストの行数
 	bool			m_bOneClickCategoryFetchMode;		///< 上ペインのリストクリック時に取得する
 	bool			m_bMagnifyModeCategoryAtStart;		///< 起動時に上ペインを最大化する
 
@@ -215,6 +216,7 @@ public:
 		, m_bListScrollByPixelOnMZ3( false )
 		, m_bBodyListIntegratedColumnMode( true )
 		, m_nBodyListIntegratedColumnModeLine( 3 )
+		, m_nCategoryListLine( 1 )
 		, m_bOneClickCategoryFetchMode( true )
 #ifdef BT_TKTW
 		, m_bMagnifyModeCategoryAtStart( true )

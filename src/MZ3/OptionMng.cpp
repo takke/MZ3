@@ -366,6 +366,12 @@ void Option::Sync(bool bSave)
 	// ボディリストのカラムの統合モード行数
 	SyncIniValue(inifile, bSave, m_nBodyListIntegratedColumnModeLine, "MainViewBodyListIntegratedColumnModeLine", "MainView");
 
+	// カテゴリリストの行数
+	SyncIniValue(inifile, bSave, m_nCategoryListLine, "MainViewCategoryListLine", "MainView");
+	if (!bSave) {
+		m_nCategoryListLine = normalizeRange(m_nCategoryListLine, 1, 3);
+	}
+
 	// 上ペインのリストクリック時に取得する
 	SyncIniValue(inifile, bSave, m_bOneClickCategoryFetchMode, "MainViewOneClickCategoryFetchMode", "MainView");
 

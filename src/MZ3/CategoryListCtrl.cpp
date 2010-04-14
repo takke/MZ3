@@ -416,8 +416,7 @@ void CCategoryListCtrl::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	int lfHeightPx = charSize.cy;
 
 	// 行数
-//	int N = theApp.m_optionMng.m_nCategoryListLine;
-	int N = 2;
+	int N = theApp.m_optionMng.m_nCategoryListLine;
 	if (N <= 1) {
 		// 1行モード
 		lpMeasureItemStruct->itemHeight = lfHeightPx   +theApp.pt2px(COLUMN_MODE_STYLE::BOX_MARGIN_BOTTOM_PT);
