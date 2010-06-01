@@ -2121,15 +2121,31 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	-- 発言内の @XXX を抽出し、メニュー化
 	body_text = body:get_text_array_joined_text('body');
 	i = 1;
+	follower_names_work = {};
 	for f_name in body_text:gmatch("@([0-9a-zA-Z_]+)") do
 		mz3.logger_debug(f_name);
-		-- Lua 変数に名前を保存しておく
-		follower_names[i] = f_name;
-		menu:append_menu("string", "@" .. f_name .. " のタイムライン", menu_items.show_follower_tl[i]);
-		-- 最大5人までサポート
-		i = i+1;
-		if i>5 then
-			break;
+		if follower_names_work[1] == nil then
+			follower_names_work[1] = name;
+			i=i+1;
+		end
+
+		local is_listed = false;
+		for j=0, i do
+			if follower_names_work[j] == f_name then
+				is_listed = true;
+				break;
+			end
+		end
+		if is_listed == false then
+			-- Lua 変数に名前を保存しておく
+			follower_names[i] = f_name;
+			follower_names_work[i] = f_name;
+			menu:append_menu("string", "@" .. f_name .. " のタイムライン", menu_items.show_follower_tl[i]);
+			-- 最大5人までサポート
+			i = i+1;
+			if i>5 then
+				break;
+			end
 		end
 	end
 
