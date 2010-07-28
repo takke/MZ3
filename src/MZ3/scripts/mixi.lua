@@ -207,7 +207,8 @@ function mixi_list_event_member_parser(parent, body, html)
 	end
 	parent:set_text('name', '');
 	
-	target_region = line:match('<div class="iconList03">.-<ul.->(.-)</ul>');
+--	target_region = line:match('<div class="iconList03">.-<ul.->(.-)</ul>');
+	target_region = line:match('<div class="iconList03">.-<ul.->(.-)<div class="pageNavigation01 bottom">');
 	user_num = 1;
 	for li_tag in target_region:gmatch("<li.->(.-)</li>") do
 --		mz3.logger_debug(li_tag);
