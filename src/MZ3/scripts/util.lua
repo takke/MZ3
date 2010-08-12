@@ -238,4 +238,36 @@ function get_sub_html(html, start_line, end_line, start_region_params, end_regio
 end
 
 
+-- rfc3986 によるエンコード
+function rawurlencode(text)
+	
+	-- ' '         => '+'
+	-- [a-zA-Z0-9] => (keep)
+	-- '-'         => (keep)
+	-- '.'         => (keep)
+	-- '_'         => (keep)
+	-- others      => %XX encode
+	text = mz3.url_encode(text, 'utf8');
+	
+	-- '+' => '%20'
+	text = text:gsub('%+', '%%20');
+	
+	-- '%7E' => '~'
+	text = text:gsub('%%7E', '~');
+
+	return text;
+end
+
+
+-- rfc3986 によるエンコード
+function url_rfc3986(text)
+	-- urlencode
+	if text == nil then
+		return '';
+	end
+	
+	return rawurlencode(text);
+end
+
+
 mz3.logger_debug('util.lua end');

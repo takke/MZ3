@@ -48,6 +48,10 @@ public:
 		return m_additionalHeaders;
 	}
 
+	void ClearAdditionalHeaders() {
+		m_additionalHeaders = L"";
+	}
+
 	/// POST のボディ部の取得（参照により設定も可能）
 	post_array& GetPostBody() { return m_postBody; }
 

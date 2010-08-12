@@ -657,32 +657,6 @@ int lua_mz3_open_url(lua_State *L)
 		break;
 	}
 
-	// MZ3 API : BASIC認証設定
-	CString strUser = NULL;
-	CString strPassword = NULL;
-	util::MyLuaDataList rvals;
-	rvals.push_back(util::MyLuaData(0));	// is_cancel
-	rvals.push_back(util::MyLuaData(""));	// id
-	rvals.push_back(util::MyLuaData(""));	// password
-	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
-			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(access_type))))
-	{
-		int is_cancel = rvals[0].m_number;
-		if (is_cancel) {
-			return 0;
-		}
-		strUser     = rvals[1].m_strText;
-		strPassword = rvals[2].m_strText;
-	}
-
-	// アクセス開始
-	theApp.m_access = true;
-
-	// TODO 共通化
-	//m_abort = FALSE;
-	theApp.m_pMainView->m_abort = FALSE;
-	theApp.m_pReportView->m_abort = FALSE;
-
 	// GET/POST 判定
 	bool bPost = false;	// デフォルトはGET
 	switch (theApp.m_accessTypeInfo.getRequestMethod(access_type)) {
@@ -709,6 +683,36 @@ int lua_mz3_open_url(lua_State *L)
 
 		post = &s_post;
 	}
+
+	// MZ3 API : BASIC認証設定
+	CString strUser = NULL;
+	CString strPassword = NULL;
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// is_cancel
+	rvals.push_back(util::MyLuaData(""));	// id
+	rvals.push_back(util::MyLuaData(""));	// password
+	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(access_type)),
+			util::MyLuaData(post),
+			util::MyLuaData(url),
+			(bPost ? util::MyLuaData(1) : util::MyLuaData(0))
+			))
+	{
+		int is_cancel = rvals[0].m_number;
+		if (is_cancel) {
+			return 0;
+		}
+		strUser     = rvals[1].m_strText;
+		strPassword = rvals[2].m_strText;
+	}
+
+	// アクセス開始
+	theApp.m_access = true;
+
+	// TODO 共通化
+	//m_abort = FALSE;
+	theApp.m_pMainView->m_abort = FALSE;
+	theApp.m_pReportView->m_abort = FALSE;
 
 	// UserAgent設定
 	CString strUserAgent(user_agent);
@@ -737,7 +741,7 @@ int lua_mz3_open_url(lua_State *L)
 			// ブロッキング型アクセス
 			theApp.m_inet.DoPostBlocking(CString(url), CString(referer), type, post);
 			int status = theApp.m_inet.m_dwHttpStatus;
-			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
+			const unsigned char* pszMbcs = (theApp.m_inet.out_buf.empty() ? (const unsigned char*)"" : &theApp.m_inet.out_buf[0]);
 			CString strWcs2(pszMbcs);
 			CStringA strUtf8;
 			kfm::ucs2_to_utf8(strWcs2, strUtf8);
@@ -760,7 +764,7 @@ int lua_mz3_open_url(lua_State *L)
 			// ブロッキング型アクセス
 			theApp.m_inet.DoGetBlocking(CString(url), CString(referer), type, post);
 			int status = theApp.m_inet.m_dwHttpStatus;
-			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
+			const unsigned char* pszMbcs = (theApp.m_inet.out_buf.empty() ? (const unsigned char*)"" : &theApp.m_inet.out_buf[0]);
 			CString strWcs2(pszMbcs);
 			CStringA strUtf8;
 			kfm::ucs2_to_utf8(strWcs2, strUtf8);
@@ -2341,18 +2345,34 @@ function mz3_post_data.create()
 */
 int lua_mz3_post_data_create(lua_State *L)
 {
-	static CPostData s_post;
+	static CPostData s_post0;
+	static CPostData s_post1;
+
+	int idx = lua_tointeger(L, 1);
+
+	static CPostData* pPost = NULL;
+	switch (idx) {
+	case 1:
+		pPost = &s_post1;
+		break;
+
+	case 0:
+	default:
+		pPost = &s_post0;
+		break;
+	}
+
 	// 初期化
 	CPostData dummy_post_data;
-	s_post = dummy_post_data;
-	s_post.SetSuccessMessage( WM_MZ3_POST_END );
-	s_post.AppendAdditionalHeader(L"");
+	*pPost = dummy_post_data;
+	pPost->SetSuccessMessage( WM_MZ3_POST_END );
+	pPost->AppendAdditionalHeader(L"");
 
 	// デフォルトは "Content-Type: multipart/form-data"で。
-	s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
+	pPost->SetContentType(CONTENT_TYPE_FORM_URLENCODED);
 
 	// 結果をスタックに戻す
-	lua_pushlightuserdata(L, (void*)&s_post);
+	lua_pushlightuserdata(L, (void*)pPost);
 
 	// 戻り値の数を返す
 	return 1;
@@ -2416,6 +2436,38 @@ int lua_mz3_post_data_append_post_body(lua_State *L)
 }
 
 /*
+--- POST する文字列の取得
+--
+-- @param post        POST 用オブジェクト
+--
+function mz3_post_data.get_post_body(post)
+*/
+int lua_mz3_post_data_get_post_body(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.get_post_body";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 追加
+	const std::vector<char>& pPostBody = post->GetPostBody();
+
+	if (pPostBody.empty()) {
+		lua_pushstring(L, "");
+	} else {
+		lua_pushstring(L, CStringA(&pPostBody[0], pPostBody.size()));
+	}
+
+	// 戻り値の数を返す
+	return 1;
+}
+
+/*
 --- POST するヘッダーの追加
 --
 -- @param post        POST 用オブジェクト
@@ -2438,6 +2490,32 @@ int lua_mz3_post_data_append_additional_header(lua_State *L)
 
 	// 追加
 	post->AppendAdditionalHeader(text);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
+--- POST するヘッダーの削除
+--
+-- @param post        POST 用オブジェクト
+--
+function mz3_post_data.clear_additional_header(post, text)
+*/
+int lua_mz3_post_data_clear_additional_header(lua_State *L)
+{
+	const char* func_name = "mz3_post_data.clear_additional_header";
+
+	// 引数取得
+	CPostData* post = (CPostData*)lua_touserdata(L, 1);
+	if (post==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 削除
+	post->ClearAdditionalHeaders();
 
 	// 戻り値の数を返す
 	return 0;
@@ -4312,7 +4390,9 @@ static const luaL_Reg lua_mz3_post_data_lib[] = {
 	{"create",					lua_mz3_post_data_create},
 	{"set_content_type",		lua_mz3_post_data_set_content_type},
 	{"append_post_body",		lua_mz3_post_data_append_post_body},
+	{"get_post_body",			lua_mz3_post_data_get_post_body},
 	{"append_additional_header",lua_mz3_post_data_append_additional_header},
+	{"clear_additional_header", lua_mz3_post_data_clear_additional_header},
 	{"append_file",				lua_mz3_post_data_append_file},
 	{NULL, NULL}
 };

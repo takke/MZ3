@@ -3345,31 +3345,6 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	// encoding 指定
 	encoding = theApp.GetInetAccessEncodingByAccessType(data->GetAccessType());
 
-	// MZ3 API : BASIC認証設定
-	CString strUser = NULL;
-	CString strPassword = NULL;
-	util::MyLuaDataList rvals;
-	rvals.push_back(util::MyLuaData(0));	// is_cancel
-	rvals.push_back(util::MyLuaData(""));	// id
-	rvals.push_back(util::MyLuaData(""));	// password
-	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
-			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(data->GetAccessType()))))
-	{
-		int is_cancel = rvals[0].m_number;
-		if (is_cancel) {
-			return;
-		}
-		strUser     = rvals[1].m_strText;
-		strPassword = rvals[2].m_strText;
-	}
-
-	// アクセス開始
-	theApp.m_access = true;
-	m_abort = FALSE;
-
-	// コントロール状態の変更
-	MyUpdateControlStatus();
-
 	// GET/POST 判定
 	bool bPost = false;	// デフォルトはGET
 	switch (theApp.m_accessTypeInfo.getRequestMethod(data->GetAccessType())) {
@@ -3385,8 +3360,37 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	static CPostData post;
 	if (bPost) {
 		post.SetSuccessMessage( WM_MZ3_POST_END );
-		post.AppendAdditionalHeader(L"");
 	}
+	post.AppendAdditionalHeader(L"");
+
+	// MZ3 API : BASIC認証設定
+	CString strUser = NULL;
+	CString strPassword = NULL;
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(0));	// is_cancel
+	rvals.push_back(util::MyLuaData(""));	// id
+	rvals.push_back(util::MyLuaData(""));	// password
+	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(data->GetAccessType())),
+			util::MyLuaData(&post),
+			util::MyLuaData(CStringA(uri)),
+			(bPost ? util::MyLuaData(1) : util::MyLuaData(0))
+			))
+	{
+		int is_cancel = rvals[0].m_number;
+		if (is_cancel) {
+			return;
+		}
+		strUser     = rvals[1].m_strText;
+		strPassword = rvals[2].m_strText;
+	}
+
+	// アクセス開始
+	theApp.m_access = true;
+	m_abort = FALSE;
+
+	// コントロール状態の変更
+	MyUpdateControlStatus();
 
 	// [MZ3-API] GET/POST 直前のフック処理(の予定)
 #ifdef BT_MZ3
@@ -5546,7 +5550,12 @@ void CMZ3View::OnBnClickedUpdateButton()
 	rvals.push_back(util::MyLuaData(""));	// id
 	rvals.push_back(util::MyLuaData(""));	// password
 	if (util::CallMZ3ScriptHookFunctions2("set_basic_auth_account", &rvals, 
-			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(theApp.m_accessType))))
+			util::MyLuaData(theApp.m_accessTypeInfo.getSerializeKey(theApp.m_accessType)),
+			util::MyLuaData(&post),
+			util::MyLuaData(CStringA(url)),
+			(theApp.m_accessTypeInfo.getRequestMethod(m_twitterPostAccessType) == AccessTypeInfo::REQUEST_METHOD_POST
+			 ? util::MyLuaData(1) : util::MyLuaData(0))
+			))
 	{
 		int is_cancel = rvals[0].m_number;
 		if (is_cancel) {

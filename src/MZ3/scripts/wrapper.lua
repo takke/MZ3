@@ -228,7 +228,9 @@ end
 
 function MZ3PostData:set_content_type(ct)	return mz3_post_data.set_content_type(self.post_data, ct);	end
 function MZ3PostData:append_post_body(text)	return mz3_post_data.append_post_body(self.post_data, text);	end
+function MZ3PostData:get_post_body()		return mz3_post_data.get_post_body(self.post_data);	end
 function MZ3PostData:append_additional_header(header)	return mz3_post_data.append_additional_header(self.post_data, header);	end
+function MZ3PostData:clear_additional_header()	return mz3_post_data.clear_additional_header(self.post_data);	end
 function MZ3PostData:append_file(filename)	return mz3_post_data.append_file(self.post_data, filename);	end
 
 

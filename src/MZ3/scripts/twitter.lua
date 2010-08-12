@@ -22,6 +22,19 @@ mz3.regist_service('Twitter', true);
 mz3_account_provider.set_param('Twitter', 'id_name', 'ID');
 mz3_account_provider.set_param('Twitter', 'password_name', 'パスワード');
 
+-- oauth cosumer key/secrets
+local app_name = mz3.get_app_name();
+if app_name=="MZ3" then
+	oauth_consumer_key    = "ihrwFbmMkoCq2oGqZRy9OQ";
+	oauth_consumer_secret = "ljMRj94uD1ElrJW4cctMTCLQuQ7JFVDXrSO8W6WH9H8";
+elseif app_name=="MZ4" then
+	oauth_consumer_key    = "pCmLA1sbYrpPnCqAf75IqA";
+	oauth_consumer_secret = "4fFQsnykz5RSxqbvSdj5IORkMTOLJ2YPapgQNGo";
+else
+	-- TkTweets
+	oauth_consumer_key    = "bhzxioodI0l2x0DljCYJQ";
+	oauth_consumer_secret = "HMWZshVvg2SE4cUwI6Se8T9RiZ1FNmnxQjlXAw4CcU";
+end
 
 ----------------------------------------
 -- アクセス種別の登録
@@ -158,6 +171,24 @@ type:set_info_type('other');								-- カテゴリ
 type:set_service_type('Twitter');							-- サービス種別
 type:set_serialize_key('TWITTER_BIT_LY');					-- シリアライズキー
 type:set_short_title('bit.ly');								-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+-- access_token
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('Twitter');							-- サービス種別
+type:set_serialize_key('TWITTER_ACCESS_TOKEN');				-- シリアライズキー
+type:set_short_title('token');								-- 簡易タイトル
+type:set_request_method('POST');								-- リクエストメソッド
+type:set_request_encoding('utf8');							-- エンコーディング
+
+-- dummy
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('other');								-- カテゴリ
+type:set_service_type('TwitterX');							-- サービス種別
+type:set_serialize_key('TWITTER_X_DUMMY');					-- シリアライズキー
+type:set_short_title('dummy');								-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
@@ -920,22 +951,59 @@ end
 ----------------------------------------
 
 --- BASIC 認証設定
-function on_set_basic_auth_account(event_name, serialize_key)
+function on_set_basic_auth_account(event_name, serialize_key, post, url, is_post)
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='Twitter' then
 		if serialize_key=='TWITTER_UPDATE_WITH_TWITPIC' then
 			-- twitpic は BASIC 認証不要
 			return true, 0, '', '';
 		end
-		id       = mz3_account_provider.get_value('Twitter', 'id');
-		password = mz3_account_provider.get_value('Twitter', 'password');
 
-		if id=='' or password=='' then
-			mz3.alert('ログイン設定画面でユーザIDとパスワードを設定してください');
-			return true, 1;
+--[[
+		if true then
+			id       = mz3_account_provider.get_value('Twitter', 'id');
+			password = mz3_account_provider.get_value('Twitter', 'password');
+
+			if id=='' or password=='' then
+				mz3.alert('ログイン設定画面でユーザIDとパスワードを設定してください');
+				return true, 1;
+			end
+			mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
+			return true, 0, id, password;
 		end
-		mz3.logger_debug('on_set_basic_auth_account, set id : ' .. id);
-		return true, 0, id, password;
+]]
+
+		if serialize_key=='TWITTER_ACCESS_TOKEN' then
+			return true, 0, '', '';
+		end
+		
+		if post ~= nil then
+			-- oauth ヘッダーを設定する
+			post = MZ3PostData:create(post);
+			
+--			mz3.logger_debug("serialize_key:" .. serialize_key);
+			post:clear_additional_header();
+			mz3.logger_debug("make_authorization_header");
+			
+			local method = "GET";
+			if is_post == 1 then
+				method = "POST";
+			end
+			
+			local authorization_header = make_authorization_header(url, post:get_post_body(), method);
+			
+			if authorization_header == nil then
+				-- トークン取得失敗
+				mz3.alert('認証に失敗しました。ログイン設定画面でユーザIDとパスワードを設定して下さい');
+				return true, 1;
+			end
+			
+			-- ヘッダーの設定
+			post:append_additional_header(authorization_header);
+		end
+		
+		-- BASIC 認証は不要
+		return true, 0, '', '';
 	end
 	return false;
 end
@@ -1647,13 +1715,13 @@ function do_post_to_twitter(text)
 
 	-- ヘッダーの設定
 	post = MZ3PostData:create();
-	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
-	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
-	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
+--	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+--	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+--	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
 
 	-- POST パラメータを設定
 	post:append_post_body('status=');
-	post:append_post_body(mz3.url_encode(text, 'utf8'));
+	post:append_post_body(rawurlencode(text));
 
 	-- 返信先ステータス
 	if text:sub( 0, 1 ) == '@' then
@@ -1675,15 +1743,15 @@ function do_post_to_twitter(text)
 			local appended_text = text .. footer_text;
 			local len = mz3.get_text_length(text);
 			if len <= 140 then
-				post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
+				post:append_post_body(rawurlencode(footer_text));
 			end
 		end
 	end
-	post:append_post_body('&source=');
-	post:append_post_body(mz3.get_app_name());
+--	post:append_post_body('&source=');
+--	post:append_post_body(mz3.get_app_name());
 
 	-- POST先URL設定
-	url = 'http://twitter.com/statuses/update.xml';
+	url = 'http://api.twitter.com/1/statuses/update.xml';
 	
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key(serialize_key);
@@ -2731,6 +2799,25 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 
 	local focus = mz3_main_view.get_focus();
 
+--[[
+	if key == VK_G and is_ctrl~=0 then
+--		-- TODO TEST
+--		my_test();
+
+		-- a=b&c=d
+		-- a=b
+		-- 
+		mz3.logger_debug("post_body 分離:");
+		local post_body = "a=b&c=d";
+		local post_body = "status=test%20from%20MZ4%20%2AMZ4%2A";
+		for k, v in string.gmatch(post_body, "([^=]+)=([^&]+)") do
+			mz3.logger_debug(' ' .. k .. '=>' .. v);
+		end
+
+		return true;
+	end
+]]
+
 	if focus == "category_list" then
 		-- カテゴリリスト
 		if key == VK_U then
@@ -3319,6 +3406,272 @@ function on_popup_detail_menu(event_name, serialize_key, data, wnd)
 	return on_popup_body_menu(event_name, serialize_key, data, mz3_main_view.get_wnd());
 end
 mz3.add_event_listener("popup_detail_menu", "twitter.on_popup_detail_menu");
+
+
+local function make_base_string(url, base_params, method)
+
+	local base_string = method
+					  .. "&" .. url_rfc3986(url)
+					  .. "&";
+
+	-- キーの昇順にアクセスする
+	local keys = {};
+	for k, v in pairs(base_params) do
+		table.insert(keys, k);
+	end
+	table.sort(keys);
+
+	local is_first = true;
+
+	for k, v in pairs(keys) do
+--		mz3.logger_debug(v .. " => " .. base_params[v]);
+		local original_key = v;
+		local original_val = base_params[v];
+		
+		if is_first==false then
+			base_string = base_string .. "%26";
+		end
+		
+		base_string = base_string .. original_key .. "%3D" .. original_val;
+		
+		is_first = false;
+	end
+
+--	mz3.logger_debug("base_string:" .. base_string);
+	return base_string;
+end
+
+
+--- OAuth ヘッダの生成
+--
+-- xAuth のアクセストークン取得時は oauth_token, oauth_token_secret を nil にすること
+--
+function make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, method)
+
+	local oauth_nonce = mz3.md5(os.time() .. math.random());
+	local oauth_signature_method = "HMAC-SHA1";
+	local oauth_timestamp = os.time();
+	local oauth_version = "1.0";
+	
+	local base_params = {};
+	
+	-- OAuth 基本パラメータ
+	base_params["oauth_consumer_key"]     = url_rfc3986(oauth_consumer_key);
+	base_params["oauth_nonce"]            = url_rfc3986(oauth_nonce);
+	base_params["oauth_signature_method"] = url_rfc3986(oauth_signature_method);
+	base_params["oauth_timestamp"]        = url_rfc3986(oauth_timestamp);
+	if oauth_token ~= nil then
+		-- xAuth アクセストークン取得時は未決定のため含まない
+		base_params["oauth_token"]        = url_rfc3986(oauth_token);
+	end
+	base_params["oauth_version"]          = url_rfc3986(oauth_version);
+
+	-- 追加パラメータ
+	for k, v in pairs(add_params) do
+		base_params[k] = v;
+	end
+
+	-- signature 生成
+	local base_string = make_base_string(url, base_params, method);
+	mz3.logger_debug("base_string:" .. base_string);
+	local oauth_signature = 
+		base64.enc(
+			hmac_sha1_binary(
+				url_rfc3986(oauth_consumer_secret) .. "&" .. url_rfc3986(oauth_token_secret),
+				base_string));
+
+	local authorization = 'Authorization: OAuth '
+		.. 'oauth_nonce="' .. url_rfc3986(oauth_nonce) .. '",'
+		.. 'oauth_signature_method="' .. url_rfc3986(oauth_signature_method) .. '",'
+		.. 'oauth_timestamp="' .. url_rfc3986(oauth_timestamp) .. '",'
+		.. 'oauth_consumer_key="' .. url_rfc3986(oauth_consumer_key) .. '",';
+	if oauth_token ~= nil then
+		-- xAuth アクセストークン取得時は未決定のため送信しない
+		authorization = authorization .. 'oauth_token="' .. url_rfc3986(oauth_token) .. '",'
+	end
+	authorization = authorization
+		.. 'oauth_signature="' .. url_rfc3986(oauth_signature) .. '",'
+		.. 'oauth_version="' .. url_rfc3986(oauth_version) .. '"';
+	--	mz3.logger_debug(authorization);
+
+	return authorization;
+end
+
+
+--- on_set_basic_auth_account で呼ばれるフック関数
+--
+--
+--
+function make_authorization_header(url, post_body, method)
+
+	mz3.logger_debug("make_authorization_header start");
+
+	local oauth_token        = mz3_account_provider.get_value('TwitterXAuth', 'id');
+	local oauth_token_secret = mz3_account_provider.get_value('TwitterXAuth', 'password');
+
+	if oauth_token == nil or oauth_token == "" or 
+	   oauth_token_secret == nil or oauth_token_secret == "" then
+
+		-- TODO 認証トークンを保存すること
+		local token_url = 'https://api.twitter.com/oauth/access_token';
+		local id        = mz3_account_provider.get_value('Twitter', 'id');
+		local password  = mz3_account_provider.get_value('Twitter', 'password');
+
+		local add_params = {};
+		add_params["x_auth_mode"]     = "client_auth";
+		add_params["x_auth_password"] = url_rfc3986(password);
+		add_params["x_auth_username"] = url_rfc3986(id);
+		local authorization_header = make_oauth_authorization_header(token_url, add_params, nil, nil, "POST");
+
+		-- ヘッダーの設定
+		post = MZ3PostData:create(mz3_post_data.create(1));
+		post:append_additional_header(authorization_header);
+
+		-- body
+		post:append_post_body('x_auth_mode=client_auth&x_auth_password=' .. url_rfc3986(password)
+							  .. '&x_auth_username=' .. url_rfc3986(id));
+
+		-- 通信開始
+		local referer = '';
+		local user_agent = nil;
+		local is_blocking = true;
+		local access_type = mz3.get_access_type_by_key("TWITTER_ACCESS_TOKEN");
+		local status, result_json = mz3.open_url(mz3_main_view.get_wnd(), access_type, token_url,
+												 referer, "text", user_agent, post.post_data, is_blocking);
+
+		mz3.logger_debug("status:" .. status);
+		mz3.logger_debug("result:/" .. result_json .. "/");
+		mz3.logger_debug("url:/" .. url .. "/");
+		
+		oauth_token        = result_json:match("oauth_token=(.-)&");
+		oauth_token_secret = result_json:match("oauth_token_secret=(.-)&");
+		if status ~= 200 or oauth_token == nil or oauth_token_secret == nil then
+			mz3.logger_error("認証エラー status[" .. status .. "], result[" .. result_json .. "]");
+			return nil;
+		end
+
+		-- 認証OK、トークン保存
+		mz3_account_provider.set_value('TwitterXAuth', 'id', oauth_token);
+		mz3_account_provider.set_value('TwitterXAuth', 'password', oauth_token_secret);
+	else
+		-- 保存済みのトークンでアクセスする
+		mz3.logger_debug("oauth_token:" .. oauth_token);
+		mz3.logger_debug("oauth_token_secret:" .. oauth_token_secret);
+	end
+	
+	-- post_body 解析
+--	local add_params = {};
+--	add_params["status"] = rawurlencode(text);
+--	local authorization_header = make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret);
+--	local url = "http://api.twitter.com/1/statuses/home_timeline.xml";
+	local add_params = {};
+	
+	-- a=b&c=d
+	-- a=b
+	-- 
+--	mz3.logger_debug("post_body:/" .. post_body .. "/");
+--	mz3.logger_debug("分離:");
+	for k, v in string.gmatch(post_body, "([^=]+)=([^&]+)") do
+		add_params[k] = rawurlencode(v);
+--		mz3.logger_debug(' ' .. k .. '=>' .. v);
+	end
+	
+	local authorization_header = make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, 
+									method);
+	mz3.logger_debug("make_authorization_header end");
+
+	return authorization_header;
+end
+
+
+--[[
+function my_test()
+
+	local referer = '';
+	local user_agent = nil;
+	local is_blocking = true;
+	local access_type = mz3.get_access_type_by_key("TWITTER_ACCESS_TOKEN");
+
+	local url      = 'https://api.twitter.com/oauth/access_token';
+	local id       = mz3_account_provider.get_value('Twitter', 'id');
+	local password = mz3_account_provider.get_value('Twitter', 'password');
+	local oauth_timestamp = os.time();
+
+	local add_params = {};
+	add_params["x_auth_mode"]     = "client_auth";
+	add_params["x_auth_password"] = password;
+	add_params["x_auth_username"] = id;
+	local authorization_header = make_oauth_authorization_header(url, add_params, nil, nil, "POST");
+
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+	post:append_additional_header(authorization_header);
+
+	-- body
+	post:append_post_body('x_auth_mode=client_auth&x_auth_password=' .. url_rfc3986(password)
+						  .. '&x_auth_username=' .. url_rfc3986(id));
+
+	-- 通信開始
+	local status, result_json = mz3.open_url(mz3_main_view.get_wnd(), access_type, url,
+											 referer, "text", user_agent, post.post_data, is_blocking);
+
+	mz3.logger_debug("status:" .. status);
+	mz3.logger_debug("result:/" .. result_json .. "/");
+	
+	
+	if status == 200 then
+		oauth_token        = result_json:match("oauth_token=(.-)&");
+		oauth_token_secret = result_json:match("oauth_token_secret=(.-)&");
+		
+		mz3.logger_debug("oauth_token       : " .. oauth_token);
+		mz3.logger_debug("oauth_token_secret: " .. oauth_token_secret);
+		
+		if false then
+			local url = "http://api.twitter.com/1/statuses/update.json";
+
+			local add_params = {};
+			local text = "★☆";
+			add_params["status"] = rawurlencode(text);
+
+			local authorization_header = make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, "POST");
+
+			-- ヘッダーの設定
+			post = MZ3PostData:create();
+			post:append_additional_header(authorization_header);
+
+			-- body
+			post:append_post_body('status=' .. rawurlencode(text));
+
+			-- 通信開始
+			local status, result_json = mz3.open_url(mz3_main_view.get_wnd(), access_type, url,
+													 referer, "text", user_agent, post.post_data, is_blocking);
+
+			mz3.logger_debug("status:" .. status);
+			mz3.logger_debug("result:/" .. result_json .. "/");
+		end
+		
+		if true then
+			local url = "http://api.twitter.com/1/statuses/home_timeline.xml";
+
+			local add_params = {};
+			local authorization_header = make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, "GET");
+
+			-- ヘッダーの設定
+			post = MZ3PostData:create();
+			post:append_additional_header(authorization_header);
+
+			-- 通信開始
+			local access_type = mz3.get_access_type_by_key("TWITTER_X_DUMMY");
+			local status, result_json = mz3.open_url(mz3_main_view.get_wnd(), access_type, url,
+													 referer, "text", user_agent, post.post_data, is_blocking);
+
+			mz3.logger_debug("status:" .. status);
+			mz3.logger_debug("result:/" .. result_json .. "/");
+		end
+	end
+	
+end
+]]
 
 
 mz3.logger_debug('twitter.lua end');

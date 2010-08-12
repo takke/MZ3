@@ -736,6 +736,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 		// ”CˆÓ‚Ìƒwƒbƒ_[‚ð‘—M‚·‚é
 		if (m_postData != NULL && !m_postData->GetAdditionalHeaders().IsEmpty()) {
+			MZ3LOGGER_DEBUG( L"additional headers:" );
+			MZ3LOGGER_DEBUG( m_postData->GetAdditionalHeaders() );
 			::HttpAddRequestHeaders( m_hRequest, m_postData->GetAdditionalHeaders(), -1, HTTP_ADDREQ_FLAG_ADD );
 		}
 
