@@ -731,15 +731,34 @@ int lua_mz3_open_url(lua_State *L)
 	theApp.m_inet.Initialize(hwnd, &s_data, encoding);
 	if (bPost) {
 		// POST
-		theApp.m_inet.DoPost(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
+		if (!blocking) {
+			theApp.m_inet.DoPost(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
+		} else {
+			// ブロッキング型アクセス
+			theApp.m_inet.DoPostBlocking(CString(url), CString(referer), type, post);
+			int status = theApp.m_inet.m_dwHttpStatus;
+			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
+			CString strWcs2(pszMbcs);
+			CStringA strUtf8;
+			kfm::ucs2_to_utf8(strWcs2, strUtf8);
+
+			// 返却
+			lua_pushinteger(L, status);
+			lua_pushstring(L, strUtf8);
+
+			// 状態復帰
+			theApp.m_access = false;
+
+			return 2;
+		}
 	} else {
 		// GET
 		if (!blocking) {
 			// 非ブロッキング型アクセス
-			theApp.m_inet.DoGet(CString(url), CString(referer), type, strUser, strPassword, strUserAgent );
+			theApp.m_inet.DoGet(CString(url), CString(referer), type, post, strUser, strPassword, strUserAgent );
 		} else {
 			// ブロッキング型アクセス
-			theApp.m_inet.DoGetBlocking(CString(url), CString(referer), type);
+			theApp.m_inet.DoGetBlocking(CString(url), CString(referer), type, post);
 			int status = theApp.m_inet.m_dwHttpStatus;
 			const unsigned char* pszMbcs = &theApp.m_inet.out_buf[0];
 			CString strWcs2(pszMbcs);
@@ -1216,6 +1235,38 @@ int lua_mz3_exec_mz3_command(lua_State *L)
 
 	// 戻り値の数を返す
 	return 0;
+}
+
+/*
+--- MD5 生成
+--
+-- @param text 対象文字列
+--
+-- @return string MD5
+--
+function mz3.md5(text)
+*/
+int lua_mz3_md5(lua_State *L)
+{
+	// 引数取得
+	CStringA text_utf8 = lua_tostring(L, 1);
+
+	int len = text_utf8.GetLength();
+
+	std::vector<unsigned char> buf(len+1);
+	strncpy((char*)&buf[0], (const char*)text_utf8, len);
+
+	MD5 md5(&buf[0], len);
+	char* pMD5hexdigest = md5.hex_digest();
+	if (pMD5hexdigest) {
+		lua_pushstring(L, CStringA(pMD5hexdigest));
+		delete pMD5hexdigest;
+	} else {
+		lua_pushstring(L, "");
+	}
+
+	// 戻り値の数を返す
+	return 1;
 }
 
 
@@ -4134,6 +4185,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"set_vib_status",						lua_mz3_set_vib_status},
 	{"get_text_length",						lua_mz3_get_text_length},
 	{"exec_mz3_command",					lua_mz3_exec_mz3_command},
+	{"md5",									lua_mz3_md5},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {

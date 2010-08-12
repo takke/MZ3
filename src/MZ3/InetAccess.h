@@ -105,9 +105,10 @@ public:
 
 	LPCTSTR	GetURL()			{ return m_uri; }
 
-	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL, LPCTSTR strUserAgent=L"" );
-	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type );
+	BOOL DoPostBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData );
+	BOOL DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postDataForHeaders );
 	BOOL DoPost( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL, LPCTSTR strUserAgent=L"" );
+	BOOL DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postDataForHeaders, LPCTSTR szUserId=NULL, LPCTSTR szPassword=NULL, LPCTSTR strUserAgent=L"" );
 
 	void Initialize( HWND hwnd, void* object, ENCODING encoding=ENCODING_EUC );
 

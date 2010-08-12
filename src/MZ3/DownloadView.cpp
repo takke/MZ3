@@ -542,7 +542,7 @@ bool CDownloadView::DoDownloadSelectedItem(void)
 	// Žæ“¾ŠJŽn
 	theApp.m_inet.Initialize( m_hWnd, NULL );
 	theApp.m_accessType = ACCESS_DOWNLOAD;
-	theApp.m_inet.DoGet( url, _T(""), CInetAccess::FILE_BINARY );
+	theApp.m_inet.DoGet( url, _T(""), CInetAccess::FILE_BINARY, NULL );
 
 	return true;
 }

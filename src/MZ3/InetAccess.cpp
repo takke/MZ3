@@ -229,7 +229,7 @@ void CInetAccess::Initialize( HWND hwnd, void* object, ENCODING encoding/*=ENCOD
  *
  * @return 常に TRUE を返す。
  */
-BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUserId, LPCTSTR szPassword, LPCTSTR strUserAgent )
+BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postDataForHeaders, LPCTSTR szUserId, LPCTSTR szPassword, LPCTSTR strUserAgent )
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -237,6 +237,7 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUse
 	m_uri		= uri;
 	m_ref		= ref;
 	m_fileType	= type;
+	m_postData	= postDataForHeaders;
 	m_nRedirect = 0;
 
 	// 認証情報の取得・設定
@@ -277,7 +278,7 @@ BOOL CInetAccess::DoGet( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, LPCTSTR szUse
  *
  * @return 常に TRUE を返す。
  */
-BOOL CInetAccess::DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
+BOOL CInetAccess::DoGetBlocking(LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postDataForHeaders)
 {
 	// 中断フラグを初期化
 	m_abort		= FALSE;
@@ -285,11 +286,30 @@ BOOL CInetAccess::DoGetBlocking( LPCTSTR uri, LPCTSTR ref, FILE_TYPE type )
 	m_uri		= uri;
 	m_ref		= ref;
 	m_fileType	= type;
+	m_postData	= postDataForHeaders;
 	m_nRedirect = 0;
 
 	// スレッド開始
 	m_bIsBlocking = true;
 	ExecGet_Thread(this);
+
+	return TRUE;
+}
+
+BOOL CInetAccess::DoPostBlocking(LPCTSTR uri, LPCTSTR ref, FILE_TYPE type, CPostData* postData)
+{
+	// 中断フラグを初期化
+	m_abort		= FALSE;
+
+	m_uri		= uri;
+	m_ref		= ref;
+	m_fileType	= type;
+	m_postData	= postData;
+	m_nRedirect = 0;
+
+	// スレッド開始
+	m_bIsBlocking = true;
+	ExecPost_Thread(this);
 
 	return TRUE;
 }
@@ -714,6 +734,11 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 		//--- GET メソッドなので「リクエスト送信」を実行
 		util::MySetInformationText( m_hwnd, _T("リクエスト送信中") );
 
+		// 任意のヘッダーを送信する
+		if (m_postData != NULL && !m_postData->GetAdditionalHeaders().IsEmpty()) {
+			::HttpAddRequestHeaders( m_hRequest, m_postData->GetAdditionalHeaders(), -1, HTTP_ADDREQ_FLAG_ADD );
+		}
+
 		// logging
 		if( MZ3LOGGER_IS_DEBUG_ENABLED() ) {
 			CString msg;
@@ -833,6 +858,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 
 		// 任意のヘッダーを送信する
 		if (!m_postData->GetAdditionalHeaders().IsEmpty()) {
+			MZ3LOGGER_DEBUG( L"additional headers:" );
+			MZ3LOGGER_DEBUG( m_postData->GetAdditionalHeaders() );
 			::HttpAddRequestHeaders( m_hRequest, m_postData->GetAdditionalHeaders(), -1, HTTP_ADDREQ_FLAG_ADD );
 		}
 

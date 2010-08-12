@@ -3441,7 +3441,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 	if (bPost) {
 		theApp.m_inet.DoPost(uri, referer, CInetAccess::FILE_HTML, &post, strUser, strPassword, strUserAgent );
 	} else {
-		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, strUser, strPassword, strUserAgent );
+		theApp.m_inet.DoGet(uri, referer, CInetAccess::FILE_HTML, &post, strUser, strPassword, strUserAgent );
 	}
 }
 
@@ -5239,7 +5239,7 @@ bool CMZ3View::MyLoadMiniImage(CMixiData& mixi)
 				MyUpdateControlStatus();
 
 				theApp.m_inet.Initialize( m_hWnd, &s_data );
-				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY );
+				theApp.m_inet.DoGet(url, L"", CInetAccess::FILE_BINARY, NULL );
 			}
 		}
 	}
@@ -7194,7 +7194,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 		// ダウンロードファイルパス
 		theApp.m_inet.Initialize( m_hWnd, &s_data );
 		theApp.m_accessType = s_data.GetAccessType();
-		theApp.m_inet.DoGet(strNewURL, _T(""), CInetAccess::FILE_BINARY);
+		theApp.m_inet.DoGet(strNewURL, _T(""), CInetAccess::FILE_BINARY, NULL);
 	}
 
 	return true;

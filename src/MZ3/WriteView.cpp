@@ -1391,7 +1391,7 @@ LRESULT CWriteView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 					((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
 					theApp.m_accessType = ACCESS_MAIN;
-					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
+					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML, NULL );
 					return TRUE;
 				}
 			} else {

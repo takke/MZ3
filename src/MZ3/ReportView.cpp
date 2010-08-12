@@ -1226,7 +1226,7 @@ void CReportView::OnLoadImage(UINT nID)
 
 	// イメージURLをCGIから取得
 	theApp.m_accessType = ACCESS_IMAGE;
-	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_HTML );
+	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_HTML, NULL );
 
 	MyUpdateControlStatus();
 }
@@ -1251,7 +1251,7 @@ void CReportView::OnLoadMovie(UINT nID)
 
 	// 動画URLをCGIから取得
 	theApp.m_accessType = ACCESS_MOVIE;
-	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+	theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY, NULL );
 
 	MyUpdateControlStatus();
 #endif
@@ -1313,7 +1313,7 @@ bool CReportView::MyLoadMixiViewPage( const CMixiData::Link link )
 		theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 
 		theApp.m_accessType = m_data.GetAccessType();
-		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML );
+		theApp.m_inet.DoGet( util::CreateMixiUrl(link.url), _T(""), CInetAccess::FILE_HTML, NULL );
 		return true;
 	} else {
 
@@ -1345,7 +1345,7 @@ void CReportView::OnReloadPage()
 	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 
 	theApp.m_accessType = m_data.GetAccessType();
-	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
+	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML, NULL );
 
 	MyUpdateControlStatus();
 }
@@ -1462,7 +1462,7 @@ void CReportView::OnLoadUrl(UINT nID)
 
 			MyUpdateControlStatus();
 
-			theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+			theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY, NULL );
 		}
 		break;
 	default:
@@ -1598,7 +1598,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 			if( bRetry ) {
 				// イメージ・動画を再ダウンロード
-				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY );
+				theApp.m_inet.DoGet(url, _T(""), CInetAccess::FILE_BINARY, NULL );
 			}
 		}
 		break;
@@ -1617,7 +1617,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 
 					((CMixiData*)lParam)->SetAccessType(ACCESS_MAIN);
 					theApp.m_accessType = ACCESS_MAIN;
-					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML );
+					theApp.m_inet.DoGet(L"http://mixi.jp/check.pl?n=%2Fhome.pl", L"", CInetAccess::FILE_HTML, NULL );
 					return TRUE;
 				}
 			} else {
@@ -1654,7 +1654,7 @@ LRESULT CReportView::OnGetEnd(WPARAM wParam, LPARAM lParam)
 			// データを待避データに戻す
 			m_data = theApp.m_mixiBeforeRelogin;
 			theApp.m_accessType = m_data.GetAccessType();
-			theApp.m_inet.DoGet(util::CreateMixiUrl(m_data.GetURL()), L"", CInetAccess::FILE_HTML );
+			theApp.m_inet.DoGet(util::CreateMixiUrl(m_data.GetURL()), L"", CInetAccess::FILE_HTML, NULL );
 		}
 		break;
 #endif
@@ -2007,7 +2007,7 @@ LRESULT CReportView::OnReload(WPARAM wParam, LPARAM lParam)
 
 	theApp.m_inet.Initialize( m_hWnd, NULL, theApp.GetInetAccessEncodingByAccessType(m_data.GetAccessType()) );
 	theApp.m_accessType = m_data.GetAccessType();
-	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML );
+	theApp.m_inet.DoGet( util::CreateMixiUrl(m_data.GetURL()), _T(""), CInetAccess::FILE_HTML, NULL );
 
 	MyUpdateControlStatus();
 
