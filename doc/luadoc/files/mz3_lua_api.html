@@ -118,8 +118,18 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.exec_mz3_command">mz3.exec_mz3_command</a>&nbsp;(command)</td>
+	<td class="summary">汎用MZ3コマンドの実行  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.get_access_type_by_key">mz3.get_access_type_by_key</a>&nbsp;(key)</td>
 	<td class="summary">シリアライズキーからアクセス種別を取得する。  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_app_build_type">mz3.get_app_build_type</a>&nbsp;()</td>
+	<td class="summary">BuildType("MZ3", "TkTweets")を返す  </td>
 	</tr>
 
 	<tr>
@@ -130,6 +140,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3.get_app_version">mz3.get_app_version</a>&nbsp;()</td>
 	<td class="summary">アプリケーションのバージョン("1.0.0 Beta13")を返す  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.get_last_request_url">mz3.get_last_request_url</a>&nbsp;()</td>
+	<td class="summary">前回のリクエストのURL取得  </td>
 	</tr>
 
 	<tr>
@@ -188,7 +203,12 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#mz3.open_url">mz3.open_url</a>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, file_type)</td>
+	<td class="name" nowrap><a href="#mz3.md5">mz3.md5</a>&nbsp;(text)</td>
+	<td class="summary">MD5 生成  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.open_url">mz3.open_url</a>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, blocking, file_type)</td>
 	<td class="summary">URL を開く  MZ3 の通信処理を開始する  </td>
 	</tr>
 
@@ -220,6 +240,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3.show_common_edit_dlg">mz3.show_common_edit_dlg</a>&nbsp;(caption, msg, initial_text, title)</td>
 	<td class="summary">共通エディット画面の表示  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3.show_common_select_dlg">mz3.show_common_select_dlg</a>&nbsp;(caption, initial_text_list, title)</td>
+	<td class="summary">共通選択画面の表示  </td>
 	</tr>
 
 	<tr>
@@ -310,6 +335,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#mz3_account_provider.set_param">mz3_account_provider.set_param</a>&nbsp;(service_name, param_name, param_value)</td>
 	<td class="summary">アカウント情報登録(各プラグインでどのような情報が必要か)  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_account_provider.set_value">mz3_account_provider.set_value</a>&nbsp;(service_name, param_name, param_value)</td>
+	<td class="summary">アカウント情報の設定  </td>
 	</tr>
 
 	<tr>
@@ -533,6 +563,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_htmlarray.get_all_text">mz3_htmlarray.get_all_text</a>&nbsp;(htmlarray, index)</td>
+	<td class="summary">全て結合した文字列を返す   </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_htmlarray.get_at">mz3_htmlarray.get_at</a>&nbsp;(htmlarray, index)</td>
 	<td class="summary">index の要素を取得する。   </td>
 	</tr>
@@ -568,8 +603,18 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_body_list_count_per_page">mz3_main_view.get_body_list_count_per_page</a>&nbsp;()</td>
+	<td class="summary"> </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_main_view.get_edit_text">mz3_main_view.get_edit_text</a>&nbsp;()</td>
 	<td class="summary">edit エリアの文字列取得  </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_main_view.get_focus">mz3_main_view.get_focus</a>&nbsp;()</td>
+	<td class="summary">フォーカス取得  </td>
 	</tr>
 
 	<tr>
@@ -688,8 +733,18 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.clear_additional_header">mz3_post_data.clear_additional_header</a>&nbsp;(post, text)</td>
+	<td class="summary">POST するヘッダーの削除  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_post_data.create">mz3_post_data.create</a>&nbsp;()</td>
 	<td class="summary">PostData の生成  スレッドセーフではない点に注意！   </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#mz3_post_data.get_post_body">mz3_post_data.get_post_body</a>&nbsp;(post)</td>
+	<td class="summary">POST する文字列の取得  </td>
 	</tr>
 
 	<tr>
@@ -1097,6 +1152,32 @@ URLから類推されるアクセス種別を取得する。
 
 
 
+<dt><a name="mz3.exec_mz3_command"></a><strong>mz3.exec_mz3_command</strong>&nbsp;(command)</dt>
+<dd>
+汎用MZ3コマンドの実行 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  command: コマンド("FONT_SHRINK", "FONT_MAGNIFY", "NEXT_TAB", "PREV_TAB", "CHANGE_MAIN_BODY_HEADER_MODE", "SHORT_CUT_MOVE_ON_MAIN_BODY_LIST") 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3.get_access_type_by_key"></a><strong>mz3.get_access_type_by_key</strong>&nbsp;(key)</dt>
 <dd>
 シリアライズキーからアクセス種別を取得する。 
@@ -1118,6 +1199,26 @@ URLから類推されるアクセス種別を取得する。
 
 <h3>Return value:</h3>
 [integer] アクセス種別 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_app_build_type"></a><strong>mz3.get_app_build_type</strong>&nbsp;()</dt>
+<dd>
+BuildType("MZ3", "TkTweets")を返す 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+[string] アプリケーション名 
 
 
 
@@ -1158,6 +1259,23 @@ URLから類推されるアクセス種別を取得する。
 
 <h3>Return value:</h3>
 [string] バージョン文字列 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.get_last_request_url"></a><strong>mz3.get_last_request_url</strong>&nbsp;()</dt>
+<dd>
+前回のリクエストのURL取得 
+
+
+
+
+
+
 
 
 
@@ -1492,7 +1610,36 @@ mz3.logger_error('text')
 
 
 
-<dt><a name="mz3.open_url"></a><strong>mz3.open_url</strong>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, file_type)</dt>
+<dt><a name="mz3.md5"></a><strong>mz3.md5</strong>&nbsp;(text)</dt>
+<dd>
+MD5 生成 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: 対象文字列 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+string MD5 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.open_url"></a><strong>mz3.open_url</strong>&nbsp;(wnd, access_type, url, referer, type, user_agent, post, blocking, file_type)</dt>
 <dd>
 URL を開く  MZ3 の通信処理を開始する 
 
@@ -1525,7 +1672,11 @@ URL を開く  MZ3 の通信処理を開始する
 	</li>
 	
 	<li>
-	  post: POST 用オブジェクト(未サポート) 
+	  post: POST 用オブジェクト(未サポート)
+	</li>
+	
+	<li>
+	  blocking: GET のブロッキング型(未指定時は非ブロッキング型) 
 	</li>
 	
 	<li>
@@ -1723,6 +1874,43 @@ URL をブラウザで開く(確認付き)
 
 <h3>Return value:</h3>
 (string) ユーザ入力値, ユーザキャンセル時は nil 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.show_common_select_dlg"></a><strong>mz3.show_common_select_dlg</strong>&nbsp;(caption, initial_text_list, title)</dt>
+<dd>
+共通選択画面の表示 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  caption: 
+	</li>
+	
+	<li>
+	  initial_text_list: 初期値(table) 
+	</li>
+	
+	<li>
+	  title: キャプション
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+(string) ユーザ選択値, ユーザキャンセル時は nil 
 
 
 
@@ -2286,6 +2474,40 @@ URL エンコードした文字列を返す
 	
 	<li>
 	  param_name: パラメータ名('id_name', 'password_name')
+	</li>
+	
+	<li>
+	  param_value: パラメータ値 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_account_provider.set_value"></a><strong>mz3_account_provider.set_value</strong>&nbsp;(service_name, param_name, param_value)</dt>
+<dd>
+アカウント情報の設定 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  service_name: サービス名
+	</li>
+	
+	<li>
+	  param_name: パラメータ名('id', 'password')
 	</li>
 	
 	<li>
@@ -3698,6 +3920,36 @@ MZ3GroupItem オブジェクトの削除
 
 
 
+<dt><a name="mz3_htmlarray.get_all_text"></a><strong>mz3_htmlarray.get_all_text</strong>&nbsp;(htmlarray, index)</dt>
+<dd>
+全て結合した文字列を返す  
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  htmlarray: 
+	</li>
+	
+	<li>
+	  index: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_htmlarray.get_at"></a><strong>mz3_htmlarray.get_at</strong>&nbsp;(htmlarray, index)</dt>
 <dd>
 index の要素を取得する。  
@@ -3901,6 +4153,23 @@ ini ファイルから値を取得する
 
 
 
+<dt><a name="mz3_main_view.get_body_list_count_per_page"></a><strong>mz3_main_view.get_body_list_count_per_page</strong>&nbsp;()</dt>
+<dd>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_main_view.get_edit_text"></a><strong>mz3_main_view.get_edit_text</strong>&nbsp;()</dt>
 <dd>
 edit エリアの文字列取得 
@@ -3910,6 +4179,26 @@ edit エリアの文字列取得
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_main_view.get_focus"></a><strong>mz3_main_view.get_focus</strong>&nbsp;()</dt>
+<dd>
+フォーカス取得 
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+string フォーカスコントロール("edit", "category_list", "body_list", "other") 
 
 
 
@@ -4492,10 +4781,66 @@ POST する文字列の追加
 
 
 
+<dt><a name="mz3_post_data.clear_additional_header"></a><strong>mz3_post_data.clear_additional_header</strong>&nbsp;(post, text)</dt>
+<dd>
+POST するヘッダーの削除 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST 用オブジェクト 
+	</li>
+	
+	<li>
+	  text: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="mz3_post_data.create"></a><strong>mz3_post_data.create</strong>&nbsp;()</dt>
 <dd>
 PostData の生成  スレッドセーフではない点に注意！  
 
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_post_data.get_post_body"></a><strong>mz3_post_data.get_post_body</strong>&nbsp;(post)</dt>
+<dd>
+POST する文字列の取得 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  post: POST 用オブジェクト 
+	</li>
+	
+</ul>
 
 
 

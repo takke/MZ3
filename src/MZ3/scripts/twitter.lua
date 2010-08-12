@@ -1865,7 +1865,7 @@ function on_click_update_button(event_name, serialize_key)
 	-- POST パラメータを設定
 	if serialize_key == 'TWITTER_NEW_DM' then
 		post:append_post_body('text=');
-		post:append_post_body(mz3.url_encode(text, 'utf8'));
+		post:append_post_body(rawurlencode(text));
 		post:append_post_body('&user=');
 		post:append_post_body(data:get_integer('owner_id'));
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
@@ -3448,9 +3448,9 @@ end
 --
 function make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, method)
 
-	local oauth_nonce = mz3.md5(os.time() .. math.random());
+	local oauth_nonce = mz3.md5(mz3.get_unixtime() .. math.random());
 	local oauth_signature_method = "HMAC-SHA1";
-	local oauth_timestamp = os.time();
+	local oauth_timestamp = mz3.get_unixtime();
 	local oauth_version = "1.0";
 	
 	local base_params = {};
@@ -3498,6 +3498,51 @@ function make_oauth_authorization_header(url, add_params, oauth_token, oauth_tok
 end
 
 
+oauth_token_file_path = mz3_dir .. "twitter_oauth_token.txt";
+
+g_oauth_token, g_oauth_token_secret = "", "";
+
+function get_oauth_tokens()
+
+	mz3.logger_debug("get_oauth_tokens");
+
+	if g_oauth_token == "" and g_oauth_token_secret == "" then
+		-- 未ロードであればロードする
+		mz3.logger_debug(" load");
+		
+		-- TODO パスワード変更等を考慮すること
+
+		local f = io.open(oauth_token_file_path, "r");
+		if f~= nil then
+			-- 全件取得
+			local file = f:read('*a');
+			f:close();
+			
+			g_oauth_token, g_oauth_token_secret = file:match("(.-)\t(.-)\n");
+
+--			mz3.logger_debug(" loaded : " .. g_oauth_token .. ", " .. g_oauth_token_secret);
+			return g_oauth_token, g_oauth_token_secret;
+		else
+			return "", "";
+		end
+	else
+		mz3.logger_debug(" use tokens in memory.");
+		return g_oauth_token, g_oauth_token_secret;
+	end
+end
+
+
+function set_oauth_tokens(oauth_token, oauth_token_secret)
+
+	f = io.open(oauth_token_file_path, "w");
+	if f~=nil then
+
+		f:write(oauth_token .. "\t" .. oauth_token_secret .. "\n");
+		f:close();
+	end
+end
+
+
 --- on_set_basic_auth_account で呼ばれるフック関数
 --
 --
@@ -3506,13 +3551,16 @@ function make_authorization_header(url, post_body, method)
 
 	mz3.logger_debug("make_authorization_header start");
 
-	local oauth_token        = mz3_account_provider.get_value('TwitterXAuth', 'id');
-	local oauth_token_secret = mz3_account_provider.get_value('TwitterXAuth', 'password');
+	local oauth_token, oauth_token_secret = get_oauth_tokens();
+--	mz3.logger_debug(" oauth_token:" .. oauth_token);
+--	mz3.logger_debug(" oauth_token_secret:" .. oauth_token_secret);
 
 	if oauth_token == nil or oauth_token == "" or 
 	   oauth_token_secret == nil or oauth_token_secret == "" then
 
-		-- TODO 認証トークンを保存すること
+--		mz3.alert('認証トークンを取得します');
+
+		-- 認証トークン未取得
 		local token_url = 'https://api.twitter.com/oauth/access_token';
 		local id        = mz3_account_provider.get_value('Twitter', 'id');
 		local password  = mz3_account_provider.get_value('Twitter', 'password');
@@ -3551,8 +3599,7 @@ function make_authorization_header(url, post_body, method)
 		end
 
 		-- 認証OK、トークン保存
-		mz3_account_provider.set_value('TwitterXAuth', 'id', oauth_token);
-		mz3_account_provider.set_value('TwitterXAuth', 'password', oauth_token_secret);
+		set_oauth_tokens(oauth_token, oauth_token_secret);
 	else
 		-- 保存済みのトークンでアクセスする
 		mz3.logger_debug("oauth_token:" .. oauth_token);
@@ -3595,7 +3642,7 @@ function my_test()
 	local url      = 'https://api.twitter.com/oauth/access_token';
 	local id       = mz3_account_provider.get_value('Twitter', 'id');
 	local password = mz3_account_provider.get_value('Twitter', 'password');
-	local oauth_timestamp = os.time();
+	local oauth_timestamp = mz3.get_unixtime();
 
 	local add_params = {};
 	add_params["x_auth_mode"]     = "client_auth";

@@ -1274,6 +1274,16 @@ int lua_mz3_md5(lua_State *L)
 }
 
 
+int lua_mz3_get_unixtime(lua_State *L)
+{
+	CTime t = CTime::GetCurrentTime();
+	lua_pushnumber(L, (lua_Number)t.GetTime());
+
+	// ñﬂÇËílÇÃêîÇï‘Ç∑
+	return 1;
+}
+
+
 //-----------------------------------------------
 // MZ3 Account Provider API
 //-----------------------------------------------
@@ -4264,6 +4274,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_text_length",						lua_mz3_get_text_length},
 	{"exec_mz3_command",					lua_mz3_exec_mz3_command},
 	{"md5",									lua_mz3_md5},
+	{"get_unixtime",						lua_mz3_get_unixtime},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_data_lib[] = {
