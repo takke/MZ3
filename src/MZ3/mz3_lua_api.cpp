@@ -18,6 +18,7 @@
 #include "util_gui.h"
 #include "CommonEditDlg.h"
 #include "MainFrm.h"
+#include "hmacsha1.h"
 #ifdef WINCE
 #include "Nled.h"
 #endif
@@ -1268,6 +1269,36 @@ int lua_mz3_md5(lua_State *L)
 	} else {
 		lua_pushstring(L, "");
 	}
+
+	// –ß‚è’l‚Ì”‚ğ•Ô‚·
+	return 1;
+}
+
+
+/*
+--- hmac_sha1 ¶¬
+--
+-- @param key  key
+-- @param text ‘ÎÛ•¶š—ñ
+--
+-- @return string sha1(hex)
+--
+function mz3.hmac_sha1(text)
+*/
+int lua_mz3_hmac_sha1(lua_State *L)
+{
+	// ˆø”æ“¾
+	CStringA key_utf8  = lua_tostring(L, 1);
+	CStringA text_utf8 = lua_tostring(L, 2);
+
+	std::string result;
+
+	HSHA1 hsha1;
+	if (!hsha1.digest((const char*)key_utf8, (const char*)text_utf8, result)) {
+		return 0;
+	}
+
+	lua_pushstring(L, result.c_str());
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 1;
@@ -4274,6 +4305,7 @@ static const luaL_Reg lua_mz3_lib[] = {
 	{"get_text_length",						lua_mz3_get_text_length},
 	{"exec_mz3_command",					lua_mz3_exec_mz3_command},
 	{"md5",									lua_mz3_md5},
+	{"hmac_sha1",							lua_mz3_hmac_sha1},
 	{"get_unixtime",						lua_mz3_get_unixtime},
 	{NULL, NULL}
 };

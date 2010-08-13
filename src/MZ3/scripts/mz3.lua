@@ -364,7 +364,7 @@ mz3.add_event_listener("keydown_detail_view", "mz3.on_keydown_detail_view");
 -- 各種ビルトインスクリプトロード
 -------------------------------------------------
 require("scripts\\base64");		-- BASE64
-require("scripts\\sha1");		-- SHA-1
+--require("scripts\\sha1");		-- SHA-1
 
 require("scripts\\util");		-- ユーティリティ
 require("scripts\\wrapper");	-- APIラッパークラス

@@ -2803,21 +2803,20 @@ function on_keyup_main_view(event_name, key, is_shift, is_ctrl, is_alt)
 	if key == VK_G and is_ctrl~=0 then
 --		-- TODO TEST
 --		my_test();
-
-		-- a=b&c=d
-		-- a=b
-		-- 
-		mz3.logger_debug("post_body 分離:");
-		local post_body = "a=b&c=d";
-		local post_body = "status=test%20from%20MZ4%20%2AMZ4%2A";
-		for k, v in string.gmatch(post_body, "([^=]+)=([^&]+)") do
-			mz3.logger_debug(' ' .. k .. '=>' .. v);
-		end
+		local base_string = "test";
+		local key = "takke";
+		local sha1 = mz3.hmac_sha1(
+					key,
+					base_string);
+		local oauth_signature = base64.enc(hex_to_binary(sha1));
+		mz3.logger_debug(sha1);
+		mz3.logger_debug(oauth_signature);
+		
+		-- "o+Y/AceexaFreG0LVS9VLH0xIsI="
 
 		return true;
 	end
 ]]
-
 	if focus == "category_list" then
 		-- カテゴリリスト
 		if key == VK_U then
@@ -3408,7 +3407,33 @@ end
 mz3.add_event_listener("popup_detail_menu", "twitter.on_popup_detail_menu");
 
 
+function string_split_it(str, sep)
+    if str == nil then
+        return nil;
+    end
+
+    return string.gmatch(str, "[^\\" .. sep .. "]+");
+end
+
+
 local function make_base_string(url, base_params, method)
+
+	-- url の正規化
+	-- "HTTP://Example.com:80/resource?id=123" => "http://example.com/resource"
+	--
+	-- ほぼ正規化されている前提とし、パラメータのみ削除する
+	--
+	if url:find('?', 1, true) ~= nil then
+		url, url_param = url:match('^(.-)?(.-)$');
+--		mz3.logger_debug('normal url:[' .. url .. '], param[' .. url_param .. ']');
+
+		-- url_param を base_params に追加
+		for seg in string_split_it(url_param, '&') do
+			local k, v = seg:match('(.-)=(.*)');
+			base_params[k] = rawurlencode(v);
+--			mz3.logger_debug(' ' .. k .. '=>' .. v);
+		end
+	end
 
 	local base_string = method
 					  .. "&" .. url_rfc3986(url)
@@ -3474,12 +3499,20 @@ function make_oauth_authorization_header(url, add_params, oauth_token, oauth_tok
 	-- signature 生成
 	local base_string = make_base_string(url, base_params, method);
 	mz3.logger_debug("base_string:" .. base_string);
+
+	local sha1 = mz3.hmac_sha1(
+				url_rfc3986(oauth_consumer_secret) .. "&" .. url_rfc3986(oauth_token_secret),
+				base_string);
+	local oauth_signature = base64.enc(hex_to_binary(sha1));
+
+--[[
+	-- pure lua 版
 	local oauth_signature = 
 		base64.enc(
 			hmac_sha1_binary(
 				url_rfc3986(oauth_consumer_secret) .. "&" .. url_rfc3986(oauth_token_secret),
 				base_string));
-
+]]
 	local authorization = 'Authorization: OAuth '
 		.. 'oauth_nonce="' .. url_rfc3986(oauth_nonce) .. '",'
 		.. 'oauth_signature_method="' .. url_rfc3986(oauth_signature_method) .. '",'
@@ -3613,12 +3646,10 @@ function make_authorization_header(url, post_body, method)
 --	local url = "http://api.twitter.com/1/statuses/home_timeline.xml";
 	local add_params = {};
 	
-	-- a=b&c=d
-	-- a=b
-	-- 
 --	mz3.logger_debug("post_body:/" .. post_body .. "/");
 --	mz3.logger_debug("分離:");
-	for k, v in string.gmatch(post_body, "([^=]+)=([^&]+)") do
+	for seg in string_split_it(post_body, '&') do
+		local k, v = seg:match('(.-)=(.*)');
 		add_params[k] = rawurlencode(v);
 --		mz3.logger_debug(' ' .. k .. '=>' .. v);
 	end

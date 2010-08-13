@@ -270,4 +270,11 @@ function url_rfc3986(text)
 end
 
 
+function hex_to_binary(hex)
+   return hex:gsub('..', function(hexval)
+                            return string.char(tonumber(hexval, 16))
+                         end)
+end
+
+
 mz3.logger_debug('util.lua end');

@@ -2230,6 +2230,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\hmacsha1.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ImageCacheManager.h"
 					>
 				</File>
