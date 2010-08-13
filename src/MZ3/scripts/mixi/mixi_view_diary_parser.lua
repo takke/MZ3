@@ -323,7 +323,9 @@ function mixi_view_diary_parser(data, dummy, html)
 			i = i + 1;
 			while i<line_count do
 				line = html:get_at(i);
-				if line_has_strings(line, '<div class="diaryPaging01">') then
+				-- if line_has_strings(line, '<div class="diaryPaging01">') then
+				if line_has_strings(line, '<div class="actionLink01">') or
+				   line_has_strings(line, '<ul class="actionLink01">') then
 					break;
 				end
 
