@@ -329,11 +329,47 @@ function mixi_view_diary_parser(data, dummy, html)
 					break;
 				end
 
+				-- youtube
+				if line_has_strings(line, 'youtube_write') then
+					local link = line:match("src=\"([^\"]+)\"");
+					link2 = link:gsub('/v/', '/watch?v=');
+					link2 = link2 .. "&feature=player_embedded";
+
+					-- mz3.logger_debug(line);
+					line = line:gsub( link, link2 )
+					data:add_body_with_extract(line);
+				end
+
+				-- ニコ動
+				if line_has_strings(line, 'div', 'class', 'nicovideo') then
+					-- local link = line:match("thumb_watch/([^\"]+)\?");
+					-- link = 'http://www.nicovideo.jp/watch/' .. link;
+					data:add_body_with_extract(line);
+				end
+
+				-- 自前の動画
+				if line_has_strings(line, 'div', 'player_1', 'insertVideo') then
+					local j = i;
+					while j<line_count do
+						line = html:get_at(j);
+						j = j +1;
+						if line_has_strings( line, 'http://video.mixi.jp/view_video.pl' ) then
+							link = line:match("\'([^\"]+)\'");
+
+							line = '<div class=\"insertVideo\"><script type=\"text/javascript\" src=\"' .. link .. '></script></div>'
+							-- data:add_body_with_extract(line);
+							i = i + 1;
+							break;
+						end
+					end
+				end
+
 				sub_html = sub_html .. line;
 				i = i + 1;
 			end
 			-- script タグの除去
 			sub_html = sub_html:gsub('<script.-</script>', '');
+			sub_html = sub_html:gsub('/script>', '');
 			data:add_body_with_extract(sub_html);
 		end
 
