@@ -6,7 +6,8 @@ Const URL = "http://mz3.jp/get_mz3_trunk_revision.php"
 Const OUTPUT_FILENAME = "mz3_revision_in.h"
 
 WScript.echo "mz3.jp ‚©‚ç trunk ‚ÌƒŠƒrƒWƒ‡ƒ“‚ðŽæ“¾‚µ‚Ä‚¢‚Ü‚·..."
-Set http = CreateObject("microsoft.xmlhttp")
+'Set http = CreateObject("microsoft.xmlhttp")
+Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
 http.open "GET", URL, false
 http.send
 WScript.echo " => " & http.responsetext
