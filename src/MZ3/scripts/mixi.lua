@@ -317,7 +317,8 @@ function mixi_recent_voice_parser(parent, body, html)
 			-- 発言
 			local voiced = li_tag:match('<div class="voiced">(.-)</div>');
 			if voiced ~= nil then
-				local comment = voiced:match('<p>(.-)<');
+				-- local comment = voiced:match('<p>(.-)<');
+				local comment = voiced:match('<p>(.-)</p');
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->', '');
 				comment = comment:gsub('</a>', ' ');
