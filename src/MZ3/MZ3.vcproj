@@ -1218,7 +1218,7 @@
 				OutputFile="$(OutDir)\TkTweets.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				EntryPointSymbol="wWinMainCRTStartup"

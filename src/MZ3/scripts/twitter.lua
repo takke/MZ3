@@ -3503,6 +3503,9 @@ function make_oauth_authorization_header(url, add_params, oauth_token, oauth_tok
 	local sha1 = mz3.hmac_sha1(
 				url_rfc3986(oauth_consumer_secret) .. "&" .. url_rfc3986(oauth_token_secret),
 				base_string);
+	if sha1 == nil then
+		return nil;
+	end
 	local oauth_signature = base64.enc(hex_to_binary(sha1));
 
 --[[
@@ -3603,6 +3606,9 @@ function make_authorization_header(url, post_body, method)
 		add_params["x_auth_password"] = url_rfc3986(password);
 		add_params["x_auth_username"] = url_rfc3986(id);
 		local authorization_header = make_oauth_authorization_header(token_url, add_params, nil, nil, "POST");
+		if authorization_header == nil then
+			return nil;
+		end
 
 		-- ヘッダーの設定
 		post = MZ3PostData:create(mz3_post_data.create(1));
@@ -3656,6 +3662,9 @@ function make_authorization_header(url, post_body, method)
 	
 	local authorization_header = make_oauth_authorization_header(url, add_params, oauth_token, oauth_token_secret, 
 									method);
+	if authorization_header == nil then
+		return nil;
+	end
 	mz3.logger_debug("make_authorization_header end");
 
 	return authorization_header;

@@ -671,17 +671,19 @@ int lua_mz3_open_url(lua_State *L)
 	}
 
 	// post が未指定であれば生成する
-	if (bPost && post==NULL) {
+	if (post==NULL) {
 		static CPostData s_post;
 		// 初期化
 		CPostData dummy_post_data;
 		s_post = dummy_post_data;
-		s_post.SetSuccessMessage( WM_MZ3_POST_END );
 		s_post.AppendAdditionalHeader(L"");
 
-		// デフォルトは "Content-Type: multipart/form-data"で。
-		s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
+		if (bPost) {
+			s_post.SetSuccessMessage( WM_MZ3_POST_END );
 
+			// デフォルトは "Content-Type: multipart/form-data"で。
+			s_post.SetContentType(CONTENT_TYPE_FORM_URLENCODED);
+		}
 		post = &s_post;
 	}
 
@@ -1295,6 +1297,7 @@ int lua_mz3_hmac_sha1(lua_State *L)
 
 	HSHA1 hsha1;
 	if (!hsha1.digest((const char*)key_utf8, (const char*)text_utf8, result)) {
+		MZ3LOGGER_ERROR(L"hmac_sha1 error");
 		return 0;
 	}
 
