@@ -7137,7 +7137,6 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 			pLatestVerNode->getProperty(L"title").c_str()));
 
 	const xml2stl::Node* pDevLatestVerNode = NULL;
-#ifdef BT_MZ3
 	if (theApp.m_optionMng.m_bUseDevVerCheck) {
 		try {
 #ifdef WINCE
@@ -7145,25 +7144,30 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 #else
 			pDevLatestVerNode = &root.getNode(L"latest_version").getNode(L"mz4_dev");
 #endif
+#ifdef BT_TKTW
+			pDevLatestVerNode = &root.getNode(L"latest_version").getNode(L"tktweets_dev");
+#endif
 		} catch (xml2stl::NodeNotFoundException& e) {
 			MZ3LOGGER_ERROR( util::FormatString( L"node not found... : %s", e.getMessage().c_str()) );
-			return false;
+//			return false;
+			pDevLatestVerNode = NULL;
 		}
-		MZ3LOGGER_DEBUG(
-			util::FormatString(L"バージョン取得結果(dev)：current[%s], latest_version[%s], url[%s], title[%s]",
-				MZ3_VERSION_TEXT_SHORT,
-				pDevLatestVerNode->getProperty(L"version").c_str(),
-				pDevLatestVerNode->getProperty(L"url").c_str(),
-				pDevLatestVerNode->getProperty(L"title").c_str()));
+		if (pDevLatestVerNode != NULL) {
+			MZ3LOGGER_DEBUG(
+				util::FormatString(L"バージョン取得結果(dev)：current[%s], latest_version[%s], url[%s], title[%s]",
+					MZ3_VERSION_TEXT_SHORT,
+					pDevLatestVerNode->getProperty(L"version").c_str(),
+					pDevLatestVerNode->getProperty(L"url").c_str(),
+					pDevLatestVerNode->getProperty(L"title").c_str()));
+		}
 	}
-#endif
 
 	// バージョン番号の正規化
 	// 0.9.3.7       => 0.9310700
 	CString strCurrentVersionR = theApp.MakeMZ3RegularVersion(MZ3_VERSION_TEXT_SHORT);
 	CString strLatestVersionR  = theApp.MakeMZ3RegularVersion(pLatestVerNode->getProperty(L"version").c_str());
 	CString strDevVersionR     = L"0.0000000";
-	if (theApp.m_optionMng.m_bUseDevVerCheck) {
+	if (theApp.m_optionMng.m_bUseDevVerCheck && pDevLatestVerNode != NULL) {
 		strDevVersionR = theApp.MakeMZ3RegularVersion(pDevLatestVerNode->getProperty(L"version").c_str());
 	}
 
@@ -7177,7 +7181,7 @@ bool CMZ3View::DoAccessEndProcForSoftwareUpdateCheck(void)
 		// 安定版が最新
 		strNewTitle = pLatestVerNode->getProperty(L"title").c_str();
 		strNewURL   = pLatestVerNode->getProperty(L"url").c_str();
-	} else if (strDevVersionR > strCurrentVersionR) {
+	} else if (pDevLatestVerNode != NULL && strDevVersionR > strCurrentVersionR) {
 		// 開発版が最新
 		strNewTitle = pDevLatestVerNode->getProperty(L"title").c_str();
 		strNewURL   = pDevLatestVerNode->getProperty(L"url").c_str();
