@@ -35,6 +35,70 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
 }
 
 /**
+ * カテゴリURLの移行処理
+ *
+ * カテゴリ名も変更可能(例:"みんなのecho" ⇒ "みんなのボイス")
+ */
+inline CString getNormalizedCategoryUrl(LPCTSTR default_category_url,
+										CStringA category_url,
+										ACCESS_TYPE category_type,
+										std::string& category_name)
+{
+
+#ifdef BT_MZ3
+	// 旧形式iniファイルの移行処理
+	if (category_type == ACCESS_LIST_FOOTSTEP && category_url == "show_log.pl") {
+		// 旧あしあとURLはAPI用URLに置換(デフォルトURLを採用する)
+		return default_category_url;
+	}
+
+	/* 下記は「マイミク一覧」を "list_friend.pl" から API に移行したときの処理
+	if (category_type == ACCESS_LIST_FRIEND && category_url == "list_friend.pl") {
+		// 旧マイミク一覧URLはAPI用URLに置換(デフォルトURLを採用する)
+		return default_category_url;
+	}
+	*/
+
+	if (category_type == ACCESS_LIST_FRIEND) {
+		// マイミク一覧URLはデフォルトURLが正しい("list_friend.pl" や API の URL は廃止とする)
+		return default_category_url;
+	}
+
+	if (category_type == ACCESS_MIXI_RECENT_VOICE &&
+		category_url.Find("recent_echo.pl")>=0)
+	{
+		// 移行処理：recent_echo.pl を recent_voice.pl に書き換える
+		CString strCategoryUrl(category_url);
+		strCategoryUrl.Replace(L"recent_echo.pl",
+							   L"recent_voice.pl");
+		category_name = "みんなのボイス";
+		return strCategoryUrl;
+	}
+	
+	if (category_type == ACCESS_MIXI_RECENT_VOICE &&
+		category_url.Find("res_echo.pl")>=0 &&
+		strstr(category_name.c_str(), "返信")!=NULL)
+	{
+		// 移行処理：res_voice.pl は 2010/04/14 のmixi仕様変更で消えたので項目としても削除
+		return L"";
+	}
+#endif
+
+	if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
+		category_url.Find("http://twitter.com/statuses/friends_timeline.xml")>=0)
+	{
+		// 移行処理：friends_timeline.xml を home_timeline.xml に書き換える
+		CString strCategoryUrl(category_url);
+		strCategoryUrl.Replace(L"http://twitter.com/statuses/friends_timeline.xml",
+							   L"http://twitter.com/statuses/home_timeline.xml");
+		return strCategoryUrl;
+	}
+
+	return CString(category_url);
+}
+
+
+/**
  * group にカテゴリを追加する。
  *
  * category_url が NULL または空の場合は、カテゴリ種別に応じたデフォルトURLを指定する。
@@ -73,45 +137,14 @@ bool Mz3GroupData::appendCategoryByIniData(
 #endif
 
 	// URL が指定されていればその URL を用いる。
+	// 但し、いくつかの古いURLについては移行処理を行う。
 	CString url = default_category_url;
 	if (category_url!=NULL && strlen(category_url) > 0) {
-#ifdef BT_MZ3
-		// 旧形式iniファイルの移行処理
-		if (category_type == ACCESS_LIST_FOOTSTEP && strcmp(category_url, "show_log.pl")==0) {
-			// 旧あしあとURLはAPI用URLに置換(デフォルトURLを採用する)
-		} else 
-		if (category_type == ACCESS_LIST_FRIEND && strcmp(category_url, "list_friend.pl")==0) {
-			// 旧マイミク一覧URLはAPI用URLに置換(デフォルトURLを採用する)
-		} else 
-#endif
-		if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
-			       strstr(category_url, "http://twitter.com/statuses/friends_timeline.xml")!=NULL)
-		{
-			// 移行処理：friends_timeline.xml を home_timeline.xml に書き換える
-			CString strCategoryUrl(category_url);
-			strCategoryUrl.Replace(L"http://twitter.com/statuses/friends_timeline.xml",
-								   L"http://twitter.com/statuses/home_timeline.xml");
-			url = strCategoryUrl;
-#ifdef BT_MZ3
-		} else if (category_type == ACCESS_MIXI_RECENT_VOICE &&
-			       strstr(category_url, "recent_echo.pl")!=NULL)
-		{
-			// 移行処理：recent_echo.pl を recent_voice.pl に書き換える
-			CString strCategoryUrl(category_url);
-			strCategoryUrl.Replace(L"recent_echo.pl",
-								   L"recent_voice.pl");
-			url = strCategoryUrl;
-			category_name = "みんなのボイス";
-		} else if (category_type == ACCESS_MIXI_RECENT_VOICE &&
-			       strstr(category_url, "res_echo.pl")!=NULL &&
-				   strstr(category_name.c_str(), "返信")!=NULL)
-		{
-			// 移行処理：res_voice.pl は 2010/04/14 のmixi仕様変更で消えたので項目としても削除
+
+		// カテゴリURLの移行処理
+		url = getNormalizedCategoryUrl(default_category_url, category_url, category_type, category_name);
+		if (url.IsEmpty()) {
 			return true;
-#endif
-		} else {
-			// カテゴリURLを採用
-			url = util::my_mbstowcs(category_url).c_str();
 		}
 	}
 

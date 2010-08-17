@@ -756,6 +756,11 @@ function on_estimate_access_type(event_name, url, data1, data2)
 		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
 	end
 
+	-- マイミク一覧
+	if line_has_strings(url, 'list_friend_simple.pl') then
+		return true, mz3.get_access_type_by_key('FRIEND');
+	end
+
     -- お気に入りユーザ・コミュニティ
 	if line_has_strings(url, 'view_mylist.pl') then
 		return true, mz3.get_access_type_by_key('FAVORITE');
@@ -1087,6 +1092,118 @@ function on_get_body_list_default_icon_index(event_name, serialize_key, body)
 	return false;
 end
 mz3.add_event_listener("get_body_list_default_icon_index", "mixi.on_get_body_list_default_icon_index");
+
+
+--------------------------------------------------
+-- 【マイミク一覧】
+-- [list] list_friend_simple.pl 用パーサ
+--
+-- http://mixi.jp/list_friend_simple.pl
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_mymixi_parser(parent, body, html)
+	mz3.logger_debug("mixi_mymixi_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+
+	local t1 = mz3.get_tick_count();
+	local in_data_region = false;
+
+	local back_data = nil;
+	local next_data = nil;
+
+	-- 行数取得
+	local line_count = html:get_count();
+	for i=300, line_count-1 do
+		line = html:get_at(i);
+
+		-- 次へ、前への抽出処理
+		-- 項目発見前にのみ存在する
+		if not in_data_region and back_data==nil and next_data==nil then
+			if line_has_strings( line, "list_friend_simple.pl" ) then
+				back_data, next_data = parse_next_back_link(line, "list_friend_simple.pl", "name");
+			end
+		end
+
+		-- 項目探索 以下一行
+		-- <div class="wrapper">
+		if line_has_strings(line, "<div", "class", "wrapper") then
+		
+			in_data_region = true;
+
+			-- data 生成
+			data = MZ3Data:create();
+
+			i = i+1;
+			line = html:get_at(i);
+
+			-- URL 取得
+			url = line:match("href=\"([^\"]+)\"");
+			if url ~= nil then
+				url = complement_mixi_url(url);
+				data:set_text("url", url);
+			end
+
+			-- id
+			id = get_param_from_url(url, "id");
+			data:set_integer("id", id);
+
+			-- 画像取得
+			local image_url = line:match('url[(](.-)[)]');
+			--mz3.logger_debug('image url:' .. image_url);
+			if image_url ~= nil then
+				data:add_text_array("image", image_url);
+			end
+
+			i = i+1;
+			line = html:get_at(i);
+
+			-- 名前取得
+			name = line:match(">([^<]+)(<.*)$");
+			data:set_text("name", name);
+			
+			-- URL に応じてアクセス種別を設定
+			type = mz3.estimate_access_type_by_url(url);
+			data:set_access_type(type);
+
+			-- data 追加
+			body:add(data.data);
+
+			-- data 削除
+			data:delete();
+		end
+
+		if in_data_region and line_has_strings(line, "</tbody>") then
+			mz3.logger_debug("★</tbody>が見つかったので終了します");
+			break;
+		end
+	end
+
+	-- 前、次へリンクの追加
+	if back_data~=nil then
+		-- 先頭に挿入
+		body:insert(0, back_data.data);
+		back_data:delete();
+	end
+	if next_data~=nil then
+		-- 末尾に追加
+		body:add(next_data.data);
+		next_data:delete();
+	end
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_mymixi_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("FRIEND", "mixi.mixi_mymixi_parser");
 
 
 ----------------------------------------

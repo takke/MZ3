@@ -2667,6 +2667,7 @@ public:
  * 【マイミク一覧】
  * http://mixi.jp/list_friend.pl または http://mixi.jp/ajax_friend_setting.pl
  */
+/*
 class ListFriendParser : public MixiListParser
 {
 public:
@@ -2792,7 +2793,7 @@ public:
 		return rval;
 	}
 };
-
+*/
 
 /**
  * [list] show_intro.pl 用パーサ。

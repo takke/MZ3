@@ -3335,10 +3335,11 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		referer.Replace(_T("view_enquete"), _T("reply_enquete"));
 		break;
 
-	case ACCESS_LIST_FRIEND:
-		// マイミク一覧
-		referer = L"http://mixi.jp/list_friend.pl";
-		break;
+		// 下記はマイミク取得がAPIの頃の処理
+//	case ACCESS_LIST_FRIEND:
+//		// マイミク一覧
+//		referer = L"http://mixi.jp/list_friend.pl";
+//		break;
 	}
 #endif
 
@@ -3394,7 +3395,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 
 	// [MZ3-API] GET/POST 直前のフック処理(の予定)
 #ifdef BT_MZ3
-	switch (data->GetAccessType()) {
+/*	switch (data->GetAccessType()) {
 	case ACCESS_LIST_FRIEND:
 		// マイミク一覧
 		// マイミク一覧はブラウザでは下記の手順で取得される。
@@ -3424,6 +3425,7 @@ void CMZ3View::AccessProc(CMixiData* data, LPCTSTR a_url, CInetAccess::ENCODING 
 		}
 		break;
 	}
+*/
 #endif
 
 	// UserAgent設定
@@ -6553,6 +6555,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 			// イベントハンドラ完了
 		} else {
 			switch (aType) {
+/*
 #ifdef BT_MZ3
 			case ACCESS_LIST_FRIEND:
 	//			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
@@ -6573,6 +6576,7 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 				}
 				break;
 #endif
+*/
 
 			case ACCESS_TWITTER_FRIENDS_TIMELINE:
 				MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");

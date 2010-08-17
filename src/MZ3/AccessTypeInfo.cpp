@@ -164,17 +164,16 @@ bool AccessTypeInfo::init()
 		INFO_TYPE_CATEGORY
 		, "mixi"
 		, L"マイミク一覧"
-		, REQUEST_METHOD_POST
+		, REQUEST_METHOD_GET
 		);
-	// url(1) : http://mixi.jp/ajax_friend_setting.pl?type=thumbnail&mode=get_friends&page=1&sort=nickname
-	m_map[type].cacheFilePattern = L"ajax_friend_setting{urlparam:page}.html";
+	// url(1) : http://mixi.jp/list_friend_simple.pl
+	m_map[type].cacheFilePattern = L"list_friend_simple{urlparam:page}.html";
 	m_map[type].serializeKey = "FRIEND";
-	m_map[type].defaultCategoryURL = L"ajax_friend_setting.pl?type=thumbnail&mode=get_friends&page=1&sort=nickname";
+	m_map[type].defaultCategoryURL = L"http://mixi.jp/list_friend_simple.pl";
 	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前");
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"ログイン時刻");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// mixi API => UTF-8
 
 	type = ACCESS_LIST_COMMUNITY;
 	m_map[type] = AccessTypeInfo::Data(
