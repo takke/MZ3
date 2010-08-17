@@ -173,6 +173,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3.hmac_sha1">mz3.hmac_sha1</a>&nbsp;(text, key)</td>
+	<td class="summary">hmac_sha1 生成  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3.is_mixi_logout">mz3.is_mixi_logout</a>&nbsp;(serialize_key)</td>
 	<td class="summary">mixiのログアウト状態判定  </td>
 	</tr>
@@ -1436,6 +1441,39 @@ Win32 API の GetTickCount() を呼び出す。
 
 <h3>Return value:</h3>
 [integer] OS起動時からの経過時間(ms) 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3.hmac_sha1"></a><strong>mz3.hmac_sha1</strong>&nbsp;(text, key)</dt>
+<dd>
+hmac_sha1 生成 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  text: 対象文字列 
+	</li>
+	
+	<li>
+	  key: key
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+string sha1(hex) 
 
 
 
