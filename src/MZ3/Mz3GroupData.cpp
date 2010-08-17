@@ -84,14 +84,20 @@ inline CString getNormalizedCategoryUrl(LPCTSTR default_category_url,
 	}
 #endif
 
-	if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE &&
-		category_url.Find("http://twitter.com/statuses/friends_timeline.xml")>=0)
-	{
-		// 移行処理：friends_timeline.xml を home_timeline.xml に書き換える
-		CString strCategoryUrl(category_url);
-		strCategoryUrl.Replace(L"http://twitter.com/statuses/friends_timeline.xml",
-							   L"http://twitter.com/statuses/home_timeline.xml");
-		return strCategoryUrl;
+	if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE) {
+		// 移行処理：friends_timeline.xml => home_timeline.xml
+		if (category_url.Find("http://twitter.com/statuses/friends_timeline.xml")>=0) {
+			category_url.Replace("http://twitter.com/statuses/friends_timeline.xml",
+								 "http://api.twitter.com/1/statuses/home_timeline.xml");
+			return CString(category_url);
+		}
+
+		// 移行処理：home_timeline.xml (BASIC認証用) => api 用 URL
+		if (category_url.Find("http://twitter.com/statuses/home_timeline.xml")>=0) {
+			category_url.Replace("http://twitter.com/statuses/home_timeline.xml",
+								 "http://api.twitter.com/1/statuses/home_timeline.xml");
+			return CString(category_url);
+		}
 	}
 
 	return CString(category_url);
