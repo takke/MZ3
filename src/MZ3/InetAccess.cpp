@@ -36,6 +36,27 @@
 
 // CInetAccess
 
+inline CString LastErrorToText(DWORD last_error)
+{
+	LPVOID lpMsgBuf;
+
+	FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+				FORMAT_MESSAGE_FROM_SYSTEM | 
+				FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				last_error,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+				(LPTSTR) &lpMsgBuf, 0, NULL);
+
+	CString error;
+	error.Format(L"Code[%d], Message[%s]", last_error, (LPCTSTR)lpMsgBuf);
+
+	LocalFree(lpMsgBuf);
+
+	return error;
+}
+
 /**
  * 画面下部の情報領域に通信量に関するメッセージを表示する
  *
@@ -670,6 +691,8 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			// HTTPS で接続するため、
 			// フラグに INTERNET_FLAG_SECURE を追加。
 			dwFlags = dwFlags | INTERNET_FLAG_SECURE;
+
+			dwFlags = dwFlags | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID;
 		}
 
 		// メソッド名とHTTPバージョンを、メソッドに応じて変更する
@@ -897,6 +920,7 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 			LPCTSTR pszContentType = m_postData->GetContentType();
 
 			MZ3LOGGER_DEBUG( util::FormatString(L"Content-Type: %s", pszContentType) );
+			MZ3LOGGER_DEBUG( util::FormatString(L"Post length: %d", buf.size()) );
 
 			if (lstrlen(pszContentType)>0) {
 				CString strContentType;
@@ -909,10 +933,16 @@ int CInetAccess::ExecSendRecv( EXEC_SENDRECV_TYPE execType )
 					buf.size() );
 				if( bRet == FALSE ) {
 					// POSTメッセージ送信失敗
+					DWORD e = GetLastError();
+
 					// m_hRequest, m_hConnection を閉じる。
 					CloseInternetHandles();
+
 					m_strErrorMsg = L"POSTメッセージ送信中にエラーが発生しました";
 					MZ3LOGGER_ERROR( m_strErrorMsg );
+
+					MZ3LOGGER_ERROR( LastErrorToText(e) );
+
 					return WM_MZ3_GET_ERROR;
 				}
 			} else {
