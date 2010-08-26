@@ -265,17 +265,17 @@ function mixi_view_diary_parser(data, dummy, html)
 --			data:add_body_with_extract("<br>");
 		end
 
-		-- 前の日記へのリンク
-		if line_has_strings(line, '<div', 'class', 'diaryPagingLeft') then
-			local link = line:match('<a.*</a>');
+		if line_has_strings(line, '<div', 'class', 'diaryPagingRight') then
+			-- 前の日記へのリンク
+			local link = line:match('<a[^>]*>前の日記</a>');
 			if link~=nil then
+				mz3.logger_debug('prev_diary:' .. link);
 				data:set_text('prev_diary', link);
 			end
-		end
-		-- 次の日記へのリンク
-		if line_has_strings(line, '<div', 'class', 'diaryPagingRight') then
-			local link = line:match('<a.*</a>');
+			-- 次の日記へのリンク
+			local link = line:match('<a[^>]*>次の日記</a>');
 			if link~=nil then
+				mz3.logger_debug('next_diary:' .. link);
 				data:set_text('next_diary', link);
 			end
 		end
