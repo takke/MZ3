@@ -418,38 +418,35 @@ end
 
 -- コメントの取得
 function parseDiaryComment(data, line, i, line_count, html)
-	if line_has_strings(line, 'diaryMainArea02') and
-	   (line_has_strings(line, 'commentList') or
-	    line_has_strings(line, 'deleteButton'))
+	if line_has_strings(line, 'commentListArea')
 	then
 		
 		-- 2件目以降は子要素として投入する
 		comment_index = 1;
-		in_dd = false;
+--		in_dd = false;
 		child = MZ3Data:create();
 
 		i = i + 1;
 		while i<line_count do
 			line = html:get_at(i);
-			if line_has_strings(line, '<div class="diaryMainArea02 commentForm">') then
+			if line_has_strings(line, 'commentInputArea">') then
 				break;
 			end
 
-			if line_has_strings(line, 'diaryCommentbox') then
+			if line_has_strings(line, '<li') then
 				child:clear();
-				in_dd = false;
 				child:add_body_with_extract('<br>');
 			end
-			
-			if line_has_strings(line, '</div') then
+
+			if line_has_strings(line, '</li') then
 				if child:get_text('author')~="" then
 					data:add_child(child);
 					child:clear();
 					child:set_text('author', '');
 				end
 			end
-			
-			if line_has_strings(line, 'commentTitleName') then
+
+			if line_has_strings(line, 'dl', 'class', 'comment') then
 				local v = line:match('<a.->(.-)</a>');
 				if v==nil then
 					-- 自分の日記なら2行目にある
@@ -463,25 +460,37 @@ function parseDiaryComment(data, line, i, line_count, html)
 				child:set_integer('comment_index', comment_index);
 				comment_index = comment_index+1;
 			end
-			
-			if line_has_strings(line, 'commentTitleDate') then
+
+			if line_has_strings(line, 'date') then
 				local v = line:match('<span.->(.-)<');
 				v = mz3.decode_html_entity(v);
 				child:set_date(v);
 			end
-			
-			if in_dd then
-				if line_has_strings(line, '</dd>') then
-					in_dd = false;
+
+			if line_has_strings(line, '<dd>') then
+				if line_has_strings(line, '<dd>', '</dd>') then
+					-- コメント1行
+					line = line:match('<dd>(.-)</dd>');
+					child:add_body_with_extract(line);
 				else
+					-- コメント複数行
+					j = i;
+					local line_comment = '';
+					while j<line_count do
+						if line_has_strings(line, '</dl>') then
+							break;
+						end
+
+						line_comment = line_comment .. line;
+						j = j+1
+						line = html:get_at(j);
+					end
+
+					line = line_comment:match('<dd>(.-)</dd>');
 					child:add_body_with_extract(line);
 				end
-			else
-				if line_has_strings(line, '<dd>') then
-					in_dd = true;
-				end
 			end
-			
+
 			i = i + 1;
 		end
 		child:delete();
