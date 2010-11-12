@@ -1549,6 +1549,12 @@ public:
 					// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
 					if(! ParserUtil::ExtractVideoLinkFromScriptTag( mixi, i, html_ ) ) {
 						// scriptタグ未発見なので、解析＆投入
+
+						// 非表示のタグを削除
+						if (isBbsHiddenLine(line)) {
+							// この行を強制的にスキップ
+							continue;
+						}
 						ParserUtil::AddBodyWithExtract( mixi, line );
 					}
 				}
@@ -1596,6 +1602,15 @@ public:
 	}
 
 private:
+
+	static bool isBbsHiddenLine(const CString& line)
+	{
+		// <p class="reportLink01" style="display: none;"><!-- ... --></p>
+		if (util::LineHasStringsNoCase(line, L"<p class=\"reportLink01\"", L"display: none;", L"</p")) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * ＢＢＳコメント取得 トピック コメント一覧
@@ -1705,6 +1720,13 @@ private:
 			// 動画用scriptタグが見つかったらscriptタグ終了まで解析。
 			if(! ParserUtil::ExtractVideoLinkFromScriptTag( cmtData, i, html_ ) ) {
 				// scriptタグ未発見なので、解析＆投入
+
+				// 非表示のタグを削除
+				if (isBbsHiddenLine(line)) {
+					// この行を強制的にスキップ
+					continue;
+				}
+
 				ParserUtil::AddBodyWithExtract( cmtData, line );
 			}
 		}
