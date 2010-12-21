@@ -28,6 +28,24 @@ type:set_body_integrated_line_pattern(1, '%2\t(%3)');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
+
+-- 日記コメント記入履歴一覧
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('category');									-- カテゴリ
+type:set_service_type('mixi');									-- サービス種別
+type:set_serialize_key('NEW_COMMENT');							-- シリアライズキー
+type:set_short_title('日記一覧');								-- 簡易タイトル
+type:set_request_method('GET');									-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\new_comment.html');		-- キャッシュファイル
+type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_default_url('http://mixi.jp/new_comment.pl');
+type:set_body_header(1, 'title', 'タイトル');
+type:set_body_header(2, 'name', '名前>>');
+type:set_body_header(3, 'date', '日時>>');
+type:set_body_integrated_line_pattern(1, '%2\t(%3)');
+type:set_body_integrated_line_pattern(2, '%1');
+
+
 -- TODO 「mixi 日記詳細」はホスト側で設定しているが、本来はこちらで設定すべき。
 
 
@@ -60,10 +78,17 @@ function mixi_list_new_friend_diary_parser(parent, body, html)
 	
 	-- 日記開始フラグの探索
 	local i_start_line = 100;
+	-- 0：マイミク日記，1：コメント記入履歴
+	category_check = 0;
 	while (i_start_line < line_count) do
 		line = html:get_at(i_start_line);
 		
 		if line_has_strings(line, "newFriendDiary") then
+			category_check = 0;
+			i_start_line = i_start_line + 1;
+			break;
+		elseif line_has_strings(line, "newCommentDiary") then
+			category_check = 1;
 			i_start_line = i_start_line + 1;
 			break;
 		end
@@ -79,7 +104,11 @@ function mixi_list_new_friend_diary_parser(parent, body, html)
 
 		-- 次へ、前への抽出処理
 		if back_data==nil and next_data==nil then
-			back_data, next_data = parse_next_back_link(line, "new_friend_diary.pl");
+			if category_check == 0 then
+				back_data, next_data = parse_next_back_link(line, "new_friend_diary.pl");
+			elseif category_check == 1 then
+				back_data, next_data = parse_next_back_link(line, "new_comment.pl");
+			end
 		end
 	end
 	
@@ -87,7 +116,9 @@ function mixi_list_new_friend_diary_parser(parent, body, html)
 	sub_html = get_sub_html(html, i_start_line, line_count, {'<ul'}, {'</ul>'});
 	
 	-- ul の中の各 dt, dd を取得
-	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
+--	for dt, dd in sub_html:gmatch("<dt>(.-)</dt>.-<dd>(.-)</dd>") do
+	-- コメント記入履歴は <dt class="diary">12月20日 18:53</dt> となっているので
+	for dt, dd in sub_html:gmatch("<dt.->(.-)</dt>.-<dd>(.-)</dd>") do
 --		mz3.logger_debug('dt: ' .. dt);
 		
 		-- data 生成
@@ -102,6 +133,7 @@ function mixi_list_new_friend_diary_parser(parent, body, html)
 		--<dd><a href="view_diary.pl?id=xxx&owner_id=xxx">タイトル</a> (なまえ)<div style="visibility: hidden;" class="diary_pop" id="xxx"></div>
 		-- or
 		--<dd><a href="view_diary.pl?url=xxx&owner_id=xxx">タイトル</a> (なまえ)
+		dd = dd:gsub( '&nbsp;', ' ' );
 		url, title, name = dd:match('href="(.-)">(.-)</a> %((.-)%)');
 		title = mz3.decode_html_entity(title);
 		data:set_text("title", title);
@@ -507,7 +539,7 @@ mz3.set_parser("DIARY",              "mixi.mixi_list_new_friend_diary_parser");
 mz3.set_parser("MIXI_DIARY",         "mixi.mixi_view_diary_parser");
 mz3.set_parser("MIXI_NEIGHBORDIARY", "mixi.mixi_view_diary_parser");
 mz3.set_parser("MIXI_MYDIARY",       "mixi.mixi_view_diary_parser");
-
+mz3.set_parser("NEW_COMMENT",        "mixi.mixi_list_new_friend_diary_parser");
 
 ----------------------------------------
 -- estimate 対象に追加
