@@ -282,8 +282,8 @@ function mixi_recent_voice_parser(parent, body, html)
 
 	-- 複数行に分かれているので1行に結合
 	local line = html:get_all_text();
-	
-	for li_tag in line:gmatch('<li class="archive">(.-)<span class="error"') do
+
+	for li_tag in line:gmatch('<li class="archive">(.-)<p class="error"') do
 --		mz3.logger_debug(li_tag);
 		
 		-- 以下一行
@@ -322,7 +322,7 @@ function mixi_recent_voice_parser(parent, body, html)
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->', '');
 				comment = comment:gsub('</a>', ' ');
-				data:add_body_with_extract(comment);
+				data:add_body_with_extract(comment .. "\r\n");
 			end
 
 			-- id
@@ -346,8 +346,33 @@ function mixi_recent_voice_parser(parent, body, html)
 				local name = dd_feedback:match('<a .->(.-)</a>');
 				local url = dd_feedback:match('href="(.-)"');
 				if name ~= nil and url ~= nil then
-					data:add_link_list(complement_mixi_url(url), 'イイネ！by' .. name);
+					data:add_link_list(complement_mixi_url(url), 'イイネ！by ' .. name);
 				end
+			end
+
+			-- コメント
+			for more_comment in li_tag:gmatch('<p class="moreLink01 hrule">(.-)</p') do
+				local url = more_comment:match('href="(.-)"');
+				url = complement_mixi_url(url);
+				local count = more_comment:match("commentCount\">(.-)</span");
+				if count ~= nil then
+					data:set_text("extra_url", url);
+					data:set_text("extra_count", count);
+				end
+			end
+
+			for dd_commentRow in li_tag:gmatch('<dd class="commentRow hrule">(.-)</dd') do
+				local commentName = dd_commentRow:match('class="commentNickname">(.-)<');
+				local extra_comment = dd_commentRow:match('<p class="commentBody">(.-)<');
+				extra_comment = "\r\n" .. "　　コメント by " .. commentName ..  "： " .. extra_comment .. "";
+
+				-- data:add_body_with_extract(extra_comment);
+				local before_comment = data:get_text('extra_comment');
+				if before_comment ~= nil then
+					extra_comment = before_comment .. extra_comment;
+				end
+
+				data:set_text('extra_comment', extra_comment);
 			end
 
 --[[
@@ -364,6 +389,15 @@ function mixi_recent_voice_parser(parent, body, html)
 				data:set_text('echo_post_time', echo_post_time);
 			end
 ]]
+
+			-- post_time
+			-- <input type="hidden" name="post_time" value="20110106003426" class="postTime" />
+			local echo_post_time = li_tag:match('name="post_time".-value="(.-)"');
+			if echo_post_time ~= nil then
+				data:set_text('echo_post_time', echo_post_time);
+				mz3.logger_debug("echo_post_time：" .. echo_post_time);
+			end
+
 			-- URL に応じてアクセス種別を設定
 			local type = mz3.get_access_type_by_key('MIXI_RECENT_VOICE_ITEM');
 			data:set_access_type(type);
@@ -450,6 +484,8 @@ menu_items.mixi_echo_reply        = mz3_menu.regist_menu("mixi.on_mixi_echo_repl
 menu_items.mixi_echo_show_profile = mz3_menu.regist_menu("mixi.on_mixi_echo_show_profile");
 menu_items.mixi_echo_add_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_echo_add_user_echo_list");
 menu_items.mixi_echo_add_ref_user_echo_list = mz3_menu.regist_menu("mixi.on_mixi_echo_add_ref_user_echo_list");
+
+menu_items.mixi_open_browser = mz3_menu.regist_menu("mixi.on_mixi_open_browser");
 
 ----------------------------------------
 -- イベントハンドラ
@@ -555,6 +591,14 @@ function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 	item = data:get_text_array_joined_text('body');
 	item = item:gsub("\r\n", "");
 	
+	extra_comment = data:get_text('extra_comment');
+	if extra_comment ~= nil then
+		if data:get_text('extra_count') ~= "" then
+			item = item .. "\r\n　" .. "総コメント件数：" .. data:get_text('extra_count') .. "件";
+		end
+		item = item .. "　" .. extra_comment;
+	end
+	
 	item = item .. "\r\n";
 	item = item .. "----\r\n";
 	item = item .. "name : " .. data:get_text('name') .. "\r\n";
@@ -647,6 +691,15 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		menu:append_menu("string", ref_user_name .. " さんのボイス", menu_items.mixi_echo_add_ref_user_echo_list);
 	end
 
+	-- コメント
+	extra_count   = body:get_text('extra_count')
+--	extra_comment = body:get_text('extra_comment');
+	extra_url = body:get_text('extra_url');
+	if extra_url ~= "" then
+		menu:append_menu("separator");
+		menu:append_menu("string", "link : もっとコメントを読む " .. extra_count .. "件", menu_items.mixi_open_browser);
+	end
+
 	-- リンク追加
 	n = body:get_link_list_size();
 	if n > 0 then
@@ -666,6 +719,13 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	return true;
 end
 mz3.add_event_listener("popup_body_menu", "mixi.on_popup_body_menu");
+
+
+--- ブラウザで開く
+function on_mixi_open_browser(serialize_key, event_name, data)
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	mz3.open_url_by_browser_with_confirm(body:get_text('extra_url'));
+end
 
 
 --- デフォルトのグループリスト生成イベントハンドラ
@@ -733,7 +793,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("マイミク一覧", "FRIEND");
 		tab:append_category("紹介文", "INTRO");
 		tab:append_category("足あと", "FOOTSTEP");
-		tab:append_category("カレンダー", "CALENDAR", "show_calendar.pl");
+		tab:append_category("カレンダー", "CALENDAR", "show_schedule.pl");
 		tab:append_category("ブックマーク", "BOOKMARK");
 		tab:append_category("お気に入りユーザー", "FAVORITE", "view_mylist.pl");
 		tab:append_category("お気に入りコミュ", "FAVORITE_COMMUNITY", "list_bookmark.pl?kind=community");
@@ -931,7 +991,11 @@ function on_click_update_button(event_name, serialize_key)
 		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
 		local echo_member_id = data:get_integer('author_id');
 		local echo_post_time = data:get_text('echo_post_time');
-		
+
+		mz3.logger_debug("text：" .. mz3.url_encode(text, 'euc-jp'));
+		mz3.logger_debug("parent_member_id：" .. echo_member_id);
+		mz3.logger_debug("parent_post_time：" .. echo_post_time);
+
 		if echo_member_id == -1 then
 			mz3.alert('返信先ユーザが不明です');
 			return true;
@@ -960,6 +1024,7 @@ function on_click_update_button(event_name, serialize_key)
 	-- POST先URL設定
 	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		url = 'http://mixi.jp/add_voice.pl';
+		-- url = 'http://mixi.jp/recent_voice.pl?from=home=gadget';
 	end
 	
 	-- 通信開始
