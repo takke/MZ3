@@ -104,7 +104,7 @@ function mixi_home_parser(parent, body, html)
 		
 		for i=0, line_count-1 do
 			line = html:get_at(i);
-			if line_has_strings(line, "<a", "href=", "add_diary.pl?id=") then
+			if line_has_strings(line, "<a", "href=", "add_diary.pl") then
 --				mz3.logger_debug("[" .. line .. "]");
 				local url = line:match("href=\"([^\"]+)\"");
 --				mz3.logger_debug("[" .. url .. "]");
