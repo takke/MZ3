@@ -6,5 +6,5 @@
 #pragma once
 
 /// ƒo[ƒWƒ‡ƒ“•¶š—ñ
-#define MZ3_VERSION_TEXT_SHORT		L"1.4.3"
+#define MZ3_VERSION_TEXT_SHORT		L"1.4.4"
 #define MZ3_VERSION_TEXT			L"Version " MZ3_VERSION_TEXT_SHORT
