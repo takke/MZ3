@@ -393,7 +393,7 @@ public:
 		}
 
 		// 絵文字画像リンクの変換
-		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
+		// <img src="http://img.mixi.net/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
 #define LINE_HAS_EMOJI_LINK(str)	util::LineHasStringsNoCase( str, L"<img", L"alt=", L"class=\"emoji\"", L">" )
 		if( LINE_HAS_EMOJI_LINK(str) ) {
 			ReplaceEmojiImageToCode( str );
@@ -502,13 +502,13 @@ public:
 	 */
 	static void ReplaceEmojiImageToText( CString& line )
 	{
-		// <img src="http://img.mixi.jp/img/emoji/xx.gif" alt="文字" width="16" height="16" class="emoji" border="0">
+		// <img src="http://img.mixi.net/img/emoji/xx.gif" alt="文字" width="16" height="16" class="emoji" border="0">
 		// のようなリンクを
 		// "((文字))" に変換する
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
+		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.net/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
 			return;
 		}
 
@@ -550,13 +550,13 @@ private:
 	 */
 	static void ReplaceEmojiImageToCode( CString& line )
 	{
-		// <img src="http://img.mixi.jp/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
+		// <img src="http://img.mixi.net/img/emoji/85.gif" alt="喫煙" width="16" height="16" class="emoji" border="0">
 		// のようなリンクを
 		// "((喫煙))" に変換する
 
 		// 正規表現のコンパイル（一回のみ）
 		static MyRegex reg;
-		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.jp/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
+		if (!util::CompileRegex( reg, L"<img src=\"http://img.mixi.net/img/emoji/([^\"]+).gif\" alt=\"([^\"]+)\" [^c]+ class=\"emoji\"[^>]*>" )) {
 			return;
 		}
 
