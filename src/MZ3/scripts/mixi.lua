@@ -458,7 +458,8 @@ function mixi_recent_voice_detail_parser(parent, body, html)
 	local t1 = mz3.get_tick_count();
 
 	local line_count = html:get_count();
-	
+
+--[[
 	-- post_key 探索
 	mixi.post_key = '';
 	for i=200, line_count-1 do
@@ -471,28 +472,30 @@ function mixi_recent_voice_detail_parser(parent, body, html)
 			break;
 		end
 	end
-
+]]
 	for i=300, line_count-1 do
 
-		if line_has_strings(line, "</dl") then
+		if line_has_strings(line, "</div") then
 			break;
 		end
 
 		line = html:get_at(i);
-		if line_has_strings(line, "<dd", "class", "commentRow hrule") then
+--		if line_has_strings(line, "<dd", "class", "commentRow hrule") then
+		if line_has_strings(line, "<dd", "class", "commentRow") or
+		   line_has_strings(line, "<li", "class", "commentRow") then
 			-- data 生成
 			data = MZ3Data:create();
 
 			i = i+1;
 			line = html:get_at(i);
-
+--[[
 			-- URL 取得
 			url = line:match("href=\"([^\"]+)\"");
 			if url ~= nil then
 				url = complement_mixi_url(url);
 				data:set_text("url", url);
 			end
-			
+]]
 			-- 画像
 			image = line:match('src="(.-)"');
 			-- image = line:match("src=\"([^\"]+)\"");
@@ -510,6 +513,16 @@ function mixi_recent_voice_detail_parser(parent, body, html)
 			end
 
 			i = i+1;
+			line = html:get_at(i);
+
+			-- 日付
+			date = line:match(">([^<]+)(<.*)$");
+			if date ~= nil then
+				date = date:gsub("\n", '');
+				data:set_date(date);
+			end
+
+			i = i+3;
 			line = html:get_at(i);
 
 			-- コメント
@@ -846,8 +859,10 @@ mz3.add_event_listener("popup_body_menu", "mixi.on_popup_body_menu");
 --- ブラウザで開く
 function on_mixi_open_browser(serialize_key, event_name, data)
 
---	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
---	mz3.open_url_by_browser_with_confirm(body:get_text('extra_url'));
+--[[
+	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
+	mz3.open_url_by_browser_with_confirm(body:get_text('extra_url'));
+]]
 
 	body = mz3_main_view.get_selected_body_item();
 	body = MZ3Data:create(body);
@@ -859,13 +874,14 @@ function on_mixi_open_browser(serialize_key, event_name, data)
 --	key = "MIXI_RECENT_ECHO";
 	key = "MIXI_RECENT_VOICE_DETAIL";
 	mz3_main_view.append_category(title, url, key);
-	
+
 	-- 追加したカテゴリの取得開始
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
 	post = nil;
 	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+
 
 end
 
