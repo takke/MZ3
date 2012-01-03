@@ -4203,7 +4203,7 @@ bool CMZ3View::PrepareViewBbsList(void)
 		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_LIST_BBS),
 		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_LIST_BBS),
 		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_LIST_BBS),
-		CCategoryItem::SAVE_TO_GROUPFILE_NO );
+		CCategoryItem::SAVE_TO_GROUPFILE_YES );
 
 	return AppendCategoryList(categoryItem);
 }
