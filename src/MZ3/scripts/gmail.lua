@@ -276,7 +276,8 @@ function gmail_inbox_parser(parent, body, html)
 		end
 
 		-- URL 生成
-		url = "https://www.google.com/accounts/ServiceLoginAuth?service=mail";
+--		url = "https://www.google.com/accounts/ServiceLoginAuth?service=mail";
+		url = "https://accounts.google.com/ServiceLogin?service=mail";
 		post = mz3_post_data.create();
 		mz3_post_data.append_post_body(post, "Email=" .. mz3.url_encode(mail_address, 'utf8') .. "&");
 		mz3_post_data.append_post_body(post, "Passwd=" .. mz3.url_encode(mail_password, 'utf8') .. "&");
