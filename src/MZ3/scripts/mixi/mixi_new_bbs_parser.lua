@@ -6,7 +6,7 @@
 --------------------------------------------------
 -- MZ3 Script : mixi parsers
 --
--- $Id$
+-- $Id: mixi_new_bbs_parser.lua 1453 2009-12-13 13:06:06Z takke $
 --------------------------------------------------
 module("mixi", package.seeall)
 
@@ -92,8 +92,8 @@ function new_bbs_parser(parent, body, html)
 			id = get_param_from_url(url, "id");
 			data:set_integer("id", id);
 
-			-- 次2行取得
-			i = i+2;
+			-- 次3行取得
+			i = i+3;
 			line = html:get_at(i);
 
 			-- 日付のパース
@@ -110,8 +110,8 @@ function new_bbs_parser(parent, body, html)
 			data:delete();
 		end
 
-		if in_data_region and line_has_strings(line, "</ul>") then
-			mz3.logger_debug("★</ul>が見つかったので終了します");
+		if in_data_region and line_has_strings(line, "<!--/communityFeed-->") then
+			mz3.logger_debug("★<!--/communityFeed-->が見つかったので終了します");
 			break;
 		end
 
