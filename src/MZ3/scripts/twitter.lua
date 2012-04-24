@@ -122,7 +122,7 @@ type:set_short_title('リスト一覧');							-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('twitter\\{urlafter:/}');	-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
-type:set_default_url('http://twitter.com/{twitter:id}/lists.xml');	-- dummy
+type:set_default_url('https://api.twitter.com/1/{twitter:id}/lists.xml');	-- dummy
 type:set_body_header(1, 'title', 'リスト名');
 type:set_body_header(2, 'name', 'members>>');	-- MZ3の制限のため
 type:set_body_header(3, 'date', 'Followers>>');	-- MZ3の制限のため
@@ -145,7 +145,7 @@ type:set_short_title('フォロワー一覧');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('twitter\\followers.xml');		-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
-type:set_default_url('http://twitter.com/statuses/followers.xml');
+type:set_default_url('https://api.twitter.com/1/statuses/followers.xml');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -159,7 +159,7 @@ type:set_short_title('フォロー一覧');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('twitter\\friends.xml');		-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
-type:set_default_url('http://twitter.com/statuses/friends.xml');
+type:set_default_url('https://api.twitter.com/1/statuses/friends.xml');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -266,12 +266,12 @@ menu_items.debug                 = mz3_menu.regist_menu("twitter.on_debug");
 menu_items.search_post           = mz3_menu.regist_menu("twitter.on_search_post");
 menu_items.search_hash           = mz3_menu.regist_menu("twitter.on_search_hash_list");
 menu_items.twitter_search        = mz3_menu.regist_menu("twitter.on_twitter_search");
-menu_items.twitter_update_destroy = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
-menu_items.twitter_user_block_create    = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
-menu_items.twitter_user_block_destroy   = mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
-menu_items.twitter_user_spam_reports    = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
-menu_items.search_favotter       = mz3_menu.regist_menu("twitter.on_search_favotter");
-menu_items.search_user_timeline  = mz3_menu.regist_menu("twitter.on_search_user_timeline");
+menu_items.twitter_update_destroy    = mz3_menu.regist_menu("twitter.on_twitter_update_destroy");
+menu_items.twitter_user_block_create = mz3_menu.regist_menu("twitter.on_twitter_user_block_create");
+menu_items.twitter_user_block_destroy= mz3_menu.regist_menu("twitter.on_twitter_user_block_destroy");
+menu_items.twitter_user_spam_reports = mz3_menu.regist_menu("twitter.on_twitter_user_spam_reports_create");
+menu_items.search_favotter           = mz3_menu.regist_menu("twitter.on_search_favotter");
+menu_items.search_user_timeline      = mz3_menu.regist_menu("twitter.on_search_user_timeline");
 
 -- 発言内のハッシュタグ #xxx 抽出リスト
 menu_items.search_hash_list = {}
@@ -288,7 +288,7 @@ menu_items.shorten_by_bitly      = mz3_menu.regist_menu("twitter.on_shorten_by_b
 menu_items.create_list           = mz3_menu.regist_menu("twitter.on_create_list");
 menu_items.delete_list           = mz3_menu.regist_menu("twitter.on_delete_list");
 menu_items.add_list_member       = mz3_menu.regist_menu("twitter.on_add_list_member");
-menu_items.delete_list_member       = mz3_menu.regist_menu("twitter.on_delete_list_member");
+menu_items.delete_list_member    = mz3_menu.regist_menu("twitter.on_delete_list_member");
 
 -- ファイル名
 twitpic_target_file = nil;
@@ -401,7 +401,7 @@ end
 --------------------------------------------------
 -- [list] タイムライン用パーサ
 --
--- http://twitter.com/statuses/friends_timeline.xml
+-- https://api.twitter.com/1/statuses/home_timeline.xml
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -542,7 +542,7 @@ mz3.set_parser("TWITTER_FAVORITES", "twitter.twitter_friends_timeline_parser");
 --------------------------------------------------
 -- [list] Lists用パーサ
 --
--- http://twitter.com/{twitter:id}/lists.xml
+-- https://api.twitter.com/1/{twitter:id}/lists.xml
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -648,7 +648,7 @@ mz3.set_parser("TWITTER_LISTS", "twitter.twitter_lists_parser");
 --------------------------------------------------
 -- [list] DM用パーサ
 --
--- http://twitter.com/direct_messages.xml
+-- https://api.twitter.com/1/direct_messages.xml
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -798,8 +798,8 @@ mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parse
 --------------------------------------------------
 -- [list] followers/friends用パーサ
 --
--- http://twitter.com/statuses/followers.xml
--- http://twitter.com/statuses/friends.xml
+-- https://api.twitter.com/1/statuses/followers.xml
+-- https://api.twitter.com/1/statuses/friends.xml
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -1244,7 +1244,7 @@ function on_twitter_create_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
-	url = "http://twitter.com/favourings/create/" .. id .. ".xml";
+	url = "https://api.twitter.com/1/favorites/create/" .. id .. ".xml";
 
 	-- 通信開始
 	key = "TWITTER_FAVOURINGS_CREATE";
@@ -1261,7 +1261,7 @@ function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
-	url = "http://twitter.com/favourings/destroy/" .. id .. ".xml";
+	url = "https://api.twitter.com/1/favorites/destroy/" .. id .. ".xml";
 
 	-- 通信開始
 	key = "TWITTER_FAVOURINGS_DESTROY";
@@ -1285,15 +1285,24 @@ function on_twitter_create_friendships(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "http://twitter.com/friendships/create/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/friendships/create.xml";
+
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
+
+	-- POST パラメータを設定
+	post:append_post_body('screen_name=' .. name);
 
 	-- 通信開始
 	key = "TWITTER_FRIENDSHIPS_CREATE";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
-	post = nil;
-	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+
 end
 
 
@@ -1311,15 +1320,23 @@ function on_twitter_destroy_friendships(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "http://twitter.com/friendships/destroy/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/friendships/destroy.xml";
+	
+	-- ヘッダーの設定
+	post = MZ3PostData:create();
+	post:append_additional_header('X-Twitter-Client: ' .. mz3.get_app_name());
+	post:append_additional_header('X-Twitter-Client-URL: http://mz3.jp/');
+	post:append_additional_header('X-Twitter-Client-Version: ' .. mz3.get_app_version());
+
+	-- POST パラメータを設定
+	post:append_post_body('screen_name=' .. name);
 
 	-- 通信開始
 	key = "TWITTER_FRIENDSHIPS_DESTROY";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
-	post = nil;
-	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
 end
 
 
@@ -1352,7 +1369,7 @@ function on_show_friend_timeline(serialize_key, event_name, data)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/statuses/user_timeline.xml?include_entities=false&include_rts=true&screen_name=" .. name;
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
@@ -1380,7 +1397,7 @@ function show_follower_tl(num)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/statuses/user_timeline.xml?include_entities=false&include_rts=true&screen_name=" .. name;
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
@@ -1436,7 +1453,7 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 		post:append_post_body('id=' .. id);
 
 		-- POST先URL設定
-		url = 'http://twitter.com/statuses/retweet/' .. id .. '.xml';
+		url = 'https://api.twitter.com/1/statuses/retweet/' .. id .. '.xml';
 
 		-- 通信開始
 		access_type = mz3.get_access_type_by_key(serialize_key);
@@ -1504,7 +1521,7 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のお気に入り";
-	url = "http://twitter.com/favorites/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/favorites/" .. name .. ".xml";
 	key = "TWITTER_FAVORITES";
 	mz3_main_view.append_category(title, url, key);
 	
@@ -1587,7 +1604,7 @@ function on_body_list_click(serialize_key, event_name, data)
 		local title = data:get_text('title');
 		local user = data:get_text('user');
 		local list_slug = data:get_text('list_slug');
-		local url = 'http://twitter.com/' .. user .. '/lists/' .. list_slug .. '/statuses.xml';
+		local url = 'https://api.twitter.com/1/' .. user .. '/lists/' .. list_slug .. '/statuses.xml';
 		local key = "TWITTER_FRIENDS_TIMELINE";
 		mz3_main_view.append_category(title, url, key);
 		
@@ -1751,7 +1768,7 @@ function do_post_to_twitter(text)
 --	post:append_post_body(mz3.get_app_name());
 
 	-- POST先URL設定
-	url = 'http://api.twitter.com/1/statuses/update.xml';
+	url = 'https://api.twitter.com/1/statuses/update.xml';
 	
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key(serialize_key);
@@ -1920,7 +1937,7 @@ function on_click_update_button(event_name, serialize_key)
 	-- POST先URL設定
 	url = '';
 	if serialize_key == 'TWITTER_NEW_DM' then
-		url = 'http://twitter.com/direct_messages/new.xml';
+		url = 'https://api.twitter.com/1/direct_messages/new.xml';
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
 		url = 'http://twitpic.com/api/uploadAndPost';
 	end
@@ -2337,17 +2354,17 @@ function on_creating_default_group(serialize_key, event_name, group)
 
 		-- Twitterタブ追加
 		local tab = MZ3GroupItem:create("Twitter");
-		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "http://api.twitter.com/1/statuses/home_timeline.xml");
-		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/replies.xml");
-		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "http://twitter.com/statuses/friends.xml");
-		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "http://twitter.com/statuses/followers.xml");
-		tab:append_category("リスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists.xml");
-		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "http://twitter.com/{twitter:id}/lists/memberships.xml");
-		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "http://twitter.com/statuses/retweets_of_me.xml");
+		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/home_timeline.xml");
+		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/replies.xml");
+		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1/statuses/friends.xml");
+		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "https://api.twitter.com/1/statuses/followers.xml");
+		tab:append_category("リスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists.xml");
+		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists/memberships.xml");
+		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/retweets_of_me.xml");
 		tab:append_category("ブロックユーザ一覧", "TWITTER_FRIENDS_TIMELINE", "http://api.twitter.com/1/blocks/blocking.xml");
-		tab:append_category("お気に入り", "TWITTER_FAVORITES", "http://twitter.com/favorites.xml");
-		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages.xml");
-		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "http://twitter.com/direct_messages/sent.xml");
+		tab:append_category("お気に入り", "TWITTER_FAVORITES", "https://api.twitter.com/1/favorites.xml");
+		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages.xml");
+		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages/sent.xml");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
@@ -2462,7 +2479,7 @@ function on_twitter_update_destroy(serialize_key, event_name, data)
 		body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 		id = body:get_integer64_as_string('id');
 		name = body:get_text('name');
-		url = "http://twitter.com/statuses/destroy/" .. id .. ".xml";
+		url = "https://api.twitter.com/1/statuses/destroy/" .. id .. ".xml";
 
 		-- 通信開始
 		key = "TWITTER_UPDATE_DESTROY";
@@ -2487,7 +2504,7 @@ function on_twitter_user_block_create(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "http://twitter.com/blocks/create/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/blocks/create/" .. name .. ".xml";
 
 	-- 通信開始
 	key = "TWITTER_USER_BLOCK_CREATE";
@@ -2511,7 +2528,7 @@ function on_twitter_user_block_destroy(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "http://twitter.com/blocks/destroy/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/blocks/destroy/" .. name .. ".xml";
 
 	-- 通信開始
 	key = "TWITTER_USER_BLOCK_DESTROY";
@@ -2552,7 +2569,7 @@ function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "http://twitter.com/report_spam.xml?screen_name=" .. name;
+	url = "https://api.twitter.com/1/report_spam.xml?screen_name=" .. name;
 
 	-- 通信開始
 	key = "TWITTER_USER_SPAM_REPORTS_CREATE";
@@ -2603,7 +2620,7 @@ function on_search_user_timeline(serialize_key, event_name, data)
 
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "http://twitter.com/statuses/user_timeline/" .. name .. ".xml";
+	url = "https://api.twitter.com/1/statuses/user_timeline/" .. name .. ".xml";
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 
@@ -2651,7 +2668,7 @@ function gather_my_list_names_blocking()
 
 	-- ブロッキング通信開始
 	key = "TWITTER_LISTS";
-	url = "http://twitter.com/" .. id .. "/lists.xml";
+	url = "https://api.twitter.com/" .. id .. "/lists.xml";
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
