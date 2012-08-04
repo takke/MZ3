@@ -2363,8 +2363,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/retweets_of_me.xml");
 		tab:append_category("ブロックユーザ一覧", "TWITTER_FRIENDS_TIMELINE", "http://api.twitter.com/1/blocks/blocking.xml");
 		tab:append_category("お気に入り", "TWITTER_FAVORITES", "https://api.twitter.com/1/favorites.xml");
-		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages.xml");
-		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages/sent.xml");
+--		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages.xml");
+--		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages/sent.xml");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
