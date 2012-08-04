@@ -37,11 +37,11 @@ type:set_request_encoding('euc-jp');						-- エンコーディング
 -- ボイス詳細
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('category');								-- カテゴリ
-type:set_service_type('mixi');							-- サービス種別
+type:set_service_type('mixi');								-- サービス種別
 type:set_serialize_key('MIXI_RECENT_VOICE_DETAIL');				-- シリアライズキー
 type:set_short_title('コメント一覧');						-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\comment.html');		-- キャッシュファイル
+type:set_cache_file_pattern('mixi\\comment.html');			-- キャッシュファイル
 type:set_request_encoding('euc-jp');							-- エンコーディング
 -- type:set_default_url('http://twitter.com/statuses/friends.xml');
 type:set_body_header(1, 'title', 'コメント');
@@ -298,6 +298,13 @@ function mixi_recent_voice_parser(parent, body, html)
 	-- 複数行に分かれているので1行に結合
 	local line = html:get_all_text();
 
+	-- 次へ、前への抽出処理
+	-- <li><a href="recent_voice.pl?direction=next&owner_id=85892&base_post_time=20120804140705">次を表示</a></li>
+	if line_has_strings( line, "recent_voice.pl" ) then
+		back_data, next_data = parse_next_back_link(line, "recent_voice.pl", "name");
+	end
+
+
 	for li_tag in line:gmatch('<li class="archive">(.-)<p class="error"') do
 --		mz3.logger_debug(li_tag);
 		
@@ -424,6 +431,18 @@ function mixi_recent_voice_parser(parent, body, html)
 
 		end
 		
+	end
+
+	-- 前、次へリンクの追加
+	if back_data~=nil then
+		-- 先頭に挿入
+		body:insert(0, back_data.data);
+		back_data:delete();
+	end
+	if next_data~=nil then
+		-- 末尾に追加
+		body:add(next_data.data);
+		next_data:delete();
 	end
 
 	local t2 = mz3.get_tick_count();
