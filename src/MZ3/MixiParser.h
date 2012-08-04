@@ -2667,6 +2667,22 @@ public:
 				break;
 			}
 
+			// 下記があれば末尾とみなす
+			/*
+			<a name="post-check"></a>
+<p class="checkButton">
+<a check_key="53be64390c2bf14912cc8ded09c28d346a7a28b0" check_button="button-5.gif">チェック</a>
+<script data-prefix-uri="http://mixi.jp/" 
+        src="http://static.mixi.jp/js/share.js" 
+        type="text/javascript"></script>
+</p>
+			*/
+			endTag = _T("<a name=\"post-check\"></a>");
+			if( wcsncmp( line, endTag, wcslen(endTag) ) == 0 ) {
+				// 終了タグ発見
+				break;
+			}
+
 			ParserUtil::AddBodyWithExtract( data_, line );
 		}
 
