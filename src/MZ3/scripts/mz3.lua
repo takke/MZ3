@@ -379,8 +379,8 @@ require("scripts\\twitter");	-- Twitter
 if build_type == "MZ3" then
 	require("scripts\\gmail");			-- Gmail
 	require("scripts\\google_reader");	-- GoogleReader
-	require("scripts\\wassr");			-- Wassr
-	require("scripts\\goohome");		-- goohome
+--	require("scripts\\wassr");			-- Wassr
+--	require("scripts\\goohome");		-- goohome
 	require("scripts\\RSS");			-- RSS
 	require("scripts\\2ch");			-- 2ch
 	require("scripts\\auone");			-- auone
