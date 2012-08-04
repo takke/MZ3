@@ -630,7 +630,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
-
+/*
 	type = ACCESS_TWITTER_DIRECT_MESSAGES;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -651,7 +651,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "メッセージ"
-
+*/
 	type = ACCESS_TWITTER_UPDATE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
@@ -738,6 +738,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- Wassr 系
 	//------------------------------------------------------------------
+/*
 #ifdef BT_MZ3
 	type = ACCESS_WASSR_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
@@ -778,10 +779,12 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "WASSR_USER";
 #endif
+*/
 
 	//------------------------------------------------------------------
 	//--- gooホーム 系
 	//------------------------------------------------------------------
+/*
 #ifdef BT_MZ3
 	type = ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS;
 	m_map[type] = AccessTypeInfo::Data(
@@ -823,6 +826,7 @@ bool AccessTypeInfo::init()
 	m_map[type].serializeKey = "GOOHOME_USER";
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 #endif
+*/
 
 	//------------------------------------------------------------------
 	//--- RSS Reader
