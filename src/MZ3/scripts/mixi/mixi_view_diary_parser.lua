@@ -461,13 +461,17 @@ function parseDiaryComment(data, line, i, line_count, html)
 		i = i + 1;
 		while i<line_count do
 			line = html:get_at(i);
-			if line_has_strings(line, 'commentInputArea">') then
+			-- if line_has_strings(line, 'commentInputArea">') then
+			if line_has_strings(line, 'commentInputArea02') then
 				break;
 			end
 
 			if line_has_strings(line, '<li') then
-				child:clear();
-				child:add_body_with_extract('<br>');
+				ret1, ret2 = line:find('<li>');
+				if ret1 == 0 then
+					child:clear();
+					child:add_body_with_extract('<br>');
+				end
 			end
 
 			if line_has_strings(line, '</li') then
@@ -519,6 +523,7 @@ function parseDiaryComment(data, line, i, line_count, html)
 					end
 
 					line = line_comment:match('<dd>(.-)</dd>');
+
 					child:add_body_with_extract(line);
 				end
 			end
