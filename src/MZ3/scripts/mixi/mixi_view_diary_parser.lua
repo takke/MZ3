@@ -29,7 +29,6 @@ type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
 
 
---[[
 -- 最近のコメント一覧
 type = MZ3AccessTypeInfo.create();
 type:set_info_type('category');									-- カテゴリ
@@ -46,7 +45,6 @@ type:set_body_header(3, 'date', '日時>>');
 type:set_body_integrated_line_pattern(1, '%2\t(%3)');
 type:set_body_integrated_line_pattern(2, '%1');
 type:set_cruise_target(true);
-]]
 
 
 -- マイミク最新日記一覧
@@ -210,6 +208,98 @@ end
 -- パーサの登録
 -- http://mixi.jp/list_diary.pl
 mz3.set_parser("MYDIARY", "mixi.mixi_list_diary_parser");
+
+
+--------------------------------------------------
+-- 【mixi 最近のコメント一覧】
+--
+-- [list] list_comment.pl 用パーサ
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_list_diary_comment_parser(parent, body, html)
+	mz3.logger_debug("mixi_list_diary_comment_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+	
+	local t1 = mz3.get_tick_count();
+	
+	-- 行数取得
+	local line_count = html:get_count();
+	
+	-- 開始フラグの探索
+	local i_start_line = 170;
+	while (i_start_line < line_count) do
+		line = html:get_at(i_start_line);
+		
+		if line_has_strings(line, "<h3>コメント一覧</h3>") then
+			break;
+		end
+		
+		i_start_line = i_start_line + 1;
+	end
+
+	-- 一覧の範囲を取得
+	sub_html = get_sub_html(html, i_start_line, line_count, {'<ul'}, {'</ul>'});
+--	mz3.logger_debug('html:' .. sub_html);
+	
+	-- 各日記を取得
+	local element_html = '';
+	for element_html in sub_html:gmatch('<li.->(.-)</li>') do
+--		mz3.logger_debug('element_html: ' .. element_html);
+		
+		-- data 生成
+		data = MZ3Data:create();
+
+		element_html = element_html:gsub( '&nbsp;', ' ' );
+		
+		-- 時刻
+		local date = element_html:match('<dt>(.-)</dt>');
+		if date ~= nil then
+			data:parse_date_line(date);
+		end
+
+		-- 見出し、URL、名前の抽出
+		url, title, name = element_html:match('href="(.-)">(.-)</a> %((.-)%)');
+		title = mz3.decode_html_entity(title);
+		data:set_text("title", title);
+
+		-- URL 取得
+		data:set_text("url", url);
+		
+		-- ID 設定
+		id = get_param_from_url(url, "id");
+		data:set_integer('id', id);
+
+		-- 名前
+		data:set_text("name", name);
+		data:set_text("author", name);
+
+		-- URL に応じてアクセス種別を設定
+		type = mz3.estimate_access_type_by_url(url);
+		data:set_access_type(type);
+
+		-- data 追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
+	end
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_list_diary_comment_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+-- パーサの登録
+-- http://mixi.jp/list_comment.pl
+mz3.set_parser("COMMENT", "mixi.mixi_list_diary_comment_parser");
 
 
 --------------------------------------------------
