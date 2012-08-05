@@ -47,22 +47,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
 
-	type = ACCESS_LIST_MYDIARY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"日記一覧"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].cacheFilePattern = L"list_diary.html";
-	m_map[type].serializeKey = "MYDIARY";
-	m_map[type].bCruiseTarget = true;
-	m_map[type].defaultCategoryURL = L"list_diary.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日時");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2";
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";
-
+	// ★Lua化する
 	type = ACCESS_LIST_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY

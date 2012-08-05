@@ -11,12 +11,50 @@ module("mixi", package.seeall)
 ----------------------------------------
 -- アクセス種別の登録
 ----------------------------------------
+
+-- 最近の日記一覧
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('category');									-- カテゴリ
+type:set_service_type('mixi');									-- サービス種別
+type:set_serialize_key('MYDIARY');								-- シリアライズキー
+type:set_short_title('最近の日記一覧');							-- 簡易タイトル
+type:set_request_method('GET');									-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\list_diary.html');			-- キャッシュファイル
+type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_default_url('http://mixi.jp/list_diary.pl');
+type:set_body_header(1, 'title', 'タイトル');
+type:set_body_header(2, 'date', '日時');
+type:set_body_integrated_line_pattern(1, '%2');
+type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
+
+
+--[[
+-- 最近のコメント一覧
+type = MZ3AccessTypeInfo.create();
+type:set_info_type('category');									-- カテゴリ
+type:set_service_type('mixi');									-- サービス種別
+type:set_serialize_key('COMMENT');								-- シリアライズキー
+type:set_short_title('コメント一覧');							-- 簡易タイトル
+type:set_request_method('GET');									-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\list_comment.html');			-- キャッシュファイル
+type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_default_url('http://mixi.jp/list_comment.pl');
+type:set_body_header(1, 'title', 'タイトル');
+type:set_body_header(2, 'name', '名前>>');
+type:set_body_header(3, 'date', '日時>>');
+type:set_body_integrated_line_pattern(1, '%2\t(%3)');
+type:set_body_integrated_line_pattern(2, '%1');
+type:set_cruise_target(true);
+]]
+
+
 -- マイミク最新日記一覧
 type = MZ3AccessTypeInfo.create();
 type:set_info_type('category');									-- カテゴリ
 type:set_service_type('mixi');									-- サービス種別
 type:set_serialize_key('DIARY');								-- シリアライズキー
-type:set_short_title('日記一覧');								-- 簡易タイトル
+type:set_short_title('マイミク最新日記');						-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
 type:set_cache_file_pattern('mixi\\new_friend_diary.html');		-- キャッシュファイル
 type:set_request_encoding('euc-jp');							-- エンコーディング
@@ -34,9 +72,9 @@ type = MZ3AccessTypeInfo.create();
 type:set_info_type('category');									-- カテゴリ
 type:set_service_type('mixi');									-- サービス種別
 type:set_serialize_key('NEW_COMMENT');							-- シリアライズキー
-type:set_short_title('日記一覧');								-- 簡易タイトル
+type:set_short_title('新着コメント一覧');						-- 簡易タイトル
 type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\new_comment.html');		-- キャッシュファイル
+type:set_cache_file_pattern('mixi\\new_comment.html');			-- キャッシュファイル
 type:set_request_encoding('euc-jp');							-- エンコーディング
 type:set_default_url('http://mixi.jp/new_comment.pl');
 type:set_body_header(1, 'title', 'タイトル');
@@ -46,12 +84,138 @@ type:set_body_integrated_line_pattern(1, '%2\t(%3)');
 type:set_body_integrated_line_pattern(2, '%1');
 
 
+
+
 -- TODO 「mixi 日記詳細」はホスト側で設定しているが、本来はこちらで設定すべき。
 
 
 --------------------------------------------------
+-- 【mixi 最近の日記一覧】
+--
+-- [list] list_diary.pl 用パーサ
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_list_diary_parser(parent, body, html)
+	mz3.logger_debug("mixi_list_diary_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+	
+	local t1 = mz3.get_tick_count();
+	
+	local back_data = nil;
+	local next_data = nil;
+
+	-- 行数取得
+	local line_count = html:get_count();
+	
+	-- 日記開始フラグの探索
+	local i_start_line = 170;
+	while (i_start_line < line_count) do
+		line = html:get_at(i_start_line);
+		
+		if line_has_strings(line, "<h3>日記一覧</h3>") then
+			break;
+		end
+		
+		i_start_line = i_start_line + 1;
+	end
+
+	-- 次へ、前への取得
+	local i=i_start_line;
+	for i=i_start_line, line_count-1 do
+		line = html:get_at(i);
+--		mz3.logger_debug(i .. " : " .. html:get_at(i));
+
+		-- 次へ、前への抽出処理
+		if back_data==nil and next_data==nil then
+			back_data, next_data = parse_next_back_link(line, "list_diary.pl");
+		else
+			break;
+		end
+	end
+	
+	-- 日記の範囲を取得
+	sub_html = get_sub_html(html, i_start_line, line_count, {'<div'}, {'</form>'});
+	
+--	mz3.logger_debug('html:' .. sub_html);
+	
+	-- 各日記を取得
+	local diary_html = '';
+	for diary_html in sub_html:gmatch('<div class="listDiaryBlock">(.-)</ul>') do
+--		mz3.logger_debug('diary_html: ' .. diary_html);
+		
+		-- data 生成
+		data = MZ3Data:create();
+
+		-- 時刻
+		-- <dd>2012年07月20日14:03</dd>
+		local date = diary_html:match('<dd>(.-)</dd>');
+		if date ~= nil then
+			data:parse_date_line(date);
+		end
+
+		-- 見出し、URL、名前の抽出
+		diary_html = diary_html:gsub( '&nbsp;', ' ' );
+		url, title = diary_html:match('href="(.-)">(.-)</a>');
+		title = mz3.decode_html_entity(title);
+		data:set_text("title", title);
+
+		-- URL 取得
+		data:set_text("url", url);
+		
+		-- ID 設定
+		id = get_param_from_url(url, "id");
+		data:set_integer('id', id);
+
+		-- 名前
+		local name = '';
+		data:set_text("name", name);
+		data:set_text("author", name);
+
+		-- URL に応じてアクセス種別を設定
+		type = mz3.estimate_access_type_by_url(url);
+		data:set_access_type(type);
+
+		-- data 追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
+	end
+
+	-- 前、次へリンクの追加
+	if back_data~=nil then
+		-- 先頭に挿入
+		body:insert(0, back_data.data);
+		back_data:delete();
+	end
+	if next_data~=nil then
+		-- 末尾に追加
+		body:add(next_data.data);
+		next_data:delete();
+	end
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_list_diary_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+-- パーサの登録
+-- http://mixi.jp/list_diary.pl
+mz3.set_parser("MYDIARY", "mixi.mixi_list_diary_parser");
+
+
+--------------------------------------------------
 -- 【mixi マイミク最新日記一覧】
--- [list] new_friend_diary.pl 用パーサ
+--
+-- [list] new_friend_diary.pl new_comment.pl 用パーサ
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -176,6 +340,11 @@ function mixi_list_new_friend_diary_parser(parent, body, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_list_new_friend_diary_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
+-- パーサの登録
+-- http://mixi.jp/new_friend_diary.pl
+mz3.set_parser("DIARY",              "mixi.mixi_list_new_friend_diary_parser");
+-- http://mixi.jp/new_comment.pl
+mz3.set_parser("NEW_COMMENT",        "mixi.mixi_list_new_friend_diary_parser");
 
 
 --------------------------------------------------
@@ -446,6 +615,10 @@ function mixi_view_diary_parser(data, dummy, html)
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_view_diary_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
+-- パーサの登録
+mz3.set_parser("MIXI_DIARY",         "mixi.mixi_view_diary_parser");
+mz3.set_parser("MIXI_NEIGHBORDIARY", "mixi.mixi_view_diary_parser");
+mz3.set_parser("MIXI_MYDIARY",       "mixi.mixi_view_diary_parser");
 
 
 -- コメントの取得
@@ -538,15 +711,6 @@ function parseDiaryComment(data, line, i, line_count, html)
 end
 
 ----------------------------------------
--- パーサの登録
-----------------------------------------
-mz3.set_parser("DIARY",              "mixi.mixi_list_new_friend_diary_parser");
-mz3.set_parser("MIXI_DIARY",         "mixi.mixi_view_diary_parser");
-mz3.set_parser("MIXI_NEIGHBORDIARY", "mixi.mixi_view_diary_parser");
-mz3.set_parser("MIXI_MYDIARY",       "mixi.mixi_view_diary_parser");
-mz3.set_parser("NEW_COMMENT",        "mixi.mixi_list_new_friend_diary_parser");
-
-----------------------------------------
 -- estimate 対象に追加
 ----------------------------------------
 
@@ -560,6 +724,11 @@ function on_estimate_access_type_by_url_for_mixi_diary(event_name, url, data1, d
     -- マイミク最新日記一覧
 	if line_has_strings(url, 'new_friend_diary.pl') then
 		return true, mz3.get_access_type_by_key('DIARY');
+	end
+
+    -- 最近の日記一覧
+	if line_has_strings(url, 'list_diary.pl') then
+		return true, mz3.get_access_type_by_key('MYDIARY');
 	end
 
 	return false;

@@ -931,12 +931,8 @@ void CMZ3View::OnLvnItemchangedCategoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	m_selGroup->focusedCategory = idx;
 
 #ifdef BT_MZ3
-	if (m_selGroup->getFocusedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY) {
-		// 日記ボタンをアクティブにする
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
-	} else {
-		theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
-	}
+	// 日記ボタンをアクティブにする
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
 #else
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 #endif
@@ -2245,9 +2241,7 @@ LRESULT CMZ3View::OnChangeView(WPARAM wParam, LPARAM lParam)
 
 	// 書き込みボタン
 #ifdef BT_MZ3
-	// 自分の日記の場合は有効に。
-	theApp.EnableCommandBarButton( ID_WRITE_BUTTON,
-		(m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY));
+	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, TRUE);
 #else
 	theApp.EnableCommandBarButton( ID_WRITE_BUTTON, FALSE);
 #endif
@@ -2274,9 +2268,11 @@ void CMZ3View::OnWriteDiary()
 		// 「日記」カテゴリを検索し、
 		// 日記の CMixiData の URL からオーナーIDを取得する。
 		bool bFound = false;
+
+		ACCESS_TYPE diaryAccessType = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("MYDIARY");
 		for( size_t i=0; i<m_selGroup->categories.size(); i++ ) {
 			CCategoryItem& category = m_selGroup->categories[i];
-			if( category.m_mixi.GetAccessType() == ACCESS_LIST_MYDIARY ) {
+			if( category.m_mixi.GetAccessType() == diaryAccessType ) {
 				// 日記発見。
 				// 第1要素を探索する。
 				if( category.GetBodyList().size() > 0 ) {

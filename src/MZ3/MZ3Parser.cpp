@@ -116,7 +116,7 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 //	case ACCESS_MAIN:							body.clear();	return mixi::HomeParser::parse( parent, html );
 //	case ACCESS_LIST_NEW_COMMENT:				body.clear();	return mixi::NewCommentParser::parse( body, html );
 	case ACCESS_LIST_COMMENT:					body.clear();	return mixi::ListCommentParser::parse( body, html );
-	case ACCESS_LIST_MYDIARY:					body.clear();	return mixi::ListDiaryParser::parse( body, html );
+//	case ACCESS_LIST_MYDIARY:					body.clear();	return mixi::ListDiaryParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::ShowLogParser::parse( body, html );
 //	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::TrackParser::parse( body, html );
 	case ACCESS_LIST_NEWS:						body.clear();	return mixi::ListNewsCategoryParser::parse( body, html );
