@@ -97,8 +97,10 @@ function new_bbs_parser(parent, body, html)
 			line = html:get_at(i);
 
 			-- 日付のパース
-			date = line:match('<li class="date">(.+)</li>');
-			data:set_date(date);
+			local date = line:match('<li class="date">(.+)</li>');
+			if date ~= nil then
+				data:set_date(date);
+			end
 
 			-- URL に応じてアクセス種別を設定
 			type = mz3.estimate_access_type_by_url(url);
