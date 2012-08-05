@@ -47,11 +47,12 @@ inline CString getNormalizedCategoryUrl(LPCTSTR default_category_url,
 
 #ifdef BT_MZ3
 	// 旧形式iniファイルの移行処理
+/*
 	if (category_type == ACCESS_LIST_FOOTSTEP && category_url == "show_log.pl") {
 		// 旧あしあとURLはAPI用URLに置換(デフォルトURLを採用する)
 		return default_category_url;
 	}
-
+*/
 	/* 下記は「マイミク一覧」を "list_friend.pl" から API に移行したときの処理
 	if (category_type == ACCESS_LIST_FRIEND && category_url == "list_friend.pl") {
 		// 旧マイミク一覧URLはAPI用URLに置換(デフォルトURLを採用する)

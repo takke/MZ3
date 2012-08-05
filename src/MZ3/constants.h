@@ -118,7 +118,7 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_NEW_BBS,			///< コミュニティ書き込み一覧(new_bbs.pl)
 //	ACCESS_LIST_MESSAGE_IN,			///< メッセージ一覧（受信箱）
 //	ACCESS_LIST_MESSAGE_OUT,		///< メッセージ一覧（受信箱）
-	ACCESS_LIST_FOOTSTEP,			///< 足跡
+//	ACCESS_LIST_FOOTSTEP,			///< 足跡
 	ACCESS_LIST_COMMENT,			///< コメント一覧
 	ACCESS_LIST_NEWS,				///< ニュース一覧
 	ACCESS_LIST_FAVORITE_USER,		///< お気に入りユーザ
@@ -162,8 +162,8 @@ enum ACCESS_TYPE {
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
 	//--- Twitter DM 系
-	ACCESS_TWITTER_DIRECT_MESSAGES,		///< [GET/POST] direct_messages.xml
-	ACCESS_TWITTER_NEW_DM,				///< [POST] DM送信
+//	ACCESS_TWITTER_DIRECT_MESSAGES,		///< [GET/POST] direct_messages.xml
+//	ACCESS_TWITTER_NEW_DM,				///< [POST] DM送信
 
 	//--- Twitter Favorites 系
 	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] お気に入り取得

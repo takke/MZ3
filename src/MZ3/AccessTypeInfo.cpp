@@ -245,6 +245,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
 
+/*
 	type = ACCESS_LIST_FOOTSTEP;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -260,7 +261,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"Žž");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
+*/
 	type = ACCESS_LIST_BOOKMARK;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
@@ -672,6 +673,7 @@ bool AccessTypeInfo::init()
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_USER";
 
+/*
 	type = ACCESS_TWITTER_NEW_DM;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
@@ -681,7 +683,7 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_NEW_DM";
-
+*/
 	//------------------------------------------------------------------
 	//--- mixi echo ŠÖ˜A
 	//------------------------------------------------------------------

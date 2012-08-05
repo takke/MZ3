@@ -3560,7 +3560,7 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 
 	case 1:
 		//TWITTER_STYLE_POST_MODE_TWITTER_DM			 = 1,	///< DM“ü—Í’†
-		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_NEW_DM;
+//		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_NEW_DM;
 		break;
 
 #ifdef BT_MZ3

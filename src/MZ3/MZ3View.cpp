@@ -1808,9 +1808,6 @@ void CMZ3View::OnNMDblclkBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 
 #ifdef BT_MZ3
 	switch (data.GetAccessType()) {
-	case ACCESS_LIST_FOOTSTEP:
-		return;
-
 	case ACCESS_COMMUNITY:
 		// コミュニティの場合は、トピック一覧を表示する。
 		// （暫定対応）
@@ -3150,11 +3147,9 @@ void CMZ3View::OnWriteButton()
 void CMZ3View::OnNMSetfocusBodyList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// ブラウザボタン
-	// 足あとの場合は有効に。
 	if (m_selGroup!=NULL && m_selGroup->getSelectedCategory()!= NULL) {
 #ifdef BT_MZ3
 		switch (m_selGroup->getSelectedCategory()->m_mixi.GetAccessType()) {
-		case ACCESS_LIST_FOOTSTEP:
 		case ACCESS_LIST_FRIEND:
 			theApp.EnableCommandBarButton( ID_OPEN_BROWSER, TRUE );
 			break;
@@ -4111,7 +4106,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 		switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
 		case ACCESS_LIST_INTRO:				// 紹介文
 		case ACCESS_LIST_FAVORITE_USER:		// お気に入り
-		case ACCESS_LIST_FOOTSTEP:			// 足あと
 		case ACCESS_LIST_FRIEND:			// マイミク一覧
 		case ACCESS_LIST_CALENDAR:			// カレンダー
 			// 操作をメニューで選択
