@@ -1645,6 +1645,93 @@ function parse_next_back_link_for_news(line, base_url, title_set_at)
 end
 
 
+--------------------------------------------------
+-- 【ニュース記事】
+-- [content] view_news.pl 用パーサ
+--
+-- http://mixi.jp/view_news.pl
+--
+-- 引数:
+--   parent: 上ペインのオブジェクト群(MZ3Data*)
+--   dummy:  NULL
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_view_news_parser(parent, body, html)
+	mz3.logger_debug("mixi_view_news_parser start");
+
+	-- wrapperクラス化
+	parent = MZ3Data:create(parent);
+	html = MZ3HTMLArray:create(html);
+	
+	parent:clear();
+	
+	parent:set_text('name', '');
+
+	local t1 = mz3.get_tick_count();
+	local line_count = html:get_count();
+
+	-- title タグからタイトル抽出
+	local title = '';
+	for i=0, 10 do
+		line = html:get_at(i);
+		
+		if line_has_strings(line, '<title>') then
+			title = line:match('<title>%[mixi%] *(.-) *</title>');
+			title = mz3.decode_html_entity(title);
+			parent:set_text('title', title);
+			break;
+		end
+	end
+	
+	-- 空行
+	parent:add_body_with_extract("<br>");
+	
+	-- 本文
+	local i=200;
+	local sub_html = '';
+	sub_html = get_sub_html(html, i, line_count, {'<div class="article">'}, {'<div class="bottomContents clearfix">'});
+--	mz3.logger_debug(sub_html);
+	-- 不要タグの削除
+--[[
+<a name="post-check"></a>
+<p class="checkButton">
+<a check_key="xx" check_button="button-5.gif">チェック</a>
+<script data-prefix-uri="http://mixi.jp/" 
+        src="http://static.mixi.jp/js/share.js" 
+        type="text/javascript"></script>
+</p>
+]]
+	sub_html = sub_html:gsub('<a name="post%-check">.-</p>', '');
+	
+	-- <ul>, <li> タグの整形
+	sub_html = sub_html:gsub('<ul>', '<br>');
+	sub_html = sub_html:gsub('<li>(.-)</li>', '%1<br>');
+	sub_html = sub_html:gsub('</ul>', '');
+	
+	-- <dl>, <dd> タグの整形
+	sub_html = sub_html:gsub('<dl>', '<br>');
+	sub_html = sub_html:gsub('<dd>(.-)</dd>', '%1<br>');
+	sub_html = sub_html:gsub('</dl>', '');
+	
+	-- その他の謎のタグ除去
+	sub_html = sub_html:gsub('<p .->', '');
+	sub_html = sub_html:gsub('<script.->', '');
+	sub_html = sub_html:gsub('</script>', '');
+	
+	parent:add_body_with_extract(sub_html);
+
+	-- 関連日記
+	-- http://news.mixi.jp/view_news.pl?id=2109259&media_id=20&from=home&position=1
+	local url = parent:get_text('url');
+	local newsId = url:match('id=([0-9]+)');
+	parent:add_link_list('http://news.mixi.jp/list_quote_diary.pl?id=' .. newsId, '関連日記');
+	
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_view_news_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("MIXI_NEWS", "mixi.mixi_view_news_parser");
+
+
 ----------------------------------------
 -- パーサのロード＆登録
 ----------------------------------------
