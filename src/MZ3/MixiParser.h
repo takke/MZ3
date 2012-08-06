@@ -62,6 +62,44 @@ public:
 };
 
 
+/**
+ * [content] home.pl ログイン後のメイン画面用パーサ
+ * 【メイントップ画面】
+ * http://mixi.jp/home.pl
+ */
+class HomeParser
+{
+public:
+	/**
+	 * ログイン判定
+	 *
+	 * ログイン成功したかどうかを判定
+	 *
+	 * @return ログイン成功時は次のURL、失敗時は空の文字列を返す
+	 */
+	static bool IsLoginSucceeded( const CHtmlArray& html )
+	{
+		INT_PTR count = html.GetCount();
+
+		for (int i=0; i<count; i++) {
+			const CString& line = html.GetAt(i);
+
+			if (util::LineHasStringsNoCase( line, L"refresh", L"check.pl" )) {
+				// <html><head><meta http-equiv="refresh" content="0;url=/check.pl?n=%2Fhome.pl"></head></html>
+				return true;
+			}
+			// <title>[mixi]</title>
+			if (util::LineHasStringsNoCase(line, L"<title>[mixi]</title>")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+};
+
+
+
 }//namespace mixi
 
 #endif	// BT_MZ3

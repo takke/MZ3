@@ -30,7 +30,7 @@
 #include "util_mz3.h"
 #include "util_gui.h"
 #include "url_encoder.h"
-#include "MixiContentParser.h"
+#include "MixiParser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
