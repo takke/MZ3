@@ -8,7 +8,8 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MZ3Parser.h"
-#include "MixiParser.h"
+#include "MixiListParser.h"
+#include "MixiContentParser.h"
 #include "TwitterParser.h"
 
 static void my_lua_printstack( lua_State *L )

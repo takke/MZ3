@@ -17,7 +17,7 @@
 #include "util.h"
 #include "util_gui.h"
 #include "QuoteDlg.h"
-#include "MixiParser.h"
+#include "MixiContentParser.h"
 #include "ViewFilter.h"
 #include "CommonSelectDlg.h"
 #include "Ran2View.h"
