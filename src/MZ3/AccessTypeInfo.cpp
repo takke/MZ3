@@ -47,28 +47,6 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
 
-	type = ACCESS_LIST_NEWS;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"ニュース一覧"
-		, REQUEST_METHOD_GET
-		);
-	// カテゴリ、ページ番号毎に分割
-	// url : http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
-	// url : http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1
-	// url : http://news.mixi.jp/list_news_category.pl?page=2&id=pickup&type=bn
-	// url : http://news.mixi.jp/list_news_category.pl?page=2&sort=1&id=1&type=bn
-	m_map[type].cacheFilePattern = L"list_news_category_{urlparam:id}_{urlparam:page}.html";
-	m_map[type].serializeKey = "NEWS";
-	m_map[type].bCruiseTarget = true;
-	m_map[type].defaultCategoryURL = L"";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"見出し");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"配信時刻>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"配給元>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1";
-	m_map[type].bodyIntegratedLinePattern2 = L"%2 (%3)";
-
 	type = ACCESS_LIST_FAVORITE_USER;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY

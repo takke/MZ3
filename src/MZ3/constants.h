@@ -120,7 +120,7 @@ enum ACCESS_TYPE {
 //	ACCESS_LIST_MESSAGE_OUT,		///< メッセージ一覧（受信箱）
 //	ACCESS_LIST_FOOTSTEP,			///< 足跡
 //	ACCESS_LIST_COMMENT,			///< コメント一覧
-	ACCESS_LIST_NEWS,				///< ニュース一覧
+//	ACCESS_LIST_NEWS,				///< ニュース一覧
 	ACCESS_LIST_FAVORITE_USER,		///< お気に入りユーザ
 	ACCESS_LIST_FAVORITE_COMMUNITY,	///< お気に入りコミュ
 	ACCESS_LIST_FRIEND,				///< マイミク一覧

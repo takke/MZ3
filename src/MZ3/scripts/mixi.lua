@@ -38,16 +38,35 @@ type:set_request_encoding('euc-jp');						-- エンコーディング
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('category');								-- カテゴリ
 type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('MIXI_RECENT_VOICE_DETAIL');				-- シリアライズキー
-type:set_short_title('コメント一覧');						-- 簡易タイトル
+type:set_serialize_key('MIXI_RECENT_VOICE_DETAIL');			-- シリアライズキー
+type:set_short_title('ボイス');								-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('mixi\\comment.html');			-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_request_encoding('euc-jp');						-- エンコーディング
 -- type:set_default_url('http://twitter.com/statuses/friends.xml');
 type:set_body_header(1, 'title', 'コメント');
 type:set_body_header(2, 'name', '名前');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
+
+-- ニュース一覧
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('NEWS');								-- シリアライズキー
+type:set_short_title('コメント一覧');						-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+type:set_cache_file_pattern('mixi\\list_news_category_{urlparam:id}_{urlparam:page}.html');			-- キャッシュファイル
+type:set_request_encoding('euc-jp');						-- エンコーディング
+-- url : http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
+-- url : http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1
+-- url : http://news.mixi.jp/list_news_category.pl?page=2&id=pickup&type=bn
+-- url : http://news.mixi.jp/list_news_category.pl?page=2&sort=1&id=1&type=bn
+type:set_body_header(1, 'title', '見出し');
+type:set_body_header(2, 'date', '配信時刻>>');
+type:set_body_header(3, 'name', '配給元>>');
+type:set_body_integrated_line_pattern(1, '%1');
+type:set_body_integrated_line_pattern(2, '%2 (%3)');
 
 
 --------------------------------------------------
@@ -993,6 +1012,11 @@ function on_estimate_access_type(event_name, url, data1, data2)
 		return true, mz3.get_access_type_by_key('MIXI_NEWS_QUOTE_DIARY');
 	end
 
+    -- ニュース一覧
+	if line_has_strings(url, 'http://news.mixi.jp/list_news_category.pl') then
+		return true, mz3.get_access_type_by_key('NEWS');
+	end
+
 	-- マイミク一覧
 	if line_has_strings(url, 'list_friend_simple.pl') then
 		return true, mz3.get_access_type_by_key('FRIEND');
@@ -1446,6 +1470,179 @@ function mixi_mymixi_parser(parent, body, html)
 	mz3.logger_debug("mixi_mymixi_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("FRIEND", "mixi.mixi_mymixi_parser");
+
+
+--------------------------------------------------
+-- 【ニュースのカテゴリ】
+-- [list] list_news_category.pl 用パーサ
+--
+-- http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_news_list_parser(parent, body, html)
+	mz3.logger_debug("mixi_news_list_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+
+	local t1 = mz3.get_tick_count();
+	
+	local back_data = nil;
+	local next_data = nil;
+
+	-- 行数取得
+	local line_count = html:get_count();
+	
+	-- 開始フラグの探索
+	local i_start_line = 100;
+	while (i_start_line < line_count) do
+		line = html:get_at(i_start_line);
+		
+		if line_has_strings(line, '<div class="newsList">') then
+			break;
+		end
+		
+		i_start_line = i_start_line + 1;
+	end
+
+	-- 次へ、前への取得
+	local i=i_start_line;
+	for i=i_start_line, line_count-1 do
+		line = html:get_at(i);
+--		mz3.logger_debug(i .. " : " .. html:get_at(i));
+
+		-- 次へ、前への抽出処理
+		if back_data==nil and next_data==nil then
+			back_data, next_data = parse_next_back_link_for_news(line, "list_news_category.pl");
+		else
+			break;
+		end
+	end
+	
+	-- 範囲を一括取得
+	sub_html = get_sub_html(html, i_start_line, line_count, {'<table'}, {'</table>'});
+	
+--	mz3.logger_debug('html:' .. sub_html);
+	
+	-- 各記事を取得
+	local element_html = '';
+	for element_html in sub_html:gmatch('<tr.->(.-)</tr>') do
+--		mz3.logger_debug('element_html: ' .. element_html);
+		
+		-- data 生成
+		data = MZ3Data:create();
+
+		element_html = element_html:gsub('&nbsp;', ' ');
+
+		-- 時刻
+		-- <dd>2012年07月20日14:03</dd>
+		local date = element_html:match('<td class="date">(.-)</td>');
+		if date ~= nil then
+			data:parse_date_line(date);
+		end
+
+--[[
+<tr class="odd">
+<td class="newsTitle"><p>・ <a href="view_news.pl?id=2109273&media_id=20">火星の生命探し 探査車着陸へ</a></p></td>
+<td class="media"><a href="list_news_media.pl?id=20">xx新聞</a></td>
+<td class="date">08月06日 12:21</td>
+</tr>
+]]
+		-- 見出し、URL、名前の抽出
+		url, title = element_html:match('<td class="newsTitle">.-href="(.-)">(.-)</a>');
+		title = mz3.decode_html_entity(title);
+		data:set_text("title", title);
+
+		-- URL 取得
+		url = 'http://news.mixi.jp/' .. url;
+		data:set_text("url", url);
+		
+		-- ID 設定
+		id = get_param_from_url(url, "id");
+		data:set_integer('id', id);
+
+		-- 名前
+		name = element_html:match('<td class="media">.-href=".-">(.-)</a>');
+		data:set_text("name", name);
+		data:set_text("author", name);
+
+		-- URL に応じてアクセス種別を設定
+		type = mz3.estimate_access_type_by_url(url);
+		data:set_access_type(type);
+
+		-- data 追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
+	end
+
+	-- 前、次へリンクの追加
+	if back_data~=nil then
+		-- 先頭に挿入
+		body:insert(0, back_data.data);
+		back_data:delete();
+	end
+	if next_data~=nil then
+		-- 末尾に追加
+		body:add(next_data.data);
+		next_data:delete();
+	end
+
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_news_list_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("NEWS", "mixi.mixi_news_list_parser");
+
+function parse_next_back_link_for_news(line, base_url, title_set_at)
+
+	local back_data = nil;
+	local next_data = nil;
+	if title_set_at == nil then
+		title_set_at = "title";
+	end
+	
+	-- <ul><li><a href="new_bbs.pl?page=1">前を表示</a></li>
+	-- <li>51件～100件を表示</li>
+	-- <li><a href="new_bbs.pl?page=3">次を表示</a></li></ul>
+	if line_has_strings(line, base_url) then
+		
+		-- 前
+		local url, t = line:match([[href="([^"]+)">(前[^<]+)<]]);
+		if url~=nil then
+			-- URL補完
+			url = 'http://news.mixi.jp/' .. url;
+			back_data = MZ3Data:create();
+			back_data:set_text(title_set_at, "<< " .. t .. " >>");
+			back_data:set_text("url", url);
+			type = mz3.estimate_access_type_by_url(url);
+			back_data:set_access_type(type);
+		end
+		
+		-- 次
+		local url, t = line:match([[href="([^"]+)">(次[^<]+)<]]);
+		if url~=nil then
+			-- URL補完
+			url = 'http://news.mixi.jp/' .. url;
+			next_data = MZ3Data:create();
+			next_data:set_text(title_set_at, "<< " .. t .. " >>");
+			next_data:set_text("url", url);
+			type = mz3.estimate_access_type_by_url(url);
+			next_data:set_access_type(type);
+		end
+	end
+	
+	return back_data, next_data;
+end
 
 
 ----------------------------------------
