@@ -3535,6 +3535,33 @@ int lua_mz3_group_item_delete(lua_State *L)
 //-----------------------------------------------
 
 /*
+--- URLを取得しレポート画面を開く
+--
+-- @param  data MZ3Data オブジェクト
+-- @return なし
+--
+function mz3_main_view.open_url(data)
+*/
+int lua_mz3_main_view_open_url(lua_State *L)
+{
+	const char* func_name = "mz3_main_view.open_url";
+
+	// 引数取得
+	MZ3Data* data = (MZ3Data*)lua_touserdata(L, 1);	// 第1引数
+	if (data==NULL) {
+		lua_pushstring(L, make_invalid_arg_error_string(func_name));
+		lua_error(L);
+		return 0;
+	}
+
+	// 開く
+	theApp.m_pMainView->AccessProc(data, util::CreateMixiUrl(data->GetURL()));
+
+	// 戻り値の数を返す
+	return 0;
+}
+
+/*
 --- Twitter 風書き込み用モードの変更(書き込み先URL/API識別用) : いわゆるアクセス種別と同じ値
 --
 -- @param mode モード値
@@ -4418,6 +4445,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 	{"retrieve_category_item",	lua_mz3_main_view_retrieve_category_item},
 	{"redraw_body_images",		lua_mz3_main_view_redraw_body_images},
 	{"get_body_list_count_per_page",	lua_mz3_main_view_get_body_list_count_per_page},
+	{"open_url",                lua_mz3_main_view_open_url},
 	{NULL, NULL}
 };
 static const luaL_Reg lua_mz3_report_view_lib[] = {

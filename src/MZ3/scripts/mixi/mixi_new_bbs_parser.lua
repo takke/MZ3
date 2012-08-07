@@ -111,7 +111,7 @@ function new_bbs_parser(parent, body, html)
 			-- 見出し
 			title, after = line:match(">([^<]+)(<.*)$");
 			title = mz3.decode_html_entity(title);
-			mz3.logger_debug(after);
+--			mz3.logger_debug(after);
 
 			-- アンケート、イベントの場合はタイトルの前にマークを付ける
 			if line_has_strings(line, "iconEvent") then

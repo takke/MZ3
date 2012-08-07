@@ -98,7 +98,7 @@ enum ACCESS_TYPE {
 	ACCESS_COMMUNITY,			///< コミュニティページ(view_community.pl)
 	ACCESS_MOVIE,				///< 動画
 	ACCESS_SCHEDULE,			///< 追加した予定  //MOriyama追加
-	ACCESS_MIXI_VOICE_USER,		///< ボイスのオブジェクト
+//	ACCESS_MIXI_VOICE_USER,		///< ボイスのオブジェクト
 #endif
 	ACCESS_IMAGE,				///< 画像
 

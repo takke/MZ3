@@ -309,10 +309,10 @@ public:
 	bool MyLoadCategoryLogfile(CCategoryItem& category);
 	void OnMySelchangedCategoryList(void);
 
+	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
+
 private:
 	void InsertInitialData();
-
-	void AccessProc(CMixiData* data, LPCTSTR url_, CInetAccess::ENCODING encoding=CInetAccess::ENCODING_EUC);
 
 	void SetBodyList( CMixiDataList& body );
 	void SetBodyImageList( CMixiDataList& body );

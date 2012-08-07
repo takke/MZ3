@@ -548,7 +548,7 @@ CString MakeImageLogfilePath( CMixiData& data )
 	case ACCESS_COMMUNITY:
 //	case ACCESS_WASSR_USER:
 //	case ACCESS_GOOHOME_USER:
-	case ACCESS_MIXI_VOICE_USER:
+//	case ACCESS_MIXI_VOICE_USER:
 #endif
 	case ACCESS_TWITTER_USER:
 		// これらのアクセス種別では強制的に表示

@@ -587,16 +587,6 @@ bool AccessTypeInfo::init()
 		, REQUEST_METHOD_POST
 		);
 	m_map[type].serializeKey = "MIXI_ADD_VOICE_REPLY";
-
-	// echo ”­Œ¾
-	type = ACCESS_MIXI_VOICE_USER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "mixi"
-		, L"mixiƒ{ƒCƒX”­Œ¾"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "MIXI_RECENT_VOICE_ITEM";
 #endif
 
 	//------------------------------------------------------------------

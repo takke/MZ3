@@ -36,12 +36,13 @@ type:set_request_encoding('euc-jp');						-- エンコーディング
 
 -- ボイス詳細
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- カテゴリ
+type:set_info_type('body');									-- カテゴリ
 type:set_service_type('mixi');								-- サービス種別
 type:set_serialize_key('MIXI_RECENT_VOICE_DETAIL');			-- シリアライズキー
 type:set_short_title('ボイス');								-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\comment.html');			-- キャッシュファイル
+-- view_voice.pl?post_time=xx&owner_id=xx
+type:set_cache_file_pattern('mixi\\mixi_voice_detail_{urlparam:post_time}_{urlparam:owner_id}.html');	-- キャッシュファイル
 type:set_request_encoding('euc-jp');						-- エンコーディング
 type:set_body_header(1, 'title', 'コメント');
 type:set_body_header(2, 'name', '名前');
@@ -293,7 +294,7 @@ mz3.set_parser("MIXI_EVENT_MEMBER", "mixi.mixi_list_event_member_parser");
 
 
 --------------------------------------------------
--- 【みんなのエコー一覧】
+-- 【みんなのボイス一覧】
 -- [list] recent_voice.pl 用パーサ
 --
 -- http://mixi.jp/recent_voice.pl
@@ -314,6 +315,9 @@ function mixi_recent_voice_parser(parent, body, html)
 	body:clear();
 
 	local t1 = mz3.get_tick_count();
+
+	local back_data = nil;
+	local next_data = nil;
 
 	local line_count = html:get_count();
 	
@@ -354,16 +358,11 @@ function mixi_recent_voice_parser(parent, body, html)
 			-- 画像取得
 			local image_url = span:match('<img src="(.-)"');
 			if image_url ~= nil then
+--				mz3.logger_debug(image_url);
 				data:add_text_array("image", image_url);
-			--	mz3.alert(image_url);
 			end
-			
-			-- URL 取得
-			local url = span:match('<a href="(.-)"');
-			if url ~= nil then
-				url = complement_mixi_url(url);
-				data:set_text("url", url);
-			end
+			-- 画像を表示フラグの設定
+			data:set_integer('show_image', 1);
 
 			-- ユーザ名
 			local nickname = li_tag:match('name="nickname" value="(.-)"');
@@ -376,21 +375,20 @@ function mixi_recent_voice_parser(parent, body, html)
 			if voiced ~= nil then
 				local comment = voiced:match('<p>(.-)</p');
 				comment = comment:gsub("\n", '');
-				comment = comment:gsub('<a.->', '');
-				comment = comment:gsub('</a>', ' ');
+				comment = comment:gsub('<a.->.-</a>', '');
 				data:add_body_with_extract(comment .. "\r\n");
 			end
 
 			-- id
-			-- <input type="hidden" name="member_id" value="85892" class="memberId" />
-			local author_id = li_tag:match('name="member_id".-value="(.-)"');
+			-- <span class="thumb"><a href="show_friend.pl?id=xx">
+			local author_id = li_tag:match('href="show_friend.pl%?id=([0-9]+)">');
 			if author_id ~= nil then
 				data:set_integer("author_id", author_id);
 				data:set_integer("id", author_id);
 			end
 
 			-- 時間
-			local date = voiced:match('<span>.-<a.->(.-)</a>');
+			local alt_url, date = voiced:match('<span>.-<a href="(.-)".->(.-)</a>');
 			if date ~= nil then
 				date = date:gsub("\n", '');
 				data:set_date(date);
@@ -406,29 +404,53 @@ function mixi_recent_voice_parser(parent, body, html)
 				end
 			end
 
+			-- ブラウザで開く
+			if alt_url ~= nil then
+				alt_url = complement_mixi_url(alt_url);
+				data:add_link_list(alt_url, 'ブラウザで開く');
+				
+--				mz3.logger_debug('★URL:' .. alt_url);
+				data:set_text("url", alt_url);
+			end
+
 			-- コメント
-			for more_comment in li_tag:gmatch('<p class="moreLink01 hrule">(.-)</p') do
+			local more_comment = li_tag:match('<p class="moreLink01.->(.-)</p');
+			local comment_count = nil;
+			if more_comment ~= nil then
 				local url = more_comment:match('href="(.-)"');
 				url = complement_mixi_url(url);
-				local count = more_comment:match("commentCount\">(.-)</span");
-				if count ~= nil then
+				comment_count = more_comment:match("commentCount\">(.-)</span");
+				if comment_count ~= nil then
 					data:set_text("extra_url", url);
-					data:set_text("extra_count", count);
+					data:set_text("extra_count", comment_count);
 				end
 			end
 
+			-- コメント本文取得(最大2件)
+			local extra_comment_all = '';
+			local comment_count_on_extra = 0;
 			for dd_commentRow in li_tag:gmatch('<dd class="commentRow hrule">(.-)</dd') do
 				local commentName = dd_commentRow:match('class="commentNickname">(.-)<');
-				local extra_comment = dd_commentRow:match('<p class="commentBody">(.-)<');
-				extra_comment = "\r\n" .. "　　コメント by " .. commentName ..  "： " .. extra_comment .. "";
+				local comment1 = dd_commentRow:match('<p class="commentBody">(.-)<');
+				comment1 = "\r\n" .. "　　コメント by " .. commentName ..  "： " .. comment1 .. "";
 
-				-- data:add_body_with_extract(extra_comment);
-				local before_comment = data:get_text('extra_comment');
-				if before_comment ~= nil then
-					extra_comment = before_comment .. extra_comment;
+				extra_comment_all = extra_comment_all .. comment1;
+				comment_count_on_extra = comment_count_on_extra + 1;
+			end
+			if extra_comment_all ~= '' then
+				data:set_text('extra_comment', extra_comment_all);
+			end
+
+			-- コメント数表示がなく、コメント本文が1件以上あれば
+			if comment_count == nil and comment_count_on_extra ~= nil then
+				comment_count = comment_count_on_extra;
+			end
+
+			-- コメント数を date に詰め込む
+			if comment_count ~= nil and date ~= nil then
+				if comment_count ~= 0 then
+					data:set_date(date .. ' コメント(' .. comment_count .. ')');
 				end
-
-				data:set_text('extra_comment', extra_comment);
 			end
 
 --[[
@@ -455,7 +477,7 @@ function mixi_recent_voice_parser(parent, body, html)
 			end
 
 			-- URL に応じてアクセス種別を設定
-			local type = mz3.get_access_type_by_key('MIXI_RECENT_VOICE_ITEM');
+			local type = mz3.get_access_type_by_key('MIXI_RECENT_VOICE_DETAIL');
 			data:set_access_type(type);
 			
 			-- data 追加
@@ -492,111 +514,79 @@ mz3.set_parser("MIXI_LIST_VOICE" , "mixi.mixi_recent_voice_parser");
 --------------------------------------------------
 -- 【発言詳細】
 -- 
--- 
+-- http://mixi.jp/view_voice.pl?post_time=xx&owner_id=xx
 -- 
 -- 引数:
---   parent: 上ペインの選択オブジェクト(MZ3Data*)
---   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   parent: 上ペインのオブジェクト群(MZ3Data*)
+--   dummy:  NULL
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
-function mixi_recent_voice_detail_parser(parent, body, html)
+function mixi_recent_voice_detail_parser(data, dummy, html)
 	mz3.logger_debug("mixi_recent_voice_detail_parser start");
+	local t1 = mz3.get_tick_count();
 
 	-- wrapperクラス化
-	body = MZ3DataList:create(body);
+	data = MZ3Data:create(data);
 	html = MZ3HTMLArray:create(html);
 
 	-- 全消去
-	body:clear();
+	data:clear();
 
-	local t1 = mz3.get_tick_count();
+	-- とりあえず改行出力
+	data:add_body_with_extract("<br>");
 
 	local line_count = html:get_count();
-
---[[
-	-- post_key 探索
-	mixi.post_key = '';
-	for i=200, line_count-1 do
-		line = html:get_at(i);
+	
+	-- 範囲を一括取得
+	local sub_html = get_sub_html(html, 100, line_count, {'<div id="bodyMainArea">'}, {'<p class="utilityLinks03">'});
+	
+	-- 本文等抽出
+	local voiceBody = sub_html:match('<div class="voiceBody">(.-)</div>');
+	if voiceBody ~= nil then
+		-- 本文
+		local v = voiceBody:match('<p class="voice">(.-)</p');
+		data:add_body_with_extract(v .. "\r\n");
 		
-		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
-		if line_has_strings(line, 'hidden', 'name="post_key"') then
-			mixi.post_key = line:match('value="(.-)"');
-			mz3.logger_debug("post_key: " .. mixi.post_key);
-			break;
-		end
+		local name = voiceBody:match('<p class="name"><a.->(.-)</a');
+		data:set_text('title', name);
+		
+--		local date = voiceBody:match('<ul class="source">.-<li>(.-)</li');
+--		data:set_date(date);
 	end
-]]
-	for i=300, line_count-1 do
-
-		if line_has_strings(line, "</div") then
-			break;
-		end
-
-		line = html:get_at(i);
---		if line_has_strings(line, "<dd", "class", "commentRow hrule") then
-		if line_has_strings(line, "<dd", "class", "commentRow") or
-		   line_has_strings(line, "<li", "class", "commentRow") then
-			-- data 生成
-			data = MZ3Data:create();
-
-			i = i+1;
-			line = html:get_at(i);
---[[
-			-- URL 取得
-			url = line:match("href=\"([^\"]+)\"");
-			if url ~= nil then
-				url = complement_mixi_url(url);
-				data:set_text("url", url);
-			end
-]]
-			-- 画像
-			image = line:match('src="(.-)"');
-			-- image = line:match("src=\"([^\"]+)\"");
-			if image ~= nil then
-				data:add_text_array("image", image);
-			end
-
-			i = i+2;
-			line = html:get_at(i);
-
-			-- 名前
-			name = line:match(">([^<]+)(<.*)$");
-			if name ~= nil then
-				data:set_text("name", name);
-			end
-
-			i = i+1;
-			line = html:get_at(i);
-
-			-- 日付
-			date = line:match(">([^<]+)(<.*)$");
-			if date ~= nil then
-				date = date:gsub("\n", '');
-				data:set_date(date);
-			end
-
-			i = i+3;
-			line = html:get_at(i);
-
-			-- コメント
-			comment = line:match(">([^<]+)(<.*)$");
-			if comment ~= nil then
-				data:set_text("title", comment);
-			end
-
-			-- URL に応じてアクセス種別を設定
-			local type = mz3.get_access_type_by_key('MIXI_RECENT_VOICE_DETAIL');
-			data:set_access_type(type);
+	
+	-- コメント一覧
+	local comment_list_area_html = sub_html:match('<div class="commentListArea">(.*)');
+	if comment_list_area_html ~= nil then
+		local comment_html = '';
+		local comment_index = 1;
+		for comment_html in comment_list_area_html:gmatch('<li class="commentRow">(.-)</dl>') do 
 			
-			-- data 追加
-			body:add(data.data);
-
-			-- data 削除
-			data:delete();
-
+--[[
+<dt><a href="show_friend.pl?id=590362" class="commentNickname">ドトール＠PSO2船6</a>
+<span class="date">2時間前</span>
+<span class="operation"></span>
+</dt>
+<dd>こめんと3</dd>
+]]
+			local url, name = comment_html:match('<dt><a href="(.-)".->(.-)</a>');
+			local date = comment_html:match('<span class="date">(.-)</span>')
+			local comment = comment_html:match('<dd>(.-)</dd>')
+			
+			child = MZ3Data:create();
+			child:set_text('author', mz3.decode_html_entity(name));
+			child:add_body_with_extract('<br>');
+			child:add_body_with_extract(mz3.decode_html_entity(comment));
+			-- コメント番号
+			child:set_integer('comment_index', comment_index);
+			comment_index = comment_index + 1;
+			child:set_date(mz3.decode_html_entity(date));
+			
+			child:add_link_list(complement_mixi_url(url), name .. ' さん');
+			
+			data:add_child(child);
+			
+			child:delete();
 		end
-
 	end
 
 	local t2 = mz3.get_tick_count();
@@ -753,8 +743,7 @@ end
 
 --- ボディリストのダブルクリック(またはEnter)のイベントハンドラ
 function on_body_list_click(serialize_key, event_name, data)
-	if serialize_key=="MIXI_RECENT_VOICE_ITEM" or
-	   serialize_key=="MIXI_RECENT_VOICE_DETAIL" then
+	if serialize_key=="MIXI_RECENT_VOICE_DETAIL" then
 		-- 全文表示
 		return on_mixi_echo_read_menu_item(serialize_key, event_name, data);
 	end
@@ -769,6 +758,7 @@ mz3.add_event_listener("enter_body_list",  "mixi.on_body_list_click");
 --- 全文表示メニューまたはダブルクリックイベント
 function on_mixi_echo_read_menu_item(serialize_key, event_name, data)
 	mz3.logger_debug('on_mixi_echo_read_menu_item : (' .. serialize_key .. ', ' .. event_name .. ')');
+	
 	data = MZ3Data:create(data);
 --	mz3.logger_debug(data:get_text('name'));
 	
@@ -851,7 +841,7 @@ end
 -- @param wnd           wnd
 --
 function on_popup_body_menu(event_name, serialize_key, body, wnd)
-	if serialize_key~="MIXI_RECENT_VOICE_ITEM" then
+	if serialize_key~="MIXI_RECENT_VOICE_DETAIL" then
 		return false;
 	end
 	
@@ -881,9 +871,8 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	end
 
 	-- コメント
-	extra_count   = body:get_text('extra_count')
---	extra_comment = body:get_text('extra_comment');
-	extra_url = body:get_text('extra_url');
+	local extra_count = body:get_text('extra_count')
+	local extra_url   = body:get_text('extra_url');
 	if extra_url ~= "" then
 		menu:append_menu("separator");
 		menu:append_menu("string", "link : もっとコメントを読む " .. extra_count .. "件", menu_items.mixi_open_browser);
@@ -910,32 +899,16 @@ end
 mz3.add_event_listener("popup_body_menu", "mixi.on_popup_body_menu");
 
 
---- ブラウザで開く
+--- もっとコメントを読む
 function on_mixi_open_browser(serialize_key, event_name, data)
+
+	-- 通常の開く(body 項目なのでレポート画面が開く)
+	mz3_main_view.open_url(data);
 
 --[[
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	mz3.open_url_by_browser_with_confirm(body:get_text('extra_url'));
 ]]
-
-	body = mz3_main_view.get_selected_body_item();
-	body = MZ3Data:create(body);
-	name = body:get_text('name');
-	
-	-- カテゴリ追加
-	title = name .. "の発言に対するコメント";
-	url = body:get_text('extra_url');
---	key = "MIXI_RECENT_ECHO";
-	key = "MIXI_RECENT_VOICE_DETAIL";
-	mz3_main_view.append_category(title, url, key);
-
-	-- 追加したカテゴリの取得開始
-	access_type = mz3.get_access_type_by_key(key);
-	referer = '';
-	user_agent = nil;
-	post = nil;
-	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post);
-
 
 end
 
