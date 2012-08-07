@@ -125,7 +125,7 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_FAVORITE_COMMUNITY,	///< お気に入りコミュ
 	ACCESS_LIST_FRIEND,				///< マイミク一覧
 	ACCESS_LIST_COMMUNITY,			///< コミュニティ一覧
-	ACCESS_LIST_INTRO,				///< 紹介文(show_intro.pl)
+//	ACCESS_LIST_INTRO,				///< 紹介文(show_intro.pl)
 	ACCESS_LIST_BBS,				///< トピック一覧(list_bbs.pl)
 	ACCESS_LIST_NEW_BBS_COMMENT,	///< コミュニティコメント記入履歴
 	ACCESS_LIST_CALENDAR,			///< カレンダー  //icchu追加
@@ -171,23 +171,25 @@ enum ACCESS_TYPE {
 	//----------------------------------------------
 	// Wassr
 	//----------------------------------------------
+/*
 #ifdef BT_MZ3
 	//--- Wassr Timeline 系
 	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] Wassr, friends_timeline.xml
 	ACCESS_WASSR_UPDATE,				///< [POST] Wassr, ステータス更新
 	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
 #endif
-
+*/
 	//----------------------------------------------
 	// gooホーム
 	//----------------------------------------------
+/*
 #ifdef BT_MZ3
 	//--- gooホーム ひとこと関連
 	ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS,	///< [GET] quotes/friends/json
 	ACCESS_GOOHOME_USER,					///< gooHome, 各発言要素
 	ACCESS_GOOHOME_QUOTE_UPDATE,			///< [POST] ひとこと発言
 #endif
-
+*/
 	//----------------------------------------------
 	// RSS
 	//----------------------------------------------

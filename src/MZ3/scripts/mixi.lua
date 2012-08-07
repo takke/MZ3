@@ -43,7 +43,6 @@ type:set_short_title('ボイス');								-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
 type:set_cache_file_pattern('mixi\\comment.html');			-- キャッシュファイル
 type:set_request_encoding('euc-jp');						-- エンコーディング
--- type:set_default_url('http://twitter.com/statuses/friends.xml');
 type:set_body_header(1, 'title', 'コメント');
 type:set_body_header(2, 'name', '名前');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -67,6 +66,23 @@ type:set_body_header(2, 'date', '配信時刻>>');
 type:set_body_header(3, 'name', '配給元>>');
 type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2 (%3)');
+
+-- 紹介文一覧
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');								-- カテゴリ
+type:set_service_type('mixi');								-- サービス種別
+type:set_serialize_key('INTRO');							-- シリアライズキー
+type:set_short_title('紹介文');								-- 簡易タイトル
+type:set_request_method('GET');								-- リクエストメソッド
+-- url(1) : http://mixi.jp/show_intro.pl
+-- url(2) : http://mixi.jp/show_intro.pl?page=2
+type:set_cache_file_pattern('mixi\\show_intro{urlparam:page}.html');	-- キャッシュファイル
+type:set_request_encoding('euc-jp');						-- エンコーディング
+ type:set_default_url('http://mixi.jp/show_intro.pl');
+type:set_body_header(1, 'name', '名前');
+type:set_body_header(2, 'body', '紹介文');
+type:set_body_integrated_line_pattern(1, '%1');
+type:set_body_integrated_line_pattern(2, '%2');
 
 
 --------------------------------------------------

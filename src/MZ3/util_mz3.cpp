@@ -546,8 +546,8 @@ CString MakeImageLogfilePath( CMixiData& data )
 #ifdef BT_MZ3
 	case ACCESS_PROFILE:
 	case ACCESS_COMMUNITY:
-	case ACCESS_WASSR_USER:
-	case ACCESS_GOOHOME_USER:
+//	case ACCESS_WASSR_USER:
+//	case ACCESS_GOOHOME_USER:
 	case ACCESS_MIXI_VOICE_USER:
 #endif
 	case ACCESS_TWITTER_USER:

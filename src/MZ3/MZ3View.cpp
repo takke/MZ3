@@ -4099,18 +4099,30 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 	case ACCESS_PROFILE:
 	case ACCESS_BIRTHDAY:
 		// プロフィールなら、カテゴリ項目に応じて処理を変更する。（暫定）
-		switch( m_selGroup->getSelectedCategory()->m_mixi.GetAccessType() ) {
-		case ACCESS_LIST_INTRO:				// 紹介文
-		case ACCESS_LIST_FAVORITE_USER:		// お気に入り
-		case ACCESS_LIST_FRIEND:			// マイミク一覧
-		case ACCESS_LIST_CALENDAR:			// カレンダー
+		{
+			bool showMenu = false;
+			ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
+			ACCESS_TYPE accessTypeIntro = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("INTRO");	// 紹介文
+
+			switch(categoryType) {
+			case ACCESS_LIST_FAVORITE_USER:		// お気に入り
+			case ACCESS_LIST_FRIEND:			// マイミク一覧
+			case ACCESS_LIST_CALENDAR:			// カレンダー
+				showMenu = true;
+				break;
+			default:
+				// 紹介文
+				if (categoryType == accessTypeIntro) {
+					showMenu = true;
+				}
+				break;
+			}
+
 			// 操作をメニューで選択
-			{
+			if (showMenu) {
 				CMenu menu;
 				menu.LoadMenu( IDR_PROFILE_ITEM_MENU );
 				CMenu* pSubMenu = menu.GetSubMenu(0);
-
-				ACCESS_TYPE categoryType = m_selGroup->getSelectedCategory()->m_mixi.GetAccessType();
 
 				// お気に入り以外では「自己紹介」を削除。
 				if( categoryType != ACCESS_LIST_FAVORITE_USER ) {
@@ -4118,7 +4130,7 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				}
 
 				// 紹介文以外では「紹介文」を削除
-				if( categoryType != ACCESS_LIST_INTRO ) {
+				if( categoryType != accessTypeIntro ) {
 					pSubMenu->DeleteMenu( ID_OPEN_INTRO, MF_BYCOMMAND );
 				}
 
@@ -4132,8 +4144,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 				// メニューを開く
 				pSubMenu->TrackPopupMenu( flags, pt.x, pt.y, this );
 			}
-
-			break;
 		}
 		break;
 
@@ -5466,17 +5476,14 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// 未入力時の処理
 	if (strStatus.IsEmpty()) {
-		switch (m_twitterPostAccessType) {
-		case ACCESS_GOOHOME_QUOTE_UPDATE:
-		default:
-			// 未入力なので最新取得
-			RetrieveCategoryItem();
-			return;
-		}
+		// 未入力なので最新取得
+		RetrieveCategoryItem();
+		return;
 	}
 
 	// 送信先確認
 	switch (m_twitterPostAccessType) {
+/*
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			CString msg;
@@ -5492,7 +5499,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 			}
 		}
 		break;
-
+*/
 	default:
 		break;
 	}
@@ -5508,7 +5515,7 @@ void CMZ3View::OnBnClickedUpdateButton()
 
 	// POST パラメータを設定
 	switch (m_twitterPostAccessType) {
-
+/*
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			// text=***&privacy=***
@@ -5521,19 +5528,19 @@ void CMZ3View::OnBnClickedUpdateButton()
 			post.AppendPostBody( "&privacy=2" );
 		}
 		break;
-
+*/
 	}
 	post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
 	post.SetSuccessMessage( WM_MZ3_POST_END );
 
 	// POST先URL設定
 	CString url;
-	switch (m_twitterPostAccessType) {
+/*	switch (m_twitterPostAccessType) {
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		url = L"http://home.goo.ne.jp/api/quote/quotes/post/json";
 		break;
 	}
-
+*/
 	// MZ3 API : BASIC認証設定
 	CString strUser = NULL;
 	CString strPassword = NULL;

@@ -30,23 +30,6 @@ bool AccessTypeInfo::init()
 	//--- mixi,ÉäÉXÉgån
 	//------------------------------------------------------------------
 #ifdef BT_MZ3
-	type = ACCESS_LIST_INTRO;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"è–âÓï∂"
-		, REQUEST_METHOD_GET
-		);
-	// url(1) : http://mixi.jp/show_intro.pl
-	// url(2) : http://mixi.jp/show_intro.pl?page=2
-	m_map[type].cacheFilePattern = L"show_intro{urlparam:page}.html";
-	m_map[type].serializeKey = "INTRO";
-	m_map[type].defaultCategoryURL = L"show_intro.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"ñºëO");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"è–âÓï∂");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1";
-	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
 	type = ACCESS_LIST_FAVORITE_USER;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY

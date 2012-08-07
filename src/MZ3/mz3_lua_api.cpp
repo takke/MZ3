@@ -3574,15 +3574,15 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_MIXI_ADD_VOICE_REPLY;
 		break;
 
-	case 4:
-		//TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
-		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_WASSR_UPDATE;
-		break;
+//	case 4:
+//		//TWITTER_STYLE_POST_MODE_WASSR_UPDATE		 = 4,	///< Wassr 用発言入力中
+//		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_WASSR_UPDATE;
+//		break;
 
-	case 5:
-		//TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
-		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_GOOHOME_QUOTE_UPDATE;
-		break;
+//	case 5:
+//		//TWITTER_STYLE_POST_MODE_GOOHOME_QUOTE_UPDATE = 5,	///< gooホームひとこと入力中
+//		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_GOOHOME_QUOTE_UPDATE;
+//		break;
 #endif
 	}
 
