@@ -86,23 +86,6 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
 
-	type = ACCESS_LIST_COMMUNITY;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"コミュニティ一覧"
-		, REQUEST_METHOD_GET
-		);
-	// url(1) : http://mixi.jp/list_community.pl?id=xxx
-	// url(2) : http://mixi.jp/list_community.pl?id=xxx&page=2
-	m_map[type].cacheFilePattern = L"list_community{urlparam:page}.html";
-	m_map[type].serializeKey = "COMMUNITY";
-	m_map[type].defaultCategoryURL = L"list_community.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"コミュニティ");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"人数");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1";
-	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
 	type = ACCESS_LIST_NEW_BBS_COMMENT;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY

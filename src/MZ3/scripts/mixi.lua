@@ -1051,6 +1051,11 @@ function on_estimate_access_type(event_name, url, data1, data2)
 		return true, mz3.get_access_type_by_key('MIXI_EVENT_MEMBER');
 	end
 
+	-- コミュニティ一覧
+	if line_has_strings(url, 'list_community.pl') then
+		return true, mz3.get_access_type_by_key('COMMUNITY');
+	end
+
     -- ボイス
 	if line_has_strings(url, 'recent_voice.pl?') then
 		return true, mz3.get_access_type_by_key('MIXI_RECENT_ECHO');
@@ -1760,7 +1765,7 @@ mz3.set_parser("MIXI_NEWS", "mixi.mixi_view_news_parser");
 --   html:   HTMLデータ(CHtmlArray*)
 --------------------------------------------------
 function mixi_intro_list_parser(parent, body, html)
-	mz3.logger_debug("mixi_news_list_parser start");
+	mz3.logger_debug("mixi_intro_list_parser start");
 
 	-- wrapperクラス化
 	body = MZ3DataList:create(body);
