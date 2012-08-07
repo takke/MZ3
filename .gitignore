@@ -17,3 +17,25 @@
 /src/MZ3/TkTw_R_W32c
 /src/MZ3/Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
 /src/MZ3/Debug_Win32
+/src/JRegexDLL/Debug
+/src/JRegexDLL/Release
+/src/JRegexDLL/Release_wm5_ppc_armv4i
+/src/MZ3Plus/Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+/src/MZ3cab/Release
+/src/MZ3cab/Release_MZ3Plus
+/src/MZ3cab/TkTw_R_WM
+/src/lua/Debug
+/src/lua/Release
+/src/lua/Release_wm5_ppc_armv4i
+/src_lib/dlmalloc
+/src_lib/jsoncpp
+/src_lib/luadoc
+/src_lib/lualogging-1.1.4
+/src/MZ3Plus/*.user
+/src/MZ3Plus/*.user
+/src/MZ3Test/*.user
+/src/lua/*.user
+/src/JRegexDLL/*.user
+/src/MZ3/*.user
+/src/MZ3/twitter_oauth_token.txt
+/src/MZ3/2ch_bookmark.tsv
