@@ -122,23 +122,6 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyIntegratedLinePattern1 = L"%2\t(%3)";
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";
 
-	type = ACCESS_LIST_BBS;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"トピック一覧"
-		, REQUEST_METHOD_GET
-		);
-	// url : list_bbs.pl?id=xxx
-	m_map[type].cacheFilePattern = L"list_bbs_{urlparam:id}.html";
-	m_map[type].serializeKey = "TOPIC";	// 本当は "BBS" だな
-	m_map[type].bCruiseTarget = true;
-	// 動的に生成されるためデフォルトURLは不要
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"トピック");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1";
-	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
 /*
 	type = ACCESS_LIST_FOOTSTEP;
 	m_map[type] = AccessTypeInfo::Data(

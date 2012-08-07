@@ -406,7 +406,8 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 					// トピック一覧用 mixi オブジェクトを生成する
 					CMixiData mixi = *pData;
-					mixi.SetAccessType( ACCESS_LIST_BBS );
+					ACCESS_TYPE accessTypeBbsList = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TOPIC");
+					mixi.SetAccessType(accessTypeBbsList);
 					CString url;
 					url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(mixi.GetURL()) );
 					mixi.SetURL(url);

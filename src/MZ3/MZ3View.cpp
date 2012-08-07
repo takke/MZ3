@@ -4084,7 +4084,10 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			CString url;
 			url.Format( L"list_bbs.pl?id=%d", mixi::MixiUrlParser::GetID(bodyItem.GetURL()) );
 			mixi.SetURL(url);
-			mixi.SetAccessType( ACCESS_LIST_BBS );
+
+			ACCESS_TYPE accessTypeBbsList = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TOPIC");
+			mixi.SetAccessType(accessTypeBbsList);
+
 			if( util::ExistFile( util::MakeLogfilePath(mixi) ) ) {
 				pSubMenu->EnableMenuItem( IDM_VIEW_BBS_LIST_LOG, MF_ENABLED | MF_BYCOMMAND );
 			}else{
@@ -4198,10 +4201,12 @@ bool CMZ3View::PrepareViewBbsList(void)
 	CString name;
 	name.Format( L"└%s", bodyItem.GetName() );
 	CCategoryItem categoryItem;
-	categoryItem.init( name, url, ACCESS_LIST_BBS, m_selGroup->categories.size(),
-		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(ACCESS_LIST_BBS),
-		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(ACCESS_LIST_BBS),
-		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(ACCESS_LIST_BBS),
+
+	ACCESS_TYPE accessTypeBbsList = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TOPIC");
+	categoryItem.init( name, url, accessTypeBbsList, m_selGroup->categories.size(),
+		theApp.m_accessTypeInfo.getBodyHeaderCol1Type(accessTypeBbsList),
+		theApp.m_accessTypeInfo.getBodyHeaderCol2Type(accessTypeBbsList),
+		theApp.m_accessTypeInfo.getBodyHeaderCol3Type(accessTypeBbsList),
 		CCategoryItem::SAVE_TO_GROUPFILE_YES );
 
 	return AppendCategoryList(categoryItem);
@@ -6533,7 +6538,9 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 	SetBodyList( body );		// ボディ一覧に表示
 
 #ifdef BT_MZ3
-	if( aType == ACCESS_LIST_BBS ) {
+
+	ACCESS_TYPE accessTypeBbsList = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TOPIC");
+	if (aType == accessTypeBbsList) {
 		// コミュニティリストの場合は自動的にボディ一覧にフォーカスする
 		m_bodyList.SetFocus();
 		m_hotList = &m_bodyList;

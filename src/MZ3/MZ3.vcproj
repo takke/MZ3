@@ -2522,10 +2522,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\MixiListParser.h"
-					>
-				</File>
-				<File
 					RelativePath=".\MixiParser.h"
 					>
 				</File>

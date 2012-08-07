@@ -126,7 +126,7 @@ enum ACCESS_TYPE {
 	ACCESS_LIST_FRIEND,				///< マイミク一覧
 //	ACCESS_LIST_COMMUNITY,			///< コミュニティ一覧
 //	ACCESS_LIST_INTRO,				///< 紹介文(show_intro.pl)
-	ACCESS_LIST_BBS,				///< トピック一覧(list_bbs.pl)
+//	ACCESS_LIST_BBS,				///< トピック一覧(list_bbs.pl)
 	ACCESS_LIST_NEW_BBS_COMMENT,	///< コミュニティコメント記入履歴
 //	ACCESS_LIST_CALENDAR,			///< カレンダー  //icchu追加
 #endif
