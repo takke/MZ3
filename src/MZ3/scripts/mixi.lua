@@ -1723,13 +1723,109 @@ function mixi_view_news_parser(parent, body, html)
 	-- 関連日記
 	-- http://news.mixi.jp/view_news.pl?id=2109259&media_id=20&from=home&position=1
 	local url = parent:get_text('url');
-	local newsId = url:match('id=([0-9]+)');
+	local newsId = get_param_from_url(url, "id");
 	parent:add_link_list('http://news.mixi.jp/list_quote_diary.pl?id=' .. newsId, '関連日記');
 	
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_view_news_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("MIXI_NEWS", "mixi.mixi_view_news_parser");
+
+
+--------------------------------------------------
+-- 【紹介文】
+-- [list] show_intro.pl 用パーサ
+--
+-- http://mixi.jp/show_intro.pl
+--
+-- 引数:
+--   parent: 上ペインの選択オブジェクト(MZ3Data*)
+--   body:   下ペインのオブジェクト群(MZ3DataList*)
+--   html:   HTMLデータ(CHtmlArray*)
+--------------------------------------------------
+function mixi_intro_list_parser(parent, body, html)
+	mz3.logger_debug("mixi_news_list_parser start");
+
+	-- wrapperクラス化
+	body = MZ3DataList:create(body);
+	html = MZ3HTMLArray:create(html);
+
+	-- 全消去
+	body:clear();
+
+	local t1 = mz3.get_tick_count();
+	
+	-- 行数取得
+	local line_count = html:get_count();
+	
+	-- 開始フラグの探索
+	local i_start_line = 100;
+	while (i_start_line < line_count) do
+		line = html:get_at(i_start_line);
+		
+		if line_has_strings(line, '<div id="bodyArea">') then
+			break;
+		end
+		
+		i_start_line = i_start_line + 1;
+	end
+
+	-- 範囲を一括取得
+	sub_html = get_sub_html(html, i_start_line, line_count, {'<ul class="introListContents">'}, {'<div id="bodySub">'});
+	
+--	mz3.logger_debug('html:' .. sub_html);
+	
+	-- 各記事を取得
+	local element_html = '';
+	for element_html in sub_html:gmatch('(<dl.-</dl>)') do
+--		mz3.logger_debug('element_html: ' .. element_html);
+		
+		-- data 生成
+		data = MZ3Data:create();
+
+		element_html = element_html:gsub('&nbsp;', ' ');
+
+		-- 時刻
+		data:set_date('');
+
+		-- URL、名前の抽出
+		-- <span class="name"><a href="show_friend.pl?id=xx">xx</a></span>
+		url, name = element_html:match('<span class="name">.-href="(.-)">(.-)</a>');
+		name = mz3.decode_html_entity(name);
+		data:set_text("name", name);
+		data:set_text("url", url);
+		
+		-- <img src="xx"
+		local image_url = element_html:match('<img src="(.-)"');
+		if image_url ~= nil then
+			data:add_text_array("image", image_url);
+		end
+		
+		-- ID 設定
+		id = get_param_from_url(url, "id");
+		data:set_integer('id', id);
+
+		-- 紹介文
+		local relation = element_html:match('<p class="relation">(.-)</p>');
+		local userInput = element_html:match('<p class="userInput">(.-)</p>');
+		data:add_body_with_extract(relation .. '  ' .. userInput);
+
+		-- URL に応じてアクセス種別を設定
+		type = mz3.estimate_access_type_by_url(url);
+		data:set_access_type(type);
+
+		-- data 追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
+	end
+
+	local t2 = mz3.get_tick_count();
+	mz3.logger_debug("mixi_intro_list_parser end; elapsed : " .. (t2-t1) .. "[msec]");
+end
+mz3.set_parser("INTRO", "mixi.mixi_intro_list_parser");
+
 
 
 ----------------------------------------
