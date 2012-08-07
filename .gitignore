@@ -1,0 +1,19 @@
+/MZ3.ncb
+/MZ3.suo
+/dist/*.lzh
+/dist/*.CAB
+/dist/MZ3_win32
+/dist/TkTweets_win32
+/dist/capture
+/dist/old_backup
+/dist/*.lnk
+/dist/99_upload_private_files.dat
+/dist/staging
+/src/MZ3/Release_Win32
+/src/MZ3/Release_Win32_c
+/src/MZ3/Debug_Win32
+/src/MZ3/TkTw_D_W32
+/src/MZ3/TkTw_R_W32
+/src/MZ3/TkTw_R_W32c
+/src/MZ3/Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+/src/MZ3/Debug_Win32
