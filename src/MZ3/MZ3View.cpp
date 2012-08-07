@@ -5486,8 +5486,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 	}
 
 	// 送信先確認
-	switch (m_twitterPostAccessType) {
 /*
+	switch (m_twitterPostAccessType) {
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			CString msg;
@@ -5503,10 +5503,10 @@ void CMZ3View::OnBnClickedUpdateButton()
 			}
 		}
 		break;
-*/
 	default:
 		break;
 	}
+*/
 
 	// フォーカスを入力領域に移動
 	GetDlgItem( IDC_STATUS_EDIT )->SetFocus();
@@ -5518,8 +5518,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 	post.ClearPostBody();
 
 	// POST パラメータを設定
-	switch (m_twitterPostAccessType) {
 /*
+	switch (m_twitterPostAccessType) {
 	case ACCESS_GOOHOME_QUOTE_UPDATE:
 		{
 			// text=***&privacy=***
@@ -5532,8 +5532,8 @@ void CMZ3View::OnBnClickedUpdateButton()
 			post.AppendPostBody( "&privacy=2" );
 		}
 		break;
-*/
 	}
+*/
 	post.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
 	post.SetSuccessMessage( WM_MZ3_POST_END );
 
