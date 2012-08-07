@@ -186,21 +186,6 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME,  L"コミュニティ");
 	m_map[type].bodyIntegratedLinePattern1 = L"%1";
 	m_map[type].bodyIntegratedLinePattern2 = L"%2";
-
-	type = ACCESS_LIST_CALENDAR;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "mixi"
-		, L"カレンダー"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].cacheFilePattern = L"show_calendar.html";
-	m_map[type].serializeKey = "CALENDAR";
-	m_map[type].defaultCategoryURL = L"show_calendar.pl";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_TITLE, L"タイトル");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE,  L"日付");
-	m_map[type].bodyIntegratedLinePattern1 = L"%1";
-	m_map[type].bodyIntegratedLinePattern2 = L"%2";
 #endif
 
 	//------------------------------------------------------------------

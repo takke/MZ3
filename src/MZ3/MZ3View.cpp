@@ -4107,7 +4107,6 @@ bool CMZ3View::PopupBodyMenu(POINT pt_, int flags_)
 			switch(categoryType) {
 			case ACCESS_LIST_FAVORITE_USER:		// お気に入り
 			case ACCESS_LIST_FRIEND:			// マイミク一覧
-			case ACCESS_LIST_CALENDAR:			// カレンダー
 				showMenu = true;
 				break;
 			default:
