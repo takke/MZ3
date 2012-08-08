@@ -31,11 +31,7 @@
 /src_lib/jsoncpp
 /src_lib/luadoc
 /src_lib/lualogging-1.1.4
-/src/MZ3Plus/*.user
-/src/MZ3Plus/*.user
-/src/MZ3Test/*.user
-/src/lua/*.user
-/src/JRegexDLL/*.user
-/src/MZ3/*.user
 /src/MZ3/twitter_oauth_token.txt
 /src/MZ3/2ch_bookmark.tsv
+*.user
+*.luac
