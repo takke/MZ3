@@ -8,7 +8,6 @@
 #include "stdafx.h"
 #include "MZ3.h"
 #include "MZ3Parser.h"
-#include "MixiContentParser.h"
 #include "TwitterParser.h"
 
 static void my_lua_printstack( lua_State *L )
@@ -164,9 +163,9 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 //	case ACCESS_NEIGHBORDIARY:
 //	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
 //	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
-	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
-	case ACCESS_EVENT_JOIN:
-	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
+//	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
+//	case ACCESS_EVENT_JOIN:
+//	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
 //	case ACCESS_BIRTHDAY:
 //	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
 #endif
