@@ -513,7 +513,8 @@ mz3.set_parser("MIXI_LIST_VOICE" , "mixi.mixi_recent_voice_parser");
 
 --------------------------------------------------
 -- 【発言詳細】
--- 
+-- [content] view_voice.pl 用パーサ
+--
 -- http://mixi.jp/view_voice.pl?post_time=xx&owner_id=xx
 -- 
 -- 引数:
@@ -634,6 +635,7 @@ function parse_next_back_link(line, base_url, title_set_at)
 	
 	return back_data, next_data;
 end
+
 
 --------------------------------------------------
 --- mixi 用URL補完
