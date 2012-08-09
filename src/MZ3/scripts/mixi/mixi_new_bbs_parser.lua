@@ -569,7 +569,7 @@ function mixi_view_bbs_parser(data, dummy, html)
 	-- 名前初期化
 	data:set_text('name', '');
 
-	-- とりあえず改行出力
+	-- 改行出力
 	data:add_body_with_extract("<br>");
 
 	local line_count = html:get_count();
@@ -580,39 +580,7 @@ function mixi_view_bbs_parser(data, dummy, html)
 	-- 本文取得
 	local main_area = sub_html:match('(<dl class="bbsList01.-<div id="bbsComment">)');
 	if main_area ~= nil then
-		-- 日付取得
-		local date = main_area:match('<span class="date">(.-)</span>');
-		if date ~= nil then
---			mz3.logger_debug(date);
-			data:parse_date_line(date);
-		end
-		
-		-- タイトル取得
-		local title = main_area:match('<span class="titleSpan"><span class="title">(.-)</span>');
-		if title ~= nil then
-			data:set_text('title', mz3.decode_html_entity(title));
-		end
-		
-		-- トピック作成者のURL
-		local author_profile_url, name = main_area:match('<dd class="bbsContent">.-<dt>.-href="(.-)">(.-)</a>');
---		mz3.logger_debug(author_profile_url);
---		mz3.logger_debug(name);
-		-- ID抽出
-		data:set_integer('author_id', get_param_from_url(author_profile_url, 'id'));
-		
-		-- 名前抽出
-		if name ~= nil then
-			data:set_text('author', mz3.decode_html_entity(name));
-		end
-		
-		-- 本文抽出
-		local dd = main_area:match('<dd class="bbsContent">.-<dd>(.-)</dd>');
-		if dd ~= nil then
-			-- 不要なタグの除去
-			dd = dd:gsub('<p class="reportLink01".-</p>', '');
-			
-			data:add_body_with_extract(dd);
-		end
+		parse_bbs_enquete_event_main_area(data, main_area);
 	end
 	
 	-- コミュニティ名抽出
@@ -622,68 +590,18 @@ function mixi_view_bbs_parser(data, dummy, html)
 	end
 	
 	-- ページ移動リンクの抽出
-	parsePageLink(data, sub_html);
+	parse_page_link(data, sub_html);
 	
 	-- 「最新のトピック」の抽出
-	parseRecentTopics(data, sub_html);
+	parse_recent_topics(data, sub_html);
 	
 	-- 投稿先URLの取得
-	parsePostURL(data, sub_html);
+	parse_post_url(data, sub_html);
 	
 	-- コメント取得
 	local comment_area = sub_html:match('<dl class="commentList01">(.-)<div class="pageNavigation01');
 	if comment_area ~= nil then
-		for comment_html in comment_area:gmatch('(<dt class="commentDate.-<dd>.-<dd>.-</dd>)') do
-			
-			child = MZ3Data:create();
-			
---[[
-<dt class="commentDate clearfix"><span class="senderId">
-<input id="commentCheck01" name="comment_id" type="checkbox" value="xx" /><label for="commentCheck01">962</label></span>
-<span class="date">2012年08月03日 22:10</span></dt>
-<dd>
-<dl class="commentContent01">
-<dt><a href="show_friend.pl?id=xx&route_trace=xx&content_id=xxx">なまえ</a></dt>
-<dd>
-ほんぶん
-...
-</dd>
-</dl>
-</dd>
-]]
-			-- コメント番号
-			local number = comment_html:match('<span class="senderId">(.-)</span>');
-			if number ~= nil then
-				-- タグ除去
-				number = number:gsub('<.->', '');
-				number = number:gsub('[^0-9]+', '');
-				mz3.logger_debug(number);
-				child:set_integer('comment_index', number);
-			end
-			
-			-- 日付
-			local date = comment_html:match('<span class="date">(.-)</span>');
-			child:parse_date_line(date);
-			
-			-- 名前
-			local url, name, comment = comment_html:match('<dt.-href="(.-)">(.-)</a.-<dd>(.-)</dd>');
-			child:set_integer('author_id', get_param_from_url(url, 'id'));
-			child:set_text('author', mz3.decode_html_entity(name));
-			
-			-- コメント
-			comment = comment:gsub('<p class="reportLink01".-</p>', '');
-			comment = comment:gsub('<ul class="listAction">.-</ul>', '');
-
-			child:add_body_with_extract('<br>');
-			child:add_body_with_extract(mz3.decode_html_entity(comment));
-			
---			child:add_link_list(complement_mixi_url(url), name .. ' さん');
-			
-			data:add_child(child);
-			
-			child:delete();
-
-		end
+		parse_bbs_enquete_event_comments(data, comment_area);
 	end
 	
 	local t2 = mz3.get_tick_count();
@@ -717,7 +635,7 @@ function mixi_view_enquete_parser(data, dummy, html)
 	-- 名前初期化
 	data:set_text('name', '');
 
-	-- とりあえず改行出力
+	-- 改行出力
 	data:add_body_with_extract("<br>");
 
 	local line_count = html:get_count();
@@ -728,39 +646,8 @@ function mixi_view_enquete_parser(data, dummy, html)
 	-- 本文取得
 	local main_area = sub_html:match('(<dl class="bbsList01.-<div id="enqueteComment">)');
 	if main_area ~= nil then
-		-- 日付取得
-		local date = main_area:match('<span class="date">(.-)</span>');
-		if date ~= nil then
---			mz3.logger_debug(date);
-			data:parse_date_line(date);
-		end
-		
-		-- タイトル取得
-		local title = main_area:match('<span class="titleSpan"><span class="title">(.-)</span>');
-		if title ~= nil then
-			data:set_text('title', mz3.decode_html_entity(title));
-		end
-		
-		-- トピック作成者のURL
-		local author_profile_url, name = main_area:match('<dd class="bbsContent">.-<dt>.-href="(.-)">(.-)</a>');
---		mz3.logger_debug(author_profile_url);
---		mz3.logger_debug(name);
-		-- ID抽出
-		data:set_integer('author_id', get_param_from_url(author_profile_url, 'id'));
-		
-		-- 名前抽出
-		if name ~= nil then
-			data:set_text('author', mz3.decode_html_entity(name));
-		end
-		
-		-- 本文抽出
-		local dd = main_area:match('<dd class="bbsContent">.-<dd>(.-)</dd>');
-		if dd ~= nil then
-			-- 不要なタグの除去
-			dd = dd:gsub('<p class="reportLink01".-</p>', '');
-			
-			data:add_body_with_extract(dd);
-		end
+		-- 共通部分抽出
+		parse_bbs_enquete_event_main_area(data, main_area);
 		
 		-- 集計結果解析
 		local result = main_area:match('<div class="enquete_meter">(.-)</div>');
@@ -791,54 +678,18 @@ function mixi_view_enquete_parser(data, dummy, html)
 	end
 	
 	-- ページ移動リンクの抽出
-	parsePageLink(data, sub_html);
+	parse_page_link(data, sub_html);
 	
 	-- 「最新のトピック」の抽出
-	parseRecentTopics(data, sub_html);
+	parse_recent_topics(data, sub_html);
 	
 	-- 投稿先URLの取得
-	parsePostURL(data, sub_html);
+	parse_post_url(data, sub_html);
 	
 	-- コメント取得
-	local comment_area = sub_html:match('<dl class="commentList01">(.-)<div class="pageNavigation01');
+	local comment_area = sub_html:match('<dl class="commentList01">(.-)<div class="bbsNewItem01');
 	if comment_area ~= nil then
-		for comment_html in comment_area:gmatch('(<dt class="commentDate.-<dd>.-<dd>.-</dd>)') do
-			
-			child = MZ3Data:create();
-			
-			-- コメント番号
-			local number = comment_html:match('<span class="senderId">(.-)</span>');
-			if number ~= nil then
-				-- タグ除去
-				number = number:gsub('<.->', '');
-				number = number:gsub('[^0-9]+', '');
-				mz3.logger_debug(number);
-				child:set_integer('comment_index', number);
-			end
-			
-			-- 日付
-			local date = comment_html:match('<span class="date">(.-)</span>');
-			child:parse_date_line(date);
-			
-			-- 名前
-			local url, name, comment = comment_html:match('<dt.-href="(.-)">(.-)</a.-<dd>(.-)</dd>');
-			child:set_integer('author_id', get_param_from_url(url, 'id'));
-			child:set_text('author', mz3.decode_html_entity(name));
-			
-			-- コメント
-			comment = comment:gsub('<p class="reportLink01".-</p>', '');
-			comment = comment:gsub('<ul class="listAction">.-</ul>', '');
-
-			child:add_body_with_extract('<br>');
-			child:add_body_with_extract(mz3.decode_html_entity(comment));
-			
---			child:add_link_list(complement_mixi_url(url), name .. ' さん');
-			
-			data:add_child(child);
-			
-			child:delete();
-
-		end
+		parse_bbs_enquete_event_comments(data, comment_area);
 	end
 	
 	local t2 = mz3.get_tick_count();
@@ -872,7 +723,7 @@ function mixi_view_event_parser(data, dummy, html)
 	-- 名前初期化
 	data:set_text('name', '');
 
-	-- とりあえず改行出力
+	-- 改行出力
 	data:add_body_with_extract("<br>");
 
 	local line_count = html:get_count();
@@ -883,46 +734,10 @@ function mixi_view_event_parser(data, dummy, html)
 	-- 本文取得
 	local main_area = sub_html:match('(<dl class="bbsList01.-<div id="eventComment">)');
 	if main_area ~= nil then
-		-- 日付取得
-		local date = main_area:match('<span class="date">(.-)</span>');
-		if date ~= nil then
---			mz3.logger_debug(date);
-			data:parse_date_line(date);
-		end
+		-- 共通部分抽出
+		parse_bbs_enquete_event_main_area(data, main_area);
 		
-		-- タイトル取得
-		local title = main_area:match('<span class="titleSpan"><span class="title">(.-)</span>');
-		if title ~= nil then
-			data:set_text('title', mz3.decode_html_entity(title));
-		end
-		
-		-- トピック作成者のURL
-		-- TODO 退会済みケア
-		local author_profile_url, name = main_area:match('<dd class="bbsContent">.-<dt>.-href="(.-)">(.-)</a></dt>');
---		mz3.logger_debug(author_profile_url);
---		mz3.logger_debug(name);
-		-- ID抽出
-		if author_profile_url ~= nil then
-			data:set_integer('author_id', get_param_from_url(author_profile_url, 'id'));
-		end
-		
-		-- 名前抽出
-		if name ~= nil then
-			data:set_text('author', mz3.decode_html_entity(name));
-		else
-			data:set_text('author', '');
-		end
-		
-		-- 本文抽出
-		local dd = main_area:match('<dd class="bbsContent">.-<dd>(.-)</dd>');
-		if dd ~= nil then
-			-- 不要なタグの除去
-			dd = dd:gsub('<p class="reportLink01".-</p>', '');
-			
-			data:add_body_with_extract(dd);
-			data:add_body_with_extract('<br>');
-		end
-		
+		-- イベントデータ
 		local date = main_area:match('<dt>開催日時</dt>.-<dd>(.-)</dd>');
 		if date ~= nil then
 			data:add_body_with_extract('●開催日時 ： ' .. date .. '<br><br>');
@@ -958,54 +773,18 @@ function mixi_view_event_parser(data, dummy, html)
 	end
 	
 	-- ページ移動リンクの抽出
-	parsePageLink(data, sub_html);
+	parse_page_link(data, sub_html);
 	
 	-- 「最新のトピック」の抽出
-	parseRecentTopics(data, sub_html);
+	parse_recent_topics(data, sub_html);
 	
 	-- 投稿先URLの取得
-	parsePostURL(data, sub_html);
+	parse_post_url(data, sub_html);
 	
 	-- コメント取得
-	local comment_area = sub_html:match('<dl class="commentList01">(.-)<div class="pageNavigation01');
+	local comment_area = sub_html:match('<dl class="commentList01">(.-)<div class="bbsNewItem01');
 	if comment_area ~= nil then
-		for comment_html in comment_area:gmatch('(<dt class="commentDate.-<dd>.-<dd>.-</dd>)') do
-			
-			child = MZ3Data:create();
-			
-			-- コメント番号
-			local number = comment_html:match('<span class="senderId">(.-)</span>');
-			if number ~= nil then
-				-- タグ除去
-				number = number:gsub('<.->', '');
-				number = number:gsub('[^0-9]+', '');
-				mz3.logger_debug(number);
-				child:set_integer('comment_index', number);
-			end
-			
-			-- 日付
-			local date = comment_html:match('<span class="date">(.-)</span>');
-			child:parse_date_line(date);
-			
-			-- 名前
-			local url, name, comment = comment_html:match('<dt.-href="(.-)">(.-)</a.-<dd>(.-)</dd>');
-			child:set_integer('author_id', get_param_from_url(url, 'id'));
-			child:set_text('author', mz3.decode_html_entity(name));
-			
-			-- コメント
-			comment = comment:gsub('<p class="reportLink01".-</p>', '');
-			comment = comment:gsub('<ul class="listAction">.-</ul>', '');
-
-			child:add_body_with_extract('<br>');
-			child:add_body_with_extract(mz3.decode_html_entity(comment));
-			
---			child:add_link_list(complement_mixi_url(url), name .. ' さん');
-			
-			data:add_child(child);
-			
-			child:delete();
-
-		end
+		parse_bbs_enquete_event_comments(data, comment_area);
 	end
 	
 	local t2 = mz3.get_tick_count();
@@ -1016,7 +795,7 @@ mz3.set_parser("MIXI_EVENT_JOIN" , "mixi.mixi_view_event_parser");
 
 
 -- ページ移動リンクの抽出
-function parsePageLink(data, html)
+function parse_page_link(data, html)
 	
 	local pl = html:match('<div class="pageList01">(.-)</div>');
 	if pl ~= nil then
@@ -1041,7 +820,7 @@ end
 
 
 -- 「最新のトピック」の抽出
-function parseRecentTopics(data, html)
+function parse_recent_topics(data, html)
 	
 	local pl = html:match('<ul class="newTopicList01">(.-)<p class="utilityLinks03">');
 	if pl ~= nil then
@@ -1059,7 +838,7 @@ end
 
 
 -- 投稿先URLの取得
-function parsePostURL(data, html)
+function parse_post_url(data, html)
 
 	-- <form name="bbs_comment_form" action="add_bbs_comment.pl?id=67676121&comm_id=5003071" enctype="multipart/form-data" method="post">
 	local action, param = html:match('<form [^>]-action="(add_.-)"(.-)>');
@@ -1075,5 +854,106 @@ function parsePostURL(data, html)
 		else
 			data:set_text('content_type', "application/x-www-form-urlencoded");
 		end
+	end
+end
+
+
+-- BBS、アンケート、イベント用の共通本文パーサ
+function parse_bbs_enquete_event_main_area(data, main_area)
+
+	-- 日付取得
+	local date = main_area:match('<span class="date">(.-)</span>');
+	if date ~= nil then
+--		mz3.logger_debug(date);
+		data:parse_date_line(date);
+	end
+	
+	-- タイトル取得
+	local title = main_area:match('<span class="titleSpan"><span class="title">(.-)</span>');
+	if title ~= nil then
+		data:set_text('title', mz3.decode_html_entity(title));
+	end
+	
+	-- トピック作成者のURL
+	local author_profile_url, name = main_area:match('<dd class="bbsContent">.-<dt>.-href="(.-)">(.-)</a>');
+	-- TODO 退会済みケア
+--	mz3.logger_debug(author_profile_url);
+--	mz3.logger_debug(name);
+	-- ID抽出
+	if author_profile_url ~= nil then
+		data:set_integer('author_id', get_param_from_url(author_profile_url, 'id'));
+	end
+	
+	-- 名前抽出
+	if name ~= nil then
+		data:set_text('author', mz3.decode_html_entity(name));
+	else
+		data:set_text('author', '');
+	end
+	
+	-- 本文抽出
+	local dd = main_area:match('<dd class="bbsContent">.-<dd>(.-)</dd>');
+	if dd ~= nil then
+		-- 不要なタグの除去
+		dd = dd:gsub('<p class="reportLink01".-</p>', '');
+		
+		data:add_body_with_extract(dd);
+		data:add_body_with_extract('<br>');
+	end
+end
+
+
+-- BBS、アンケート、イベント用の共通コメントパーサ
+function parse_bbs_enquete_event_comments(data, comment_area)
+
+	for comment_html in comment_area:gmatch('(<dt class="commentDate.-<dd>.-<dd>.-</dd>)') do
+		
+		local child = MZ3Data:create();
+		
+--[[
+<dt class="commentDate clearfix"><span class="senderId">
+<input id="commentCheck01" name="comment_id" type="checkbox" value="xx" /><label for="commentCheck01">962</label></span>
+<span class="date">2012年08月03日 22:10</span></dt>
+<dd>
+<dl class="commentContent01">
+<dt><a href="show_friend.pl?id=xx&route_trace=xx&content_id=xxx">なまえ</a></dt>
+<dd>
+ほんぶん
+...
+</dd>
+</dl>
+</dd>
+]]
+		-- コメント番号
+		local number = comment_html:match('<span class="senderId">(.-)</span>');
+		if number ~= nil then
+			-- タグ除去
+			number = number:gsub('<.->', '');
+			number = number:gsub('[^0-9]+', '');
+			mz3.logger_debug(number);
+			child:set_integer('comment_index', number);
+		end
+		
+		-- 日付
+		local date = comment_html:match('<span class="date">(.-)</span>');
+		child:parse_date_line(date);
+		
+		-- 名前
+		local url, name, comment = comment_html:match('<dt.-href="(.-)">(.-)</a.-<dd>(.-)</dd>');
+		child:set_integer('author_id', get_param_from_url(url, 'id'));
+		child:set_text('author', mz3.decode_html_entity(name));
+		
+		-- コメント
+		comment = comment:gsub('<p class="reportLink01".-</p>', '');
+		comment = comment:gsub('<ul class="listAction">.-</ul>', '');
+
+		child:add_body_with_extract('<br>');
+		child:add_body_with_extract(mz3.decode_html_entity(comment));
+		
+--		child:add_link_list(complement_mixi_url(url), name .. ' さん');
+		
+		data:add_child(child);
+		
+		child:delete();
 	end
 end
