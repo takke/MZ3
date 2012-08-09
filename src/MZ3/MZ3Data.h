@@ -200,7 +200,7 @@ public:
 	}
 
 	// author_id : 投稿者のID（オーナーIDに設定される場合もある）
-	void	SetAuthorID(int authorId)	{ m_Int32Map[L"author_id"] = authorId; }
+//	void	SetAuthorID(int authorId)	{ m_Int32Map[L"author_id"] = authorId; }
 	int		GetAuthorID() const			{ return FindInt32Map(L"author_id", -1); }
 
 	// id : 記事ID
@@ -227,7 +227,7 @@ public:
 	int		GetOwnerID() const			{ return FindInt32Map(L"owner_id", -1); }
 
 	// my_mixi : マイミクフラグ（足あとからのマイミク抽出時のみ対応）
-	void	SetMyMixi(bool bMyMixi)		{ m_Int32Map[L"my_mixi"] = bMyMixi ? 1 : 0; }
+//	void	SetMyMixi(bool bMyMixi)		{ m_Int32Map[L"my_mixi"] = bMyMixi ? 1 : 0; }
 	bool	IsMyMixi() const			{ return FindInt32Map(L"my_mixi", 0) ? true : false; }
 
 
@@ -307,7 +307,7 @@ public:
 	LPCTSTR GetBrowseUri()					{ return FindStringMap(L"browse_uri"); }
 
 	// post_address : POST用のアドレス
-	void	SetPostAddress(LPCTSTR str)		{ m_StringMap[L"post_address"] = str; }
+//	void	SetPostAddress(LPCTSTR str)		{ m_StringMap[L"post_address"] = str; }
 	LPCTSTR GetPostAddress()				{ return FindStringMap(L"post_address"); }
 
 	// opening_range : 公開範囲
@@ -323,7 +323,7 @@ public:
 	CString GetPrevDiary()					{ return FindStringMap(L"prev_diary"); }
 
 	// full_diary : 全てを表示
-	void	SetFullDiary(LPCTSTR url)		{ m_StringMap[L"full_diary"] = url; }
+//	void	SetFullDiary(LPCTSTR url)		{ m_StringMap[L"full_diary"] = url; }
 	CString GetFullDiary()					{ return FindStringMap(L"full_diary"); }
 
 	// Content-Typeのアクセッサ
