@@ -826,6 +826,27 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 	CString url = L"http://mixi.jp/login.pl";
 	LPCTSTR nextUrl = L"/home.pl";
 
+	// 2012/7/17 の仕様変更によりpost_keyが増えた
+
+	//---------------------------------
+	// post_key 取得
+	//---------------------------------
+	theApp.m_inet.DoGetBlocking(url, L"", CInetAccess::FILE_HTML, NULL);
+	int status = theApp.m_inet.m_dwHttpStatus;
+	const unsigned char* pszMbcs = (theApp.m_inet.out_buf.empty() ? (const unsigned char*)"" : &theApp.m_inet.out_buf[0]);
+	CString html(pszMbcs);
+	// <input type="hidden" value="xxx" name="post_key" />
+	CString post_key = L"";
+	static MyRegex s_reg;
+	if (util::CompileRegex(s_reg, L"<input type=\"hidden\" value=\"(.*?)\" name=\"post_key\"")) {
+		if (s_reg.exec(html) && s_reg.results.size() == 2 ) {
+			// post_key
+			MZ3_TRACE(L"post_key[%s]\n", s_reg.results[1].str.c_str());
+			post_key = s_reg.results[1].str.c_str();
+		}
+	}
+
+	// ログイン処理開始
 	post_data.ClearPostBody();
 	post_data.AppendPostBody(L"email=");
 	post_data.AppendPostBody(URLEncoder::encode_euc( theApp.m_loginMng.GetMixiEmail() ));
@@ -835,6 +856,8 @@ void CMZ3App::StartMixiLoginAccess(HWND hwnd, CMixiData* data)
 	post_data.AppendPostBody(L"&");
 	post_data.AppendPostBody(L"next_url=");
 	post_data.AppendPostBody(URLEncoder::encode_euc( nextUrl ));
+	post_data.AppendPostBody(L"&post_key=");
+	post_data.AppendPostBody(URLEncoder::encode_euc( post_key ));
 
 	// Content-Type: application/x-www-form-urlencoded
 	post_data.SetContentType( CONTENT_TYPE_FORM_URLENCODED );
