@@ -11,6 +11,10 @@
 mz3.logger_debug('twitter.lua start');
 module("twitter", package.seeall)
 
+-- uses dkjson, see: http://dkolf.de/src/dkjson-lua.fsl/home
+local json = require ("scripts\\lib\\dkjson")
+
+
 ID_REPORT_URL_BASE = 36100 -37000;	-- URLを開く
 
 ----------------------------------------
@@ -113,6 +117,28 @@ type:set_short_title('ブロック解除');						-- 簡易タイトル
 type:set_request_method('POST');							-- リクエストメソッド
 type:set_request_encoding('utf8');							-- エンコーディング
 
+
+-- http://twitter.com/statuses/friends_timeline.xml
+-- http://twitter.com/statuses/friends_timeline/takke.xml
+-- http://twitter.com/statuses/replies.xml
+-- http://twitter.com/statuses/user_timeline.xml
+-- http://twitter.com/statuses/user_timeline/takke.xml
+-- => twitter/user_timeline_takke.xml
+type = MZ3AccessTypeInfo:create();
+type:set_info_type('category');
+type:set_service_type('Twitter');
+type:set_serialize_key('TWITTER_FRIENDS_TIMELINE');
+type:set_short_title('タイムライン');
+type:set_request_method('GET');
+type:set_cache_file_pattern('twitter\\{urlafter:/:friends_timeline.xml}');
+type:set_request_encoding('utf8');
+type:set_default_url('https://api.twitter.com/1.1/statuses/home_timeline.json');
+type:set_body_header(1, 'body', '発言');
+type:set_body_header(2, 'name', '名前>>');
+type:set_body_header(3, 'date', '日付>>');
+type:set_body_integrated_line_pattern(1, '%2 \t(%3)');	-- "名前  (日付)"
+type:set_body_integrated_line_pattern(2, '%1');			-- "発言"
+
 -- Lists用アクセス種別登録
 type = MZ3AccessTypeInfo:create();
 type:set_info_type('category');								-- カテゴリ
@@ -120,7 +146,7 @@ type:set_service_type('Twitter');							-- サービス種別
 type:set_serialize_key('TWITTER_LISTS');					-- シリアライズキー
 type:set_short_title('リスト一覧');							-- 簡易タイトル
 type:set_request_method('GET');								-- リクエストメソッド
-type:set_cache_file_pattern('twitter\\{urlafter:/}');	-- キャッシュファイル
+type:set_cache_file_pattern('twitter\\{urlafter:/}');		-- キャッシュファイル
 type:set_request_encoding('utf8');							-- エンコーディング
 type:set_default_url('https://api.twitter.com/1/{twitter:id}/lists.xml');	-- dummy
 type:set_body_header(1, 'title', 'リスト名');
@@ -314,22 +340,13 @@ function my_add_new_user(new_list, status, id)
 	data:set_access_type(type);
 	
 	-- updated : status/created_at
-	local s = status:match('<created_at>([^<]*)<');
+	local s = status.created_at;
 	data:parse_date_line(s);
 	
 	-- text : status/text
-	text = status:match('<text>([^<]*)<');
-	text = text:gsub('&amp;', '&');
-	text = mz3.decode_html_entity(text);
-
+	local text = mz3.decode_html_entity(status.text);
 	data:add_text_array('body', text);
 
-	-- @takke などがあればバイブする
---	if line_has_strings(text, "@" .. my_twitter_name) then
---		mz3.set_vib_status(true);
---		mz3.set_vib_status(false);
---	end
-	
 	-- URL を抽出し、リンクにする
 	if line_has_strings(text, 'ttp') then
 		for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%%#]+") do
@@ -339,51 +356,37 @@ function my_add_new_user(new_list, status, id)
 	end
 
 	-- source : status/source
-	s = status:match('<source>([^<]*)<');
+	s = status.source
 	s = mz3.decode_html_entity(s);
 	data:set_text('source', s);
 	
 	-- name : status/user/screen_name
-	user = status:match('<user>.-</user>');
-	s = user:match('<screen_name>([^<]*)<');
-	s = s:gsub('&amp;', '&');
-	s = mz3.decode_html_entity(s);
-	data:set_text('name', s);
+	local user = status.user
+	data:set_text('name', mz3.decode_html_entity(user.screen_name));
 
 	-- author : status/user/name
-	s = user:match('<name>([^<]*)<');
-	s = s:gsub('&amp;', '&');
-	s = mz3.decode_html_entity(s);
-	data:set_text('author', s);
+	data:set_text('author', mz3.decode_html_entity(user.name));
 
 	-- description : status/user/description
 	-- title に入れるのは苦肉の策・・・
-	s = user:match('<description>([^<]*)<');
-	if s~=nil then
-		s = s:gsub('&amp;', '&');
-		s = mz3.decode_html_entity(s);
-		data:set_text('title', s);
-	else
-		data:set_text('title', '');
-	end
+	data:set_text('title', mz3.decode_html_entity(user.description));
 
 	-- owner-id : status/user/id
-	data:set_integer('owner_id', user:match('<id>([^<]*)<'));
+	data:set_integer('owner_id', user.id);
 	
 	-- in_reply_to_status_id : status/in_reply_to_status_id
-	data:set_integer64_from_string('in_reply_to_status_id', status:match('<in_reply_to_status_id>([^<]*)</'));
+	data:set_integer64_from_string('in_reply_to_status_id', status.in_reply_to_status_id);
 
 	-- in_reply_to_screen_name : status/in_reply_to_screen_name
-	data:set_integer('in_reply_to_screen_name', status:match('<in_reply_to_screen_name>([^<]*)</'));
+	data:set_integer('in_reply_to_screen_name', mz3.decode_html_entity(status.in_reply_to_screen_name));
 
 	-- URL : status/user/url
-	url = user:match('<url>([^<]*)<');
+	local url = mz3.decode_html_entity(user.url);
 	data:set_text('url', url);
 	data:set_text('browse_uri', url);
 
 	-- Image : status/user/profile_image_url
-	profile_image_url = user:match('<profile_image_url>([^<]*)<');
-	profile_image_url = mz3.decode_html_entity(profile_image_url);
+	local profile_image_url = mz3.decode_html_entity(user.profile_image_url);
 	data:add_text_array('image', profile_image_url);
 
 	data:set_text('user_tag', user);
@@ -401,7 +404,7 @@ end
 --------------------------------------------------
 -- [list] タイムライン用パーサ
 --
--- https://api.twitter.com/1/statuses/home_timeline.xml
+-- https://api.twitter.com/1.1/statuses/home_timeline.json
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -419,15 +422,21 @@ function twitter_friends_timeline_parser(parent, body, html)
 	body_item = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	reset_body_list_id = body_item:get_integer64_as_string('id');
 
-	if mz3_pro_mode then
-		-- Pro モードならホスト側に任せる
-		return false;
-	end
-
 	-- wrapperクラス化
 	parent = MZ3Data:create(parent);
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
+	
+	-- jsonの結合
+	local json_text = html:get_all_text();
+--	print(json_text);
+	
+	-- jsonパース
+	local obj, pos, err = json.decode (json_text, 1, nil)
+	if err then
+		print ("Error:", err);
+		return;
+	end
 
 	my_twitter_name = mz3_account_provider.get_value('Twitter', 'id');
 
@@ -451,75 +460,19 @@ function twitter_friends_timeline_parser(parent, body, html)
 	-- 一時リスト
 	new_list = MZ3DataList:create();
 	
-	line = '';
-	local line_count = html:get_count();
-	status = '';
-	local i=0;
-	local id=0;
-	while i<line_count do
-		line = html:get_at(i);
---		mz3.logger_debug('line:' .. i);
+	-- 各要素のパース
+	for i = 1, #obj do
+		local v = obj[i];
 		
-		if line_has_strings(line, '<status>') then
-			status = line;
-
-			-- </status> まで取得する
-			-- ただし、同一IDがあればskipする
-			i = i+1;
-			i_in_status = 0;
-			while i<line_count do
-				line = html:get_at(i);
-				status = status .. line;
-				
-				-- 同一 skip は先にやる
-				if i_in_status<3 and line_has_strings(line, '<id>') then
-					-- id : status/id
-					id = line:match('<id>(.-)</id>');
-					-- 同一IDがあれば追加しない。
-					if id_set[ "" .. id ] then
-						mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
-						i = i+1;
-						while i<line_count do
-							line = html:get_at(i);
-							
-							if line_has_strings(line, '</status>') then
-								break;
-							end
-							i = i+1;
-						end
---						mz3.logger_debug('new i:' .. i);
-
-						status = '';
-						break;
-					end
-				elseif i_in_status>35 and line_has_strings(line, '</status>') then
-					-- </status> 発見したのでここまでの status を解析して追加
-					my_add_new_user(new_list, status, id);
-					break;
-				end
-
-				-- <retweeted_status> があれば </retweeted_status> までを読み飛ばす
-				if i_in_status > 8 and line_has_strings(line, '<retweeted_status>') then
-					i = i+1;
-					while i<line_count do
-						line = html:get_at(i);
-						if line_has_strings(line, '</retweeted_status>') then
-							break;
-						end
-						i = i+1;
-					end
-				end
-
-				i = i+1;
-				i_in_status = i_in_status+1;
-			end
-
-			-- 次の status 取得
-			status = '';
+		-- 同一 ID の skip
+		local id = v.id;
+		if id_set[ "" .. id ] then
+			print(i, id, "skip");
+		else
+			my_add_new_user(new_list, v, id);
 		end
-		i = i+1;
 	end
-	
+
 	-- 生成したデータを出力に反映
 	if mz3.get_app_name()=="MZ3" then
 		body:merge(new_list, 100);
@@ -2354,7 +2307,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 
 		-- Twitterタブ追加
 		local tab = MZ3GroupItem:create("Twitter");
-		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/home_timeline.xml");
+		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/home_timeline.json");
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1/statuses/replies.xml");
 		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1/statuses/friends.xml");
 		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "https://api.twitter.com/1/statuses/followers.xml");

@@ -450,7 +450,7 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- Twitter Œn
 	//------------------------------------------------------------------
-	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
+/*	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
 		, "Twitter"
@@ -473,7 +473,7 @@ bool AccessTypeInfo::init()
 	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"“ú•t>>");
 	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "–¼‘O  (“ú•t)"
 	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "”­Œ¾"
-
+*/
 	type = ACCESS_TWITTER_FAVORITES;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_CATEGORY
