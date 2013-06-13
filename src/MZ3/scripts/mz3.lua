@@ -383,7 +383,7 @@ if build_type == "MZ3" then
 --	require("scripts\\goohome");		-- goohome
 	require("scripts\\RSS");			-- RSS
 	require("scripts\\2ch");			-- 2ch
-	require("scripts\\auone");			-- auone
+--	require("scripts\\auone");			-- auone
 end
 
 mz3.logger_info('mz3.lua end');
