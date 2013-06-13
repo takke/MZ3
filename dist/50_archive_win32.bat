@@ -15,6 +15,8 @@ copy ..\src\JRegexDLL\Release\jregex.dll MZ3_win32\
 :copy ..\src\lua\Release\lua.dll          MZ3_win32\
 del /Q MZ3_win32\scripts\*
 copy ..\src\MZ3\scripts\*                MZ3_win32\scripts\
+del /Q MZ3_win32\scripts\lib\*
+copy ..\src\MZ3\scripts\lib\*           MZ3_win32\scripts\lib
 del /Q MZ3_win32\scripts\mixi\*
 copy ..\src\MZ3\scripts\mixi\*           MZ3_win32\scripts\mixi
 del /Q MZ3_win32\scripts\goohome\*
