@@ -20,12 +20,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_05DF1E8F0A03485D8B8F899474E1DBA1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0CD7DC0DFCB04F5B8487746EED89A481"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,18 +69,6 @@
         "Entry"
         {
         "MsmKey" = "8:_3183679E24D6419EB5EAC43E0F652BE2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_322CC9CEB71E4A448BFE17232C633C30"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_334B1DADD0B94670AEEDD01CA2AD7302"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -242,12 +224,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_81C9804E30354FEFB089876AD772D0A0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_8E6EF11A5BD44AEAB0902C123386A4FC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -332,12 +308,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C7AF35D090464A7883C9F56912F9307C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C8A7425E99AF47348301322208D348CD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -351,12 +321,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D3D7CC93ECA84A03941872C94B66C5A0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D88021CE7DE442D8BABB8096080B93F9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -429,18 +393,6 @@
         "Entry"
         {
         "MsmKey" = "8:_F1AD7D2E3B3A48F3AE6D7F3A580E2073"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F1D68EB643424798B5F51FDC185118F0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F7D6B8F66D8741B4AB51D40D9A261B18"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -530,24 +482,6 @@
             "TargetName" = "8:emoji.ini"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_05DF1E8F0A03485D8B8F899474E1DBA1"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\goohome\\goohome_quote_quotes_friends_parser.lua"
-            "TargetName" = "8:goohome_quote_quotes_friends_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_F89F108A4B0A4CC9984492D137F83235"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -710,42 +644,6 @@
             "TargetName" = "8:dummy_plugin.lua"
             "Tag" = "8:"
             "Folder" = "8:_C96D8C0A54414528B3B66D574D465CBD"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_322CC9CEB71E4A448BFE17232C633C30"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\auone.luac"
-            "TargetName" = "8:auone.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_334B1DADD0B94670AEEDD01CA2AD7302"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\goohome\\goohome_quote_quotes_friends_parser.luac"
-            "TargetName" = "8:goohome_quote_quotes_friends_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_F89F108A4B0A4CC9984492D137F83235"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1208,24 +1106,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_81C9804E30354FEFB089876AD772D0A0"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\wassr.luac"
-            "TargetName" = "8:wassr.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_8E6EF11A5BD44AEAB0902C123386A4FC"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_user_parser.lua"
@@ -1460,24 +1340,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_C7AF35D090464A7883C9F56912F9307C"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\goohome.lua"
-            "TargetName" = "8:goohome.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_C8A7425E99AF47348301322208D348CD"
             {
             "SourcePath" = "8:skin\\default\\header.jpg"
@@ -1500,24 +1362,6 @@
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\base64.lua"
             "TargetName" = "8:base64.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_D88021CE7DE442D8BABB8096080B93F9"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\wassr.lua"
-            "TargetName" = "8:wassr.lua"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
@@ -1730,42 +1574,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_F1D68EB643424798B5F51FDC185118F0"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\auone.lua"
-            "TargetName" = "8:auone.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_F7D6B8F66D8741B4AB51D40D9A261B18"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\goohome.luac"
-            "TargetName" = "8:goohome.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_FB305B7E41AB4F4E8BB41959E3194A28"
             {
             "SourcePath" = "8:skin\\dark\\header__.jpg"
@@ -1870,15 +1678,6 @@
                             "Name" = "8:mixi"
                             "Condition" = "8:"
                             "Property" = "8:_452661E83E8B4D9B995B25BEAA7F6F63"
-                                "Folders"
-                                {
-                                }
-                            }
-                            "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_F89F108A4B0A4CC9984492D137F83235"
-                            {
-                            "Name" = "8:goohome"
-                            "Condition" = "8:"
-                            "Property" = "8:_C9153029E98D4BEE93F7DB55BFD4EC85"
                                 "Folders"
                                 {
                                 }
