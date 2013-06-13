@@ -1768,7 +1768,7 @@ function do_post_to_twitter(text)
 --	post:append_post_body(mz3.get_app_name());
 
 	-- POST先URL設定
-	url = 'https://api.twitter.com/1/statuses/update.xml';
+	url = 'https://api.twitter.com/1.1/statuses/update.json';
 	
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key(serialize_key);
