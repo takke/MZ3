@@ -422,6 +422,18 @@ function on_migrate_category_url(event_name, serialize_key, url)
 		end
 	end
 	
+	if serialize_key == 'TWITTER_LISTS' then
+	
+		local r;
+		
+		-- lists
+		url, r = my_replace(url, "https://api.twitter.com/1/{twitter:id}/lists.xml",
+		                         "https://api.twitter.com/1.1/lists/list.json");
+		if r == true then
+			return true, url;
+		end
+	end
+	
 	return false;
 end
 mz3.add_event_listener("migrate_category_url", "twitter.on_migrate_category_url");
@@ -453,11 +465,8 @@ function twitter_friends_timeline_parser(parent, body, html)
 	body = MZ3DataList:create(body);
 	html = MZ3HTMLArray:create(html);
 	
-	-- jsonの結合
-	local json_text = html:get_all_text();
---	print(json_text);
-	
 	-- jsonパース
+	local json_text = html:get_all_text();
 	local obj, pos, err = json.decode (json_text, 1, nil)
 	if err then
 		print ("Error:", err);
@@ -596,7 +605,7 @@ end
 --------------------------------------------------
 -- [list] Lists用パーサ
 --
--- https://api.twitter.com/1/{twitter:id}/lists.json
+-- https://api.twitter.com/1.1/lists/list.json
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -614,60 +623,56 @@ function twitter_lists_parser(parent, body, html)
 	-- 全消去
 	body:clear();
 	
+	-- jsonパース
+	local json_text = html:get_all_text();
+	local obj, pos, err = json.decode (json_text, 1, nil)
+	if err then
+		print ("Error:", err);
+		return;
+	end
+
 	local t1 = mz3.get_tick_count();
 	
-	local i=0;
-	local line = '';
-	local line_count = html:get_count();
-	while i<line_count do
-		line = html:get_at(i);
---		mz3.logger_debug('line:' .. i);
+	-- 各要素のパース
+	for i = 1, #obj do
+		local v = obj[i];
 		
-		if line_has_strings(line, '<list>') then
-			local list = '';
-			list, i = get_sub_html(html, i, line_count, {'<list>'}, {'</list>'});
-			if list ~= '' then
---				mz3.logger_debug(' list:' .. list);
-				-- data 生成
-				data = MZ3Data:create();
-				
-				-- 各種データ取得、設定
-				local full_name    = list:match('<full_name>(.-)</');
-				local slug         = list:match('<slug>(.-)</slug>');
-				local member_count = list:match('<member_count>(.-)</member_count>');
-				local subscriber_count = list:match('<subscriber_count>(.-)</subscriber_count>');
-				local uri              = list:match('<uri>(.-)</uri>');
+		-- data 生成
+		data = MZ3Data:create();
+		
+		-- 各種データ取得、設定
+		local full_name    = v.full_name;
+		local slug         = v.slug;
+		local member_count = v.member_count;
+		local subscriber_count = v.subscriber_count;
+		local uri              = v.uri;
+		local user_name        = v.user.screen_name;
+		
+		data:set_text('title', full_name);
+		data:set_text('name', member_count);
+		data:set_text('list_slug', slug);
+		data:set_text('user', user_name);
+		data:set_date(subscriber_count);
+		data:set_text('uri', uri);
 
-				local user_name    = list:match('<screen_name>(.-)</screen_name>');
-				
-				data:set_text('title', full_name);
-				data:set_text('name', member_count);
-				data:set_text('list_slug', slug);
-				data:set_text('user', user_name);
-				data:set_date(subscriber_count);
-				data:set_text('uri', uri);
+		-- Image : list/user/profile_image_url
+		profile_image_url = v.user.profile_image_url;
+		profile_image_url = mz3.decode_html_entity(profile_image_url);
+		mz3.logger_debug(profile_image_url);
+		data:add_text_array('image', profile_image_url);
 
-				-- Image : list/user/profile_image_url
-				profile_image_url = list:match('<profile_image_url>([^<]*)</profile_image_url>');
-				profile_image_url = mz3.decode_html_entity(profile_image_url);
-				mz3.logger_debug(profile_image_url);
-				data:add_text_array('image', profile_image_url);
+		-- 画像表示フラグを立てる
+		data:set_integer('show_image', 1);
 
-				-- 画像表示フラグを立てる
-				data:set_integer('show_image', 1);
+		-- アクセス種別設定
+		type = mz3.get_access_type_by_key('TWITTER_LISTS_ITEM');
+		data:set_access_type(type);
 
-				-- アクセス種別設定
-				type = mz3.get_access_type_by_key('TWITTER_LISTS_ITEM');
-				data:set_access_type(type);
-
-				-- リストに追加
-				body:add(data.data);
-				
-				-- data 削除
-				data:delete();
-			end
-		end
-		i = i+1;
+		-- リストに追加
+		body:add(data.data);
+		
+		-- data 削除
+		data:delete();
 	end
 
 	-- リストがなければメッセージを表示
@@ -697,156 +702,6 @@ function twitter_lists_parser(parent, body, html)
 	mz3.logger_debug("twitter_lists_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end
 mz3.set_parser("TWITTER_LISTS", "twitter.twitter_lists_parser");
-
-
---------------------------------------------------
--- [list] DM用パーサ
---
--- https://api.twitter.com/1/direct_messages.xml
---
--- 引数:
---   parent: 上ペインの選択オブジェクト(MZ3Data*)
---   body:   下ペインのオブジェクト群(MZ3DataList*)
---   html:   HTMLデータ(CHtmlArray*)
---------------------------------------------------
-function twitter_direct_messages_parser(parent, body, html)
-	mz3.logger_debug("twitter_direct_messages_parser start");
-	
-	-- wrapperクラス化
-	parent = MZ3Data:create(parent);
-	body = MZ3DataList:create(body);
-	html = MZ3HTMLArray:create(html);
-
-	-- 'sent.xml' があれば「送信メッセージ」
-	category_url = parent:get_text('url');
-	is_sent = line_has_strings(category_url, 'sent.xml');
-
-	-- 全消去しない
---	body:clear();
-	
-	-- 重複防止用の id 一覧を生成。
-	id_set = {};
-	n = body:get_count();
-	for i=0, n-1 do
-		id = mz3_data.get_integer64_as_string(body:get_data(i), 'id');
-		id_set[ "" .. id ] = true;
-	end
-
-	local t1 = mz3.get_tick_count();
-	
-	-- 一時リスト
-	new_list = MZ3DataList:create();
-	
-	line = '';
-	local line_count = html:get_count();
-	direct_message = '';
-	for i=0, line_count-1 do
-		line = html:get_at(i);
-		
-		if line_has_strings(line, '<direct_message>') then
-			direct_message = line;
-		elseif line_has_strings(line, '</direct_message>') then
-			direct_message = direct_message .. line;
-			
-			-- id : direct_message/id
-			id = direct_message:match('<id>(.-)</id>');
-			
-			-- 同一IDがあれば追加しない。
-			if id_set[ id ] then
---				mz3.logger_debug('id[' .. id .. '] は既に存在するのでskipする');
-			else
-				-- data 生成
-				data = MZ3Data:create();
-				
-				data:set_integer64_from_string('id', id);
-				
-				type = mz3.get_access_type_by_key('TWITTER_USER');
-				data:set_access_type(type);
-				
-				-- text : direct_message/text
-				text = direct_message:match('<text>(.-)</text>');
-				text = text:gsub('&amp;', '&');
-				text = mz3.decode_html_entity(text);
-				data:add_text_array('body', text);
-				
-				-- updated : status/created_at
-				s = direct_message:match('<created_at>(.-)</created_at>');
-				data:parse_date_line(s);
-				
-				-- URL を抽出し、リンクにする
-				for url in text:gmatch("h?ttps?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%%#]+") do
-					data:add_link_list(url, url);
---					mz3.logger_debug(url);
-				end
-				
-
-				if is_sent then
-					user = direct_message:match('<recipient>.-</recipient>');
-				else
-					user = direct_message:match('<sender>.-</sender>');
-				end
-				
-				-- name : direct_message/user/screen_name
-				s = user:match('<screen_name>(.-)</screen_name>');
-				s = s:gsub('&amp;', '&');
-				s = mz3.decode_html_entity(s);
-				data:set_text('name', s);
-				
-				-- author : direct_message/user/name
-				s = user:match('<name>(.-)</name>');
-				s = mz3.decode_html_entity(s);
-				data:set_text('author', s);
-
-				-- description : direct_message/user/description
-				-- title に入れるのは苦肉の策・・・
-				s = user:match('<description>(.-)</description>');
-				s = s:gsub('&amp;', '&');
-				s = mz3.decode_html_entity(s);
-				data:set_text('title', s);
-
-				-- owner-id : direct_message/user/id
-				data:set_integer('owner_id', user:match('<id>(.-)</id>'));
-
-				-- URL : direct_message/user/url
-				url = user:match('<url>(.-)</url>');
-				data:set_text('url', url);
-				data:set_text('browse_uri', url);
-
-				-- Image : direct_message/user/profile_image_url
-				profile_image_url = user:match('<profile_image_url>(.-)</profile_image_url>');
-				profile_image_url = mz3.decode_html_entity(profile_image_url);
-				data:add_text_array('image', profile_image_url);
-
-				data:set_text('user_tag', user);
-
-				-- 一時リストに追加
-				new_list:add(data.data);
-				
-				-- data 削除
-				data:delete();
-
-			end
-
-			-- 次の direct_message 取得
-			direct_message = '';
-		elseif direct_message ~= '' then	-- direct_message が空であれば <direct_message> 未発見なので読み飛ばす
-			direct_message = direct_message .. line;
-		end
-	end
-	
-	-- 生成したデータを出力に反映
-	body:merge(new_list);
-	--TwitterParserBase::MergeNewList(out_, new_list);
-
-	new_list:delete();
-	
-	-- 新着件数を parent(カテゴリの m_mixi) に設定する
-	parent:set_integer('new_count', new_count);
-	
-	local t2 = mz3.get_tick_count();
-	mz3.logger_debug("twitter_direct_messages_parser end; elapsed : " .. (t2-t1) .. "[msec]");
-end
-mz3.set_parser("TWITTER_DIRECT_MESSAGES", "twitter.twitter_direct_messages_parser");
 
 
 --------------------------------------------------
@@ -1658,7 +1513,7 @@ function on_body_list_click(serialize_key, event_name, data)
 		local title = data:get_text('title');
 		local user = data:get_text('user');
 		local list_slug = data:get_text('list_slug');
-		local url = 'https://api.twitter.com/1/' .. user .. '/lists/' .. list_slug .. '/statuses.xml';
+		local url = 'https://api.twitter.com/1.1/lists/statuses.json?slug=' .. list_slug .. '&owner_screen_name=' .. user;
 		local key = "TWITTER_FRIENDS_TIMELINE";
 		mz3_main_view.append_category(title, url, key);
 		
