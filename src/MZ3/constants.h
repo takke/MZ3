@@ -157,7 +157,7 @@ enum ACCESS_TYPE {
 	// Twitter
 	//----------------------------------------------
 	//--- Twitter Timeline 系
-	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
+//	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
 	ACCESS_TWITTER_UPDATE,				///< [POST] ステータス更新
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
@@ -166,7 +166,7 @@ enum ACCESS_TYPE {
 //	ACCESS_TWITTER_NEW_DM,				///< [POST] DM送信
 
 	//--- Twitter Favorites 系
-	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] お気に入り取得
+//	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] お気に入り取得
 
 	//----------------------------------------------
 	// Wassr

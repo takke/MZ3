@@ -39,7 +39,7 @@ bool Mz3GroupData::initForTopPage(AccessTypeInfo& accessTypeInfo, const Initiali
  *
  * カテゴリ名も変更可能(例:"みんなのecho" ⇒ "みんなのボイス")
  */
-inline CString getNormalizedCategoryUrl(LPCTSTR default_category_url,
+inline CString migrateCategoryUrl(LPCTSTR default_category_url,
 										CStringA category_url,
 										ACCESS_TYPE category_type,
 										std::string& category_name)
@@ -85,19 +85,13 @@ inline CString getNormalizedCategoryUrl(LPCTSTR default_category_url,
 	}
 #endif
 
-	if (category_type == ACCESS_TWITTER_FRIENDS_TIMELINE) {
-		// 移行処理：friends_timeline.xml => home_timeline.xml
-		if (category_url.Find("http://twitter.com/statuses/friends_timeline.xml")>=0) {
-			category_url.Replace("http://twitter.com/statuses/friends_timeline.xml",
-								 "http://api.twitter.com/1/statuses/home_timeline.xml");
-			return CString(category_url);
-		}
-
-		// 移行処理：home_timeline.xml (BASIC認証用) => api 用 URL
-		if (category_url.Find("http://twitter.com/statuses/home_timeline.xml")>=0) {
-			category_url.Replace("http://twitter.com/statuses/home_timeline.xml",
-								 "http://api.twitter.com/1/statuses/home_timeline.xml");
-			return CString(category_url);
+	// MZ3 API : カテゴリURLのmigrate
+	util::MyLuaDataList rvals;
+	rvals.push_back(util::MyLuaData(""));	// URL
+	CStringA serializeKey = CStringA(theApp.m_accessTypeInfo.getSerializeKey(category_type));
+	if (util::CallMZ3ScriptHookFunctions2("migrate_category_url", &rvals, util::MyLuaData(serializeKey), util::MyLuaData(category_url))) {
+		if (rvals.size() == 1) {
+			return CString(rvals[0].m_strText);
 		}
 	}
 
@@ -149,7 +143,7 @@ bool Mz3GroupData::appendCategoryByIniData(
 	if (category_url!=NULL && strlen(category_url) > 0) {
 
 		// カテゴリURLの移行処理
-		url = getNormalizedCategoryUrl(default_category_url, category_url, category_type, category_name);
+		url = migrateCategoryUrl(default_category_url, category_url, category_type, category_name);
 		if (url.IsEmpty()) {
 			return true;
 		}

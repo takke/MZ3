@@ -450,49 +450,6 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- Twitter 系
 	//------------------------------------------------------------------
-/*	type = ACCESS_TWITTER_FRIENDS_TIMELINE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "Twitter"
-		, L"タイムライン"
-//		, REQUEST_METHOD_POST// タイムライン取得をPOSTにしてみる
-		, REQUEST_METHOD_GET
-		);
-	// http://twitter.com/statuses/friends_timeline.xml
-	// http://twitter.com/statuses/friends_timeline/takke.xml
-	// http://twitter.com/statuses/replies.xml
-	// http://twitter.com/statuses/user_timeline.xml
-	// http://twitter.com/statuses/user_timeline/takke.xml
-	// => twitter/user_timeline_takke.xml
-	m_map[type].cacheFilePattern = L"twitter\\{urlafter:/:friends_timeline.xml}";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FRIENDS_TIMELINE";
-	m_map[type].defaultCategoryURL = L"http://twitter.com/statuses/friends_timeline.xml";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
-*/
-	type = ACCESS_TWITTER_FAVORITES;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "Twitter"
-		, L"お気に入り"
-		, REQUEST_METHOD_GET
-		);
-	// http://twitter.com/favorites.xml
-	// http://twitter.com/favorites/takke.xml
-	// => twitter/favorites_takke.xml
-	m_map[type].cacheFilePattern = L"twitter\\favorites{urlafter:favorites/:.xml}";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_FAVORITES";
-	m_map[type].defaultCategoryURL = L"http://twitter.com/favorites.xml";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
 /*
 	type = ACCESS_TWITTER_DIRECT_MESSAGES;
 	m_map[type] = AccessTypeInfo::Data(

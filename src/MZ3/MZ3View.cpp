@@ -5826,7 +5826,9 @@ bool CMZ3View::AppendCategoryList(const CCategoryItem& categoryItem)
 	CCategoryItem* pCategoryItem = NULL;
 	for( u_int i=0; i<m_selGroup->categories.size(); i++ ) {
 		CCategoryItem& category = m_selGroup->categories[i];
-		if( category.m_mixi.GetAccessType() == ACCESS_TWITTER_FRIENDS_TIMELINE &&
+
+		const char* szSerializeKey = theApp.m_accessTypeInfo.getSerializeKey(category.m_mixi.GetAccessType());
+		if (strcmp(szSerializeKey, "TWITTER_FRIENDS_TIMELINE") == 0 &&
 			category.m_mixi.GetURL()==url)
 		{
 			// 該当項目発見。
@@ -6557,36 +6559,12 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 		{
 			// イベントハンドラ完了
 		} else {
-			switch (aType) {
-/*
-#ifdef BT_MZ3
-			case ACCESS_LIST_FRIEND:
-	//			MZ3_TRACE(L"★ACCESS_LIST_FRIEND\n");
-				// マイミク一覧
-				// list_friend.pl であれば、ajax_friend_setting.pl に変更して再リクエスト
-				if (wcsstr(theApp.m_inet.GetURL(), L"list_friend.pl")!=NULL) {
-					// 再リクエスト
-					CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
-					AccessProc( &pCategoryItem->m_mixi, util::CreateMixiUrl(pCategoryItem->m_mixi.GetURL()));
-					return false;
-				} else {
-					// 取得完了したので post_key を初期化しておく。
-					CMixiDataList& body = m_selGroup->getSelectedCategory()->m_body;
-					if (body.size()>0) {
-	//					MZ3_TRACE(L"  ★post_key, reset\n");
-						body[0].SetTextValue(L"post_key", L"");
-					}
-				}
-				break;
-#endif
-*/
-
-			case ACCESS_TWITTER_FRIENDS_TIMELINE:
+			const char* szSerializeKey = theApp.m_accessTypeInfo.getSerializeKey(aType);
+			if (strcmp(szSerializeKey, "TWITTER_FRIENDS_TIMELINE") == 0) {
 				MZ3_TRACE(L"★ACCESS_TWITTER_FRIENDS_TIMELINE\n");
 				// Twitter タイムライン、ページ変更(複数ページ取得)処理
 				if (theApp.m_access) {
 					// 画像取得中の可能性あり。キャンセル
-					break;
 				} else {
 					CCategoryItem* pCategoryItem = m_selGroup->getSelectedCategory();
 					int page = pCategoryItem->m_mixi.GetIntValue(L"request_page", 1);
@@ -6658,7 +6636,6 @@ bool CMZ3View::DoAccessEndProcForBody(ACCESS_TYPE aType)
 						pCategoryItem->m_mixi.SetIntValue(L"request_page", 1);
 					}
 				}
-				break;
 			}
 		}
 	}
