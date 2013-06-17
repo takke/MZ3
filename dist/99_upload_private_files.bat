@@ -10,20 +10,20 @@
 @echo rename x.CAB MZ3.%MZ3_VERSION%.CAB      >> %DAT_FILE%
 @echo chmod 744 MZ3.%MZ3_VERSION%.CAB         >> %DAT_FILE%
 
-@echo put MZ4.%MZ3_VERSION%.lzh x.lzh         >> %DAT_FILE%
-@echo rm MZ4.%MZ3_VERSION%.lzh                >> %DAT_FILE%
-@echo rename x.lzh MZ4.%MZ3_VERSION%.lzh      >> %DAT_FILE%
-@echo chmod 744 MZ4.%MZ3_VERSION%.lzh         >> %DAT_FILE%
+@echo put MZ4.%MZ3_VERSION%.zip x.zip         >> %DAT_FILE%
+@echo rm MZ4.%MZ3_VERSION%.zip                >> %DAT_FILE%
+@echo rename x.zip MZ4.%MZ3_VERSION%.zip      >> %DAT_FILE%
+@echo chmod 744 MZ4.%MZ3_VERSION%.zip         >> %DAT_FILE%
 
 @echo put TkTweets.%MZ3_VERSION%.CAB x.CAB    >> %DAT_FILE%
 @echo rm TkTweets.%MZ3_VERSION%.CAB           >> %DAT_FILE%
 @echo rename x.CAB TkTweets.%MZ3_VERSION%.CAB >> %DAT_FILE%
 @echo chmod 744 TkTweets.%MZ3_VERSION%.CAB    >> %DAT_FILE%
 
-@echo put TkTweets.%MZ3_VERSION%.lzh x.lzh    >> %DAT_FILE%
-@echo rm TkTweets.%MZ3_VERSION%.lzh           >> %DAT_FILE%
-@echo rename x.lzh TkTweets.%MZ3_VERSION%.lzh >> %DAT_FILE%
-@echo chmod 744 TkTweets.%MZ3_VERSION%.lzh    >> %DAT_FILE%
+@echo put TkTweets.%MZ3_VERSION%.zip x.zip    >> %DAT_FILE%
+@echo rm TkTweets.%MZ3_VERSION%.zip           >> %DAT_FILE%
+@echo rename x.zip TkTweets.%MZ3_VERSION%.zip >> %DAT_FILE%
+@echo chmod 744 TkTweets.%MZ3_VERSION%.zip    >> %DAT_FILE%
 
 @echo bye                                     >> %DAT_FILE%
 

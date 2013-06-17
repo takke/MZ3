@@ -6,13 +6,13 @@
 @call 00_set_env.bat
 
 @set dist_dir=%CD%
-@set DOC=doc.LZH
-@set DOC_TO=..\dist\MZ3.%MZ3_VERSION%.srcdoc.lzh
+@set DOC=doc.zip
+@set DOC_TO=..\dist\MZ3.%MZ3_VERSION%.srcdoc.zip
 
 @echo ■ ソースドキュメントファイルを圧縮します
 @cd ..\doxygen
 @del %DOC%
-%UNLHA_EXE% @%dist_dir%\response_srcdoc.txt
+@%_7Z_EXE% a -r -tzip %DOC% *
 
 @echo ■ 圧縮したソースドキュメントファイルを移動します
 @echo %DOC% ⇒ %DOC_TO%

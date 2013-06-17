@@ -1,1 +1,0 @@
-a src -r2 -d1 $ src MZ3.sln doxygen\Doxyfile dist\*.bat dist\response_*.txt dist\toppage_group_sample.ini doc\*
