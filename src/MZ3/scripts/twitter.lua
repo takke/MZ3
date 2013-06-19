@@ -815,6 +815,8 @@ function get_http_status_error_status(http_status)
 		return "権限がないAPI を実行しようとした";
 	elseif http_status==404 then		-- Not Found:
 		return "存在しない API を実行しようとした、存在しないユーザを引数で指定して API を実行しようとした";
+	elseif http_status==410 then		-- Gone:
+		return "APIが廃止されました";
 	elseif http_status==500 then		-- Internal Server Error:
 		return "Twitter 側で何らかの問題が発生しています";
 	elseif http_status==502 then		-- Bad Gateway:
