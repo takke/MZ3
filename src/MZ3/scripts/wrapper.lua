@@ -143,6 +143,7 @@ function MZ3AccessTypeInfo:create(type)
 	return object;
 end
 
+function MZ3AccessTypeInfo:set_params(params)			return mz3_access_type_info.set_params(self.type, params);			end
 function MZ3AccessTypeInfo:set_info_type(c)				return mz3_access_type_info.set_info_type(self.type, c);			end
 function MZ3AccessTypeInfo:set_service_type(st)			return mz3_access_type_info.set_service_type(self.type, st);		end
 function MZ3AccessTypeInfo:set_serialize_key(key)		return mz3_access_type_info.set_serialize_key(self.type, key);		end

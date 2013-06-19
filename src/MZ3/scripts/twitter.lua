@@ -46,77 +46,58 @@ end
 
 -- POST用アクセス種別登録
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FAVOURINGS_CREATE');
-type:set_short_title('お気に入り登録');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_FAVOURINGS_CREATE',
+  short_title='お気に入り登録', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FAVOURINGS_DESTROY');
-type:set_short_title('お気に入り削除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_FAVOURINGS_DESTROY',
+  short_title='お気に入り削除', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FRIENDSHIPS_CREATE');
-type:set_short_title('フォロー登録');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_FRIENDSHIPS_CREATE',
+  short_title='フォロー登録', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FRIENDSHIPS_DESTROY');
-type:set_short_title('フォロー解除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_FRIENDSHIPS_DESTROY',
+  short_title='フォロー解除', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_UPDATE_WITH_TWITPIC');
-type:set_short_title('twitpic投稿');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_UPDATE_WITH_TWITPIC',
+  short_title='twitpic投稿', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_UPDATE_RETWEET');
-type:set_short_title('ReTweet');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_UPDATE_RETWEET',
+  short_title='ReTweet', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_UPDATE_DESTROY');
-type:set_short_title('発言削除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_UPDATE_DESTROY',
+  short_title='発言削除', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_USER_BLOCK_CREATE');
-type:set_short_title('ブロック');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_USER_BLOCK_CREATE',
+  short_title='ブロック', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_USER_BLOCK_DESTROY');
-type:set_short_title('ブロック解除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
-
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_UPDATE_DESTROY',
+  short_title='ブロック解除', request_method='POST', request_encoding='utf8'
+});
 
 -- https://api.twitter.com/1.1/statuses/home_timeline.json
 -- https://api.twitter.com/1.1/statuses/home_timeline.json?screen_name=takke
@@ -125,13 +106,11 @@ type:set_request_encoding('utf8');
 -- https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=takke
 -- => twitter/user_timeline_takke.json
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FRIENDS_TIMELINE');
-type:set_short_title('タイムライン');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='Twitter', key='TWITTER_FRIENDS_TIMELINE',
+  short_title='タイムライン', request_method='GET', request_encoding='utf8'
+});
 type:set_cache_file_pattern('twitter\\{urlafter:/:friends_timeline.json}');
-type:set_request_encoding('utf8');
 type:set_default_url('https://api.twitter.com/1.1/statuses/home_timeline.json');
 type:set_body_header(1, 'body', '発言');
 type:set_body_header(2, 'name', '名前>>');
@@ -144,13 +123,11 @@ type:set_body_integrated_line_pattern(2, '%1');			-- "発言"
 -- https://api.twitter.com/1.1/favorites/list.json?screen_name=takke
 -- => twitter/favorites_takke.json
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FAVORITES');
-type:set_short_title('お気に入り');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='Twitter', key='TWITTER_FAVORITES',
+  short_title='お気に入り', request_method='GET', request_encoding='utf8'
+});
 type:set_cache_file_pattern('twitter\\favorites{urlafter:screen_name=/:.json}');
-type:set_request_encoding('utf8');
 type:set_default_url('https://api.twitter.com/1.1/favorites/list.json');
 type:set_body_header(1, 'body', '発言');
 type:set_body_header(2, 'name', '名前>>');
@@ -161,13 +138,11 @@ type:set_body_integrated_line_pattern(2, '%1');			-- "発言"
 
 -- Lists用アクセス種別登録
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_LISTS');
-type:set_short_title('リスト一覧');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='Twitter', key='TWITTER_LISTS',
+  short_title='リスト一覧', request_method='GET', request_encoding='utf8'
+});
 type:set_cache_file_pattern('twitter\\{urlafter:/}');
-type:set_request_encoding('utf8');
 type:set_default_url('https://api.twitter.com/1.1/favorites/list.json?screen_name{twitter:id}');	-- dummy
 type:set_body_header(1, 'title', 'リスト名');
 type:set_body_header(2, 'name', 'members>>');	-- MZ3の制限のため
@@ -176,21 +151,17 @@ type:set_body_integrated_line_pattern(1, '%1 (%2)');
 type:set_body_integrated_line_pattern(2, '  Followers:%3');
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('other');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_LISTS_ITEM');
-type:set_short_title('Twitterリスト');
-type:set_request_method('GET');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='other', service_type='Twitter', key='TWITTER_LISTS_ITEM',
+  short_title='Twitterリスト', request_method='GET', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FOLLOWERS');
-type:set_short_title('フォロワー一覧');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='Twitter', key='TWITTER_FOLLOWERS',
+  short_title='フォロワー一覧', request_method='GET', request_encoding='utf8'
+});
 type:set_cache_file_pattern('twitter\\followers_lists.json');
-type:set_request_encoding('utf8');
 type:set_default_url('https://api.twitter.com/1.1/followers/lists.json');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
@@ -198,13 +169,11 @@ type:set_body_integrated_line_pattern(1, '%1');
 type:set_body_integrated_line_pattern(2, '%2');
 
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_FOLLOWINGS');
-type:set_short_title('フォロー一覧');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='Twitter', key='TWITTER_FOLLOWINGS',
+  short_title='フォロー一覧', request_method='GET', request_encoding='utf8'
+});
 type:set_cache_file_pattern('twitter\\friends_lists.json');
-type:set_request_encoding('utf8');
 type:set_default_url('https://api.twitter.com/1.1/friends/lists.json');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
@@ -213,63 +182,49 @@ type:set_body_integrated_line_pattern(2, '%2');
 
 -- bit.ly
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_BIT_LY');
-type:set_short_title('bit.ly');
-type:set_request_method('GET');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='other', service_type='Twitter', key='TWITTER_BIT_LY',
+  short_title='bit.ly', request_method='GET', request_encoding='utf8'
+});
 
 -- access_token
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_ACCESS_TOKEN');
-type:set_short_title('token');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='other', service_type='Twitter', key='TWITTER_ACCESS_TOKEN',
+  short_title='token', request_method='POST', request_encoding='utf8'
+});
 
 -- dummy
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('other');
-type:set_service_type('TwitterX');
-type:set_serialize_key('TWITTER_X_DUMMY');
-type:set_short_title('dummy');
-type:set_request_method('GET');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='other', service_type='TwitterX', key='TWITTER_X_DUMMY',
+  short_title='dummy', request_method='GET', request_encoding='utf8'
+});
 
 -- リスト系
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_CREATE_LIST');
-type:set_short_title('リスト作成');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_CREATE_LIST',
+  short_title='リスト作成', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_DELETE_LIST');
-type:set_short_title('リスト削除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_DELETE_LIST',
+  short_title='リスト削除', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_ADD_LIST_MEMBER');
-type:set_short_title('リストに追加');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_ADD_LIST_MEMBER',
+  short_title='リストに追加', request_method='POST', request_encoding='utf8'
+});
 
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('post');
-type:set_service_type('Twitter');
-type:set_serialize_key('TWITTER_DELETE_LIST_MEMBER');
-type:set_short_title('リストから削除');
-type:set_request_method('POST');
-type:set_request_encoding('utf8');
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_DELETE_LIST_MEMBER',
+  short_title='リストから削除', request_method='POST', request_encoding='utf8'
+});
 
 
 ----------------------------------------

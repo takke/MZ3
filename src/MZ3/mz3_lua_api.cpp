@@ -2983,6 +2983,60 @@ int lua_mz3_access_type_info_new_access_type(lua_State *L)
 	return 1;
 }
 
+// from http://densan-labs.net/tech/lua/chapter6.html
+void dumpStack(lua_State* L)
+{
+	int i;
+	int stackSize = lua_gettop(L);
+	for( i = stackSize; i >= 1; i-- ) {
+		int type = lua_type(L, i);
+		printf("Stack[%2d-%10s] : ", i, lua_typename(L,type) );
+
+		switch( type ) {
+		case LUA_TNUMBER:
+			printf("%f", lua_tonumber(L, i) );
+			break;
+		case LUA_TBOOLEAN:
+			if( lua_toboolean(L, i) ) {
+				printf("true");
+			}else{
+				printf("false");
+			}
+			break;
+		case LUA_TSTRING:
+			{
+				CString s = MyUTF82WCS2(lua_tostring(L, i));
+				wprintf(L"%s", (LPCTSTR)s);
+			}
+			break;
+		case LUA_TNIL:
+			break;
+		default:
+			printf("%s", lua_typename(L, type));
+			break;
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+static bool mz3_access_type_info_set_info_type(ACCESS_TYPE access_type, const std::string& info_type)
+{
+	if (info_type=="category") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_CATEGORY;
+	} else if (info_type=="body") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_BODY;
+	} else if (info_type=="post") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_POST;
+	} else if (info_type=="other") {
+		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_OTHER;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
 /*
 --- アクセス種別の種別の設定
 --
@@ -3000,15 +3054,7 @@ int lua_mz3_access_type_info_set_info_type(lua_State *L)
 	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
 	const std::string& info_type = lua_tostring(L, 2);
 
-	if (info_type=="category") {
-		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_CATEGORY;
-	} else if (info_type=="body") {
-		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_BODY;
-	} else if (info_type=="post") {
-		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_POST;
-	} else if (info_type=="other") {
-		theApp.m_accessTypeInfo.m_map[access_type].infoType = AccessTypeInfo::INFO_TYPE_OTHER;
-	} else {
+	if (!mz3_access_type_info_set_info_type(access_type, info_type)) {
 		lua_pushstring(L, MyWCS2UTF8(L"サポート外のinfo_typeです"));
 		lua_error(L);
 		return 0;
@@ -3325,6 +3371,120 @@ int lua_mz3_access_type_info_set_cruise_target(lua_State *L)
 	// 戻り値の数を返す
 	return 1;
 }
+
+
+/*
+--- アクセス種別のパラメータの一括設定
+--
+-- @param type アクセス種別
+-- @param table 各キーにパラメータを設定する(info_type, service_type, key, short_title, request_method, request_encoding)
+-- @return [bool] 成功時は true、失敗時は false
+--
+function mz3_access_type_info.set_params(type, table)
+*/
+int lua_mz3_access_type_info_set_params(lua_State *L)
+{
+	const char* func_name = "mz3_access_type_info.set_params";
+
+//	printf("----- %s -----\n", func_name);
+//	dumpStack(L);
+
+	// 引数取得
+	ACCESS_TYPE access_type = (ACCESS_TYPE)lua_tointeger(L, 1);
+
+	// アクセス種別の種別
+	lua_getfield(L, -1, "info_type");
+	if (!lua_isnil(L, -1)) {
+		const char* info_type = lua_tostring(L, -1);
+
+		if (!mz3_access_type_info_set_info_type(access_type, info_type)) {
+			lua_pushstring(L, MyWCS2UTF8(L"サポート外のinfo_typeです"));
+			lua_error(L);
+			return 0;
+		}
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+
+	// サービス種別
+	lua_getfield(L, -1, "service_type");
+	if (!lua_isnil(L, -1)) {
+		const char* service_type = lua_tostring(L, -1);
+
+		theApp.m_accessTypeInfo.m_map[access_type].serviceType = service_type;
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+
+	// シリアライズキーの設定
+	lua_getfield(L, -1, "key");
+	if (!lua_isnil(L, -1)) {
+		const char* serialize_key = lua_tostring(L, -1);
+
+		theApp.m_accessTypeInfo.m_map[access_type].serializeKey = serialize_key;
+		theApp.m_accessTypeInfo.m_serializeKeyToAccessKeyMap[serialize_key] = access_type;
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+
+	// 簡易タイトルの設定
+	lua_getfield(L, -1, "short_title");
+	if (!lua_isnil(L, -1)) {
+		CString short_title = MyUTF82WCS2(lua_tostring(L, -1));
+
+		theApp.m_accessTypeInfo.m_map[access_type].shortText = short_title;
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+	
+	// リクエストメソッドの設定
+	lua_getfield(L, -1, "request_method");
+	if (!lua_isnil(L, -1)) {
+		const std::string& method_type = lua_tostring(L, -1);
+
+		if (method_type=="GET") {
+			theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_GET;
+		} else if (method_type=="POST") {
+			theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_POST;
+		} else {
+			theApp.m_accessTypeInfo.m_map[access_type].requestMethod = AccessTypeInfo::REQUEST_METHOD_INVALID;
+		}
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+
+	// エンコーディングの設定
+	lua_getfield(L, -1, "request_encoding");
+	if (!lua_isnil(L, -1)) {
+		const std::string& encoding = lua_tostring(L, -1);
+
+		if (encoding=="sjis") {
+			theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_SJIS;
+		} else if (encoding=="euc-jp") {
+			theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_EUC;
+		} else if (encoding=="utf8") {
+			theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_UTF8;
+		} else {
+			theApp.m_accessTypeInfo.m_map[access_type].requestEncoding = AccessTypeInfo::ENCODING_NOCONVERSION;
+		}
+
+//		dumpStack(L);
+		lua_pop(L, 1);
+	}
+
+
+	// 結果をスタックに積む
+	lua_pushboolean(L, 1);
+
+	// 戻り値の数を返す
+	return 1;
+}
+
 
 //-----------------------------------------------
 // MZ3 GroupData API
@@ -4399,6 +4559,7 @@ static const luaL_Reg lua_mz3_inifile_lib[] = {
 };
 static const luaL_Reg lua_mz3_access_type_info_lib[] = {
 	{"new_access_type",		lua_mz3_access_type_info_new_access_type},
+	{"set_params",			lua_mz3_access_type_info_set_params},
 	{"set_info_type",		lua_mz3_access_type_info_set_info_type},
 	{"set_service_type",	lua_mz3_access_type_info_set_service_type},
 	{"set_serialize_key",	lua_mz3_access_type_info_set_serialize_key},
