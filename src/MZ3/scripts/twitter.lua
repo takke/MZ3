@@ -161,8 +161,8 @@ type:set_params({
   info_type='category', service_type='Twitter', key='TWITTER_FOLLOWERS',
   short_title='フォロワー一覧', request_method='GET', request_encoding='utf8'
 });
-type:set_cache_file_pattern('twitter\\followers_lists.json');
-type:set_default_url('https://api.twitter.com/1.1/followers/lists.json');
+type:set_cache_file_pattern('twitter\\followers_list.json');
+type:set_default_url('https://api.twitter.com/1.1/followers/list.json');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -173,8 +173,8 @@ type:set_params({
   info_type='category', service_type='Twitter', key='TWITTER_FOLLOWINGS',
   short_title='フォロー一覧', request_method='GET', request_encoding='utf8'
 });
-type:set_cache_file_pattern('twitter\\friends_lists.json');
-type:set_default_url('https://api.twitter.com/1.1/friends/lists.json');
+type:set_cache_file_pattern('twitter\\friends_list.json');
+type:set_default_url('https://api.twitter.com/1.1/friends/list.json');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -384,6 +384,26 @@ function on_migrate_category_url(event_name, serialize_key, url)
 		-- lists
 		url, r = my_replace(url, "https://api.twitter.com/1/{twitter:id}/lists.xml",
 		                         "https://api.twitter.com/1.1/lists/list.json");
+		if r == true then
+			return true, url;
+		end
+	end
+	
+	if serialize_key == 'TWITTER_FOLLOWINGS' then
+	
+		local r;
+		url, r = my_replace(url, "https://api.twitter.com/1/statuses/friends.xml",
+		                         "https://api.twitter.com/1.1/friends/list.json");
+		if r == true then
+			return true, url;
+		end
+	end
+	
+	if serialize_key == 'TWITTER_FOLLOWERS' then
+	
+		local r;
+		url, r = my_replace(url, "https://api.twitter.com/1/statuses/followers.xml",
+		                         "https://api.twitter.com/1.1/followers/list.json");
 		if r == true then
 			return true, url;
 		end
@@ -662,8 +682,8 @@ mz3.set_parser("TWITTER_LISTS", "twitter.twitter_lists_parser");
 --------------------------------------------------
 -- [list] followers/friends用パーサ
 --
--- https://api.twitter.com/1.1/followers/lists.json
--- https://api.twitter.com/1.1/friends/lists.json
+-- https://api.twitter.com/1.1/followers/list.json
+-- https://api.twitter.com/1.1/friends/list.json
 --
 -- 引数:
 --   parent: 上ペインの選択オブジェクト(MZ3Data*)
@@ -681,95 +701,92 @@ function twitter_followers_parser(parent, body, html)
 	-- 全消去
 	body:clear();
 
+	-- jsonパース
+	local json_text = html:get_all_text();
+	local obj, pos, err = json.decode (json_text, 1, nil)
+	if err then
+		print ("Error:", err);
+		return;
+	end
+
 	local t1 = mz3.get_tick_count();
+	
+	local users = obj.users;
+	
+	-- 各要素のパース
+	for i = 1, #users do
+		local user = users[i];
 
-	local i=0;
-	local line = '';
-	local line_count = html:get_count();
-	while i<line_count do
-		line = html:get_at(i);
+		-- data 生成
+		data = MZ3Data:create();
 
-		if line_has_strings(line, '<user>') then
-			local user = '';
-			user, i = get_sub_html(html, i, line_count, {'<user>'}, {'</user>'});
+		-- アクセス種別設定
+		type = mz3.get_access_type_by_key('TWITTER_USER');
+		data:set_access_type(type);
 
-			if user ~= '' then
-				-- data 生成
-				data = MZ3Data:create();
+		-- 各種データ取得、設定
 
-				-- アクセス種別設定
-				type = mz3.get_access_type_by_key('TWITTER_USER');
-				data:set_access_type(type);
+		local owner_id        = user.id;
+		local user_name       = user.name; -- 日本語名
+		local screen_name     = user.screen_name; -- @名前
+		local location        = mz3.decode_html_entity(user.location);
+		local description     = user.description;
+		local uri             = user.url;
+		local followers_count = user.followers_count;
+		local friends_count   = user.friends_count;
 
-				-- 各種データ取得、設定
+		local status     = user.status;
+		
+		local id         = status and status.id;
+		local created_at = status and status.created_at;
+		local text       = status and status.text;
+		local source     = status and mz3.decode_html_entity(status.source);
 
-				local owner_id        = user:match('<id>(.-)</id>');
-				local user_name       = user:match('<name>(.-)</name>'); -- 日本語名
-				local screen_name     = user:match('<screen_name>(.-)</screen_name>'); -- @名前の
-				local location        = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
-				local description     = user:match('<description>(.-)</description>');
-				local uri             = user:match('<uri>(.-)</uri>');
-				local followers_count = user:match('<followers_count>(.-)</followers_count>');
-				local friends_count   = user:match('<friends_count>(.-)</friends_count>');
+		user_name = user_name:gsub('&amp;', '&');
+		user_name = mz3.decode_html_entity(user_name);
 
-				status, j = get_sub_html(html, i, line_count, {'<status>'}, {'</status>'});
-				local id         = status:match('<id>(.-)</id>');
-				local created_at = user:match('<created_at>(.-)</created_at>');
-				local text       = user:match('<text>(.-)</text>');
-				local source     = user:match('<source>(.-)</source>');
+		screen_name = screen_name:gsub('&amp;', '&');
+		screen_name = mz3.decode_html_entity(screen_name);
 
-				source   = mz3.decode_html_entity(source);
-				location = mz3.decode_html_entity(location);
-
-				user_name = user_name:gsub('&amp;', '&');
-				user_name = mz3.decode_html_entity(user_name);
-
-				screen_name = screen_name:gsub('&amp;', '&');
-				screen_name = mz3.decode_html_entity(screen_name);
-
-				if description ~= nil then
-					description = description:gsub('&amp;', '&');
-					description = mz3.decode_html_entity(description);
-				end
-
-				if text ~= nil then
-					text = text:gsub('&amp;', '&');
-					text = mz3.decode_html_entity(text);
-				end
-
-				data:set_integer64_from_string('id', id);
-				data:set_integer('owner_id', owner_id);
-				data:set_text('name', screen_name);
-				data:set_text('author', user_name);
-				data:set_text('location', location);
-				data:set_text('title', description);
-				data:set_text('uri', uri);
-				data:set_text('text', text);
-				data:parse_date_line(created_at);
-				data:add_text_array('body', text);
-				data:set_text('source', source);
-				data:set_text('followers_count', followers_count);
-				data:set_text('friends_count', friends_count);
-
-				-- Image : user/user/profile_image_url
-				profile_image_url = user:match('<profile_image_url>([^<]*)</profile_image_url>');
-				profile_image_url = mz3.decode_html_entity(profile_image_url);
---				mz3.logger_debug(profile_image_url);
-				data:add_text_array('image', profile_image_url);
-
-				-- 画像表示フラグを立てる
-				data:set_integer('show_image', 1);
-
-				data:set_text('user_tag', user);
-
-				-- リストに追加
-				body:add(data.data);
-
-				-- data 削除
-				data:delete();
-			end
+		if description ~= nil then
+			description = description:gsub('&amp;', '&');
+			description = mz3.decode_html_entity(description);
 		end
-		i = i+1;
+
+		if text ~= nil then
+			text = text:gsub('&amp;', '&');
+			text = mz3.decode_html_entity(text);
+		end
+
+		data:set_integer64_from_string('id', id);
+		data:set_integer('owner_id', owner_id);
+		data:set_text('name', screen_name);
+		data:set_text('author', user_name);
+		data:set_text('location', location);
+		data:set_text('title', description);
+		data:set_text('uri', uri);
+		data:set_text('text', text);
+		data:parse_date_line(created_at);
+		data:add_text_array('body', text);
+		data:set_text('source', source);
+		data:set_text('followers_count', followers_count);
+		data:set_text('friends_count', friends_count);
+
+		-- Image : user/user/profile_image_url
+		profile_image_url = user.profile_image_url;
+		profile_image_url = mz3.decode_html_entity(profile_image_url);
+		data:add_text_array('image', profile_image_url);
+
+		-- 画像表示フラグを立てる
+		data:set_integer('show_image', 1);
+
+		data:set_text('user_tag', user);
+
+		-- リストに追加
+		body:add(data.data);
+
+		-- data 削除
+		data:delete();
 	end
 
 	local t2 = mz3.get_tick_count();
@@ -2220,8 +2237,8 @@ function on_creating_default_group(serialize_key, event_name, group)
 		local tab = MZ3GroupItem:create("Twitter");
 		tab:append_category("タイムライン", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/home_timeline.json");
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/mentions_timeline.json");
-		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1/statuses/friends.xml");
-		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "https://api.twitter.com/1/statuses/followers.xml");
+		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1.1/friends/list.json");
+		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "https://api.twitter.com/1.1/followers/list.json");
 		tab:append_category("リスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists.xml");
 		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists/memberships.xml");
 		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/retweets_of_me.json");
