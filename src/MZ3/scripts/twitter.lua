@@ -495,9 +495,9 @@ function twitter_friends_timeline_parser(parent, body, html)
 	-- 一時リスト
 	new_list = MZ3DataList:create();
 	
-	-- https://api.twitter.com/1.1/blocks/list.json などでは users キーに一覧がある
-	if obj.users ~= nil then
-		obj = obj.users;
+	-- Twitter検索ではstatusesキーにデータがある
+	if obj.statuses ~= nil then
+		obj = obj.statuses;
 	end
 	
 	-- 各要素のパース
@@ -2376,8 +2376,8 @@ function on_twitter_search(serialize_key, event_name, data)
 
 	-- カテゴリ追加
 	title = key .. " - Twitter Search";
-	url = "http://search.twitter.com/search.rss?q=" .. mz3.url_encode(key, 'utf8');
-	key = "RSS_FEED";
+	url = "https://api.twitter.com/1.1/search/tweets.json?q=" .. mz3.url_encode(key, 'utf8');
+	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
 	-- 追加したカテゴリの取得開始
