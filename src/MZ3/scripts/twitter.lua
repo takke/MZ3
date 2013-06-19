@@ -238,6 +238,12 @@ type:set_params({
   short_title='リストから削除', request_method='POST', request_encoding='utf8'
 });
 
+type = MZ3AccessTypeInfo.create();
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_NEW_DM',
+  short_title='DM', request_method='POST', request_encoding='utf8'
+});
+
 
 ----------------------------------------
 -- メニュー項目登録(静的に用意すること)
@@ -1857,7 +1863,7 @@ function on_click_update_button(event_name, serialize_key)
 	-- POST先URL設定
 	url = '';
 	if serialize_key == 'TWITTER_NEW_DM' then
-		url = 'https://api.twitter.com/1/direct_messages/new.xml';
+		url = 'https://api.twitter.com/1.1/direct_messages/new.json';
 	elseif serialize_key == 'TWITTER_UPDATE_WITH_TWITPIC' then
 		url = 'http://twitpic.com/api/uploadAndPost';
 	end
