@@ -448,29 +448,6 @@ bool AccessTypeInfo::init()
 #endif
 
 	//------------------------------------------------------------------
-	//--- Twitter Œn
-	//------------------------------------------------------------------
-	type = ACCESS_TWITTER_UPDATE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"XV"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_UPDATE";
-
-	type = ACCESS_TWITTER_USER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "Twitter"
-		, L"Twitter”­Œ¾"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_USER";
-
-	//------------------------------------------------------------------
 	//--- mixi echo ŠÖ˜A
 	//------------------------------------------------------------------
 #ifdef BT_MZ3

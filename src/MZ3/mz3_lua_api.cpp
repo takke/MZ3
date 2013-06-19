@@ -3742,7 +3742,7 @@ int lua_mz3_main_view_set_post_mode(lua_State *L)
 	switch (theApp.m_pMainView->m_twitterPostAccessType) {
 	case 0:
 		//TWITTER_STYLE_POST_MODE_TWITTER_UPDATE		 = 0,	///< タイムライン用発言入力中
-		theApp.m_pMainView->m_twitterPostAccessType = ACCESS_TWITTER_UPDATE;
+		theApp.m_pMainView->m_twitterPostAccessType = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TWITTER_UPDATE");
 		break;
 
 	case 1:

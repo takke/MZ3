@@ -5679,23 +5679,21 @@ LRESULT CMZ3View::OnPostEnd(WPARAM wParam, LPARAM lParam)
 	// [MZ3-API] 通信終了(UI初期化完了)後のフック処理
 	switch (theApp.m_accessTypeInfo.getInfoType(aType)) {
 	case AccessTypeInfo::INFO_TYPE_POST:
-		switch (aType) {
-		case ACCESS_TWITTER_UPDATE:
+		if (aType == theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TWITTER_UPDATE")) {
 			// 投稿後にタイムラインを取得する
 			if (theApp.m_optionMng.m_bTwitterReloadTLAfterPost) {
-				// http://twitter.com/statuses/friends_timeline.xml であれば再取得する。
-				// http://twitter.com/statuses/replies.xml や
-				// http://twitter.com/statuses/user_timeline/takke.xml であれば再取得しない。
+				// http://api.twitter.com/1.1/statuses/home_timeline.json であれば再取得する。
+				// http://api.twitter.com/1.1/statuses/mentions_timeline.json や
+				// https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=takke であれば再取得しない。
 				CCategoryItem* pCategory = m_selGroup->getSelectedCategory();
 				if (pCategory!=NULL && 
-					(wcsstr(pCategory->m_mixi.GetURL(), L"friends_timeline.xml")!=NULL ||
-					 wcsstr(pCategory->m_mixi.GetURL(), L"home_timeline.xml")!=NULL)
+					wcsstr(pCategory->m_mixi.GetURL(), L"home_timeline.json")!=NULL
 					) {
 					RetrieveCategoryItem();
 				}
 			}
-			break;
 		}
+		break;
 	}
 
 	return TRUE;
@@ -6929,7 +6927,7 @@ void CMZ3View::MyResetTwitterStylePostMode()
 		}
 	} else {
 		// デフォルトは Twitter
-		m_twitterPostAccessType = ACCESS_TWITTER_UPDATE;
+		m_twitterPostAccessType = theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TWITTER_UPDATE");
 	}
 }
 

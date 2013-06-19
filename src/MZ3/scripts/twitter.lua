@@ -44,7 +44,19 @@ end
 -- アクセス種別の登録
 ----------------------------------------
 
+type = MZ3AccessTypeInfo:create();
+type:set_params({
+  info_type='other', service_type='Twitter', key='TWITTER_USER',
+  short_title='Twitter発言', request_method='GET', request_encoding='utf8'
+});
+
 -- POST用アクセス種別登録
+type = MZ3AccessTypeInfo:create();
+type:set_params({
+  info_type='post', service_type='Twitter', key='TWITTER_UPDATE',
+  short_title='更新', request_method='POST', request_encoding='utf8'
+});
+
 type = MZ3AccessTypeInfo:create();
 type:set_params({
   info_type='post', service_type='Twitter', key='TWITTER_FAVOURINGS_CREATE',

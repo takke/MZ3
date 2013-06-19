@@ -424,9 +424,11 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				break;
 #endif
 
-			case ACCESS_TWITTER_USER:
-				// Twitter 項目
-				{
+			default:
+
+				if (pData->GetAccessType() == theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TWITTER_USER")) {
+					// Twitter 項目
+
 					// デフォルト値設定
 					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
 
@@ -474,13 +476,12 @@ void CBodyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 							break;
 						}
 					}
-				}
-				break;
+				} else {
 
-			default:
-				// 色づけなし
-				// 黒にする
-				clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
+					// 色づけなし
+					// 黒にする
+					clrTextFg = theApp.m_skininfo.getColor("MainBodyListDefaultText");
+				}
 				break;
 			}
 
@@ -1127,7 +1128,7 @@ void CBodyListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 
 				// アイコン領域クリック通知
 				// TODO API 化
-				if (data->GetAccessType()==ACCESS_TWITTER_USER) {
+				if (data->GetAccessType()==theApp.m_accessTypeInfo.getAccessTypeBySerializeKey("TWITTER_USER")) {
 
 					// Lua 関数呼び出しで仮実装
 					theApp.MyLuaExecute(L"twitter.on_twitter_reply()");
