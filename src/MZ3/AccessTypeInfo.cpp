@@ -450,28 +450,6 @@ bool AccessTypeInfo::init()
 	//------------------------------------------------------------------
 	//--- Twitter 系
 	//------------------------------------------------------------------
-/*
-	type = ACCESS_TWITTER_DIRECT_MESSAGES;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "Twitter"
-		, L"メッセージ"
-		, REQUEST_METHOD_GET
-		);
-	// http://twitter.com/direct_messages.xml
-	// => twitter/recv.xml
-	// http://twitter.com/direct_messages/sent.xml
-	// => twitter/sent.xml
-	m_map[type].cacheFilePattern = L"twitter\\{urlafter:direct_messages/:recv.xml}";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_DIRECT_MESSAGES";
-	m_map[type].defaultCategoryURL = L"http://twitter.com/direct_messages.xml";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"メッセージ");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "メッセージ"
-*/
 	type = ACCESS_TWITTER_UPDATE;
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
@@ -492,17 +470,6 @@ bool AccessTypeInfo::init()
 	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
 	m_map[type].serializeKey = "TWITTER_USER";
 
-/*
-	type = ACCESS_TWITTER_NEW_DM;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Twitter"
-		, L"メッセージ送信"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-	m_map[type].serializeKey = "TWITTER_NEW_DM";
-*/
 	//------------------------------------------------------------------
 	//--- mixi echo 関連
 	//------------------------------------------------------------------
@@ -545,99 +512,6 @@ bool AccessTypeInfo::init()
 		);
 	m_map[type].serializeKey = "MIXI_ADD_VOICE_REPLY";
 #endif
-
-	//------------------------------------------------------------------
-	//--- Wassr 系
-	//------------------------------------------------------------------
-/*
-#ifdef BT_MZ3
-	type = ACCESS_WASSR_FRIENDS_TIMELINE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "Wassr"
-		, L"タイムライン"
-		, REQUEST_METHOD_GET
-		);
-	// http://api.wassr.jp/statuses/friends_timeline.xml
-	// http://api.wassr.jp/statuses/replies.xml
-	// => wassr/user_timeline_takke.xml
-	m_map[type].cacheFilePattern = L"wassr\\{urlafter:statuses/:friends_timeline.xml}";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
-	m_map[type].serializeKey = "WASSR_FRIENDS_TIMELINE";
-	m_map[type].defaultCategoryURL = L"http://api.wassr.jp/statuses/friends_timeline.xml";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
-
-	type = ACCESS_WASSR_UPDATE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "Wassr"
-		, L"Wassr更新"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
-	m_map[type].serializeKey = "WASSR_UPDATE";
-
-	type = ACCESS_WASSR_USER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "Wassr"
-		, L"Wassr発言"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "WASSR_USER";
-#endif
-*/
-
-	//------------------------------------------------------------------
-	//--- gooホーム 系
-	//------------------------------------------------------------------
-/*
-#ifdef BT_MZ3
-	type = ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_CATEGORY
-		, "gooHome"
-		, L"友達・注目の人"
-		, REQUEST_METHOD_GET
-		);
-	// http://home.goo.ne.jp/api/quote/quotes/friends/json
-	// http://home.goo.ne.jp/api/quote/quotes/myself/json
-	// => goohome/quote/quotes_friends.json
-	m_map[type].cacheFilePattern = L"goohome\\quote\\quotes_{urlafter:quotes/:friends.json}";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// goohome API => UTF-8
-	m_map[type].serializeKey = "GOOHOME_QUOTE_QUOTES_FRIENDS";
-	m_map[type].defaultCategoryURL = L"http://home.goo.ne.jp/api/quote/quotes/friends/json";
-	m_map[type].bodyHeaderCol1 = BodyHeaderColumn(BODY_INDICATE_TYPE_BODY, L"発言");
-	m_map[type].bodyHeaderCol2 = BodyHeaderColumn(BODY_INDICATE_TYPE_NAME, L"名前>>");
-	m_map[type].bodyHeaderCol3 = BodyHeaderColumn(BODY_INDICATE_TYPE_DATE, L"日付>>");
-	m_map[type].bodyIntegratedLinePattern1 = L"%2 \t(%3)";	// "名前  (日付)"
-	m_map[type].bodyIntegratedLinePattern2 = L"%1";			// "発言"
-
-	type = ACCESS_GOOHOME_QUOTE_UPDATE;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_POST
-		, "gooHome"
-		, L"ひとこと更新"
-		, REQUEST_METHOD_POST
-		);
-	m_map[type].serializeKey = "GOOHOME_QUOTE_UPDATE";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Wassr API => UTF-8
-
-	type = ACCESS_GOOHOME_USER;
-	m_map[type] = AccessTypeInfo::Data(
-		INFO_TYPE_OTHER
-		, "gooHome"
-		, L"ひとこと発言"
-		, REQUEST_METHOD_GET
-		);
-	m_map[type].serializeKey = "GOOHOME_USER";
-	m_map[type].requestEncoding = ENCODING_UTF8;	// Twitter API => UTF-8
-#endif
-*/
 
 	//------------------------------------------------------------------
 	//--- RSS Reader

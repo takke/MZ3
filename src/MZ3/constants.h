@@ -156,40 +156,9 @@ enum ACCESS_TYPE {
 	//----------------------------------------------
 	// Twitter
 	//----------------------------------------------
-	//--- Twitter Timeline 系
-//	ACCESS_TWITTER_FRIENDS_TIMELINE,	///< [GET/POST] friends_timeline.xml
 	ACCESS_TWITTER_UPDATE,				///< [POST] ステータス更新
 	ACCESS_TWITTER_USER,				///< 各発言要素
 
-	//--- Twitter DM 系
-//	ACCESS_TWITTER_DIRECT_MESSAGES,		///< [GET/POST] direct_messages.xml
-//	ACCESS_TWITTER_NEW_DM,				///< [POST] DM送信
-
-	//--- Twitter Favorites 系
-//	ACCESS_TWITTER_FAVORITES,			///< [GET/POST] お気に入り取得
-
-	//----------------------------------------------
-	// Wassr
-	//----------------------------------------------
-/*
-#ifdef BT_MZ3
-	//--- Wassr Timeline 系
-	ACCESS_WASSR_FRIENDS_TIMELINE,		///< [GET/POST] Wassr, friends_timeline.xml
-	ACCESS_WASSR_UPDATE,				///< [POST] Wassr, ステータス更新
-	ACCESS_WASSR_USER,					///< Wassr, 各発言要素
-#endif
-*/
-	//----------------------------------------------
-	// gooホーム
-	//----------------------------------------------
-/*
-#ifdef BT_MZ3
-	//--- gooホーム ひとこと関連
-	ACCESS_GOOHOME_QUOTE_QUOTES_FRIENDS,	///< [GET] quotes/friends/json
-	ACCESS_GOOHOME_USER,					///< gooHome, 各発言要素
-	ACCESS_GOOHOME_QUOTE_UPDATE,			///< [POST] ひとこと発言
-#endif
-*/
 	//----------------------------------------------
 	// RSS
 	//----------------------------------------------
