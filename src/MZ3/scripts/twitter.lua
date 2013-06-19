@@ -1180,7 +1180,7 @@ function on_twitter_create_friendships(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "https://api.twitter.com/1/friendships/create.xml";
+	url = "https://api.twitter.com/1.1/friendships/create.json";
 
 	-- ヘッダーの設定
 	post = MZ3PostData:create();
@@ -1215,7 +1215,7 @@ function on_twitter_destroy_friendships(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "https://api.twitter.com/1/friendships/destroy.xml";
+	url = "https://api.twitter.com/1.1/friendships/destroy.json";
 	
 	-- ヘッダーの設定
 	post = MZ3PostData:create();
@@ -1264,7 +1264,7 @@ function on_show_friend_timeline(serialize_key, event_name, data)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "https://api.twitter.com/1/statuses/user_timeline.xml?include_entities=false&include_rts=true&screen_name=" .. name;
+	url = "https://api.twitter.com/1.1/statuses/user_timeline.json?include_entities=false&include_rts=true&screen_name=" .. name;
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
@@ -1292,7 +1292,7 @@ function show_follower_tl(num)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "https://api.twitter.com/1/statuses/user_timeline.xml?include_entities=false&include_rts=true&screen_name=" .. name;
+	url = "https://api.twitter.com/1.1/statuses/user_timeline.json?include_entities=false&include_rts=true&screen_name=" .. name;
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 	
@@ -1348,7 +1348,7 @@ function on_retweet_menu_item(serialize_key, event_name, data)
 		post:append_post_body('id=' .. id);
 
 		-- POST先URL設定
-		url = 'https://api.twitter.com/1/statuses/retweet/' .. id .. '.xml';
+		url = 'https://api.twitter.com/1.1/statuses/retweet/' .. id .. '.json';
 
 		-- 通信開始
 		access_type = mz3.get_access_type_by_key(serialize_key);
@@ -1416,7 +1416,7 @@ function on_open_friend_favorites(serialize_key, event_name, data)
 	
 	-- カテゴリ追加
 	title = "@" .. name .. "のお気に入り";
-	url = "https://api.twitter.com/1/favorites/" .. name .. ".xml";
+	url = "https://api.twitter.com/1.1/favorites/list.json?screen_name=" .. name;
 	key = "TWITTER_FAVORITES";
 	mz3_main_view.append_category(title, url, key);
 	
