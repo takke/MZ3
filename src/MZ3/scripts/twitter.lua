@@ -387,6 +387,12 @@ function on_migrate_category_url(event_name, serialize_key, url)
 		if r == true then
 			return true, url;
 		end
+		
+		url, r = my_replace(url, "https://api.twitter.com/1/favorites.xml",
+		                         "https://api.twitter.com/1.1/favorites/list.json");
+		if r == true then
+			return true, url;
+		end
 	end
 	
 	if serialize_key == 'TWITTER_LISTS' then
@@ -396,6 +402,13 @@ function on_migrate_category_url(event_name, serialize_key, url)
 		-- lists
 		url, r = my_replace(url, "https://api.twitter.com/1/{twitter:id}/lists.xml",
 		                         "https://api.twitter.com/1.1/lists/list.json");
+		if r == true then
+			return true, url;
+		end
+		
+		-- 登録されているリスト一覧
+		url, r = my_replace(url, "https://api.twitter.com/1.1/lists/memberships.json?screen_name={twitter:id}",
+		                         "https://api.twitter.com/1.1/lists/memberships.json?screen_name={twitter:id}");
 		if r == true then
 			return true, url;
 		end
@@ -482,6 +495,11 @@ function twitter_friends_timeline_parser(parent, body, html)
 	-- 一時リスト
 	new_list = MZ3DataList:create();
 	
+	-- https://api.twitter.com/1.1/blocks/list.json などでは users キーに一覧がある
+	if obj.users ~= nil then
+		obj = obj.users;
+	end
+	
 	-- 各要素のパース
 	for i = 1, #obj do
 		local v = obj[i];
@@ -550,34 +568,36 @@ function my_add_new_user(new_list, status, id)
 	
 	-- name : status/user/screen_name
 	local user = status.user
-	data:set_text('name', mz3.decode_html_entity(user.screen_name));
+	if user ~= nil then
+		data:set_text('name', mz3.decode_html_entity(user.screen_name));
 
-	-- author : status/user/name
-	data:set_text('author', mz3.decode_html_entity(user.name));
+		-- author : status/user/name
+		data:set_text('author', mz3.decode_html_entity(user.name));
 
-	-- description : status/user/description
-	-- title に入れるのは苦肉の策・・・
-	data:set_text('title', mz3.decode_html_entity(user.description));
+		-- description : status/user/description
+		-- title に入れるのは苦肉の策・・・
+		data:set_text('title', mz3.decode_html_entity(user.description));
 
-	-- owner-id : status/user/id
-	data:set_integer('owner_id', user.id);
+		-- owner-id : status/user/id
+		data:set_integer('owner_id', user.id);
+	
+		-- URL : status/user/url
+		local url = mz3.decode_html_entity(user.url);
+		data:set_text('url', url);
+		data:set_text('browse_uri', url);
+
+		-- Image : status/user/profile_image_url
+		local profile_image_url = mz3.decode_html_entity(user.profile_image_url);
+		data:add_text_array('image', profile_image_url);
+
+		data:set_text('user_tag', user);
+	end
 	
 	-- in_reply_to_status_id : status/in_reply_to_status_id
 	data:set_integer64_from_string('in_reply_to_status_id', status.in_reply_to_status_id);
 
 	-- in_reply_to_screen_name : status/in_reply_to_screen_name
 	data:set_integer('in_reply_to_screen_name', mz3.decode_html_entity(status.in_reply_to_screen_name));
-
-	-- URL : status/user/url
-	local url = mz3.decode_html_entity(user.url);
-	data:set_text('url', url);
-	data:set_text('browse_uri', url);
-
-	-- Image : status/user/profile_image_url
-	local profile_image_url = mz3.decode_html_entity(user.profile_image_url);
-	data:add_text_array('image', profile_image_url);
-
-	data:set_text('user_tag', user);
 
 	-- 一時リストに追加
 	new_list:add(data.data);
@@ -619,6 +639,11 @@ function twitter_lists_parser(parent, body, html)
 	end
 
 	local t1 = mz3.get_tick_count();
+	
+	-- 登録されているリスト一覧は lists キーにデータがある
+	if obj.lists ~= nil then
+		obj = obj.lists;
+	end
 	
 	-- 各要素のパース
 	for i = 1, #obj do
@@ -1498,7 +1523,7 @@ function on_body_list_click(serialize_key, event_name, data)
 		
 		local title = data:get_text('title');
 		local user = data:get_text('user');
-		local list_slug = data:get_text('list_slug');
+		local list_slug = mz3.url_encode(data:get_text('list_slug'), 'utf8');
 		local url = 'https://api.twitter.com/1.1/lists/statuses.json?slug=' .. list_slug .. '&owner_screen_name=' .. user;
 		local key = "TWITTER_FRIENDS_TIMELINE";
 		mz3_main_view.append_category(title, url, key);
@@ -2134,9 +2159,9 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	
 	submenu:append_menu("string", "@" .. name .. " をフォローする", menu_items.create_friendships);
 	submenu:append_menu("string", "@" .. name .. " のフォローをやめる", menu_items.destroy_friendships);
-	submenu:append_menu("string", "@" .. name .. " さんをブロック", menu_items.twitter_user_block_create);
-	submenu:append_menu("string", "@" .. name .. " さんのブロック解除", menu_items.twitter_user_block_destroy);
-	submenu:append_menu("string", "@" .. name .. " さんをスパム通報する", menu_items.twitter_user_spam_reports);
+	submenu:append_menu("string", "@" .. name .. " をブロック", menu_items.twitter_user_block_create);
+	submenu:append_menu("string", "@" .. name .. " のブロック解除", menu_items.twitter_user_block_destroy);
+	submenu:append_menu("string", "@" .. name .. " をスパム通報する", menu_items.twitter_user_spam_reports);
 	submenu:append_menu("string", "@" .. name .. " のホームをブラウザで開く", menu_items.open_home);
 	submenu:append_menu("string", "@" .. name .. " のお気に入りをブラウザで開く", menu_items.open_friend_favorites_by_browser);
 	submenu:append_menu("string", "@" .. name .. " のお気に入り", menu_items.open_friend_favorites);
@@ -2253,13 +2278,11 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("返信一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/mentions_timeline.json");
 		tab:append_category("フォローしている一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1.1/friends/list.json");
 		tab:append_category("フォローされている一覧", "TWITTER_FOLLOWERS", "https://api.twitter.com/1.1/followers/list.json");
-		tab:append_category("リスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists.xml");
-		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1/{twitter:id}/lists/memberships.xml");
+		tab:append_category("リスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1.1/lists/list.json");
+		tab:append_category("登録されているリスト一覧", "TWITTER_LISTS", "https://api.twitter.com/1.1/lists/memberships.json?screen_name={twitter:id}");
 		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/retweets_of_me.json");
-		tab:append_category("ブロックユーザ一覧", "TWITTER_FRIENDS_TIMELINE", "http://api.twitter.com/1/blocks/blocking.xml");
-		tab:append_category("お気に入り", "TWITTER_FAVORITES", "https://api.twitter.com/1/favorites.xml");
---		tab:append_category("受信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages.xml");
---		tab:append_category("送信メッセージ", "TWITTER_DIRECT_MESSAGES", "https://api.twitter.com/1/direct_messages/sent.xml");
+		tab:append_category("ブロックユーザ一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1.1/blocks/list.json");
+		tab:append_category("お気に入り", "TWITTER_FAVORITES", "https://api.twitter.com/1.1/favorites/list.json");
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
