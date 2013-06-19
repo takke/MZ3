@@ -1139,7 +1139,7 @@ function on_twitter_create_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
-	url = "https://api.twitter.com/1/favorites/create/" .. id .. ".xml";
+	url = 'https://api.twitter.com/1.1/favorites/create.json?id=' .. id;
 
 	-- 通信開始
 	key = "TWITTER_FAVOURINGS_CREATE";
@@ -1156,7 +1156,7 @@ function on_twitter_destroy_favourings(serialize_key, event_name, data)
 	-- URL 生成
 	body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 	id = body:get_integer64_as_string('id');
-	url = "https://api.twitter.com/1/favorites/destroy/" .. id .. ".xml";
+	url = 'https://api.twitter.com/1.1/favorites/destroy.json?id=' .. id;
 
 	-- 通信開始
 	key = "TWITTER_FAVOURINGS_DESTROY";
