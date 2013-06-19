@@ -596,7 +596,7 @@ function my_add_new_user(new_list, status, id)
 		local profile_image_url = mz3.decode_html_entity(user.profile_image_url);
 		data:add_text_array('image', profile_image_url);
 
-		data:set_text('user_tag', user);
+		data:set_text('user_json', json.encode(user));
 	end
 	
 	-- in_reply_to_status_id : status/in_reply_to_status_id
@@ -823,7 +823,7 @@ function twitter_followers_parser(parent, body, html)
 		-- 画像表示フラグを立てる
 		data:set_integer('show_image', 1);
 
-		data:set_text('user_tag', user);
+		data:set_text('user_json', json.encode(user));
 
 		-- リストに追加
 		body:add(data.data);
@@ -1607,32 +1607,34 @@ function on_show_user_info(serialize_key, event_name, data)
 
 
 	-- location 等はここでパースする
-	user = data:get_text('user_tag');
+	user_json = data:get_text('user_json');
+	if user_json ~= nil then
 
-	-- <location>East Tokyo United</location>
-	location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
-	-- <followers_count>555</followers_count>
-	followers_count = user:match('<followers_count>([^<]*)<');
-	-- <friends_count>596</friends_count>
-	friends_count = user:match('<friends_count>([^<]*)<');
-	-- <favourites_count>361</favourites_count>
-	favourites_count = user:match('<favourites_count>([^<]*)<');
-	-- <statuses_count>7889</statuses_count>
-	statuses_count = user:match('<statuses_count>([^<]*)<');
+		local user, pos, err = json.decode (user_json, 1, nil)
+		if err then
+			print ("Error:", err);
+		else
+			local location = mz3.decode_html_entity(user.location);
+			local followers_count = user.followers_count;
+			local friends_count = user.friends_count;
+			local favourites_count = user.favourites_count;
+			local statuses_count = user.statuses_count;
 
-	if location ~= nil then
-		item = item .. "location : " .. location .. "\r\n";
-	end
-	
-	if friends_count ~= nil then
-		item = item .. "followings : " .. friends_count
-		            .. ", "
-		            .. "followers : " .. followers_count
-		            .. ", "
-		            .. "fav : " .. favourites_count
-		            .. ", "
-		            .. "発言 : " .. statuses_count
-		            .. "\r\n";
+			if location ~= nil and mz3.get_text_length(location)>0 then
+				item = item .. "location : " .. location .. "\r\n";
+			end
+			
+			if friends_count ~= nil then
+				item = item .. "followings : " .. friends_count
+				            .. ", "
+				            .. "followers : " .. followers_count
+				            .. ", "
+				            .. "fav : " .. favourites_count
+				            .. ", "
+				            .. "発言 : " .. statuses_count
+				            .. "\r\n";
+			end
+		end
 	end
 	
 	mz3.alert(item, data:get_text('name'));
@@ -2054,7 +2056,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 		end
 
 		menu:append_menu("string", "全文を読む...", menu_items.read);
---		menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
+		menu:append_menu("string", "@" .. name .. " さんについて...", menu_items.show_user_info);
 	end
 
 	menu:append_menu("separator");
@@ -3030,33 +3032,36 @@ function on_draw_detail_view(event_name, serialize_key, data, dc, cx, cy)
 		            .. ", owner-id : " .. data:get_integer('owner_id') .. "\r\n";
 
 		-- location 等はここでパースする
-		user = data:get_text('user_tag');
+		user_json = data:get_text('user_json');
+		if user_json ~= nil then
+			local user, pos, err = json.decode (user_json, 1, nil)
+			if err then
+				print ("Error:", err);
+			else
+			
+				local location = mz3.decode_html_entity(user.location);
+				local followers_count = user.followers_count;
+				local friends_count = user.friends_count;
+				local favourites_count = user.favourites_count;
+				local statuses_count = user.statuses_count;
 
-		-- <location>East Tokyo United</location>
-		location = mz3.decode_html_entity(user:match('<location>([^<]*)<'));
-		-- <followers_count>555</followers_count>
-		followers_count = user:match('<followers_count>([^<]*)<');
-		-- <friends_count>596</friends_count>
-		friends_count = user:match('<friends_count>([^<]*)<');
-		-- <favourites_count>361</favourites_count>
-		favourites_count = user:match('<favourites_count>([^<]*)<');
-		-- <statuses_count>7889</statuses_count>
-		statuses_count = user:match('<statuses_count>([^<]*)<');
-
-		if location ~= nil then
-			item = item .. "location : " .. location .. "\r\n";
+				if location ~= nil and mz3.get_text_length(location)>0 then
+					item = item .. "location : " .. location .. "\r\n";
+				end
+				
+				if friends_count ~= nil then
+					item = item .. "followings : " .. friends_count
+					            .. ", "
+					            .. "followers : " .. followers_count
+					            .. ", "
+					            .. "fav : " .. favourites_count
+					            .. "\r\n"
+					            .. "発言数 : " .. statuses_count
+					            .. "\r\n";
+				end
+			end
 		end
 		
-		if friends_count ~= nil then
-			item = item .. "followings : " .. friends_count
-			            .. ", "
-			            .. "followers : " .. followers_count
-			            .. ", "
-			            .. "fav : " .. favourites_count
-			            .. "\r\n"
-			            .. "発言数 : " .. statuses_count
-			            .. "\r\n";
-		end
 		item = item --.. "description : "
 		       .. data:get_text('title') .. "\r\n";
 		g:set_color("text", "MainBodyListDefaultText");
