@@ -185,7 +185,7 @@ type:set_params({
   info_type='category', service_type='Twitter', key='TWITTER_FOLLOWINGS',
   short_title='フォロー一覧', request_method='GET', request_encoding='utf8'
 });
-type:set_cache_file_pattern('twitter\\friends_list.json');
+type:set_cache_file_pattern('twitter\\{urlafter:/}');
 type:set_default_url('https://api.twitter.com/1.1/friends/list.json');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'title', '自己紹介');
