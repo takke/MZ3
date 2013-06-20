@@ -155,7 +155,7 @@ type:set_params({
   short_title='リスト一覧', request_method='GET', request_encoding='utf8'
 });
 type:set_cache_file_pattern('twitter\\{urlafter:/}');
-type:set_default_url('https://api.twitter.com/1.1/favorites/list.json?screen_name{twitter:id}');	-- dummy
+type:set_default_url('https://api.twitter.com/1.1/favorites/list.json?screen_name={twitter:id}');	-- dummy
 type:set_body_header(1, 'title', 'リスト名');
 type:set_body_header(2, 'name', 'members>>');	-- MZ3の制限のため
 type:set_body_header(3, 'date', 'Followers>>');	-- MZ3の制限のため
@@ -2291,6 +2291,7 @@ function on_creating_default_group(serialize_key, event_name, group)
 		tab:append_category("RTされた一覧", "TWITTER_FRIENDS_TIMELINE", "https://api.twitter.com/1.1/statuses/retweets_of_me.json");
 		tab:append_category("ブロックユーザ一覧", "TWITTER_FOLLOWINGS", "https://api.twitter.com/1.1/blocks/list.json");
 		tab:append_category("お気に入り", "TWITTER_FAVORITES", "https://api.twitter.com/1.1/favorites/list.json");
+		
 		mz3_group_data.append_tab(group, tab.item);
 		tab:delete();
 
@@ -2405,7 +2406,7 @@ function on_twitter_update_destroy(serialize_key, event_name, data)
 		body = MZ3Data:create(mz3_main_view.get_selected_body_item());
 		id = body:get_integer64_as_string('id');
 		name = body:get_text('name');
-		url = "https://api.twitter.com/1/statuses/destroy/" .. id .. ".xml";
+		url = 'https://api.twitter.com/1.1/statuses/destroy/' .. id .. '.json';
 
 		-- 通信開始
 		key = "TWITTER_UPDATE_DESTROY";
@@ -2430,7 +2431,7 @@ function on_twitter_user_block_create(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "https://api.twitter.com/1/blocks/create/" .. name .. ".xml";
+	url = 'https://api.twitter.com/1.1/blocks/create.json?screen_name=' .. name;
 
 	-- 通信開始
 	key = "TWITTER_USER_BLOCK_CREATE";
@@ -2454,7 +2455,7 @@ function on_twitter_user_block_destroy(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "https://api.twitter.com/1/blocks/destroy/" .. name .. ".xml";
+	url = 'https://api.twitter.com/1.1/blocks/destroy.json?screen_name=' .. name;
 
 	-- 通信開始
 	key = "TWITTER_USER_BLOCK_DESTROY";
@@ -2495,7 +2496,7 @@ function on_twitter_user_spam_reports_create(serialize_key, event_name, data)
 	end
 
 	-- URL 生成
-	url = "https://api.twitter.com/1/report_spam.xml?screen_name=" .. name;
+	url = 'https://api.twitter.com/1.1/users/report_spam.json?screen_name=' .. name;
 
 	-- 通信開始
 	key = "TWITTER_USER_SPAM_REPORTS_CREATE";
@@ -2546,7 +2547,7 @@ function on_search_user_timeline(serialize_key, event_name, data)
 
 	-- カテゴリ追加
 	title = "@" .. name .. "のタイムライン";
-	url = "https://api.twitter.com/1/statuses/user_timeline/" .. name .. ".xml";
+	url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' .. name;
 	key = "TWITTER_FRIENDS_TIMELINE";
 	mz3_main_view.append_category(title, url, key);
 
@@ -2576,7 +2577,7 @@ function on_create_list(serialize_key, event_name, data)
 
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
-	url = "http://api.twitter.com/1/" .. id .. "/lists.xml?name=" .. name;
+	url = 'https://api.twitter.com/1.1/lists/create.json?name=' .. name;
 -- mz3.alert(url);
 	-- 通信開始
 	key = "TWITTER_CREATE_LIST";
@@ -2594,7 +2595,7 @@ function gather_my_list_names_blocking()
 
 	-- ブロッキング通信開始
 	key = "TWITTER_LISTS";
-	url = "https://api.twitter.com/" .. id .. "/lists.xml";
+	url = 'https://api.twitter.com/1.1/lists/list.json';
 	access_type = mz3.get_access_type_by_key(key);
 	referer = '';
 	user_agent = nil;
@@ -2606,8 +2607,19 @@ function gather_my_list_names_blocking()
 	end
 	
 	list_names_self = {};
-	for list_name in result:gmatch('<list>.-<slug>(.-)</slug>.-</list>') do
-		table.insert(list_names_self, list_name);
+	
+	local json_text = result;
+	local obj, pos, err = json.decode (json_text, 1, nil)
+	if err then
+		mz3.alert("Error:" .. err);
+		return false;
+	end
+	local myid = mz3_account_provider.get_value('Twitter', 'id');
+	for i = 1, #obj do
+		local v = obj[i];
+		if v.user.screen_name == myid then
+			table.insert(list_names_self, v.slug);
+		end
 	end
 
 	return true;
@@ -2639,7 +2651,7 @@ function on_delete_list(serialize_key, event_name, data)
 
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
-	url = "http://api.twitter.com/1/" .. id .. "/lists/" .. list_name .. ".xml?_method=DELETE";
+	url = 'https://api.twitter.com/1.1/lists/destroy.json?slug=' .. mz3.url_encode(list_name, 'utf8') .. '&owner_screen_name=' .. id;
 -- mz3.alert(url);
 	-- 通信開始
 	key = "TWITTER_DELETE_LIST";
@@ -2679,7 +2691,7 @@ function on_add_list_member(serialize_key, event_name, data)
 
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
-	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name;
+	url = 'https://api.twitter.com/1.1/lists/members/create.json?owner_screen_name=' .. id .. '&slug=' .. list_name .. '&screen_name=' .. name;
 
 	-- 通信開始
 	key = "TWITTER_ADD_LIST_MEMBER";
@@ -2719,7 +2731,7 @@ function on_delete_list_member(serialize_key, event_name, data)
 
 	-- URL 生成
 	id  = mz3_account_provider.get_value('Twitter', 'id');
-	url = "http://api.twitter.com/1/" .. id .. "/" .. list_name .. "/members.xml?id=" .. name .. "&_method=DELETE";
+	url = 'https://api.twitter.com/1.1/lists/members/destroy.json?owner_screen_name=' .. id .. '&slug=' .. list_name .. '&screen_name=' .. name;
 
 	-- 通信開始
 	key = "TWITTER_DELETE_LIST_MEMBER";
