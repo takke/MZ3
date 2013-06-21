@@ -20,13 +20,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0CD7DC0DFCB04F5B8487746EED89A481"
+        "MsmKey" = "8:_065B3AA041914B3B962F3B80F4E3B183"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_1112F0110B6246869833B6A078B69488"
+        "MsmKey" = "8:_0A19584BAF1943548C862BA410139C7B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0CD7DC0DFCB04F5B8487746EED89A481"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,24 +45,6 @@
         "Entry"
         {
         "MsmKey" = "8:_16E04A4DBAFE4AAE9BCC9385DB8BC54C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2B3E8CA3F1E6470CA7F1B68AC4338337"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2BDED867F714400EBA975BB3A6006DF1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2E82FB507F4A428B9D38799271ECD52C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -80,12 +68,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_35961645CF734502B9107D975BD07D2D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_363EBB5EAA404A6B8EC1D671717A8DFC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -104,6 +86,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3A7AD9F75F2840ACAC96F5A72EDB2B3A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_48344990B63D4909B246B543DA7C7AF0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -116,19 +104,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4F6D2D6F0A244F008EB67FD202F42374"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4FEE9441B31540009468186BCA6A9769"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_59E47789FAE64DBE8C869A91C1F7DC1A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -146,12 +122,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5D83DE1BAF81487E99A428C1D0478C38"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5ED1D21152934C8B86CB3D8BA86E3DDC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -159,12 +129,6 @@
         "Entry"
         {
         "MsmKey" = "8:_5F271BE43DEC4C39A269486517357A60"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6062B24234D84841823653E288FDE004"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -194,18 +158,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_70A83056FA42481DAEE4D50085E42AF2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_74CDFA05EA2D451AABB0AA9DA81E1DA1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_751FB0856A4948F697F69A26694DDF83"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -218,13 +170,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7AD5CA6BA72349E29DE524024E279721"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8E6EF11A5BD44AEAB0902C123386A4FC"
+        "MsmKey" = "8:_8A9729A2E761483489F8CA84501F5209"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -243,12 +189,6 @@
         "Entry"
         {
         "MsmKey" = "8:_97AD7D3853EA47DD8365D3CF3B3D745F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9A746E8704FA45F0A1F5F2B7AE6EDF4A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -284,25 +224,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B1C68F1B0F2B4A5B91340FC88F434D7A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B5D5FE7F1A154E0D93AFF58B48884BD6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B9C40DB476F74346A4D8FD524ED79728"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BA0A7BCC9D044E5694135E3C5AF61FDA"
+        "MsmKey" = "8:_B683EB291AFD4EFAAAE23ABDE38CFB88"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -338,12 +260,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_DDFDD383F6AB4086B4E871153543DB5F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_E073AE9D1AC74E87A492EE04578219FB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -351,12 +267,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E0975A96522C4A7A8A7A7864794515F0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E2CFC6C147CC4AFBAB7C9007847D4A73"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -380,18 +290,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E9444CFD3FF8499993D49A0E8EC92F18"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F016A88BEC5E4FB98C283C576DE50EE4"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_F1AD7D2E3B3A48F3AE6D7F3A580E2073"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -405,6 +303,12 @@
         "Entry"
         {
         "MsmKey" = "8:_FD424ECF0ECB45C18AD8B07BF75C05FE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FF3955D3B04C403F80F7F1E2A2F01207"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -494,12 +398,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_0CD7DC0DFCB04F5B8487746EED89A481"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_065B3AA041914B3B962F3B80F4E3B183"
             {
-            "SourcePath" = "8:skin\\dark\\body__.jpg"
-            "TargetName" = "8:body__.jpg"
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_diary_parser.luac"
+            "TargetName" = "8:mixi_diary_parser.luac"
             "Tag" = "8:"
-            "Folder" = "8:_1A588D4CD71246D4AA223A0516473FE2"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -512,12 +416,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_1112F0110B6246869833B6A078B69488"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_0A19584BAF1943548C862BA410139C7B"
             {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_diary_parser.lua"
-            "TargetName" = "8:mixi_view_diary_parser.lua"
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_diary_parser.lua"
+            "TargetName" = "8:mixi_diary_parser.lua"
             "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_0CD7DC0DFCB04F5B8487746EED89A481"
+            {
+            "SourcePath" = "8:skin\\dark\\body__.jpg"
+            "TargetName" = "8:body__.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_1A588D4CD71246D4AA223A0516473FE2"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -554,60 +476,6 @@
             "TargetName" = "8:body.jpg"
             "Tag" = "8:"
             "Folder" = "8:_27598CBCCC82437094151C98AEA875C1"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_2B3E8CA3F1E6470CA7F1B68AC4338337"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_news_quote_diary_parser.luac"
-            "TargetName" = "8:mixi_news_quote_diary_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_2BDED867F714400EBA975BB3A6006DF1"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_show_self_log_parser.luac"
-            "TargetName" = "8:mixi_show_self_log_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_2E82FB507F4A428B9D38799271ECD52C"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_new_official_message_parser.luac"
-            "TargetName" = "8:mixi_new_official_message_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -674,24 +542,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_35961645CF734502B9107D975BD07D2D"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_community_parser.lua"
-            "TargetName" = "8:mixi_bookmark_community_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_363EBB5EAA404A6B8EC1D671717A8DFC"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\2ch.luac"
@@ -746,6 +596,24 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_3A7AD9F75F2840ACAC96F5A72EDB2B3A"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_parser.luac"
+            "TargetName" = "8:mixi_parser.luac"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_48344990B63D4909B246B543DA7C7AF0"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\mixi.lua"
@@ -782,48 +650,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_4F6D2D6F0A244F008EB67FD202F42374"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_new_bbs_parser.lua"
-            "TargetName" = "8:mixi_new_bbs_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_4FEE9441B31540009468186BCA6A9769"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\mixi.luac"
             "TargetName" = "8:mixi.luac"
             "Tag" = "8:"
             "Folder" = "8:_D222F4363E8949039D126142DC49664A"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_59E47789FAE64DBE8C869A91C1F7DC1A"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_show_self_log_parser.lua"
-            "TargetName" = "8:mixi_show_self_log_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -872,24 +704,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_5D83DE1BAF81487E99A428C1D0478C38"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_diary_parser.luac"
-            "TargetName" = "8:mixi_view_diary_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_5ED1D21152934C8B86CB3D8BA86E3DDC"
             {
             "SourcePath" = "8:skin\\aluminium\\report_.jpg"
@@ -914,24 +728,6 @@
             "TargetName" = "8:user_setting.lua"
             "Tag" = "8:"
             "Folder" = "8:_FA34FEA1B5DF4E5B99746AF505215046"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_6062B24234D84841823653E288FDE004"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_home_parser.luac"
-            "TargetName" = "8:mixi_home_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1016,42 +812,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_70A83056FA42481DAEE4D50085E42AF2"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_message_inbox_parser.luac"
-            "TargetName" = "8:mixi_message_inbox_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_74CDFA05EA2D451AABB0AA9DA81E1DA1"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_new_bbs_parser.luac"
-            "TargetName" = "8:mixi_new_bbs_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_751FB0856A4948F697F69A26694DDF83"
             {
             "SourcePath" = "8:..\\MZ3\\scripts\\gmail.luac"
@@ -1088,30 +848,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_7AD5CA6BA72349E29DE524024E279721"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_8A9729A2E761483489F8CA84501F5209"
             {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_user_parser.luac"
-            "TargetName" = "8:mixi_bookmark_user_parser.luac"
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_community_parser.luac"
+            "TargetName" = "8:mixi_community_parser.luac"
             "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_8E6EF11A5BD44AEAB0902C123386A4FC"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_user_parser.lua"
-            "TargetName" = "8:mixi_bookmark_user_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1166,24 +908,6 @@
             "TargetName" = "8:dummy_user_script.lua"
             "Tag" = "8:"
             "Folder" = "8:_FA34FEA1B5DF4E5B99746AF505215046"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_9A746E8704FA45F0A1F5F2B7AE6EDF4A"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_bookmark_community_parser.luac"
-            "TargetName" = "8:mixi_bookmark_community_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1268,66 +992,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_B1C68F1B0F2B4A5B91340FC88F434D7A"
+            "{BA458234-9B71-4F46-8107-E91156377184}:_B683EB291AFD4EFAAAE23ABDE38CFB88"
             {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_message_parser.lua"
-            "TargetName" = "8:mixi_view_message_parser.lua"
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_parser.lua"
+            "TargetName" = "8:mixi_parser.lua"
             "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_B5D5FE7F1A154E0D93AFF58B48884BD6"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_message_outbox_parser.lua"
-            "TargetName" = "8:mixi_message_outbox_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_B9C40DB476F74346A4D8FD524ED79728"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_news_quote_diary_parser.lua"
-            "TargetName" = "8:mixi_news_quote_diary_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_BA0A7BCC9D044E5694135E3C5AF61FDA"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_new_official_message_parser.lua"
-            "TargetName" = "8:mixi_new_official_message_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1412,24 +1082,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_DDFDD383F6AB4086B4E871153543DB5F"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_view_message_parser.luac"
-            "TargetName" = "8:mixi_view_message_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_E073AE9D1AC74E87A492EE04578219FB"
             {
             "SourcePath" = "8:skin\\aluminium\\body_.jpg"
@@ -1454,24 +1106,6 @@
             "TargetName" = "8:ChangeLog.txt"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_E2CFC6C147CC4AFBAB7C9007847D4A73"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_message_outbox_parser.luac"
-            "TargetName" = "8:mixi_message_outbox_parser.luac"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1538,42 +1172,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_E9444CFD3FF8499993D49A0E8EC92F18"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_message_inbox_parser.lua"
-            "TargetName" = "8:mixi_message_inbox_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{BA458234-9B71-4F46-8107-E91156377184}:_F016A88BEC5E4FB98C283C576DE50EE4"
-            {
-            "SourcePath" = "8:..\\MZ3\\scripts\\mixi\\mixi_home_parser.lua"
-            "TargetName" = "8:mixi_home_parser.lua"
-            "Tag" = "8:"
-            "Folder" = "8:_EE89441823A84DCAB9D7B1214075B685"
-            "Condition" = "8:"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "Register" = "3:0"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{BA458234-9B71-4F46-8107-E91156377184}:_FB305B7E41AB4F4E8BB41959E3194A28"
             {
             "SourcePath" = "8:skin\\dark\\header__.jpg"
@@ -1598,6 +1196,24 @@
             "TargetName" = "8:gsgetfile.dll"
             "Tag" = "8:"
             "Folder" = "8:_3E903888F59A48A99BCB08BE2C7CC7A5"
+            "Condition" = "8:"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "Register" = "3:0"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{BA458234-9B71-4F46-8107-E91156377184}:_FF3955D3B04C403F80F7F1E2A2F01207"
+            {
+            "SourcePath" = "8:..\\MZ3\\scripts\\mixi_community_parser.lua"
+            "TargetName" = "8:mixi_community_parser.lua"
+            "Tag" = "8:"
+            "Folder" = "8:_D222F4363E8949039D126142DC49664A"
             "Condition" = "8:"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
@@ -1673,15 +1289,6 @@
                     "Property" = "8:_861E3041CB2E4519A892BD56711523B6"
                         "Folders"
                         {
-                            "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_EE89441823A84DCAB9D7B1214075B685"
-                            {
-                            "Name" = "8:mixi"
-                            "Condition" = "8:"
-                            "Property" = "8:_452661E83E8B4D9B995B25BEAA7F6F63"
-                                "Folders"
-                                {
-                                }
-                            }
                             "{5943FCFD-5B64-4EE4-96C9-4618EC95352A}:_EEB622119D654CCD9533BACDC452BABB"
                             {
                             "Name" = "8:lib"
