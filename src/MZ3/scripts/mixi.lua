@@ -27,23 +27,19 @@ mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
 
 -- イベント参加者一覧
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('body');									-- カテゴリ
-type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('MIXI_EVENT_MEMBER');				-- シリアライズキー
-type:set_short_title('イベント参加者一覧');					-- 簡易タイトル
-type:set_request_method('GET');								-- リクエストメソッド
-type:set_request_encoding('euc-jp');						-- エンコーディング
+type:set_params({
+  info_type='body', service_type='mixi', key='MIXI_EVENT_MEMBER',
+  short_title='イベント参加者一覧', request_method='GET', request_encoding='euc-jp'
+});
 
 -- ボイス詳細
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('body');									-- カテゴリ
-type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('MIXI_RECENT_VOICE_DETAIL');			-- シリアライズキー
-type:set_short_title('ボイス');								-- 簡易タイトル
-type:set_request_method('GET');								-- リクエストメソッド
+type:set_params({
+  info_type='body', service_type='mixi', key='MIXI_RECENT_VOICE_DETAIL',
+  short_title='ボイス', request_method='GET', request_encoding='euc-jp'
+});
 -- view_voice.pl?post_time=xx&owner_id=xx
 type:set_cache_file_pattern('mixi\\mixi_voice_detail_{urlparam:post_time}_{urlparam:owner_id}.html');	-- キャッシュファイル
-type:set_request_encoding('euc-jp');						-- エンコーディング
 type:set_body_header(1, 'title', 'コメント');
 type:set_body_header(2, 'name', '名前');
 type:set_body_integrated_line_pattern(1, '%1');
@@ -51,13 +47,11 @@ type:set_body_integrated_line_pattern(2, '%2');
 
 -- ニュース一覧
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- カテゴリ
-type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('NEWS');								-- シリアライズキー
-type:set_short_title('コメント一覧');						-- 簡易タイトル
-type:set_request_method('GET');								-- リクエストメソッド
+type:set_params({
+  info_type='category', service_type='mixi', key='NEWS',
+  short_title='ニュース一覧', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\list_news_category_{urlparam:id}_{urlparam:page}.html');			-- キャッシュファイル
-type:set_request_encoding('euc-jp');						-- エンコーディング
 -- url : http://news.mixi.jp/list_news_category.pl?id=pickup&type=bn
 -- url : http://news.mixi.jp/list_news_category.pl?id=1&type=bn&sort=1
 -- url : http://news.mixi.jp/list_news_category.pl?page=2&id=pickup&type=bn
@@ -70,15 +64,13 @@ type:set_body_integrated_line_pattern(2, '%2 (%3)');
 
 -- 紹介文一覧
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');								-- カテゴリ
-type:set_service_type('mixi');								-- サービス種別
-type:set_serialize_key('INTRO');							-- シリアライズキー
-type:set_short_title('紹介文');								-- 簡易タイトル
-type:set_request_method('GET');								-- リクエストメソッド
+type:set_params({
+  info_type='category', service_type='mixi', key='INTRO',
+  short_title='紹介文', request_method='GET', request_encoding='euc-jp'
+});
 -- url(1) : http://mixi.jp/show_intro.pl
 -- url(2) : http://mixi.jp/show_intro.pl?page=2
 type:set_cache_file_pattern('mixi\\show_intro{urlparam:page}.html');	-- キャッシュファイル
-type:set_request_encoding('euc-jp');						-- エンコーディング
  type:set_default_url('http://mixi.jp/show_intro.pl');
 type:set_body_header(1, 'name', '名前');
 type:set_body_header(2, 'body', '紹介文');
