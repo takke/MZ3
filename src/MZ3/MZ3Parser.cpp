@@ -104,20 +104,6 @@ bool MyDoParseMixiListHtml( ACCESS_TYPE aType, CMixiData& parent, CMixiDataList&
 
 #ifdef BT_MZ3
 	switch (aType) {
-//	case ACCESS_MAIN:							body.clear();	return mixi::HomeParser::parse( parent, html );
-//	case ACCESS_LIST_NEW_COMMENT:				body.clear();	return mixi::NewCommentParser::parse( body, html );
-//	case ACCESS_LIST_COMMENT:					body.clear();	return mixi::ListCommentParser::parse( body, html );
-//	case ACCESS_LIST_MYDIARY:					body.clear();	return mixi::ListDiaryParser::parse( body, html );
-//	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::ShowLogParser::parse( body, html );
-//	case ACCESS_LIST_FOOTSTEP:					body.clear();	return mixi::TrackParser::parse( body, html );
-//	case ACCESS_LIST_NEWS:						body.clear();	return mixi::ListNewsCategoryParser::parse( body, html );
-//	case ACCESS_LIST_FAVORITE_USER:				body.clear();	return mixi::ListBookmarkParser::parse( body, html );
-//	case ACCESS_LIST_FAVORITE_COMMUNITY:		body.clear();	return mixi::ListBookmarkParser::parse( body, html );
-//	case ACCESS_LIST_FRIEND:					body.clear();	return mixi::ListFriendParser::parse( body, html );
-//	case ACCESS_LIST_COMMUNITY:					body.clear();	return mixi::ListCommunityParser::parse( body, html );
-//	case ACCESS_LIST_INTRO:						body.clear();	return mixi::ShowIntroParser::parse( body, html );
-//	case ACCESS_LIST_BBS:						body.clear();	return mixi::ListBbsParser::parse( body, html );
-//	case ACCESS_LIST_CALENDAR:					body.clear();	return mixi::ShowCalendarParser::parse( body, html );
 	case ACCESS_RSS_READER_FEED:				body.clear();	return parser::RssFeedParser::parse( body, html );
 	default:
 		break;
@@ -150,17 +136,6 @@ bool MyDoParseMixiHtml( ACCESS_TYPE aType, CMixiData& mixi, CHtmlArray& html )
 	}
 
 	switch (aType) {
-#ifdef BT_MZ3
-//	case ACCESS_DIARY:
-//	case ACCESS_NEIGHBORDIARY:
-//	case ACCESS_MYDIARY:		return mixi::ViewDiaryParser::parse( mixi, html );
-//	case ACCESS_BBS:			return mixi::ViewBbsParser::parse( mixi, html );
-//	case ACCESS_ENQUETE:		return mixi::ViewEnqueteParser::parse( mixi, html );
-//	case ACCESS_EVENT_JOIN:
-//	case ACCESS_EVENT:			return mixi::ViewEventParser::parse( mixi, html );
-//	case ACCESS_BIRTHDAY:
-//	case ACCESS_NEWS:			return mixi::ViewNewsParser::parse( mixi, html );
-#endif
 	case ACCESS_HELP:			return parser::HelpParser::parse( mixi, html );
 	case ACCESS_ERRORLOG:		return parser::ErrorlogParser::parse( mixi, html );
 #ifdef BT_MZ3
