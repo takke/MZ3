@@ -14,13 +14,11 @@ module("mixi", package.seeall)
 
 -- 【最近の日記一覧】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- カテゴリ
-type:set_service_type('mixi');									-- サービス種別
-type:set_serialize_key('MYDIARY');								-- シリアライズキー
-type:set_short_title('最近の日記一覧');							-- 簡易タイトル
-type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\list_diary.html');			-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_params({
+  info_type='category', service_type='mixi', key='MYDIARY',
+  short_title='最近の日記一覧', request_method='GET', request_encoding='euc-jp'
+});
+type:set_cache_file_pattern('mixi\\list_diary.html');
 type:set_default_url('http://mixi.jp/list_diary.pl');
 type:set_body_header(1, 'title', 'タイトル');
 type:set_body_header(2, 'date', '日時');
@@ -31,13 +29,11 @@ type:set_cruise_target(true);
 
 -- 【最近のコメント一覧】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- カテゴリ
-type:set_service_type('mixi');									-- サービス種別
-type:set_serialize_key('COMMENT');								-- シリアライズキー
-type:set_short_title('コメント一覧');							-- 簡易タイトル
-type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\list_comment.html');			-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_params({
+  info_type='category', service_type='mixi', key='COMMENT',
+  short_title='コメント一覧', request_method='GET', request_encoding='euc-jp'
+});
+type:set_cache_file_pattern('mixi\\list_comment.html');
 type:set_default_url('http://mixi.jp/list_comment.pl');
 type:set_body_header(1, 'title', 'タイトル');
 type:set_body_header(2, 'name', '名前>>');
@@ -49,13 +45,11 @@ type:set_cruise_target(true);
 
 -- 【マイミク最新日記一覧】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- カテゴリ
-type:set_service_type('mixi');									-- サービス種別
-type:set_serialize_key('DIARY');								-- シリアライズキー
-type:set_short_title('マイミク最新日記');						-- 簡易タイトル
-type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\new_friend_diary.html');		-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_params({
+  info_type='category', service_type='mixi', key='DIARY',
+  short_title='マイミク最新日記', request_method='GET', request_encoding='euc-jp'
+});
+type:set_cache_file_pattern('mixi\\new_friend_diary.html');
 type:set_default_url('http://mixi.jp/new_friend_diary.pl');
 type:set_body_header(1, 'title', 'タイトル');
 type:set_body_header(2, 'name', '名前>>');
@@ -67,13 +61,11 @@ type:set_cruise_target(true);
 
 -- 【日記コメント記入履歴一覧】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');									-- カテゴリ
-type:set_service_type('mixi');									-- サービス種別
-type:set_serialize_key('NEW_COMMENT');							-- シリアライズキー
-type:set_short_title('新着コメント一覧');						-- 簡易タイトル
-type:set_request_method('GET');									-- リクエストメソッド
-type:set_cache_file_pattern('mixi\\new_comment.html');			-- キャッシュファイル
-type:set_request_encoding('euc-jp');							-- エンコーディング
+type:set_params({
+  info_type='category', service_type='mixi', key='NEW_COMMENT',
+  short_title='新着コメント一覧', request_method='GET', request_encoding='euc-jp'
+});
+type:set_cache_file_pattern('mixi\\new_comment.html');
 type:set_default_url('http://mixi.jp/new_comment.pl');
 type:set_body_header(1, 'title', 'タイトル');
 type:set_body_header(2, 'name', '名前>>');

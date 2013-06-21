@@ -73,13 +73,11 @@ type:set_body_integrated_line_pattern(2, '%2');
 --[[
 -- 【お気に入りコミュ一覧】
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('FAVORITE_COMMUNITY');
-type:set_short_title('お気に入りコミュ');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='FAVORITE_COMMUNITY',
+  short_title='お気に入りコミュ', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\bookmark_community.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/list_bookmark.pl?kind=community');
 type:set_body_header(1, 'name', 'コミュニティ');
 type:set_body_header(2, 'title', '説明');
@@ -91,13 +89,11 @@ type:set_body_integrated_line_pattern(2, '%2');
 --[[
 -- 【お気に入りユーザー一覧】
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('FAVORITE');
-type:set_short_title('お気に入りユーザー');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='FAVORITE',
+  short_title='お気に入りユーザー', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\bookmark_user.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/view_mylist.pl');
 type:set_body_header(1, 'name', 'ユーザー名');
 type:set_body_header(2, 'title', '自己紹介');
@@ -108,13 +104,11 @@ type:set_body_integrated_line_pattern(2, '%2');
 
 -- 【メッセージ受信箱】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('MESSAGE_IN');
-type:set_short_title('メッセージ(受信箱)');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='MESSAGE_IN',
+  short_title='メッセージ(受信箱)', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\list_message_inbox.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/list_message.pl');
 type:set_body_header(1, 'title', '件名');
 type:set_body_header(2, 'name', '差出人>>');
@@ -125,13 +119,11 @@ type:set_cruise_target(true);
 
 -- 【メッセージ送信箱】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('MESSAGE_OUT');
-type:set_short_title('メッセージ(送信箱)');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='MESSAGE_OUT',
+  short_title='メッセージ(送信箱)', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\list_message_outbox.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/list_message.pl?box=outbox');
 type:set_body_header(1, 'title', '件名');
 type:set_body_header(2, 'name', '差出人>>');
@@ -142,13 +134,11 @@ type:set_cruise_target(true);
 
 -- 【公式メッセージ】
 type = MZ3AccessTypeInfo.create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('MIXI_LIST_MESSAGE_OFFICIAL');
-type:set_short_title('公式メッセージ');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='MIXI_LIST_MESSAGE_OFFICIAL',
+  short_title='公式メッセージ', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\list_message_official.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/list_message.pl?box=noticebox');
 type:set_body_header(1, 'title', '件名');
 type:set_body_header(2, 'name', '差出人>>');
@@ -167,24 +157,20 @@ type:set_cruise_target(true);
 
 -- 【mixi ニュース関連日記】
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('body');
-type:set_service_type('mixi');
-type:set_serialize_key('MIXI_NEWS_QUOTE_DIARY');
-type:set_short_title('ニュース関連日記');
-type:set_request_method('GET');
+type:set_params({
+  info_type='body', service_type='mixi', key='MIXI_NEWS_QUOTE_DIARY',
+  short_title='ニュース関連日記', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('news\\list_quote_diary_{urlparam:id}.html');
-type:set_request_encoding('euc-jp');
 -- url(1) : http://news.mixi.jp/list_quote_diary.pl?id=839733
 
 -- 【逆あしあと一覧】
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('MIXI_SHOW_SELF_LOG');
-type:set_short_title('逆あしあと');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='MIXI_SHOW_SELF_LOG',
+  short_title='逆あしあと', request_method='GET', request_encoding='euc-jp'
+});
 type:set_cache_file_pattern('mixi\\show_self_log.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/show_self_log.pl');
 type:set_body_header(1, 'title', '名前');
 type:set_body_header(2, 'date', '日付');

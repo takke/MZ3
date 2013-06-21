@@ -14,15 +14,13 @@ module("mixi", package.seeall)
 
 -- コミュニティ一覧
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('COMMUNITY');
-type:set_short_title('コミュニティ一覧');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='COMMUNITY',
+  short_title='コミュニティ一覧', request_method='GET', request_encoding='euc-jp'
+});
 -- url(1) : http://mixi.jp/list_community.pl?id=xxx
 -- url(2) : http://mixi.jp/list_community.pl?id=xxx&page=2
 type:set_cache_file_pattern('mixi\\list_community{urlparam:page}.html');
-type:set_request_encoding('euc-jp');
 type:set_default_url('http://mixi.jp/list_community.pl');
 type:set_body_header(1, 'name', 'コミュニティ');
 type:set_body_header(2, 'date', '人数');
@@ -31,14 +29,12 @@ type:set_body_integrated_line_pattern(2, '%2');
 
 -- トピック一覧
 type = MZ3AccessTypeInfo:create();
-type:set_info_type('category');
-type:set_service_type('mixi');
-type:set_serialize_key('TOPIC');
-type:set_short_title('トピック一覧');
-type:set_request_method('GET');
+type:set_params({
+  info_type='category', service_type='mixi', key='TOPIC',
+  short_title='トピック一覧', request_method='GET', request_encoding='euc-jp'
+});
 -- url : list_bbs.pl?id=xxx
 type:set_cache_file_pattern('mixi\\list_bbs_{urlparam:id}.html');
-type:set_request_encoding('euc-jp');
 type:set_body_header(1, 'title', 'トピック');
 type:set_body_header(2, 'date', '日付');
 type:set_body_integrated_line_pattern(1, '%1');
