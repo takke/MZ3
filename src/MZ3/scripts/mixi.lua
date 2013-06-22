@@ -694,7 +694,7 @@ function do_reply_voice(text)
       jsonrpc="2.0",
       method="jp.mixi.voice.comment.create",
       params={
-        owner_id=owner_id,
+        owner_id=echo_member_id,
         id=echo_post_time,
         viewer_id=owner_id,
         body=text
