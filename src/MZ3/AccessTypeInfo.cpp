@@ -441,7 +441,7 @@ bool AccessTypeInfo::init()
 	m_map[type] = AccessTypeInfo::Data(
 		INFO_TYPE_POST
 		, "mixi"
-		, L"コメント投稿（書込）"
+		, L"日記投稿（書込）"
 		, REQUEST_METHOD_GET
 		);
 	m_map[type].serializeKey = "MIXI_POST_NEWDIARY_REGIST";
