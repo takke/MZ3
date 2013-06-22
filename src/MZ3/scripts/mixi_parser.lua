@@ -421,8 +421,9 @@ function mixi_recent_voice_parser(parent, body, html)
 		
 		-- <input type="hidden" name="post_key" id="post_key" value="xxx"> 
 		if line_has_strings(line, 'hidden', 'name="post_key"') then
-			mixi.post_key = line:match('value="(.-)"');
-			mz3.logger_debug("post_key: " .. mixi.post_key);
+			local input_tag = line:match('(<input[^<]*name="post_key"[^>]*>)');
+			mixi.post_key = input_tag:match('value="(.-)"');
+			mz3.logger_debug("post_key: [" .. mixi.post_key .. "]");
 			break;
 		end
 	end
@@ -566,7 +567,7 @@ function mixi_recent_voice_parser(parent, body, html)
 			local echo_post_time = li_tag:match('name="post_time".-value="(.-)"');
 			if echo_post_time ~= nil then
 				data:set_text('echo_post_time', echo_post_time);
-				mz3.logger_debug("echo_post_time：" .. echo_post_time);
+--				mz3.logger_debug("echo_post_time：" .. echo_post_time);
 			end
 
 			-- URL に応じてアクセス種別を設定

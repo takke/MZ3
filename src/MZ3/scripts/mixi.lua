@@ -11,6 +11,8 @@
 mz3.logger_debug('mixi.lua start');
 module("mixi", package.seeall)
 
+local json = require ("scripts\\lib\\dkjson")
+
 
 ----------------------------------------
 -- サービスの登録(タブ初期化用)
@@ -616,7 +618,7 @@ function on_click_update_button(event_name, serialize_key)
 	data = mz3_main_view.get_selected_body_item();
 	data = MZ3Data:create(data);
 	if serialize_key == 'MIXI_ADD_VOICE' then
-		msg = 'mixi エコーで発言します。 \n'
+		msg = 'mixi でつぶやきます。 \n'
 		   .. '----\n'
 		   .. text .. '\n'
 		   .. '----\n'
@@ -626,7 +628,7 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	elseif serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		local username = data:get_text('name');
-		msg = 'mixi エコーで ' .. username .. ' さんに返信します。 \n'
+		msg = 'mixi で ' .. username .. ' さんに返信します。 \n'
 		   .. '---- 発言 ----\n'
 		   .. text .. '\n'
 		   .. '----\n'
@@ -636,8 +638,15 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	end
 
+	-- POST パラメータを設定
+	local post_key = mixi.post_key;
+	if post_key==nil or post_key=='' then
+		mz3.alert('送信用のキーが見つかりません。つぶやき一覧(みんなのボイス)をリロードして下さい。');
+		return true;
+	end
+	
 	if serialize_key == 'MIXI_ADD_VOICE' then
-		-- 単純投稿は共通処理で。
+		-- つぶやき投稿は共通処理で。
 
 		-- クロスポスト管理データ初期化
 		mz3.init_cross_post_info("echo");
@@ -646,13 +655,8 @@ function on_click_update_button(event_name, serialize_key)
 		return true;
 	end
 	
-	-- POST パラメータを設定
+	
 	post = MZ3PostData:create();
-	local post_key = mixi.post_key;
-	if post_key=='' then
-		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
-		return true;
-	end
 	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
 		local echo_member_id = data:get_integer('author_id');
@@ -703,24 +707,30 @@ function on_click_update_button(event_name, serialize_key)
 end
 mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
 
-
 --- echo に投稿する
 function do_post_to_echo(text)
 
 	serialize_key = 'MIXI_ADD_VOICE'
 
 	post = MZ3PostData:create();
-	local post_key = mixi.post_key;
-	if post_key=='' then
-		mz3.alert('送信用のキーが見つかりません。エコー一覧をリロードして下さい。');
-		return true;
-	end
-	post:append_post_body('body=');
-	post:append_post_body(mz3.url_encode(text, 'euc-jp'));
-	post:append_post_body('&x=28&y=20');
-	post:append_post_body('&post_key=');
-	post:append_post_body(post_key);
-	post:append_post_body('&redirect=recent_voice');
+	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
+
+	local jsontable = {
+      jsonrpc="2.0",
+      method="jp.mixi.voice.create",
+      params={
+        viewer_id="85892",
+        owner_id="85892",
+        body=mz3.url_encode(text, 'euc-jp'),
+        twitter_sync=0,
+        privacy={name="public"},
+        via=18,
+        guidance_id="1"
+      },
+      id=0
+	};
+	post:append_post_body(json.encode(jsontable));
+
 
 	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
 --	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
@@ -729,7 +739,9 @@ function do_post_to_echo(text)
 --	end
 
 	-- POST先URL設定
-	url = 'http://mixi.jp/add_voice.pl';
+	local post_key = mixi.post_key;
+--	mz3.logger_debug(post_key);
+	url = 'http://mixi.jp/system/rpc.json?auth_type=postkey&secret=' .. post_key;
 	
 	-- 通信開始
 	access_type = mz3.get_access_type_by_key(serialize_key);
@@ -760,12 +772,23 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 	
 	if serialize_key == 'MIXI_ADD_VOICE' or 
 	   serialize_key == 'MIXI_ADD_VOICE_REPLY' then
+		
+		-- 本文取得
+		local f = io.open(filename, 'r');
+		local file = f:read('*a');
+		f:close();
+		
+--		mz3.logger_debug('file:' .. file);
+		
 		if mz3.is_mixi_logout(serialize_key) then
-			mz3.alert('未ログインです。エコー一覧をリロードし、mixiにログインして下さい。');
+			mz3.alert('未ログインです。みんなのボイスをリロードし、mixiにログインして下さい。');
+			return true;
+		elseif line_has_strings(file, '"status":"OK"')==false then -- <p class="messageAlert">データがありません<br /></p>
+			mz3.alert('投稿に失敗しました');
 			return true;
 		else
 			-- 投稿成功
-			mz3_main_view.set_info_text("エコー書き込み完了");
+			mz3_main_view.set_info_text("つぶやき投稿完了");
 
 			-- クロスポスト
 			if serialize_key == "MIXI_ADD_VOICE" then
