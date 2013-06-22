@@ -220,7 +220,11 @@ int lua_mz3_alert(lua_State *L)
 	CString msg = MyUTF82WCS2(lua_tostring(L, 1));		// ‘æ1ˆø”
 	CString title = MyUTF82WCS2(lua_tostring(L, 2));	// ‘æ2ˆø”
 
-	MessageBox(GetActiveWindow(), msg, title, MB_OK);
+	if (title.IsEmpty()) {
+		title = MZ3_APP_NAME;
+	}
+
+	MessageBox(GetActiveWindow(), msg, title, MB_OK | MB_ICONINFORMATION);
 
 	// –ß‚è’l‚Ì”‚ğ•Ô‚·
 	return 0;
@@ -243,6 +247,10 @@ int lua_mz3_confirm(lua_State *L)
 	CString  title = MyUTF82WCS2(lua_tostring(L, 2));		// ‘æ2ˆø”
 	CStringA type  = lua_tostring(L, 3);					// ‘æ3ˆø”
 
+	if (title.IsEmpty()) {
+		title = MZ3_APP_NAME;
+	}
+
 	UINT uType = MB_YESNO;
 	if (type=="yes_no") {
 		uType = MB_YESNO;
@@ -253,6 +261,7 @@ int lua_mz3_confirm(lua_State *L)
 		lua_error(L);
 		return 0;
 	}
+	uType |= MB_ICONQUESTION;
 
 	int rval = MessageBox(GetActiveWindow(), msg, title, uType);
 	switch (rval) {
