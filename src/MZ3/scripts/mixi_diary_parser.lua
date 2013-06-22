@@ -652,41 +652,42 @@ function mixi_view_diary_parser(data, dummy, html)
 		-- コメント取得
 		i = parseDiaryComment(data, line, i, line_count, html);
 		
-		-- POST URL 解析
-		if line_has_strings(line, '<form', 'comment_form') and
-		   line_has_strings(line, 'add_comment.pl') then
-			-- <form action="add_comment.pl?diary_id=xxx" method="post" name="comment_form">
-			local url = line:match('action="(.-)"');
-			if url~=nil then
-				data:set_text('post_address', url);
-				data:set_text('content_type', "application/x-www-form-urlencoded");
-			end
-
-			-- hidden
-			i = i + 1;
-			while i<line_count do
-				line = html:get_at(i);
-				if line_has_strings(line, '</form>') then
-					break;
-				end
-
-				-- <input type="hidden" name="owner_id" value="85892" />
-				if line_has_strings(line, '<input', 'hidden') then
-					local v = line:match('value="(.-)"');
-					data:set_integer('owner_id', v);
-					break;
-				end
-
-				i = i + 1;
-			end
-			
-			-- この投稿フォームがあったら解析終了
-			break;
-		end
-		
 		i = i + 1;
 	end
 
+	-- 投稿用データ取得
+	for i=10, line_count-1 do
+		line = html:get_at(i);
+		
+		-- "owner_id":"85892"
+		if line_has_strings(line, '"owner_id":"') then
+			data:set_text('owner_id', line:match('"owner_id":"(.-)"'));
+			mz3.logger_debug("owner_id: [" .. data:get_text('owner_id') .. "]");
+		end
+		
+		-- "rpc_post_key":"xx"
+		if line_has_strings(line, '"rpc_post_key":"') then
+			data:set_text('rpc_post_key', line:match('"rpc_post_key":"(.-)"'));
+			mz3.logger_debug("rpc_post_key: [" .. data:get_text('rpc_post_key') .. "]");
+		end
+		
+		-- "diary_id":"1889119399"
+		if line_has_strings(line, '"diary_id":"') then
+			data:set_text('diary_id', line:match('"diary_id":"(.-)"'));
+			mz3.logger_debug("diary_id: [" .. data:get_text('diary_id') .. "]");
+		end
+		
+		-- "login_member_id":"85892"
+		if line_has_strings(line, '"login_member_id":"') then
+			data:set_text('login_member_id', line:match('"login_member_id":"(.-)"'));
+			mz3.logger_debug("login_member_id: [" .. data:get_text('login_member_id') .. "]");
+		end
+		
+		if i > 100 then
+			break;
+		end
+	end
+	
 	local t2 = mz3.get_tick_count();
 	mz3.logger_debug("mixi_view_diary_parser end; elapsed : " .. (t2-t1) .. "[msec]");
 end

@@ -25,6 +25,18 @@ mz3_account_provider.set_param('mixi', 'password_name', 'パスワード');
 
 
 ----------------------------------------
+-- アクセス種別の登録
+----------------------------------------
+
+-- 【日記コメント】
+type = MZ3AccessTypeInfo:create();
+type:set_params({
+  info_type='post', service_type='mixi', key='MIXI_POST_DIARY_COMMENT',
+  short_title='日記コメント', request_method='POST', request_encoding='euc-jp'
+});
+
+
+----------------------------------------
 -- パーサおよびアクセス種別のロード
 ----------------------------------------
 require("scripts\\mixi_parser");
@@ -524,11 +536,17 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	serialize_key = report_item:get_serialize_key();
 	service_type = mz3.get_service_type(serialize_key);
 	if service_type=='mixi' then
+		
+		mz3.logger_debug('on_get_write_view_type_by_report_item_access_type[' .. serialize_key .. ']');
+		
 		if serialize_key=='MIXI_MESSAGE' then
-			-- メッセージ返信の書き込み種別
+			-- メッセージ返信
 			return true, mz3.get_access_type_by_key('MIXI_POST_REPLYMESSAGE_ENTRY');
+		elseif serialize_key=='MIXI_DIARY' then
+			-- 日記コメント返信
+			return true, mz3.get_access_type_by_key('MIXI_POST_DIARY_COMMENT');
 		else
-			-- コメント返信の書き込み種別
+			-- コメント返信
 			return true, mz3.get_access_type_by_key('MIXI_POST_COMMENT_CONFIRM');
 		end
 	end
@@ -536,6 +554,52 @@ function on_get_write_view_type_by_report_item_access_type(event_name, report_it
 	return false;
 end
 mz3.add_event_listener("get_write_view_type_by_report_item_access_type", "mixi.on_get_write_view_type_by_report_item_access_type");
+
+
+--- 書き込み画面の初期化イベント
+--
+-- @param event_name      'init_write_view'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+-- @return [1] ok                  true の場合チェーン終了
+-- @return [2] is_from_main_view   1 の場合メイン画面に戻る、0 の場合レポート画面に戻る
+-- @return [3] init_focus          初期フォーカス
+--                                 'body'  : 本文から開始
+--                                 'title' : タイトルから開始
+-- @return [4] enable_combo_box    1 の場合コンボボックス有効
+-- @return [5] enable_title_change 1 の場合タイトル変更有効
+--
+function on_init_write_view(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	if write_view_key=='MIXI_POST_DIARY_COMMENT' then
+		-- 日記コメント
+		
+		-- タイトル変更：有効化
+		enable_title_change = 0;
+
+		-- タイトルの初期値設定
+		local title = 'Re: ' .. write_item:get_text('title');
+		mz3_write_view.set_text('title_edit', title);
+		
+		-- 公開範囲コンボボックス：無効
+		enable_combo_box = 0;
+		
+		-- フォーカス：本文から開始
+		init_focus = 'body';
+
+		-- キャンセル時、レポート画面に戻る
+		is_from_main_view = 0;
+		
+		return true, is_from_main_view, init_focus, enable_combo_box, enable_title_change;
+	end
+
+	return false;
+end
+mz3.add_event_listener("init_write_view", "mixi.on_init_write_view");
 
 
 --- 書き込み画面で「画像が添付可能なモードか」の判定
@@ -581,6 +645,150 @@ function on_is_enable_write_view_attach_image_mode(event_name, write_view_type, 
 	return false;
 end
 mz3.add_event_listener("is_enable_write_view_attach_image_mode", "mixi.on_is_enable_write_view_attach_image_mode");
+
+
+--- 書き込み画面の書き込みボタン押下イベント
+--
+-- @param event_name      'click_write_view_send_button'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+--
+function on_click_write_view_send_button(event_name, write_view_type, write_item)
+
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type=='mixi' then
+		-- 送信処理
+		
+		local title = mz3_write_view.get_text('title_edit');
+		local body  = mz3_write_view.get_text('body_edit');
+		
+		if body=='' then
+			mz3.alert('メール本文を入力して下さい');
+			return true;
+		end
+		
+		if write_view_key=="MIXI_POST_DIARY_COMMENT" then
+			-- 日記コメント投稿
+			msg = '日記にコメントを投稿します。よろしいですか？' .. "\r\n";
+			msg = msg .. '----' .. "\r\n";
+			msg = msg .. body .. "\r\n";
+			if mz3.confirm(msg, nil, "yes_no") ~= 'yes' then
+				return true;
+			end
+			
+			
+			------------------------------------------
+			-- POST パラメータ生成
+			------------------------------------------
+
+			-- POSTパラメータ生成
+			post = MZ3PostData:create();
+			post:set_content_type('application/json-rpc; charset=UTF-8' .. '\r\n');
+			
+			local diary_owner_id = write_item:get_text('owner_id');
+			local post_key = write_item:get_text('rpc_post_key');
+			local diary_id = write_item:get_text('diary_id');
+			local login_member_id = write_item:get_text('login_member_id');
+			local jsontable = {
+		      jsonrpc="2.0",
+		      method="jp.mixi.diary.comment.create",
+		      params={
+		        body=body,
+		        owner_id=diary_owner_id,
+		        id=diary_id,
+		        viewer_id=login_member_id,
+		      },
+		      id=0
+			};
+			post:append_post_body(json.encode(jsontable));
+--			mz3.logger_debug('json:[' .. json.encode(jsontable) .. ']');
+			
+			-- URL 生成
+			local url = 'http://mixi.jp/system/rpc.json?auth_type=postkey&secret=' .. post_key;
+
+			-- 通信開始
+			access_type = mz3.get_access_type_by_key("MIXI_POST_DIARY_COMMENT");
+			referer = 'http://mixi.jp/' .. write_item:get_text('url');
+--			mz3.alert(write_item:get_text('url'));
+			user_agent = nil;
+			mz3.open_url(mz3_write_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+			
+			return true;
+		end
+	end
+
+	return false;
+end
+mz3.add_event_listener("click_write_view_send_button", "mixi.on_click_write_view_send_button");
+
+
+--- 書き込み画面の書き込み完了イベント
+--
+-- @param event_name      'get_end_write_view'
+-- @param write_view_type 書き込み種別
+-- @param write_item      [MZ3Data] 書き込み画面の要素
+-- @param http_status     HTTP Status Code (200, 404, etc...)
+-- @param filename        レスポンスファイル
+-- @param access_type     通信のアクセス種別
+-- 
+--
+function on_post_end_write_view(event_name, write_view_type, write_item, http_status, filename, access_type)
+	
+	-- CWriteView::OnPostEnd と同様の処理を行う。
+	
+	write_item = MZ3Data:create(write_item);
+	
+	write_view_key = mz3.get_serialize_key_by_access_type(write_view_type);
+	serialize_key = mz3.get_serialize_key_by_access_type(access_type);
+	service_type = mz3.get_service_type(write_view_key);
+	if service_type~='mixi' then
+		return false;
+	end
+
+	-- 返信完了チェック
+	if write_view_key == "MIXI_POST_DIARY_COMMENT" then
+	
+		if http_status~=200 then
+			-- 失敗
+			mz3.logger_error('失敗:' .. http_status);
+			
+			mz3.alert('投稿に失敗しました。');
+		end
+		
+		-- 本文取得
+		local f = io.open(filename, 'r');
+		local file = f:read('*a');
+		f:close();
+		
+		if line_has_strings(file, '"status":"OK"')==false then
+			mz3.alert('投稿に失敗しました');
+			return true;
+		else
+			-- 成功
+			
+			-- メッセージ表示
+			mz3.alert('コメントを投稿しました');
+			
+			-- 初期化
+			mz3_write_view.set_text('title_edit', '');
+			mz3_write_view.set_text('body_edit', '');
+			
+			-- 前の画面に戻る
+			mz3.change_view('report_view');
+			
+			-- リロード
+			mz3_report_view.reload();
+		end
+		
+		return true;
+	end
+	
+	return false;
+end
+mz3.add_event_listener("post_end_write_view", "mixi.on_post_end_write_view");
 
 
 --- 更新ボタン押下イベント
@@ -670,7 +878,7 @@ mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
 function do_reply_voice(text)
 
 	post = MZ3PostData:create();
-	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
+	post:set_content_type('application/json-rpc; charset=UTF-8' .. '\r\n');
 	
 	local echo_member_id = data:get_integer('author_id');
 	local echo_post_time = data:get_text('echo_post_time');
@@ -721,7 +929,7 @@ end
 function do_post_to_echo(text)
 
 	post = MZ3PostData:create();
-	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
+	post:set_content_type('application/json-rpc; charset=UTF-8' .. '\r\n');
 	
 	local owner_id = mixi.owner_id;
 
@@ -794,7 +1002,7 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 		if mz3.is_mixi_logout(serialize_key) then
 			mz3.alert('未ログインです。みんなのボイスをリロードし、mixiにログインして下さい。');
 			return true;
-		elseif line_has_strings(file, '"status":"OK"')==false then -- <p class="messageAlert">データがありません<br /></p>
+		elseif line_has_strings(file, '"status":"OK"')==false then
 			mz3.alert('投稿に失敗しました');
 			return true;
 		else

@@ -4160,6 +4160,20 @@ int lua_mz3_report_view_get_wnd(lua_State *L)
 	return 1;
 }
 
+/*
+--- レポートビューのリロード
+--
+function mz3_report_view.reload();
+*/
+int lua_mz3_report_view_reload(lua_State *L)
+{
+	// 結果をスタックに積む
+	::SendMessage(theApp.m_pReportView->m_hWnd, WM_MZ3_RELOAD, NULL, NULL);
+
+	// 戻り値の数を返す
+	return 0;
+}
+
 
 //-----------------------------------------------
 // MZ3 WriteView API
@@ -4620,6 +4634,7 @@ static const luaL_Reg lua_mz3_main_view_lib[] = {
 };
 static const luaL_Reg lua_mz3_report_view_lib[] = {
 	{"get_wnd",					lua_mz3_report_view_get_wnd},
+	{"reload",					lua_mz3_report_view_reload},
 	{NULL, NULL}
 };
 #ifdef BT_MZ3
