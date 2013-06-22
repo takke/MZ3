@@ -308,6 +308,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#mz3_access_type_info.set_params">mz3_access_type_info.set_params</a>&nbsp;(type, table)</td>
+	<td class="summary">アクセス種別のパラメータの一括設定  </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#mz3_access_type_info.set_request_encoding">mz3_access_type_info.set_request_encoding</a>&nbsp;(type, encoding)</td>
 	<td class="summary">エンコーディングの設定  </td>
 	</tr>
@@ -2289,6 +2294,39 @@ URL エンコードした文字列を返す
 	
 	<li>
 	  info_type: アクセス種別の種別('category', 'body', 'post', 'other')
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+[bool] 成功時は true、失敗時は false 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="mz3_access_type_info.set_params"></a><strong>mz3_access_type_info.set_params</strong>&nbsp;(type, table)</dt>
+<dd>
+アクセス種別のパラメータの一括設定 
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: アクセス種別
+	</li>
+	
+	<li>
+	  table: 各キーにパラメータを設定する(info_type, service_type, key, short_title, request_method, request_encoding)
 	</li>
 	
 </ul>
