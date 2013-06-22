@@ -488,11 +488,12 @@ function mixi_recent_voice_parser(parent, body, html)
 			end
 
 			-- id
-			-- <span class="thumb"><a href="show_friend.pl?id=xx">
-			local author_id = li_tag:match('href="show_friend.pl%?id=([0-9]+)">');
+			-- http://mixi.jp/view_voice.pl?post_time=20130622135002&owner_id=153110
+			local author_id = li_tag:match('http://mixi.jp/view_voice.pl%?.-owner_id=([0-9]+)">');
 			if author_id ~= nil then
 				data:set_integer("author_id", author_id);
 				data:set_integer("id", author_id);
+--				mz3.logger_debug('author_id:' .. author_id);
 			end
 
 			-- 時間

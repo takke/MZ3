@@ -323,7 +323,7 @@ function on_popup_body_menu(event_name, serialize_key, body, wnd)
 	menu:append_menu("string", "全文を読む...", menu_items.mixi_echo_item_read);
 	menu:append_menu("separator");
 	menu:append_menu("string", "つぶやく", menu_items.mixi_echo_update);
---	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
+	menu:append_menu("string", "返信", menu_items.mixi_echo_reply);
 	menu:append_menu("string", body:get_text('name') .. " さんのプロフィール", menu_items.mixi_echo_show_profile);
 	menu:append_menu("separator");
 
@@ -628,10 +628,10 @@ function on_click_update_button(event_name, serialize_key)
 		end
 	elseif serialize_key == 'MIXI_ADD_VOICE_REPLY' then
 		local username = data:get_text('name');
-		msg = 'mixi で ' .. username .. ' さんに返信します。 \n'
-		   .. '---- 発言 ----\n'
+		msg = 'mixi で ' .. username .. ' さんに返信します。 \n\n'
+		   .. '---- コメント ----\n'
 		   .. text .. '\n'
-		   .. '----\n'
+		   .. '----\n\n'
 		   .. 'よろしいですか？';
 		if mz3.confirm(msg, nil, 'yes_no') ~= 'yes' then
 			return true;
@@ -655,62 +655,70 @@ function on_click_update_button(event_name, serialize_key)
 		return true;
 	end
 	
-	
-	post = MZ3PostData:create();
 	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
-		-- body=test&x=36&y=12&parent_member_id=xxx&parent_post_time=20090626110655&redirect=recent_echo&post_key=xxx
-		local echo_member_id = data:get_integer('author_id');
-		local echo_post_time = data:get_text('echo_post_time');
 
-		mz3.logger_debug("text：" .. mz3.url_encode(text, 'euc-jp'));
-		mz3.logger_debug("parent_member_id：" .. echo_member_id);
-		mz3.logger_debug("parent_post_time：" .. echo_post_time);
-
-		if echo_member_id == -1 then
-			mz3.alert('返信先ユーザが不明です');
-			return true;
-		end
-		if echo_post_time == '' then
-			mz3.alert('返信対象POSTの時刻が不明です');
-			return true;
-		end
-		
-		post:append_post_body('body=');
-		post:append_post_body(mz3.url_encode(text, 'euc-jp'));
-		post:append_post_body('&x=28&y=20');
- 		post:append_post_body('&parent_member_id=' .. echo_member_id);
- 		post:append_post_body('&parent_post_time=' .. echo_post_time);
-		post:append_post_body('&redirect=recent_voice');
-		post:append_post_body('&post_key=');
-		post:append_post_body(post_key);
+		-- つぶやき返信
+		do_reply_voice(text);
 	end
-	
-	-- theApp.m_optionMng.m_bAddSourceTextOnTwitterPost の確認
---	if mz3_inifile.get_value('AddSourceTextOnTwitterPost', 'Twitter')=='1' then
---		footer_text = mz3_inifile.get_value('PostFotterText', 'Twitter');
---		post:append_post_body(mz3.url_encode(footer_text, 'utf8'));
---	end
-
-	-- POST先URL設定
-	if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
-		url = 'http://mixi.jp/add_voice.pl';
-		-- url = 'http://mixi.jp/recent_voice.pl?from=home=gadget';
-	end
-	
-	-- 通信開始
-	access_type = mz3.get_access_type_by_key(serialize_key);
-	referer = '';
-	user_agent = nil;
-	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
 
 	return true;
 end
 mz3.add_event_listener("click_update_button", "mixi.on_click_update_button");
 
---- echo に投稿する
-function do_post_to_echo(text)
 
-	serialize_key = 'MIXI_ADD_VOICE'
+-- つぶやき返信
+function do_reply_voice(text)
+
+	post = MZ3PostData:create();
+	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
+	
+	local echo_member_id = data:get_integer('author_id');
+	local echo_post_time = data:get_text('echo_post_time');
+
+	mz3.logger_debug("text：" .. mz3.url_encode(text, 'euc-jp'));
+	mz3.logger_debug("parent_member_id：" .. echo_member_id);
+	mz3.logger_debug("parent_post_time：" .. echo_post_time);
+
+	if echo_member_id == -1 then
+		mz3.alert('返信先ユーザが不明です');
+		return true;
+	end
+	if echo_post_time == '' then
+		mz3.alert('返信対象POSTの時刻が不明です');
+		return true;
+	end
+	
+	local owner_id = mixi.owner_id;
+	
+	local jsontable = {
+      jsonrpc="2.0",
+      method="jp.mixi.voice.comment.create",
+      params={
+        owner_id=owner_id,
+        id=echo_post_time,
+        viewer_id=owner_id,
+        body=text
+      },
+      id=0
+	};
+	post:append_post_body(json.encode(jsontable));
+	
+	-- POST先URL設定
+	local post_key = mixi.post_key;
+--	mz3.logger_debug(post_key);
+	url = 'http://mixi.jp/system/rpc.json?auth_type=postkey&secret=' .. post_key;
+	
+	-- 通信開始
+	serialize_key = 'MIXI_ADD_VOICE_REPLY';
+	access_type = mz3.get_access_type_by_key(serialize_key);
+	referer = '';
+	user_agent = nil;
+	mz3.open_url(mz3_main_view.get_wnd(), access_type, url, referer, "text", user_agent, post.post_data);
+end
+
+
+--- つぶやきを投稿する
+function do_post_to_echo(text)
 
 	post = MZ3PostData:create();
 	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
@@ -746,6 +754,7 @@ function do_post_to_echo(text)
 	url = 'http://mixi.jp/system/rpc.json?auth_type=postkey&secret=' .. post_key;
 	
 	-- 通信開始
+	serialize_key = 'MIXI_ADD_VOICE';
 	access_type = mz3.get_access_type_by_key(serialize_key);
 	referer = '';
 	user_agent = nil;
@@ -790,7 +799,12 @@ function on_post_end(event_name, serialize_key, http_status, filename)
 			return true;
 		else
 			-- 投稿成功
-			mz3_main_view.set_info_text("つぶやき投稿完了");
+			if serialize_key == 'MIXI_ADD_VOICE' then
+				mz3_main_view.set_info_text("つぶやき投稿完了");
+			end
+			if serialize_key == 'MIXI_ADD_VOICE_REPLY' then
+				mz3_main_view.set_info_text("つぶやき返信完了");
+			end
 
 			-- クロスポスト
 			if serialize_key == "MIXI_ADD_VOICE" then
