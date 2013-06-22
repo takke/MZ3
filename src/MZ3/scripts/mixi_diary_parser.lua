@@ -717,7 +717,6 @@ function parseDiaryComment(data, line, i, line_count, html)
 				ret1, ret2 = line:find('<li>');
 				if ret1 == 0 then
 					child:clear();
-					child:add_body_with_extract('<br>');
 				end
 			end
 
@@ -754,6 +753,7 @@ function parseDiaryComment(data, line, i, line_count, html)
 				if line_has_strings(line, '<dd>', '</dd>') then
 					-- コメント1行
 					line = line:match('<dd>(.-)</dd>');
+					child:add_body_with_extract('<br>');
 					child:add_body_with_extract(line);
 				else
 					-- コメント複数行
@@ -771,6 +771,7 @@ function parseDiaryComment(data, line, i, line_count, html)
 
 					line = line_comment:match('<dd>(.-)</dd>');
 
+					child:add_body_with_extract('<br>');
 					child:add_body_with_extract(line);
 				end
 			end
