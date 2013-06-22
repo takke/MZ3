@@ -427,6 +427,19 @@ function mixi_recent_voice_parser(parent, body, html)
 			break;
 		end
 	end
+	
+	-- owner_id 探索
+	mixi.owner_id = '';
+	for i=10, line_count-1 do
+		line = html:get_at(i);
+		
+		-- "owner_id":"85892"
+		if line_has_strings(line, '"owner_id":"') then
+			mixi.owner_id = line:match('"owner_id":"(.-)"');
+			mz3.logger_debug("owner_id: [" .. mixi.owner_id .. "]");
+			break;
+		end
+	end
 
 	-- 複数行に分かれているので1行に結合
 	local line = html:get_all_text();

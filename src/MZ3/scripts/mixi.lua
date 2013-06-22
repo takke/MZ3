@@ -714,14 +714,16 @@ function do_post_to_echo(text)
 
 	post = MZ3PostData:create();
 	post:set_content_type('	application/json-rpc; charset=UTF-8' .. '\r\n');
+	
+	local owner_id = mixi.owner_id;
 
 	local jsontable = {
       jsonrpc="2.0",
       method="jp.mixi.voice.create",
       params={
-        viewer_id="85892",
-        owner_id="85892",
-        body=mz3.url_encode(text, 'euc-jp'),
+        viewer_id=owner_id,
+        owner_id=owner_id,
+        body=text,
         twitter_sync=0,
         privacy={name="public"},
         via=18,
