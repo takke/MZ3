@@ -470,6 +470,7 @@ function mixi_recent_voice_parser(parent, body, html)
 				local comment = voiced:match('<p>(.-)</p');
 				comment = comment:gsub("\n", '');
 				comment = comment:gsub('<a.->.-</a>', '');
+				comment = comment:gsub('<cite.->.-</cite>', '');
 				data:add_body_with_extract(comment .. "\r\n");
 			end
 
