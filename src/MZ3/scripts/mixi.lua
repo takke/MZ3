@@ -228,6 +228,26 @@ function on_body_list_click(serialize_key, event_name, data)
 		return on_mixi_echo_read_menu_item(serialize_key, event_name, data);
 	end
 	
+	if serialize_key=="MIXI_MESSAGE" then
+		data = MZ3Data:create(data);
+		
+		local url = data:get_text('url');
+		url = complement_mixi_url(url);
+		mz3.logger_debug('message: url[' .. url .. ']');
+		
+		-- 公式メッセージならレポートビューで開く
+		-- (mixi_view_message_parser でパースされる)
+		if line_has_strings(url, '&box=noticebox') then
+			return false;
+		end
+		
+		-- 受信箱、送信箱はレポートビューで表示できない(LINE風表示になったのでパース仕切れない)
+		-- ので、ブラウザで開く
+		mz3.open_url_by_browser(url);
+	
+		return true;
+	end
+	
 	-- 標準の処理を続行
 	return false;
 end
