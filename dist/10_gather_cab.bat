@@ -27,9 +27,9 @@
 @set cab_to=.\MZ3Plus.%MZ3_VERSION%.CAB
 
 :----- CAB ファイルの収集 -----
-@echo ■ src ファイルを収集します
-@echo %cab_from% ⇒ %cab_to%
-@copy %cab_from% %cab_to%
+:@echo ■ src ファイルを収集します
+:@echo %cab_from% ⇒ %cab_to%
+:@copy %cab_from% %cab_to%
 
 
 :
