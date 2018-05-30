@@ -13,4 +13,4 @@ http://mz3.jp
 
 ライセンス
 ----------
-see [license.en.txt](MZ3/blob/master/license.en.txt) or [license.jp.txt](MZ3/blob/master/license.jp.txt)
+see [license.en.txt](license.en.txt) or [license.jp.txt](license.jp.txt)
